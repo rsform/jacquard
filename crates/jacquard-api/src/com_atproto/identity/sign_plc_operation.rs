@@ -10,14 +10,17 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SignPlcOperation<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub also_known_as: Option<Vec<S>>,
@@ -34,9 +37,11 @@ pub struct SignPlcOperation<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SignPlcOperationOutput<S: BosStr = DefaultStr> {
     ///A signed DID PLC operation.
     pub operation: Data<S>,
@@ -55,9 +60,8 @@ impl jacquard_common::xrpc::XrpcResp for SignPlcOperationResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SignPlcOperation<S> {
     const NSID: &'static str = "com.atproto.identity.signPlcOperation";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = SignPlcOperationResponse;
 }
 
@@ -65,9 +69,8 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SignPlcOperation<S> {
 pub struct SignPlcOperationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SignPlcOperationRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.signPlcOperation";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = SignPlcOperation<S>;
     type Response = SignPlcOperationResponse;
 }

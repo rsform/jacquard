@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,13 +20,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::network_slices::slice::get_sync_summary;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::network_slices::slice::get_sync_summary;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CollectionSummary<S: BosStr = DefaultStr> {
     pub collection: S,
     pub estimated_repos: i64,
@@ -35,9 +38,11 @@ pub struct CollectionSummary<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetSyncSummary<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collections: Option<Vec<S>>,
@@ -48,9 +53,11 @@ pub struct GetSyncSummary<S: BosStr = DefaultStr> {
     pub slice: S,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetSyncSummaryOutput<S: BosStr = DefaultStr> {
     ///The actual limit applied (user-specified or default)
     pub applied_limit: i64,
@@ -106,7 +113,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSyncSummaryRequest {
 
 pub mod collection_summary_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -261,10 +268,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CollectionSummary<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CollectionSummary<S> {
         CollectionSummary {
             collection: self._fields.0.unwrap(),
             estimated_repos: self._fields.1.unwrap(),
@@ -275,10 +279,10 @@ where
 }
 
 fn lexicon_doc_network_slices_slice_getSyncSummary() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.slice.getSyncSummary"),
@@ -287,19 +291,19 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("collectionSummary"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("collection"),
-                            SmolStr::new_static("estimatedRepos"),
-                            SmolStr::new_static("isExternal")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("collection"),
+                        SmolStr::new_static("estimatedRepos"),
+                        SmolStr::new_static("isExternal"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("collection"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("estimatedRepos"),
@@ -321,53 +325,51 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("slice")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("collections"),
-                                    LexXrpcParametersProperty::Array(LexPrimitiveArray {
-                                        items: LexPrimitiveArrayItem::String(LexString {
-                                            ..Default::default()
-                                        }),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("slice")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("collections"),
+                                LexXrpcParametersProperty::Array(LexPrimitiveArray {
+                                    items: LexPrimitiveArrayItem::String(LexString {
                                         ..Default::default()
                                     }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("externalCollections"),
-                                    LexXrpcParametersProperty::Array(LexPrimitiveArray {
-                                        items: LexPrimitiveArrayItem::String(LexString {
-                                            ..Default::default()
-                                        }),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("externalCollections"),
+                                LexXrpcParametersProperty::Array(LexPrimitiveArray {
+                                    items: LexPrimitiveArrayItem::String(LexString {
                                         ..Default::default()
                                     }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("repos"),
-                                    LexXrpcParametersProperty::Array(LexPrimitiveArray {
-                                        items: LexPrimitiveArrayItem::String(LexString {
-                                            ..Default::default()
-                                        }),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("repos"),
+                                LexXrpcParametersProperty::Array(LexPrimitiveArray {
+                                    items: LexPrimitiveArrayItem::String(LexString {
                                         ..Default::default()
                                     }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("slice"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static("URI of the slice to sync"),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("slice"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "URI of the slice to sync",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
@@ -379,7 +381,7 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> LexiconDoc<'static> {
 
 pub mod get_sync_summary_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

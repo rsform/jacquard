@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,11 +26,11 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::dev_tsunagite::difficulty::Difficulty;
 use crate::dev_tsunagite::types::TypedRef;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A chart included in a game hosting leaderboards via Tsunagite.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -61,7 +61,6 @@ pub struct Chart<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -143,31 +142,25 @@ impl<S: BosStr> LexiconSchema for Chart<S> {
         if let Some(ref value) = self.jacket {
             {
                 let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &[
-                    "image/png",
-                    "image/jpeg",
-                    "image/jxl",
-                    "image/webp",
-                ];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let accepted: &[&str] = &["image/png", "image/jpeg", "image/jxl", "image/webp"];
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("jacket"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/jxl".to_string(), "image/webp".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/jxl".to_string(),
+                            "image/webp".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -180,7 +173,7 @@ impl<S: BosStr> LexiconSchema for Chart<S> {
 
 pub mod chart_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -310,10 +303,7 @@ where
     St::Game: chart_state::IsUnset,
 {
     /// Set the `game` field (required)
-    pub fn game(
-        mut self,
-        value: impl Into<AtUri<S>>,
-    ) -> ChartBuilder<S, chart_state::SetGame<St>> {
+    pub fn game(mut self, value: impl Into<AtUri<S>>) -> ChartBuilder<S, chart_state::SetGame<St>> {
         self._fields.1 = Option::Some(value.into());
         ChartBuilder {
             _state: PhantomData,
@@ -368,10 +358,7 @@ where
     St::Rating: chart_state::IsUnset,
 {
     /// Set the `rating` field (required)
-    pub fn rating(
-        mut self,
-        value: impl Into<S>,
-    ) -> ChartBuilder<S, chart_state::SetRating<St>> {
+    pub fn rating(mut self, value: impl Into<S>) -> ChartBuilder<S, chart_state::SetRating<St>> {
         self._fields.5 = Option::Some(value.into());
         ChartBuilder {
             _state: PhantomData,
@@ -387,10 +374,7 @@ where
     St::Song: chart_state::IsUnset,
 {
     /// Set the `song` field (required)
-    pub fn song(
-        mut self,
-        value: impl Into<AtUri<S>>,
-    ) -> ChartBuilder<S, chart_state::SetSong<St>> {
+    pub fn song(mut self, value: impl Into<AtUri<S>>) -> ChartBuilder<S, chart_state::SetSong<St>> {
         self._fields.6 = Option::Some(value.into());
         ChartBuilder {
             _state: PhantomData,
@@ -437,10 +421,10 @@ where
 }
 
 fn lexicon_doc_dev_tsunagite_chart() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.tsunagite.chart"),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,15 +25,18 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::blue_backyard::feed::post;
+use crate::blue_backyard::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::blue_backyard::richtext::facet::Facet;
-use crate::blue_backyard::feed::post;
+use serde::{Deserialize, Serialize};
 /// Width and height of the media, used for layout before the blob is loaded.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -44,7 +47,10 @@ pub struct AspectRatio<S: BosStr = DefaultStr> {
 /// An inline URL embed (link preview).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct EmbedBlock<S: BosStr = DefaultStr> {
     ///The URL to embed as a link preview.
     pub url: UriValue<S>,
@@ -55,7 +61,10 @@ pub struct EmbedBlock<S: BosStr = DefaultStr> {
 /// An inline image or video.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ImageBlock<S: BosStr = DefaultStr> {
     ///Alt text description for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -92,7 +101,6 @@ pub struct Post<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -119,7 +127,10 @@ pub struct PostGetRecordOutput<S: BosStr = DefaultStr> {
 /// A block of rich text content.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TextBlock<S: BosStr = DefaultStr> {
     ///Annotations of text (mentions, URLs, hashtags, formatting).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -245,27 +256,27 @@ impl<S: BosStr> LexiconSchema for ImageBlock<S> {
                     "video/mp4",
                     "video/webm",
                 ];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/gif".to_string(), "image/webp".to_string(),
-                            "image/avif".to_string(), "video/mp4".to_string(),
-                            "video/webm".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/gif".to_string(),
+                            "image/webp".to_string(),
+                            "image/avif".to_string(),
+                            "video/mp4".to_string(),
+                            "video/webm".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -412,7 +423,7 @@ impl<S: BosStr> LexiconSchema for TextBlock<S> {
 
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -532,10 +543,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AspectRatio<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -545,10 +553,10 @@ where
 }
 
 fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.backyard.feed.post"),
@@ -557,14 +565,13 @@ fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("aspectRatio"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Width and height of the media, used for layout before the blob is loaded.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Width and height of the media, used for layout before the blob is loaded.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("width"),
+                        SmolStr::new_static("height"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -590,9 +597,7 @@ fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("embedBlock"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("An inline URL embed (link preview)."),
-                    ),
+                    description: Some(CowStr::new_static("An inline URL embed (link preview).")),
                     required: Some(vec![SmolStr::new_static("url")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -600,9 +605,9 @@ fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URL to embed as a link preview."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URL to embed as a link preview.",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -751,9 +756,7 @@ fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("textBlock"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A block of rich text content."),
-                    ),
+                    description: Some(CowStr::new_static("A block of rich text content.")),
                     required: Some(vec![SmolStr::new_static("text")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -761,11 +764,9 @@ fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Annotations of text (mentions, URLs, hashtags, formatting).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Annotations of text (mentions, URLs, hashtags, formatting).",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("blue.backyard.richtext.facet"),
                                     ..Default::default()
@@ -776,9 +777,9 @@ fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The text content of this block."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The text content of this block.",
+                                )),
                                 max_length: Some(30000usize),
                                 max_graphemes: Some(3000usize),
                                 ..Default::default()
@@ -797,7 +798,7 @@ fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
 
 pub mod embed_block_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -884,10 +885,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> EmbedBlock<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EmbedBlock<S> {
         EmbedBlock {
             url: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -897,7 +895,7 @@ where
 
 pub mod image_block_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -942,7 +940,12 @@ pub mod image_block_state {
 /// Builder for constructing an instance of this type.
 pub struct ImageBlockBuilder<S: BosStr, St: image_block_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<post::AspectRatio<S>>, Option<BlobRef<S>>, Option<S>),
+    _fields: (
+        Option<S>,
+        Option<post::AspectRatio<S>>,
+        Option<BlobRef<S>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -979,10 +982,7 @@ impl<S: BosStr, St: image_block_state::State> ImageBlockBuilder<S, St> {
 
 impl<S: BosStr, St: image_block_state::State> ImageBlockBuilder<S, St> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(
-        mut self,
-        value: impl Into<Option<post::AspectRatio<S>>>,
-    ) -> Self {
+    pub fn aspect_ratio(mut self, value: impl Into<Option<post::AspectRatio<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -1048,10 +1048,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ImageBlock<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ImageBlock<S> {
         ImageBlock {
             alt: self._fields.0,
             aspect_ratio: self._fields.1,
@@ -1064,7 +1061,7 @@ where
 
 pub mod post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

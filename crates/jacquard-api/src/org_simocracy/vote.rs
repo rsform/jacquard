@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
+use serde::{Deserialize, Serialize};
 /// A quadratic vote allocation targeting a sim.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -109,7 +109,7 @@ impl<S: BosStr> LexiconSchema for Vote<S> {
 
 pub mod vote_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -215,10 +215,7 @@ where
     St::Sim: vote_state::IsUnset,
 {
     /// Set the `sim` field (required)
-    pub fn sim(
-        mut self,
-        value: impl Into<StrongRef<S>>,
-    ) -> VoteBuilder<S, vote_state::SetSim<St>> {
+    pub fn sim(mut self, value: impl Into<StrongRef<S>>) -> VoteBuilder<S, vote_state::SetSim<St>> {
         self._fields.1 = Option::Some(value.into());
         VoteBuilder {
             _state: PhantomData,
@@ -234,10 +231,7 @@ where
     St::Votes: vote_state::IsUnset,
 {
     /// Set the `votes` field (required)
-    pub fn votes(
-        mut self,
-        value: impl Into<i64>,
-    ) -> VoteBuilder<S, vote_state::SetVotes<St>> {
+    pub fn votes(mut self, value: impl Into<i64>) -> VoteBuilder<S, vote_state::SetVotes<St>> {
         self._fields.2 = Option::Some(value.into());
         VoteBuilder {
             _state: PhantomData,
@@ -275,10 +269,10 @@ where
 }
 
 fn lexicon_doc_org_simocracy_vote() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.simocracy.vote"),
@@ -287,28 +281,25 @@ fn lexicon_doc_org_simocracy_vote() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A quadratic vote allocation targeting a sim.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A quadratic vote allocation targeting a sim.",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("sim"), SmolStr::new_static("votes"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("sim"),
+                            SmolStr::new_static("votes"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Timestamp when the vote was cast"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp when the vote was cast",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

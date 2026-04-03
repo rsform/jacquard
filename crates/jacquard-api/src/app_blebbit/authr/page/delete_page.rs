@@ -10,14 +10,17 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeletePageParams<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
@@ -38,9 +41,8 @@ impl jacquard_common::xrpc::XrpcResp for DeletePageResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for DeletePage {
     const NSID: &'static str = "app.blebbit.authr.page.deletePage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeletePageResponse;
 }
 
@@ -48,16 +50,15 @@ impl jacquard_common::xrpc::XrpcRequest for DeletePage {
 pub struct DeletePageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeletePageRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.page.deletePage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = DeletePage;
     type Response = DeletePageResponse;
 }
 
 pub mod delete_page_params_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -118,8 +119,6 @@ where
 {
     /// Build the final struct.
     pub fn build(self) -> DeletePageParams<S> {
-        DeletePageParams {
-            id: self._fields.0,
-        }
+        DeletePageParams { id: self._fields.0 }
     }
 }

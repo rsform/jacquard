@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,11 +25,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::ai_syui::log::chat;
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::ai_syui::log::chat;
+use serde::{Deserialize, Serialize};
 /// Record containing a chat message. Compatible with site.standard.document.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -100,7 +100,10 @@ pub struct ChatGetRecordOutput<S: BosStr = DefaultStr> {
 /// Markdown content format.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Markdown<S: BosStr = DefaultStr> {
     ///Markdown text content.
     pub text: S,
@@ -111,7 +114,10 @@ pub struct Markdown<S: BosStr = DefaultStr> {
 /// A translation of a chat message.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Translation<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<S>,
@@ -124,7 +130,10 @@ pub struct Translation<S: BosStr = DefaultStr> {
 /// Map of language codes to translations.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TranslationMap<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub en: Option<chat::Translation<S>>,
@@ -194,19 +203,16 @@ impl<S: BosStr> LexiconSchema for Chat<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("cover_image"),
@@ -391,7 +397,7 @@ impl<S: BosStr> LexiconSchema for TranslationMap<S> {
 
 pub mod chat_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -483,20 +489,7 @@ impl<S: BosStr> ChatBuilder<S, chat_state::Empty> {
         ChatBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _type: PhantomData,
@@ -678,10 +671,7 @@ where
     St::Title: chat_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> ChatBuilder<S, chat_state::SetTitle<St>> {
+    pub fn title(mut self, value: impl Into<S>) -> ChatBuilder<S, chat_state::SetTitle<St>> {
         self._fields.12 = Option::Some(value.into());
         ChatBuilder {
             _state: PhantomData,
@@ -693,10 +683,7 @@ where
 
 impl<S: BosStr, St: chat_state::State> ChatBuilder<S, St> {
     /// Set the `translations` field (optional)
-    pub fn translations(
-        mut self,
-        value: impl Into<Option<chat::TranslationMap<S>>>,
-    ) -> Self {
+    pub fn translations(mut self, value: impl Into<Option<chat::TranslationMap<S>>>) -> Self {
         self._fields.13 = value.into();
         self
     }
@@ -772,10 +759,10 @@ where
 }
 
 fn lexicon_doc_ai_syui_log_chat() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ai.syui.log.chat"),
@@ -983,9 +970,7 @@ fn lexicon_doc_ai_syui_log_chat() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Markdown text content."),
-                                ),
+                                description: Some(CowStr::new_static("Markdown text content.")),
                                 max_length: Some(1000000usize),
                                 max_graphemes: Some(100000usize),
                                 ..Default::default()
@@ -999,9 +984,7 @@ fn lexicon_doc_ai_syui_log_chat() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("translation"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A translation of a chat message."),
-                    ),
+                    description: Some(CowStr::new_static("A translation of a chat message.")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1029,9 +1012,7 @@ fn lexicon_doc_ai_syui_log_chat() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("translationMap"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Map of language codes to translations."),
-                    ),
+                    description: Some(CowStr::new_static("Map of language codes to translations.")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

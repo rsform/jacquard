@@ -13,13 +13,12 @@ pub mod list_webhooks;
 pub mod settings;
 pub mod update_webhook;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,13 +29,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::place_stream::server;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::place_stream::server;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RewriteRule<S: BosStr = DefaultStr> {
     ///Text to search for and replace.
     pub from: S,
@@ -49,7 +51,10 @@ pub struct RewriteRule<S: BosStr = DefaultStr> {
 /// A webhook configuration for receiving Streamplace events.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Webhook<S: BosStr = DefaultStr> {
     ///Whether this webhook is currently active.
     pub active: bool,
@@ -196,10 +201,10 @@ impl<S: BosStr> LexiconSchema for Webhook<S> {
 }
 
 fn lexicon_doc_place_stream_server_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.server.defs"),
@@ -208,18 +213,16 @@ fn lexicon_doc_place_stream_server_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("rewriteRule"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("from"), SmolStr::new_static("to")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("from"), SmolStr::new_static("to")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("from"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Text to search for and replace."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Text to search for and replace.",
+                                )),
                                 min_length: Some(1usize),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -228,9 +231,7 @@ fn lexicon_doc_place_stream_server_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("to"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Text to replace with."),
-                                ),
+                                description: Some(CowStr::new_static("Text to replace with.")),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -420,7 +421,7 @@ fn lexicon_doc_place_stream_server_defs() -> LexiconDoc<'static> {
 
 pub mod webhook_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -545,20 +546,7 @@ impl<S: BosStr> WebhookBuilder<S, webhook_state::Empty> {
         WebhookBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -654,10 +642,7 @@ where
     St::Id: webhook_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(
-        mut self,
-        value: impl Into<S>,
-    ) -> WebhookBuilder<S, webhook_state::SetId<St>> {
+    pub fn id(mut self, value: impl Into<S>) -> WebhookBuilder<S, webhook_state::SetId<St>> {
         self._fields.5 = Option::Some(value.into());
         WebhookBuilder {
             _state: PhantomData,
@@ -721,10 +706,7 @@ impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
 
 impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
     /// Set the `rewrite` field (optional)
-    pub fn rewrite(
-        mut self,
-        value: impl Into<Option<Vec<server::RewriteRule<S>>>>,
-    ) -> Self {
+    pub fn rewrite(mut self, value: impl Into<Option<Vec<server::RewriteRule<S>>>>) -> Self {
         self._fields.10 = value.into();
         self
     }

@@ -8,25 +8,30 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::chat_bsky::convo::ConvoView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::chat_bsky::convo::ConvoView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetConvoAvailability<S: BosStr = DefaultStr> {
     pub members: Vec<Did<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetConvoAvailabilityOutput<S: BosStr = DefaultStr> {
     pub can_chat: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -61,7 +66,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetConvoAvailabilityRequest {
 
 pub mod get_convo_availability_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -92,10 +97,7 @@ pub mod get_convo_availability_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetConvoAvailabilityBuilder<
-    S: BosStr,
-    St: get_convo_availability_state::State,
-> {
+pub struct GetConvoAvailabilityBuilder<S: BosStr, St: get_convo_availability_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Did<S>>>,),
     _type: PhantomData<fn() -> S>,

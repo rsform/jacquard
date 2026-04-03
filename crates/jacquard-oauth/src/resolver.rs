@@ -837,7 +837,10 @@ where
     let schema = resolver.resolve_lexicon_schema(nsid).await?;
 
     // 2. Extract the "main" def from the LexiconDoc.
-    let main_def = schema.doc.defs.get("main")
+    let main_def = schema
+        .doc
+        .defs
+        .get("main")
         .ok_or_else(|| ResolverError::not_found())?;
 
     // 3. Downcast to LexPermissionSet.
@@ -847,17 +850,19 @@ where
     };
 
     // 4. Validate namespace constraints.
-    perm_set.validate(nsid.as_ref())
-        .map_err(|e| match e {
-            PermissionSetError::EmptyPermissions => {
-                ResolverError::permission_set_conversion("permission set has empty permissions array")
-            }
-            PermissionSetError::NamespaceViolation { nsid: n, resource: r } => {
-                ResolverError::permission_set_namespace(
-                    smol_str::format_smolstr!("{} references out-of-namespace resource: {}", n, r)
-                )
-            }
-        })?;
+    perm_set.validate(nsid.as_ref()).map_err(|e| match e {
+        PermissionSetError::EmptyPermissions => {
+            ResolverError::permission_set_conversion("permission set has empty permissions array")
+        }
+        PermissionSetError::NamespaceViolation {
+            nsid: n,
+            resource: r,
+        } => ResolverError::permission_set_namespace(smol_str::format_smolstr!(
+            "{} references out-of-namespace resource: {}",
+            n,
+            r
+        )),
+    })?;
 
     // 5. Expand to concrete scopes, passing inherited audience for inheritAud.
     crate::scopes::expand_permission_set(perm_set, inherited_audience)
@@ -1024,8 +1029,8 @@ mod tests {
     async fn test_expand_permission_set_exported() {
         // This is a simple integration test that verifies expand_permission_set is accessible
         use crate::scopes::expand_permission_set;
-        use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource, LexPermissionSet};
         use jacquard_common::CowStr;
+        use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource, LexPermissionSet};
 
         let mut perms = Vec::new();
         perms.push(LexPermission::Permission {
@@ -1044,6 +1049,9 @@ mod tests {
 
         let scopes = expand_permission_set(&perm_set, None).expect("should expand permission set");
         assert_eq!(scopes.len(), 1);
-        assert!(matches!(scopes[0], crate::scopes::Scope::Identity(crate::scopes::IdentityScope::Handle)));
+        assert!(matches!(
+            scopes[0],
+            crate::scopes::Scope::Identity(crate::scopes::IdentityScope::Handle)
+        ));
     }
 }

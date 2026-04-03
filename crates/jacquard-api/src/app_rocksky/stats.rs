@@ -7,7 +7,6 @@
 
 pub mod get_stats;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
@@ -22,10 +21,13 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StatsView<S: BosStr = DefaultStr> {
     ///The total number of unique albums scrobbled.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -62,10 +64,10 @@ impl<S: BosStr> LexiconSchema for StatsView<S> {
 }
 
 fn lexicon_doc_app_rocksky_stats_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.stats.defs"),

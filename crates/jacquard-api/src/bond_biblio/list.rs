@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::bond_biblio::BookRequirement;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::bond_biblio::BookRequirement;
+use serde::{Deserialize, Serialize};
 /// A reading list curated by a librarian
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -162,7 +162,7 @@ impl<S: BosStr> LexiconSchema for List<S> {
 
 pub mod list_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -379,10 +379,7 @@ where
     St::Title: list_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> ListBuilder<S, list_state::SetTitle<St>> {
+    pub fn title(mut self, value: impl Into<S>) -> ListBuilder<S, list_state::SetTitle<St>> {
         self._fields.5 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -428,10 +425,10 @@ where
 }
 
 fn lexicon_doc_bond_biblio_list() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("bond.biblio.list"),
@@ -440,31 +437,25 @@ fn lexicon_doc_bond_biblio_list() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A reading list curated by a librarian"),
-                    ),
+                    description: Some(CowStr::new_static("A reading list curated by a librarian")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("title"),
-                                SmolStr::new_static("librarians"),
-                                SmolStr::new_static("books"),
-                                SmolStr::new_static("duedate"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("title"),
+                            SmolStr::new_static("librarians"),
+                            SmolStr::new_static("books"),
+                            SmolStr::new_static("duedate"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("books"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Required books for this reading challenge",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Required books for this reading challenge",
+                                    )),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static(
                                             "bond.biblio.defs#bookRequirement",
@@ -477,9 +468,9 @@ fn lexicon_doc_bond_biblio_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("When this list was created"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "When this list was created",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -487,9 +478,9 @@ fn lexicon_doc_bond_biblio_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Description of the reading challenge"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Description of the reading challenge",
+                                    )),
                                     max_length: Some(2000usize),
                                     max_graphemes: Some(1000usize),
                                     ..Default::default()
@@ -498,11 +489,9 @@ fn lexicon_doc_bond_biblio_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("duedate"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Deadline for completing the reading challenge",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Deadline for completing the reading challenge",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -510,11 +499,9 @@ fn lexicon_doc_bond_biblio_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("librarians"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "DIDs of users who can issue stamps for this list",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "DIDs of users who can issue stamps for this list",
+                                    )),
                                     items: LexArrayItem::String(LexString {
                                         format: Some(LexStringFormat::Did),
                                         ..Default::default()
@@ -525,9 +512,9 @@ fn lexicon_doc_bond_biblio_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("title"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Display name for the reading list"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Display name for the reading list",
+                                    )),
                                     max_length: Some(200usize),
                                     max_graphemes: Some(100usize),
                                     ..Default::default()

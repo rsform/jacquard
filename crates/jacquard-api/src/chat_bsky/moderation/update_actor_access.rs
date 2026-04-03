@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateActorAccess<S: BosStr = DefaultStr> {
     pub actor: Did<S>,
     pub allow_access: bool,
@@ -39,9 +42,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateActorAccessResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateActorAccess<S> {
     const NSID: &'static str = "chat.bsky.moderation.updateActorAccess";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateActorAccessResponse;
 }
 
@@ -49,16 +51,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateActorAccess<S> {
 pub struct UpdateActorAccessRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateActorAccessRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.moderation.updateActorAccess";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = UpdateActorAccess<S>;
     type Response = UpdateActorAccessResponse;
 }
 
 pub mod update_actor_access_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -192,10 +193,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> UpdateActorAccess<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateActorAccess<S> {
         UpdateActorAccess {
             actor: self._fields.0.unwrap(),
             allow_access: self._fields.1.unwrap(),

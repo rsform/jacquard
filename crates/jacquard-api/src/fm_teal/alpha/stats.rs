@@ -11,13 +11,12 @@ pub mod get_top_releases;
 pub mod get_user_top_artists;
 pub mod get_user_top_releases;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,10 +28,13 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ArtistView<S: BosStr = DefaultStr> {
     ///MusicBrainz artist ID
     pub mbid: S,
@@ -44,9 +46,11 @@ pub struct ArtistView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RecordingView<S: BosStr = DefaultStr> {
     ///MusicBrainz recording ID
     pub mbid: S,
@@ -58,9 +62,11 @@ pub struct RecordingView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReleaseView<S: BosStr = DefaultStr> {
     ///MusicBrainz release ID
     pub mbid: S,
@@ -119,7 +125,7 @@ impl<S: BosStr> LexiconSchema for ReleaseView<S> {
 
 pub mod artist_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -274,10 +280,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ArtistView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ArtistView<S> {
         ArtistView {
             mbid: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -288,10 +291,10 @@ where
 }
 
 fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fm.teal.alpha.stats.defs"),
@@ -300,21 +303,18 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("artistView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("mbid"), SmolStr::new_static("name"),
-                            SmolStr::new_static("playCount")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("mbid"),
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("playCount"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("mbid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("MusicBrainz artist ID"),
-                                ),
+                                description: Some(CowStr::new_static("MusicBrainz artist ID")),
                                 ..Default::default()
                             }),
                         );
@@ -339,30 +339,25 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("recordingView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("mbid"), SmolStr::new_static("name"),
-                            SmolStr::new_static("playCount")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("mbid"),
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("playCount"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("mbid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("MusicBrainz recording ID"),
-                                ),
+                                description: Some(CowStr::new_static("MusicBrainz recording ID")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Recording/track name"),
-                                ),
+                                description: Some(CowStr::new_static("Recording/track name")),
                                 ..Default::default()
                             }),
                         );
@@ -380,21 +375,18 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("releaseView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("mbid"), SmolStr::new_static("name"),
-                            SmolStr::new_static("playCount")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("mbid"),
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("playCount"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("mbid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("MusicBrainz release ID"),
-                                ),
+                                description: Some(CowStr::new_static("MusicBrainz release ID")),
                                 ..Default::default()
                             }),
                         );
@@ -424,7 +416,7 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
 
 pub mod recording_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -579,10 +571,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RecordingView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordingView<S> {
         RecordingView {
             mbid: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -594,7 +583,7 @@ where
 
 pub mod release_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -749,10 +738,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ReleaseView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReleaseView<S> {
         ReleaseView {
             mbid: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

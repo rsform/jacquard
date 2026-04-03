@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A vote on a poll. Lives in the voter's repo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -119,7 +119,7 @@ impl<S: BosStr> LexiconSchema for Vote<S> {
 
 pub mod vote_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -225,10 +225,7 @@ where
     St::Poll: vote_state::IsUnset,
 {
     /// Set the `poll` field (required)
-    pub fn poll(
-        mut self,
-        value: impl Into<AtUri<S>>,
-    ) -> VoteBuilder<S, vote_state::SetPoll<St>> {
+    pub fn poll(mut self, value: impl Into<AtUri<S>>) -> VoteBuilder<S, vote_state::SetPoll<St>> {
         self._fields.1 = Option::Some(value.into());
         VoteBuilder {
             _state: PhantomData,
@@ -285,10 +282,10 @@ where
 }
 
 fn lexicon_doc_app_protoimsg_chat_vote() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.protoimsg.chat.vote"),
@@ -297,20 +294,16 @@ fn lexicon_doc_app_protoimsg_chat_vote() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A vote on a poll. Lives in the voter's repo.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A vote on a poll. Lives in the voter's repo.",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("poll"),
-                                SmolStr::new_static("selectedOptions"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("poll"),
+                            SmolStr::new_static("selectedOptions"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -325,9 +318,9 @@ fn lexicon_doc_app_protoimsg_chat_vote() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("poll"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("AT-URI of the poll being voted on."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "AT-URI of the poll being voted on.",
+                                    )),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -335,9 +328,9 @@ fn lexicon_doc_app_protoimsg_chat_vote() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("selectedOptions"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static("Indices of selected options (0-based)."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Indices of selected options (0-based).",
+                                    )),
                                     items: LexArrayItem::Integer(LexInteger {
                                         ..Default::default()
                                     }),

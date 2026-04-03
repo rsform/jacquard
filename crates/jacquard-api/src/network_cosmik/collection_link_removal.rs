@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
+use serde::{Deserialize, Serialize};
 /// A record representing the removal of a collection link by a collection owner when they cannot delete the original link (which exists in another user's repository). The creator of this record (determined from the AT-URI) is the user who performed the removal.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -76,8 +76,7 @@ impl XrpcResp for CollectionLinkRemovalRecord {
     type Err = RecordError;
 }
 
-impl<S: BosStr> From<CollectionLinkRemovalGetRecordOutput<S>>
-for CollectionLinkRemoval<S> {
+impl<S: BosStr> From<CollectionLinkRemovalGetRecordOutput<S>> for CollectionLinkRemoval<S> {
     fn from(output: CollectionLinkRemovalGetRecordOutput<S>) -> Self {
         output.value
     }
@@ -110,7 +109,7 @@ impl<S: BosStr> LexiconSchema for CollectionLinkRemoval<S> {
 
 pub mod collection_link_removal_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -167,10 +166,7 @@ pub mod collection_link_removal_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionLinkRemovalBuilder<
-    S: BosStr,
-    St: collection_link_removal_state::State,
-> {
+pub struct CollectionLinkRemovalBuilder<S: BosStr, St: collection_link_removal_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>, Option<Datetime>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
@@ -178,10 +174,7 @@ pub struct CollectionLinkRemovalBuilder<
 
 impl<S: BosStr> CollectionLinkRemoval<S> {
     /// Create a new builder for this type.
-    pub fn new() -> CollectionLinkRemovalBuilder<
-        S,
-        collection_link_removal_state::Empty,
-    > {
+    pub fn new() -> CollectionLinkRemovalBuilder<S, collection_link_removal_state::Empty> {
         CollectionLinkRemovalBuilder::new()
     }
 }
@@ -206,10 +199,7 @@ where
     pub fn collection(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CollectionLinkRemovalBuilder<
-        S,
-        collection_link_removal_state::SetCollection<St>,
-    > {
+    ) -> CollectionLinkRemovalBuilder<S, collection_link_removal_state::SetCollection<St>> {
         self._fields.0 = Option::Some(value.into());
         CollectionLinkRemovalBuilder {
             _state: PhantomData,
@@ -228,10 +218,7 @@ where
     pub fn removed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CollectionLinkRemovalBuilder<
-        S,
-        collection_link_removal_state::SetRemovedAt<St>,
-    > {
+    ) -> CollectionLinkRemovalBuilder<S, collection_link_removal_state::SetRemovedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         CollectionLinkRemovalBuilder {
             _state: PhantomData,
@@ -250,10 +237,7 @@ where
     pub fn removed_link(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CollectionLinkRemovalBuilder<
-        S,
-        collection_link_removal_state::SetRemovedLink<St>,
-    > {
+    ) -> CollectionLinkRemovalBuilder<S, collection_link_removal_state::SetRemovedLink<St>> {
         self._fields.2 = Option::Some(value.into());
         CollectionLinkRemovalBuilder {
             _state: PhantomData,
@@ -294,10 +278,10 @@ where
 }
 
 fn lexicon_doc_network_cosmik_collectionLinkRemoval() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.cosmik.collectionLinkRemoval"),

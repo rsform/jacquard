@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A human-readable/writable slug pointing to a separate record by the slug's creator.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -128,7 +128,7 @@ impl<S: BosStr> LexiconSchema for Slug<S> {
 
 pub mod slug_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -201,10 +201,7 @@ where
     St::Ref: slug_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(
-        mut self,
-        value: impl Into<AtUri<S>>,
-    ) -> SlugBuilder<S, slug_state::SetRef<St>> {
+    pub fn r#ref(mut self, value: impl Into<AtUri<S>>) -> SlugBuilder<S, slug_state::SetRef<St>> {
         self._fields.0 = Option::Some(value.into());
         SlugBuilder {
             _state: PhantomData,
@@ -220,10 +217,7 @@ where
     St::Slug: slug_state::IsUnset,
 {
     /// Set the `slug` field (required)
-    pub fn slug(
-        mut self,
-        value: impl Into<S>,
-    ) -> SlugBuilder<S, slug_state::SetSlug<St>> {
+    pub fn slug(mut self, value: impl Into<S>) -> SlugBuilder<S, slug_state::SetSlug<St>> {
         self._fields.1 = Option::Some(value.into());
         SlugBuilder {
             _state: PhantomData,
@@ -258,10 +252,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_slug() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.slug"),

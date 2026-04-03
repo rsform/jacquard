@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::com_atproto::repo::strong_ref::StrongRef;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Speaking and reply style for a sim — describes how the sim communicates.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -134,7 +134,7 @@ impl<S: BosStr> LexiconSchema for Style<S> {
 
 pub mod style_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -193,7 +193,12 @@ pub mod style_state {
 /// Builder for constructing an instance of this type.
 pub struct StyleBuilder<S: BosStr, St: style_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<S>, Option<Vec<Facet<S>>>, Option<StrongRef<S>>),
+    _fields: (
+        Option<Datetime>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<StrongRef<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -255,10 +260,7 @@ where
 
 impl<S: BosStr, St: style_state::State> StyleBuilder<S, St> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(
-        mut self,
-        value: impl Into<Option<Vec<Facet<S>>>>,
-    ) -> Self {
+    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -318,10 +320,10 @@ where
 }
 
 fn lexicon_doc_org_simocracy_style() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.simocracy.style"),
@@ -330,20 +332,16 @@ fn lexicon_doc_org_simocracy_style() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "Speaking and reply style for a sim — describes how the sim communicates.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Speaking and reply style for a sim — describes how the sim communicates.",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("sim"),
-                                SmolStr::new_static("description"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("sim"),
+                            SmolStr::new_static("description"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -357,11 +355,9 @@ fn lexicon_doc_org_simocracy_style() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "A description of the sim's speaking and reply style.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "A description of the sim's speaking and reply style.",
+                                    )),
                                     max_length: Some(30000usize),
                                     max_graphemes: Some(3000usize),
                                     ..Default::default()

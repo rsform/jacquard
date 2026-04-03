@@ -21,21 +21,26 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::unspecced::ThreadItemPost;
 use crate::app_bsky::unspecced::get_post_thread_other_v2;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetPostThreadOtherV2<S: BosStr = DefaultStr> {
     pub anchor: AtUri<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetPostThreadOtherV2Output<S: BosStr = DefaultStr> {
     ///A flat list of other thread items. The depth of each item is indicated by the depth property inside the item.
     pub thread: Vec<get_post_thread_other_v2::ThreadItem<S>>,
@@ -43,9 +48,11 @@ pub struct GetPostThreadOtherV2Output<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ThreadItem<S: BosStr = DefaultStr> {
     ///The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
     pub depth: i64,
@@ -96,7 +103,7 @@ impl<S: BosStr> LexiconSchema for ThreadItem<S> {
 
 pub mod get_post_thread_other_v2_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -127,10 +134,7 @@ pub mod get_post_thread_other_v2_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetPostThreadOtherV2Builder<
-    S: BosStr,
-    St: get_post_thread_other_v2_state::State,
-> {
+pub struct GetPostThreadOtherV2Builder<S: BosStr, St: get_post_thread_other_v2_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -138,10 +142,7 @@ pub struct GetPostThreadOtherV2Builder<
 
 impl<S: BosStr> GetPostThreadOtherV2<S> {
     /// Create a new builder for this type.
-    pub fn new() -> GetPostThreadOtherV2Builder<
-        S,
-        get_post_thread_other_v2_state::Empty,
-    > {
+    pub fn new() -> GetPostThreadOtherV2Builder<S, get_post_thread_other_v2_state::Empty> {
         GetPostThreadOtherV2Builder::new()
     }
 }
@@ -191,7 +192,7 @@ where
 
 pub mod thread_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -346,10 +347,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ThreadItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ThreadItem<S> {
         ThreadItem {
             depth: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -360,10 +358,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.unspecced.getPostThreadOtherV2"),
@@ -401,12 +399,11 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("threadItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("depth"),
-                            SmolStr::new_static("value")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("depth"),
+                        SmolStr::new_static("value"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -426,9 +423,9 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> LexiconDoc<'static> 
                         map.insert(
                             SmolStr::new_static("value"),
                             LexObjectProperty::Union(LexRefUnion {
-                                refs: vec![
-                                    CowStr::new_static("app.bsky.unspecced.defs#threadItemPost")
-                                ],
+                                refs: vec![CowStr::new_static(
+                                    "app.bsky.unspecced.defs#threadItemPost",
+                                )],
                                 ..Default::default()
                             }),
                         );

@@ -8,25 +8,30 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::sh_weaver::actor::ProfileViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::sh_weaver::actor::ProfileViewBasic;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetResourceParticipants<S: BosStr = DefaultStr> {
     pub resource: AtUri<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetResourceParticipantsOutput<S: BosStr = DefaultStr> {
     pub owner: ProfileViewBasic<S>,
     pub participants: Vec<ProfileViewBasic<S>>,
@@ -62,7 +67,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetResourceParticipantsRequest {
 
 pub mod get_resource_participants_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -93,10 +98,7 @@ pub mod get_resource_participants_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetResourceParticipantsBuilder<
-    S: BosStr,
-    St: get_resource_participants_state::State,
-> {
+pub struct GetResourceParticipantsBuilder<S: BosStr, St: get_resource_participants_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -104,17 +106,12 @@ pub struct GetResourceParticipantsBuilder<
 
 impl<S: BosStr> GetResourceParticipants<S> {
     /// Create a new builder for this type.
-    pub fn new() -> GetResourceParticipantsBuilder<
-        S,
-        get_resource_participants_state::Empty,
-    > {
+    pub fn new() -> GetResourceParticipantsBuilder<S, get_resource_participants_state::Empty> {
         GetResourceParticipantsBuilder::new()
     }
 }
 
-impl<
-    S: BosStr,
-> GetResourceParticipantsBuilder<S, get_resource_participants_state::Empty> {
+impl<S: BosStr> GetResourceParticipantsBuilder<S, get_resource_participants_state::Empty> {
     /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetResourceParticipantsBuilder {
@@ -134,10 +131,7 @@ where
     pub fn resource(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetResourceParticipantsBuilder<
-        S,
-        get_resource_participants_state::SetResource<St>,
-    > {
+    ) -> GetResourceParticipantsBuilder<S, get_resource_participants_state::SetResource<St>> {
         self._fields.0 = Option::Some(value.into());
         GetResourceParticipantsBuilder {
             _state: PhantomData,

@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Merge<S: BosStr = DefaultStr> {
     ///Author email for the merge commit
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,9 +58,8 @@ impl jacquard_common::xrpc::XrpcResp for MergeResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Merge<S> {
     const NSID: &'static str = "sh.tangled.repo.merge";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = MergeResponse;
 }
 
@@ -65,16 +67,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Merge<S> {
 pub struct MergeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MergeRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.merge";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Merge<S>;
     type Response = MergeResponse;
 }
 
 pub mod merge_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -212,10 +213,7 @@ where
     St::Branch: merge_state::IsUnset,
 {
     /// Set the `branch` field (required)
-    pub fn branch(
-        mut self,
-        value: impl Into<S>,
-    ) -> MergeBuilder<S, merge_state::SetBranch<St>> {
+    pub fn branch(mut self, value: impl Into<S>) -> MergeBuilder<S, merge_state::SetBranch<St>> {
         self._fields.2 = Option::Some(value.into());
         MergeBuilder {
             _state: PhantomData,
@@ -257,10 +255,7 @@ where
     St::Did: merge_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> MergeBuilder<S, merge_state::SetDid<St>> {
+    pub fn did(mut self, value: impl Into<Did<S>>) -> MergeBuilder<S, merge_state::SetDid<St>> {
         self._fields.5 = Option::Some(value.into());
         MergeBuilder {
             _state: PhantomData,
@@ -276,10 +271,7 @@ where
     St::Name: merge_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> MergeBuilder<S, merge_state::SetName<St>> {
+    pub fn name(mut self, value: impl Into<S>) -> MergeBuilder<S, merge_state::SetName<St>> {
         self._fields.6 = Option::Some(value.into());
         MergeBuilder {
             _state: PhantomData,
@@ -295,10 +287,7 @@ where
     St::Patch: merge_state::IsUnset,
 {
     /// Set the `patch` field (required)
-    pub fn patch(
-        mut self,
-        value: impl Into<S>,
-    ) -> MergeBuilder<S, merge_state::SetPatch<St>> {
+    pub fn patch(mut self, value: impl Into<S>) -> MergeBuilder<S, merge_state::SetPatch<St>> {
         self._fields.7 = Option::Some(value.into());
         MergeBuilder {
             _state: PhantomData,

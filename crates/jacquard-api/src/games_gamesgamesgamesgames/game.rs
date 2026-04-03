@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,9 +24,6 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::AgeRating;
 use crate::games_gamesgamesgamesgames::AlternativeName;
 use crate::games_gamesgamesgamesgames::ApplicationType;
@@ -45,6 +42,9 @@ use crate::games_gamesgamesgamesgames::Theme;
 use crate::games_gamesgamesgamesgames::TimeToBeat;
 use crate::games_gamesgamesgamesgames::Website;
 use crate::games_gamesgamesgamesgames::richtext::facet::Facet;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A video game.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -177,7 +177,7 @@ impl<S: BosStr> LexiconSchema for Game<S> {
 
 pub mod game_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -281,33 +281,8 @@ impl<S: BosStr> GameBuilder<S, game_state::Empty> {
         GameBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -329,18 +304,12 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
 
 impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `alternativeNames` field (optional)
-    pub fn alternative_names(
-        mut self,
-        value: impl Into<Option<Vec<AlternativeName<S>>>>,
-    ) -> Self {
+    pub fn alternative_names(mut self, value: impl Into<Option<Vec<AlternativeName<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `alternativeNames` field to an Option value (optional)
-    pub fn maybe_alternative_names(
-        mut self,
-        value: Option<Vec<AlternativeName<S>>>,
-    ) -> Self {
+    pub fn maybe_alternative_names(mut self, value: Option<Vec<AlternativeName<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -399,10 +368,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
 
 impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(
-        mut self,
-        value: impl Into<Option<Vec<Facet<S>>>>,
-    ) -> Self {
+    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -467,18 +433,12 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
 
 impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `languageSupports` field (optional)
-    pub fn language_supports(
-        mut self,
-        value: impl Into<Option<Vec<LanguageSupport<S>>>>,
-    ) -> Self {
+    pub fn language_supports(mut self, value: impl Into<Option<Vec<LanguageSupport<S>>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `languageSupports` field to an Option value (optional)
-    pub fn maybe_language_supports(
-        mut self,
-        value: Option<Vec<LanguageSupport<S>>>,
-    ) -> Self {
+    pub fn maybe_language_supports(mut self, value: Option<Vec<LanguageSupport<S>>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -512,18 +472,12 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
 
 impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `multiplayerModes` field (optional)
-    pub fn multiplayer_modes(
-        mut self,
-        value: impl Into<Option<Vec<MultiplayerMode<S>>>>,
-    ) -> Self {
+    pub fn multiplayer_modes(mut self, value: impl Into<Option<Vec<MultiplayerMode<S>>>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `multiplayerModes` field to an Option value (optional)
-    pub fn maybe_multiplayer_modes(
-        mut self,
-        value: Option<Vec<MultiplayerMode<S>>>,
-    ) -> Self {
+    pub fn maybe_multiplayer_modes(mut self, value: Option<Vec<MultiplayerMode<S>>>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -535,10 +489,7 @@ where
     St::Name: game_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> GameBuilder<S, game_state::SetName<St>> {
+    pub fn name(mut self, value: impl Into<S>) -> GameBuilder<S, game_state::SetName<St>> {
         self._fields.14 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
@@ -563,18 +514,12 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
 
 impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `platformFeatures` field (optional)
-    pub fn platform_features(
-        mut self,
-        value: impl Into<Option<Vec<PlatformFeatures<S>>>>,
-    ) -> Self {
+    pub fn platform_features(mut self, value: impl Into<Option<Vec<PlatformFeatures<S>>>>) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `platformFeatures` field to an Option value (optional)
-    pub fn maybe_platform_features(
-        mut self,
-        value: Option<Vec<PlatformFeatures<S>>>,
-    ) -> Self {
+    pub fn maybe_platform_features(mut self, value: Option<Vec<PlatformFeatures<S>>>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -590,10 +535,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
         self
     }
     /// Set the `playerPerspectives` field to an Option value (optional)
-    pub fn maybe_player_perspectives(
-        mut self,
-        value: Option<Vec<PlayerPerspective<S>>>,
-    ) -> Self {
+    pub fn maybe_player_perspectives(mut self, value: Option<Vec<PlayerPerspective<S>>>) -> Self {
         self._fields.17 = value;
         self
     }
@@ -661,10 +603,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
         self
     }
     /// Set the `systemRequirements` field to an Option value (optional)
-    pub fn maybe_system_requirements(
-        mut self,
-        value: Option<Vec<SystemRequirements<S>>>,
-    ) -> Self {
+    pub fn maybe_system_requirements(mut self, value: Option<Vec<SystemRequirements<S>>>) -> Self {
         self._fields.22 = value;
         self
     }
@@ -798,10 +737,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_game() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.game"),

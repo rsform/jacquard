@@ -23,11 +23,14 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// (Deprecated: use storageHttp or storageS3 instead.) External storage via URLs for WebDataset tar archives. URLs support brace notation for sharding (e.g., 'data-{000000..000099}.tar').
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StorageExternal<S: BosStr = DefaultStr> {
     ///WebDataset URLs with optional brace notation for sharded tar files
     pub urls: Vec<UriValue<S>>,
@@ -63,7 +66,7 @@ impl<S: BosStr> LexiconSchema for StorageExternal<S> {
 
 pub mod storage_external_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -150,10 +153,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> StorageExternal<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StorageExternal<S> {
         StorageExternal {
             urls: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -162,10 +162,10 @@ where
 }
 
 fn lexicon_doc_science_alt_dataset_storageExternal() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("science.alt.dataset.storageExternal"),

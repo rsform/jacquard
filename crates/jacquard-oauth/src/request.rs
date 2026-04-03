@@ -577,8 +577,7 @@ pub async fn par<
         .await?;
 
         let scopes = if let Some(scope) = &metadata.client_metadata.scope {
-            Scopes::new(SmolStr::from(scope.as_ref()))
-                .expect("Failed to parse scopes")
+            Scopes::new(SmolStr::from(scope.as_ref())).expect("Failed to parse scopes")
         } else {
             Scopes::empty()
         };

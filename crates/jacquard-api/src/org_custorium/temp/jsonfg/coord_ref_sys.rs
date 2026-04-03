@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,13 +21,16 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::org_custorium::temp::jsonfg::coord_ref_sys;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::org_custorium::temp::jsonfg::coord_ref_sys;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MultiRefSys<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ref_sys: Option<Vec<coord_ref_sys::SingleRefSys<S>>>,
@@ -35,9 +38,11 @@ pub struct MultiRefSys<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RefSysByRef<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub epoch: Option<i64>,
@@ -46,9 +51,11 @@ pub struct RefSysByRef<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RefSysCustom<S: BosStr = DefaultStr> {
     ///Value should not be reference
     pub r#type: S,
@@ -56,9 +63,11 @@ pub struct RefSysCustom<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RefSysSimpleRef<S: BosStr = DefaultStr> {
     ///The value is either a URI or a CURIE.
     pub uri: S,
@@ -66,15 +75,16 @@ pub struct RefSysSimpleRef<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SingleRefSys<S: BosStr = DefaultStr> {
     pub ref_sys: SingleRefSysRefSys<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -174,10 +184,10 @@ impl<S: BosStr> LexiconSchema for SingleRefSys<S> {
 }
 
 fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.custorium.temp.jsonfg.coordRefSys"),
@@ -240,9 +250,9 @@ fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Value should not be reference"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Value should not be reference",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -261,9 +271,9 @@ fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The value is either a URI or a CURIE."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The value is either a URI or a CURIE.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -285,7 +295,7 @@ fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("#refSysSimpleRef"),
                                     CowStr::new_static("#refSysByRef"),
-                                    CowStr::new_static("#refSysCustom")
+                                    CowStr::new_static("#refSysCustom"),
                                 ],
                                 ..Default::default()
                             }),
@@ -303,7 +313,7 @@ fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> LexiconDoc<'static> {
 
 pub mod ref_sys_by_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -404,10 +414,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RefSysByRef<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RefSysByRef<S> {
         RefSysByRef {
             epoch: self._fields.0,
             href: self._fields.1.unwrap(),
@@ -418,7 +425,7 @@ where
 
 pub mod single_ref_sys_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -505,10 +512,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SingleRefSys<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SingleRefSys<S> {
         SingleRefSys {
             ref_sys: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

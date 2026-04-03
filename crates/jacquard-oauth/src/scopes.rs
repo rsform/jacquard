@@ -25,11 +25,14 @@ use std::marker::PhantomData;
 use std::str::FromStr;
 
 use jacquard_common::bos::{BosStr, DefaultStr};
-use jacquard_common::deps::fluent_uri::pct_enc::{EStr, EString, encoder::{Query, Query as EncQuery}};
+use jacquard_common::deps::fluent_uri::pct_enc::{
+    EStr, EString,
+    encoder::{Query, Query as EncQuery},
+};
 use jacquard_common::types::did::Did;
 use jacquard_common::types::nsid::Nsid;
 use jacquard_common::types::string::AtStrError;
-use jacquard_common::{Bos, BorrowOrShare, FromStaticStr, IntoStatic};
+use jacquard_common::{BorrowOrShare, Bos, FromStaticStr, IntoStatic};
 use serde::de::{Error as DeError, Visitor};
 use serde::{Deserialize, Serialize};
 use smallvec::SmallVec;
@@ -540,18 +543,6 @@ impl RepoActionFlags {
     pub(crate) const DELETE: u8 = 0b100;
     pub(crate) const ALL: u8 = 0b111;
 
-    pub(crate) fn from_actions(actions: &BTreeSet<RepoAction>) -> Self {
-        let mut flags = 0u8;
-        for action in actions {
-            match action {
-                RepoAction::Create => flags |= Self::CREATE,
-                RepoAction::Update => flags |= Self::UPDATE,
-                RepoAction::Delete => flags |= Self::DELETE,
-            }
-        }
-        RepoActionFlags(flags)
-    }
-
     pub(crate) fn contains(self, flag: u8) -> bool {
         self.0 & flag != 0
     }
@@ -783,7 +774,11 @@ impl<S: Bos<str> + AsRef<str>> Scopes<S> {
 
         // Compute total length for pre-allocation.
         let total_len = normalized.iter().map(|s| s.len()).sum::<usize>()
-            + if normalized.len() > 1 { normalized.len() - 1 } else { 0 }; // Add length for space separators.
+            + if normalized.len() > 1 {
+                normalized.len() - 1
+            } else {
+                0
+            }; // Add length for space separators.
 
         let mut result = String::with_capacity(total_len);
         for (i, s) in normalized.iter().enumerate() {
@@ -873,8 +868,17 @@ where
 fn parse_scope_indices(token: &str, base: u16) -> Result<ScopeInnerIndices, ParseError> {
     // Determine the prefix by checking for known prefixes.
     let prefixes = [
-        "account", "identity", "blob", "repo", "rpc", "atproto", "transition", "include",
-        "openid", "profile", "email",
+        "account",
+        "identity",
+        "blob",
+        "repo",
+        "rpc",
+        "atproto",
+        "transition",
+        "include",
+        "openid",
+        "profile",
+        "email",
     ];
 
     let mut found_prefix = None;
@@ -896,8 +900,9 @@ fn parse_scope_indices(token: &str, base: u16) -> Result<ScopeInnerIndices, Pars
         }
     }
 
-    let prefix =
-        found_prefix.ok_or_else(|| ParseError::UnknownPrefix(token[..token.find(':').unwrap_or(token.len())].to_string()))?;
+    let prefix = found_prefix.ok_or_else(|| {
+        ParseError::UnknownPrefix(token[..token.find(':').unwrap_or(token.len())].to_string())
+    })?;
 
     match prefix {
         "account" => parse_account_indices(suffix),
@@ -1110,7 +1115,10 @@ fn parse_repo_indices(
         }
     }
 
-    Ok(ScopeInnerIndices::Repo { collection, actions })
+    Ok(ScopeInnerIndices::Repo {
+        collection,
+        actions,
+    })
 }
 
 /// Parse RPC scope indices, storing byte ranges of lexicon and audience values.
@@ -1257,15 +1265,17 @@ fn parse_include_indices(
 
                 if has_encoding {
                     // Validate and decode the percent-encoded value using fluent-uri.
-                    let estr = EStr::<Query>::new(aud_value)
-                        .ok_or_else(|| ParseError::InvalidResource(
+                    let estr = EStr::<Query>::new(aud_value).ok_or_else(|| {
+                        ParseError::InvalidResource(
                             "include audience has invalid percent-encoding".to_string(),
-                        ))?;
+                        )
+                    })?;
 
-                    let decoded = estr.decode().to_string()
-                        .map_err(|_| ParseError::InvalidResource(
+                    let decoded = estr.decode().to_string().map_err(|_| {
+                        ParseError::InvalidResource(
                             "include audience contains invalid UTF-8 sequence".to_string(),
-                        ))?;
+                        )
+                    })?;
 
                     // Validate the DID portion (before any #).
                     let did_part = decoded.split('#').next().unwrap_or("");
@@ -1353,11 +1363,10 @@ fn reduce_indices(
 
     // Deduplicate unit/account/identity/transition scopes.
     let mut seen = std::collections::HashSet::new();
-    unit_or_account_or_identity_or_transition
-        .retain(|idx| {
-            let scope = unsafe { reconstruct_scope(buffer, idx) };
-            seen.insert(scope.to_string_normalized())
-        });
+    unit_or_account_or_identity_or_transition.retain(|idx| {
+        let scope = unsafe { reconstruct_scope(buffer, idx) };
+        seen.insert(scope.to_string_normalized())
+    });
 
     // Pairwise reduction for repo scopes.
     repo_indices = reduce_pairwise(buffer, repo_indices);
@@ -1428,10 +1437,7 @@ fn reduce_pairwise(buffer: &str, indices: Vec<ScopeIndices>) -> Vec<ScopeIndices
 ///
 /// `indices` must have been computed from `buffer` during `Scopes::new()`.
 /// All byte ranges in `indices` must be valid for `buffer`.
-unsafe fn reconstruct_scope<'a>(
-    buffer: &'a str,
-    indices: &ScopeIndices,
-) -> Scope<&'a str> {
+unsafe fn reconstruct_scope<'a>(buffer: &'a str, indices: &ScopeIndices) -> Scope<&'a str> {
     match &indices.inner {
         ScopeInnerIndices::Unit(kind) => match kind {
             ScopeKind::Atproto => Scope::Atproto,
@@ -1440,12 +1446,10 @@ unsafe fn reconstruct_scope<'a>(
             ScopeKind::Email => Scope::Email,
         },
 
-        ScopeInnerIndices::Account { resource, action } => {
-            Scope::Account(AccountScope {
-                resource: *resource,
-                action: *action,
-            })
-        }
+        ScopeInnerIndices::Account { resource, action } => Scope::Account(AccountScope {
+            resource: *resource,
+            action: *action,
+        }),
 
         ScopeInnerIndices::Identity(scope) => Scope::Identity(scope.clone()),
 
@@ -1472,7 +1476,10 @@ unsafe fn reconstruct_scope<'a>(
             Scope::Blob(BlobScope { accept: patterns })
         }
 
-        ScopeInnerIndices::Repo { collection, actions } => {
+        ScopeInnerIndices::Repo {
+            collection,
+            actions,
+        } => {
             let collection = match collection {
                 None => RepoCollection::All,
                 Some((start, end)) => {
@@ -1561,8 +1568,6 @@ impl<S: BosStr + Ord> Scope<S> {
             Scope::Email => Scope::Email,
         }
     }
-
-
 
     /// Parse a scope from a string
     pub fn parse<'a>(s: &'a str) -> Result<Self, ParseError>
@@ -2008,7 +2013,7 @@ impl<S: BosStr + Ord> Scope<S> {
                 } else {
                     format_smolstr!("include:{}", scope.nsid)
                 }
-            },
+            }
             Scope::Atproto => "atproto".to_smolstr(),
             Scope::Transition(scope) => match scope {
                 TransitionScope::Generic => "transition:generic".to_smolstr(),
@@ -2296,7 +2301,11 @@ pub fn expand_permission_set(
                     }));
                 }
             }
-            LexPermissionResource::Rpc { lxm, aud, inherit_aud } => {
+            LexPermissionResource::Rpc {
+                lxm,
+                aud,
+                inherit_aud,
+            } => {
                 // Build the audience set based on priority order
                 let mut aud_set = BTreeSet::new();
                 if let Some(explicit_aud) = aud {
@@ -2352,7 +2361,11 @@ pub fn expand_permission_set(
                 let identity_scope = match attr.as_ref() {
                     "handle" => IdentityScope::Handle,
                     "*" => IdentityScope::All,
-                    other => return Err(PermissionSetConversionError::UnknownIdentityAttr(other.to_string())),
+                    other => {
+                        return Err(PermissionSetConversionError::UnknownIdentityAttr(
+                            other.to_string(),
+                        ));
+                    }
                 };
                 scopes.push(Scope::Identity(identity_scope));
             }
@@ -2361,13 +2374,23 @@ pub fn expand_permission_set(
                     "email" => AccountResource::Email,
                     "repo" => AccountResource::Repo,
                     "status" => AccountResource::Status,
-                    other => return Err(PermissionSetConversionError::UnknownAccountAttr(other.to_string())),
+                    other => {
+                        return Err(PermissionSetConversionError::UnknownAccountAttr(
+                            other.to_string(),
+                        ));
+                    }
                 };
 
+                // Take the highest privilege level. Manage subsumes Read.
                 let act = action
                     .as_ref()
-                    .and_then(|a| a.first())
-                    .copied()
+                    .map(|actions| {
+                        if actions.contains(&AccountAction::Manage) {
+                            AccountAction::Manage
+                        } else {
+                            AccountAction::Read
+                        }
+                    })
                     .unwrap_or(AccountAction::Read);
 
                 scopes.push(Scope::Account(AccountScope {
@@ -3005,7 +3028,8 @@ mod tests {
     #[test]
     fn test_scopes_new_multiple() {
         // Test AC3.1: Parse multiple scopes and create indices.
-        let scopes = Scopes::new(SmolStr::new_static("atproto rpc:* repo:app.bsky.feed.post")).unwrap();
+        let scopes =
+            Scopes::new(SmolStr::new_static("atproto rpc:* repo:app.bsky.feed.post")).unwrap();
         assert_eq!(scopes.len(), 3);
     }
 
@@ -3146,7 +3170,10 @@ mod tests {
         let test_cases = vec![
             ("include:app.bsky.authFull", 1),
             ("include:app.bsky.full?aud=did:web:api.example.com", 1),
-            ("include:app.bsky.full?aud=did:web:api.example.com%23svc_appview", 1),
+            (
+                "include:app.bsky.full?aud=did:web:api.example.com%23svc_appview",
+                1,
+            ),
         ];
 
         for (input, expected_count) in test_cases {
@@ -3207,7 +3234,10 @@ mod tests {
     #[test]
     fn test_scopes_reconstruction_account() {
         // Reconstruct account scopes from indices.
-        let scopes = Scopes::new(SmolStr::new_static("account:email account:repo?action=manage")).unwrap();
+        let scopes = Scopes::new(SmolStr::new_static(
+            "account:email account:repo?action=manage",
+        ))
+        .unwrap();
         assert_eq!(scopes.len(), 2);
     }
 
@@ -3244,7 +3274,10 @@ mod tests {
     #[test]
     fn test_scopes_reconstruction_include() {
         // Reconstruct include scopes from indices.
-        let scopes = Scopes::new(SmolStr::new_static("include:app.bsky.authFull include:app.bsky.full?aud=did:web:api.example.com")).unwrap();
+        let scopes = Scopes::new(SmolStr::new_static(
+            "include:app.bsky.authFull include:app.bsky.full?aud=did:web:api.example.com",
+        ))
+        .unwrap();
         assert_eq!(scopes.len(), 2);
     }
 
@@ -3256,7 +3289,8 @@ mod tests {
     fn test_scopes_iter() {
         // oauth-scopes-rework.AC3.2: `iter()` yields correctly typed `Scope<&str>`
         // views borrowing from the buffer.
-        let scopes = Scopes::new(SmolStr::new_static("atproto rpc:* repo:app.bsky.feed.post")).unwrap();
+        let scopes =
+            Scopes::new(SmolStr::new_static("atproto rpc:* repo:app.bsky.feed.post")).unwrap();
 
         let collected: Vec<_> = scopes.iter().collect();
 
@@ -3463,7 +3497,8 @@ mod tests {
     fn test_scopes_serialize_multiple_sorted() {
         // oauth-scopes-rework.AC3.6: Serialize produces sorted output
         // regardless of input order.
-        let scopes = Scopes::new(SmolStr::new_static("rpc:* atproto repo:app.bsky.feed.post")).unwrap();
+        let scopes =
+            Scopes::new(SmolStr::new_static("rpc:* atproto repo:app.bsky.feed.post")).unwrap();
         let json = serde_json::to_string(&scopes).unwrap();
         // Should be sorted: atproto, repo:app.bsky.feed.post, rpc:*
         assert_eq!(json, "\"atproto repo:app.bsky.feed.post rpc:*\"");
@@ -3539,7 +3574,10 @@ mod tests {
         let json = serde_json::to_string(&scopes).unwrap();
 
         // Should be sorted
-        assert_eq!(json, "\"account:email atproto repo:app.bsky.feed.post rpc:*\"");
+        assert_eq!(
+            json,
+            "\"account:email atproto repo:app.bsky.feed.post rpc:*\""
+        );
 
         // Deserialize
         let deserialized: Scopes<SmolStr> = serde_json::from_str(&json).unwrap();
@@ -3588,7 +3626,10 @@ mod tests {
     #[test]
     fn test_scopes_len() {
         // AC3.1: len() returns correct count after reduction.
-        let scopes = Scopes::new(SmolStr::new_static("atproto repo:* repo:app.bsky.feed.post")).unwrap();
+        let scopes = Scopes::new(SmolStr::new_static(
+            "atproto repo:* repo:app.bsky.feed.post",
+        ))
+        .unwrap();
         // repo:* should reduce the more specific one
         assert_eq!(scopes.len(), 2); // atproto + repo:*
     }
@@ -3662,7 +3703,8 @@ mod tests {
     #[test]
     fn test_scopes_construction() {
         // AC3.1: Construct multi-scope string, verify len and individual scopes.
-        let scopes = Scopes::new(SmolStr::new_static("atproto rpc:* repo:app.bsky.feed.post")).unwrap();
+        let scopes =
+            Scopes::new(SmolStr::new_static("atproto rpc:* repo:app.bsky.feed.post")).unwrap();
         assert_eq!(scopes.len(), 3);
 
         // Verify individual scopes
@@ -3699,7 +3741,6 @@ mod tests {
         assert!(matches!(collected[0], Scope::Atproto));
     }
 
-
     #[test]
     fn test_scopes_consecutive_spaces() {
         // Test handling of multiple spaces between scopes.
@@ -3731,7 +3772,10 @@ mod tests {
     #[test]
     fn test_scopes_include_plain_audience() {
         // AC2.2: include scope with plain unencoded audience.
-        let scopes = Scopes::new(SmolStr::new_static("include:app.bsky.authFull?aud=did:web:api.example.com")).unwrap();
+        let scopes = Scopes::new(SmolStr::new_static(
+            "include:app.bsky.authFull?aud=did:web:api.example.com",
+        ))
+        .unwrap();
         assert_eq!(scopes.len(), 1);
         match scopes.get(0) {
             Some(Scope::Include(inc)) => {
@@ -3849,7 +3893,7 @@ mod tests {
     #[cfg(feature = "scope-check")]
     #[test]
     fn test_expand_permission_set_repo() {
-        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+        use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource, LexPermissionSet};
 
         // Create a simple permission set with a repo permission
         let mut perms = Vec::new();
@@ -3901,7 +3945,7 @@ mod tests {
     #[cfg(feature = "scope-check")]
     #[test]
     fn test_expand_permission_set_identity() {
-        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+        use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource, LexPermissionSet};
 
         let mut perms = Vec::new();
         perms.push(LexPermission::Permission {
@@ -3927,7 +3971,7 @@ mod tests {
     #[cfg(feature = "scope-check")]
     #[test]
     fn test_expand_permission_set_account() {
-        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+        use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource, LexPermissionSet};
 
         let mut perms = Vec::new();
         perms.push(LexPermission::Permission {
@@ -3959,8 +4003,40 @@ mod tests {
 
     #[cfg(feature = "scope-check")]
     #[test]
+    fn test_expand_permission_set_account_highest_privilege() {
+        // Regression test: when both Read and Manage are in the action list,
+        // the highest privilege (Manage) must be selected, not the first.
+        use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource, LexPermissionSet};
+
+        let perm_set = LexPermissionSet {
+            title: None,
+            title_lang: None,
+            detail: None,
+            detail_lang: None,
+            permissions: vec![LexPermission::Permission {
+                resource: LexPermissionResource::Account {
+                    attr: CowStr::Borrowed("email"),
+                    action: Some(vec![AccountAction::Read, AccountAction::Manage]),
+                },
+            }],
+        };
+
+        let scopes = expand_permission_set(&perm_set, None).unwrap();
+        assert_eq!(scopes.len(), 1);
+        assert_eq!(
+            scopes[0],
+            Scope::Account(AccountScope {
+                resource: AccountResource::Email,
+                action: AccountAction::Manage,
+            }),
+            "should select Manage (highest privilege), not Read (first in list)"
+        );
+    }
+
+    #[cfg(feature = "scope-check")]
+    #[test]
     fn test_expand_permission_set_rpc_with_inherit_aud() {
-        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+        use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource, LexPermissionSet};
 
         let mut perms = Vec::new();
         perms.push(LexPermission::Permission {
@@ -3986,7 +4062,9 @@ mod tests {
         if let Scope::Rpc(rpc_scope) = &scopes[0] {
             assert_eq!(rpc_scope.lxm.len(), 1);
             assert_eq!(rpc_scope.aud.len(), 1);
-            assert!(matches!(rpc_scope.aud.iter().next(), Some(RpcAudience::Did(d)) if d.as_ref() == "did:web:example.com"));
+            assert!(
+                matches!(rpc_scope.aud.iter().next(), Some(RpcAudience::Did(d)) if d.as_ref() == "did:web:example.com")
+            );
         } else {
             panic!("Expected Rpc scope");
         }
@@ -3995,7 +4073,7 @@ mod tests {
     #[cfg(feature = "scope-check")]
     #[test]
     fn test_expand_permission_set_rpc_explicit_aud() {
-        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+        use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource, LexPermissionSet};
 
         let mut perms = Vec::new();
         perms.push(LexPermission::Permission {
@@ -4019,7 +4097,9 @@ mod tests {
 
         if let Scope::Rpc(rpc_scope) = &scopes[0] {
             assert_eq!(rpc_scope.aud.len(), 1);
-            assert!(matches!(rpc_scope.aud.iter().next(), Some(RpcAudience::Did(d)) if d.as_ref() == "did:web:custom.com"));
+            assert!(
+                matches!(rpc_scope.aud.iter().next(), Some(RpcAudience::Did(d)) if d.as_ref() == "did:web:custom.com")
+            );
         } else {
             panic!("Expected Rpc scope");
         }
@@ -4028,7 +4108,7 @@ mod tests {
     #[cfg(feature = "scope-check")]
     #[test]
     fn test_expand_permission_set_unknown_identity_attr() {
-        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+        use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource, LexPermissionSet};
 
         let mut perms = Vec::new();
         perms.push(LexPermission::Permission {
@@ -4046,13 +4126,16 @@ mod tests {
         };
 
         let result = expand_permission_set(&perm_set, None);
-        assert!(matches!(result, Err(PermissionSetConversionError::UnknownIdentityAttr(_))));
+        assert!(matches!(
+            result,
+            Err(PermissionSetConversionError::UnknownIdentityAttr(_))
+        ));
     }
 
     #[cfg(feature = "scope-check")]
     #[test]
     fn test_expand_permission_set_unknown_account_attr() {
-        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+        use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource, LexPermissionSet};
 
         let mut perms = Vec::new();
         perms.push(LexPermission::Permission {
@@ -4071,14 +4154,17 @@ mod tests {
         };
 
         let result = expand_permission_set(&perm_set, None);
-        assert!(matches!(result, Err(PermissionSetConversionError::UnknownAccountAttr(_))));
+        assert!(matches!(
+            result,
+            Err(PermissionSetConversionError::UnknownAccountAttr(_))
+        ));
     }
 
     #[cfg(feature = "scope-check")]
     #[test]
     fn test_expand_permission_set_blob() {
-        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
         use jacquard_common::types::blob::MimeType;
+        use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource, LexPermissionSet};
 
         // Test exact type
         let mut perms = Vec::new();

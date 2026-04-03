@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Represents metadata about a container layer stored in the hold. Stored in the hold's embedded PDS for tracking and analytics.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -136,7 +136,7 @@ impl<S: BosStr> LexiconSchema for Layer<S> {
 
 pub mod layer_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -303,10 +303,7 @@ where
     St::Digest: layer_state::IsUnset,
 {
     /// Set the `digest` field (required)
-    pub fn digest(
-        mut self,
-        value: impl Into<S>,
-    ) -> LayerBuilder<S, layer_state::SetDigest<St>> {
+    pub fn digest(mut self, value: impl Into<S>) -> LayerBuilder<S, layer_state::SetDigest<St>> {
         self._fields.1 = Option::Some(value.into());
         LayerBuilder {
             _state: PhantomData,
@@ -360,10 +357,7 @@ where
     St::Size: layer_state::IsUnset,
 {
     /// Set the `size` field (required)
-    pub fn size(
-        mut self,
-        value: impl Into<i64>,
-    ) -> LayerBuilder<S, layer_state::SetSize<St>> {
+    pub fn size(mut self, value: impl Into<i64>) -> LayerBuilder<S, layer_state::SetSize<St>> {
         self._fields.4 = Option::Some(value.into());
         LayerBuilder {
             _state: PhantomData,
@@ -429,10 +423,10 @@ where
 }
 
 fn lexicon_doc_io_atcr_hold_layer() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.hold.layer"),

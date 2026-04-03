@@ -23,10 +23,13 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Gallery<S: BosStr = DefaultStr> {
     ///Reference to a blog.pckt.gallery record
     pub r#ref: AtUri<S>,
@@ -51,7 +54,7 @@ impl<S: BosStr> LexiconSchema for Gallery<S> {
 
 pub mod gallery_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -147,10 +150,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_block_gallery() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.block.gallery"),
@@ -166,11 +169,9 @@ fn lexicon_doc_blog_pckt_block_gallery() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("ref"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Reference to a blog.pckt.gallery record",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Reference to a blog.pckt.gallery record",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),

@@ -28,9 +28,7 @@ pub enum AccountAction {
 }
 
 /// Repository action permissions for AT Protocol OAuth scopes.
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize,
-)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum RepoAction {
     /// Create records.

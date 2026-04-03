@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DisableAccountInvites<S: BosStr = DefaultStr> {
     pub account: Did<S>,
     ///Optional reason for disabled invites.
@@ -39,9 +42,8 @@ impl jacquard_common::xrpc::XrpcResp for DisableAccountInvitesResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DisableAccountInvites<S> {
     const NSID: &'static str = "com.atproto.admin.disableAccountInvites";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DisableAccountInvitesResponse;
 }
 
@@ -49,16 +51,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DisableAccountInvites<S> 
 pub struct DisableAccountInvitesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DisableAccountInvitesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.disableAccountInvites";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = DisableAccountInvites<S>;
     type Response = DisableAccountInvitesResponse;
 }
 
 pub mod disable_account_invites_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -89,10 +90,7 @@ pub mod disable_account_invites_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DisableAccountInvitesBuilder<
-    S: BosStr,
-    St: disable_account_invites_state::State,
-> {
+pub struct DisableAccountInvitesBuilder<S: BosStr, St: disable_account_invites_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -100,10 +98,7 @@ pub struct DisableAccountInvitesBuilder<
 
 impl<S: BosStr> DisableAccountInvites<S> {
     /// Create a new builder for this type.
-    pub fn new() -> DisableAccountInvitesBuilder<
-        S,
-        disable_account_invites_state::Empty,
-    > {
+    pub fn new() -> DisableAccountInvitesBuilder<S, disable_account_invites_state::Empty> {
         DisableAccountInvitesBuilder::new()
     }
 }
@@ -138,10 +133,7 @@ where
     }
 }
 
-impl<
-    S: BosStr,
-    St: disable_account_invites_state::State,
-> DisableAccountInvitesBuilder<S, St> {
+impl<S: BosStr, St: disable_account_invites_state::State> DisableAccountInvitesBuilder<S, St> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();

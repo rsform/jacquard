@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::tools_ozone::moderation::ScheduledActionView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::string::{Datetime, Did};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::tools_ozone::moderation::ScheduledActionView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListScheduledActions<S: BosStr = DefaultStr> {
     ///Cursor for pagination
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -43,9 +46,11 @@ pub struct ListScheduledActions<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListScheduledActionsOutput<S: BosStr = DefaultStr> {
     pub actions: Vec<ScheduledActionView<S>>,
     ///Cursor for next page of results
@@ -66,9 +71,8 @@ impl jacquard_common::xrpc::XrpcResp for ListScheduledActionsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListScheduledActions<S> {
     const NSID: &'static str = "tools.ozone.moderation.listScheduledActions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = ListScheduledActionsResponse;
 }
 
@@ -76,9 +80,8 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListScheduledActions<S> {
 pub struct ListScheduledActionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListScheduledActionsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.listScheduledActions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = ListScheduledActions<S>;
     type Response = ListScheduledActionsResponse;
 }
@@ -89,7 +92,7 @@ fn _default_list_scheduled_actions_limit() -> Option<i64> {
 
 pub mod list_scheduled_actions_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -120,10 +123,7 @@ pub mod list_scheduled_actions_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListScheduledActionsBuilder<
-    S: BosStr,
-    St: list_scheduled_actions_state::State,
-> {
+pub struct ListScheduledActionsBuilder<S: BosStr, St: list_scheduled_actions_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -154,10 +154,7 @@ impl<S: BosStr> ListScheduledActionsBuilder<S, list_scheduled_actions_state::Emp
     }
 }
 
-impl<
-    S: BosStr,
-    St: list_scheduled_actions_state::State,
-> ListScheduledActionsBuilder<S, St> {
+impl<S: BosStr, St: list_scheduled_actions_state::State> ListScheduledActionsBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -170,10 +167,7 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: list_scheduled_actions_state::State,
-> ListScheduledActionsBuilder<S, St> {
+impl<S: BosStr, St: list_scheduled_actions_state::State> ListScheduledActionsBuilder<S, St> {
     /// Set the `endsBefore` field (optional)
     pub fn ends_before(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -186,10 +180,7 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: list_scheduled_actions_state::State,
-> ListScheduledActionsBuilder<S, St> {
+impl<S: BosStr, St: list_scheduled_actions_state::State> ListScheduledActionsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -202,10 +193,7 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: list_scheduled_actions_state::State,
-> ListScheduledActionsBuilder<S, St> {
+impl<S: BosStr, St: list_scheduled_actions_state::State> ListScheduledActionsBuilder<S, St> {
     /// Set the `startsAfter` field (optional)
     pub fn starts_after(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -237,10 +225,7 @@ where
     }
 }
 
-impl<
-    S: BosStr,
-    St: list_scheduled_actions_state::State,
-> ListScheduledActionsBuilder<S, St> {
+impl<S: BosStr, St: list_scheduled_actions_state::State> ListScheduledActionsBuilder<S, St> {
     /// Set the `subjects` field (optional)
     pub fn subjects(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
         self._fields.5 = value.into();

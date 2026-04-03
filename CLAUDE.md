@@ -33,8 +33,8 @@ Key design goals:
 
 This is a Cargo workspace with several crates:
 - jacquard: Main library crate (public API surface) with HTTP/XRPC client(s)
-- jacquard-common: Core AT Protocol types (DIDs, handles, at-URIs, NSIDs, TIDs, CIDs, etc.) and the `CowStr` type
-- jacquard-lexicon: Lexicon parsing and Rust code generation from lexicon schemas
+- jacquard-common: Core AT Protocol types (DIDs, handles, at-URIs, NSIDs, TIDs, CIDs, etc.), the `CowStr` type, and shared scope primitive enums
+- jacquard-lexicon: Lexicon parsing, Rust code generation from lexicon schemas, and permission set types
 - jacquard-api: Generated API bindings from 646 lexicon schemas (ATProto, Bluesky, community lexicons)
 - jacquard-derive: Attribute macros (`#[lexicon]`, `#[open_union]`) and derive macros (`#[derive(IntoStatic)]`, `#[derive(XrpcRequest)]`) for lexicon structures
 - jacquard-oauth: OAuth/DPoP flow implementation with session management
@@ -166,6 +166,12 @@ Collection types:
 - `Collection` trait: Marker trait for record types with `NSID` constant and `Record` associated type
 - `RecordError`: Generic error type for record retrieval operations (RecordNotFound, Unknown)
 
+Scope primitives (`scope_primitives` module):
+- `AccountResource`: Email, Repo, Status -- shared by OAuth scopes and permission set lexicons
+- `AccountAction`: Read, Manage -- account-level permission actions
+- `RepoAction`: Create, Update, Delete -- repository-level permission actions
+- These enums live in jacquard-common (not jacquard-oauth) because they are used by both the OAuth scope system and lexicon permission set types
+
 ## XRPC type design pattern
 
 XRPC traits use GATs parameterised on `S: BosStr`:
@@ -201,6 +207,26 @@ Test WASM compilation:
 ```bash
 just check-wasm
 ```
+
+## OAuth scopes (jacquard-oauth)
+
+Scope types (`Scope<S>` enum variants):
+- `Account`, `Identity`, `Repo`, `Rpc`, `Blob`: resource-specific scopes
+- `Transition(TransitionScope)`: migration scopes (Generic, Email, ChatBsky)
+- `Include(IncludeScope<S>)`: references a permission set NSID with optional `?aud=<did>` audience
+- `Atproto`, `OpenId`, `Profile`, `Email`: unit scopes (no string data)
+
+Container:
+- `Scopes<S>`: validated buffer+indices container for space-separated scope strings, replacing `Vec<Scope<S>>`
+- Stores a single string buffer with pre-computed byte-range indices (`u16`)
+- Yields `Scope<&str>` views via `iter()` -- zero-copy reconstruction from shared buffer
+- `Scopes::new(buffer)` parses and validates; `Scopes::empty()` for empty set
+
+Permission set resolution (feature: `scope-check`):
+- `LexPermissionSet` / `LexPermission` / `LexPermissionResource`: lexicon types in jacquard-lexicon for permission set definitions
+- `expand_permission_set()`: converts a `LexPermissionSet` into `Vec<Scope<SmolStr>>`
+- `resolve_permission_set()`: fetches a lexicon schema by NSID, validates namespace constraints, and expands to concrete scopes
+- Requires both `OAuthResolver` and `LexiconSchemaResolver` traits
 
 ## Client Architecture
 

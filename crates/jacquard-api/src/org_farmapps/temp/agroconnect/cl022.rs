@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::org_farmapps::temp::ecrop::CodeType;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::org_farmapps::temp::ecrop::CodeType;
+use serde::{Deserialize, Serialize};
 /// Fertilizer codelist
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -170,7 +170,7 @@ impl<S: BosStr> LexiconSchema for Cl022<S> {
 
 pub mod cl022_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -243,7 +243,9 @@ impl<S: BosStr> Cl022Builder<S, cl022_state::Empty> {
     pub fn new() -> Self {
         Cl022Builder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -313,10 +315,7 @@ where
     St::Id: cl022_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(
-        mut self,
-        value: impl Into<CodeType<S>>,
-    ) -> Cl022Builder<S, cl022_state::SetId<St>> {
+    pub fn id(mut self, value: impl Into<CodeType<S>>) -> Cl022Builder<S, cl022_state::SetId<St>> {
         self._fields.4 = Option::Some(value.into());
         Cl022Builder {
             _state: PhantomData,
@@ -447,10 +446,10 @@ where
 }
 
 fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.farmapps.temp.agroconnect.cl022"),
@@ -463,21 +462,19 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> LexiconDoc<'static> {
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
                         description: Some(CowStr::new_static("Codelist ferilizers")),
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("id"),
-                                SmolStr::new_static("description")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("id"),
+                            SmolStr::new_static("description"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("added"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Date when added to the list"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Date when added to the list",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -499,9 +496,9 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Description / name of the fertilizer"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Description / name of the fertilizer",
+                                    )),
                                     ..Default::default()
                                 }),
                             );

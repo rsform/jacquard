@@ -1,7 +1,10 @@
 use std::str::FromStr;
 
 use crate::types::OAuthClientMetadata;
-use crate::{keyset::Keyset, scopes::{Scope, Scopes}};
+use crate::{
+    keyset::Keyset,
+    scopes::{Scope, Scopes},
+};
 use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::{BosStr, IntoStatic};
 use serde::{Deserialize, Serialize};
@@ -345,9 +348,7 @@ where
                 .collect(),
         ),
         response_types: vec![S::from_static("code")],
-        scope: Some(
-            S::from_str(metadata.scopes.to_normalized_string().as_str()).unwrap(),
-        ),
+        scope: Some(S::from_str(metadata.scopes.to_normalized_string().as_str()).unwrap()),
         dpop_bound_access_tokens: Some(true),
         jwks_uri,
         jwks,
@@ -426,7 +427,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                         Uri::parse("http://127.0.0.1/callback".to_string()).unwrap(),
                         Uri::parse("http://[::1]/callback".to_string()).unwrap(),
                     ]),
-                    Some(Scopes::new(SmolStr::from("account:email atproto transition:generic")).unwrap())
+                    Some(
+                        Scopes::new(SmolStr::from("account:email atproto transition:generic"))
+                            .unwrap()
+                    )
                 ),
                 &None
             )

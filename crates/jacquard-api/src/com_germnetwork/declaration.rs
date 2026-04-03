@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_germnetwork::declaration;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_germnetwork::declaration;
+use serde::{Deserialize, Serialize};
 /// A declaration of a Germ Network account
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -69,9 +69,11 @@ pub struct DeclarationGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Declaration<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MessageMe<S: BosStr = DefaultStr> {
     ///A URL to present to an account that does not have its own com.germnetwork.declaration record, must have an empty fragment component, where the app should fill in the fragment component with the DIDs of the two accounts who wish to message each other
     pub message_me_url: UriValue<S>,
@@ -159,9 +161,7 @@ where
             MessageMeShowButtonTo::None => MessageMeShowButtonTo::None,
             MessageMeShowButtonTo::UsersIFollow => MessageMeShowButtonTo::UsersIFollow,
             MessageMeShowButtonTo::Everyone => MessageMeShowButtonTo::Everyone,
-            MessageMeShowButtonTo::Other(v) => {
-                MessageMeShowButtonTo::Other(v.into_static())
-            }
+            MessageMeShowButtonTo::Other(v) => MessageMeShowButtonTo::Other(v.into_static()),
         }
     }
 }
@@ -307,7 +307,7 @@ impl<S: BosStr> LexiconSchema for MessageMe<S> {
 
 pub mod declaration_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -427,10 +427,7 @@ impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
 
 impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
     /// Set the `messageMe` field (optional)
-    pub fn message_me(
-        mut self,
-        value: impl Into<Option<declaration::MessageMe<S>>>,
-    ) -> Self {
+    pub fn message_me(mut self, value: impl Into<Option<declaration::MessageMe<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -478,10 +475,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Declaration<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Declaration<S> {
         Declaration {
             continuity_proofs: self._fields.0,
             current_key: self._fields.1.unwrap(),
@@ -494,10 +488,10 @@ where
 }
 
 fn lexicon_doc_com_germnetwork_declaration() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.germnetwork.declaration"),
@@ -622,7 +616,7 @@ fn lexicon_doc_com_germnetwork_declaration() -> LexiconDoc<'static> {
 
 pub mod message_me_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -742,10 +736,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> MessageMe<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MessageMe<S> {
         MessageMe {
             message_me_url: self._fields.0.unwrap(),
             show_button_to: self._fields.1.unwrap(),

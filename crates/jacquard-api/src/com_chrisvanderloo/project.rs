@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A project for display on my website.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -162,7 +162,7 @@ impl<S: BosStr> LexiconSchema for Project<S> {
 
 pub mod project_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -237,7 +237,13 @@ pub mod project_state {
 /// Builder for constructing an instance of this type.
 pub struct ProjectBuilder<S: BosStr, St: project_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<UriValue<S>>, Option<UriValue<S>>, Option<S>),
+    _fields: (
+        Option<S>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<UriValue<S>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -335,10 +341,7 @@ where
     St::Title: project_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> ProjectBuilder<S, project_state::SetTitle<St>> {
+    pub fn title(mut self, value: impl Into<S>) -> ProjectBuilder<S, project_state::SetTitle<St>> {
         self._fields.4 = Option::Some(value.into());
         ProjectBuilder {
             _state: PhantomData,
@@ -381,10 +384,10 @@ where
 }
 
 fn lexicon_doc_com_chrisvanderloo_project() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.chrisvanderloo.project"),
@@ -393,18 +396,15 @@ fn lexicon_doc_com_chrisvanderloo_project() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A project for display on my website."),
-                    ),
+                    description: Some(CowStr::new_static("A project for display on my website.")),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("title"),
-                                SmolStr::new_static("description"),
-                                SmolStr::new_static("repo"), SmolStr::new_static("language")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("title"),
+                            SmolStr::new_static("description"),
+                            SmolStr::new_static("repo"),
+                            SmolStr::new_static("language"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

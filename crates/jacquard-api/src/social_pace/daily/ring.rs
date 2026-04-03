@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A record of daily activity rings (Apple Fitness), including move, exercise, and stand goals.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -115,7 +115,7 @@ impl<S: BosStr> LexiconSchema for Ring<S> {
 
 pub mod ring_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -343,10 +343,7 @@ where
     St::Move: ring_state::IsUnset,
 {
     /// Set the `move` field (required)
-    pub fn r#move(
-        mut self,
-        value: impl Into<i64>,
-    ) -> RingBuilder<S, ring_state::SetMove<St>> {
+    pub fn r#move(mut self, value: impl Into<i64>) -> RingBuilder<S, ring_state::SetMove<St>> {
         self._fields.3 = Option::Some(value.into());
         RingBuilder {
             _state: PhantomData,
@@ -453,10 +450,10 @@ where
 }
 
 fn lexicon_doc_social_pace_daily_ring() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.pace.daily.ring"),

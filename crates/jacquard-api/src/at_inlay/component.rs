@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Nsid, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, Nsid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,15 +24,18 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::at_inlay::ViaValtown;
 use crate::at_inlay::component;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Component rendered by calling a remote XRPC endpoint
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BodyExternal<S: BosStr = DefaultStr> {
     ///DID of the service hosting this component
     pub did: Did<S>,
@@ -43,7 +46,10 @@ pub struct BodyExternal<S: BosStr = DefaultStr> {
 /// Component rendered by the host from a serialized element tree
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BodyTemplate<S: BosStr = DefaultStr> {
     ///Serialized element tree with bindings
     pub node: Data<S>,
@@ -86,7 +92,6 @@ pub struct Component<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -111,7 +116,10 @@ pub struct ComponentGetRecordOutput<S: BosStr = DefaultStr> {
 /// Declares what data this component views and which prop receives it.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct View<S: BosStr = DefaultStr> {
     ///Data types this view accepts.
     pub accepts: Vec<ViewAcceptsItem<S>>,
@@ -120,7 +128,6 @@ pub struct View<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -135,7 +142,10 @@ pub enum ViewAcceptsItem<S: BosStr = DefaultStr> {
 /// View accepts a primitive value type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewPrimitive<S: BosStr = DefaultStr> {
     ///String format constraint. Only applies when type is 'string'.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -359,7 +369,10 @@ where
 /// View accepts individual records of a collection. Omit collection for a generic record view. When rkey is present, the component accepts bare DIDs (expanded to full AT URIs) and appears on identity pages.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewRecord<S: BosStr = DefaultStr> {
     ///The collection this component views. Omit for any-collection.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -571,7 +584,7 @@ impl<S: BosStr> LexiconSchema for ViewRecord<S> {
 
 pub mod body_external_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -658,10 +671,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BodyExternal<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BodyExternal<S> {
         BodyExternal {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -670,10 +680,10 @@ where
 }
 
 fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.inlay.component"),
@@ -682,11 +692,9 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("bodyExternal"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Component rendered by calling a remote XRPC endpoint",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Component rendered by calling a remote XRPC endpoint",
+                    )),
                     required: Some(vec![SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -694,11 +702,9 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "DID of the service hosting this component",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of the service hosting this component",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -711,11 +717,9 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("bodyTemplate"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Component rendered by the host from a serialized element tree",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Component rendered by the host from a serialized element tree",
+                    )),
                     required: Some(vec![SmolStr::new_static("node")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -841,27 +845,26 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("view"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Declares what data this component views and which prop receives it.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("prop"), SmolStr::new_static("accepts")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Declares what data this component views and which prop receives it.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("prop"),
+                        SmolStr::new_static("accepts"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("accepts"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Data types this view accepts."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Data types this view accepts.",
+                                )),
                                 items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("#viewRecord"),
-                                        CowStr::new_static("#viewPrimitive")
+                                        CowStr::new_static("#viewPrimitive"),
                                     ],
                                     ..Default::default()
                                 }),
@@ -872,11 +875,9 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("prop"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Which component prop receives the view data.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Which component prop receives the view data.",
+                                )),
                                 max_length: Some(256usize),
                                 ..Default::default()
                             }),
@@ -889,9 +890,7 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("viewPrimitive"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("View accepts a primitive value type."),
-                    ),
+                    description: Some(CowStr::new_static("View accepts a primitive value type.")),
                     required: Some(vec![SmolStr::new_static("type")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -899,11 +898,9 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("format"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "String format constraint. Only applies when type is 'string'.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "String format constraint. Only applies when type is 'string'.",
+                                )),
                                 max_length: Some(64usize),
                                 ..Default::default()
                             }),
@@ -911,9 +908,7 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Lexicon primitive type."),
-                                ),
+                                description: Some(CowStr::new_static("Lexicon primitive type.")),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),
@@ -971,7 +966,7 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
 
 pub mod body_template_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1058,10 +1053,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BodyTemplate<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BodyTemplate<S> {
         BodyTemplate {
             node: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1071,7 +1063,7 @@ where
 
 pub mod component_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1265,10 +1257,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Component<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Component<S> {
         Component {
             body: self._fields.0,
             created_at: self._fields.1,
@@ -1285,7 +1274,7 @@ where
 
 pub mod view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1377,10 +1366,7 @@ where
     St::Prop: view_state::IsUnset,
 {
     /// Set the `prop` field (required)
-    pub fn prop(
-        mut self,
-        value: impl Into<S>,
-    ) -> ViewBuilder<S, view_state::SetProp<St>> {
+    pub fn prop(mut self, value: impl Into<S>) -> ViewBuilder<S, view_state::SetProp<St>> {
         self._fields.1 = Option::Some(value.into());
         ViewBuilder {
             _state: PhantomData,

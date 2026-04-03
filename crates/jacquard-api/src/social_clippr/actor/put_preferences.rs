@@ -8,17 +8,20 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::social_clippr::actor::Preferences;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::social_clippr::actor::Preferences;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PutPreferences<S: BosStr = DefaultStr> {
     ///A ref to the user's preferences
     pub preferences: Preferences<S>,
@@ -37,9 +40,8 @@ impl jacquard_common::xrpc::XrpcResp for PutPreferencesResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutPreferences<S> {
     const NSID: &'static str = "social.clippr.actor.putPreferences";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PutPreferencesResponse;
 }
 
@@ -47,16 +49,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutPreferences<S> {
 pub struct PutPreferencesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutPreferencesRequest {
     const PATH: &'static str = "/xrpc/social.clippr.actor.putPreferences";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = PutPreferences<S>;
     type Response = PutPreferencesResponse;
 }
 
 pub mod put_preferences_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -143,10 +144,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PutPreferences<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PutPreferences<S> {
         PutPreferences {
             preferences: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

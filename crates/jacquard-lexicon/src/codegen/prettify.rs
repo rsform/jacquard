@@ -1405,7 +1405,8 @@ mod tests {
         assert!(tokens_str.contains("Did"));
         assert!(
             tokens_str.contains("S"),
-            "Did should include type param S in Macro mode, got: {}", tokens_str
+            "Did should include type param S in Macro mode, got: {}",
+            tokens_str
         );
     }
 

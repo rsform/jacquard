@@ -30,33 +30,35 @@ pub mod search_actors_skeleton;
 pub mod search_posts_skeleton;
 pub mod search_starter_packs_skeleton;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri, Datetime};
+use jacquard_common::types::string::{AtUri, Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewBasic;
 use crate::app_bsky::feed::BlockedAuthor;
 use crate::app_bsky::feed::PostView;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Object used to store age assurance data in stash.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AgeAssuranceEvent<S: BosStr = DefaultStr> {
     ///The unique identifier for this instance of the age assurance flow, in UUID format.
     pub attempt_id: S,
@@ -161,9 +163,7 @@ where
             AgeAssuranceEventStatus::Unknown => AgeAssuranceEventStatus::Unknown,
             AgeAssuranceEventStatus::Pending => AgeAssuranceEventStatus::Pending,
             AgeAssuranceEventStatus::Assured => AgeAssuranceEventStatus::Assured,
-            AgeAssuranceEventStatus::Other(v) => {
-                AgeAssuranceEventStatus::Other(v.into_static())
-            }
+            AgeAssuranceEventStatus::Other(v) => AgeAssuranceEventStatus::Other(v.into_static()),
         }
     }
 }
@@ -171,7 +171,10 @@ where
 /// The computed state of the age assurance process, returned to the user in question on certain authenticated requests.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AgeAssuranceState<S: BosStr = DefaultStr> {
     ///The timestamp when this state was last updated.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -264,43 +267,49 @@ where
             AgeAssuranceStateStatus::Pending => AgeAssuranceStateStatus::Pending,
             AgeAssuranceStateStatus::Assured => AgeAssuranceStateStatus::Assured,
             AgeAssuranceStateStatus::Blocked => AgeAssuranceStateStatus::Blocked,
-            AgeAssuranceStateStatus::Other(v) => {
-                AgeAssuranceStateStatus::Other(v.into_static())
-            }
+            AgeAssuranceStateStatus::Other(v) => AgeAssuranceStateStatus::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SkeletonSearchActor<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SkeletonSearchPost<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SkeletonSearchStarterPack<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SkeletonTrend<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<S>,
@@ -315,7 +324,6 @@ pub struct SkeletonTrend<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SkeletonTrendStatus<S: BosStr = DefaultStr> {
@@ -390,34 +398,42 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ThreadItemBlocked<S: BosStr = DefaultStr> {
     pub author: BlockedAuthor<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ThreadItemNoUnauthenticated<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ThreadItemNotFound<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ThreadItemPost<S: BosStr = DefaultStr> {
     ///The threadgate created by the author indicates this post as a reply to be hidden for everyone consuming the thread.
     pub hidden_by_threadgate: bool,
@@ -434,9 +450,11 @@ pub struct ThreadItemPost<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TrendView<S: BosStr = DefaultStr> {
     pub actors: Vec<ProfileViewBasic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -451,7 +469,6 @@ pub struct TrendView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TrendViewStatus<S: BosStr = DefaultStr> {
@@ -526,9 +543,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TrendingTopic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -722,7 +741,7 @@ impl<S: BosStr> LexiconSchema for TrendingTopic<S> {
 
 pub mod age_assurance_event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -956,10 +975,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AgeAssuranceEvent<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AgeAssuranceEvent<S> {
         AgeAssuranceEvent {
             attempt_id: self._fields.0.unwrap(),
             complete_ip: self._fields.1,
@@ -975,10 +991,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_unspecced_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.unspecced.defs"),
@@ -1194,21 +1210,22 @@ fn lexicon_doc_app_bsky_unspecced_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("skeletonTrend"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("topic"),
-                            SmolStr::new_static("displayName"),
-                            SmolStr::new_static("link"),
-                            SmolStr::new_static("startedAt"),
-                            SmolStr::new_static("postCount"), SmolStr::new_static("dids")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("topic"),
+                        SmolStr::new_static("displayName"),
+                        SmolStr::new_static("link"),
+                        SmolStr::new_static("startedAt"),
+                        SmolStr::new_static("postCount"),
+                        SmolStr::new_static("dids"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("category"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("dids"),
@@ -1222,11 +1239,15 @@ fn lexicon_doc_app_bsky_unspecced_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("displayName"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("link"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("postCount"),
@@ -1243,11 +1264,15 @@ fn lexicon_doc_app_bsky_unspecced_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("topic"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1264,9 +1289,7 @@ fn lexicon_doc_app_bsky_unspecced_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.feed.defs#blockedAuthor",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.feed.defs#blockedAuthor"),
                                 ..Default::default()
                             }),
                         );
@@ -1300,16 +1323,14 @@ fn lexicon_doc_app_bsky_unspecced_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("threadItemPost"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("post"),
-                            SmolStr::new_static("moreParents"),
-                            SmolStr::new_static("moreReplies"),
-                            SmolStr::new_static("opThread"),
-                            SmolStr::new_static("hiddenByThreadgate"),
-                            SmolStr::new_static("mutedByViewer")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("post"),
+                        SmolStr::new_static("moreParents"),
+                        SmolStr::new_static("moreReplies"),
+                        SmolStr::new_static("opThread"),
+                        SmolStr::new_static("hiddenByThreadgate"),
+                        SmolStr::new_static("mutedByViewer"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1358,16 +1379,14 @@ fn lexicon_doc_app_bsky_unspecced_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("trendView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("topic"),
-                            SmolStr::new_static("displayName"),
-                            SmolStr::new_static("link"),
-                            SmolStr::new_static("startedAt"),
-                            SmolStr::new_static("postCount"),
-                            SmolStr::new_static("actors")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("topic"),
+                        SmolStr::new_static("displayName"),
+                        SmolStr::new_static("link"),
+                        SmolStr::new_static("startedAt"),
+                        SmolStr::new_static("postCount"),
+                        SmolStr::new_static("actors"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1385,15 +1404,21 @@ fn lexicon_doc_app_bsky_unspecced_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("category"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("displayName"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("link"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("postCount"),
@@ -1410,11 +1435,15 @@ fn lexicon_doc_app_bsky_unspecced_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("topic"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1424,27 +1453,36 @@ fn lexicon_doc_app_bsky_unspecced_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("trendingTopic"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("topic"), SmolStr::new_static("link")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("topic"),
+                        SmolStr::new_static("link"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("description"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("displayName"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("link"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("topic"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1459,7 +1497,7 @@ fn lexicon_doc_app_bsky_unspecced_defs() -> LexiconDoc<'static> {
 
 pub mod skeleton_search_actor_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1490,10 +1528,7 @@ pub mod skeleton_search_actor_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SkeletonSearchActorBuilder<
-    S: BosStr,
-    St: skeleton_search_actor_state::State,
-> {
+pub struct SkeletonSearchActorBuilder<S: BosStr, St: skeleton_search_actor_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -1549,10 +1584,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SkeletonSearchActor<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SkeletonSearchActor<S> {
         SkeletonSearchActor {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1562,7 +1594,7 @@ where
 
 pub mod skeleton_search_post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1649,10 +1681,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SkeletonSearchPost<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SkeletonSearchPost<S> {
         SkeletonSearchPost {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1662,7 +1691,7 @@ where
 
 pub mod skeleton_search_starter_pack_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1704,17 +1733,12 @@ pub struct SkeletonSearchStarterPackBuilder<
 
 impl<S: BosStr> SkeletonSearchStarterPack<S> {
     /// Create a new builder for this type.
-    pub fn new() -> SkeletonSearchStarterPackBuilder<
-        S,
-        skeleton_search_starter_pack_state::Empty,
-    > {
+    pub fn new() -> SkeletonSearchStarterPackBuilder<S, skeleton_search_starter_pack_state::Empty> {
         SkeletonSearchStarterPackBuilder::new()
     }
 }
 
-impl<
-    S: BosStr,
-> SkeletonSearchStarterPackBuilder<S, skeleton_search_starter_pack_state::Empty> {
+impl<S: BosStr> SkeletonSearchStarterPackBuilder<S, skeleton_search_starter_pack_state::Empty> {
     /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SkeletonSearchStarterPackBuilder {
@@ -1734,10 +1758,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SkeletonSearchStarterPackBuilder<
-        S,
-        skeleton_search_starter_pack_state::SetUri<St>,
-    > {
+    ) -> SkeletonSearchStarterPackBuilder<S, skeleton_search_starter_pack_state::SetUri<St>> {
         self._fields.0 = Option::Some(value.into());
         SkeletonSearchStarterPackBuilder {
             _state: PhantomData,
@@ -1773,7 +1794,7 @@ where
 
 pub mod skeleton_trend_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2082,10 +2103,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SkeletonTrend<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SkeletonTrend<S> {
         SkeletonTrend {
             category: self._fields.0,
             dids: self._fields.1.unwrap(),
@@ -2102,7 +2120,7 @@ where
 
 pub mod thread_item_blocked_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2189,10 +2207,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ThreadItemBlocked<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ThreadItemBlocked<S> {
         ThreadItemBlocked {
             author: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -2202,7 +2217,7 @@ where
 
 pub mod thread_item_post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2481,10 +2496,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ThreadItemPost<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ThreadItemPost<S> {
         ThreadItemPost {
             hidden_by_threadgate: self._fields.0.unwrap(),
             more_parents: self._fields.1.unwrap(),
@@ -2499,7 +2511,7 @@ where
 
 pub mod trend_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2808,10 +2820,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TrendView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TrendView<S> {
         TrendView {
             actors: self._fields.0.unwrap(),
             category: self._fields.1,

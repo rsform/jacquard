@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A boxing match program combined with a history book entry. Before the fight it is a schedule. After the fight it is a permanent record. Ptah-Seker-Osiris — creation, shadow, rebirth. The event holds all three phases simultaneously.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -270,12 +270,8 @@ pub enum EventLoreStatus<S: BosStr = DefaultStr> {
 impl<S: BosStr> EventLoreStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::CanonicalStatusOfficial => {
-                "world.ptah.temp.defs#canonicalStatusOfficial"
-            }
-            Self::CanonicalStatusCommunity => {
-                "world.ptah.temp.defs#canonicalStatusCommunity"
-            }
+            Self::CanonicalStatusOfficial => "world.ptah.temp.defs#canonicalStatusOfficial",
+            Self::CanonicalStatusCommunity => "world.ptah.temp.defs#canonicalStatusCommunity",
             Self::Pending => "pending",
             Self::Other(s) => s.as_ref(),
         }
@@ -283,12 +279,8 @@ impl<S: BosStr> EventLoreStatus<S> {
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "world.ptah.temp.defs#canonicalStatusOfficial" => {
-                Self::CanonicalStatusOfficial
-            }
-            "world.ptah.temp.defs#canonicalStatusCommunity" => {
-                Self::CanonicalStatusCommunity
-            }
+            "world.ptah.temp.defs#canonicalStatusOfficial" => Self::CanonicalStatusOfficial,
+            "world.ptah.temp.defs#canonicalStatusCommunity" => Self::CanonicalStatusCommunity,
             "pending" => Self::Pending,
             _ => Self::Other(s),
         }
@@ -340,12 +332,8 @@ where
     type Output = EventLoreStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            EventLoreStatus::CanonicalStatusOfficial => {
-                EventLoreStatus::CanonicalStatusOfficial
-            }
-            EventLoreStatus::CanonicalStatusCommunity => {
-                EventLoreStatus::CanonicalStatusCommunity
-            }
+            EventLoreStatus::CanonicalStatusOfficial => EventLoreStatus::CanonicalStatusOfficial,
+            EventLoreStatus::CanonicalStatusCommunity => EventLoreStatus::CanonicalStatusCommunity,
             EventLoreStatus::Pending => EventLoreStatus::Pending,
             EventLoreStatus::Other(v) => EventLoreStatus::Other(v.into_static()),
         }
@@ -608,7 +596,7 @@ impl<S: BosStr> LexiconSchema for Event<S> {
 
 pub mod event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -715,20 +703,7 @@ impl<S: BosStr> EventBuilder<S, event_state::Empty> {
         EventBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -844,10 +819,7 @@ where
     St::Name: event_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> EventBuilder<S, event_state::SetName<St>> {
+    pub fn name(mut self, value: impl Into<S>) -> EventBuilder<S, event_state::SetName<St>> {
         self._fields.7 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -992,10 +964,10 @@ where
 }
 
 fn lexicon_doc_world_ptah_temp_event() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("world.ptah.temp.event"),

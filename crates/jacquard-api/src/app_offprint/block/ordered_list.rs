@@ -20,14 +20,17 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_offprint::block::ordered_list;
+use crate::app_offprint::block::text::Text;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_offprint::block::text::Text;
-use crate::app_offprint::block::ordered_list;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListItem<S: BosStr = DefaultStr> {
     ///Nested list items
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -38,9 +41,11 @@ pub struct ListItem<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct OrderedList<S: BosStr = DefaultStr> {
     ///List items
     pub children: Vec<ordered_list::ListItem<S>>,
@@ -84,7 +89,7 @@ impl<S: BosStr> LexiconSchema for OrderedList<S> {
 
 pub mod list_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -141,18 +146,12 @@ impl<S: BosStr> ListItemBuilder<S, list_item_state::Empty> {
 
 impl<S: BosStr, St: list_item_state::State> ListItemBuilder<S, St> {
     /// Set the `children` field (optional)
-    pub fn children(
-        mut self,
-        value: impl Into<Option<Vec<ordered_list::ListItem<S>>>>,
-    ) -> Self {
+    pub fn children(mut self, value: impl Into<Option<Vec<ordered_list::ListItem<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `children` field to an Option value (optional)
-    pub fn maybe_children(
-        mut self,
-        value: Option<Vec<ordered_list::ListItem<S>>>,
-    ) -> Self {
+    pub fn maybe_children(mut self, value: Option<Vec<ordered_list::ListItem<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -201,10 +200,10 @@ where
 }
 
 fn lexicon_doc_app_offprint_block_orderedList() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.offprint.block.orderedList"),
@@ -281,7 +280,7 @@ fn _default_ordered_list_start() -> Option<i64> {
 
 pub mod ordered_list_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -382,10 +381,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> OrderedList<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> OrderedList<S> {
         OrderedList {
             children: self._fields.0.unwrap(),
             start: self._fields.1.or_else(|| Some(1i64)),

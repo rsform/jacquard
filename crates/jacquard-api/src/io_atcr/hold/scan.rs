@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Vulnerability scan results for a container manifest. Stored in the hold's embedded PDS. Record key is deterministic: the manifest digest hex without the 'sha256:' prefix, so re-scans upsert the existing record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -178,19 +178,16 @@ impl<S: BosStr> LexiconSchema for Scan<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["application/spdx+json"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("sbom_blob"),
@@ -225,25 +222,20 @@ impl<S: BosStr> LexiconSchema for Scan<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["application/vnd.atcr.vulnerabilities+json"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("vuln_report_blob"),
-                        accepted: vec![
-                            "application/vnd.atcr.vulnerabilities+json".to_string()
-                        ],
+                        accepted: vec!["application/vnd.atcr.vulnerabilities+json".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -255,7 +247,7 @@ impl<S: BosStr> LexiconSchema for Scan<S> {
 
 pub mod scan_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -498,18 +490,7 @@ impl<S: BosStr> ScanBuilder<S, scan_state::Empty> {
         ScanBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -541,10 +522,7 @@ where
     St::High: scan_state::IsUnset,
 {
     /// Set the `high` field (required)
-    pub fn high(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ScanBuilder<S, scan_state::SetHigh<St>> {
+    pub fn high(mut self, value: impl Into<i64>) -> ScanBuilder<S, scan_state::SetHigh<St>> {
         self._fields.1 = Option::Some(value.into());
         ScanBuilder {
             _state: PhantomData,
@@ -560,10 +538,7 @@ where
     St::Low: scan_state::IsUnset,
 {
     /// Set the `low` field (required)
-    pub fn low(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ScanBuilder<S, scan_state::SetLow<St>> {
+    pub fn low(mut self, value: impl Into<i64>) -> ScanBuilder<S, scan_state::SetLow<St>> {
         self._fields.2 = Option::Some(value.into());
         ScanBuilder {
             _state: PhantomData,
@@ -598,10 +573,7 @@ where
     St::Medium: scan_state::IsUnset,
 {
     /// Set the `medium` field (required)
-    pub fn medium(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ScanBuilder<S, scan_state::SetMedium<St>> {
+    pub fn medium(mut self, value: impl Into<i64>) -> ScanBuilder<S, scan_state::SetMedium<St>> {
         self._fields.4 = Option::Some(value.into());
         ScanBuilder {
             _state: PhantomData,
@@ -687,10 +659,7 @@ where
     St::Total: scan_state::IsUnset,
 {
     /// Set the `total` field (required)
-    pub fn total(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ScanBuilder<S, scan_state::SetTotal<St>> {
+    pub fn total(mut self, value: impl Into<i64>) -> ScanBuilder<S, scan_state::SetTotal<St>> {
         self._fields.9 = Option::Some(value.into());
         ScanBuilder {
             _state: PhantomData,
@@ -785,10 +754,10 @@ where
 }
 
 fn lexicon_doc_io_atcr_hold_scan() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.hold.scan"),

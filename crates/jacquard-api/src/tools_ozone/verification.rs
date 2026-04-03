@@ -9,32 +9,34 @@ pub mod grant_verifications;
 pub mod list_verifications;
 pub mod revoke_verifications;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Handle, AtUri, Datetime};
+use jacquard_common::types::string::{AtUri, Datetime, Did, Handle};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::RepoViewDetail;
 use crate::tools_ozone::moderation::RepoViewNotFound;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Verification data for the associated subject.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct VerificationView<S: BosStr = DefaultStr> {
     ///Timestamp when the verification was created.
     pub created_at: Datetime,
@@ -69,7 +71,6 @@ pub struct VerificationView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -79,7 +80,6 @@ pub enum VerificationViewIssuerRepo<S: BosStr = DefaultStr> {
     #[serde(rename = "tools.ozone.moderation.defs#repoViewNotFound")]
     RepoViewNotFound(Box<RepoViewNotFound<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -108,7 +108,7 @@ impl<S: BosStr> LexiconSchema for VerificationView<S> {
 
 pub mod verification_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -252,19 +252,7 @@ impl<S: BosStr> VerificationViewBuilder<S, verification_view_state::Empty> {
         VerificationViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -362,18 +350,12 @@ impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, S
 
 impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, St> {
     /// Set the `issuerRepo` field (optional)
-    pub fn issuer_repo(
-        mut self,
-        value: impl Into<Option<VerificationViewIssuerRepo<S>>>,
-    ) -> Self {
+    pub fn issuer_repo(mut self, value: impl Into<Option<VerificationViewIssuerRepo<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `issuerRepo` field to an Option value (optional)
-    pub fn maybe_issuer_repo(
-        mut self,
-        value: Option<VerificationViewIssuerRepo<S>>,
-    ) -> Self {
+    pub fn maybe_issuer_repo(mut self, value: Option<VerificationViewIssuerRepo<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -460,10 +442,7 @@ impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, S
         self
     }
     /// Set the `subjectRepo` field to an Option value (optional)
-    pub fn maybe_subject_repo(
-        mut self,
-        value: Option<VerificationViewSubjectRepo<S>>,
-    ) -> Self {
+    pub fn maybe_subject_repo(mut self, value: Option<VerificationViewSubjectRepo<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -518,10 +497,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> VerificationView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> VerificationView<S> {
         VerificationView {
             created_at: self._fields.0.unwrap(),
             display_name: self._fields.1.unwrap(),
@@ -542,10 +518,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_verification_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.verification.defs"),

@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::games_gamesgamesgamesgames::GameFeedViewItem;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::games_gamesgamesgamesgames::GameFeedViewItem;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetSimilarGamesFeed<S: BosStr = DefaultStr> {
     ///Defaults to `5`. Min: 1. Max: 10.
     #[serde(default = "_default_limit")]
@@ -28,9 +31,11 @@ pub struct GetSimilarGamesFeed<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetSimilarGamesFeedOutput<S: BosStr = DefaultStr> {
     pub feed: Vec<GameFeedViewItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -67,7 +72,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_similar_games_feed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -98,10 +103,7 @@ pub mod get_similar_games_feed_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetSimilarGamesFeedBuilder<
-    S: BosStr,
-    St: get_similar_games_feed_state::State,
-> {
+pub struct GetSimilarGamesFeedBuilder<S: BosStr, St: get_similar_games_feed_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
@@ -125,10 +127,7 @@ impl<S: BosStr> GetSimilarGamesFeedBuilder<S, get_similar_games_feed_state::Empt
     }
 }
 
-impl<
-    S: BosStr,
-    St: get_similar_games_feed_state::State,
-> GetSimilarGamesFeedBuilder<S, St> {
+impl<S: BosStr, St: get_similar_games_feed_state::State> GetSimilarGamesFeedBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();

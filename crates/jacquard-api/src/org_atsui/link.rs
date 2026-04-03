@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::at_inlay::Response;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Link<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub children: Option<Data<S>>,
@@ -29,7 +32,6 @@ pub struct Link<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum LinkDecoration<S: BosStr = DefaultStr> {
@@ -108,9 +110,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LinkOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -129,9 +133,8 @@ impl jacquard_common::xrpc::XrpcResp for LinkResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Link<S> {
     const NSID: &'static str = "org.atsui.Link";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = LinkResponse;
 }
 
@@ -139,16 +142,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Link<S> {
 pub struct LinkRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LinkRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Link";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Link<S>;
     type Response = LinkResponse;
 }
 
 pub mod link_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -181,7 +183,11 @@ pub mod link_state {
 /// Builder for constructing an instance of this type.
 pub struct LinkBuilder<S: BosStr, St: link_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Data<S>>, Option<LinkDecoration<S>>, Option<UriValue<S>>),
+    _fields: (
+        Option<Data<S>>,
+        Option<LinkDecoration<S>>,
+        Option<UriValue<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -235,10 +241,7 @@ where
     St::Uri: link_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(
-        mut self,
-        value: impl Into<UriValue<S>>,
-    ) -> LinkBuilder<S, link_state::SetUri<St>> {
+    pub fn uri(mut self, value: impl Into<UriValue<S>>) -> LinkBuilder<S, link_state::SetUri<St>> {
         self._fields.2 = Option::Some(value.into());
         LinkBuilder {
             _state: PhantomData,

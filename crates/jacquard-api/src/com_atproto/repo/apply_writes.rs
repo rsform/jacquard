@@ -10,27 +10,30 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_common::types::string::{AtUri, Nsid, Cid, RecordKey, Rkey};
+use jacquard_common::types::string::{AtUri, Cid, Nsid, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::CommitMeta;
 use crate::com_atproto::repo::apply_writes;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Operation which creates a new record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Create<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
     ///NOTE: maxLength is redundant with record-key format. Keeping it temporarily to ensure backwards compatibility.
@@ -41,9 +44,11 @@ pub struct Create<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateResult<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -52,7 +57,6 @@ pub struct CreateResult<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CreateResultValidationStatus<S: BosStr = DefaultStr> {
@@ -100,8 +104,7 @@ impl<S: BosStr> Serialize for CreateResultValidationStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for CreateResultValidationStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CreateResultValidationStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -126,9 +129,7 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             CreateResultValidationStatus::Valid => CreateResultValidationStatus::Valid,
-            CreateResultValidationStatus::Unknown => {
-                CreateResultValidationStatus::Unknown
-            }
+            CreateResultValidationStatus::Unknown => CreateResultValidationStatus::Unknown,
             CreateResultValidationStatus::Other(v) => {
                 CreateResultValidationStatus::Other(v.into_static())
             }
@@ -139,7 +140,10 @@ where
 /// Operation which deletes an existing record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Delete<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
     pub rkey: RecordKey<Rkey<S>>,
@@ -147,17 +151,21 @@ pub struct Delete<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeleteResult<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ApplyWrites<S: BosStr = DefaultStr> {
     ///The handle or DID of the repo (aka, current account).
     pub repo: AtIdentifier<S>,
@@ -172,7 +180,6 @@ pub struct ApplyWrites<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ApplyWritesWritesItem<S: BosStr = DefaultStr> {
@@ -184,9 +191,11 @@ pub enum ApplyWritesWritesItem<S: BosStr = DefaultStr> {
     Delete(Box<apply_writes::Delete<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ApplyWritesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub commit: Option<CommitMeta<S>>,
@@ -195,7 +204,6 @@ pub struct ApplyWritesOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -208,18 +216,9 @@ pub enum ApplyWritesOutputResultsItem<S: BosStr = DefaultStr> {
     DeleteResult(Box<apply_writes::DeleteResult<S>>),
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum ApplyWritesError {
     /// Indicates that the 'swapCommit' parameter did not match current commit.
@@ -227,7 +226,10 @@ pub enum ApplyWritesError {
     InvalidSwap(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for ApplyWritesError {
@@ -254,7 +256,10 @@ impl core::fmt::Display for ApplyWritesError {
 /// Operation which updates an existing record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Update<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
     pub rkey: RecordKey<Rkey<S>>,
@@ -263,9 +268,11 @@ pub struct Update<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateResult<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -274,7 +281,6 @@ pub struct UpdateResult<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UpdateResultValidationStatus<S: BosStr = DefaultStr> {
@@ -322,8 +328,7 @@ impl<S: BosStr> Serialize for UpdateResultValidationStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for UpdateResultValidationStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for UpdateResultValidationStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -348,9 +353,7 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             UpdateResultValidationStatus::Valid => UpdateResultValidationStatus::Valid,
-            UpdateResultValidationStatus::Unknown => {
-                UpdateResultValidationStatus::Unknown
-            }
+            UpdateResultValidationStatus::Unknown => UpdateResultValidationStatus::Unknown,
             UpdateResultValidationStatus::Other(v) => {
                 UpdateResultValidationStatus::Other(v.into_static())
             }
@@ -439,9 +442,8 @@ impl jacquard_common::xrpc::XrpcResp for ApplyWritesResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ApplyWrites<S> {
     const NSID: &'static str = "com.atproto.repo.applyWrites";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = ApplyWritesResponse;
 }
 
@@ -449,9 +451,8 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ApplyWrites<S> {
 pub struct ApplyWritesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ApplyWritesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.repo.applyWrites";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = ApplyWrites<S>;
     type Response = ApplyWritesResponse;
 }
@@ -488,7 +489,7 @@ impl<S: BosStr> LexiconSchema for UpdateResult<S> {
 
 pub mod create_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -633,10 +634,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.repo.applyWrites"),
@@ -691,9 +692,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("createResult"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -713,7 +712,9 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("validationStatus"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -723,15 +724,13 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("delete"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Operation which deletes an existing record."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("collection"),
-                            SmolStr::new_static("rkey")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Operation which deletes an existing record.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("collection"),
+                        SmolStr::new_static("rkey"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -838,15 +837,14 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("update"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Operation which updates an existing record."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("collection"),
-                            SmolStr::new_static("rkey"), SmolStr::new_static("value")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Operation which updates an existing record.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("collection"),
+                        SmolStr::new_static("rkey"),
+                        SmolStr::new_static("value"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -878,9 +876,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("updateResult"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -900,7 +896,9 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("validationStatus"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -915,7 +913,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
 
 pub mod create_result_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -960,7 +958,11 @@ pub mod create_result_state {
 /// Builder for constructing an instance of this type.
 pub struct CreateResultBuilder<S: BosStr, St: create_result_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Cid<S>>, Option<AtUri<S>>, Option<CreateResultValidationStatus<S>>),
+    _fields: (
+        Option<Cid<S>>,
+        Option<AtUri<S>>,
+        Option<CreateResultValidationStatus<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1055,10 +1057,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CreateResult<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateResult<S> {
         CreateResult {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -1070,7 +1069,7 @@ where
 
 pub mod delete_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1201,7 +1200,7 @@ where
 
 pub mod apply_writes_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1354,10 +1353,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ApplyWrites<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ApplyWrites<S> {
         ApplyWrites {
             repo: self._fields.0.unwrap(),
             swap_commit: self._fields.1,
@@ -1370,7 +1366,7 @@ where
 
 pub mod update_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1537,7 +1533,7 @@ where
 
 pub mod update_result_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1582,7 +1578,11 @@ pub mod update_result_state {
 /// Builder for constructing an instance of this type.
 pub struct UpdateResultBuilder<S: BosStr, St: update_result_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Cid<S>>, Option<AtUri<S>>, Option<UpdateResultValidationStatus<S>>),
+    _fields: (
+        Option<Cid<S>>,
+        Option<AtUri<S>>,
+        Option<UpdateResultValidationStatus<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1677,10 +1677,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> UpdateResult<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateResult<S> {
         UpdateResult {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),

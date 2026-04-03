@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,13 +20,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::games_firehose::barklesheep::place_sheeps;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::games_firehose::barklesheep::place_sheeps;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PlaceSheeps<S: BosStr = DefaultStr> {
     pub game_id: S,
     pub sheeps: Vec<place_sheeps::SheepPlacement<S>>,
@@ -34,9 +37,11 @@ pub struct PlaceSheeps<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PlaceSheepsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub success: Option<bool>,
@@ -44,9 +49,11 @@ pub struct PlaceSheepsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SheepPlacement<S: BosStr = DefaultStr> {
     pub horizontal: bool,
     pub start: i64,
@@ -66,9 +73,8 @@ impl jacquard_common::xrpc::XrpcResp for PlaceSheepsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PlaceSheeps<S> {
     const NSID: &'static str = "games.firehose.barklesheep.placeSheeps";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PlaceSheepsResponse;
 }
 
@@ -76,9 +82,8 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PlaceSheeps<S> {
 pub struct PlaceSheepsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PlaceSheepsRequest {
     const PATH: &'static str = "/xrpc/games.firehose.barklesheep.placeSheeps";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = PlaceSheeps<S>;
     type Response = PlaceSheepsResponse;
 }
@@ -100,7 +105,7 @@ impl<S: BosStr> LexiconSchema for SheepPlacement<S> {
 
 pub mod place_sheeps_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -220,10 +225,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PlaceSheeps<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PlaceSheeps<S> {
         PlaceSheeps {
             game_id: self._fields.0.unwrap(),
             sheeps: self._fields.1.unwrap(),
@@ -234,7 +236,7 @@ where
 
 pub mod sheep_placement_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -389,10 +391,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SheepPlacement<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SheepPlacement<S> {
         SheepPlacement {
             horizontal: self._fields.0.unwrap(),
             start: self._fields.1.unwrap(),
@@ -403,10 +402,10 @@ where
 }
 
 fn lexicon_doc_games_firehose_barklesheep_placeSheeps() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.firehose.barklesheep.placeSheeps"),
@@ -417,37 +416,34 @@ fn lexicon_doc_games_firehose_barklesheep_placeSheeps() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(
-                            LexXrpcBodySchema::Object(LexObject {
-                                required: Some(
-                                    vec![
-                                        SmolStr::new_static("gameId"), SmolStr::new_static("sheeps")
-                                    ],
-                                ),
-                                properties: {
-                                    #[allow(unused_mut)]
-                                    let mut map = BTreeMap::new();
-                                    map.insert(
-                                        SmolStr::new_static("gameId"),
-                                        LexObjectProperty::String(LexString {
+                        schema: Some(LexXrpcBodySchema::Object(LexObject {
+                            required: Some(vec![
+                                SmolStr::new_static("gameId"),
+                                SmolStr::new_static("sheeps"),
+                            ]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("gameId"),
+                                    LexObjectProperty::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("sheeps"),
+                                    LexObjectProperty::Array(LexArray {
+                                        items: LexArrayItem::Ref(LexRef {
+                                            r#ref: CowStr::new_static("#sheepPlacement"),
                                             ..Default::default()
                                         }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("sheeps"),
-                                        LexObjectProperty::Array(LexArray {
-                                            items: LexArrayItem::Ref(LexRef {
-                                                r#ref: CowStr::new_static("#sheepPlacement"),
-                                                ..Default::default()
-                                            }),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map
-                                },
-                                ..Default::default()
-                            }),
-                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        })),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -456,12 +452,11 @@ fn lexicon_doc_games_firehose_barklesheep_placeSheeps() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("sheepPlacement"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("type"), SmolStr::new_static("start"),
-                            SmolStr::new_static("horizontal")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("type"),
+                        SmolStr::new_static("start"),
+                        SmolStr::new_static("horizontal"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -479,7 +474,9 @@ fn lexicon_doc_games_firehose_barklesheep_placeSheeps() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },

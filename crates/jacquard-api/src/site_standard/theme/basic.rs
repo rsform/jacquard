@@ -20,13 +20,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::site_standard::theme::color::Rgb;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::site_standard::theme::color::Rgb;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Basic<S: BosStr = DefaultStr> {
     pub accent: Rgb<S>,
     pub accent_foreground: Rgb<S>,
@@ -53,7 +56,7 @@ impl<S: BosStr> LexiconSchema for Basic<S> {
 
 pub mod basic_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -128,7 +131,12 @@ pub mod basic_state {
 /// Builder for constructing an instance of this type.
 pub struct BasicBuilder<S: BosStr, St: basic_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Rgb<S>>, Option<Rgb<S>>, Option<Rgb<S>>, Option<Rgb<S>>),
+    _fields: (
+        Option<Rgb<S>>,
+        Option<Rgb<S>>,
+        Option<Rgb<S>>,
+        Option<Rgb<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -257,10 +265,10 @@ where
 }
 
 fn lexicon_doc_site_standard_theme_basic() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("site.standard.theme.basic"),
@@ -269,50 +277,40 @@ fn lexicon_doc_site_standard_theme_basic() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("background"),
-                            SmolStr::new_static("foreground"),
-                            SmolStr::new_static("accent"),
-                            SmolStr::new_static("accentForeground")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("background"),
+                        SmolStr::new_static("foreground"),
+                        SmolStr::new_static("accent"),
+                        SmolStr::new_static("accentForeground"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("accent"),
                             LexObjectProperty::Union(LexRefUnion {
-                                refs: vec![
-                                    CowStr::new_static("site.standard.theme.color#rgb")
-                                ],
+                                refs: vec![CowStr::new_static("site.standard.theme.color#rgb")],
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("accentForeground"),
                             LexObjectProperty::Union(LexRefUnion {
-                                refs: vec![
-                                    CowStr::new_static("site.standard.theme.color#rgb")
-                                ],
+                                refs: vec![CowStr::new_static("site.standard.theme.color#rgb")],
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("background"),
                             LexObjectProperty::Union(LexRefUnion {
-                                refs: vec![
-                                    CowStr::new_static("site.standard.theme.color#rgb")
-                                ],
+                                refs: vec![CowStr::new_static("site.standard.theme.color#rgb")],
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("foreground"),
                             LexObjectProperty::Union(LexRefUnion {
-                                refs: vec![
-                                    CowStr::new_static("site.standard.theme.color#rgb")
-                                ],
+                                refs: vec![CowStr::new_static("site.standard.theme.color#rgb")],
                                 ..Default::default()
                             }),
                         );

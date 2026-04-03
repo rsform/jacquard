@@ -13,35 +13,37 @@ pub mod profile;
 pub mod search_actors;
 pub mod search_actors_typeahead;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Handle, AtUri, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Datetime, Did, Handle, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewDetailed;
 use crate::com_atproto::label::Label;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::actor;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A single author in a Weaver notebook.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Author<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     ///signed bytes of the corresponding notebook record in the author's repo
@@ -55,7 +57,10 @@ pub struct Author<S: BosStr = DefaultStr> {
 pub type PinnedList<S = DefaultStr> = Vec<StrongRef<S>>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileDataView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collaboration_count: Option<i64>,
@@ -74,7 +79,6 @@ pub struct ProfileDataView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -87,9 +91,11 @@ pub enum ProfileDataViewInner<S: BosStr = DefaultStr> {
     TangledProfileView(Box<actor::TangledProfileView<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileDataViewBasic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub follower_count: Option<i64>,
@@ -101,7 +107,6 @@ pub struct ProfileDataViewBasic<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -115,9 +120,11 @@ pub enum ProfileDataViewBasicInner<S: BosStr = DefaultStr> {
     TangledProfileView(Box<actor::TangledProfileView<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
@@ -163,9 +170,11 @@ pub struct ProfileView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileViewBasic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
@@ -190,7 +199,10 @@ pub type PronounsList<S = DefaultStr> = Vec<S>;
 /// A notebook the viewer subscribes to without a global follow.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SubscribedNotebook<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub path: Option<S>,
@@ -201,9 +213,11 @@ pub struct SubscribedNotebook<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TangledProfileView<S: BosStr = DefaultStr> {
     ///Include link to this account on Bluesky.
     pub bluesky: bool,
@@ -229,7 +243,10 @@ pub struct TangledProfileView<S: BosStr = DefaultStr> {
 /// Viewer's relationship state with an actor (detailed version).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewerState<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocked: Option<AtUri<S>>,
@@ -254,7 +271,10 @@ pub struct ViewerState<S: BosStr = DefaultStr> {
 /// Viewer's relationship state with an actor (basic version).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewerStateBasic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocked: Option<AtUri<S>>,
@@ -625,7 +645,7 @@ impl<S: BosStr> LexiconSchema for ViewerStateBasic<S> {
 
 pub mod author_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -686,10 +706,7 @@ where
     St::Did: author_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> AuthorBuilder<S, author_state::SetDid<St>> {
+    pub fn did(mut self, value: impl Into<Did<S>>) -> AuthorBuilder<S, author_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         AuthorBuilder {
             _state: PhantomData,
@@ -736,10 +753,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_actor_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.actor.defs"),
@@ -748,9 +765,7 @@ fn lexicon_doc_sh_weaver_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("author"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A single author in a Weaver notebook."),
-                    ),
+                    description: Some(CowStr::new_static("A single author in a Weaver notebook.")),
                     required: Some(vec![SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -764,7 +779,9 @@ fn lexicon_doc_sh_weaver_actor_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("signature"),
-                            LexObjectProperty::Bytes(LexBytes { ..Default::default() }),
+                            LexObjectProperty::Bytes(LexBytes {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -818,7 +835,7 @@ fn lexicon_doc_sh_weaver_actor_defs() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("#profileView"),
                                     CowStr::new_static("app.bsky.actor.defs#profileViewDetailed"),
-                                    CowStr::new_static("#tangledProfileView")
+                                    CowStr::new_static("#tangledProfileView"),
                                 ],
                                 ..Default::default()
                             }),
@@ -866,7 +883,7 @@ fn lexicon_doc_sh_weaver_actor_defs() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("#profileViewBasic"),
                                     CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
-                                    CowStr::new_static("#tangledProfileView")
+                                    CowStr::new_static("#tangledProfileView"),
                                 ],
                                 ..Default::default()
                             }),
@@ -1040,9 +1057,10 @@ fn lexicon_doc_sh_weaver_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("profileViewBasic"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("did"), SmolStr::new_static("handle")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("handle"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1126,22 +1144,24 @@ fn lexicon_doc_sh_weaver_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("subscribedNotebook"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A notebook the viewer subscribes to without a global follow.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A notebook the viewer subscribes to without a global follow.",
+                    )),
                     required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("path"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -1263,11 +1283,9 @@ fn lexicon_doc_sh_weaver_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("viewerState"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Viewer's relationship state with an actor (detailed version).",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Viewer's relationship state with an actor (detailed version).",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1337,11 +1355,9 @@ fn lexicon_doc_sh_weaver_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("viewerStateBasic"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Viewer's relationship state with an actor (basic version).",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Viewer's relationship state with an actor (basic version).",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1412,7 +1428,7 @@ fn lexicon_doc_sh_weaver_actor_defs() -> LexiconDoc<'static> {
 
 pub mod profile_data_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1591,10 +1607,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ProfileDataView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileDataView<S> {
         ProfileDataView {
             collaboration_count: self._fields.0,
             entry_count: self._fields.1,
@@ -1610,7 +1623,7 @@ where
 
 pub mod profile_data_view_basic_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1641,10 +1654,7 @@ pub mod profile_data_view_basic_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileDataViewBasicBuilder<
-    S: BosStr,
-    St: profile_data_view_basic_state::State,
-> {
+pub struct ProfileDataViewBasicBuilder<S: BosStr, St: profile_data_view_basic_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
@@ -1657,10 +1667,7 @@ pub struct ProfileDataViewBasicBuilder<
 
 impl<S: BosStr> ProfileDataViewBasic<S> {
     /// Create a new builder for this type.
-    pub fn new() -> ProfileDataViewBasicBuilder<
-        S,
-        profile_data_view_basic_state::Empty,
-    > {
+    pub fn new() -> ProfileDataViewBasicBuilder<S, profile_data_view_basic_state::Empty> {
         ProfileDataViewBasicBuilder::new()
     }
 }
@@ -1676,10 +1683,7 @@ impl<S: BosStr> ProfileDataViewBasicBuilder<S, profile_data_view_basic_state::Em
     }
 }
 
-impl<
-    S: BosStr,
-    St: profile_data_view_basic_state::State,
-> ProfileDataViewBasicBuilder<S, St> {
+impl<S: BosStr, St: profile_data_view_basic_state::State> ProfileDataViewBasicBuilder<S, St> {
     /// Set the `followerCount` field (optional)
     pub fn follower_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -1692,10 +1696,7 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: profile_data_view_basic_state::State,
-> ProfileDataViewBasicBuilder<S, St> {
+impl<S: BosStr, St: profile_data_view_basic_state::State> ProfileDataViewBasicBuilder<S, St> {
     /// Set the `followingCount` field (optional)
     pub fn following_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -1727,15 +1728,9 @@ where
     }
 }
 
-impl<
-    S: BosStr,
-    St: profile_data_view_basic_state::State,
-> ProfileDataViewBasicBuilder<S, St> {
+impl<S: BosStr, St: profile_data_view_basic_state::State> ProfileDataViewBasicBuilder<S, St> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(
-        mut self,
-        value: impl Into<Option<actor::ViewerStateBasic<S>>>,
-    ) -> Self {
+    pub fn viewer(mut self, value: impl Into<Option<actor::ViewerStateBasic<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -1778,7 +1773,7 @@ where
 
 pub mod profile_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1859,24 +1854,8 @@ impl<S: BosStr> ProfileViewBuilder<S, profile_view_state::Empty> {
         ProfileViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -2160,10 +2139,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ProfileView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileView<S> {
         ProfileView {
             avatar: self._fields.0,
             banner: self._fields.1,
@@ -2190,7 +2166,7 @@ where
 
 pub mod profile_view_basic_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2403,10 +2379,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ProfileViewBasic<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileViewBasic<S> {
         ProfileViewBasic {
             avatar: self._fields.0,
             created_at: self._fields.1,
@@ -2423,7 +2396,7 @@ where
 
 pub mod subscribed_notebook_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2538,10 +2511,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SubscribedNotebook<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SubscribedNotebook<S> {
         SubscribedNotebook {
             path: self._fields.0,
             title: self._fields.1,
@@ -2553,7 +2523,7 @@ where
 
 pub mod tangled_profile_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2741,10 +2711,7 @@ impl<S: BosStr, St: tangled_profile_view_state::State> TangledProfileViewBuilder
 
 impl<S: BosStr, St: tangled_profile_view_state::State> TangledProfileViewBuilder<S, St> {
     /// Set the `pinnedRepositories` field (optional)
-    pub fn pinned_repositories(
-        mut self,
-        value: impl Into<Option<Vec<AtUri<S>>>>,
-    ) -> Self {
+    pub fn pinned_repositories(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
@@ -2790,10 +2757,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TangledProfileView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TangledProfileView<S> {
         TangledProfileView {
             bluesky: self._fields.0.unwrap(),
             description: self._fields.1,

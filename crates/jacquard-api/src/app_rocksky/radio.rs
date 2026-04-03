@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A declaration of a radio station.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -71,9 +71,11 @@ pub struct RadioGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Radio<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RadioViewBasic<S: BosStr = DefaultStr> {
     ///The date and time when the radio was created.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -91,9 +93,11 @@ pub struct RadioViewBasic<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RadioViewDetailed<S: BosStr = DefaultStr> {
     ///The date and time when the radio was created.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -223,25 +227,20 @@ impl<S: BosStr> LexiconSchema for Radio<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("logo"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -305,7 +304,7 @@ impl<S: BosStr> LexiconSchema for RadioViewDetailed<S> {
 
 pub mod radio_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -458,10 +457,7 @@ where
     St::Name: radio_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> RadioBuilder<S, radio_state::SetName<St>> {
+    pub fn name(mut self, value: impl Into<S>) -> RadioBuilder<S, radio_state::SetName<St>> {
         self._fields.4 = Option::Some(value.into());
         RadioBuilder {
             _state: PhantomData,
@@ -539,10 +535,10 @@ where
 }
 
 fn lexicon_doc_app_rocksky_radio() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.radio"),
@@ -551,28 +547,23 @@ fn lexicon_doc_app_rocksky_radio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A declaration of a radio station."),
-                    ),
+                    description: Some(CowStr::new_static("A declaration of a radio station.")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("name"), SmolStr::new_static("url"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("url"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "The date when the radio station was created.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The date when the radio station was created.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -580,9 +571,9 @@ fn lexicon_doc_app_rocksky_radio() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("A description of the radio station."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "A description of the radio station.",
+                                    )),
                                     min_length: Some(1usize),
                                     max_length: Some(1000usize),
                                     ..Default::default()
@@ -591,9 +582,9 @@ fn lexicon_doc_app_rocksky_radio() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("genre"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The genre of the radio station."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The genre of the radio station.",
+                                    )),
                                     min_length: Some(1usize),
                                     max_length: Some(256usize),
                                     ..Default::default()
@@ -601,14 +592,16 @@ fn lexicon_doc_app_rocksky_radio() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("logo"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The name of the radio station."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The name of the radio station.",
+                                    )),
                                     min_length: Some(1usize),
                                     max_length: Some(512usize),
                                     ..Default::default()
@@ -617,9 +610,9 @@ fn lexicon_doc_app_rocksky_radio() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("url"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The URL of the radio station."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The URL of the radio station.",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -627,9 +620,9 @@ fn lexicon_doc_app_rocksky_radio() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("website"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The website of the radio station."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The website of the radio station.",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -648,10 +641,10 @@ fn lexicon_doc_app_rocksky_radio() -> LexiconDoc<'static> {
 }
 
 fn lexicon_doc_app_rocksky_radio_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.radio.defs"),
@@ -666,11 +659,9 @@ fn lexicon_doc_app_rocksky_radio_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The date and time when the radio was created.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The date and time when the radio was created.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -678,27 +669,25 @@ fn lexicon_doc_app_rocksky_radio_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("A brief description of the radio."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "A brief description of the radio.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The unique identifier of the radio."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The unique identifier of the radio.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The name of the radio."),
-                                ),
+                                description: Some(CowStr::new_static("The name of the radio.")),
                                 ..Default::default()
                             }),
                         );
@@ -716,11 +705,9 @@ fn lexicon_doc_app_rocksky_radio_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The date and time when the radio was created.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The date and time when the radio was created.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -728,54 +715,50 @@ fn lexicon_doc_app_rocksky_radio_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("A brief description of the radio."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "A brief description of the radio.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("genre"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The genre of the radio."),
-                                ),
+                                description: Some(CowStr::new_static("The genre of the radio.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The unique identifier of the radio."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The unique identifier of the radio.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("logo"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The logo of the radio station."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The logo of the radio station.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The name of the radio."),
-                                ),
+                                description: Some(CowStr::new_static("The name of the radio.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The streaming URL of the radio."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The streaming URL of the radio.",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -783,9 +766,7 @@ fn lexicon_doc_app_rocksky_radio_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("website"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The website of the radio."),
-                                ),
+                                description: Some(CowStr::new_static("The website of the radio.")),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),

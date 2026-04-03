@@ -1,5 +1,7 @@
 use jacquard_common::session::SessionStoreError;
 use miette::Diagnostic;
+#[cfg(feature = "scope-check")]
+use smol_str::SmolStr;
 
 use crate::request::RequestError;
 use crate::resolver::ResolverError;
@@ -62,6 +64,12 @@ pub enum OAuthError {
     #[error(transparent)]
     #[diagnostic(code(jacquard_oauth::callback))]
     Callback(#[from] CallbackError),
+
+    /// An error occurred checking request scope permissions.
+    #[cfg(feature = "scope-check")]
+    #[error(transparent)]
+    #[diagnostic(transparent)]
+    ScopeCheck(#[from] ScopeError),
 }
 
 /// Typed callback validation errors (redirect handling).
@@ -94,6 +102,29 @@ pub enum CallbackError {
     #[error("timeout")]
     #[diagnostic(code(jacquard_oauth::callback::timeout))]
     Timeout,
+    /// An error occurred resolving permission sets during session creation.
+    #[cfg(feature = "scope-check")]
+    #[error("scope resolution failed: {detail}")]
+    #[diagnostic(code(jacquard_oauth::callback::scope_resolution))]
+    ScopeResolution {
+        /// Description of the resolution failure.
+        detail: String,
+    },
+}
+
+/// Error returned when a request's required scope is not covered by the session's granted scopes.
+#[cfg(feature = "scope-check")]
+#[derive(Debug, thiserror::Error, Diagnostic)]
+#[error("request to `{nsid}` not permitted: no granted scope covers this endpoint")]
+#[diagnostic(
+    code(jacquard_oauth::scope_check),
+    help("granted scopes: {granted}. The endpoint requires an `rpc:` scope covering `{nsid}`.")
+)]
+pub struct ScopeError {
+    /// The NSID of the XRPC method that was denied.
+    pub nsid: SmolStr,
+    /// Human-readable summary of the granted scopes for diagnostic output.
+    pub granted: SmolStr,
 }
 
 /// Convenience alias for `Result<T, OAuthError>`.

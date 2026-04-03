@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::sh_weaver::notebook::ChapterView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::sh_weaver::notebook::ChapterView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetNotebookChapters<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -30,9 +33,11 @@ pub struct GetNotebookChapters<S: BosStr = DefaultStr> {
     pub notebook: AtUri<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetNotebookChaptersOutput<S: BosStr = DefaultStr> {
     pub chapters: Vec<ChapterView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -71,7 +76,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_notebook_chapters_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -102,10 +107,7 @@ pub mod get_notebook_chapters_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetNotebookChaptersBuilder<
-    S: BosStr,
-    St: get_notebook_chapters_state::State,
-> {
+pub struct GetNotebookChaptersBuilder<S: BosStr, St: get_notebook_chapters_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
@@ -129,10 +131,7 @@ impl<S: BosStr> GetNotebookChaptersBuilder<S, get_notebook_chapters_state::Empty
     }
 }
 
-impl<
-    S: BosStr,
-    St: get_notebook_chapters_state::State,
-> GetNotebookChaptersBuilder<S, St> {
+impl<S: BosStr, St: get_notebook_chapters_state::State> GetNotebookChaptersBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -145,10 +144,7 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: get_notebook_chapters_state::State,
-> GetNotebookChaptersBuilder<S, St> {
+impl<S: BosStr, St: get_notebook_chapters_state::State> GetNotebookChaptersBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();

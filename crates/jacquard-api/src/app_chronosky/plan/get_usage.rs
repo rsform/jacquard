@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,14 +21,17 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_chronosky::plan::get_usage;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_chronosky::plan::get_usage;
+use serde::{Deserialize, Serialize};
 /// Current plan information.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CurrentPlan<S: BosStr = DefaultStr> {
     ///Localized plan display names
     pub display_name: Data<S>,
@@ -47,9 +50,11 @@ pub struct CurrentPlan<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetUsageOutput<S: BosStr = DefaultStr> {
     pub current_plan: get_usage::CurrentPlan<S>,
     pub limits: get_usage::PlanLimits<S>,
@@ -61,7 +66,10 @@ pub struct GetUsageOutput<S: BosStr = DefaultStr> {
 /// Plan limits.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PlanLimits<S: BosStr = DefaultStr> {
     ///Whether markdown formatting is supported
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -100,7 +108,10 @@ pub struct PlanLimits<S: BosStr = DefaultStr> {
 /// Usage statistics.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UsageStats<S: BosStr = DefaultStr> {
     ///API requests in current hour
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -230,7 +241,7 @@ impl<S: BosStr> LexiconSchema for UsageStats<S> {
 
 pub mod current_plan_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -482,10 +493,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CurrentPlan<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CurrentPlan<S> {
         CurrentPlan {
             display_name: self._fields.0.unwrap(),
             id: self._fields.1.unwrap(),
@@ -499,10 +507,10 @@ where
 }
 
 fn lexicon_doc_app_chronosky_plan_getUsage() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chronosky.plan.getUsage"),
@@ -512,14 +520,13 @@ fn lexicon_doc_app_chronosky_plan_getUsage() -> LexiconDoc<'static> {
                 SmolStr::new_static("currentPlan"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Current plan information.")),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("id"), SmolStr::new_static("tier"),
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("displayName"),
-                            SmolStr::new_static("isActive")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("tier"),
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("displayName"),
+                        SmolStr::new_static("isActive"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -554,11 +561,9 @@ fn lexicon_doc_app_chronosky_plan_getUsage() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("tier"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Plan tier (FREE, BASIC, STANDARD, PREMIUM)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Plan tier (FREE, BASIC, STANDARD, PREMIUM)",
+                                )),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -566,9 +571,9 @@ fn lexicon_doc_app_chronosky_plan_getUsage() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("validUntil"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Plan expiration date (ISO 8601)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Plan expiration date (ISO 8601)",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -590,16 +595,14 @@ fn lexicon_doc_app_chronosky_plan_getUsage() -> LexiconDoc<'static> {
                 SmolStr::new_static("planLimits"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Plan limits.")),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("monthlyPostsLimit"),
-                            SmolStr::new_static("pendingPostsLimit"),
-                            SmolStr::new_static("maxScheduleDays"),
-                            SmolStr::new_static("scheduleIntervalMinutes"),
-                            SmolStr::new_static("maxImagesPerPost"),
-                            SmolStr::new_static("threadPostsLimit")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("monthlyPostsLimit"),
+                        SmolStr::new_static("pendingPostsLimit"),
+                        SmolStr::new_static("maxScheduleDays"),
+                        SmolStr::new_static("scheduleIntervalMinutes"),
+                        SmolStr::new_static("maxImagesPerPost"),
+                        SmolStr::new_static("threadPostsLimit"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -684,15 +687,13 @@ fn lexicon_doc_app_chronosky_plan_getUsage() -> LexiconDoc<'static> {
                 SmolStr::new_static("usageStats"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Usage statistics.")),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("pendingPostsCount"),
-                            SmolStr::new_static("monthlyPostsCount"),
-                            SmolStr::new_static("monthlyPeriodStart"),
-                            SmolStr::new_static("monthlyPeriodEnd"),
-                            SmolStr::new_static("lastUpdated")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("pendingPostsCount"),
+                        SmolStr::new_static("monthlyPostsCount"),
+                        SmolStr::new_static("monthlyPeriodStart"),
+                        SmolStr::new_static("monthlyPeriodEnd"),
+                        SmolStr::new_static("lastUpdated"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -705,9 +706,9 @@ fn lexicon_doc_app_chronosky_plan_getUsage() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("lastUpdated"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Last time usage was updated (ISO 8601)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Last time usage was updated (ISO 8601)",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -716,11 +717,9 @@ fn lexicon_doc_app_chronosky_plan_getUsage() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("monthlyPeriodEnd"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "End of current monthly period (ISO 8601)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "End of current monthly period (ISO 8601)",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -729,11 +728,9 @@ fn lexicon_doc_app_chronosky_plan_getUsage() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("monthlyPeriodStart"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Start of current monthly period (ISO 8601)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Start of current monthly period (ISO 8601)",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -770,7 +767,7 @@ fn lexicon_doc_app_chronosky_plan_getUsage() -> LexiconDoc<'static> {
 
 pub mod plan_limits_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -913,18 +910,7 @@ impl<S: BosStr> PlanLimitsBuilder<S, plan_limits_state::Empty> {
         PlanLimitsBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1099,10 +1085,7 @@ where
 
 impl<S: BosStr, St: plan_limits_state::State> PlanLimitsBuilder<S, St> {
     /// Set the `videoProcessingMinutesMonthly` field (optional)
-    pub fn video_processing_minutes_monthly(
-        mut self,
-        value: impl Into<Option<i64>>,
-    ) -> Self {
+    pub fn video_processing_minutes_monthly(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.10 = value.into();
         self
     }
@@ -1155,10 +1138,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PlanLimits<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PlanLimits<S> {
         PlanLimits {
             markdown_support: self._fields.0,
             max_image_size_mb: self._fields.1,
@@ -1179,7 +1159,7 @@ where
 
 pub mod usage_stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1446,10 +1426,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> UsageStats<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UsageStats<S> {
         UsageStats {
             api_requests_this_hour: self._fields.0,
             last_updated: self._fields.1.unwrap(),

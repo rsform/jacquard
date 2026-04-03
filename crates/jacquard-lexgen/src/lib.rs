@@ -38,4 +38,3 @@ pub mod schema_discovery;
 pub mod schema_extraction;
 
 pub use fetch::{Config, Fetcher};
-

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::my_skylights::Item;
 use crate::my_skylights::rel;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -60,9 +60,11 @@ pub struct RelGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Rel<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Note<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub updated_at: Datetime,
@@ -71,9 +73,11 @@ pub struct Note<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Rating<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub value: i64,
@@ -181,7 +185,7 @@ impl<S: BosStr> LexiconSchema for Rating<S> {
 
 pub mod rel_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -260,10 +264,7 @@ where
     St::Item: rel_state::IsUnset,
 {
     /// Set the `item` field (required)
-    pub fn item(
-        mut self,
-        value: impl Into<Item<S>>,
-    ) -> RelBuilder<S, rel_state::SetItem<St>> {
+    pub fn item(mut self, value: impl Into<Item<S>>) -> RelBuilder<S, rel_state::SetItem<St>> {
         self._fields.1 = Option::Some(value.into());
         RelBuilder {
             _state: PhantomData,
@@ -327,10 +328,10 @@ where
 }
 
 fn lexicon_doc_my_skylights_rel() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("my.skylights.rel"),
@@ -386,13 +387,11 @@ fn lexicon_doc_my_skylights_rel() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("note"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("value"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("updatedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("value"),
+                        SmolStr::new_static("createdAt"),
+                        SmolStr::new_static("updatedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -412,7 +411,9 @@ fn lexicon_doc_my_skylights_rel() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("value"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -422,12 +423,10 @@ fn lexicon_doc_my_skylights_rel() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("rating"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("value"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("value"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -459,7 +458,7 @@ fn lexicon_doc_my_skylights_rel() -> LexiconDoc<'static> {
 
 pub mod note_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -584,10 +583,7 @@ where
     St::Value: note_state::IsUnset,
 {
     /// Set the `value` field (required)
-    pub fn value(
-        mut self,
-        value: impl Into<S>,
-    ) -> NoteBuilder<S, note_state::SetValue<St>> {
+    pub fn value(mut self, value: impl Into<S>) -> NoteBuilder<S, note_state::SetValue<St>> {
         self._fields.2 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
@@ -626,7 +622,7 @@ where
 
 pub mod rating_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -718,10 +714,7 @@ where
     St::Value: rating_state::IsUnset,
 {
     /// Set the `value` field (required)
-    pub fn value(
-        mut self,
-        value: impl Into<i64>,
-    ) -> RatingBuilder<S, rating_state::SetValue<St>> {
+    pub fn value(mut self, value: impl Into<i64>) -> RatingBuilder<S, rating_state::SetValue<St>> {
         self._fields.1 = Option::Some(value.into());
         RatingBuilder {
             _state: PhantomData,

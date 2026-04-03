@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::dev_sensorthings::datastream::UnitOfMeasurement;
 use crate::dev_sensorthings::multi_observation;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A composite observation bundling multiple co-produced results from a single act of sensing. Each entry carries its own ObservedProperty, unit, and scale metadata. Use this instead of separate Observations when the results are genuinely co-produced (e.g. wave statistics from spectral processing) and have no independent existence.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -114,8 +114,7 @@ impl<S: BosStr> Serialize for MultiObservationResultQuality<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for MultiObservationResultQuality<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for MultiObservationResultQuality<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -140,12 +139,8 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             MultiObservationResultQuality::Good => MultiObservationResultQuality::Good,
-            MultiObservationResultQuality::Suspect => {
-                MultiObservationResultQuality::Suspect
-            }
-            MultiObservationResultQuality::Missing => {
-                MultiObservationResultQuality::Missing
-            }
+            MultiObservationResultQuality::Suspect => MultiObservationResultQuality::Suspect,
+            MultiObservationResultQuality::Missing => MultiObservationResultQuality::Missing,
             MultiObservationResultQuality::Other(v) => {
                 MultiObservationResultQuality::Other(v.into_static())
             }
@@ -167,7 +162,10 @@ pub struct MultiObservationGetRecordOutput<S: BosStr = DefaultStr> {
 /// A single result within a composite observation, fully self-describing.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MultiObservationEntry<S: BosStr = DefaultStr> {
     ///AT-URI of the dev.sensorthings.observedProperty record
     pub observed_property: AtUri<S>,
@@ -182,7 +180,6 @@ pub struct MultiObservationEntry<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -239,8 +236,7 @@ impl<S: BosStr> Serialize for MultiObservationEntryResultQuality<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for MultiObservationEntryResultQuality<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for MultiObservationEntryResultQuality<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -264,9 +260,7 @@ where
     type Output = MultiObservationEntryResultQuality<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            MultiObservationEntryResultQuality::Good => {
-                MultiObservationEntryResultQuality::Good
-            }
+            MultiObservationEntryResultQuality::Good => MultiObservationEntryResultQuality::Good,
             MultiObservationEntryResultQuality::Suspect => {
                 MultiObservationEntryResultQuality::Suspect
             }
@@ -386,7 +380,7 @@ impl<S: BosStr> LexiconSchema for MultiObservationEntry<S> {
 
 pub mod multi_observation_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -566,10 +560,7 @@ impl<S: BosStr, St: multi_observation_state::State> MultiObservationBuilder<S, S
         self
     }
     /// Set the `resultQuality` field to an Option value (optional)
-    pub fn maybe_result_quality(
-        mut self,
-        value: Option<MultiObservationResultQuality<S>>,
-    ) -> Self {
+    pub fn maybe_result_quality(mut self, value: Option<MultiObservationResultQuality<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -649,10 +640,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> MultiObservation<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MultiObservation<S> {
         MultiObservation {
             derived_from: self._fields.0,
             entries: self._fields.1.unwrap(),
@@ -668,10 +656,10 @@ where
 }
 
 fn lexicon_doc_dev_sensorthings_multiObservation() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.sensorthings.multiObservation"),
@@ -887,7 +875,7 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> LexiconDoc<'static> {
 
 pub mod multi_observation_entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -944,10 +932,7 @@ pub mod multi_observation_entry_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MultiObservationEntryBuilder<
-    S: BosStr,
-    St: multi_observation_entry_state::State,
-> {
+pub struct MultiObservationEntryBuilder<S: BosStr, St: multi_observation_entry_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
@@ -961,10 +946,7 @@ pub struct MultiObservationEntryBuilder<
 
 impl<S: BosStr> MultiObservationEntry<S> {
     /// Create a new builder for this type.
-    pub fn new() -> MultiObservationEntryBuilder<
-        S,
-        multi_observation_entry_state::Empty,
-    > {
+    pub fn new() -> MultiObservationEntryBuilder<S, multi_observation_entry_state::Empty> {
         MultiObservationEntryBuilder::new()
     }
 }
@@ -989,10 +971,8 @@ where
     pub fn observed_property(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> MultiObservationEntryBuilder<
-        S,
-        multi_observation_entry_state::SetObservedProperty<St>,
-    > {
+    ) -> MultiObservationEntryBuilder<S, multi_observation_entry_state::SetObservedProperty<St>>
+    {
         self._fields.0 = Option::Some(value.into());
         MultiObservationEntryBuilder {
             _state: PhantomData,
@@ -1021,10 +1001,7 @@ where
     }
 }
 
-impl<
-    S: BosStr,
-    St: multi_observation_entry_state::State,
-> MultiObservationEntryBuilder<S, St> {
+impl<S: BosStr, St: multi_observation_entry_state::State> MultiObservationEntryBuilder<S, St> {
     /// Set the `resultQuality` field (optional)
     pub fn result_quality(
         mut self,
@@ -1043,10 +1020,7 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: multi_observation_entry_state::State,
-> MultiObservationEntryBuilder<S, St> {
+impl<S: BosStr, St: multi_observation_entry_state::State> MultiObservationEntryBuilder<S, St> {
     /// Set the `resultScaleFactor` field (optional)
     pub fn result_scale_factor(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -1068,10 +1042,8 @@ where
     pub fn unit_of_measurement(
         mut self,
         value: impl Into<UnitOfMeasurement<S>>,
-    ) -> MultiObservationEntryBuilder<
-        S,
-        multi_observation_entry_state::SetUnitOfMeasurement<St>,
-    > {
+    ) -> MultiObservationEntryBuilder<S, multi_observation_entry_state::SetUnitOfMeasurement<St>>
+    {
         self._fields.4 = Option::Some(value.into());
         MultiObservationEntryBuilder {
             _state: PhantomData,

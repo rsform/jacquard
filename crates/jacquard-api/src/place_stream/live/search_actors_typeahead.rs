@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,13 +21,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::place_stream::live::search_actors_typeahead;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::place_stream::live::search_actors_typeahead;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Actor<S: BosStr = DefaultStr> {
     ///The actor's DID
     pub did: Did<S>,
@@ -37,9 +40,11 @@ pub struct Actor<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SearchActorsTypeahead<S: BosStr = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -49,9 +54,11 @@ pub struct SearchActorsTypeahead<S: BosStr = DefaultStr> {
     pub q: Option<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SearchActorsTypeaheadOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<search_actors_typeahead::Actor<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -99,7 +106,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsTypeaheadRequest {
 
 pub mod actor_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -172,10 +179,7 @@ where
     St::Did: actor_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> ActorBuilder<S, actor_state::SetDid<St>> {
+    pub fn did(mut self, value: impl Into<Did<S>>) -> ActorBuilder<S, actor_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         ActorBuilder {
             _state: PhantomData,
@@ -229,10 +233,10 @@ where
 }
 
 fn lexicon_doc_place_stream_live_searchActorsTypeahead() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.live.searchActorsTypeahead"),
@@ -241,9 +245,10 @@ fn lexicon_doc_place_stream_live_searchActorsTypeahead() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("actor"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("did"), SmolStr::new_static("handle")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("handle"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -271,33 +276,29 @@ fn lexicon_doc_place_stream_live_searchActorsTypeahead() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("limit"),
-                                    LexXrpcParametersProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("q"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "Search query prefix; not a full query string.",
-                                            ),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("limit"),
+                                LexXrpcParametersProperty::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("q"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Search query prefix; not a full query string.",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
@@ -313,7 +314,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_actors_typeahead_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -331,10 +332,7 @@ pub mod search_actors_typeahead_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchActorsTypeaheadBuilder<
-    S: BosStr,
-    St: search_actors_typeahead_state::State,
-> {
+pub struct SearchActorsTypeaheadBuilder<S: BosStr, St: search_actors_typeahead_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -342,10 +340,7 @@ pub struct SearchActorsTypeaheadBuilder<
 
 impl<S: BosStr> SearchActorsTypeahead<S> {
     /// Create a new builder for this type.
-    pub fn new() -> SearchActorsTypeaheadBuilder<
-        S,
-        search_actors_typeahead_state::Empty,
-    > {
+    pub fn new() -> SearchActorsTypeaheadBuilder<S, search_actors_typeahead_state::Empty> {
         SearchActorsTypeaheadBuilder::new()
     }
 }
@@ -361,10 +356,7 @@ impl<S: BosStr> SearchActorsTypeaheadBuilder<S, search_actors_typeahead_state::E
     }
 }
 
-impl<
-    S: BosStr,
-    St: search_actors_typeahead_state::State,
-> SearchActorsTypeaheadBuilder<S, St> {
+impl<S: BosStr, St: search_actors_typeahead_state::State> SearchActorsTypeaheadBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -377,10 +369,7 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: search_actors_typeahead_state::State,
-> SearchActorsTypeaheadBuilder<S, St> {
+impl<S: BosStr, St: search_actors_typeahead_state::State> SearchActorsTypeaheadBuilder<S, St> {
     /// Set the `q` field (optional)
     pub fn q(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();

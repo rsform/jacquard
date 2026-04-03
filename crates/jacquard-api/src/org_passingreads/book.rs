@@ -17,34 +17,36 @@ pub mod list_book_ids;
 pub mod list_dropped_books;
 pub mod registration;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Datetime, Did, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::community_lexicon::location::hthree::Hthree;
 use crate::org_passingreads::Actor;
 use crate::org_passingreads::AspectRatio;
 use crate::org_passingreads::book;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A confirmed book event for display purposes. Omits cryptographic fields (bookPub, bookSig) and book reference since it's shown in context of a book.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ConfirmedEvent<S: BosStr = DefaultStr> {
     ///The person who performed this event
     pub actor: Actor<S>,
@@ -152,7 +154,10 @@ where
 /// A view of a book registration for API responses. Omits cryptographic fields (bookPub, bookSig) and the cover blob.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RegistrationView<S: BosStr = DefaultStr> {
     ///Authors of this book, in order of credit
     pub authors: Vec<S>,
@@ -174,7 +179,10 @@ pub struct RegistrationView<S: BosStr = DefaultStr> {
 /// A book with its current state, combining registration data with computed state information.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StatefulBook<S: BosStr = DefaultStr> {
     ///Aspect ratio of the cover image
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -344,7 +352,7 @@ impl<S: BosStr> LexiconSchema for StatefulBook<S> {
 
 pub mod confirmed_event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -581,10 +589,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ConfirmedEvent<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ConfirmedEvent<S> {
         ConfirmedEvent {
             actor: self._fields.0.unwrap(),
             event: self._fields.1.unwrap(),
@@ -597,10 +602,10 @@ where
 }
 
 fn lexicon_doc_org_passingreads_book_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.passingreads.book.defs"),
@@ -889,7 +894,7 @@ fn lexicon_doc_org_passingreads_book_defs() -> LexiconDoc<'static> {
 
 pub mod registration_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1141,10 +1146,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RegistrationView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RegistrationView<S> {
         RegistrationView {
             authors: self._fields.0.unwrap(),
             book_id: self._fields.1.unwrap(),
@@ -1159,7 +1161,7 @@ where
 
 pub mod stateful_book_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1363,10 +1365,7 @@ impl<S: BosStr, St: stateful_book_state::State> StatefulBookBuilder<S, St> {
 
 impl<S: BosStr, St: stateful_book_state::State> StatefulBookBuilder<S, St> {
     /// Set the `events` field (optional)
-    pub fn events(
-        mut self,
-        value: impl Into<Option<Vec<book::ConfirmedEvent<S>>>>,
-    ) -> Self {
+    pub fn events(mut self, value: impl Into<Option<Vec<book::ConfirmedEvent<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -1459,10 +1458,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> StatefulBook<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StatefulBook<S> {
         StatefulBook {
             aspect_ratio: self._fields.0,
             cid: self._fields.1.unwrap(),

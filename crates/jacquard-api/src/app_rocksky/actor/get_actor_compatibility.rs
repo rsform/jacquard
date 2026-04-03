@@ -8,25 +8,30 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::app_rocksky::actor::CompatibilityViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::app_rocksky::actor::CompatibilityViewBasic;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetActorCompatibility<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetActorCompatibilityOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub compatibility: Option<CompatibilityViewBasic<S>>,
@@ -60,7 +65,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorCompatibilityRequest {
 
 pub mod get_actor_compatibility_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -91,10 +96,7 @@ pub mod get_actor_compatibility_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetActorCompatibilityBuilder<
-    S: BosStr,
-    St: get_actor_compatibility_state::State,
-> {
+pub struct GetActorCompatibilityBuilder<S: BosStr, St: get_actor_compatibility_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -102,10 +104,7 @@ pub struct GetActorCompatibilityBuilder<
 
 impl<S: BosStr> GetActorCompatibility<S> {
     /// Create a new builder for this type.
-    pub fn new() -> GetActorCompatibilityBuilder<
-        S,
-        get_actor_compatibility_state::Empty,
-    > {
+    pub fn new() -> GetActorCompatibilityBuilder<S, get_actor_compatibility_state::Empty> {
         GetActorCompatibilityBuilder::new()
     }
 }

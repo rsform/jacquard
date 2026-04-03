@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::org_hypercerts::SmallBlob;
 use crate::org_hypercerts::Uri;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A reusable scope atom for work scope logic expressions. Scopes can represent topics, languages, domains, deliverables, methods, regions, tags, or other categorical labels. Tags are composed into structured expressions via CEL (Common Expression Language) on activity records.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -160,7 +160,6 @@ where
         }
     }
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -400,7 +399,7 @@ impl<S: BosStr> LexiconSchema for Tag<S> {
 
 pub mod tag_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -487,7 +486,9 @@ impl<S: BosStr> TagBuilder<S, tag_state::Empty> {
     pub fn new() -> Self {
         TagBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -598,18 +599,12 @@ impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
 
 impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     /// Set the `referenceDocument` field (optional)
-    pub fn reference_document(
-        mut self,
-        value: impl Into<Option<TagReferenceDocument<S>>>,
-    ) -> Self {
+    pub fn reference_document(mut self, value: impl Into<Option<TagReferenceDocument<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `referenceDocument` field to an Option value (optional)
-    pub fn maybe_reference_document(
-        mut self,
-        value: Option<TagReferenceDocument<S>>,
-    ) -> Self {
+    pub fn maybe_reference_document(mut self, value: Option<TagReferenceDocument<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -698,10 +693,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_workscope_tag() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.workscope.tag"),

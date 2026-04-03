@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_greengale::blog::Theme;
 use crate::app_greengale::blog::VoiceTheme;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A publication configuration with title, description, and default theme.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -157,7 +157,7 @@ fn _default_publication_enable_site_standard() -> Option<bool> {
 
 pub mod publication_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -340,10 +340,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Publication<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Publication<S> {
         Publication {
             description: self._fields.0,
             enable_site_standard: self._fields.1.or_else(|| Some(false)),
@@ -357,10 +354,10 @@ where
 }
 
 fn lexicon_doc_app_greengale_publication() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.greengale.publication"),
@@ -369,25 +366,24 @@ fn lexicon_doc_app_greengale_publication() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A publication configuration with title, description, and default theme.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A publication configuration with title, description, and default theme.",
+                    )),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![SmolStr::new_static("url"), SmolStr::new_static("name")],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("url"),
+                            SmolStr::new_static("name"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Publication description"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Publication description",
+                                    )),
                                     max_length: Some(1000usize),
                                     ..Default::default()
                                 }),
@@ -401,9 +397,7 @@ fn lexicon_doc_app_greengale_publication() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Publication/blog title"),
-                                    ),
+                                    description: Some(CowStr::new_static("Publication/blog title")),
                                     max_length: Some(200usize),
                                     ..Default::default()
                                 }),
@@ -418,11 +412,9 @@ fn lexicon_doc_app_greengale_publication() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("url"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Publication base URL (e.g., https://greengale.app)",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Publication base URL (e.g., https://greengale.app)",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     max_length: Some(2048usize),
                                     ..Default::default()
@@ -431,9 +423,7 @@ fn lexicon_doc_app_greengale_publication() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("voiceTheme"),
                                 LexObjectProperty::Ref(LexRef {
-                                    r#ref: CowStr::new_static(
-                                        "app.greengale.blog.defs#voiceTheme",
-                                    ),
+                                    r#ref: CowStr::new_static("app.greengale.blog.defs#voiceTheme"),
                                     ..Default::default()
                                 }),
                             );

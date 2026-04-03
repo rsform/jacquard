@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// An encrypted audio track. The audio blob is encrypted with AES-GCM-256, and the decryption key is wrapped and stored in grant records.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -114,25 +114,23 @@ impl<S: BosStr> LexiconSchema for Track<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["audio/wav", "audio/mpeg", "audio/flac"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("audio_blob"),
                         accepted: vec![
-                            "audio/wav".to_string(), "audio/mpeg".to_string(),
-                            "audio/flac".to_string()
+                            "audio/wav".to_string(),
+                            "audio/mpeg".to_string(),
+                            "audio/flac".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -181,7 +179,7 @@ fn _default_track_encryption_algorithm<S: FromStaticStr>() -> ::core::option::Op
 
 pub mod track_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -256,7 +254,13 @@ pub mod track_state {
 /// Builder for constructing an instance of this type.
 pub struct TrackBuilder<S: BosStr, St: track_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<BlobRef<S>>, Option<Datetime>, Option<S>, Option<S>, Option<S>),
+    _fields: (
+        Option<BlobRef<S>>,
+        Option<Datetime>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -354,10 +358,7 @@ where
     St::Title: track_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> TrackBuilder<S, track_state::SetTitle<St>> {
+    pub fn title(mut self, value: impl Into<S>) -> TrackBuilder<S, track_state::SetTitle<St>> {
         self._fields.4 = Option::Some(value.into());
         TrackBuilder {
             _state: PhantomData,
@@ -406,10 +407,10 @@ where
 }
 
 fn lexicon_doc_ch_indiemusi_alpha_track() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ch.indiemusi.alpha.track"),

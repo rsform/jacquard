@@ -3,9 +3,9 @@ use std::sync::Arc;
 
 use bytes::Bytes;
 use http::{Response as HttpResponse, StatusCode};
-use jacquard::BosStr;
 use jacquard::client::Agent;
 use jacquard::xrpc::XrpcClient;
+use jacquard::{BosStr, IntoStatic};
 use jacquard_common::http_client::HttpClient;
 use jacquard_oauth::atproto::AtprotoClientMetadata;
 use jacquard_oauth::authstore::ClientAuthStore;
@@ -150,6 +150,28 @@ impl OAuthResolver for MockClient {
 
 impl jacquard_oauth::dpop::DpopExt for MockClient {}
 
+#[cfg(feature = "scope-check")]
+impl jacquard_identity::lexicon_resolver::LexiconSchemaResolver for MockClient {
+    async fn resolve_lexicon_schema<S: jacquard::BosStr + Sync>(
+        &self,
+        nsid: &jacquard::types::nsid::Nsid<S>,
+    ) -> Result<
+        jacquard_identity::lexicon_resolver::ResolvedLexiconSchema<'static>,
+        jacquard_identity::lexicon_resolver::LexiconResolutionError,
+    > {
+        // Return an error for this mock - tests that need include scope resolution
+        // should provide their own mock or use real resolver
+        Err(
+            jacquard_identity::lexicon_resolver::LexiconResolutionError::new(
+                jacquard_identity::lexicon_resolver::LexiconResolutionErrorKind::FetchFailed {
+                    nsid: nsid.clone().into_static(),
+                },
+                None,
+            ),
+        )
+    }
+}
+
 #[tokio::test(flavor = "multi_thread")]
 async fn oauth_end_to_end_mock_flow() {
     let client = Arc::new(MockClient::default());
@@ -183,6 +205,7 @@ async fn oauth_end_to_end_mock_flow() {
                         "sub": "did:plc:alice",
                         "iss": "https://issuer",
                         "aud": "https://pds",
+                        "scope": "atproto rpc:*",
                         "expires_in": 3600
                     }))
                     .unwrap(),
@@ -215,7 +238,10 @@ async fn oauth_end_to_end_mock_flow() {
 
     let client_data: ClientData<_> = ClientData {
         keyset: None,
-        config: AtprotoClientMetadata::new_localhost(None, Some(Scopes::new(SmolStr::new_static("atproto")).unwrap())),
+        config: AtprotoClientMetadata::new_localhost(
+            None,
+            Some(Scopes::new(SmolStr::new_static("atproto rpc:*")).unwrap()),
+        ),
     };
     let client_arc = client.clone();
     let oauth = OAuthClient::new_from_resolver(store, (*client_arc).clone(), client_data);
@@ -225,7 +251,10 @@ async fn oauth_end_to_end_mock_flow() {
     let mut metadata = jacquard_oauth::request::OAuthMetadata {
         server_metadata,
         client_metadata: jacquard_oauth::atproto::atproto_client_metadata(
-            &AtprotoClientMetadata::new_localhost(None, Some(Scopes::new(SmolStr::new_static("atproto")).unwrap())),
+            &AtprotoClientMetadata::new_localhost(
+                None,
+                Some(Scopes::new(SmolStr::new_static("atproto rpc:*")).unwrap()),
+            ),
             &None,
         )
         .unwrap(),

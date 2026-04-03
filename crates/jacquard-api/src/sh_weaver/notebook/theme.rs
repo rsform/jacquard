@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -25,15 +25,18 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::notebook::theme;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Custom syntax highlighting theme file (sublime text/textmate theme format)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CodeThemeFile<S: BosStr = DefaultStr> {
     pub content: BlobRef<S>,
     pub did: Did<S>,
@@ -45,14 +48,16 @@ pub struct CodeThemeFile<S: BosStr = DefaultStr> {
 pub type CodeThemeName<S = DefaultStr> = S;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Font<S: BosStr = DefaultStr> {
     ///Font for a notebook
     pub value: FontValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -67,7 +72,10 @@ pub enum FontValue<S: BosStr = DefaultStr> {
 /// Custom woff(2) or ttf font file
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FontFile<S: BosStr = DefaultStr> {
     pub content: BlobRef<S>,
     pub did: Did<S>,
@@ -106,7 +114,6 @@ pub struct Theme<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -120,7 +127,10 @@ pub enum ThemeDarkCodeTheme<S: BosStr = DefaultStr> {
 /// Fonts to be used in the notebook. Can specify a name or list of names (will load if available) or a file or list of files for each. Empty lists will use site defaults.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ThemeFonts<S: BosStr = DefaultStr> {
     pub body: Vec<crate::sh_weaver::notebook::theme::Font<S>>,
     pub heading: Vec<crate::sh_weaver::notebook::theme::Font<S>>,
@@ -128,7 +138,6 @@ pub struct ThemeFonts<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -140,9 +149,11 @@ pub enum ThemeLightCodeTheme<S: BosStr = DefaultStr> {
     CodeThemeFile(Box<theme::CodeThemeFile<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ThemeSpacing<S: BosStr = DefaultStr> {
     pub base_size: S,
     pub line_height: S,
@@ -197,19 +208,16 @@ impl<S: BosStr> LexiconSchema for CodeThemeFile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("content"),
@@ -267,19 +275,16 @@ impl<S: BosStr> LexiconSchema for FontFile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("content"),
@@ -337,7 +342,7 @@ impl<S: BosStr> LexiconSchema for Theme<S> {
 
 pub mod code_theme_file_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -492,10 +497,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CodeThemeFile<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CodeThemeFile<S> {
         CodeThemeFile {
             content: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -506,10 +508,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_notebook_theme() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.notebook.theme"),
@@ -554,7 +556,9 @@ fn lexicon_doc_sh_weaver_notebook_theme() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("codeThemeName"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("font"),
@@ -566,12 +570,10 @@ fn lexicon_doc_sh_weaver_notebook_theme() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("value"),
                             LexObjectProperty::Union(LexRefUnion {
-                                description: Some(
-                                    CowStr::new_static("Font for a notebook"),
-                                ),
+                                description: Some(CowStr::new_static("Font for a notebook")),
                                 refs: vec![
                                     CowStr::new_static("#fontName"),
-                                    CowStr::new_static("#fontFile")
+                                    CowStr::new_static("#fontFile"),
                                 ],
                                 ..Default::default()
                             }),
@@ -584,21 +586,20 @@ fn lexicon_doc_sh_weaver_notebook_theme() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("fontFile"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Custom woff(2) or ttf font file"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("name"), SmolStr::new_static("did"),
-                            SmolStr::new_static("content")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("Custom woff(2) or ttf font file")),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("content"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("content"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("did"),
@@ -609,7 +610,9 @@ fn lexicon_doc_sh_weaver_notebook_theme() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -618,7 +621,9 @@ fn lexicon_doc_sh_weaver_notebook_theme() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("fontName"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("main"),
@@ -792,7 +797,7 @@ fn lexicon_doc_sh_weaver_notebook_theme() -> LexiconDoc<'static> {
 
 pub mod font_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -889,7 +894,7 @@ where
 
 pub mod font_file_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1014,10 +1019,7 @@ where
     St::Name: font_file_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> FontFileBuilder<S, font_file_state::SetName<St>> {
+    pub fn name(mut self, value: impl Into<S>) -> FontFileBuilder<S, font_file_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         FontFileBuilder {
             _state: PhantomData,
@@ -1075,7 +1077,7 @@ impl<S: BosStr> LexiconSchema for ThemeFonts<S> {
 
 pub mod theme_fonts_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1234,10 +1236,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ThemeFonts<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ThemeFonts<S> {
         ThemeFonts {
             body: self._fields.0.unwrap(),
             heading: self._fields.1.unwrap(),
@@ -1264,7 +1263,7 @@ impl<S: BosStr> LexiconSchema for ThemeSpacing<S> {
 
 pub mod theme_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

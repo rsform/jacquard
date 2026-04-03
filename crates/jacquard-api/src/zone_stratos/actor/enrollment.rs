@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,11 +25,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::zone_stratos::actor::enrollment;
+use crate::zone_stratos::boundary::Domain;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::zone_stratos::boundary::Domain;
-use crate::zone_stratos::actor::enrollment;
+use serde::{Deserialize, Serialize};
 /// A record indicating the user is enrolled in a Stratos service. Published to the user's PDS during OAuth enrollment for endpoint discovery by AppViews. Multiple enrollment records are supported — one per Stratos service.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -69,7 +69,10 @@ pub struct EnrollmentGetRecordOutput<S: BosStr = DefaultStr> {
 /// An attestation signed by the Stratos service key. The signed payload is DAG-CBOR encoded {boundaries, did, signingKey} with sorted keys.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ServiceAttestation<S: BosStr = DefaultStr> {
     ///Raw signature bytes of the DAG-CBOR encoded attestation payload, signed by the service key.
     #[serde(with = "jacquard_common::serde_bytes_helper")]
@@ -155,7 +158,7 @@ impl<S: BosStr> LexiconSchema for ServiceAttestation<S> {
 
 pub mod enrollment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -367,10 +370,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Enrollment<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Enrollment<S> {
         Enrollment {
             attestation: self._fields.0.unwrap(),
             boundaries: self._fields.1,
@@ -383,10 +383,10 @@ where
 }
 
 fn lexicon_doc_zone_stratos_actor_enrollment() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("zone.stratos.actor.enrollment"),
@@ -524,7 +524,7 @@ fn lexicon_doc_zone_stratos_actor_enrollment() -> LexiconDoc<'static> {
 
 pub mod service_attestation_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -644,10 +644,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ServiceAttestation<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ServiceAttestation<S> {
         ServiceAttestation {
             sig: self._fields.0.unwrap(),
             signing_key: self._fields.1.unwrap(),

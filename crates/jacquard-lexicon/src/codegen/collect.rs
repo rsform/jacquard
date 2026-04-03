@@ -243,7 +243,6 @@ impl<'c> CodeGenerator<'c> {
         imports.external.insert(ExternalImport::LexiconAttr);
         imports.external.insert(ExternalImport::PhantomData);
 
-
         // Records generate LexiconSchema trait impls with validation.
         imports.external.insert(ExternalImport::LexiconSchema);
         imports.external.insert(ExternalImport::LexiconDoc);
@@ -669,7 +668,7 @@ impl<'c> CodeGenerator<'c> {
                     imports.external.insert(ExternalImport::Serialize);
                     imports.external.insert(ExternalImport::Deserialize);
                     imports.external.insert(ExternalImport::IntoStatic);
-                                imports.external.insert(ExternalImport::DefaultStr);
+                    imports.external.insert(ExternalImport::DefaultStr);
                     if union.closed != Some(true) {
                         imports.external.insert(ExternalImport::OpenUnion);
                     }
@@ -692,7 +691,7 @@ impl<'c> CodeGenerator<'c> {
                 imports.external.insert(ExternalImport::Serialize);
                 imports.external.insert(ExternalImport::Deserialize);
                 imports.external.insert(ExternalImport::IntoStatic);
-                        imports.external.insert(ExternalImport::DefaultStr);
+                imports.external.insert(ExternalImport::DefaultStr);
                 if union.closed != Some(true) {
                     imports.external.insert(ExternalImport::OpenUnion);
                 }

@@ -5,6 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 /// Lightning Address for Bitcoin Lightning Network payments. Used as an extension field in app.bsky.feed.post records to enable tipping.
 pub type Lightning<S = DefaultStr> = S;

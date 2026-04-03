@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
+use serde::{Deserialize, Serialize};
 /// A podcast episode belonging to a show.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -220,25 +220,23 @@ impl<S: BosStr> LexiconSchema for Episode<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/jpeg", "image/png", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("cover_art"),
                         accepted: vec![
-                            "image/jpeg".to_string(), "image/png".to_string(),
-                            "image/webp".to_string()
+                            "image/jpeg".to_string(),
+                            "image/png".to_string(),
+                            "image/webp".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -272,7 +270,7 @@ impl<S: BosStr> LexiconSchema for Episode<S> {
 
 pub mod episode_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -375,7 +373,9 @@ impl<S: BosStr> EpisodeBuilder<S, episode_state::Empty> {
     pub fn new() -> Self {
         EpisodeBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -473,10 +473,7 @@ impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
 
 impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     /// Set the `episodeType` field (optional)
-    pub fn episode_type(
-        mut self,
-        value: impl Into<Option<EpisodeEpisodeType<S>>>,
-    ) -> Self {
+    pub fn episode_type(mut self, value: impl Into<Option<EpisodeEpisodeType<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
@@ -538,10 +535,7 @@ where
     St::Title: episode_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> EpisodeBuilder<S, episode_state::SetTitle<St>> {
+    pub fn title(mut self, value: impl Into<S>) -> EpisodeBuilder<S, episode_state::SetTitle<St>> {
         self._fields.10 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
@@ -596,10 +590,10 @@ where
 }
 
 fn lexicon_doc_pink_vase_pod_episode() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pink.vase.pod.episode"),

@@ -7,13 +7,12 @@
 
 pub mod item;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +26,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::label::Label;
 use crate::com_atproto::label::SelfLabels;
 use crate::social_grain::actor::ProfileView;
 use crate::social_grain::photo::PhotoView;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -65,9 +64,11 @@ pub struct GalleryGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Gallery<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GalleryView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub creator: ProfileView<S>,
@@ -168,7 +169,7 @@ impl<S: BosStr> LexiconSchema for GalleryView<S> {
 
 pub mod gallery_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -213,7 +214,12 @@ pub mod gallery_state {
 /// Builder for constructing an instance of this type.
 pub struct GalleryBuilder<S: BosStr, St: gallery_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<S>, Option<SelfLabels<S>>, Option<S>),
+    _fields: (
+        Option<Datetime>,
+        Option<S>,
+        Option<SelfLabels<S>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -286,10 +292,7 @@ where
     St::Title: gallery_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> GalleryBuilder<S, gallery_state::SetTitle<St>> {
+    pub fn title(mut self, value: impl Into<S>) -> GalleryBuilder<S, gallery_state::SetTitle<St>> {
         self._fields.3 = Option::Some(value.into());
         GalleryBuilder {
             _state: PhantomData,
@@ -328,10 +331,10 @@ where
 }
 
 fn lexicon_doc_social_grain_gallery() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.grain.gallery"),
@@ -401,7 +404,7 @@ fn lexicon_doc_social_grain_gallery() -> LexiconDoc<'static> {
 
 pub mod gallery_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -668,10 +671,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> GalleryView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GalleryView<S> {
         GalleryView {
             cid: self._fields.0.unwrap(),
             creator: self._fields.1.unwrap(),
@@ -686,10 +686,10 @@ where
 }
 
 fn lexicon_doc_social_grain_gallery_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.grain.gallery.defs"),
@@ -698,14 +698,13 @@ fn lexicon_doc_social_grain_gallery_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("galleryView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("creator"),
-                            SmolStr::new_static("record"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("creator"),
+                        SmolStr::new_static("record"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -719,9 +718,7 @@ fn lexicon_doc_social_grain_gallery_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("creator"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "social.grain.actor.defs#profileView",
-                                ),
+                                r#ref: CowStr::new_static("social.grain.actor.defs#profileView"),
                                 ..Default::default()
                             }),
                         );
@@ -736,9 +733,9 @@ fn lexicon_doc_social_grain_gallery_defs() -> LexiconDoc<'static> {
                             SmolStr::new_static("items"),
                             LexObjectProperty::Array(LexArray {
                                 items: LexArrayItem::Union(LexRefUnion {
-                                    refs: vec![
-                                        CowStr::new_static("social.grain.photo.defs#photoView")
-                                    ],
+                                    refs: vec![CowStr::new_static(
+                                        "social.grain.photo.defs#photoView",
+                                    )],
                                     ..Default::default()
                                 }),
                                 ..Default::default()

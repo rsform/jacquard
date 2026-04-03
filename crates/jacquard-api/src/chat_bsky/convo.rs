@@ -23,34 +23,36 @@ pub mod unmute_convo;
 pub mod update_all_read;
 pub mod update_read;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::string::{Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::embed::record::Record;
 use crate::app_bsky::embed::record::View;
 use crate::app_bsky::richtext::facet::Facet;
 use crate::chat_bsky::actor::ProfileViewBasic;
 use crate::chat_bsky::convo;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ConvoView<S: BosStr = DefaultStr> {
     pub id: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -67,7 +69,6 @@ pub struct ConvoView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -77,7 +78,6 @@ pub enum ConvoViewLastMessage<S: BosStr = DefaultStr> {
     #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConvoViewStatus<S: BosStr = DefaultStr> {
@@ -156,9 +156,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeletedMessageView<S: BosStr = DefaultStr> {
     pub id: S,
     pub rev: S,
@@ -168,9 +170,11 @@ pub struct DeletedMessageView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LogAcceptConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -178,9 +182,11 @@ pub struct LogAcceptConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LogAddReaction<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogAddReactionMessage<S>,
@@ -189,7 +195,6 @@ pub struct LogAddReaction<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -201,9 +206,11 @@ pub enum LogAddReactionMessage<S: BosStr = DefaultStr> {
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LogBeginConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -211,9 +218,11 @@ pub struct LogBeginConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LogCreateMessage<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogCreateMessageMessage<S>,
@@ -221,7 +230,6 @@ pub struct LogCreateMessage<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -233,9 +241,11 @@ pub enum LogCreateMessageMessage<S: BosStr = DefaultStr> {
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LogDeleteMessage<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogDeleteMessageMessage<S>,
@@ -243,7 +253,6 @@ pub struct LogDeleteMessage<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -255,9 +264,11 @@ pub enum LogDeleteMessageMessage<S: BosStr = DefaultStr> {
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LogLeaveConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -265,9 +276,11 @@ pub struct LogLeaveConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LogMuteConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -275,9 +288,11 @@ pub struct LogMuteConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LogReadMessage<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogReadMessageMessage<S>,
@@ -285,7 +300,6 @@ pub struct LogReadMessage<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -297,9 +311,11 @@ pub enum LogReadMessageMessage<S: BosStr = DefaultStr> {
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LogRemoveReaction<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogRemoveReactionMessage<S>,
@@ -308,7 +324,6 @@ pub struct LogRemoveReaction<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -320,9 +335,11 @@ pub enum LogRemoveReactionMessage<S: BosStr = DefaultStr> {
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LogUnmuteConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -330,9 +347,11 @@ pub struct LogUnmuteConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MessageAndReactionView<S: BosStr = DefaultStr> {
     pub message: convo::MessageView<S>,
     pub reaction: convo::ReactionView<S>,
@@ -340,9 +359,11 @@ pub struct MessageAndReactionView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MessageInput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<Record<S>>,
@@ -354,9 +375,11 @@ pub struct MessageInput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MessageRef<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub did: Did<S>,
@@ -365,9 +388,11 @@ pub struct MessageRef<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MessageView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<View<S>>,
@@ -386,18 +411,22 @@ pub struct MessageView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MessageViewSender<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReactionView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub sender: convo::ReactionViewSender<S>,
@@ -406,9 +435,11 @@ pub struct ReactionView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReactionViewSender<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -750,7 +781,7 @@ impl<S: BosStr> LexiconSchema for ReactionViewSender<S> {
 
 pub mod convo_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -880,10 +911,7 @@ where
     St::Id: convo_view_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(
-        mut self,
-        value: impl Into<S>,
-    ) -> ConvoViewBuilder<S, convo_view_state::SetId<St>> {
+    pub fn id(mut self, value: impl Into<S>) -> ConvoViewBuilder<S, convo_view_state::SetId<St>> {
         self._fields.0 = Option::Some(value.into());
         ConvoViewBuilder {
             _state: PhantomData,
@@ -895,10 +923,7 @@ where
 
 impl<S: BosStr, St: convo_view_state::State> ConvoViewBuilder<S, St> {
     /// Set the `lastMessage` field (optional)
-    pub fn last_message(
-        mut self,
-        value: impl Into<Option<ConvoViewLastMessage<S>>>,
-    ) -> Self {
+    pub fn last_message(mut self, value: impl Into<Option<ConvoViewLastMessage<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -919,10 +944,7 @@ impl<S: BosStr, St: convo_view_state::State> ConvoViewBuilder<S, St> {
         self
     }
     /// Set the `lastReaction` field to an Option value (optional)
-    pub fn maybe_last_reaction(
-        mut self,
-        value: Option<convo::MessageAndReactionView<S>>,
-    ) -> Self {
+    pub fn maybe_last_reaction(mut self, value: Option<convo::MessageAndReactionView<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -972,10 +994,7 @@ where
     St::Rev: convo_view_state::IsUnset,
 {
     /// Set the `rev` field (required)
-    pub fn rev(
-        mut self,
-        value: impl Into<S>,
-    ) -> ConvoViewBuilder<S, convo_view_state::SetRev<St>> {
+    pub fn rev(mut self, value: impl Into<S>) -> ConvoViewBuilder<S, convo_view_state::SetRev<St>> {
         self._fields.5 = Option::Some(value.into());
         ConvoViewBuilder {
             _state: PhantomData,
@@ -1041,10 +1060,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ConvoView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ConvoView<S> {
         ConvoView {
             id: self._fields.0.unwrap(),
             last_message: self._fields.1,
@@ -1060,10 +1076,10 @@ where
 }
 
 fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.convo.defs"),
@@ -1072,26 +1088,28 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("convoView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("id"), SmolStr::new_static("rev"),
-                            SmolStr::new_static("members"), SmolStr::new_static("muted"),
-                            SmolStr::new_static("unreadCount")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("members"),
+                        SmolStr::new_static("muted"),
+                        SmolStr::new_static("unreadCount"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("lastMessage"),
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#messageView"),
-                                    CowStr::new_static("#deletedMessageView")
+                                    CowStr::new_static("#deletedMessageView"),
                                 ],
                                 ..Default::default()
                             }),
@@ -1123,11 +1141,15 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("unreadCount"),
@@ -1143,22 +1165,26 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("deletedMessageView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("id"), SmolStr::new_static("rev"),
-                            SmolStr::new_static("sender"), SmolStr::new_static("sentAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("sender"),
+                        SmolStr::new_static("sentAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("sender"),
@@ -1182,19 +1208,24 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logAcceptConvo"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("rev"), SmolStr::new_static("convoId")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1204,26 +1235,27 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logAddReaction"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
-                            SmolStr::new_static("message"),
-                            SmolStr::new_static("reaction")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                        SmolStr::new_static("message"),
+                        SmolStr::new_static("reaction"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#messageView"),
-                                    CowStr::new_static("#deletedMessageView")
+                                    CowStr::new_static("#deletedMessageView"),
                                 ],
                                 ..Default::default()
                             }),
@@ -1237,7 +1269,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1247,19 +1281,24 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logBeginConvo"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("rev"), SmolStr::new_static("convoId")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1269,32 +1308,35 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logCreateMessage"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
-                            SmolStr::new_static("message")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                        SmolStr::new_static("message"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#messageView"),
-                                    CowStr::new_static("#deletedMessageView")
+                                    CowStr::new_static("#deletedMessageView"),
                                 ],
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1304,32 +1346,35 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logDeleteMessage"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
-                            SmolStr::new_static("message")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                        SmolStr::new_static("message"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#messageView"),
-                                    CowStr::new_static("#deletedMessageView")
+                                    CowStr::new_static("#deletedMessageView"),
                                 ],
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1339,19 +1384,24 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logLeaveConvo"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("rev"), SmolStr::new_static("convoId")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1361,19 +1411,24 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logMuteConvo"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("rev"), SmolStr::new_static("convoId")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1383,32 +1438,35 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logReadMessage"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
-                            SmolStr::new_static("message")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                        SmolStr::new_static("message"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#messageView"),
-                                    CowStr::new_static("#deletedMessageView")
+                                    CowStr::new_static("#deletedMessageView"),
                                 ],
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1418,26 +1476,27 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logRemoveReaction"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
-                            SmolStr::new_static("message"),
-                            SmolStr::new_static("reaction")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                        SmolStr::new_static("message"),
+                        SmolStr::new_static("reaction"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#messageView"),
-                                    CowStr::new_static("#deletedMessageView")
+                                    CowStr::new_static("#deletedMessageView"),
                                 ],
                                 ..Default::default()
                             }),
@@ -1451,7 +1510,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1461,19 +1522,24 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logUnmuteConvo"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("rev"), SmolStr::new_static("convoId")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1483,12 +1549,10 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("messageAndReactionView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("message"),
-                            SmolStr::new_static("reaction")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("message"),
+                        SmolStr::new_static("reaction"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1528,11 +1592,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Annotations of text (mentions, URLs, hashtags, etc)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Annotations of text (mentions, URLs, hashtags, etc)",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("app.bsky.richtext.facet"),
                                     ..Default::default()
@@ -1556,18 +1618,19 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("messageRef"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("did"), SmolStr::new_static("messageId"),
-                            SmolStr::new_static("convoId")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("messageId"),
+                        SmolStr::new_static("convoId"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("did"),
@@ -1578,7 +1641,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("messageId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1694,12 +1759,11 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reactionView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("value"), SmolStr::new_static("sender"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("value"),
+                        SmolStr::new_static("sender"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1719,7 +1783,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("value"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1753,7 +1819,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
 
 pub mod deleted_message_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1950,10 +2016,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> DeletedMessageView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeletedMessageView<S> {
         DeletedMessageView {
             id: self._fields.0.unwrap(),
             rev: self._fields.1.unwrap(),
@@ -1966,7 +2029,7 @@ where
 
 pub mod log_add_reaction_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2163,10 +2226,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LogAddReaction<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogAddReaction<S> {
         LogAddReaction {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -2179,7 +2239,7 @@ where
 
 pub mod log_create_message_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2334,10 +2394,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LogCreateMessage<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogCreateMessage<S> {
         LogCreateMessage {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -2349,7 +2406,7 @@ where
 
 pub mod log_delete_message_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2504,10 +2561,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LogDeleteMessage<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogDeleteMessage<S> {
         LogDeleteMessage {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -2519,7 +2573,7 @@ where
 
 pub mod log_read_message_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2674,10 +2728,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LogReadMessage<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogReadMessage<S> {
         LogReadMessage {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -2689,7 +2740,7 @@ where
 
 pub mod log_remove_reaction_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2886,10 +2937,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LogRemoveReaction<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogRemoveReaction<S> {
         LogRemoveReaction {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -2902,7 +2950,7 @@ where
 
 pub mod message_and_reaction_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2945,28 +2993,23 @@ pub mod message_and_reaction_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MessageAndReactionViewBuilder<
-    S: BosStr,
-    St: message_and_reaction_view_state::State,
-> {
+pub struct MessageAndReactionViewBuilder<S: BosStr, St: message_and_reaction_view_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<convo::MessageView<S>>, Option<convo::ReactionView<S>>),
+    _fields: (
+        Option<convo::MessageView<S>>,
+        Option<convo::ReactionView<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl<S: BosStr> MessageAndReactionView<S> {
     /// Create a new builder for this type.
-    pub fn new() -> MessageAndReactionViewBuilder<
-        S,
-        message_and_reaction_view_state::Empty,
-    > {
+    pub fn new() -> MessageAndReactionViewBuilder<S, message_and_reaction_view_state::Empty> {
         MessageAndReactionViewBuilder::new()
     }
 }
 
-impl<
-    S: BosStr,
-> MessageAndReactionViewBuilder<S, message_and_reaction_view_state::Empty> {
+impl<S: BosStr> MessageAndReactionViewBuilder<S, message_and_reaction_view_state::Empty> {
     /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MessageAndReactionViewBuilder {
@@ -2986,10 +3029,7 @@ where
     pub fn message(
         mut self,
         value: impl Into<convo::MessageView<S>>,
-    ) -> MessageAndReactionViewBuilder<
-        S,
-        message_and_reaction_view_state::SetMessage<St>,
-    > {
+    ) -> MessageAndReactionViewBuilder<S, message_and_reaction_view_state::SetMessage<St>> {
         self._fields.0 = Option::Some(value.into());
         MessageAndReactionViewBuilder {
             _state: PhantomData,
@@ -3008,10 +3048,7 @@ where
     pub fn reaction(
         mut self,
         value: impl Into<convo::ReactionView<S>>,
-    ) -> MessageAndReactionViewBuilder<
-        S,
-        message_and_reaction_view_state::SetReaction<St>,
-    > {
+    ) -> MessageAndReactionViewBuilder<S, message_and_reaction_view_state::SetReaction<St>> {
         self._fields.1 = Option::Some(value.into());
         MessageAndReactionViewBuilder {
             _state: PhantomData,
@@ -3050,7 +3087,7 @@ where
 
 pub mod message_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3205,10 +3242,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> MessageRef<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MessageRef<S> {
         MessageRef {
             convo_id: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -3220,7 +3254,7 @@ where
 
 pub mod message_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3391,18 +3425,12 @@ where
 
 impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
     /// Set the `reactions` field (optional)
-    pub fn reactions(
-        mut self,
-        value: impl Into<Option<Vec<convo::ReactionView<S>>>>,
-    ) -> Self {
+    pub fn reactions(mut self, value: impl Into<Option<Vec<convo::ReactionView<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `reactions` field to an Option value (optional)
-    pub fn maybe_reactions(
-        mut self,
-        value: Option<Vec<convo::ReactionView<S>>>,
-    ) -> Self {
+    pub fn maybe_reactions(mut self, value: Option<Vec<convo::ReactionView<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -3508,10 +3536,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> MessageView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MessageView<S> {
         MessageView {
             embed: self._fields.0,
             facets: self._fields.1,
@@ -3528,7 +3553,7 @@ where
 
 pub mod message_view_sender_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3615,10 +3640,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> MessageViewSender<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MessageViewSender<S> {
         MessageViewSender {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -3628,7 +3650,7 @@ where
 
 pub mod reaction_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3687,7 +3709,11 @@ pub mod reaction_view_state {
 /// Builder for constructing an instance of this type.
 pub struct ReactionViewBuilder<S: BosStr, St: reaction_view_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<convo::ReactionViewSender<S>>, Option<S>),
+    _fields: (
+        Option<Datetime>,
+        Option<convo::ReactionViewSender<S>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -3783,10 +3809,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ReactionView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReactionView<S> {
         ReactionView {
             created_at: self._fields.0.unwrap(),
             sender: self._fields.1.unwrap(),
@@ -3798,7 +3821,7 @@ where
 
 pub mod reaction_view_sender_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3885,10 +3908,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ReactionViewSender<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReactionViewSender<S> {
         ReactionViewSender {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

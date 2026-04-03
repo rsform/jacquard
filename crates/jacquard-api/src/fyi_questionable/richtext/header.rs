@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,13 +20,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::fyi_questionable::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::fyi_questionable::richtext::facet::Facet;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Header<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
@@ -97,7 +100,7 @@ impl<S: BosStr> LexiconSchema for Header<S> {
 
 pub mod header_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -183,10 +186,7 @@ where
     St::Level: header_state::IsUnset,
 {
     /// Set the `level` field (required)
-    pub fn level(
-        mut self,
-        value: impl Into<i64>,
-    ) -> HeaderBuilder<S, header_state::SetLevel<St>> {
+    pub fn level(mut self, value: impl Into<i64>) -> HeaderBuilder<S, header_state::SetLevel<St>> {
         self._fields.1 = Option::Some(value.into());
         HeaderBuilder {
             _state: PhantomData,
@@ -242,10 +242,10 @@ where
 }
 
 fn lexicon_doc_fyi_questionable_richtext_header() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fyi.questionable.richtext.header"),
@@ -254,12 +254,10 @@ fn lexicon_doc_fyi_questionable_richtext_header() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("plaintext"),
-                            SmolStr::new_static("level")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("plaintext"),
+                        SmolStr::new_static("level"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -267,9 +265,7 @@ fn lexicon_doc_fyi_questionable_richtext_header() -> LexiconDoc<'static> {
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
                                 items: LexArrayItem::Ref(LexRef {
-                                    r#ref: CowStr::new_static(
-                                        "fyi.questionable.richtext.facet",
-                                    ),
+                                    r#ref: CowStr::new_static("fyi.questionable.richtext.facet"),
                                     ..Default::default()
                                 }),
                                 ..Default::default()

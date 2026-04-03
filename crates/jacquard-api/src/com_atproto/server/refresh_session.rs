@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RefreshSessionOutput<S: BosStr = DefaultStr> {
     pub access_jwt: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -92,8 +95,7 @@ impl<S: BosStr> Serialize for RefreshSessionOutputStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for RefreshSessionOutputStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for RefreshSessionOutputStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -117,15 +119,9 @@ where
     type Output = RefreshSessionOutputStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            RefreshSessionOutputStatus::Takendown => {
-                RefreshSessionOutputStatus::Takendown
-            }
-            RefreshSessionOutputStatus::Suspended => {
-                RefreshSessionOutputStatus::Suspended
-            }
-            RefreshSessionOutputStatus::Deactivated => {
-                RefreshSessionOutputStatus::Deactivated
-            }
+            RefreshSessionOutputStatus::Takendown => RefreshSessionOutputStatus::Takendown,
+            RefreshSessionOutputStatus::Suspended => RefreshSessionOutputStatus::Suspended,
+            RefreshSessionOutputStatus::Deactivated => RefreshSessionOutputStatus::Deactivated,
             RefreshSessionOutputStatus::Other(v) => {
                 RefreshSessionOutputStatus::Other(v.into_static())
             }
@@ -133,18 +129,9 @@ where
     }
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum RefreshSessionError {
     #[serde(rename = "AccountTakedown")]
@@ -155,7 +142,10 @@ pub enum RefreshSessionError {
     ExpiredToken(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for RefreshSessionError {
@@ -208,9 +198,8 @@ impl jacquard_common::xrpc::XrpcResp for RefreshSessionResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RefreshSession {
     const NSID: &'static str = "com.atproto.server.refreshSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RefreshSessionResponse;
 }
 
@@ -218,9 +207,8 @@ impl jacquard_common::xrpc::XrpcRequest for RefreshSession {
 pub struct RefreshSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RefreshSessionRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.refreshSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = RefreshSession;
     type Response = RefreshSessionResponse;
 }

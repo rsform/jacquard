@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetOnboardingSuggestedUsersSkeleton<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<S>,
@@ -30,9 +33,11 @@ pub struct GetOnboardingSuggestedUsersSkeleton<S: BosStr = DefaultStr> {
     pub viewer: Option<Did<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetOnboardingSuggestedUsersSkeletonOutput<S: BosStr = DefaultStr> {
     pub dids: Vec<Did<S>>,
     ///DEPRECATED: use recIdStr instead.
@@ -54,8 +59,7 @@ impl jacquard_common::xrpc::XrpcResp for GetOnboardingSuggestedUsersSkeletonResp
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: BosStr> jacquard_common::xrpc::XrpcRequest
-for GetOnboardingSuggestedUsersSkeleton<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetOnboardingSuggestedUsersSkeleton<S> {
     const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedUsersSkeleton";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetOnboardingSuggestedUsersSkeletonResponse;
@@ -76,7 +80,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_onboarding_suggested_users_skeleton_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -113,12 +117,12 @@ impl<S: BosStr> GetOnboardingSuggestedUsersSkeleton<S> {
     }
 }
 
-impl<
-    S: BosStr,
-> GetOnboardingSuggestedUsersSkeletonBuilder<
-    S,
-    get_onboarding_suggested_users_skeleton_state::Empty,
-> {
+impl<S: BosStr>
+    GetOnboardingSuggestedUsersSkeletonBuilder<
+        S,
+        get_onboarding_suggested_users_skeleton_state::Empty,
+    >
+{
     /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetOnboardingSuggestedUsersSkeletonBuilder {
@@ -129,10 +133,9 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: get_onboarding_suggested_users_skeleton_state::State,
-> GetOnboardingSuggestedUsersSkeletonBuilder<S, St> {
+impl<S: BosStr, St: get_onboarding_suggested_users_skeleton_state::State>
+    GetOnboardingSuggestedUsersSkeletonBuilder<S, St>
+{
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -145,10 +148,9 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: get_onboarding_suggested_users_skeleton_state::State,
-> GetOnboardingSuggestedUsersSkeletonBuilder<S, St> {
+impl<S: BosStr, St: get_onboarding_suggested_users_skeleton_state::State>
+    GetOnboardingSuggestedUsersSkeletonBuilder<S, St>
+{
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -161,10 +163,9 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: get_onboarding_suggested_users_skeleton_state::State,
-> GetOnboardingSuggestedUsersSkeletonBuilder<S, St> {
+impl<S: BosStr, St: get_onboarding_suggested_users_skeleton_state::State>
+    GetOnboardingSuggestedUsersSkeletonBuilder<S, St>
+{
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.2 = value.into();

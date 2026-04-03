@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,14 +24,17 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_chavatar::settings;
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::app_chavatar::settings;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AvatarItem<S: BosStr = DefaultStr> {
     pub id: S,
     pub image: StrongRef<S>,
@@ -56,7 +59,6 @@ pub struct Settings<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SettingsInterval<S: BosStr = DefaultStr> {
@@ -154,7 +156,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SettingsMode<S: BosStr = DefaultStr> {
@@ -342,7 +343,7 @@ impl<S: BosStr> LexiconSchema for Settings<S> {
 
 pub mod avatar_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -415,10 +416,7 @@ where
     St::Id: avatar_item_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(
-        mut self,
-        value: impl Into<S>,
-    ) -> AvatarItemBuilder<S, avatar_item_state::SetId<St>> {
+    pub fn id(mut self, value: impl Into<S>) -> AvatarItemBuilder<S, avatar_item_state::SetId<St>> {
         self._fields.0 = Option::Some(value.into());
         AvatarItemBuilder {
             _state: PhantomData,
@@ -462,10 +460,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AvatarItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AvatarItem<S> {
         AvatarItem {
             id: self._fields.0.unwrap(),
             image: self._fields.1.unwrap(),
@@ -475,10 +470,10 @@ where
 }
 
 fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chavatar.settings"),
@@ -487,9 +482,10 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("avatarItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("id"), SmolStr::new_static("image")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("image"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -515,18 +511,15 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("Rotation configuration for a user."),
-                    ),
+                    description: Some(CowStr::new_static("Rotation configuration for a user.")),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("enabled"),
-                                SmolStr::new_static("interval"),
-                                SmolStr::new_static("mode"), SmolStr::new_static("avatars")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("enabled"),
+                            SmolStr::new_static("interval"),
+                            SmolStr::new_static("mode"),
+                            SmolStr::new_static("avatars"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -575,7 +568,7 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
 
 pub mod settings_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

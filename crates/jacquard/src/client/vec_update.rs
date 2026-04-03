@@ -54,7 +54,9 @@ pub trait VecUpdate {
 
     /// Extract the vec from the get response output (always owned/DefaultStr-backed).
     fn extract_vec(
-        output: <<Self::GetRequest as XrpcRequest>::Response as XrpcResp>::Output<jacquard_common::DefaultStr>,
+        output: <<Self::GetRequest as XrpcRequest>::Response as XrpcResp>::Output<
+            jacquard_common::DefaultStr,
+        >,
     ) -> Vec<Self::Item>;
 
     /// Build the put request from the modified vec

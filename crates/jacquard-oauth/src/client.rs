@@ -9,8 +9,16 @@ use crate::{
     session::{ClientData, ClientSessionData, DpopClientData, SessionRegistry},
     types::{AuthorizeOptions, CallbackParams},
 };
+#[cfg(feature = "scope-check")]
+use crate::{
+    error::ScopeError,
+    resolver::resolve_permission_set,
+    scopes::{IncludeScope, RepoCollection, RpcLexicon, Scope},
+};
 #[cfg(feature = "websocket")]
 use jacquard_common::CowStr;
+#[cfg(feature = "scope-check")]
+use jacquard_common::types::nsid::Nsid;
 use jacquard_common::{
     AuthorizationToken, IntoStatic,
     bos::BosStr,
@@ -23,6 +31,12 @@ use jacquard_common::{
         build_http_request, process_response,
     },
 };
+#[cfg(feature = "scope-check")]
+use jacquard_identity::lexicon_resolver::LexiconSchemaResolver;
+
+
+#[cfg(feature = "scope-check")]
+use jacquard_common::deps::fluent_uri::pct_enc::{EStr, encoder::Query};
 
 #[cfg(feature = "websocket")]
 use jacquard_common::websocket::{WebSocketClient, WebSocketConnection};
@@ -234,8 +248,35 @@ where
     /// Validates the `state` and optional `iss` parameters, exchanges the authorization code for
     /// tokens via the token endpoint, verifies the `sub` claim against the expected issuer, and
     /// persists the resulting session. On success returns an [`OAuthSession`] ready for API calls.
+    ///
+    /// When the `scope-check` feature is enabled, this method also eagerly resolves any `include:`
+    /// scopes by fetching the referenced permission sets. `T` must implement
+    /// `LexiconSchemaResolver` in that case.
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "info", skip_all, fields(state = params.state.as_ref().map(|s| s.as_str()))))]
+    #[cfg(not(feature = "scope-check"))]
     pub async fn callback(&self, params: CallbackParams) -> Result<OAuthSession<T, S>> {
+        let client_data = self.callback_core(params).await?;
+        self.create_session(client_data).await
+    }
+
+    /// Complete the OAuth authorization flow (scope-check variant).
+    ///
+    /// Same as `callback`, but eagerly resolves `include:` scopes into
+    /// concrete permissions via `LexiconSchemaResolver`.
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "info", skip_all, fields(state = params.state.as_ref().map(|s| s.as_str()))))]
+    #[cfg(feature = "scope-check")]
+    pub async fn callback(&self, params: CallbackParams) -> Result<OAuthSession<T, S>>
+    where
+        T: LexiconSchemaResolver,
+    {
+        let mut client_data = self.callback_core(params).await?;
+        client_data.resolved_scopes =
+            Some(resolve_include_scopes(self.client.as_ref(), &client_data.scopes).await?);
+        self.create_session(client_data).await
+    }
+
+    /// Shared callback logic: validate state/iss, exchange code, build session data.
+    async fn callback_core(&self, params: CallbackParams) -> Result<ClientSessionData> {
         let Some(state_key) = params.state else {
             return Err(CallbackError::MissingState.into());
         };
@@ -296,7 +337,7 @@ where
                 } else {
                     Scopes::empty()
                 };
-                let mut client_data = ClientSessionData {
+                Ok(ClientSessionData {
                     account_did: token_set.sub.clone(),
                     session_id: auth_req_info.state,
                     host_url: Uri::parse(token_set.aud.as_str())?.to_owned(),
@@ -315,14 +356,7 @@ where
                     token_set,
                     #[cfg(feature = "scope-check")]
                     resolved_scopes: None,
-                };
-
-                // TODO: Phase 5 Task 3 - eagerly resolve include scopes
-                // When scope-check is enabled, iterate the scopes, find any Include scopes,
-                // resolve them via resolve_permission_set(), and populate resolved_scopes.
-                // For now, this is left as None.
-
-                self.create_session(client_data).await
+                })
             }
             Err(e) => Err(e.into()),
         }
@@ -359,6 +393,94 @@ where
     ) -> Result<()> {
         Ok(self.registry.del(did, session_id).await?)
     }
+}
+
+/// Decode a percent-encoded audience string.
+///
+/// The audience may contain percent-encoded characters like `%23` for `#`.
+/// This function decodes those and returns the decoded string.
+#[cfg(feature = "scope-check")]
+fn decode_audience(aud: &str) -> Result<String> {
+    // Use fluent_uri's percent-decoding to handle encoded characters.
+    // The audience is typically a DID, possibly with a fragment.
+    // EStr::new returns Option<&EStr>, so we match on that.
+    match EStr::<Query>::new(aud) {
+        Some(estr) => {
+            // estr.decode() returns a Decode struct
+            // The Decode type has a to_string() method that returns Result<Cow<str>, Vec<u8>>
+            let decoded = estr.decode();
+            match decoded.to_string() {
+                Ok(cow) => Ok(cow.into_owned()),
+                Err(bytes) => {
+                    Err(crate::error::CallbackError::ScopeResolution {
+                        detail: format!("percent-decoded audience contains invalid UTF-8: {:?}", bytes),
+                    }.into())
+                }
+            }
+        }
+        None => {
+            // If it's not a valid percent-encoded string, use it as-is.
+            // This handles cases where no encoding was applied.
+            Ok(aud.to_string())
+        }
+    }
+}
+
+/// Resolve all `include:` scopes in the given scope set into concrete permissions.
+///
+/// Non-include scopes are passed through unchanged. Each `include:` scope is
+/// resolved via `resolve_permission_set`, which fetches the permission set
+/// lexicon and expands it into concrete `Scope<SmolStr>` values.
+#[cfg(feature = "scope-check")]
+async fn resolve_include_scopes<R>(
+    resolver: &R,
+    scopes: &Scopes<SmolStr>,
+) -> Result<Vec<Scope<SmolStr>>>
+where
+    R: OAuthResolver + LexiconSchemaResolver + Send + Sync,
+{
+    let mut resolved = Vec::new();
+    for scope in scopes.iter() {
+        match scope {
+            Scope::Include(IncludeScope { nsid, audience }) => {
+                let audience_did = if let Some(aud_str) = audience {
+                    let decoded = decode_audience(aud_str)?;
+                    match Did::new_owned(&decoded) {
+                        Ok(did) => Some(did),
+                        Err(_) => {
+                            return Err(crate::error::CallbackError::ScopeResolution {
+                                detail: format!(
+                                    "invalid DID in include scope audience: {}",
+                                    decoded
+                                ),
+                            }
+                            .into());
+                        }
+                    }
+                } else {
+                    None
+                };
+
+                let nsid_smolstr = match Nsid::<SmolStr>::new_owned(nsid.as_str()) {
+                    Ok(n) => n,
+                    Err(_) => {
+                        return Err(crate::error::CallbackError::ScopeResolution {
+                            detail: format!("invalid NSID in include scope: {}", nsid),
+                        }
+                        .into());
+                    }
+                };
+
+                let expanded =
+                    resolve_permission_set(resolver, &nsid_smolstr, audience_did.as_ref()).await?;
+                resolved.extend(expanded);
+            }
+            other => {
+                resolved.push(other.convert());
+            }
+        }
+    }
+    Ok(resolved)
 }
 
 impl<T, S> HttpClient for OAuthClient<T, S>
@@ -734,6 +856,15 @@ where
         R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
     {
+        // Pre-flight scope check: pure in-memory, no HTTP.
+        #[cfg(feature = "scope-check")]
+        {
+            self.check_scope::<R>().await.map_err(|e| {
+                ClientError::invalid_request(format!("scope check failed: {:?}", e))
+                    .for_nsid(R::NSID)
+            })?;
+        }
+
         let base_uri = self.base_uri().await;
         let original_token = self.access_token().await;
         opts.auth = Some(original_token.clone());
@@ -791,6 +922,92 @@ where
         } else {
             resp
         }
+    }
+}
+
+#[cfg(feature = "scope-check")]
+impl<T, S, W> OAuthSession<T, S, W>
+where
+    S: ClientAuthStore + Send + Sync + 'static,
+    T: OAuthResolver + Send + Sync + 'static,
+    W: Send + Sync,
+{
+    /// Check whether the session's resolved scopes grant access to
+    /// the XRPC method identified by `R::NSID`.
+    async fn check_scope<R: XrpcRequest>(&self) -> core::result::Result<(), ScopeError> {
+        let data = self.data.read().await;
+
+        // Use the resolved scopes from Phase 5's eager resolution.
+        // These are fully expanded — no include scopes remain.
+        let resolved = data.resolved_scopes.as_ref();
+
+        let is_permitted = match resolved {
+            Some(scopes) => {
+                let nsid = Nsid::<SmolStr>::new_static(R::NSID).expect("valid NSID");
+
+                // Check if any granted scope covers this NSID. A request
+                // may be covered by rpc: scopes (method access) or repo:
+                // scopes (record operations).
+                //
+                // Note: `atproto` is the minimum base scope (auth only).
+                // It does NOT grant rpc/repo access.
+                //
+                // For rpc: scopes, we check only the lxm (method) match
+                // and ignore audience. At pre-flight time the client does
+                // not know the target audience — audience enforcement is
+                // the server's responsibility. A granted scope with a
+                // specific aud (e.g., did:web:api.bsky.app) still permits
+                // calling the method from the client's perspective.
+                let rpc_ok = scopes.iter().any(|s| match s {
+                    Scope::Rpc(rpc) => {
+                        rpc.lxm.iter().any(|l| match l {
+                            RpcLexicon::All => true,
+                            RpcLexicon::Nsid(granted_nsid) => {
+                                granted_nsid.as_ref() == nsid.as_ref()
+                            }
+                        })
+                    }
+                    _ => false,
+                });
+
+                // For repo: scopes, check if the NSID matches a granted
+                // collection. Any action suffices for pre-flight.
+                let repo_ok = scopes.iter().any(|s| match s {
+                    Scope::Repo(repo) => match &repo.collection {
+                        RepoCollection::All => true,
+                        RepoCollection::Nsid(col) => col.as_ref() == nsid.as_ref(),
+                    },
+                    _ => false,
+                });
+
+                rpc_ok || repo_ok
+            }
+            None => {
+                // No resolved scopes means resolution was skipped
+                // (e.g., no include scopes were present, or scope-check
+                // was enabled after session creation). Allow the request.
+                true
+            }
+        };
+
+        if !is_permitted {
+            let granted_summary = resolved
+                .map(|scopes| {
+                    scopes
+                        .iter()
+                        .map(|s| s.to_string_normalized())
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                })
+                .unwrap_or_default();
+
+            return Err(ScopeError {
+                nsid: SmolStr::new_static(R::NSID),
+                granted: SmolStr::from(granted_summary),
+            });
+        }
+
+        Ok(())
     }
 }
 
@@ -1118,5 +1335,260 @@ where
             .with_options(opts)
             .subscribe(params)
             .await
+    }
+}
+
+#[cfg(all(test, feature = "scope-check"))]
+mod tests {
+    use super::*;
+    use crate::scopes::{RepoAction, RepoScope, RpcAudience, RpcLexicon, RpcScope};
+    use std::collections::BTreeSet;
+
+    /// Test that a scope granting access to an RPC method works correctly.
+    #[test]
+    fn test_scope_check_permits_matching_rpc() {
+        // AC7.1: Session with rpc:com.example.test grants access to com.example.test.
+        let mut rpc_scope_set = BTreeSet::new();
+        rpc_scope_set.insert(RpcLexicon::Nsid(
+            Nsid::<SmolStr>::new_static("com.example.test").unwrap(),
+        ));
+        let mut aud_set = BTreeSet::new();
+        aud_set.insert(RpcAudience::All);
+
+        let granted_scope = Scope::Rpc(RpcScope {
+            lxm: rpc_scope_set,
+            aud: aud_set,
+        });
+
+        // Target scope for a request to com.example.test.
+        let mut target_lxm = BTreeSet::new();
+        target_lxm.insert(RpcLexicon::Nsid(
+            Nsid::<SmolStr>::new_static("com.example.test").unwrap(),
+        ));
+        let mut target_aud = BTreeSet::new();
+        target_aud.insert(RpcAudience::All);
+
+        let target_scope = Scope::Rpc(RpcScope {
+            lxm: target_lxm,
+            aud: target_aud,
+        });
+
+        // The granted scope should permit the target scope.
+        assert!(
+            granted_scope.grants(&target_scope),
+            "rpc:com.example.test should grant access to com.example.test"
+        );
+    }
+
+    /// Test that rpc:* wildcard grants access to all RPC methods.
+    #[test]
+    fn test_scope_check_permits_rpc_wildcard() {
+        // AC7.1: Session with rpc:* (wildcard) grants access to any RPC method.
+        let mut rpc_scope_set: BTreeSet<RpcLexicon<SmolStr>> = BTreeSet::new();
+        rpc_scope_set.insert(RpcLexicon::All);
+        let mut aud_set: BTreeSet<RpcAudience<SmolStr>> = BTreeSet::new();
+        aud_set.insert(RpcAudience::All);
+
+        let wildcard_scope = Scope::Rpc(RpcScope {
+            lxm: rpc_scope_set,
+            aud: aud_set,
+        });
+
+        // Target scope for any request.
+        let mut target_lxm = BTreeSet::new();
+        target_lxm.insert(RpcLexicon::Nsid(
+            Nsid::<SmolStr>::new_static("com.example.test").unwrap(),
+        ));
+        let mut target_aud = BTreeSet::new();
+        target_aud.insert(RpcAudience::All);
+
+        let target_scope = Scope::Rpc(RpcScope {
+            lxm: target_lxm,
+            aud: target_aud,
+        });
+
+        // Wildcard should grant any target scope.
+        assert!(
+            wildcard_scope.grants(&target_scope),
+            "rpc:* should grant access to any RPC method"
+        );
+    }
+
+    /// Test that an unmatched scope denies access.
+    #[test]
+    fn test_scope_check_denies_ungranted() {
+        // AC7.4: Session with rpc:com.example.other denies access to com.example.test.
+        let mut rpc_scope_set = BTreeSet::new();
+        rpc_scope_set.insert(RpcLexicon::Nsid(
+            Nsid::<SmolStr>::new_static("com.example.other").unwrap(),
+        ));
+        let mut aud_set = BTreeSet::new();
+        aud_set.insert(RpcAudience::All);
+
+        let granted_scope = Scope::Rpc(RpcScope {
+            lxm: rpc_scope_set,
+            aud: aud_set,
+        });
+
+        // Target scope for a request to com.example.test.
+        let mut target_lxm = BTreeSet::new();
+        target_lxm.insert(RpcLexicon::Nsid(
+            Nsid::<SmolStr>::new_static("com.example.test").unwrap(),
+        ));
+        let mut target_aud = BTreeSet::new();
+        target_aud.insert(RpcAudience::All);
+
+        let target_scope = Scope::Rpc(RpcScope {
+            lxm: target_lxm,
+            aud: target_aud,
+        });
+
+        // rpc:com.example.other should NOT grant access to com.example.test.
+        assert!(
+            !granted_scope.grants(&target_scope),
+            "rpc:com.example.other should NOT grant access to com.example.test"
+        );
+    }
+
+    /// Test that a repo scope grants access to the specified collection.
+    #[test]
+    fn test_scope_check_permits_repo_scope() {
+        // AC7.1: Session with repo:com.example.test grants access to that collection.
+        let mut actions = BTreeSet::new();
+        actions.insert(RepoAction::Create);
+        actions.insert(RepoAction::Update);
+        actions.insert(RepoAction::Delete);
+
+        let granted_repo = Scope::Repo(RepoScope {
+            collection: RepoCollection::Nsid(
+                Nsid::<SmolStr>::new_static("com.example.test").unwrap(),
+            ),
+            actions,
+        });
+
+        // Target scope for a request to com.example.test.
+        let mut target_actions = BTreeSet::new();
+        target_actions.insert(RepoAction::Create);
+        target_actions.insert(RepoAction::Update);
+        target_actions.insert(RepoAction::Delete);
+
+        let target_repo = Scope::Repo(RepoScope {
+            collection: RepoCollection::Nsid(
+                Nsid::<SmolStr>::new_static("com.example.test").unwrap(),
+            ),
+            actions: target_actions,
+        });
+
+        // The repo scope should grant the target scope.
+        assert!(
+            granted_repo.grants(&target_repo),
+            "repo:com.example.test should grant repo access to com.example.test"
+        );
+    }
+
+    /// Test that ScopeError provides diagnostic information.
+    #[test]
+    fn test_scope_error_diagnostic_info() {
+        // AC7.4: ScopeError includes request NSID and granted scope summary.
+        let err = ScopeError {
+            nsid: SmolStr::from("com.example.test"),
+            granted: SmolStr::from("rpc:com.example.other"),
+        };
+
+        assert_eq!(err.nsid, "com.example.test");
+        assert_eq!(err.granted, "rpc:com.example.other");
+        let error_msg = err.to_string();
+        assert!(
+            error_msg.contains("not permitted"),
+            "error message should indicate request is not permitted"
+        );
+    }
+
+    /// Test that multiple granted scopes are checked correctly.
+    #[test]
+    fn test_scope_check_multiple_scopes() {
+        // AC7.1: With multiple scopes, request matching one of them is permitted.
+        let mut other_lxm = BTreeSet::new();
+        other_lxm.insert(RpcLexicon::Nsid(
+            Nsid::<SmolStr>::new_static("com.example.other").unwrap(),
+        ));
+        let mut other_aud = BTreeSet::new();
+        other_aud.insert(RpcAudience::All);
+
+        let other_scope = Scope::Rpc(RpcScope {
+            lxm: other_lxm,
+            aud: other_aud,
+        });
+
+        let mut test_lxm = BTreeSet::new();
+        test_lxm.insert(RpcLexicon::Nsid(
+            Nsid::<SmolStr>::new_static("com.example.test").unwrap(),
+        ));
+        let mut test_aud = BTreeSet::new();
+        test_aud.insert(RpcAudience::All);
+
+        let test_scope = Scope::Rpc(RpcScope {
+            lxm: test_lxm,
+            aud: test_aud,
+        });
+
+        // Target scope for a request to com.example.test.
+        let mut target_lxm = BTreeSet::new();
+        target_lxm.insert(RpcLexicon::Nsid(
+            Nsid::<SmolStr>::new_static("com.example.test").unwrap(),
+        ));
+        let mut target_aud = BTreeSet::new();
+        target_aud.insert(RpcAudience::All);
+
+        let target_scope = Scope::Rpc(RpcScope {
+            lxm: target_lxm,
+            aud: target_aud,
+        });
+
+        // With multiple scopes, if one matches, the check passes.
+        let granted_scopes = vec![other_scope, test_scope];
+        let is_permitted = granted_scopes.iter().any(|s| s.grants(&target_scope));
+        assert!(
+            is_permitted,
+            "at least one granted scope should permit the target request"
+        );
+    }
+
+    /// Test that both RPC and repo scopes are checked when determining permissions.
+    #[test]
+    fn test_scope_check_rpc_and_repo_paths() {
+        // AC7.1: A request can be granted via either rpc: or repo: scopes.
+
+        // Create a repo scope for the collection.
+        let mut repo_actions = BTreeSet::new();
+        repo_actions.insert(RepoAction::Create);
+        repo_actions.insert(RepoAction::Update);
+        repo_actions.insert(RepoAction::Delete);
+
+        let repo_scope = Scope::Repo(RepoScope {
+            collection: RepoCollection::Nsid(
+                Nsid::<SmolStr>::new_static("com.example.test").unwrap(),
+            ),
+            actions: repo_actions,
+        });
+
+        // Target scope for a request to com.example.test (as repo operations).
+        let mut target_actions = BTreeSet::new();
+        target_actions.insert(RepoAction::Create);
+        target_actions.insert(RepoAction::Update);
+        target_actions.insert(RepoAction::Delete);
+
+        let target_repo = Scope::Repo(RepoScope {
+            collection: RepoCollection::Nsid(
+                Nsid::<SmolStr>::new_static("com.example.test").unwrap(),
+            ),
+            actions: target_actions,
+        });
+
+        // The repo scope should satisfy the request.
+        assert!(
+            repo_scope.grants(&target_repo),
+            "repo scope should grant repo-based requests"
+        );
     }
 }

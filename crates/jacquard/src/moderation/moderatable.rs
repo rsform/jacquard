@@ -71,8 +71,8 @@ pub trait ModeratableIterExt<'a, S: BosStr, T: Moderateable<S> + 'a>:
     }
 }
 
-impl<'a, S: BosStr, T: Moderateable<S> + 'a, I: Iterator<Item = &'a T>>
-    ModeratableIterExt<'a, S, T> for I
+impl<'a, S: BosStr, T: Moderateable<S> + 'a, I: Iterator<Item = &'a T>> ModeratableIterExt<'a, S, T>
+    for I
 {
 }
 

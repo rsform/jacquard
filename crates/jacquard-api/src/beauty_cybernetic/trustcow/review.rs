@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A review connected to a verified transaction, can only be created by one of the transaction parties
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -236,7 +236,7 @@ impl<S: BosStr> LexiconSchema for Review<S> {
 
 pub mod review_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -377,10 +377,7 @@ where
 
 impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `reviewerRole` field (optional)
-    pub fn reviewer_role(
-        mut self,
-        value: impl Into<Option<ReviewReviewerRole<S>>>,
-    ) -> Self {
+    pub fn reviewer_role(mut self, value: impl Into<Option<ReviewReviewerRole<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -457,10 +454,10 @@ where
 }
 
 fn lexicon_doc_beauty_cybernetic_trustcow_review() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("beauty.cybernetic.trustcow.review"),

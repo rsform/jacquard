@@ -18,4 +18,3 @@ pub enum Header<S: BosStr = DefaultStr> {
     /// A JWS compact-serialization header.
     Jws(jws::Header<S>),
 }
-

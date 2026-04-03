@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,15 +20,18 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::chat_bsky::convo::MessageInput;
 use crate::chat_bsky::convo::MessageView;
 use crate::chat_bsky::convo::send_message_batch;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BatchItem<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: MessageInput<S>,
@@ -36,18 +39,22 @@ pub struct BatchItem<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SendMessageBatch<S: BosStr = DefaultStr> {
     pub items: Vec<send_message_batch::BatchItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SendMessageBatchOutput<S: BosStr = DefaultStr> {
     pub items: Vec<MessageView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -80,9 +87,8 @@ impl jacquard_common::xrpc::XrpcResp for SendMessageBatchResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SendMessageBatch<S> {
     const NSID: &'static str = "chat.bsky.convo.sendMessageBatch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = SendMessageBatchResponse;
 }
 
@@ -90,16 +96,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SendMessageBatch<S> {
 pub struct SendMessageBatchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendMessageBatchRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.sendMessageBatch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = SendMessageBatch<S>;
     type Response = SendMessageBatchResponse;
 }
 
 pub mod batch_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -219,10 +224,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BatchItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BatchItem<S> {
         BatchItem {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -232,10 +234,10 @@ where
 }
 
 fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.convo.sendMessageBatch"),
@@ -244,25 +246,23 @@ fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("batchItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("convoId"),
-                            SmolStr::new_static("message")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("convoId"),
+                        SmolStr::new_static("message"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "chat.bsky.convo.defs#messageInput",
-                                ),
+                                r#ref: CowStr::new_static("chat.bsky.convo.defs#messageInput"),
                                 ..Default::default()
                             }),
                         );
@@ -276,28 +276,26 @@ fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(
-                            LexXrpcBodySchema::Object(LexObject {
-                                required: Some(vec![SmolStr::new_static("items")]),
-                                properties: {
-                                    #[allow(unused_mut)]
-                                    let mut map = BTreeMap::new();
-                                    map.insert(
-                                        SmolStr::new_static("items"),
-                                        LexObjectProperty::Array(LexArray {
-                                            items: LexArrayItem::Ref(LexRef {
-                                                r#ref: CowStr::new_static("#batchItem"),
-                                                ..Default::default()
-                                            }),
-                                            max_length: Some(100usize),
+                        schema: Some(LexXrpcBodySchema::Object(LexObject {
+                            required: Some(vec![SmolStr::new_static("items")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("items"),
+                                    LexObjectProperty::Array(LexArray {
+                                        items: LexArrayItem::Ref(LexRef {
+                                            r#ref: CowStr::new_static("#batchItem"),
                                             ..Default::default()
                                         }),
-                                    );
-                                    map
-                                },
-                                ..Default::default()
-                            }),
-                        ),
+                                        max_length: Some(100usize),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        })),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -311,7 +309,7 @@ fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> LexiconDoc<'static> {
 
 pub mod send_message_batch_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -398,10 +396,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SendMessageBatch<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SendMessageBatch<S> {
         SendMessageBatch {
             items: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

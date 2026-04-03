@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Delete<S: BosStr = DefaultStr> {
     ///DID of the repository owner
     pub did: Did<S>,
@@ -41,9 +44,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Delete<S> {
     const NSID: &'static str = "sh.tangled.repo.delete";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteResponse;
 }
 
@@ -51,16 +53,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Delete<S> {
 pub struct DeleteRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.delete";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Delete<S>;
     type Response = DeleteResponse;
 }
 
 pub mod delete_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -147,10 +148,7 @@ where
     St::Did: delete_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> DeleteBuilder<S, delete_state::SetDid<St>> {
+    pub fn did(mut self, value: impl Into<Did<S>>) -> DeleteBuilder<S, delete_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         DeleteBuilder {
             _state: PhantomData,
@@ -166,10 +164,7 @@ where
     St::Name: delete_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> DeleteBuilder<S, delete_state::SetName<St>> {
+    pub fn name(mut self, value: impl Into<S>) -> DeleteBuilder<S, delete_state::SetName<St>> {
         self._fields.1 = Option::Some(value.into());
         DeleteBuilder {
             _state: PhantomData,
@@ -185,10 +180,7 @@ where
     St::Rkey: delete_state::IsUnset,
 {
     /// Set the `rkey` field (required)
-    pub fn rkey(
-        mut self,
-        value: impl Into<S>,
-    ) -> DeleteBuilder<S, delete_state::SetRkey<St>> {
+    pub fn rkey(mut self, value: impl Into<S>) -> DeleteBuilder<S, delete_state::SetRkey<St>> {
         self._fields.2 = Option::Some(value.into());
         DeleteBuilder {
             _state: PhantomData,

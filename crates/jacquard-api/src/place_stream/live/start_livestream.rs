@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::place_stream::livestream::Livestream;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Cid, UriValue};
+use jacquard_common::types::string::{Cid, Did, UriValue};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::place_stream::livestream::Livestream;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StartLivestream<S: BosStr = DefaultStr> {
     ///Whether to create a Bluesky post announcing the livestream.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -31,9 +34,11 @@ pub struct StartLivestream<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StartLivestreamOutput<S: BosStr = DefaultStr> {
     ///The CID of the livestream record.
     pub cid: Cid<S>,
@@ -54,9 +59,8 @@ impl jacquard_common::xrpc::XrpcResp for StartLivestreamResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for StartLivestream<S> {
     const NSID: &'static str = "place.stream.live.startLivestream";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = StartLivestreamResponse;
 }
 
@@ -64,16 +68,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for StartLivestream<S> {
 pub struct StartLivestreamRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StartLivestreamRequest {
     const PATH: &'static str = "/xrpc/place.stream.live.startLivestream";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = StartLivestream<S>;
     type Response = StartLivestreamResponse;
 }
 
 pub mod start_livestream_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -207,10 +210,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> StartLivestream<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StartLivestream<S> {
         StartLivestream {
             create_bluesky_post: self._fields.0,
             livestream: self._fields.1.unwrap(),

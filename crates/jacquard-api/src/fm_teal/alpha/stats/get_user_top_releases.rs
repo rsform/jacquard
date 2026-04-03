@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::fm_teal::alpha::stats::ReleaseView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::fm_teal::alpha::stats::ReleaseView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetUserTopReleases<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -34,9 +37,11 @@ pub struct GetUserTopReleases<S: BosStr = DefaultStr> {
     pub period: Option<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetUserTopReleasesOutput<S: BosStr = DefaultStr> {
     ///Next page cursor
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -80,7 +85,7 @@ fn _default_period<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_user_top_releases_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -154,10 +159,7 @@ where
     }
 }
 
-impl<
-    S: BosStr,
-    St: get_user_top_releases_state::State,
-> GetUserTopReleasesBuilder<S, St> {
+impl<S: BosStr, St: get_user_top_releases_state::State> GetUserTopReleasesBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -170,10 +172,7 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: get_user_top_releases_state::State,
-> GetUserTopReleasesBuilder<S, St> {
+impl<S: BosStr, St: get_user_top_releases_state::State> GetUserTopReleasesBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -186,10 +185,7 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: get_user_top_releases_state::State,
-> GetUserTopReleasesBuilder<S, St> {
+impl<S: BosStr, St: get_user_top_releases_state::State> GetUserTopReleasesBuilder<S, St> {
     /// Set the `period` field (optional)
     pub fn period(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();

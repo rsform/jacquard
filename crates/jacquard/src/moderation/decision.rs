@@ -140,8 +140,7 @@ fn apply_label<S: BosStr>(
             decision.no_override = true;
             decision.causes.push(LabelCause {
                 label: LabelValue::from_value(SmolStr::new(label_val)),
-                source: Did::new_owned(label.src.as_ref())
-                    .expect("label.src must be a valid DID"),
+                source: Did::new_owned(label.src.as_ref()).expect("label.src must be a valid DID"),
                 target: determine_target(label),
             });
             return;
@@ -154,8 +153,7 @@ fn apply_label<S: BosStr>(
             decision.filter = true;
             decision.causes.push(LabelCause {
                 label: LabelValue::from_value(SmolStr::new(label_val)),
-                source: Did::new_owned(label.src.as_ref())
-                    .expect("label.src must be a valid DID"),
+                source: Did::new_owned(label.src.as_ref()).expect("label.src must be a valid DID"),
                 target: determine_target(label),
             });
         }
@@ -372,13 +370,11 @@ pub trait ModerationIterExt<'a, S: BosStr, T: Labeled<S> + 'a>:
         defs: &'a LabelerDefs,
         accepted_labelers: &'a [Did],
     ) -> impl Iterator<Item = &'a T> {
-        self.filter(move |item| {
-            !moderate::<S, T>(*item, prefs, defs, accepted_labelers).filter
-        })
+        self.filter(move |item| !moderate::<S, T>(*item, prefs, defs, accepted_labelers).filter)
     }
 }
 
-impl<'a, S: BosStr, T: Labeled<S> + 'a, I: Iterator<Item = &'a T>>
-    ModerationIterExt<'a, S, T> for I
+impl<'a, S: BosStr, T: Labeled<S> + 'a, I: Iterator<Item = &'a T>> ModerationIterExt<'a, S, T>
+    for I
 {
 }

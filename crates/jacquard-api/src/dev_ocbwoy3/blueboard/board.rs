@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -133,7 +133,7 @@ impl<S: BosStr> LexiconSchema for Board<S> {
 
 pub mod board_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -274,10 +274,7 @@ where
     St::Nsfw: board_state::IsUnset,
 {
     /// Set the `nsfw` field (required)
-    pub fn nsfw(
-        mut self,
-        value: impl Into<bool>,
-    ) -> BoardBuilder<S, board_state::SetNsfw<St>> {
+    pub fn nsfw(mut self, value: impl Into<bool>) -> BoardBuilder<S, board_state::SetNsfw<St>> {
         self._fields.2 = Option::Some(value.into());
         BoardBuilder {
             _state: PhantomData,
@@ -293,10 +290,7 @@ where
     St::Title: board_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> BoardBuilder<S, board_state::SetTitle<St>> {
+    pub fn title(mut self, value: impl Into<S>) -> BoardBuilder<S, board_state::SetTitle<St>> {
         self._fields.3 = Option::Some(value.into());
         BoardBuilder {
             _state: PhantomData,
@@ -337,10 +331,10 @@ where
 }
 
 fn lexicon_doc_dev_ocbwoy3_blueboard_board() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.ocbwoy3.blueboard.board"),
@@ -351,25 +345,21 @@ fn lexicon_doc_dev_ocbwoy3_blueboard_board() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("title"),
-                                SmolStr::new_static("description"),
-                                SmolStr::new_static("nsfw"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("title"),
+                            SmolStr::new_static("description"),
+                            SmolStr::new_static("nsfw"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "The date and time when the board was created",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The date and time when the board was created",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -377,9 +367,9 @@ fn lexicon_doc_dev_ocbwoy3_blueboard_board() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("A short description of the board"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "A short description of the board",
+                                    )),
                                     max_graphemes: Some(30usize),
                                     ..Default::default()
                                 }),
@@ -393,9 +383,9 @@ fn lexicon_doc_dev_ocbwoy3_blueboard_board() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("title"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The title of the board (e.g. /at/)"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The title of the board (e.g. /at/)",
+                                    )),
                                     max_length: Some(10usize),
                                     ..Default::default()
                                 }),

@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RevokeAccountCredentials<S: BosStr = DefaultStr> {
     pub account: AtIdentifier<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -36,9 +39,8 @@ impl jacquard_common::xrpc::XrpcResp for RevokeAccountCredentialsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RevokeAccountCredentials<S> {
     const NSID: &'static str = "com.atproto.temp.revokeAccountCredentials";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RevokeAccountCredentialsResponse;
 }
 
@@ -46,16 +48,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RevokeAccountCredentials<
 pub struct RevokeAccountCredentialsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RevokeAccountCredentialsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.revokeAccountCredentials";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = RevokeAccountCredentials<S>;
     type Response = RevokeAccountCredentialsResponse;
 }
 
 pub mod revoke_account_credentials_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -86,10 +87,7 @@ pub mod revoke_account_credentials_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RevokeAccountCredentialsBuilder<
-    S: BosStr,
-    St: revoke_account_credentials_state::State,
-> {
+pub struct RevokeAccountCredentialsBuilder<S: BosStr, St: revoke_account_credentials_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -97,17 +95,12 @@ pub struct RevokeAccountCredentialsBuilder<
 
 impl<S: BosStr> RevokeAccountCredentials<S> {
     /// Create a new builder for this type.
-    pub fn new() -> RevokeAccountCredentialsBuilder<
-        S,
-        revoke_account_credentials_state::Empty,
-    > {
+    pub fn new() -> RevokeAccountCredentialsBuilder<S, revoke_account_credentials_state::Empty> {
         RevokeAccountCredentialsBuilder::new()
     }
 }
 
-impl<
-    S: BosStr,
-> RevokeAccountCredentialsBuilder<S, revoke_account_credentials_state::Empty> {
+impl<S: BosStr> RevokeAccountCredentialsBuilder<S, revoke_account_credentials_state::Empty> {
     /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RevokeAccountCredentialsBuilder {
@@ -127,10 +120,7 @@ where
     pub fn account(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> RevokeAccountCredentialsBuilder<
-        S,
-        revoke_account_credentials_state::SetAccount<St>,
-    > {
+    ) -> RevokeAccountCredentialsBuilder<S, revoke_account_credentials_state::SetAccount<St>> {
         self._fields.0 = Option::Some(value.into());
         RevokeAccountCredentialsBuilder {
             _state: PhantomData,

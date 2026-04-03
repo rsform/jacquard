@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,9 +24,6 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::article;
 use crate::social_flockfeeds::lexical::r#type::brand;
 use crate::social_flockfeeds::lexical::r#type::event;
@@ -35,10 +32,16 @@ use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A particular physical business or branch of an organization. Examples of LocalBusiness include a restaurant, a particular branch of a restaurant chain, a branch of a bank, a medical practice, a club, a bowling alley, etc.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accepted_payment_method: Option<EmbeddedAcceptedPaymentMethod<S>>,
@@ -273,9 +276,7 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub smoking_allowed: Option<EmbeddedSmokingAllowed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub special_opening_hours_specification: Option<
-        EmbeddedSpecialOpeningHoursSpecification<S>,
-    >,
+    pub special_opening_hours_specification: Option<EmbeddedSpecialOpeningHoursSpecification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sponsor: Option<EmbeddedSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -297,7 +298,6 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -347,7 +347,6 @@ pub enum EmbeddedAlumni<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -381,7 +380,6 @@ pub enum EmbeddedBranchOf<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -391,7 +389,6 @@ pub enum EmbeddedBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -441,7 +438,6 @@ pub enum EmbeddedDepartment<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -470,7 +466,6 @@ pub enum EmbeddedDiversityStaffingReport<S: BosStr = DefaultStr> {
     ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -489,7 +484,6 @@ pub enum EmbeddedEmployee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -497,7 +491,6 @@ pub enum EmbeddedEmployees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -512,7 +505,6 @@ pub enum EmbeddedEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -520,7 +512,6 @@ pub enum EmbeddedEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -537,7 +528,6 @@ pub enum EmbeddedFounder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -545,7 +535,6 @@ pub enum EmbeddedFounders<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -566,7 +555,6 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -701,7 +689,6 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -760,7 +747,6 @@ pub enum EmbeddedLegalRepresentative<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -779,7 +765,6 @@ pub enum EmbeddedLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -797,7 +782,6 @@ pub enum EmbeddedMakesOffer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -824,7 +808,6 @@ pub enum EmbeddedMember<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -832,7 +815,6 @@ pub enum EmbeddedMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -843,7 +825,6 @@ pub enum EmbeddedMembers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -888,7 +869,6 @@ pub enum EmbeddedOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -896,7 +876,6 @@ pub enum EmbeddedParentOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -911,7 +890,6 @@ pub enum EmbeddedPhoto<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -919,7 +897,6 @@ pub enum EmbeddedPhotos<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -996,7 +973,6 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1005,7 +981,6 @@ pub enum EmbeddedSubOrganization<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1013,7 +988,6 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1286,9 +1260,8 @@ pub struct LocalBusiness<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub smoking_allowed: Option<LocalBusinessSmokingAllowed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub special_opening_hours_specification: Option<
-        LocalBusinessSpecialOpeningHoursSpecification<S>,
-    >,
+    pub special_opening_hours_specification:
+        Option<LocalBusinessSpecialOpeningHoursSpecification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sponsor: Option<LocalBusinessSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1310,7 +1283,6 @@ pub struct LocalBusiness<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1360,7 +1332,6 @@ pub enum LocalBusinessAlumni<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1394,7 +1365,6 @@ pub enum LocalBusinessBranchOf<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1404,7 +1374,6 @@ pub enum LocalBusinessBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1454,7 +1423,6 @@ pub enum LocalBusinessDepartment<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1483,7 +1451,6 @@ pub enum LocalBusinessDiversityStaffingReport<S: BosStr = DefaultStr> {
     ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1502,7 +1469,6 @@ pub enum LocalBusinessEmployee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1510,7 +1476,6 @@ pub enum LocalBusinessEmployees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1525,7 +1490,6 @@ pub enum LocalBusinessEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1533,7 +1497,6 @@ pub enum LocalBusinessEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1550,7 +1513,6 @@ pub enum LocalBusinessFounder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1558,7 +1520,6 @@ pub enum LocalBusinessFounders<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1579,7 +1540,6 @@ pub enum LocalBusinessFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1714,7 +1674,6 @@ pub enum LocalBusinessImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1773,7 +1732,6 @@ pub enum LocalBusinessLegalRepresentative<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1792,7 +1750,6 @@ pub enum LocalBusinessLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1810,7 +1767,6 @@ pub enum LocalBusinessMakesOffer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1837,7 +1793,6 @@ pub enum LocalBusinessMember<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1845,7 +1800,6 @@ pub enum LocalBusinessMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1856,7 +1810,6 @@ pub enum LocalBusinessMembers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1901,7 +1854,6 @@ pub enum LocalBusinessOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1909,7 +1861,6 @@ pub enum LocalBusinessParentOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1924,7 +1875,6 @@ pub enum LocalBusinessPhoto<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1932,7 +1882,6 @@ pub enum LocalBusinessPhotos<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2009,7 +1958,6 @@ pub enum LocalBusinessSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2018,7 +1966,6 @@ pub enum LocalBusinessSubOrganization<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2026,7 +1973,6 @@ pub enum LocalBusinessSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2132,10 +2078,10 @@ impl<S: BosStr> LexiconSchema for LocalBusiness<S> {
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_LocalBusiness() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.LocalBusiness"),
@@ -4813,7 +4759,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_LocalBusiness() -> LexiconDoc<'sta
 
 pub mod local_business_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4977,132 +4923,15 @@ impl<S: BosStr> LocalBusinessBuilder<S, local_business_state::Empty> {
         LocalBusinessBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -5176,10 +5005,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(
-        mut self,
-        value: Option<LocalBusinessAdditionalType<S>>,
-    ) -> Self {
+    pub fn maybe_additional_type(mut self, value: Option<LocalBusinessAdditionalType<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -5246,10 +5072,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(
-        mut self,
-        value: Option<LocalBusinessAlternateName<S>>,
-    ) -> Self {
+    pub fn maybe_alternate_name(mut self, value: Option<LocalBusinessAlternateName<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -5278,10 +5101,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
         self
     }
     /// Set the `amenityFeature` field to an Option value (optional)
-    pub fn maybe_amenity_feature(
-        mut self,
-        value: Option<LocalBusinessAmenityFeature<S>>,
-    ) -> Self {
+    pub fn maybe_amenity_feature(mut self, value: Option<LocalBusinessAmenityFeature<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -5289,18 +5109,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `areaServed` field (optional)
-    pub fn area_served(
-        mut self,
-        value: impl Into<Option<LocalBusinessAreaServed<S>>>,
-    ) -> Self {
+    pub fn area_served(mut self, value: impl Into<Option<LocalBusinessAreaServed<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `areaServed` field to an Option value (optional)
-    pub fn maybe_area_served(
-        mut self,
-        value: Option<LocalBusinessAreaServed<S>>,
-    ) -> Self {
+    pub fn maybe_area_served(mut self, value: Option<LocalBusinessAreaServed<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -5334,18 +5148,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `branchCode` field (optional)
-    pub fn branch_code(
-        mut self,
-        value: impl Into<Option<LocalBusinessBranchCode<S>>>,
-    ) -> Self {
+    pub fn branch_code(mut self, value: impl Into<Option<LocalBusinessBranchCode<S>>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `branchCode` field to an Option value (optional)
-    pub fn maybe_branch_code(
-        mut self,
-        value: Option<LocalBusinessBranchCode<S>>,
-    ) -> Self {
+    pub fn maybe_branch_code(mut self, value: Option<LocalBusinessBranchCode<S>>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -5353,10 +5161,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `branchOf` field (optional)
-    pub fn branch_of(
-        mut self,
-        value: impl Into<Option<LocalBusinessBranchOf<S>>>,
-    ) -> Self {
+    pub fn branch_of(mut self, value: impl Into<Option<LocalBusinessBranchOf<S>>>) -> Self {
         self._fields.14 = value.into();
         self
     }
@@ -5401,18 +5206,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `contactPoint` field (optional)
-    pub fn contact_point(
-        mut self,
-        value: impl Into<Option<LocalBusinessContactPoint<S>>>,
-    ) -> Self {
+    pub fn contact_point(mut self, value: impl Into<Option<LocalBusinessContactPoint<S>>>) -> Self {
         self._fields.17 = value.into();
         self
     }
     /// Set the `contactPoint` field to an Option value (optional)
-    pub fn maybe_contact_point(
-        mut self,
-        value: Option<LocalBusinessContactPoint<S>>,
-    ) -> Self {
+    pub fn maybe_contact_point(mut self, value: Option<LocalBusinessContactPoint<S>>) -> Self {
         self._fields.17 = value;
         self
     }
@@ -5428,10 +5227,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
         self
     }
     /// Set the `contactPoints` field to an Option value (optional)
-    pub fn maybe_contact_points(
-        mut self,
-        value: Option<LocalBusinessContactPoints<S>>,
-    ) -> Self {
+    pub fn maybe_contact_points(mut self, value: Option<LocalBusinessContactPoints<S>>) -> Self {
         self._fields.18 = value;
         self
     }
@@ -5439,18 +5235,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `containedIn` field (optional)
-    pub fn contained_in(
-        mut self,
-        value: impl Into<Option<LocalBusinessContainedIn<S>>>,
-    ) -> Self {
+    pub fn contained_in(mut self, value: impl Into<Option<LocalBusinessContainedIn<S>>>) -> Self {
         self._fields.19 = value.into();
         self
     }
     /// Set the `containedIn` field to an Option value (optional)
-    pub fn maybe_contained_in(
-        mut self,
-        value: Option<LocalBusinessContainedIn<S>>,
-    ) -> Self {
+    pub fn maybe_contained_in(mut self, value: Option<LocalBusinessContainedIn<S>>) -> Self {
         self._fields.19 = value;
         self
     }
@@ -5485,10 +5275,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
         self
     }
     /// Set the `containsPlace` field to an Option value (optional)
-    pub fn maybe_contains_place(
-        mut self,
-        value: Option<LocalBusinessContainsPlace<S>>,
-    ) -> Self {
+    pub fn maybe_contains_place(mut self, value: Option<LocalBusinessContainsPlace<S>>) -> Self {
         self._fields.21 = value;
         self
     }
@@ -5534,18 +5321,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `department` field (optional)
-    pub fn department(
-        mut self,
-        value: impl Into<Option<LocalBusinessDepartment<S>>>,
-    ) -> Self {
+    pub fn department(mut self, value: impl Into<Option<LocalBusinessDepartment<S>>>) -> Self {
         self._fields.24 = value.into();
         self
     }
     /// Set the `department` field to an Option value (optional)
-    pub fn maybe_department(
-        mut self,
-        value: Option<LocalBusinessDepartment<S>>,
-    ) -> Self {
+    pub fn maybe_department(mut self, value: Option<LocalBusinessDepartment<S>>) -> Self {
         self._fields.24 = value;
         self
     }
@@ -5553,18 +5334,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<LocalBusinessDescription<S>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<LocalBusinessDescription<S>>>) -> Self {
         self._fields.25 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<LocalBusinessDescription<S>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<LocalBusinessDescription<S>>) -> Self {
         self._fields.25 = value;
         self
     }
@@ -5674,10 +5449,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `employee` field (optional)
-    pub fn employee(
-        mut self,
-        value: impl Into<Option<LocalBusinessEmployee<S>>>,
-    ) -> Self {
+    pub fn employee(mut self, value: impl Into<Option<LocalBusinessEmployee<S>>>) -> Self {
         self._fields.32 = value.into();
         self
     }
@@ -5690,10 +5462,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `employees` field (optional)
-    pub fn employees(
-        mut self,
-        value: impl Into<Option<LocalBusinessEmployees<S>>>,
-    ) -> Self {
+    pub fn employees(mut self, value: impl Into<Option<LocalBusinessEmployees<S>>>) -> Self {
         self._fields.33 = value.into();
         self
     }
@@ -5706,18 +5475,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `ethicsPolicy` field (optional)
-    pub fn ethics_policy(
-        mut self,
-        value: impl Into<Option<LocalBusinessEthicsPolicy<S>>>,
-    ) -> Self {
+    pub fn ethics_policy(mut self, value: impl Into<Option<LocalBusinessEthicsPolicy<S>>>) -> Self {
         self._fields.34 = value.into();
         self
     }
     /// Set the `ethicsPolicy` field to an Option value (optional)
-    pub fn maybe_ethics_policy(
-        mut self,
-        value: Option<LocalBusinessEthicsPolicy<S>>,
-    ) -> Self {
+    pub fn maybe_ethics_policy(mut self, value: Option<LocalBusinessEthicsPolicy<S>>) -> Self {
         self._fields.34 = value;
         self
     }
@@ -5751,10 +5514,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `faxNumber` field (optional)
-    pub fn fax_number(
-        mut self,
-        value: impl Into<Option<LocalBusinessFaxNumber<S>>>,
-    ) -> Self {
+    pub fn fax_number(mut self, value: impl Into<Option<LocalBusinessFaxNumber<S>>>) -> Self {
         self._fields.37 = value.into();
         self
     }
@@ -5780,10 +5540,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `founders` field (optional)
-    pub fn founders(
-        mut self,
-        value: impl Into<Option<LocalBusinessFounders<S>>>,
-    ) -> Self {
+    pub fn founders(mut self, value: impl Into<Option<LocalBusinessFounders<S>>>) -> Self {
         self._fields.39 = value.into();
         self
     }
@@ -5796,18 +5553,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `foundingDate` field (optional)
-    pub fn founding_date(
-        mut self,
-        value: impl Into<Option<LocalBusinessFoundingDate<S>>>,
-    ) -> Self {
+    pub fn founding_date(mut self, value: impl Into<Option<LocalBusinessFoundingDate<S>>>) -> Self {
         self._fields.40 = value.into();
         self
     }
     /// Set the `foundingDate` field to an Option value (optional)
-    pub fn maybe_founding_date(
-        mut self,
-        value: Option<LocalBusinessFoundingDate<S>>,
-    ) -> Self {
+    pub fn maybe_founding_date(mut self, value: Option<LocalBusinessFoundingDate<S>>) -> Self {
         self._fields.40 = value;
         self
     }
@@ -5873,18 +5624,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `geoContains` field (optional)
-    pub fn geo_contains(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoContains<S>>>,
-    ) -> Self {
+    pub fn geo_contains(mut self, value: impl Into<Option<LocalBusinessGeoContains<S>>>) -> Self {
         self._fields.45 = value.into();
         self
     }
     /// Set the `geoContains` field to an Option value (optional)
-    pub fn maybe_geo_contains(
-        mut self,
-        value: Option<LocalBusinessGeoContains<S>>,
-    ) -> Self {
+    pub fn maybe_geo_contains(mut self, value: Option<LocalBusinessGeoContains<S>>) -> Self {
         self._fields.45 = value;
         self
     }
@@ -5900,10 +5645,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
         self
     }
     /// Set the `geoCoveredBy` field to an Option value (optional)
-    pub fn maybe_geo_covered_by(
-        mut self,
-        value: Option<LocalBusinessGeoCoveredBy<S>>,
-    ) -> Self {
+    pub fn maybe_geo_covered_by(mut self, value: Option<LocalBusinessGeoCoveredBy<S>>) -> Self {
         self._fields.46 = value;
         self
     }
@@ -5911,10 +5653,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `geoCovers` field (optional)
-    pub fn geo_covers(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoCovers<S>>>,
-    ) -> Self {
+    pub fn geo_covers(mut self, value: impl Into<Option<LocalBusinessGeoCovers<S>>>) -> Self {
         self._fields.47 = value.into();
         self
     }
@@ -5927,18 +5666,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `geoCrosses` field (optional)
-    pub fn geo_crosses(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoCrosses<S>>>,
-    ) -> Self {
+    pub fn geo_crosses(mut self, value: impl Into<Option<LocalBusinessGeoCrosses<S>>>) -> Self {
         self._fields.48 = value.into();
         self
     }
     /// Set the `geoCrosses` field to an Option value (optional)
-    pub fn maybe_geo_crosses(
-        mut self,
-        value: Option<LocalBusinessGeoCrosses<S>>,
-    ) -> Self {
+    pub fn maybe_geo_crosses(mut self, value: Option<LocalBusinessGeoCrosses<S>>) -> Self {
         self._fields.48 = value;
         self
     }
@@ -5946,18 +5679,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `geoDisjoint` field (optional)
-    pub fn geo_disjoint(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoDisjoint<S>>>,
-    ) -> Self {
+    pub fn geo_disjoint(mut self, value: impl Into<Option<LocalBusinessGeoDisjoint<S>>>) -> Self {
         self._fields.49 = value.into();
         self
     }
     /// Set the `geoDisjoint` field to an Option value (optional)
-    pub fn maybe_geo_disjoint(
-        mut self,
-        value: Option<LocalBusinessGeoDisjoint<S>>,
-    ) -> Self {
+    pub fn maybe_geo_disjoint(mut self, value: Option<LocalBusinessGeoDisjoint<S>>) -> Self {
         self._fields.49 = value;
         self
     }
@@ -5965,10 +5692,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `geoEquals` field (optional)
-    pub fn geo_equals(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoEquals<S>>>,
-    ) -> Self {
+    pub fn geo_equals(mut self, value: impl Into<Option<LocalBusinessGeoEquals<S>>>) -> Self {
         self._fields.50 = value.into();
         self
     }
@@ -5989,10 +5713,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
         self
     }
     /// Set the `geoIntersects` field to an Option value (optional)
-    pub fn maybe_geo_intersects(
-        mut self,
-        value: Option<LocalBusinessGeoIntersects<S>>,
-    ) -> Self {
+    pub fn maybe_geo_intersects(mut self, value: Option<LocalBusinessGeoIntersects<S>>) -> Self {
         self._fields.51 = value;
         self
     }
@@ -6000,18 +5721,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `geoOverlaps` field (optional)
-    pub fn geo_overlaps(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoOverlaps<S>>>,
-    ) -> Self {
+    pub fn geo_overlaps(mut self, value: impl Into<Option<LocalBusinessGeoOverlaps<S>>>) -> Self {
         self._fields.52 = value.into();
         self
     }
     /// Set the `geoOverlaps` field to an Option value (optional)
-    pub fn maybe_geo_overlaps(
-        mut self,
-        value: Option<LocalBusinessGeoOverlaps<S>>,
-    ) -> Self {
+    pub fn maybe_geo_overlaps(mut self, value: Option<LocalBusinessGeoOverlaps<S>>) -> Self {
         self._fields.52 = value;
         self
     }
@@ -6019,18 +5734,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `geoTouches` field (optional)
-    pub fn geo_touches(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoTouches<S>>>,
-    ) -> Self {
+    pub fn geo_touches(mut self, value: impl Into<Option<LocalBusinessGeoTouches<S>>>) -> Self {
         self._fields.53 = value.into();
         self
     }
     /// Set the `geoTouches` field to an Option value (optional)
-    pub fn maybe_geo_touches(
-        mut self,
-        value: Option<LocalBusinessGeoTouches<S>>,
-    ) -> Self {
+    pub fn maybe_geo_touches(mut self, value: Option<LocalBusinessGeoTouches<S>>) -> Self {
         self._fields.53 = value;
         self
     }
@@ -6038,10 +5747,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `geoWithin` field (optional)
-    pub fn geo_within(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoWithin<S>>>,
-    ) -> Self {
+    pub fn geo_within(mut self, value: impl Into<Option<LocalBusinessGeoWithin<S>>>) -> Self {
         self._fields.54 = value.into();
         self
     }
@@ -6100,10 +5806,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
         self
     }
     /// Set the `hasCredential` field to an Option value (optional)
-    pub fn maybe_has_credential(
-        mut self,
-        value: Option<LocalBusinessHasCredential<S>>,
-    ) -> Self {
+    pub fn maybe_has_credential(mut self, value: Option<LocalBusinessHasCredential<S>>) -> Self {
         self._fields.57 = value;
         self
     }
@@ -6270,18 +5973,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(
-        mut self,
-        value: impl Into<Option<LocalBusinessIdentifier<S>>>,
-    ) -> Self {
+    pub fn identifier(mut self, value: impl Into<Option<LocalBusinessIdentifier<S>>>) -> Self {
         self._fields.67 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
-    pub fn maybe_identifier(
-        mut self,
-        value: Option<LocalBusinessIdentifier<S>>,
-    ) -> Self {
+    pub fn maybe_identifier(mut self, value: Option<LocalBusinessIdentifier<S>>) -> Self {
         self._fields.67 = value;
         self
     }
@@ -6353,18 +6050,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `iso6523Code` field (optional)
-    pub fn iso6523_code(
-        mut self,
-        value: impl Into<Option<LocalBusinessIso6523Code<S>>>,
-    ) -> Self {
+    pub fn iso6523_code(mut self, value: impl Into<Option<LocalBusinessIso6523Code<S>>>) -> Self {
         self._fields.72 = value.into();
         self
     }
     /// Set the `iso6523Code` field to an Option value (optional)
-    pub fn maybe_iso6523_code(
-        mut self,
-        value: Option<LocalBusinessIso6523Code<S>>,
-    ) -> Self {
+    pub fn maybe_iso6523_code(mut self, value: Option<LocalBusinessIso6523Code<S>>) -> Self {
         self._fields.72 = value;
         self
     }
@@ -6372,10 +6063,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(
-        mut self,
-        value: impl Into<Option<LocalBusinessKeywords<S>>>,
-    ) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<LocalBusinessKeywords<S>>>) -> Self {
         self._fields.73 = value.into();
         self
     }
@@ -6388,18 +6076,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `knowsAbout` field (optional)
-    pub fn knows_about(
-        mut self,
-        value: impl Into<Option<LocalBusinessKnowsAbout<S>>>,
-    ) -> Self {
+    pub fn knows_about(mut self, value: impl Into<Option<LocalBusinessKnowsAbout<S>>>) -> Self {
         self._fields.74 = value.into();
         self
     }
     /// Set the `knowsAbout` field to an Option value (optional)
-    pub fn maybe_knows_about(
-        mut self,
-        value: Option<LocalBusinessKnowsAbout<S>>,
-    ) -> Self {
+    pub fn maybe_knows_about(mut self, value: Option<LocalBusinessKnowsAbout<S>>) -> Self {
         self._fields.74 = value;
         self
     }
@@ -6415,10 +6097,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
         self
     }
     /// Set the `knowsLanguage` field to an Option value (optional)
-    pub fn maybe_knows_language(
-        mut self,
-        value: Option<LocalBusinessKnowsLanguage<S>>,
-    ) -> Self {
+    pub fn maybe_knows_language(mut self, value: Option<LocalBusinessKnowsLanguage<S>>) -> Self {
         self._fields.75 = value;
         self
     }
@@ -6426,10 +6105,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `latitude` field (optional)
-    pub fn latitude(
-        mut self,
-        value: impl Into<Option<LocalBusinessLatitude<S>>>,
-    ) -> Self {
+    pub fn latitude(mut self, value: impl Into<Option<LocalBusinessLatitude<S>>>) -> Self {
         self._fields.76 = value.into();
         self
     }
@@ -6442,18 +6118,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `legalAddress` field (optional)
-    pub fn legal_address(
-        mut self,
-        value: impl Into<Option<LocalBusinessLegalAddress<S>>>,
-    ) -> Self {
+    pub fn legal_address(mut self, value: impl Into<Option<LocalBusinessLegalAddress<S>>>) -> Self {
         self._fields.77 = value.into();
         self
     }
     /// Set the `legalAddress` field to an Option value (optional)
-    pub fn maybe_legal_address(
-        mut self,
-        value: Option<LocalBusinessLegalAddress<S>>,
-    ) -> Self {
+    pub fn maybe_legal_address(mut self, value: Option<LocalBusinessLegalAddress<S>>) -> Self {
         self._fields.77 = value;
         self
     }
@@ -6461,10 +6131,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `legalName` field (optional)
-    pub fn legal_name(
-        mut self,
-        value: impl Into<Option<LocalBusinessLegalName<S>>>,
-    ) -> Self {
+    pub fn legal_name(mut self, value: impl Into<Option<LocalBusinessLegalName<S>>>) -> Self {
         self._fields.78 = value.into();
         self
     }
@@ -6496,10 +6163,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `leiCode` field (optional)
-    pub fn lei_code(
-        mut self,
-        value: impl Into<Option<LocalBusinessLeiCode<S>>>,
-    ) -> Self {
+    pub fn lei_code(mut self, value: impl Into<Option<LocalBusinessLeiCode<S>>>) -> Self {
         self._fields.80 = value.into();
         self
     }
@@ -6512,10 +6176,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `location` field (optional)
-    pub fn location(
-        mut self,
-        value: impl Into<Option<LocalBusinessLocation<S>>>,
-    ) -> Self {
+    pub fn location(mut self, value: impl Into<Option<LocalBusinessLocation<S>>>) -> Self {
         self._fields.81 = value.into();
         self
     }
@@ -6541,10 +6202,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `longitude` field (optional)
-    pub fn longitude(
-        mut self,
-        value: impl Into<Option<LocalBusinessLongitude<S>>>,
-    ) -> Self {
+    pub fn longitude(mut self, value: impl Into<Option<LocalBusinessLongitude<S>>>) -> Self {
         self._fields.83 = value.into();
         self
     }
@@ -6576,18 +6234,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `makesOffer` field (optional)
-    pub fn makes_offer(
-        mut self,
-        value: impl Into<Option<LocalBusinessMakesOffer<S>>>,
-    ) -> Self {
+    pub fn makes_offer(mut self, value: impl Into<Option<LocalBusinessMakesOffer<S>>>) -> Self {
         self._fields.85 = value.into();
         self
     }
     /// Set the `makesOffer` field to an Option value (optional)
-    pub fn maybe_makes_offer(
-        mut self,
-        value: Option<LocalBusinessMakesOffer<S>>,
-    ) -> Self {
+    pub fn maybe_makes_offer(mut self, value: Option<LocalBusinessMakesOffer<S>>) -> Self {
         self._fields.85 = value;
         self
     }
@@ -6653,10 +6305,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `memberOf` field (optional)
-    pub fn member_of(
-        mut self,
-        value: impl Into<Option<LocalBusinessMemberOf<S>>>,
-    ) -> Self {
+    pub fn member_of(mut self, value: impl Into<Option<LocalBusinessMemberOf<S>>>) -> Self {
         self._fields.90 = value.into();
         self
     }
@@ -6746,18 +6395,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `openingHours` field (optional)
-    pub fn opening_hours(
-        mut self,
-        value: impl Into<Option<LocalBusinessOpeningHours<S>>>,
-    ) -> Self {
+    pub fn opening_hours(mut self, value: impl Into<Option<LocalBusinessOpeningHours<S>>>) -> Self {
         self._fields.96 = value.into();
         self
     }
     /// Set the `openingHours` field to an Option value (optional)
-    pub fn maybe_opening_hours(
-        mut self,
-        value: Option<LocalBusinessOpeningHours<S>>,
-    ) -> Self {
+    pub fn maybe_opening_hours(mut self, value: Option<LocalBusinessOpeningHours<S>>) -> Self {
         self._fields.96 = value;
         self
     }
@@ -6899,18 +6542,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `priceRange` field (optional)
-    pub fn price_range(
-        mut self,
-        value: impl Into<Option<LocalBusinessPriceRange<S>>>,
-    ) -> Self {
+    pub fn price_range(mut self, value: impl Into<Option<LocalBusinessPriceRange<S>>>) -> Self {
         self._fields.105 = value.into();
         self
     }
     /// Set the `priceRange` field to an Option value (optional)
-    pub fn maybe_price_range(
-        mut self,
-        value: Option<LocalBusinessPriceRange<S>>,
-    ) -> Self {
+    pub fn maybe_price_range(mut self, value: Option<LocalBusinessPriceRange<S>>) -> Self {
         self._fields.105 = value;
         self
     }
@@ -6918,18 +6555,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `publicAccess` field (optional)
-    pub fn public_access(
-        mut self,
-        value: impl Into<Option<LocalBusinessPublicAccess<S>>>,
-    ) -> Self {
+    pub fn public_access(mut self, value: impl Into<Option<LocalBusinessPublicAccess<S>>>) -> Self {
         self._fields.106 = value.into();
         self
     }
     /// Set the `publicAccess` field to an Option value (optional)
-    pub fn maybe_public_access(
-        mut self,
-        value: Option<LocalBusinessPublicAccess<S>>,
-    ) -> Self {
+    pub fn maybe_public_access(mut self, value: Option<LocalBusinessPublicAccess<S>>) -> Self {
         self._fields.106 = value;
         self
     }
@@ -7008,18 +6639,12 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `serviceArea` field (optional)
-    pub fn service_area(
-        mut self,
-        value: impl Into<Option<LocalBusinessServiceArea<S>>>,
-    ) -> Self {
+    pub fn service_area(mut self, value: impl Into<Option<LocalBusinessServiceArea<S>>>) -> Self {
         self._fields.112 = value.into();
         self
     }
     /// Set the `serviceArea` field to an Option value (optional)
-    pub fn maybe_service_area(
-        mut self,
-        value: Option<LocalBusinessServiceArea<S>>,
-    ) -> Self {
+    pub fn maybe_service_area(mut self, value: Option<LocalBusinessServiceArea<S>>) -> Self {
         self._fields.112 = value;
         self
     }
@@ -7061,10 +6686,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
         self
     }
     /// Set the `smokingAllowed` field to an Option value (optional)
-    pub fn maybe_smoking_allowed(
-        mut self,
-        value: Option<LocalBusinessSmokingAllowed<S>>,
-    ) -> Self {
+    pub fn maybe_smoking_allowed(mut self, value: Option<LocalBusinessSmokingAllowed<S>>) -> Self {
         self._fields.115 = value;
         self
     }
@@ -7123,10 +6745,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `subjectOf` field (optional)
-    pub fn subject_of(
-        mut self,
-        value: impl Into<Option<LocalBusinessSubjectOf<S>>>,
-    ) -> Self {
+    pub fn subject_of(mut self, value: impl Into<Option<LocalBusinessSubjectOf<S>>>) -> Self {
         self._fields.119 = value.into();
         self
     }
@@ -7152,10 +6771,7 @@ impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
 
 impl<S: BosStr, St: local_business_state::State> LocalBusinessBuilder<S, St> {
     /// Set the `telephone` field (optional)
-    pub fn telephone(
-        mut self,
-        value: impl Into<Option<LocalBusinessTelephone<S>>>,
-    ) -> Self {
+    pub fn telephone(mut self, value: impl Into<Option<LocalBusinessTelephone<S>>>) -> Self {
         self._fields.121 = value.into();
         self
     }
@@ -7367,10 +6983,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LocalBusiness<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LocalBusiness<S> {
         LocalBusiness {
             accepted_payment_method: self._fields.0,
             actionable_feedback_policy: self._fields.1,

@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Nsid};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StartSync<S: BosStr = DefaultStr> {
     ///List of collection NSIDs to sync (primary collections matching slice domain)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -42,9 +45,11 @@ pub struct StartSync<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StartSyncOutput<S: BosStr = DefaultStr> {
     ///UUID of the enqueued sync job
     pub job_id: S,
@@ -65,9 +70,8 @@ impl jacquard_common::xrpc::XrpcResp for StartSyncResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for StartSync<S> {
     const NSID: &'static str = "network.slices.slice.startSync";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = StartSyncResponse;
 }
 
@@ -75,9 +79,8 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for StartSync<S> {
 pub struct StartSyncRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StartSyncRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.startSync";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = StartSync<S>;
     type Response = StartSyncResponse;
 }

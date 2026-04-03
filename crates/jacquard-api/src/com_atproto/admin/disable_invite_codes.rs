@@ -10,14 +10,17 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DisableInviteCodes<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accounts: Option<Vec<S>>,
@@ -38,9 +41,8 @@ impl jacquard_common::xrpc::XrpcResp for DisableInviteCodesResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DisableInviteCodes<S> {
     const NSID: &'static str = "com.atproto.admin.disableInviteCodes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DisableInviteCodesResponse;
 }
 
@@ -48,9 +50,8 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DisableInviteCodes<S> {
 pub struct DisableInviteCodesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DisableInviteCodesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.disableInviteCodes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = DisableInviteCodes<S>;
     type Response = DisableInviteCodesResponse;
 }

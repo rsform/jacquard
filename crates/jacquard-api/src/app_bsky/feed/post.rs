@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,22 +24,25 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::embed::external::ExternalRecord;
 use crate::app_bsky::embed::images::Images;
 use crate::app_bsky::embed::record::Record;
 use crate::app_bsky::embed::record_with_media::RecordWithMedia;
 use crate::app_bsky::embed::video::Video;
+use crate::app_bsky::feed::post;
 use crate::app_bsky::richtext::facet::Facet;
 use crate::com_atproto::label::SelfLabels;
 use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::app_bsky::feed::post;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Deprecated: use facets instead.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Entity<S: BosStr = DefaultStr> {
     pub index: post::TextSlice<S>,
     ///Expected values are 'mention' and 'link'.
@@ -86,7 +89,6 @@ pub struct Post<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -114,9 +116,11 @@ pub struct PostGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Post<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReplyRef<S: BosStr = DefaultStr> {
     pub parent: StrongRef<S>,
     pub root: StrongRef<S>,
@@ -127,7 +131,10 @@ pub struct ReplyRef<S: BosStr = DefaultStr> {
 /// Deprecated. Use app.bsky.richtext instead -- A text segment. Start is inclusive, end is exclusive. Indices are for utf16-encoded strings.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TextSlice<S: BosStr = DefaultStr> {
     pub end: i64,
     pub start: i64,
@@ -294,7 +301,7 @@ impl<S: BosStr> LexiconSchema for TextSlice<S> {
 
 pub mod entity_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -400,10 +407,7 @@ where
     St::Type: entity_state::IsUnset,
 {
     /// Set the `type` field (required)
-    pub fn r#type(
-        mut self,
-        value: impl Into<S>,
-    ) -> EntityBuilder<S, entity_state::SetType<St>> {
+    pub fn r#type(mut self, value: impl Into<S>) -> EntityBuilder<S, entity_state::SetType<St>> {
         self._fields.1 = Option::Some(value.into());
         EntityBuilder {
             _state: PhantomData,
@@ -419,10 +423,7 @@ where
     St::Value: entity_state::IsUnset,
 {
     /// Set the `value` field (required)
-    pub fn value(
-        mut self,
-        value: impl Into<S>,
-    ) -> EntityBuilder<S, entity_state::SetValue<St>> {
+    pub fn value(mut self, value: impl Into<S>) -> EntityBuilder<S, entity_state::SetValue<St>> {
         self._fields.2 = Option::Some(value.into());
         EntityBuilder {
             _state: PhantomData,
@@ -460,10 +461,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_feed_post() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.feed.post"),
@@ -472,15 +473,12 @@ fn lexicon_doc_app_bsky_feed_post() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("entity"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Deprecated: use facets instead."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("index"), SmolStr::new_static("type"),
-                            SmolStr::new_static("value")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("Deprecated: use facets instead.")),
+                    required: Some(vec![
+                        SmolStr::new_static("index"),
+                        SmolStr::new_static("type"),
+                        SmolStr::new_static("value"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -494,17 +492,17 @@ fn lexicon_doc_app_bsky_feed_post() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Expected values are 'mention' and 'link'.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Expected values are 'mention' and 'link'.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("value"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -660,9 +658,10 @@ fn lexicon_doc_app_bsky_feed_post() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("replyRef"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("root"), SmolStr::new_static("parent")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("root"),
+                        SmolStr::new_static("parent"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -726,7 +725,7 @@ fn lexicon_doc_app_bsky_feed_post() -> LexiconDoc<'static> {
 
 pub mod post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -919,10 +918,7 @@ where
     St::Text: post_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(
-        mut self,
-        value: impl Into<S>,
-    ) -> PostBuilder<S, post_state::SetText<St>> {
+    pub fn text(mut self, value: impl Into<S>) -> PostBuilder<S, post_state::SetText<St>> {
         self._fields.8 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -972,7 +968,7 @@ where
 
 pub mod reply_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1103,7 +1099,7 @@ where
 
 pub mod text_slice_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1223,10 +1219,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TextSlice<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TextSlice<S> {
         TextSlice {
             end: self._fields.0.unwrap(),
             start: self._fields.1.unwrap(),

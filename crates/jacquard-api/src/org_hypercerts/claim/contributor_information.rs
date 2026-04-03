@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::org_hypercerts::SmallImage;
 use crate::org_hypercerts::Uri;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Contributor information including identifier, display name, and image.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -53,7 +53,6 @@ pub struct ContributorInformation<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -93,8 +92,7 @@ impl XrpcResp for ContributorInformationRecord {
     type Err = RecordError;
 }
 
-impl<S: BosStr> From<ContributorInformationGetRecordOutput<S>>
-for ContributorInformation<S> {
+impl<S: BosStr> From<ContributorInformationGetRecordOutput<S>> for ContributorInformation<S> {
     fn from(output: ContributorInformationGetRecordOutput<S>) -> Self {
         output.value
     }
@@ -147,7 +145,7 @@ impl<S: BosStr> LexiconSchema for ContributorInformation<S> {
 
 pub mod contributor_information_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -178,10 +176,7 @@ pub mod contributor_information_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ContributorInformationBuilder<
-    S: BosStr,
-    St: contributor_information_state::State,
-> {
+pub struct ContributorInformationBuilder<S: BosStr, St: contributor_information_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -194,10 +189,7 @@ pub struct ContributorInformationBuilder<
 
 impl<S: BosStr> ContributorInformation<S> {
     /// Create a new builder for this type.
-    pub fn new() -> ContributorInformationBuilder<
-        S,
-        contributor_information_state::Empty,
-    > {
+    pub fn new() -> ContributorInformationBuilder<S, contributor_information_state::Empty> {
         ContributorInformationBuilder::new()
     }
 }
@@ -222,10 +214,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ContributorInformationBuilder<
-        S,
-        contributor_information_state::SetCreatedAt<St>,
-    > {
+    ) -> ContributorInformationBuilder<S, contributor_information_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         ContributorInformationBuilder {
             _state: PhantomData,
@@ -235,10 +224,7 @@ where
     }
 }
 
-impl<
-    S: BosStr,
-    St: contributor_information_state::State,
-> ContributorInformationBuilder<S, St> {
+impl<S: BosStr, St: contributor_information_state::State> ContributorInformationBuilder<S, St> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -251,10 +237,7 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: contributor_information_state::State,
-> ContributorInformationBuilder<S, St> {
+impl<S: BosStr, St: contributor_information_state::State> ContributorInformationBuilder<S, St> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -267,15 +250,9 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: contributor_information_state::State,
-> ContributorInformationBuilder<S, St> {
+impl<S: BosStr, St: contributor_information_state::State> ContributorInformationBuilder<S, St> {
     /// Set the `image` field (optional)
-    pub fn image(
-        mut self,
-        value: impl Into<Option<ContributorInformationImage<S>>>,
-    ) -> Self {
+    pub fn image(mut self, value: impl Into<Option<ContributorInformationImage<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -317,10 +294,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_claim_contributorInformation() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.claim.contributorInformation"),

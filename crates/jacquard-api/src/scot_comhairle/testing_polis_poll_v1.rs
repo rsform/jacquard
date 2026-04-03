@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A poll/topic for deliberation in the Polis-style system
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -133,7 +133,7 @@ impl<S: BosStr> LexiconSchema for TestingPolisPollV1<S> {
 
 pub mod testing_polis_poll_v1_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -200,10 +200,7 @@ impl<S: BosStr> TestingPolisPollV1Builder<S, testing_polis_poll_v1_state::Empty>
     }
 }
 
-impl<
-    S: BosStr,
-    St: testing_polis_poll_v1_state::State,
-> TestingPolisPollV1Builder<S, St> {
+impl<S: BosStr, St: testing_polis_poll_v1_state::State> TestingPolisPollV1Builder<S, St> {
     /// Set the `closedAt` field (optional)
     pub fn closed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -235,10 +232,7 @@ where
     }
 }
 
-impl<
-    S: BosStr,
-    St: testing_polis_poll_v1_state::State,
-> TestingPolisPollV1Builder<S, St> {
+impl<S: BosStr, St: testing_polis_poll_v1_state::State> TestingPolisPollV1Builder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -287,10 +281,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TestingPolisPollV1<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TestingPolisPollV1<S> {
         TestingPolisPollV1 {
             closed_at: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -302,10 +293,10 @@ where
 }
 
 fn lexicon_doc_scot_comhairle_testingPolisPollV1() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("scot.comhairle.testingPolisPollV1"),

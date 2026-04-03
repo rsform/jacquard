@@ -9,13 +9,12 @@ pub mod declaration;
 pub mod delete_account;
 pub mod export_account_data;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,16 +25,19 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileAssociated;
 use crate::app_bsky::actor::VerificationState;
 use crate::app_bsky::actor::ViewerState;
 use crate::com_atproto::label::Label;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileViewBasic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated: Option<ProfileAssociated<S>>,
@@ -97,7 +99,7 @@ impl<S: BosStr> LexiconSchema for ProfileViewBasic<S> {
 
 pub mod profile_view_basic_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -279,10 +281,7 @@ impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, 
 
 impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
     /// Set the `verification` field (optional)
-    pub fn verification(
-        mut self,
-        value: impl Into<Option<VerificationState<S>>>,
-    ) -> Self {
+    pub fn verification(mut self, value: impl Into<Option<VerificationState<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
@@ -328,10 +327,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ProfileViewBasic<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileViewBasic<S> {
         ProfileViewBasic {
             associated: self._fields.0,
             avatar: self._fields.1,
@@ -348,10 +344,10 @@ where
 }
 
 fn lexicon_doc_chat_bsky_actor_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.actor.defs"),
@@ -360,18 +356,17 @@ fn lexicon_doc_chat_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("profileViewBasic"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("did"), SmolStr::new_static("handle")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("handle"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("associated"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileAssociated",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileAssociated"),
                                 ..Default::default()
                             }),
                         );
@@ -423,18 +418,14 @@ fn lexicon_doc_chat_bsky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("verification"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#verificationState",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#verificationState"),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("viewer"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#viewerState",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#viewerState"),
                                 ..Default::default()
                             }),
                         );

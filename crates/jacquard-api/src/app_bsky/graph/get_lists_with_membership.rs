@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,19 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::graph::ListItemView;
 use crate::app_bsky::graph::ListView;
 use crate::app_bsky::graph::get_lists_with_membership;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A list and an optional list item indicating membership of a target user to that list.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListWithMembership<S: BosStr = DefaultStr> {
     pub list: ListView<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,9 +42,11 @@ pub struct ListWithMembership<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetListsWithMembership<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,9 +59,11 @@ pub struct GetListsWithMembership<S: BosStr = DefaultStr> {
     pub purposes: Option<Vec<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetListsWithMembershipOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -106,7 +113,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetListsWithMembershipRequest {
 
 pub mod list_with_membership_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -207,10 +214,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ListWithMembership<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ListWithMembership<S> {
         ListWithMembership {
             list: self._fields.0.unwrap(),
             list_item: self._fields.1,
@@ -220,10 +224,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_graph_getListsWithMembership() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.graph.getListsWithMembership"),
@@ -265,50 +269,46 @@ fn lexicon_doc_app_bsky_graph_getListsWithMembership() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("actor")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("actor"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "The account (actor) to check for membership.",
-                                            ),
-                                        ),
-                                        format: Some(LexStringFormat::AtIdentifier),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("actor")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("actor"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "The account (actor) to check for membership.",
+                                    )),
+                                    format: Some(LexStringFormat::AtIdentifier),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("cursor"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("limit"),
+                                LexXrpcParametersProperty::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("purposes"),
+                                LexXrpcParametersProperty::Array(LexPrimitiveArray {
+                                    items: LexPrimitiveArrayItem::String(LexString {
                                         ..Default::default()
                                     }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("cursor"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("limit"),
-                                    LexXrpcParametersProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("purposes"),
-                                    LexXrpcParametersProperty::Array(LexPrimitiveArray {
-                                        items: LexPrimitiveArrayItem::String(LexString {
-                                            ..Default::default()
-                                        }),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
@@ -324,7 +324,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_lists_with_membership_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -355,28 +355,25 @@ pub mod get_lists_with_membership_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetListsWithMembershipBuilder<
-    S: BosStr,
-    St: get_lists_with_membership_state::State,
-> {
+pub struct GetListsWithMembershipBuilder<S: BosStr, St: get_lists_with_membership_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>, Option<Vec<S>>),
+    _fields: (
+        Option<AtIdentifier<S>>,
+        Option<S>,
+        Option<i64>,
+        Option<Vec<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl<S: BosStr> GetListsWithMembership<S> {
     /// Create a new builder for this type.
-    pub fn new() -> GetListsWithMembershipBuilder<
-        S,
-        get_lists_with_membership_state::Empty,
-    > {
+    pub fn new() -> GetListsWithMembershipBuilder<S, get_lists_with_membership_state::Empty> {
         GetListsWithMembershipBuilder::new()
     }
 }
 
-impl<
-    S: BosStr,
-> GetListsWithMembershipBuilder<S, get_lists_with_membership_state::Empty> {
+impl<S: BosStr> GetListsWithMembershipBuilder<S, get_lists_with_membership_state::Empty> {
     /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetListsWithMembershipBuilder {
@@ -396,10 +393,7 @@ where
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetListsWithMembershipBuilder<
-        S,
-        get_lists_with_membership_state::SetActor<St>,
-    > {
+    ) -> GetListsWithMembershipBuilder<S, get_lists_with_membership_state::SetActor<St>> {
         self._fields.0 = Option::Some(value.into());
         GetListsWithMembershipBuilder {
             _state: PhantomData,
@@ -409,10 +403,7 @@ where
     }
 }
 
-impl<
-    S: BosStr,
-    St: get_lists_with_membership_state::State,
-> GetListsWithMembershipBuilder<S, St> {
+impl<S: BosStr, St: get_lists_with_membership_state::State> GetListsWithMembershipBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -425,10 +416,7 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: get_lists_with_membership_state::State,
-> GetListsWithMembershipBuilder<S, St> {
+impl<S: BosStr, St: get_lists_with_membership_state::State> GetListsWithMembershipBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -441,10 +429,7 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: get_lists_with_membership_state::State,
-> GetListsWithMembershipBuilder<S, St> {
+impl<S: BosStr, St: get_lists_with_membership_state::State> GetListsWithMembershipBuilder<S, St> {
     /// Set the `purposes` field (optional)
     pub fn purposes(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();

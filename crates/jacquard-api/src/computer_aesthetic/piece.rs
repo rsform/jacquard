@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A piece (interactive program) from Aesthetic Computer
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -130,7 +130,7 @@ impl<S: BosStr> LexiconSchema for Piece<S> {
 
 pub mod piece_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -217,10 +217,7 @@ where
     St::Ref: piece_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(
-        mut self,
-        value: impl Into<S>,
-    ) -> PieceBuilder<S, piece_state::SetRef<St>> {
+    pub fn r#ref(mut self, value: impl Into<S>) -> PieceBuilder<S, piece_state::SetRef<St>> {
         self._fields.0 = Option::Some(value.into());
         PieceBuilder {
             _state: PhantomData,
@@ -236,10 +233,7 @@ where
     St::Slug: piece_state::IsUnset,
 {
     /// Set the `slug` field (required)
-    pub fn slug(
-        mut self,
-        value: impl Into<S>,
-    ) -> PieceBuilder<S, piece_state::SetSlug<St>> {
+    pub fn slug(mut self, value: impl Into<S>) -> PieceBuilder<S, piece_state::SetSlug<St>> {
         self._fields.1 = Option::Some(value.into());
         PieceBuilder {
             _state: PhantomData,
@@ -255,10 +249,7 @@ where
     St::When: piece_state::IsUnset,
 {
     /// Set the `when` field (required)
-    pub fn when(
-        mut self,
-        value: impl Into<Datetime>,
-    ) -> PieceBuilder<S, piece_state::SetWhen<St>> {
+    pub fn when(mut self, value: impl Into<Datetime>) -> PieceBuilder<S, piece_state::SetWhen<St>> {
         self._fields.2 = Option::Some(value.into());
         PieceBuilder {
             _state: PhantomData,
@@ -296,10 +287,10 @@ where
 }
 
 fn lexicon_doc_computer_aesthetic_piece() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("computer.aesthetic.piece"),
@@ -308,30 +299,25 @@ fn lexicon_doc_computer_aesthetic_piece() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A piece (interactive program) from Aesthetic Computer",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A piece (interactive program) from Aesthetic Computer",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("slug"), SmolStr::new_static("when"),
-                                SmolStr::new_static("ref")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("slug"),
+                            SmolStr::new_static("when"),
+                            SmolStr::new_static("ref"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("ref"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "MongoDB ObjectId reference for bidirectional sync",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "MongoDB ObjectId reference for bidirectional sync",
+                                    )),
                                     max_length: Some(24usize),
                                     ..Default::default()
                                 }),
@@ -339,9 +325,9 @@ fn lexicon_doc_computer_aesthetic_piece() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("slug"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The piece identifier (e.g., 'wand')"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The piece identifier (e.g., 'wand')",
+                                    )),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
@@ -349,9 +335,9 @@ fn lexicon_doc_computer_aesthetic_piece() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("when"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Creation timestamp (ISO 8601)"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Creation timestamp (ISO 8601)",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

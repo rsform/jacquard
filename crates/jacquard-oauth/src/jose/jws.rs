@@ -1,4 +1,7 @@
-use jacquard_common::{IntoStatic, bos::{BosStr, DefaultStr}};
+use jacquard_common::{
+    IntoStatic,
+    bos::{BosStr, DefaultStr},
+};
 use jose_jwa::Algorithm;
 use jose_jwk::Jwk;
 use serde::{Deserialize, Serialize};

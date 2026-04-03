@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Nsid, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Nsid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,13 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::labeler::LabelerPolicies;
 use crate::com_atproto::label::SelfLabels;
 use crate::com_atproto::moderation::ReasonType;
 use crate::com_atproto::moderation::SubjectType;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A declaration of the existence of labeler service.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -119,7 +119,7 @@ impl<S: BosStr> LexiconSchema for Service<S> {
 
 pub mod service_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -259,10 +259,7 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
 
 impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     /// Set the `subjectCollections` field (optional)
-    pub fn subject_collections(
-        mut self,
-        value: impl Into<Option<Vec<Nsid<S>>>>,
-    ) -> Self {
+    pub fn subject_collections(mut self, value: impl Into<Option<Vec<Nsid<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -275,10 +272,7 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
 
 impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     /// Set the `subjectTypes` field (optional)
-    pub fn subject_types(
-        mut self,
-        value: impl Into<Option<Vec<SubjectType<S>>>>,
-    ) -> Self {
+    pub fn subject_types(mut self, value: impl Into<Option<Vec<SubjectType<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -322,10 +316,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_labeler_service() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.labeler.service"),

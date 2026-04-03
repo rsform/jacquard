@@ -3,9 +3,13 @@
 // https://github.com/atrium-rs/atrium/blob/main/lexicon/atrium-lex/src/lib.rs
 
 use jacquard_common::{
-    CowStr, deps::smol_str::SmolStr, into_static::IntoStatic, types::blob::MimeType,
-    types::did::Did, types::nsid::Nsid,
-    types::scope_primitives::{RepoAction, AccountAction},
+    CowStr,
+    deps::smol_str::SmolStr,
+    into_static::IntoStatic,
+    types::blob::MimeType,
+    types::did::Did,
+    types::nsid::Nsid,
+    types::scope_primitives::{AccountAction, RepoAction},
 };
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
@@ -1187,7 +1191,10 @@ mod tests {
         let main_def = doc.defs.get("main").expect("main def exists");
         match main_def {
             LexUserType::PermissionSet(pset) => {
-                assert_eq!(pset.title.as_ref().map(|s| s.as_ref()), Some("Full Bluesky Client Access"));
+                assert_eq!(
+                    pset.title.as_ref().map(|s| s.as_ref()),
+                    Some("Full Bluesky Client Access")
+                );
                 assert_eq!(pset.permissions.len(), 1);
 
                 let perm = &pset.permissions[0];
@@ -1197,11 +1204,7 @@ mod tests {
                     } => {
                         assert_eq!(collection.len(), 1);
                         assert_eq!(collection[0].as_ref(), "app.bsky.feed.post");
-                        assert_eq!(
-                            action.as_ref().map(|a| a.len()),
-                            Some(1),
-                            "has action vec"
-                        );
+                        assert_eq!(action.as_ref().map(|a| a.len()), Some(1), "has action vec");
                         if let Some(actions) = action {
                             assert_eq!(actions[0], RepoAction::Create);
                         }
@@ -1215,8 +1218,8 @@ mod tests {
 
     #[test]
     fn test_permission_set_deserialize_full() {
-        let doc = serde_json::from_str::<LexiconDoc>(PERMISSION_SET_FULL)
-            .expect("failed to deserialize");
+        let doc =
+            serde_json::from_str::<LexiconDoc>(PERMISSION_SET_FULL).expect("failed to deserialize");
         let main_def = doc.defs.get("main").expect("main def");
 
         match main_def {
@@ -1231,11 +1234,7 @@ mod tests {
                         resource: LexPermissionResource::Repo { collection, action },
                     } => {
                         assert_eq!(collection.len(), 2);
-                        assert_eq!(
-                            action.as_ref().map(|a| a.len()),
-                            Some(3),
-                            "has 3 actions"
-                        );
+                        assert_eq!(action.as_ref().map(|a| a.len()), Some(3), "has 3 actions");
                     }
                     _ => panic!("entry 0 should be Repo"),
                 }
@@ -1243,7 +1242,10 @@ mod tests {
                 // Entry 3: Rpc with inherit_aud
                 match &pset.permissions[2] {
                     LexPermission::Permission {
-                        resource: LexPermissionResource::Rpc { lxm, inherit_aud, .. },
+                        resource:
+                            LexPermissionResource::Rpc {
+                                lxm, inherit_aud, ..
+                            },
                     } => {
                         assert_eq!(lxm.len(), 2);
                         assert_eq!(*inherit_aud, Some(true));
@@ -1277,11 +1279,7 @@ mod tests {
                         resource: LexPermissionResource::Account { attr, action },
                     } => {
                         assert_eq!(attr.as_ref(), "email");
-                        assert_eq!(
-                            action.as_ref().map(|a| a.len()),
-                            Some(1),
-                            "has 1 action"
-                        );
+                        assert_eq!(action.as_ref().map(|a| a.len()), Some(1), "has 1 action");
                         if let Some(actions) = action {
                             assert_eq!(actions[0], AccountAction::Read);
                         }
@@ -1295,8 +1293,8 @@ mod tests {
 
     #[test]
     fn test_permission_set_into_static() {
-        let doc = serde_json::from_str::<LexiconDoc>(PERMISSION_SET_FULL)
-            .expect("failed to deserialize");
+        let doc =
+            serde_json::from_str::<LexiconDoc>(PERMISSION_SET_FULL).expect("failed to deserialize");
         let main_def = doc
             .defs
             .get("main")
@@ -1401,11 +1399,13 @@ mod tests {
 
         // Serialize to JSON value and back
         let serialized_str = serde_json::to_string(orig_pset).expect("serialize to string");
-        let deserialized_pset =
-            serde_json::from_str::<LexPermissionSet>(serialized_str.as_str())
-                .expect("roundtrip deserialize");
+        let deserialized_pset = serde_json::from_str::<LexPermissionSet>(serialized_str.as_str())
+            .expect("roundtrip deserialize");
 
-        assert_eq!(orig_pset.permissions.len(), deserialized_pset.permissions.len());
+        assert_eq!(
+            orig_pset.permissions.len(),
+            deserialized_pset.permissions.len()
+        );
     }
 
     #[test]
@@ -1462,8 +1462,8 @@ mod tests {
 
     #[test]
     fn test_permission_set_title_lang() {
-        let doc = serde_json::from_str::<LexiconDoc>(PERMISSION_SET_FULL)
-            .expect("failed to deserialize");
+        let doc =
+            serde_json::from_str::<LexiconDoc>(PERMISSION_SET_FULL).expect("failed to deserialize");
         let pset = match doc.defs.get("main").expect("main def") {
             LexUserType::PermissionSet(p) => p,
             _ => panic!("expected PermissionSet"),
@@ -1475,10 +1475,7 @@ mod tests {
             .iter()
             .find(|(k, _)| k.as_ref() == "es")
             .expect("has es translation");
-        assert_eq!(
-            es_title.1.as_ref(),
-            "Acceso completo al cliente de Bluesky"
-        );
+        assert_eq!(es_title.1.as_ref(), "Acceso completo al cliente de Bluesky");
 
         // Roundtrip and verify title:lang survives
         let serialized = serde_json::to_value(&pset).expect("serialize");

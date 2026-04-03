@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,9 +25,6 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewBasic;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::place_stream::BlockView;
@@ -36,9 +33,15 @@ use crate::place_stream::Renditions;
 use crate::place_stream::chat::MessageView;
 use crate::place_stream::chat::profile::Profile;
 use crate::place_stream::livestream;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LivestreamView<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     pub cid: Cid<S>,
@@ -106,9 +109,11 @@ pub struct LivestreamGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Livestream<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct NotificationSettings<S: BosStr = DefaultStr> {
     ///Whether this livestream should trigger a push notification to followers.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -117,15 +122,16 @@ pub struct NotificationSettings<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StreamplaceAnything<S: BosStr = DefaultStr> {
     pub livestream: StreamplaceAnythingLivestream<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -149,9 +155,11 @@ pub enum StreamplaceAnythingLivestream<S: BosStr = DefaultStr> {
     MessageView(Box<MessageView<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TeleportArrival<S: BosStr = DefaultStr> {
     ///The chat profile of the source streamer
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -168,9 +176,11 @@ pub struct TeleportArrival<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TeleportCanceled<S: BosStr = DefaultStr> {
     ///Why this teleport was canceled
     pub reason: S,
@@ -180,9 +190,11 @@ pub struct TeleportCanceled<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewerCount<S: BosStr = DefaultStr> {
     pub count: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -264,19 +276,16 @@ impl<S: BosStr> LexiconSchema for Livestream<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("thumb"),
@@ -391,7 +400,7 @@ impl<S: BosStr> LexiconSchema for ViewerCount<S> {
 
 pub mod livestream_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -610,18 +619,12 @@ where
 
 impl<S: BosStr, St: livestream_view_state::State> LivestreamViewBuilder<S, St> {
     /// Set the `viewerCount` field (optional)
-    pub fn viewer_count(
-        mut self,
-        value: impl Into<Option<livestream::ViewerCount<S>>>,
-    ) -> Self {
+    pub fn viewer_count(mut self, value: impl Into<Option<livestream::ViewerCount<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `viewerCount` field to an Option value (optional)
-    pub fn maybe_viewer_count(
-        mut self,
-        value: Option<livestream::ViewerCount<S>>,
-    ) -> Self {
+    pub fn maybe_viewer_count(mut self, value: Option<livestream::ViewerCount<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -649,10 +652,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LivestreamView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LivestreamView<S> {
         LivestreamView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -666,10 +666,10 @@ where
 }
 
 fn lexicon_doc_place_stream_livestream() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.livestream"),
@@ -678,22 +678,20 @@ fn lexicon_doc_place_stream_livestream() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("livestreamView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("author"), SmolStr::new_static("record"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("author"),
+                        SmolStr::new_static("record"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
@@ -906,7 +904,7 @@ fn lexicon_doc_place_stream_livestream() -> LexiconDoc<'static> {
                                     CowStr::new_static("place.stream.defs#blockView"),
                                     CowStr::new_static("place.stream.defs#renditions"),
                                     CowStr::new_static("place.stream.defs#rendition"),
-                                    CowStr::new_static("place.stream.chat.defs#messageView")
+                                    CowStr::new_static("place.stream.chat.defs#messageView"),
                                 ],
                                 ..Default::default()
                             }),
@@ -919,14 +917,12 @@ fn lexicon_doc_place_stream_livestream() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("teleportArrival"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("teleportUri"),
-                            SmolStr::new_static("source"),
-                            SmolStr::new_static("viewerCount"),
-                            SmolStr::new_static("startsAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("teleportUri"),
+                        SmolStr::new_static("source"),
+                        SmolStr::new_static("viewerCount"),
+                        SmolStr::new_static("startsAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -940,18 +936,14 @@ fn lexicon_doc_place_stream_livestream() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("source"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("startsAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When this teleport started"),
-                                ),
+                                description: Some(CowStr::new_static("When this teleport started")),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -959,9 +951,9 @@ fn lexicon_doc_place_stream_livestream() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("teleportUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URI of the teleport record"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URI of the teleport record",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -980,32 +972,28 @@ fn lexicon_doc_place_stream_livestream() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("teleportCanceled"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("teleportUri"),
-                            SmolStr::new_static("reason")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("teleportUri"),
+                        SmolStr::new_static("reason"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("reason"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Why this teleport was canceled"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Why this teleport was canceled",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("teleportUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The URI of the teleport record that was canceled",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URI of the teleport record that was canceled",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1041,7 +1029,7 @@ fn lexicon_doc_place_stream_livestream() -> LexiconDoc<'static> {
 
 pub mod livestream_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1114,7 +1102,9 @@ impl<S: BosStr> LivestreamBuilder<S, livestream_state::Empty> {
     pub fn new() -> Self {
         LivestreamBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -1305,10 +1295,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Livestream<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Livestream<S> {
         Livestream {
             agent: self._fields.0,
             canonical_url: self._fields.1,
@@ -1328,7 +1315,7 @@ where
 
 pub mod streamplace_anything_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1415,10 +1402,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> StreamplaceAnything<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StreamplaceAnything<S> {
         StreamplaceAnything {
             livestream: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1428,7 +1412,7 @@ where
 
 pub mod teleport_arrival_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1640,10 +1624,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TeleportArrival<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TeleportArrival<S> {
         TeleportArrival {
             chat_profile: self._fields.0,
             source: self._fields.1.unwrap(),
@@ -1657,7 +1638,7 @@ where
 
 pub mod teleport_canceled_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1777,10 +1758,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TeleportCanceled<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TeleportCanceled<S> {
         TeleportCanceled {
             reason: self._fields.0.unwrap(),
             teleport_uri: self._fields.1.unwrap(),
@@ -1791,7 +1769,7 @@ where
 
 pub mod viewer_count_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1878,10 +1856,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ViewerCount<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ViewerCount<S> {
         ViewerCount {
             count: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

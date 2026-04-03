@@ -7,13 +7,12 @@
 
 pub mod get_valid_badges;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,11 +25,14 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// View of a badge record, with fields resolved for display. If the DID in issuer is not the current streamplace node, the signature field shall be required.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BadgeView<S: BosStr = DefaultStr> {
     pub badge_type: BadgeViewBadgeType<S>,
     ///DID of the badge issuer.
@@ -43,7 +45,6 @@ pub struct BadgeView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BadgeViewBadgeType<S: BosStr = DefaultStr> {
@@ -169,7 +170,7 @@ impl<S: BosStr> LexiconSchema for BadgeView<S> {
 
 pub mod badge_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -228,7 +229,12 @@ pub mod badge_view_state {
 /// Builder for constructing an instance of this type.
 pub struct BadgeViewBuilder<S: BosStr, St: badge_view_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<BadgeViewBadgeType<S>>, Option<Did<S>>, Option<Did<S>>, Option<S>),
+    _fields: (
+        Option<BadgeViewBadgeType<S>>,
+        Option<Did<S>>,
+        Option<Did<S>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -338,10 +344,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BadgeView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BadgeView<S> {
         BadgeView {
             badge_type: self._fields.0.unwrap(),
             issuer: self._fields.1.unwrap(),
@@ -353,10 +356,10 @@ where
 }
 
 fn lexicon_doc_place_stream_badge_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.badge.defs"),
@@ -422,15 +425,21 @@ fn lexicon_doc_place_stream_badge_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("mod"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("streamer"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("vip"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map
         },

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,15 +21,18 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::graph::ListItemView;
 use crate::app_bsky::graph::StarterPackView;
 use crate::app_bsky::graph::get_starter_packs_with_membership;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetStarterPacksWithMembership<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -40,15 +43,16 @@ pub struct GetStarterPacksWithMembership<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetStarterPacksWithMembershipOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    pub starter_packs_with_membership: Vec<
-        get_starter_packs_with_membership::StarterPackWithMembership<S>,
-    >,
+    pub starter_packs_with_membership:
+        Vec<get_starter_packs_with_membership::StarterPackWithMembership<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -56,7 +60,10 @@ pub struct GetStarterPacksWithMembershipOutput<S: BosStr = DefaultStr> {
 /// A starter pack and an optional list item indicating membership of a target user to that starter pack.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StarterPackWithMembership<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub list_item: Option<ListItemView<S>>,
@@ -110,7 +117,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_starter_packs_with_membership_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -152,20 +159,15 @@ pub struct GetStarterPacksWithMembershipBuilder<
 
 impl<S: BosStr> GetStarterPacksWithMembership<S> {
     /// Create a new builder for this type.
-    pub fn new() -> GetStarterPacksWithMembershipBuilder<
-        S,
-        get_starter_packs_with_membership_state::Empty,
-    > {
+    pub fn new()
+    -> GetStarterPacksWithMembershipBuilder<S, get_starter_packs_with_membership_state::Empty> {
         GetStarterPacksWithMembershipBuilder::new()
     }
 }
 
-impl<
-    S: BosStr,
-> GetStarterPacksWithMembershipBuilder<
-    S,
-    get_starter_packs_with_membership_state::Empty,
-> {
+impl<S: BosStr>
+    GetStarterPacksWithMembershipBuilder<S, get_starter_packs_with_membership_state::Empty>
+{
     /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetStarterPacksWithMembershipBuilder {
@@ -198,10 +200,9 @@ where
     }
 }
 
-impl<
-    S: BosStr,
-    St: get_starter_packs_with_membership_state::State,
-> GetStarterPacksWithMembershipBuilder<S, St> {
+impl<S: BosStr, St: get_starter_packs_with_membership_state::State>
+    GetStarterPacksWithMembershipBuilder<S, St>
+{
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -214,10 +215,9 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: get_starter_packs_with_membership_state::State,
-> GetStarterPacksWithMembershipBuilder<S, St> {
+impl<S: BosStr, St: get_starter_packs_with_membership_state::State>
+    GetStarterPacksWithMembershipBuilder<S, St>
+{
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -247,7 +247,7 @@ where
 
 pub mod starter_pack_with_membership_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -289,17 +289,12 @@ pub struct StarterPackWithMembershipBuilder<
 
 impl<S: BosStr> StarterPackWithMembership<S> {
     /// Create a new builder for this type.
-    pub fn new() -> StarterPackWithMembershipBuilder<
-        S,
-        starter_pack_with_membership_state::Empty,
-    > {
+    pub fn new() -> StarterPackWithMembershipBuilder<S, starter_pack_with_membership_state::Empty> {
         StarterPackWithMembershipBuilder::new()
     }
 }
 
-impl<
-    S: BosStr,
-> StarterPackWithMembershipBuilder<S, starter_pack_with_membership_state::Empty> {
+impl<S: BosStr> StarterPackWithMembershipBuilder<S, starter_pack_with_membership_state::Empty> {
     /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StarterPackWithMembershipBuilder {
@@ -310,10 +305,9 @@ impl<
     }
 }
 
-impl<
-    S: BosStr,
-    St: starter_pack_with_membership_state::State,
-> StarterPackWithMembershipBuilder<S, St> {
+impl<S: BosStr, St: starter_pack_with_membership_state::State>
+    StarterPackWithMembershipBuilder<S, St>
+{
     /// Set the `listItem` field (optional)
     pub fn list_item(mut self, value: impl Into<Option<ListItemView<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -335,10 +329,8 @@ where
     pub fn starter_pack(
         mut self,
         value: impl Into<StarterPackView<S>>,
-    ) -> StarterPackWithMembershipBuilder<
-        S,
-        starter_pack_with_membership_state::SetStarterPack<St>,
-    > {
+    ) -> StarterPackWithMembershipBuilder<S, starter_pack_with_membership_state::SetStarterPack<St>>
+    {
         self._fields.1 = Option::Some(value.into());
         StarterPackWithMembershipBuilder {
             _state: PhantomData,
@@ -375,10 +367,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.graph.getStarterPacksWithMembership"),
@@ -387,41 +379,37 @@ fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> LexiconDoc<'sta
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("actor")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("actor"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "The account (actor) to check for membership.",
-                                            ),
-                                        ),
-                                        format: Some(LexStringFormat::AtIdentifier),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("cursor"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("limit"),
-                                    LexXrpcParametersProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("actor")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("actor"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "The account (actor) to check for membership.",
+                                    )),
+                                    format: Some(LexStringFormat::AtIdentifier),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("cursor"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("limit"),
+                                LexXrpcParametersProperty::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );

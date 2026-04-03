@@ -162,6 +162,10 @@ pub fn one_shot_server(addr: SocketAddr) -> (SocketAddr, CallbackHandle) {
 ///
 /// Returns a session if the callback succeeds within the configured timeout
 /// and shuts down the server.
+///
+/// When the `scope-check` feature is enabled, `T` must also implement `LexiconSchemaResolver`
+/// for eager resolution of include scopes.
+#[cfg(not(feature = "scope-check"))]
 pub async fn handle_localhost_callback<T, S>(
     handle: CallbackHandle,
     flow_client: &super::client::OAuthClient<T, S>,
@@ -188,9 +192,140 @@ where
     }
 }
 
+/// Handles the OAuth callback for the localhost loopback server.
+///
+/// Returns a session if the callback succeeds within the configured timeout
+/// and shuts down the server.
+///
+/// When the `scope-check` feature is enabled, `T` must also implement `LexiconSchemaResolver`
+/// for eager resolution of include scopes.
+#[cfg(feature = "scope-check")]
+pub async fn handle_localhost_callback<T, S>(
+    handle: CallbackHandle,
+    flow_client: &super::client::OAuthClient<T, S>,
+    cfg: &LoopbackConfig,
+) -> crate::error::Result<super::client::OAuthSession<T, S>>
+where
+    T: OAuthResolver
+        + DpopExt
+        + jacquard_identity::lexicon_resolver::LexiconSchemaResolver
+        + Send
+        + Sync
+        + 'static,
+    S: ClientAuthStore + Send + Sync + 'static,
+{
+    // Await callback or timeout
+    let mut callback_rx = handle.callback_rx;
+    let cb = tokio::time::timeout(
+        std::time::Duration::from_millis(cfg.timeout_ms),
+        callback_rx.recv(),
+    )
+    .await;
+    // trigger shutdown
+    let _ = handle.server_stop.send(());
+    if let Ok(Some(cb)) = cb {
+        // Handle callback and create a session
+        Ok(flow_client.callback(cb).await?)
+    } else {
+        Err(OAuthError::Callback(CallbackError::Timeout))
+    }
+}
+
+#[cfg(not(feature = "scope-check"))]
 impl<T, S> OAuthClient<T, S>
 where
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
+    S: ClientAuthStore + Send + Sync + 'static,
+{
+    /// Drive the full OAuth flow using a local loopback server.
+    ///
+    /// This uses localhost OAuth and an ephemeral in-process web server to
+    /// handle the OAuth callback redirect. It has a bunch of nice friendly
+    /// defaults to help you get started and will basically drive the *entire*
+    /// callback flow itself.
+    ///
+    /// Best used for development and for small CLI applications that don't
+    /// require long session lengths. For long-running unattended sessions,
+    /// app passwords (via CredentialSession in the jacquard crate) remain
+    /// the best option. For more complex OAuth, or if you want more control
+    /// over the process, use the other methods on OAuthClient.
+    ///
+    /// 'input' parameter is what you type in the login box (usually, your handle)
+    /// for it to look up your PDS and redirect to its authentication interface.
+    ///
+    /// If the `browser-open` feature is enabled, this will open a web browser
+    /// for you to authenticate with your PDS. It will also print the
+    /// callback url to the console for you to copy.
+    pub async fn login_with_local_server(
+        &self,
+        input: impl AsRef<str>,
+        opts: AuthorizeOptions<SmolStr>,
+        cfg: LoopbackConfig,
+    ) -> crate::error::Result<super::client::OAuthSession<T, S>> {
+        let port = match cfg.port {
+            LoopbackPort::Fixed(p) => p,
+            LoopbackPort::Ephemeral => 0,
+        };
+        // TODO: fix this to it also accepts ipv6 and properly finds a free port
+        let bind_addr: SocketAddr = format!("0.0.0.0:{}", port)
+            .parse()
+            .expect("invalid loopback host/port");
+        let (local_addr, handle) = one_shot_server(bind_addr);
+        println!("Listening on {}", local_addr);
+
+        let client_data = self.build_localhost_client_data(&cfg, &opts, local_addr);
+        // Build client using store and resolver
+        let flow_client = OAuthClient::new_with_shared(
+            self.registry.store.clone(),
+            self.client.clone(),
+            client_data,
+        );
+
+        // Start auth and get authorization URL
+        let auth_url = flow_client.start_auth(input.as_ref(), opts).await?;
+        // Print URL for copy/paste
+        println!("To authenticate with your PDS, visit:\n{}\n", auth_url);
+        // Optionally open browser
+        if cfg.open_browser {
+            let _ = try_open_in_browser(&auth_url);
+        }
+
+        handle_localhost_callback(handle, &flow_client, &cfg).await
+    }
+
+    /// Builds a [`crate::session::ClientData`] for use with the local loopback server method of OAuth.
+    pub fn build_localhost_client_data(
+        &self,
+        cfg: &LoopbackConfig,
+        opts: &AuthorizeOptions<SmolStr>,
+        local_addr: SocketAddr,
+    ) -> crate::session::ClientData<SmolStr> {
+        let redirect_uri = format!("http://{}:{}/oauth/callback", cfg.host, local_addr.port(),);
+        let redirect = Uri::parse(redirect_uri).unwrap();
+
+        let scopes = if opts.scopes.is_empty() {
+            Some(self.registry.client_data.config.scopes.clone())
+        } else {
+            Some(opts.scopes.clone())
+        };
+
+        crate::session::ClientData {
+            keyset: self.registry.client_data.keyset.clone(),
+            config: AtprotoClientMetadata::new_localhost(Some(vec![redirect]), scopes),
+        }
+        .into_static()
+    }
+}
+
+#[cfg(feature = "scope-check")]
+impl<T, S> OAuthClient<T, S>
+where
+    T: OAuthResolver
+        + DpopExt
+        + jacquard_identity::lexicon_resolver::LexiconSchemaResolver
+        + Send
+        + Sync
+        + 'static,
     S: ClientAuthStore + Send + Sync + 'static,
 {
     /// Drive the full OAuth flow using a local loopback server.

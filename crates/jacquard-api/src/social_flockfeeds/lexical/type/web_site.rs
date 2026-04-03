@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,19 +24,22 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::event;
 use crate::social_flockfeeds::lexical::r#type::image_object;
 use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A WebSite is a set of related web pages and other items typically served from a single web domain and accessible via URLs.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub about: Option<EmbeddedAbout<S>>,
@@ -298,7 +301,6 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -351,7 +353,6 @@ pub enum EmbeddedAccountablePerson<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -413,7 +414,6 @@ pub enum EmbeddedAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -431,7 +431,6 @@ pub enum EmbeddedCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -478,7 +477,6 @@ pub enum EmbeddedContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -488,7 +486,6 @@ pub enum EmbeddedCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -524,7 +521,6 @@ pub enum EmbeddedCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -578,7 +574,6 @@ pub enum EmbeddedEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -635,7 +630,6 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -668,7 +662,6 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -703,7 +696,6 @@ pub enum EmbeddedIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -711,7 +703,6 @@ pub enum EmbeddedIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -768,7 +759,6 @@ pub enum EmbeddedMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -776,7 +766,6 @@ pub enum EmbeddedMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -800,7 +789,6 @@ pub enum EmbeddedOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -827,7 +815,6 @@ pub enum EmbeddedProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -837,7 +824,6 @@ pub enum EmbeddedProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -854,7 +840,6 @@ pub enum EmbeddedPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -862,7 +847,6 @@ pub enum EmbeddedPublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -876,7 +860,6 @@ pub enum EmbeddedRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -923,7 +906,6 @@ pub enum EmbeddedSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -936,7 +918,6 @@ pub enum EmbeddedSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -958,7 +939,6 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -966,7 +946,6 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -996,7 +975,6 @@ pub enum EmbeddedThumbnail<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1021,7 +999,6 @@ pub enum EmbeddedTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1331,7 +1308,6 @@ pub struct WebSite<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1384,7 +1360,6 @@ pub enum WebSiteAccountablePerson<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1446,7 +1421,6 @@ pub enum WebSiteAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1464,7 +1438,6 @@ pub enum WebSiteCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1511,7 +1484,6 @@ pub enum WebSiteContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1521,7 +1493,6 @@ pub enum WebSiteCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1557,7 +1528,6 @@ pub enum WebSiteCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1611,7 +1581,6 @@ pub enum WebSiteEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1668,7 +1637,6 @@ pub enum WebSiteFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1701,7 +1669,6 @@ pub enum WebSiteImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1736,7 +1703,6 @@ pub enum WebSiteIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1744,7 +1710,6 @@ pub enum WebSiteIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1801,7 +1766,6 @@ pub enum WebSiteMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1809,7 +1773,6 @@ pub enum WebSiteMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1833,7 +1796,6 @@ pub enum WebSiteOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1860,7 +1822,6 @@ pub enum WebSiteProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1870,7 +1831,6 @@ pub enum WebSiteProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1887,7 +1847,6 @@ pub enum WebSitePublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1895,7 +1854,6 @@ pub enum WebSitePublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1909,7 +1867,6 @@ pub enum WebSiteRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1956,7 +1913,6 @@ pub enum WebSiteSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1969,7 +1925,6 @@ pub enum WebSiteSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1991,7 +1946,6 @@ pub enum WebSiteSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1999,7 +1953,6 @@ pub enum WebSiteSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2029,7 +1982,6 @@ pub enum WebSiteThumbnail<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2054,7 +2006,6 @@ pub enum WebSiteTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2170,10 +2121,10 @@ impl<S: BosStr> LexiconSchema for WebSite<S> {
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_WebSite() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.WebSite"),
@@ -4883,7 +4834,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_WebSite() -> LexiconDoc<'static> {
 
 pub mod web_site_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5049,134 +5000,16 @@ impl<S: BosStr> WebSiteBuilder<S, web_site_state::Empty> {
         WebSiteBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None,
             ),
             _type: PhantomData,
         }
@@ -5211,10 +5044,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `accessMode` field (optional)
-    pub fn access_mode(
-        mut self,
-        value: impl Into<Option<WebSiteAccessMode<S>>>,
-    ) -> Self {
+    pub fn access_mode(mut self, value: impl Into<Option<WebSiteAccessMode<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -5254,10 +5084,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
         self
     }
     /// Set the `accessibilityAPI` field to an Option value (optional)
-    pub fn maybe_accessibility_api(
-        mut self,
-        value: Option<WebSiteAccessibilityApi<S>>,
-    ) -> Self {
+    pub fn maybe_accessibility_api(mut self, value: Option<WebSiteAccessibilityApi<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -5349,10 +5176,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
         self
     }
     /// Set the `accountablePerson` field to an Option value (optional)
-    pub fn maybe_accountable_person(
-        mut self,
-        value: Option<WebSiteAccountablePerson<S>>,
-    ) -> Self {
+    pub fn maybe_accountable_person(mut self, value: Option<WebSiteAccountablePerson<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -5379,18 +5203,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `additionalType` field (optional)
-    pub fn additional_type(
-        mut self,
-        value: impl Into<Option<WebSiteAdditionalType<S>>>,
-    ) -> Self {
+    pub fn additional_type(mut self, value: impl Into<Option<WebSiteAdditionalType<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(
-        mut self,
-        value: Option<WebSiteAdditionalType<S>>,
-    ) -> Self {
+    pub fn maybe_additional_type(mut self, value: Option<WebSiteAdditionalType<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -5398,18 +5216,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `aggregateRating` field (optional)
-    pub fn aggregate_rating(
-        mut self,
-        value: impl Into<Option<WebSiteAggregateRating<S>>>,
-    ) -> Self {
+    pub fn aggregate_rating(mut self, value: impl Into<Option<WebSiteAggregateRating<S>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(
-        mut self,
-        value: Option<WebSiteAggregateRating<S>>,
-    ) -> Self {
+    pub fn maybe_aggregate_rating(mut self, value: Option<WebSiteAggregateRating<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -5417,18 +5229,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(
-        mut self,
-        value: impl Into<Option<WebSiteAlternateName<S>>>,
-    ) -> Self {
+    pub fn alternate_name(mut self, value: impl Into<Option<WebSiteAlternateName<S>>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(
-        mut self,
-        value: Option<WebSiteAlternateName<S>>,
-    ) -> Self {
+    pub fn maybe_alternate_name(mut self, value: Option<WebSiteAlternateName<S>>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -5455,10 +5261,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `archivedAt` field (optional)
-    pub fn archived_at(
-        mut self,
-        value: impl Into<Option<WebSiteArchivedAt<S>>>,
-    ) -> Self {
+    pub fn archived_at(mut self, value: impl Into<Option<WebSiteArchivedAt<S>>>) -> Self {
         self._fields.15 = value.into();
         self
     }
@@ -5484,18 +5287,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `associatedMedia` field (optional)
-    pub fn associated_media(
-        mut self,
-        value: impl Into<Option<WebSiteAssociatedMedia<S>>>,
-    ) -> Self {
+    pub fn associated_media(mut self, value: impl Into<Option<WebSiteAssociatedMedia<S>>>) -> Self {
         self._fields.17 = value.into();
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
-    pub fn maybe_associated_media(
-        mut self,
-        value: Option<WebSiteAssociatedMedia<S>>,
-    ) -> Self {
+    pub fn maybe_associated_media(mut self, value: Option<WebSiteAssociatedMedia<S>>) -> Self {
         self._fields.17 = value;
         self
     }
@@ -5607,10 +5404,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `commentCount` field (optional)
-    pub fn comment_count(
-        mut self,
-        value: impl Into<Option<WebSiteCommentCount<S>>>,
-    ) -> Self {
+    pub fn comment_count(mut self, value: impl Into<Option<WebSiteCommentCount<S>>>) -> Self {
         self._fields.26 = value.into();
         self
     }
@@ -5642,18 +5436,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `contentLocation` field (optional)
-    pub fn content_location(
-        mut self,
-        value: impl Into<Option<WebSiteContentLocation<S>>>,
-    ) -> Self {
+    pub fn content_location(mut self, value: impl Into<Option<WebSiteContentLocation<S>>>) -> Self {
         self._fields.28 = value.into();
         self
     }
     /// Set the `contentLocation` field to an Option value (optional)
-    pub fn maybe_content_location(
-        mut self,
-        value: Option<WebSiteContentLocation<S>>,
-    ) -> Self {
+    pub fn maybe_content_location(mut self, value: Option<WebSiteContentLocation<S>>) -> Self {
         self._fields.28 = value;
         self
     }
@@ -5661,18 +5449,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `contentRating` field (optional)
-    pub fn content_rating(
-        mut self,
-        value: impl Into<Option<WebSiteContentRating<S>>>,
-    ) -> Self {
+    pub fn content_rating(mut self, value: impl Into<Option<WebSiteContentRating<S>>>) -> Self {
         self._fields.29 = value.into();
         self
     }
     /// Set the `contentRating` field to an Option value (optional)
-    pub fn maybe_content_rating(
-        mut self,
-        value: Option<WebSiteContentRating<S>>,
-    ) -> Self {
+    pub fn maybe_content_rating(mut self, value: Option<WebSiteContentRating<S>>) -> Self {
         self._fields.29 = value;
         self
     }
@@ -5699,10 +5481,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `contributor` field (optional)
-    pub fn contributor(
-        mut self,
-        value: impl Into<Option<WebSiteContributor<S>>>,
-    ) -> Self {
+    pub fn contributor(mut self, value: impl Into<Option<WebSiteContributor<S>>>) -> Self {
         self._fields.31 = value.into();
         self
     }
@@ -5715,18 +5494,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `copyrightHolder` field (optional)
-    pub fn copyright_holder(
-        mut self,
-        value: impl Into<Option<WebSiteCopyrightHolder<S>>>,
-    ) -> Self {
+    pub fn copyright_holder(mut self, value: impl Into<Option<WebSiteCopyrightHolder<S>>>) -> Self {
         self._fields.32 = value.into();
         self
     }
     /// Set the `copyrightHolder` field to an Option value (optional)
-    pub fn maybe_copyright_holder(
-        mut self,
-        value: Option<WebSiteCopyrightHolder<S>>,
-    ) -> Self {
+    pub fn maybe_copyright_holder(mut self, value: Option<WebSiteCopyrightHolder<S>>) -> Self {
         self._fields.32 = value;
         self
     }
@@ -5734,18 +5507,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `copyrightNotice` field (optional)
-    pub fn copyright_notice(
-        mut self,
-        value: impl Into<Option<WebSiteCopyrightNotice<S>>>,
-    ) -> Self {
+    pub fn copyright_notice(mut self, value: impl Into<Option<WebSiteCopyrightNotice<S>>>) -> Self {
         self._fields.33 = value.into();
         self
     }
     /// Set the `copyrightNotice` field to an Option value (optional)
-    pub fn maybe_copyright_notice(
-        mut self,
-        value: Option<WebSiteCopyrightNotice<S>>,
-    ) -> Self {
+    pub fn maybe_copyright_notice(mut self, value: Option<WebSiteCopyrightNotice<S>>) -> Self {
         self._fields.33 = value;
         self
     }
@@ -5753,18 +5520,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `copyrightYear` field (optional)
-    pub fn copyright_year(
-        mut self,
-        value: impl Into<Option<WebSiteCopyrightYear<S>>>,
-    ) -> Self {
+    pub fn copyright_year(mut self, value: impl Into<Option<WebSiteCopyrightYear<S>>>) -> Self {
         self._fields.34 = value.into();
         self
     }
     /// Set the `copyrightYear` field to an Option value (optional)
-    pub fn maybe_copyright_year(
-        mut self,
-        value: Option<WebSiteCopyrightYear<S>>,
-    ) -> Self {
+    pub fn maybe_copyright_year(mut self, value: Option<WebSiteCopyrightYear<S>>) -> Self {
         self._fields.34 = value;
         self
     }
@@ -5793,10 +5554,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
         self
     }
     /// Set the `countryOfOrigin` field to an Option value (optional)
-    pub fn maybe_country_of_origin(
-        mut self,
-        value: Option<WebSiteCountryOfOrigin<S>>,
-    ) -> Self {
+    pub fn maybe_country_of_origin(mut self, value: Option<WebSiteCountryOfOrigin<S>>) -> Self {
         self._fields.36 = value;
         self
     }
@@ -5836,10 +5594,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `creditText` field (optional)
-    pub fn credit_text(
-        mut self,
-        value: impl Into<Option<WebSiteCreditText<S>>>,
-    ) -> Self {
+    pub fn credit_text(mut self, value: impl Into<Option<WebSiteCreditText<S>>>) -> Self {
         self._fields.39 = value.into();
         self
     }
@@ -5852,10 +5607,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `dateCreated` field (optional)
-    pub fn date_created(
-        mut self,
-        value: impl Into<Option<WebSiteDateCreated<S>>>,
-    ) -> Self {
+    pub fn date_created(mut self, value: impl Into<Option<WebSiteDateCreated<S>>>) -> Self {
         self._fields.40 = value.into();
         self
     }
@@ -5868,10 +5620,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `dateModified` field (optional)
-    pub fn date_modified(
-        mut self,
-        value: impl Into<Option<WebSiteDateModified<S>>>,
-    ) -> Self {
+    pub fn date_modified(mut self, value: impl Into<Option<WebSiteDateModified<S>>>) -> Self {
         self._fields.41 = value.into();
         self
     }
@@ -5884,18 +5633,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `datePublished` field (optional)
-    pub fn date_published(
-        mut self,
-        value: impl Into<Option<WebSiteDatePublished<S>>>,
-    ) -> Self {
+    pub fn date_published(mut self, value: impl Into<Option<WebSiteDatePublished<S>>>) -> Self {
         self._fields.42 = value.into();
         self
     }
     /// Set the `datePublished` field to an Option value (optional)
-    pub fn maybe_date_published(
-        mut self,
-        value: Option<WebSiteDatePublished<S>>,
-    ) -> Self {
+    pub fn maybe_date_published(mut self, value: Option<WebSiteDatePublished<S>>) -> Self {
         self._fields.42 = value;
         self
     }
@@ -5903,10 +5646,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<WebSiteDescription<S>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<WebSiteDescription<S>>>) -> Self {
         self._fields.43 = value.into();
         self
     }
@@ -5927,10 +5667,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
         self
     }
     /// Set the `digitalSourceType` field to an Option value (optional)
-    pub fn maybe_digital_source_type(
-        mut self,
-        value: Option<WebSiteDigitalSourceType<S>>,
-    ) -> Self {
+    pub fn maybe_digital_source_type(mut self, value: Option<WebSiteDigitalSourceType<S>>) -> Self {
         self._fields.44 = value;
         self
     }
@@ -5957,18 +5694,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `discussionUrl` field (optional)
-    pub fn discussion_url(
-        mut self,
-        value: impl Into<Option<WebSiteDiscussionUrl<S>>>,
-    ) -> Self {
+    pub fn discussion_url(mut self, value: impl Into<Option<WebSiteDiscussionUrl<S>>>) -> Self {
         self._fields.46 = value.into();
         self
     }
     /// Set the `discussionUrl` field to an Option value (optional)
-    pub fn maybe_discussion_url(
-        mut self,
-        value: Option<WebSiteDiscussionUrl<S>>,
-    ) -> Self {
+    pub fn maybe_discussion_url(mut self, value: Option<WebSiteDiscussionUrl<S>>) -> Self {
         self._fields.46 = value;
         self
     }
@@ -6029,10 +5760,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
         self
     }
     /// Set the `educationalLevel` field to an Option value (optional)
-    pub fn maybe_educational_level(
-        mut self,
-        value: Option<WebSiteEducationalLevel<S>>,
-    ) -> Self {
+    pub fn maybe_educational_level(mut self, value: Option<WebSiteEducationalLevel<S>>) -> Self {
         self._fields.50 = value;
         self
     }
@@ -6040,18 +5768,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `educationalUse` field (optional)
-    pub fn educational_use(
-        mut self,
-        value: impl Into<Option<WebSiteEducationalUse<S>>>,
-    ) -> Self {
+    pub fn educational_use(mut self, value: impl Into<Option<WebSiteEducationalUse<S>>>) -> Self {
         self._fields.51 = value.into();
         self
     }
     /// Set the `educationalUse` field to an Option value (optional)
-    pub fn maybe_educational_use(
-        mut self,
-        value: Option<WebSiteEducationalUse<S>>,
-    ) -> Self {
+    pub fn maybe_educational_use(mut self, value: Option<WebSiteEducationalUse<S>>) -> Self {
         self._fields.51 = value;
         self
     }
@@ -6072,18 +5794,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `encodingFormat` field (optional)
-    pub fn encoding_format(
-        mut self,
-        value: impl Into<Option<WebSiteEncodingFormat<S>>>,
-    ) -> Self {
+    pub fn encoding_format(mut self, value: impl Into<Option<WebSiteEncodingFormat<S>>>) -> Self {
         self._fields.53 = value.into();
         self
     }
     /// Set the `encodingFormat` field to an Option value (optional)
-    pub fn maybe_encoding_format(
-        mut self,
-        value: Option<WebSiteEncodingFormat<S>>,
-    ) -> Self {
+    pub fn maybe_encoding_format(mut self, value: Option<WebSiteEncodingFormat<S>>) -> Self {
         self._fields.53 = value;
         self
     }
@@ -6104,18 +5820,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `exampleOfWork` field (optional)
-    pub fn example_of_work(
-        mut self,
-        value: impl Into<Option<WebSiteExampleOfWork<S>>>,
-    ) -> Self {
+    pub fn example_of_work(mut self, value: impl Into<Option<WebSiteExampleOfWork<S>>>) -> Self {
         self._fields.55 = value.into();
         self
     }
     /// Set the `exampleOfWork` field to an Option value (optional)
-    pub fn maybe_example_of_work(
-        mut self,
-        value: Option<WebSiteExampleOfWork<S>>,
-    ) -> Self {
+    pub fn maybe_example_of_work(mut self, value: Option<WebSiteExampleOfWork<S>>) -> Self {
         self._fields.55 = value;
         self
     }
@@ -6136,10 +5846,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `fileFormat` field (optional)
-    pub fn file_format(
-        mut self,
-        value: impl Into<Option<WebSiteFileFormat<S>>>,
-    ) -> Self {
+    pub fn file_format(mut self, value: impl Into<Option<WebSiteFileFormat<S>>>) -> Self {
         self._fields.57 = value.into();
         self
     }
@@ -6243,10 +5950,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `inLanguage` field (optional)
-    pub fn in_language(
-        mut self,
-        value: impl Into<Option<WebSiteInLanguage<S>>>,
-    ) -> Self {
+    pub fn in_language(mut self, value: impl Into<Option<WebSiteInLanguage<S>>>) -> Self {
         self._fields.65 = value.into();
         self
     }
@@ -6286,10 +5990,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
         self
     }
     /// Set the `interactivityType` field to an Option value (optional)
-    pub fn maybe_interactivity_type(
-        mut self,
-        value: Option<WebSiteInteractivityType<S>>,
-    ) -> Self {
+    pub fn maybe_interactivity_type(mut self, value: Option<WebSiteInteractivityType<S>>) -> Self {
         self._fields.67 = value;
         self
     }
@@ -6348,18 +6049,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `isBasedOnUrl` field (optional)
-    pub fn is_based_on_url(
-        mut self,
-        value: impl Into<Option<WebSiteIsBasedOnUrl<S>>>,
-    ) -> Self {
+    pub fn is_based_on_url(mut self, value: impl Into<Option<WebSiteIsBasedOnUrl<S>>>) -> Self {
         self._fields.71 = value.into();
         self
     }
     /// Set the `isBasedOnUrl` field to an Option value (optional)
-    pub fn maybe_is_based_on_url(
-        mut self,
-        value: Option<WebSiteIsBasedOnUrl<S>>,
-    ) -> Self {
+    pub fn maybe_is_based_on_url(mut self, value: Option<WebSiteIsBasedOnUrl<S>>) -> Self {
         self._fields.71 = value;
         self
     }
@@ -6375,10 +6070,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
-    pub fn maybe_is_family_friendly(
-        mut self,
-        value: Option<WebSiteIsFamilyFriendly<S>>,
-    ) -> Self {
+    pub fn maybe_is_family_friendly(mut self, value: Option<WebSiteIsFamilyFriendly<S>>) -> Self {
         self._fields.72 = value;
         self
     }
@@ -6457,18 +6149,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `locationCreated` field (optional)
-    pub fn location_created(
-        mut self,
-        value: impl Into<Option<WebSiteLocationCreated<S>>>,
-    ) -> Self {
+    pub fn location_created(mut self, value: impl Into<Option<WebSiteLocationCreated<S>>>) -> Self {
         self._fields.78 = value.into();
         self
     }
     /// Set the `locationCreated` field to an Option value (optional)
-    pub fn maybe_location_created(
-        mut self,
-        value: Option<WebSiteLocationCreated<S>>,
-    ) -> Self {
+    pub fn maybe_location_created(mut self, value: Option<WebSiteLocationCreated<S>>) -> Self {
         self._fields.78 = value;
         self
     }
@@ -6476,10 +6162,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `mainEntity` field (optional)
-    pub fn main_entity(
-        mut self,
-        value: impl Into<Option<WebSiteMainEntity<S>>>,
-    ) -> Self {
+    pub fn main_entity(mut self, value: impl Into<Option<WebSiteMainEntity<S>>>) -> Self {
         self._fields.79 = value.into();
         self
     }
@@ -6500,10 +6183,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
-    pub fn maybe_main_entity_of_page(
-        mut self,
-        value: Option<WebSiteMainEntityOfPage<S>>,
-    ) -> Self {
+    pub fn maybe_main_entity_of_page(mut self, value: Option<WebSiteMainEntityOfPage<S>>) -> Self {
         self._fields.80 = value;
         self
     }
@@ -6537,18 +6217,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `materialExtent` field (optional)
-    pub fn material_extent(
-        mut self,
-        value: impl Into<Option<WebSiteMaterialExtent<S>>>,
-    ) -> Self {
+    pub fn material_extent(mut self, value: impl Into<Option<WebSiteMaterialExtent<S>>>) -> Self {
         self._fields.83 = value.into();
         self
     }
     /// Set the `materialExtent` field to an Option value (optional)
-    pub fn maybe_material_extent(
-        mut self,
-        value: Option<WebSiteMaterialExtent<S>>,
-    ) -> Self {
+    pub fn maybe_material_extent(mut self, value: Option<WebSiteMaterialExtent<S>>) -> Self {
         self._fields.83 = value;
         self
     }
@@ -6621,18 +6295,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `potentialAction` field (optional)
-    pub fn potential_action(
-        mut self,
-        value: impl Into<Option<WebSitePotentialAction<S>>>,
-    ) -> Self {
+    pub fn potential_action(mut self, value: impl Into<Option<WebSitePotentialAction<S>>>) -> Self {
         self._fields.89 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(
-        mut self,
-        value: Option<WebSitePotentialAction<S>>,
-    ) -> Self {
+    pub fn maybe_potential_action(mut self, value: Option<WebSitePotentialAction<S>>) -> Self {
         self._fields.89 = value;
         self
     }
@@ -6666,10 +6334,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `publication` field (optional)
-    pub fn publication(
-        mut self,
-        value: impl Into<Option<WebSitePublication<S>>>,
-    ) -> Self {
+    pub fn publication(mut self, value: impl Into<Option<WebSitePublication<S>>>) -> Self {
         self._fields.92 = value.into();
         self
     }
@@ -6703,10 +6368,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
         self
     }
     /// Set the `publisherImprint` field to an Option value (optional)
-    pub fn maybe_publisher_imprint(
-        mut self,
-        value: Option<WebSitePublisherImprint<S>>,
-    ) -> Self {
+    pub fn maybe_publisher_imprint(mut self, value: Option<WebSitePublisherImprint<S>>) -> Self {
         self._fields.94 = value;
         self
     }
@@ -6733,10 +6395,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `recordedAt` field (optional)
-    pub fn recorded_at(
-        mut self,
-        value: impl Into<Option<WebSiteRecordedAt<S>>>,
-    ) -> Self {
+    pub fn recorded_at(mut self, value: impl Into<Option<WebSiteRecordedAt<S>>>) -> Self {
         self._fields.96 = value.into();
         self
     }
@@ -6749,18 +6408,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `releasedEvent` field (optional)
-    pub fn released_event(
-        mut self,
-        value: impl Into<Option<WebSiteReleasedEvent<S>>>,
-    ) -> Self {
+    pub fn released_event(mut self, value: impl Into<Option<WebSiteReleasedEvent<S>>>) -> Self {
         self._fields.97 = value.into();
         self
     }
     /// Set the `releasedEvent` field to an Option value (optional)
-    pub fn maybe_released_event(
-        mut self,
-        value: Option<WebSiteReleasedEvent<S>>,
-    ) -> Self {
+    pub fn maybe_released_event(mut self, value: Option<WebSiteReleasedEvent<S>>) -> Self {
         self._fields.97 = value;
         self
     }
@@ -6807,18 +6460,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `schemaVersion` field (optional)
-    pub fn schema_version(
-        mut self,
-        value: impl Into<Option<WebSiteSchemaVersion<S>>>,
-    ) -> Self {
+    pub fn schema_version(mut self, value: impl Into<Option<WebSiteSchemaVersion<S>>>) -> Self {
         self._fields.101 = value.into();
         self
     }
     /// Set the `schemaVersion` field to an Option value (optional)
-    pub fn maybe_schema_version(
-        mut self,
-        value: Option<WebSiteSchemaVersion<S>>,
-    ) -> Self {
+    pub fn maybe_schema_version(mut self, value: Option<WebSiteSchemaVersion<S>>) -> Self {
         self._fields.101 = value;
         self
     }
@@ -6834,10 +6481,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
         self
     }
     /// Set the `sdDatePublished` field to an Option value (optional)
-    pub fn maybe_sd_date_published(
-        mut self,
-        value: Option<WebSiteSdDatePublished<S>>,
-    ) -> Self {
+    pub fn maybe_sd_date_published(mut self, value: Option<WebSiteSdDatePublished<S>>) -> Self {
         self._fields.102 = value;
         self
     }
@@ -6858,10 +6502,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `sdPublisher` field (optional)
-    pub fn sd_publisher(
-        mut self,
-        value: impl Into<Option<WebSiteSdPublisher<S>>>,
-    ) -> Self {
+    pub fn sd_publisher(mut self, value: impl Into<Option<WebSiteSdPublisher<S>>>) -> Self {
         self._fields.104 = value.into();
         self
     }
@@ -6919,18 +6560,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `spatialCoverage` field (optional)
-    pub fn spatial_coverage(
-        mut self,
-        value: impl Into<Option<WebSiteSpatialCoverage<S>>>,
-    ) -> Self {
+    pub fn spatial_coverage(mut self, value: impl Into<Option<WebSiteSpatialCoverage<S>>>) -> Self {
         self._fields.108 = value.into();
         self
     }
     /// Set the `spatialCoverage` field to an Option value (optional)
-    pub fn maybe_spatial_coverage(
-        mut self,
-        value: Option<WebSiteSpatialCoverage<S>>,
-    ) -> Self {
+    pub fn maybe_spatial_coverage(mut self, value: Option<WebSiteSpatialCoverage<S>>) -> Self {
         self._fields.108 = value;
         self
     }
@@ -6998,10 +6633,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
         self
     }
     /// Set the `temporalCoverage` field to an Option value (optional)
-    pub fn maybe_temporal_coverage(
-        mut self,
-        value: Option<WebSiteTemporalCoverage<S>>,
-    ) -> Self {
+    pub fn maybe_temporal_coverage(mut self, value: Option<WebSiteTemporalCoverage<S>>) -> Self {
         self._fields.113 = value;
         self
     }
@@ -7035,10 +6667,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `thumbnailUrl` field (optional)
-    pub fn thumbnail_url(
-        mut self,
-        value: impl Into<Option<WebSiteThumbnailUrl<S>>>,
-    ) -> Self {
+    pub fn thumbnail_url(mut self, value: impl Into<Option<WebSiteThumbnailUrl<S>>>) -> Self {
         self._fields.116 = value.into();
         self
     }
@@ -7051,10 +6680,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `timeRequired` field (optional)
-    pub fn time_required(
-        mut self,
-        value: impl Into<Option<WebSiteTimeRequired<S>>>,
-    ) -> Self {
+    pub fn time_required(mut self, value: impl Into<Option<WebSiteTimeRequired<S>>>) -> Self {
         self._fields.117 = value.into();
         self
     }
@@ -7075,10 +6701,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
         self
     }
     /// Set the `translationOfWork` field to an Option value (optional)
-    pub fn maybe_translation_of_work(
-        mut self,
-        value: Option<WebSiteTranslationOfWork<S>>,
-    ) -> Self {
+    pub fn maybe_translation_of_work(mut self, value: Option<WebSiteTranslationOfWork<S>>) -> Self {
         self._fields.118 = value;
         self
     }
@@ -7107,10 +6730,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
-    pub fn maybe_typical_age_range(
-        mut self,
-        value: Option<WebSiteTypicalAgeRange<S>>,
-    ) -> Self {
+    pub fn maybe_typical_age_range(mut self, value: Option<WebSiteTypicalAgeRange<S>>) -> Self {
         self._fields.120 = value;
         self
     }
@@ -7183,10 +6803,7 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `workExample` field (optional)
-    pub fn work_example(
-        mut self,
-        value: impl Into<Option<WebSiteWorkExample<S>>>,
-    ) -> Self {
+    pub fn work_example(mut self, value: impl Into<Option<WebSiteWorkExample<S>>>) -> Self {
         self._fields.126 = value.into();
         self
     }
@@ -7199,18 +6816,12 @@ impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
 
 impl<S: BosStr, St: web_site_state::State> WebSiteBuilder<S, St> {
     /// Set the `workTranslation` field (optional)
-    pub fn work_translation(
-        mut self,
-        value: impl Into<Option<WebSiteWorkTranslation<S>>>,
-    ) -> Self {
+    pub fn work_translation(mut self, value: impl Into<Option<WebSiteWorkTranslation<S>>>) -> Self {
         self._fields.127 = value.into();
         self
     }
     /// Set the `workTranslation` field to an Option value (optional)
-    pub fn maybe_work_translation(
-        mut self,
-        value: Option<WebSiteWorkTranslation<S>>,
-    ) -> Self {
+    pub fn maybe_work_translation(mut self, value: Option<WebSiteWorkTranslation<S>>) -> Self {
         self._fields.127 = value;
         self
     }

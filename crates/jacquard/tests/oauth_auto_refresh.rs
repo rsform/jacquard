@@ -211,7 +211,10 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
 
     let client_data = ClientData {
         keyset: None,
-        config: AtprotoClientMetadata::new_localhost(None, Some(Scopes::new(SmolStr::new_static("atproto")).unwrap())),
+        config: AtprotoClientMetadata::new_localhost(
+            None,
+            Some(Scopes::new(SmolStr::new_static("atproto")).unwrap()),
+        ),
     };
     use jacquard::IntoStatic;
     let session_data = ClientSessionData {
@@ -344,7 +347,10 @@ async fn oauth_xrpc_invalid_token_body_triggers_refresh_and_retries() {
 
     let client_data = ClientData {
         keyset: None,
-        config: AtprotoClientMetadata::new_localhost(None, Some(Scopes::new(SmolStr::new_static("atproto")).unwrap())),
+        config: AtprotoClientMetadata::new_localhost(
+            None,
+            Some(Scopes::new(SmolStr::new_static("atproto")).unwrap()),
+        ),
     };
     use jacquard::IntoStatic;
     let session_data = ClientSessionData {

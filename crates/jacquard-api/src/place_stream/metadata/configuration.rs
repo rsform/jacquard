@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::place_stream::metadata::content_rights::ContentRights;
 use crate::place_stream::metadata::content_warnings::ContentWarnings;
 use crate::place_stream::metadata::distribution_policy::DistributionPolicy;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Default metadata record for livestream including content warnings, rights, and distribution policy
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -111,7 +111,7 @@ impl<S: BosStr> LexiconSchema for Configuration<S> {
 
 pub mod configuration_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -172,10 +172,7 @@ impl<S: BosStr, St: configuration_state::State> ConfigurationBuilder<S, St> {
 
 impl<S: BosStr, St: configuration_state::State> ConfigurationBuilder<S, St> {
     /// Set the `contentWarnings` field (optional)
-    pub fn content_warnings(
-        mut self,
-        value: impl Into<Option<ContentWarnings<S>>>,
-    ) -> Self {
+    pub fn content_warnings(mut self, value: impl Into<Option<ContentWarnings<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -188,18 +185,12 @@ impl<S: BosStr, St: configuration_state::State> ConfigurationBuilder<S, St> {
 
 impl<S: BosStr, St: configuration_state::State> ConfigurationBuilder<S, St> {
     /// Set the `distributionPolicy` field (optional)
-    pub fn distribution_policy(
-        mut self,
-        value: impl Into<Option<DistributionPolicy<S>>>,
-    ) -> Self {
+    pub fn distribution_policy(mut self, value: impl Into<Option<DistributionPolicy<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `distributionPolicy` field to an Option value (optional)
-    pub fn maybe_distribution_policy(
-        mut self,
-        value: Option<DistributionPolicy<S>>,
-    ) -> Self {
+    pub fn maybe_distribution_policy(mut self, value: Option<DistributionPolicy<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -219,10 +210,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Configuration<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Configuration<S> {
         Configuration {
             content_rights: self._fields.0,
             content_warnings: self._fields.1,
@@ -233,10 +221,10 @@ where
 }
 
 fn lexicon_doc_place_stream_metadata_configuration() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.metadata.configuration"),

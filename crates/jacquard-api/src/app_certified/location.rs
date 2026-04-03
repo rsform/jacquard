@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use crate::app_certified::location;
 use crate::org_hypercerts::SmallBlob;
 use crate::org_hypercerts::Uri;
-use crate::app_certified::location;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A location reference
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -59,7 +59,6 @@ pub struct Location<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -163,21 +162,15 @@ where
     type Output = LocationLocationType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            LocationLocationType::CoordinateDecimal => {
-                LocationLocationType::CoordinateDecimal
-            }
+            LocationLocationType::CoordinateDecimal => LocationLocationType::CoordinateDecimal,
             LocationLocationType::GeojsonPoint => LocationLocationType::GeojsonPoint,
             LocationLocationType::Geojson => LocationLocationType::Geojson,
             LocationLocationType::H3 => LocationLocationType::H3,
             LocationLocationType::Geohash => LocationLocationType::Geohash,
             LocationLocationType::Wkt => LocationLocationType::Wkt,
             LocationLocationType::Address => LocationLocationType::Address,
-            LocationLocationType::ScaledCoordinates => {
-                LocationLocationType::ScaledCoordinates
-            }
-            LocationLocationType::Other(v) => {
-                LocationLocationType::Other(v.into_static())
-            }
+            LocationLocationType::ScaledCoordinates => LocationLocationType::ScaledCoordinates,
+            LocationLocationType::Other(v) => LocationLocationType::Other(v.into_static()),
         }
     }
 }
@@ -196,7 +189,10 @@ pub struct LocationGetRecordOutput<S: BosStr = DefaultStr> {
 /// A location represented as a string, e.g. coordinates or a small GeoJSON string.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LocationString<S: BosStr = DefaultStr> {
     ///The location string value
     pub string: S,
@@ -370,7 +366,7 @@ impl<S: BosStr> LexiconSchema for LocationString<S> {
 
 pub mod location_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -652,10 +648,10 @@ where
 }
 
 fn lexicon_doc_app_certified_location() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.certified.location"),

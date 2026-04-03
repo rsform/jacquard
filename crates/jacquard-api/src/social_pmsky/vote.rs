@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -123,7 +123,7 @@ impl<S: BosStr> LexiconSchema for Vote<S> {
 
 pub mod vote_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -261,10 +261,7 @@ where
     St::Cts: vote_state::IsUnset,
 {
     /// Set the `cts` field (required)
-    pub fn cts(
-        mut self,
-        value: impl Into<Datetime>,
-    ) -> VoteBuilder<S, vote_state::SetCts<St>> {
+    pub fn cts(mut self, value: impl Into<Datetime>) -> VoteBuilder<S, vote_state::SetCts<St>> {
         self._fields.2 = Option::Some(value.into());
         VoteBuilder {
             _state: PhantomData,
@@ -306,10 +303,7 @@ where
     St::Src: vote_state::IsUnset,
 {
     /// Set the `src` field (required)
-    pub fn src(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> VoteBuilder<S, vote_state::SetSrc<St>> {
+    pub fn src(mut self, value: impl Into<Did<S>>) -> VoteBuilder<S, vote_state::SetSrc<St>> {
         self._fields.5 = Option::Some(value.into());
         VoteBuilder {
             _state: PhantomData,
@@ -325,10 +319,7 @@ where
     St::Uri: vote_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(
-        mut self,
-        value: impl Into<UriValue<S>>,
-    ) -> VoteBuilder<S, vote_state::SetUri<St>> {
+    pub fn uri(mut self, value: impl Into<UriValue<S>>) -> VoteBuilder<S, vote_state::SetUri<St>> {
         self._fields.6 = Option::Some(value.into());
         VoteBuilder {
             _state: PhantomData,
@@ -344,10 +335,7 @@ where
     St::Val: vote_state::IsUnset,
 {
     /// Set the `val` field (required)
-    pub fn val(
-        mut self,
-        value: impl Into<i64>,
-    ) -> VoteBuilder<S, vote_state::SetVal<St>> {
+    pub fn val(mut self, value: impl Into<i64>) -> VoteBuilder<S, vote_state::SetVal<St>> {
         self._fields.7 = Option::Some(value.into());
         VoteBuilder {
             _state: PhantomData,
@@ -396,10 +384,10 @@ where
 }
 
 fn lexicon_doc_social_pmsky_vote() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.pmsky.vote"),

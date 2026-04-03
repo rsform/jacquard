@@ -8,24 +8,29 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::org_passingreads::book::StatefulBook;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::org_passingreads::book::StatefulBook;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetBooks<S: BosStr = DefaultStr> {
     pub ids: S,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetBooksOutput<S: BosStr = DefaultStr> {
     ///List of books found. Missing books are omitted.
     pub books: Vec<StatefulBook<S>>,
@@ -59,7 +64,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetBooksRequest {
 
 pub mod get_books_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -120,10 +125,7 @@ where
     St::Ids: get_books_state::IsUnset,
 {
     /// Set the `ids` field (required)
-    pub fn ids(
-        mut self,
-        value: impl Into<S>,
-    ) -> GetBooksBuilder<S, get_books_state::SetIds<St>> {
+    pub fn ids(mut self, value: impl Into<S>) -> GetBooksBuilder<S, get_books_state::SetIds<St>> {
         self._fields.0 = Option::Some(value.into());
         GetBooksBuilder {
             _state: PhantomData,

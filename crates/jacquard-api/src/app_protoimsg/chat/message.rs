@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -25,14 +25,17 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_protoimsg::chat::message;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_protoimsg::chat::message;
+use serde::{Deserialize, Serialize};
 /// Width and height for layout before media loads.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -43,7 +46,10 @@ pub struct AspectRatio<S: BosStr = DefaultStr> {
 /// Facet feature for a block quotation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Blockquote<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -52,7 +58,10 @@ pub struct Blockquote<S: BosStr = DefaultStr> {
 /// Facet feature for bold text.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Bold<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -61,7 +70,10 @@ pub struct Bold<S: BosStr = DefaultStr> {
 /// Specifies the sub-string range a facet feature applies to. Start index is inclusive, end index is exclusive. Indices are zero-indexed, counting bytes of the UTF-8 encoded text.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ByteSlice<S: BosStr = DefaultStr> {
     pub byte_end: i64,
     pub byte_start: i64,
@@ -72,7 +84,10 @@ pub struct ByteSlice<S: BosStr = DefaultStr> {
 /// Facet feature for a code block. The text contains the code content.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CodeBlock<S: BosStr = DefaultStr> {
     ///Programming language for syntax highlighting.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -84,7 +99,10 @@ pub struct CodeBlock<S: BosStr = DefaultStr> {
 /// Facet feature for inline code.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CodeInline<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -93,7 +111,10 @@ pub struct CodeInline<S: BosStr = DefaultStr> {
 /// External link card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ExternalEmbed<S: BosStr = DefaultStr> {
     ///Description or summary.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -112,7 +133,10 @@ pub struct ExternalEmbed<S: BosStr = DefaultStr> {
 /// Embedded images.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ImageEmbed<S: BosStr = DefaultStr> {
     pub images: Vec<message::ImageItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -122,7 +146,10 @@ pub struct ImageEmbed<S: BosStr = DefaultStr> {
 /// A single embedded image.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ImageItem<S: BosStr = DefaultStr> {
     ///Alt text for accessibility.
     pub alt: S,
@@ -137,7 +164,10 @@ pub struct ImageItem<S: BosStr = DefaultStr> {
 /// Facet feature for italic text.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Italic<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -146,7 +176,10 @@ pub struct Italic<S: BosStr = DefaultStr> {
 /// Facet feature for a URL. The text URL may have been simplified or truncated, but the facet reference should be a complete URL.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Link<S: BosStr = DefaultStr> {
     pub uri: UriValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -182,7 +215,6 @@ pub struct Message<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -209,7 +241,10 @@ pub struct MessageGetRecordOutput<S: BosStr = DefaultStr> {
 /// Facet feature for mention of another account. The text is usually a handle, including a '@' prefix, but the facet reference is a DID.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Mention<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -219,7 +254,10 @@ pub struct Mention<S: BosStr = DefaultStr> {
 /// Thread reply reference with root and parent for efficient deep thread traversal.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReplyRef<S: BosStr = DefaultStr> {
     ///AT-URI of the direct parent message being replied to.
     pub parent: AtUri<S>,
@@ -232,14 +270,16 @@ pub struct ReplyRef<S: BosStr = DefaultStr> {
 /// Annotation of a sub-string within rich text.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RichTextFacet<S: BosStr = DefaultStr> {
     pub features: Vec<RichTextFacetFeaturesItem<S>>,
     pub index: message::ByteSlice<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -268,7 +308,10 @@ pub enum RichTextFacetFeaturesItem<S: BosStr = DefaultStr> {
 /// Facet feature for strikethrough text.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Strikethrough<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -277,7 +320,10 @@ pub struct Strikethrough<S: BosStr = DefaultStr> {
 /// Facet feature for a hashtag. The text usually includes a '#' prefix, but the facet reference should not.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Tag<S: BosStr = DefaultStr> {
     pub tag: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -287,7 +333,10 @@ pub struct Tag<S: BosStr = DefaultStr> {
 /// Embedded video.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct VideoEmbed<S: BosStr = DefaultStr> {
     ///Alt text for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -486,25 +535,20 @@ impl<S: BosStr> LexiconSchema for ExternalEmbed<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("thumb"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -590,31 +634,25 @@ impl<S: BosStr> LexiconSchema for ImageItem<S> {
             let value = &self.image;
             {
                 let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &[
-                    "image/png",
-                    "image/jpeg",
-                    "image/gif",
-                    "image/webp",
-                ];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let accepted: &[&str] = &["image/png", "image/jpeg", "image/gif", "image/webp"];
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/gif".to_string(), "image/webp".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/gif".to_string(),
+                            "image/webp".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -857,25 +895,20 @@ impl<S: BosStr> LexiconSchema for VideoEmbed<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("thumbnail"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -899,25 +932,20 @@ impl<S: BosStr> LexiconSchema for VideoEmbed<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["video/mp4", "video/webm"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("video"),
-                        accepted: vec![
-                            "video/mp4".to_string(), "video/webm".to_string()
-                        ],
+                        accepted: vec!["video/mp4".to_string(), "video/webm".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -929,7 +957,7 @@ impl<S: BosStr> LexiconSchema for VideoEmbed<S> {
 
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1049,10 +1077,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AspectRatio<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -1062,10 +1087,10 @@ where
 }
 
 fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.protoimsg.chat.message"),
@@ -1074,14 +1099,13 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("aspectRatio"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Width and height for layout before media loads.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Width and height for layout before media loads.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("width"),
+                        SmolStr::new_static("height"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1107,9 +1131,7 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("blockquote"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Facet feature for a block quotation."),
-                    ),
+                    description: Some(CowStr::new_static("Facet feature for a block quotation.")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1121,9 +1143,7 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("bold"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Facet feature for bold text."),
-                    ),
+                    description: Some(CowStr::new_static("Facet feature for bold text.")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1171,22 +1191,18 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("codeBlock"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Facet feature for a code block. The text contains the code content.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Facet feature for a code block. The text contains the code content.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("lang"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Programming language for syntax highlighting.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Programming language for syntax highlighting.",
+                                )),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -1199,9 +1215,7 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("codeInline"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Facet feature for inline code."),
-                    ),
+                    description: Some(CowStr::new_static("Facet feature for inline code.")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1214,32 +1228,33 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
                 SmolStr::new_static("externalEmbed"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("External link card.")),
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("title")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("title"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Description or summary."),
-                                ),
+                                description: Some(CowStr::new_static("Description or summary.")),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("thumb"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Title of the external content."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Title of the external content.",
+                                )),
                                 max_length: Some(300usize),
                                 ..Default::default()
                             }),
@@ -1247,9 +1262,9 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("URL of the external content."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "URL of the external content.",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -1287,18 +1302,19 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
                 SmolStr::new_static("imageItem"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("A single embedded image.")),
-                    required: Some(
-                        vec![SmolStr::new_static("image"), SmolStr::new_static("alt")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("image"),
+                        SmolStr::new_static("alt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Alt text for accessibility."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Alt text for accessibility.",
+                                )),
                                 max_length: Some(2000usize),
                                 ..Default::default()
                             }),
@@ -1312,7 +1328,9 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("image"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1322,9 +1340,7 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("italic"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Facet feature for italic text."),
-                    ),
+                    description: Some(CowStr::new_static("Facet feature for italic text.")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1522,16 +1538,13 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("richTextFacet"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Annotation of a sub-string within rich text.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("index"), SmolStr::new_static("features")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Annotation of a sub-string within rich text.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("index"),
+                        SmolStr::new_static("features"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1540,13 +1553,15 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
                             LexObjectProperty::Array(LexArray {
                                 items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
-                                        CowStr::new_static("#mention"), CowStr::new_static("#link"),
-                                        CowStr::new_static("#tag"), CowStr::new_static("#bold"),
+                                        CowStr::new_static("#mention"),
+                                        CowStr::new_static("#link"),
+                                        CowStr::new_static("#tag"),
+                                        CowStr::new_static("#bold"),
                                         CowStr::new_static("#italic"),
                                         CowStr::new_static("#strikethrough"),
                                         CowStr::new_static("#codeInline"),
                                         CowStr::new_static("#codeBlock"),
-                                        CowStr::new_static("#blockquote")
+                                        CowStr::new_static("#blockquote"),
                                     ],
                                     ..Default::default()
                                 }),
@@ -1568,9 +1583,7 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("strikethrough"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Facet feature for strikethrough text."),
-                    ),
+                    description: Some(CowStr::new_static("Facet feature for strikethrough text.")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1615,9 +1628,9 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Alt text for accessibility."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Alt text for accessibility.",
+                                )),
                                 max_length: Some(2000usize),
                                 ..Default::default()
                             }),
@@ -1631,11 +1644,15 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("thumbnail"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("video"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1650,7 +1667,7 @@ fn lexicon_doc_app_protoimsg_chat_message() -> LexiconDoc<'static> {
 
 pub mod byte_slice_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1770,10 +1787,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ByteSlice<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ByteSlice<S> {
         ByteSlice {
             byte_end: self._fields.0.unwrap(),
             byte_start: self._fields.1.unwrap(),
@@ -1784,7 +1798,7 @@ where
 
 pub mod external_embed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1829,7 +1843,12 @@ pub mod external_embed_state {
 /// Builder for constructing an instance of this type.
 pub struct ExternalEmbedBuilder<S: BosStr, St: external_embed_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<BlobRef<S>>, Option<S>, Option<UriValue<S>>),
+    _fields: (
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1932,10 +1951,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ExternalEmbed<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ExternalEmbed<S> {
         ExternalEmbed {
             description: self._fields.0,
             thumb: self._fields.1,
@@ -1948,7 +1964,7 @@ where
 
 pub mod image_embed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2035,10 +2051,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ImageEmbed<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ImageEmbed<S> {
         ImageEmbed {
             images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -2048,7 +2061,7 @@ where
 
 pub mod image_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2093,7 +2106,11 @@ pub mod image_item_state {
 /// Builder for constructing an instance of this type.
 pub struct ImageItemBuilder<S: BosStr, St: image_item_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<message::AspectRatio<S>>, Option<BlobRef<S>>),
+    _fields: (
+        Option<S>,
+        Option<message::AspectRatio<S>>,
+        Option<BlobRef<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -2121,10 +2138,7 @@ where
     St::Alt: image_item_state::IsUnset,
 {
     /// Set the `alt` field (required)
-    pub fn alt(
-        mut self,
-        value: impl Into<S>,
-    ) -> ImageItemBuilder<S, image_item_state::SetAlt<St>> {
+    pub fn alt(mut self, value: impl Into<S>) -> ImageItemBuilder<S, image_item_state::SetAlt<St>> {
         self._fields.0 = Option::Some(value.into());
         ImageItemBuilder {
             _state: PhantomData,
@@ -2136,10 +2150,7 @@ where
 
 impl<S: BosStr, St: image_item_state::State> ImageItemBuilder<S, St> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(
-        mut self,
-        value: impl Into<Option<message::AspectRatio<S>>>,
-    ) -> Self {
+    pub fn aspect_ratio(mut self, value: impl Into<Option<message::AspectRatio<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -2185,10 +2196,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ImageItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ImageItem<S> {
         ImageItem {
             alt: self._fields.0.unwrap(),
             aspect_ratio: self._fields.1,
@@ -2200,7 +2208,7 @@ where
 
 pub mod link_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2261,10 +2269,7 @@ where
     St::Uri: link_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(
-        mut self,
-        value: impl Into<UriValue<S>>,
-    ) -> LinkBuilder<S, link_state::SetUri<St>> {
+    pub fn uri(mut self, value: impl Into<UriValue<S>>) -> LinkBuilder<S, link_state::SetUri<St>> {
         self._fields.0 = Option::Some(value.into());
         LinkBuilder {
             _state: PhantomData,
@@ -2297,7 +2302,7 @@ where
 
 pub mod message_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2438,18 +2443,12 @@ impl<S: BosStr, St: message_state::State> MessageBuilder<S, St> {
 
 impl<S: BosStr, St: message_state::State> MessageBuilder<S, St> {
     /// Set the `facets` field (optional)
-    pub fn facets(
-        mut self,
-        value: impl Into<Option<Vec<message::RichTextFacet<S>>>>,
-    ) -> Self {
+    pub fn facets(mut self, value: impl Into<Option<Vec<message::RichTextFacet<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
-    pub fn maybe_facets(
-        mut self,
-        value: Option<Vec<message::RichTextFacet<S>>>,
-    ) -> Self {
+    pub fn maybe_facets(mut self, value: Option<Vec<message::RichTextFacet<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -2474,10 +2473,7 @@ where
     St::Text: message_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(
-        mut self,
-        value: impl Into<S>,
-    ) -> MessageBuilder<S, message_state::SetText<St>> {
+    pub fn text(mut self, value: impl Into<S>) -> MessageBuilder<S, message_state::SetText<St>> {
         self._fields.5 = Option::Some(value.into());
         MessageBuilder {
             _state: PhantomData,
@@ -2522,7 +2518,7 @@ where
 
 pub mod mention_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2583,10 +2579,7 @@ where
     St::Did: mention_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> MentionBuilder<S, mention_state::SetDid<St>> {
+    pub fn did(mut self, value: impl Into<Did<S>>) -> MentionBuilder<S, mention_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         MentionBuilder {
             _state: PhantomData,
@@ -2619,7 +2612,7 @@ where
 
 pub mod reply_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2750,7 +2743,7 @@ where
 
 pub mod rich_text_facet_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2795,7 +2788,10 @@ pub mod rich_text_facet_state {
 /// Builder for constructing an instance of this type.
 pub struct RichTextFacetBuilder<S: BosStr, St: rich_text_facet_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<RichTextFacetFeaturesItem<S>>>, Option<message::ByteSlice<S>>),
+    _fields: (
+        Option<Vec<RichTextFacetFeaturesItem<S>>>,
+        Option<message::ByteSlice<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -2870,10 +2866,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RichTextFacet<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RichTextFacet<S> {
         RichTextFacet {
             features: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),
@@ -2884,7 +2877,7 @@ where
 
 pub mod video_embed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2959,10 +2952,7 @@ impl<S: BosStr, St: video_embed_state::State> VideoEmbedBuilder<S, St> {
 
 impl<S: BosStr, St: video_embed_state::State> VideoEmbedBuilder<S, St> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(
-        mut self,
-        value: impl Into<Option<message::AspectRatio<S>>>,
-    ) -> Self {
+    pub fn aspect_ratio(mut self, value: impl Into<Option<message::AspectRatio<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -3021,10 +3011,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> VideoEmbed<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> VideoEmbed<S> {
         VideoEmbed {
             alt: self._fields.0,
             aspect_ratio: self._fields.1,

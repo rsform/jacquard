@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,15 +24,18 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::science_alt::dataset::lens;
+use crate::science_alt::dataset::programming_language::ProgrammingLanguage;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::science_alt::dataset::programming_language::ProgrammingLanguage;
-use crate::science_alt::dataset::lens;
+use serde::{Deserialize, Serialize};
 /// Reference to code in an external repository (GitHub, tangled.org, etc.)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CodeReference<S: BosStr = DefaultStr> {
     ///Optional branch name (for reference, commit hash is authoritative)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,7 +56,10 @@ pub struct CodeReference<S: BosStr = DefaultStr> {
 /// Open metadata object for lens records. Applications may extend with additional fields (author, performance notes, etc.).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LensMetadata<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -306,10 +312,10 @@ impl<S: BosStr> LexiconSchema for Lens<S> {
 }
 
 fn lexicon_doc_science_alt_dataset_lens() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("science.alt.dataset.lens"),
@@ -555,7 +561,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> LexiconDoc<'static> {
 
 pub mod lens_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -696,7 +702,9 @@ impl<S: BosStr> LensBuilder<S, lens_state::Empty> {
     pub fn new() -> Self {
         LensBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -785,10 +793,7 @@ where
     St::Name: lens_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> LensBuilder<S, lens_state::SetName<St>> {
+    pub fn name(mut self, value: impl Into<S>) -> LensBuilder<S, lens_state::SetName<St>> {
         self._fields.5 = Option::Some(value.into());
         LensBuilder {
             _state: PhantomData,

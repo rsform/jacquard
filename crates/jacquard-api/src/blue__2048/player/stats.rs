@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::blue__2048::SyncStatus;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::blue__2048::SyncStatus;
+use serde::{Deserialize, Serialize};
 /// A declaration of a at://2048 player's stats over the course of their playtime
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -155,7 +155,7 @@ fn _default_stats_total_score() -> i64 {
 
 pub mod stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -244,27 +244,21 @@ pub mod stats_state {
         type GamesPlayed = St::GamesPlayed;
     }
     ///State transition - sets the `times_twenty_forty_eight_been_found` field to Set
-    pub struct SetTimesTwentyFortyEightBeenFound<St: State = Empty>(
-        PhantomData<fn() -> St>,
-    );
+    pub struct SetTimesTwentyFortyEightBeenFound<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTimesTwentyFortyEightBeenFound<St> {}
     impl<St: State> State for SetTimesTwentyFortyEightBeenFound<St> {
         type CreatedAt = St::CreatedAt;
         type SyncStatus = St::SyncStatus;
         type HighestScore = St::HighestScore;
         type HighestNumberBlock = St::HighestNumberBlock;
-        type TimesTwentyFortyEightBeenFound = Set<
-            members::times_twenty_forty_eight_been_found,
-        >;
+        type TimesTwentyFortyEightBeenFound = Set<members::times_twenty_forty_eight_been_found>;
         type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
         type AverageScore = St::AverageScore;
         type TotalScore = St::TotalScore;
         type GamesPlayed = St::GamesPlayed;
     }
     ///State transition - sets the `least_moves_to_find_twenty_forty_eight` field to Set
-    pub struct SetLeastMovesToFindTwentyFortyEight<St: State = Empty>(
-        PhantomData<fn() -> St>,
-    );
+    pub struct SetLeastMovesToFindTwentyFortyEight<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLeastMovesToFindTwentyFortyEight<St> {}
     impl<St: State> State for SetLeastMovesToFindTwentyFortyEight<St> {
         type CreatedAt = St::CreatedAt;
@@ -272,9 +266,8 @@ pub mod stats_state {
         type HighestScore = St::HighestScore;
         type HighestNumberBlock = St::HighestNumberBlock;
         type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = Set<
-            members::least_moves_to_find_twenty_forty_eight,
-        >;
+        type LeastMovesToFindTwentyFortyEight =
+            Set<members::least_moves_to_find_twenty_forty_eight>;
         type AverageScore = St::AverageScore;
         type TotalScore = St::TotalScore;
         type GamesPlayed = St::GamesPlayed;
@@ -597,10 +590,10 @@ where
 }
 
 fn lexicon_doc_blue_2048_player_stats() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.2048.player.stats"),
