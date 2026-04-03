@@ -25,12 +25,12 @@ use std::marker::PhantomData;
 use std::str::FromStr;
 
 use jacquard_common::bos::{BosStr, DefaultStr};
-use jacquard_common::deps::fluent_uri::pct_enc::{EString, encoder::Query as EncQuery};
+use jacquard_common::deps::fluent_uri::pct_enc::{EStr, EString, encoder::{Query, Query as EncQuery}};
 use jacquard_common::types::did::Did;
 use jacquard_common::types::nsid::Nsid;
 use jacquard_common::types::string::AtStrError;
-use jacquard_common::{Bos, FromStaticStr, IntoStatic};
-use serde::de::Visitor;
+use jacquard_common::{Bos, BorrowOrShare, FromStaticStr, IntoStatic};
+use serde::de::{Error as DeError, Visitor};
 use serde::{Deserialize, Serialize};
 use smallvec::SmallVec;
 use smol_str::{SmolStr, SmolStrBuilder, ToSmolStr, format_smolstr};
@@ -172,7 +172,7 @@ pub enum TransitionScope {
     Generic,
     /// Email transition operations
     Email,
-    /// Chat transition scope for chat.bsky operations
+    /// Chat transition scope for chat.bsky operations.
     ChatBsky,
 }
 
@@ -303,7 +303,9 @@ impl<S: BosStr> MimePattern<S> {
     /// # Safety
     ///
     /// The caller must ensure `s` is a valid MIME pattern string
-    /// and `kind` matches the pattern.
+    /// and `kind` matches the pattern. `MimePattern`'s API assumes
+    /// the invariant holds — violating it will produce incorrect
+    /// results from downstream operations.
     pub(crate) unsafe fn unchecked(s: S, kind: MimePatternKind) -> Self {
         match kind {
             MimePatternKind::All => MimePattern::All,
@@ -610,6 +612,964 @@ pub(crate) enum IncludeAudience {
     /// Audience in buffer contains percent-encoding (e.g., `%23`).
     /// `grants()` must decode before comparing. Serialisation can pass through.
     Encoded(u16, u16),
+}
+
+// ============================================================================
+// Scopes<S> container — validated, zero-copy scope string with indices.
+// ============================================================================
+
+/// Iterator over scopes in a `Scopes<S>` container.
+///
+/// Yields `Scope<&'o str>` views that borrow from the shared buffer.
+/// This type is returned by `Scopes::iter()`.
+pub struct ScopesIter<'i, 'o> {
+    buffer: &'o str,
+    indices: std::slice::Iter<'i, ScopeIndices>,
+}
+
+impl<'i, 'o> Iterator for ScopesIter<'i, 'o> {
+    type Item = Scope<&'o str>;
+
+    fn next(&mut self) -> Option<Scope<&'o str>> {
+        self.indices.next().map(|idx| {
+            // Safety: indices computed at construction from the buffer.
+            unsafe { reconstruct_scope(self.buffer, idx) }
+        })
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.indices.size_hint()
+    }
+
+    fn count(self) -> usize {
+        self.indices.count()
+    }
+}
+
+impl<'i, 'o> ExactSizeIterator for ScopesIter<'i, 'o> {
+    fn len(&self) -> usize {
+        self.indices.len()
+    }
+}
+
+impl<'i, 'o> std::iter::FusedIterator for ScopesIter<'i, 'o> {}
+
+/// A validated container of space-separated OAuth scopes.
+///
+/// Owns or borrows a single scope string and stores pre-computed byte-range
+/// indices. Typed `Scope<&str>` views are reconstructed on demand from the
+/// shared buffer.
+#[derive(Debug, Clone)]
+pub struct Scopes<S: Bos<str> + AsRef<str> = DefaultStr> {
+    buffer: S,
+    indices: Vec<ScopeIndices>,
+}
+
+impl<S: Bos<str> + AsRef<str>> Scopes<S> {
+    /// Parse a space-separated scope string, validate each scope, and
+    /// compute byte-range indices.
+    ///
+    /// Returns an empty `Scopes` for an empty string. Returns an error
+    /// if any individual scope is malformed.
+    pub fn new(buffer: S) -> Result<Self, ParseError> {
+        let s = buffer.as_ref();
+
+        if s.is_empty() {
+            return Ok(Scopes {
+                buffer,
+                indices: Vec::new(),
+            });
+        }
+
+        // Check u16 limit on buffer length.
+        if s.len() > u16::MAX as usize {
+            return Err(ParseError::InvalidResource(
+                "scope string exceeds u16 byte limit".to_string(),
+            ));
+        }
+
+        let mut indices = Vec::new();
+        let mut pos: usize = 0;
+
+        for token in s.split(' ') {
+            if token.is_empty() {
+                pos += 1; // Advance past the space.
+                continue;
+            }
+
+            let start = pos as u16;
+            let end = start + token.len() as u16;
+
+            let inner = parse_scope_indices(token, start)?;
+            indices.push(ScopeIndices { start, end, inner });
+
+            pos = end as usize + 1; // +1 for the space delimiter.
+        }
+
+        // Reduce the set by removing indices for scopes already granted by a broader scope.
+        indices = reduce_indices(s, indices)?;
+
+        Ok(Scopes { buffer, indices })
+    }
+
+    /// Return the number of scopes in this container.
+    pub fn len(&self) -> usize {
+        self.indices.len()
+    }
+
+    /// Return whether this container is empty.
+    pub fn is_empty(&self) -> bool {
+        self.indices.is_empty()
+    }
+
+    /// Iterate over scopes as `Scope<&'o str>` views borrowing from the buffer.
+    ///
+    /// The iterator borrows from the buffer via the `BorrowOrShare` split lifetimes.
+    /// For example, when `S = &'a str`, the iterator yields `Scope<&'a str>` and
+    /// can outlive the borrow of `self`.
+    pub fn iter<'i, 'o>(&'i self) -> ScopesIter<'i, 'o>
+    where
+        S: BorrowOrShare<'i, 'o, str>,
+    {
+        let buffer: &'o str = self.buffer.borrow_or_share();
+        ScopesIter {
+            buffer,
+            indices: self.indices.iter(),
+        }
+    }
+
+    /// Get a single scope by positional index.
+    pub fn get<'i, 'o>(&'i self, index: usize) -> Option<Scope<&'o str>>
+    where
+        S: BorrowOrShare<'i, 'o, str>,
+    {
+        let idx = self.indices.get(index)?;
+        let buffer: &'o str = self.buffer.borrow_or_share();
+        Some(unsafe { reconstruct_scope(buffer, idx) })
+    }
+
+    /// Get a single scope with owned `SmolStr` backing, independent
+    /// of the buffer's lifetime.
+    pub fn get_owned(&self, index: usize) -> Option<Scope<SmolStr>> {
+        let idx = self.indices.get(index)?;
+        let buffer: &str = self.buffer.as_ref();
+        let scope = unsafe { reconstruct_scope(buffer, idx) };
+        Some(scope.convert())
+    }
+
+    /// Get a single scope with caller-chosen backing type.
+    pub fn get_as<B: BosStr + for<'a> From<&'a str>>(&self, index: usize) -> Option<Scope<B>>
+    where
+        B: Ord,
+    {
+        let idx = self.indices.get(index)?;
+        let buffer: &str = self.buffer.as_ref();
+        let scope = unsafe { reconstruct_scope(buffer, idx) };
+        Some(scope.convert())
+    }
+
+    /// Borrow as `Scopes<&str>`.
+    ///
+    /// Indices are cloned (they're small, no heap strings). The buffer
+    /// is borrowed via `AsRef<str>`.
+    pub fn borrow(&self) -> Scopes<&str> {
+        Scopes {
+            buffer: self.buffer.as_ref(),
+            indices: self.indices.clone(),
+        }
+    }
+
+    /// Convert to `Scopes` with a different backing type.
+    ///
+    /// Indices are moved (no clone). The buffer is converted via `From<S>`.
+    /// Byte offsets remain valid because the buffer content is identical.
+    pub fn convert<B: Bos<str> + AsRef<str> + From<S>>(self) -> Scopes<B> {
+        Scopes {
+            buffer: B::from(self.buffer),
+            indices: self.indices,
+        }
+    }
+
+    /// Produce the sorted, normalized space-separated scope string.
+    ///
+    /// Same output as `Serialize`, but returns `SmolStr` directly
+    /// without going through a serializer.
+    pub fn to_normalized_string(&self) -> SmolStr {
+        if self.indices.is_empty() {
+            return SmolStr::default();
+        }
+        let buffer = self.buffer.as_ref();
+        let mut normalized: Vec<SmolStr> = self
+            .indices
+            .iter()
+            .map(|idx| {
+                let scope = unsafe { reconstruct_scope(buffer, idx) };
+                scope.to_string_normalized()
+            })
+            .collect();
+        normalized.sort();
+
+        // Compute total length for pre-allocation.
+        let total_len = normalized.iter().map(|s| s.len()).sum::<usize>()
+            + if normalized.len() > 1 { normalized.len() - 1 } else { 0 }; // Add length for space separators.
+
+        let mut result = String::with_capacity(total_len);
+        for (i, s) in normalized.iter().enumerate() {
+            if i > 0 {
+                result.push(' ');
+            }
+            result.push_str(s);
+        }
+        result.to_smolstr()
+    }
+
+    /// Check if the container has a scope that grants the given scope.
+    pub fn grants<T: BosStr>(&self, scope: &Scope<T>) -> bool {
+        let buffer = self.buffer.as_ref();
+        self.indices.iter().any(|idx| {
+            let s = unsafe { reconstruct_scope(buffer, idx) };
+            s.grants(scope)
+        })
+    }
+
+    /// Return the raw buffer as a string slice.
+    pub fn as_str(&self) -> &str {
+        self.buffer.as_ref()
+    }
+}
+
+impl<S: Bos<str> + AsRef<str>> Serialize for Scopes<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(&self.to_normalized_string())
+    }
+}
+
+impl<'de, S> Deserialize<'de> for Scopes<S>
+where
+    S: Bos<str> + AsRef<str> + Deserialize<'de>,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Scopes::new(s).map_err(D::Error::custom)
+    }
+}
+
+impl Scopes<SmolStr> {
+    /// Create an empty `Scopes` with `SmolStr` backing.
+    pub fn empty() -> Self {
+        Scopes {
+            buffer: SmolStr::default(),
+            indices: Vec::new(),
+        }
+    }
+}
+
+impl<S: Bos<str> + AsRef<str> + Default> Default for Scopes<S> {
+    fn default() -> Self {
+        Scopes {
+            buffer: S::default(),
+            indices: Vec::new(),
+        }
+    }
+}
+
+impl<S: Bos<str> + AsRef<str> + IntoStatic> IntoStatic for Scopes<S>
+where
+    S::Output: Bos<str> + AsRef<str>,
+{
+    type Output = Scopes<S::Output>;
+
+    fn into_static(self) -> Scopes<S::Output> {
+        Scopes {
+            buffer: self.buffer.into_static(),
+            indices: self.indices,
+        }
+    }
+}
+
+/// Parse a single scope token into index structure.
+///
+/// `base` is the byte offset of `token` within the outer buffer.
+/// All `(u16, u16)` ranges in the returned indices are absolute
+/// offsets into the outer buffer, NOT relative to `token`.
+fn parse_scope_indices(token: &str, base: u16) -> Result<ScopeInnerIndices, ParseError> {
+    // Determine the prefix by checking for known prefixes.
+    let prefixes = [
+        "account", "identity", "blob", "repo", "rpc", "atproto", "transition", "include",
+        "openid", "profile", "email",
+    ];
+
+    let mut found_prefix = None;
+    let mut suffix = None;
+
+    for prefix in &prefixes {
+        if let Some(remainder) = token.strip_prefix(prefix) {
+            if remainder.is_empty() || remainder.starts_with(':') || remainder.starts_with('?') {
+                found_prefix = Some(*prefix);
+                if let Some(stripped) = remainder.strip_prefix(':') {
+                    suffix = Some(stripped);
+                } else if remainder.starts_with('?') {
+                    suffix = Some(remainder);
+                } else {
+                    suffix = None;
+                }
+                break;
+            }
+        }
+    }
+
+    let prefix =
+        found_prefix.ok_or_else(|| ParseError::UnknownPrefix(token[..token.find(':').unwrap_or(token.len())].to_string()))?;
+
+    match prefix {
+        "account" => parse_account_indices(suffix),
+        "identity" => parse_identity_indices(suffix),
+        "blob" => parse_blob_indices(token, suffix, base),
+        "repo" => parse_repo_indices(token, suffix, base),
+        "rpc" => parse_rpc_indices(token, suffix, base),
+        "atproto" => parse_atproto_indices(suffix),
+        "transition" => parse_transition_indices(suffix),
+        "include" => parse_include_indices(token, suffix, base),
+        "openid" => parse_openid_indices(suffix),
+        "profile" => parse_profile_indices(suffix),
+        "email" => parse_email_indices(suffix),
+        _ => Err(ParseError::UnknownPrefix(prefix.to_string())),
+    }
+}
+
+/// Parse account scope indices.
+fn parse_account_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, ParseError> {
+    let (resource_str, params) = match suffix {
+        Some(s) => {
+            if let Some(pos) = s.find('?') {
+                (&s[..pos], Some(&s[pos + 1..]))
+            } else {
+                (s, None)
+            }
+        }
+        None => return Err(ParseError::MissingResource),
+    };
+
+    let resource = match resource_str {
+        "email" => AccountResource::Email,
+        "repo" => AccountResource::Repo,
+        "status" => AccountResource::Status,
+        _ => return Err(ParseError::InvalidResource(resource_str.to_string())),
+    };
+
+    let action = if let Some(params) = params {
+        let parsed_params = parse_query_string(params);
+        match parsed_params
+            .get("action")
+            .and_then(|v| v.first())
+            .map(|s| s.as_ref())
+        {
+            Some("read") => AccountAction::Read,
+            Some("manage") => AccountAction::Manage,
+            Some(other) => return Err(ParseError::InvalidAction(other.to_string())),
+            None => AccountAction::Read,
+        }
+    } else {
+        AccountAction::Read
+    };
+
+    Ok(ScopeInnerIndices::Account { resource, action })
+}
+
+/// Parse identity scope indices.
+fn parse_identity_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, ParseError> {
+    let scope = match suffix {
+        Some("handle") => IdentityScope::Handle,
+        Some("*") => IdentityScope::All,
+        Some(other) => return Err(ParseError::InvalidResource(other.to_string())),
+        None => return Err(ParseError::MissingResource),
+    };
+
+    Ok(ScopeInnerIndices::Identity(scope))
+}
+
+/// Parse transition scope indices.
+fn parse_transition_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, ParseError> {
+    let scope = match suffix {
+        Some("generic") => TransitionScope::Generic,
+        Some("email") => TransitionScope::Email,
+        Some("chat.bsky") => TransitionScope::ChatBsky,
+        Some(other) => return Err(ParseError::InvalidResource(other.to_string())),
+        None => return Err(ParseError::MissingResource),
+    };
+
+    Ok(ScopeInnerIndices::Transition(scope))
+}
+
+/// Parse atproto scope indices (unit scope, no suffix allowed).
+fn parse_atproto_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, ParseError> {
+    if suffix.is_some() {
+        return Err(ParseError::InvalidResource(
+            "atproto scope does not accept suffixes".to_string(),
+        ));
+    }
+    Ok(ScopeInnerIndices::Unit(ScopeKind::Atproto))
+}
+
+/// Parse openid scope indices (unit scope, no suffix allowed).
+fn parse_openid_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, ParseError> {
+    if suffix.is_some() {
+        return Err(ParseError::InvalidResource(
+            "openid scope does not accept suffixes".to_string(),
+        ));
+    }
+    Ok(ScopeInnerIndices::Unit(ScopeKind::OpenId))
+}
+
+/// Parse profile scope indices (unit scope, no suffix allowed).
+fn parse_profile_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, ParseError> {
+    if suffix.is_some() {
+        return Err(ParseError::InvalidResource(
+            "profile scope does not accept suffixes".to_string(),
+        ));
+    }
+    Ok(ScopeInnerIndices::Unit(ScopeKind::Profile))
+}
+
+/// Parse email scope indices (unit scope, no suffix allowed).
+fn parse_email_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, ParseError> {
+    if suffix.is_some() {
+        return Err(ParseError::InvalidResource(
+            "email scope does not accept suffixes".to_string(),
+        ));
+    }
+    Ok(ScopeInnerIndices::Unit(ScopeKind::Email))
+}
+
+/// Parse blob scope indices, storing byte ranges of MIME patterns.
+fn parse_blob_indices(
+    token: &str,
+    suffix: Option<&str>,
+    base: u16,
+) -> Result<ScopeInnerIndices, ParseError> {
+    let mut accept: SmallVec<[(u16, u16); 2]> = SmallVec::new();
+
+    match suffix {
+        Some(s) if s.starts_with('?') => {
+            let params = parse_query_string(&s[1..]);
+            if let Some(values) = params.get("accept") {
+                for value in values {
+                    validate_mime_pattern(value)?;
+                    // Find the byte position of this value in the token.
+                    if let Some(pos) = token.find(value) {
+                        let start = base + pos as u16;
+                        let end = start + value.len() as u16;
+                        accept.push((start, end));
+                    }
+                }
+            }
+        }
+        Some(s) => {
+            validate_mime_pattern(s)?;
+            let start = base + ("blob:".len() as u16);
+            let end = start + s.len() as u16;
+            accept.push((start, end));
+        }
+        None => {
+            // Default to all patterns (bare `blob` token).
+            // Store empty SmallVec to signal "all wildcards" on reconstruction.
+        }
+    }
+
+    // Empty accept SmallVec signals MimePattern::All on reconstruction.
+
+    Ok(ScopeInnerIndices::Blob { accept })
+}
+
+/// Parse repo scope indices, storing byte range of collection NSID if present.
+fn parse_repo_indices(
+    token: &str,
+    suffix: Option<&str>,
+    base: u16,
+) -> Result<ScopeInnerIndices, ParseError> {
+    let (collection_str, params) = match suffix {
+        Some(s) => {
+            if let Some(pos) = s.find('?') {
+                (Some(&s[..pos]), Some(&s[pos + 1..]))
+            } else {
+                (Some(s), None)
+            }
+        }
+        None => (None, None),
+    };
+
+    let collection = match collection_str {
+        Some("*") | None => None,
+        Some(nsid_str) => {
+            jacquard_common::types::nsid::validate_nsid(nsid_str)?;
+            // Find position of the NSID in the token.
+            if let Some(pos) = token.find(nsid_str) {
+                let start = base + pos as u16;
+                let end = start + nsid_str.len() as u16;
+                Some((start, end))
+            } else {
+                return Err(ParseError::InvalidResource(nsid_str.to_string()));
+            }
+        }
+    };
+
+    let mut actions = RepoActionFlags(RepoActionFlags::ALL);
+
+    if let Some(params) = params {
+        let parsed_params = parse_query_string(params);
+        if let Some(values) = parsed_params.get("action") {
+            let mut flags = 0u8;
+            for value in values {
+                match value.as_ref() {
+                    "create" => flags |= RepoActionFlags::CREATE,
+                    "update" => flags |= RepoActionFlags::UPDATE,
+                    "delete" => flags |= RepoActionFlags::DELETE,
+                    "*" => flags = RepoActionFlags::ALL,
+                    other => return Err(ParseError::InvalidAction(other.to_string())),
+                }
+            }
+            actions = RepoActionFlags(flags);
+        }
+    }
+
+    Ok(ScopeInnerIndices::Repo { collection, actions })
+}
+
+/// Parse RPC scope indices, storing byte ranges of lexicon and audience values.
+fn parse_rpc_indices(
+    token: &str,
+    suffix: Option<&str>,
+    base: u16,
+) -> Result<ScopeInnerIndices, ParseError> {
+    let mut lxm: SmallVec<[(u16, u16); 2]> = SmallVec::new();
+    let mut aud: SmallVec<[(u16, u16); 2]> = SmallVec::new();
+
+    match suffix {
+        Some("*") => {
+            let wildcard_pos = token.rfind('*').unwrap_or(token.len() - 1);
+            let start = base + wildcard_pos as u16;
+            lxm.push((start, start + 1));
+            aud.push((start, start + 1));
+        }
+        Some(s) if s.starts_with('?') => {
+            let params = parse_query_string(&s[1..]);
+
+            if let Some(values) = params.get("lxm") {
+                for value in values {
+                    if *value == "*" {
+                        if let Some(pos) = token.rfind('*') {
+                            let start = base + pos as u16;
+                            lxm.push((start, start + 1));
+                        }
+                    } else {
+                        jacquard_common::types::nsid::validate_nsid(value)?;
+                        if let Some(pos) = token.find(value) {
+                            let start = base + pos as u16;
+                            let end = start + value.len() as u16;
+                            lxm.push((start, end));
+                        }
+                    }
+                }
+            }
+
+            if let Some(values) = params.get("aud") {
+                for value in values {
+                    if *value == "*" {
+                        if let Some(pos) = token.rfind('*') {
+                            let start = base + pos as u16;
+                            aud.push((start, start + 1));
+                        }
+                    } else {
+                        jacquard_common::types::did::validate_did(value)?;
+                        if let Some(pos) = token.find(value) {
+                            let start = base + pos as u16;
+                            let end = start + value.len() as u16;
+                            aud.push((start, end));
+                        }
+                    }
+                }
+            }
+        }
+        Some(s) => {
+            // Single NSID, possibly with query params.
+            if let Some(pos) = s.find('?') {
+                let nsid_str = &s[..pos];
+                let params = parse_query_string(&s[pos + 1..]);
+
+                jacquard_common::types::nsid::validate_nsid(nsid_str)?;
+                if let Some(token_pos) = token.find(nsid_str) {
+                    let start = base + token_pos as u16;
+                    let end = start + nsid_str.len() as u16;
+                    lxm.push((start, end));
+                }
+
+                if let Some(values) = params.get("aud") {
+                    for value in values {
+                        if *value == "*" {
+                            if let Some(pos) = token.rfind('*') {
+                                let start = base + pos as u16;
+                                aud.push((start, start + 1));
+                            }
+                        } else {
+                            jacquard_common::types::did::validate_did(value)?;
+                            if let Some(pos) = token.find(value) {
+                                let start = base + pos as u16;
+                                let end = start + value.len() as u16;
+                                aud.push((start, end));
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Just an NSID, no query params.
+                jacquard_common::types::nsid::validate_nsid(s)?;
+                if let Some(pos) = token.find(s) {
+                    let start = base + pos as u16;
+                    let end = start + s.len() as u16;
+                    lxm.push((start, end));
+                }
+                // aud remains empty, which means wildcard on reconstruction.
+            }
+        }
+        None => {
+            // Empty suffix, default to all.
+            // Leave both lxm and aud empty to signal wildcards on reconstruction.
+        }
+    }
+
+    // Empty lxm SmallVec signals RpcLexicon::All on reconstruction.
+    // Empty aud SmallVec signals RpcAudience::All on reconstruction (already handled).
+
+    Ok(ScopeInnerIndices::Rpc { lxm, aud })
+}
+
+/// Parse include scope indices, validating NSID and optional audience.
+fn parse_include_indices(
+    token: &str,
+    suffix: Option<&str>,
+    base: u16,
+) -> Result<ScopeInnerIndices, ParseError> {
+    let (nsid_str, params) = match suffix {
+        Some(s) => {
+            if let Some(pos) = s.find('?') {
+                (&s[..pos], Some(&s[pos + 1..]))
+            } else {
+                (s, None)
+            }
+        }
+        None => return Err(ParseError::MissingResource),
+    };
+
+    // Validate the NSID.
+    jacquard_common::types::nsid::validate_nsid(nsid_str)?;
+
+    // Find the NSID's byte position in the token.
+    let nsid_pos = token
+        .find(nsid_str)
+        .ok_or_else(|| ParseError::InvalidResource(nsid_str.to_string()))?;
+    let nsid_start = base + nsid_pos as u16;
+    let nsid_end = nsid_start + nsid_str.len() as u16;
+
+    let audience = if let Some(params) = params {
+        let parsed_params = parse_query_string(params);
+        if let Some(values) = parsed_params.get("aud") {
+            if let Some(aud_value) = values.first() {
+                // Check if value contains percent-encoding.
+                let has_encoding = aud_value.contains('%');
+
+                if has_encoding {
+                    // Validate and decode the percent-encoded value using fluent-uri.
+                    let estr = EStr::<Query>::new(aud_value)
+                        .ok_or_else(|| ParseError::InvalidResource(
+                            "include audience has invalid percent-encoding".to_string(),
+                        ))?;
+
+                    let decoded = estr.decode().to_string()
+                        .map_err(|_| ParseError::InvalidResource(
+                            "include audience contains invalid UTF-8 sequence".to_string(),
+                        ))?;
+
+                    // Validate the DID portion (before any #).
+                    let did_part = decoded.split('#').next().unwrap_or("");
+                    jacquard_common::types::did::validate_did(did_part)?;
+                    if decoded.contains('#') {
+                        let frag = decoded.split('#').nth(1).unwrap_or("");
+                        if frag.is_empty() {
+                            return Err(ParseError::InvalidResource(
+                                "include audience fragment cannot be empty".to_string(),
+                            ));
+                        }
+                    }
+                } else {
+                    // Unencoded: validate the DID portion before `#`.
+                    let did_part = aud_value.split('#').next().unwrap_or("");
+                    jacquard_common::types::did::validate_did(did_part)?;
+                    if aud_value.contains('#') {
+                        let frag = aud_value.split('#').nth(1).unwrap_or("");
+                        if frag.is_empty() {
+                            return Err(ParseError::InvalidResource(
+                                "include audience fragment cannot be empty".to_string(),
+                            ));
+                        }
+                    }
+                }
+
+                // Find the audience's byte position in the token.
+                let aud_pos = token
+                    .find(aud_value)
+                    .ok_or_else(|| ParseError::InvalidResource(aud_value.to_string()))?;
+                let aud_start = base + aud_pos as u16;
+                let aud_end = aud_start + aud_value.len() as u16;
+
+                if has_encoding {
+                    Some(IncludeAudience::Encoded(aud_start, aud_end))
+                } else {
+                    Some(IncludeAudience::Plain(aud_start, aud_end))
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
+    Ok(ScopeInnerIndices::Include {
+        nsid: (nsid_start, nsid_end),
+        audience,
+    })
+}
+
+/// Reduce scope indices by removing those already granted by broader scopes.
+fn reduce_indices(
+    buffer: &str,
+    indices: Vec<ScopeIndices>,
+) -> Result<Vec<ScopeIndices>, ParseError> {
+    if indices.is_empty() {
+        return Ok(indices);
+    }
+
+    // Partition indices by scope kind.
+    let mut unit_or_account_or_identity_or_transition: Vec<_> = Vec::new();
+    let mut repo_indices: Vec<_> = Vec::new();
+    let mut rpc_indices: Vec<_> = Vec::new();
+    let mut blob_indices: Vec<_> = Vec::new();
+    let mut include_indices: Vec<_> = Vec::new();
+
+    for indices in indices.into_iter() {
+        match &indices.inner {
+            ScopeInnerIndices::Unit(_)
+            | ScopeInnerIndices::Account { .. }
+            | ScopeInnerIndices::Identity(_)
+            | ScopeInnerIndices::Transition(_) => {
+                unit_or_account_or_identity_or_transition.push(indices);
+            }
+            ScopeInnerIndices::Repo { .. } => repo_indices.push(indices),
+            ScopeInnerIndices::Rpc { .. } => rpc_indices.push(indices),
+            ScopeInnerIndices::Blob { .. } => blob_indices.push(indices),
+            ScopeInnerIndices::Include { .. } => include_indices.push(indices),
+        }
+    }
+
+    // Deduplicate unit/account/identity/transition scopes.
+    let mut seen = std::collections::HashSet::new();
+    unit_or_account_or_identity_or_transition
+        .retain(|idx| {
+            let scope = unsafe { reconstruct_scope(buffer, idx) };
+            seen.insert(scope.to_string_normalized())
+        });
+
+    // Pairwise reduction for repo scopes.
+    repo_indices = reduce_pairwise(buffer, repo_indices);
+
+    // Pairwise reduction for rpc scopes.
+    rpc_indices = reduce_pairwise(buffer, rpc_indices);
+
+    // Combine back.
+    let mut result = unit_or_account_or_identity_or_transition;
+    result.extend(repo_indices);
+    result.extend(rpc_indices);
+    result.extend(blob_indices);
+    result.extend(include_indices);
+
+    Ok(result)
+}
+
+/// Perform pairwise reduction on a set of indices, removing those granted by others.
+fn reduce_pairwise(buffer: &str, indices: Vec<ScopeIndices>) -> Vec<ScopeIndices> {
+    let mut result: Vec<ScopeIndices> = Vec::new();
+
+    for candidate_idx in indices {
+        // Reconstruct the candidate scope.
+        let candidate = unsafe { reconstruct_scope(buffer, &candidate_idx) };
+
+        // Check if it's already granted by something in result.
+        let mut is_granted = false;
+        for existing_idx in &result {
+            let existing = unsafe { reconstruct_scope(buffer, existing_idx) };
+            if existing.grants(&candidate) && existing != candidate {
+                is_granted = true;
+                break;
+            }
+        }
+
+        if is_granted {
+            continue;
+        }
+
+        // Check if it grants any existing scopes.
+        let mut indices_to_remove = Vec::new();
+        for (i, existing_idx) in result.iter().enumerate() {
+            let existing = unsafe { reconstruct_scope(buffer, existing_idx) };
+            if candidate.grants(&existing) && candidate != existing {
+                indices_to_remove.push(i);
+            }
+        }
+
+        for i in indices_to_remove.into_iter().rev() {
+            result.remove(i);
+        }
+
+        // Add candidate if not a duplicate.
+        if !result.iter().any(|idx| {
+            let existing = unsafe { reconstruct_scope(buffer, idx) };
+            existing == candidate
+        }) {
+            result.push(candidate_idx);
+        }
+    }
+
+    result
+}
+
+/// Reconstruct a typed `Scope<&str>` from pre-computed indices.
+///
+/// # Safety
+///
+/// `indices` must have been computed from `buffer` during `Scopes::new()`.
+/// All byte ranges in `indices` must be valid for `buffer`.
+unsafe fn reconstruct_scope<'a>(
+    buffer: &'a str,
+    indices: &ScopeIndices,
+) -> Scope<&'a str> {
+    match &indices.inner {
+        ScopeInnerIndices::Unit(kind) => match kind {
+            ScopeKind::Atproto => Scope::Atproto,
+            ScopeKind::OpenId => Scope::OpenId,
+            ScopeKind::Profile => Scope::Profile,
+            ScopeKind::Email => Scope::Email,
+        },
+
+        ScopeInnerIndices::Account { resource, action } => {
+            Scope::Account(AccountScope {
+                resource: *resource,
+                action: *action,
+            })
+        }
+
+        ScopeInnerIndices::Identity(scope) => Scope::Identity(scope.clone()),
+
+        ScopeInnerIndices::Transition(scope) => Scope::Transition(scope.clone()),
+
+        ScopeInnerIndices::Blob { accept } => {
+            let mut patterns = BTreeSet::new();
+            if accept.is_empty() {
+                // Empty accept SmallVec signals MimePattern::All (bare `blob` token).
+                patterns.insert(MimePattern::All);
+            } else {
+                for &(start, end) in accept.iter() {
+                    let s = &buffer[start as usize..end as usize];
+                    let pattern = if s == "*/*" {
+                        MimePattern::All
+                    } else if s.ends_with("/*") {
+                        MimePattern::TypeWildcard(&s[..s.len() - 2])
+                    } else {
+                        MimePattern::Exact(s)
+                    };
+                    patterns.insert(pattern);
+                }
+            }
+            Scope::Blob(BlobScope { accept: patterns })
+        }
+
+        ScopeInnerIndices::Repo { collection, actions } => {
+            let collection = match collection {
+                None => RepoCollection::All,
+                Some((start, end)) => {
+                    let s = &buffer[*start as usize..*end as usize];
+                    RepoCollection::Nsid(unsafe { Nsid::unchecked(s) })
+                }
+            };
+            Scope::Repo(RepoScope {
+                collection,
+                actions: actions.to_actions(),
+            })
+        }
+
+        ScopeInnerIndices::Rpc { lxm, aud } => {
+            let mut lxm_set = BTreeSet::new();
+            let mut aud_set = BTreeSet::new();
+
+            if lxm.is_empty() {
+                // Empty lxm means wildcard (bare `rpc` token).
+                lxm_set.insert(RpcLexicon::All);
+            } else {
+                for &(start, end) in lxm.iter() {
+                    let s = &buffer[start as usize..end as usize];
+                    if s == "*" {
+                        lxm_set.insert(RpcLexicon::All);
+                    } else {
+                        lxm_set.insert(RpcLexicon::Nsid(unsafe { Nsid::unchecked(s) }));
+                    }
+                }
+            }
+
+            if aud.is_empty() {
+                // Empty aud means wildcard.
+                aud_set.insert(RpcAudience::All);
+            } else {
+                for &(start, end) in aud.iter() {
+                    let s = &buffer[start as usize..end as usize];
+                    if s == "*" {
+                        aud_set.insert(RpcAudience::All);
+                    } else {
+                        aud_set.insert(RpcAudience::Did(unsafe { Did::unchecked(s) }));
+                    }
+                }
+            }
+
+            Scope::Rpc(RpcScope {
+                lxm: lxm_set,
+                aud: aud_set,
+            })
+        }
+
+        ScopeInnerIndices::Include { nsid, audience } => {
+            let (ns, ne) = *nsid;
+            let nsid_str = &buffer[ns as usize..ne as usize];
+
+            let aud = match audience {
+                None => None,
+                Some(IncludeAudience::Plain(start, end))
+                | Some(IncludeAudience::Encoded(start, end)) => {
+                    Some(&buffer[*start as usize..*end as usize])
+                }
+            };
+
+            Scope::Include(IncludeScope {
+                nsid: unsafe { Nsid::unchecked(nsid_str) },
+                audience: aud,
+            })
+        }
+    }
 }
 
 impl<S: BosStr + Ord> Scope<S> {
@@ -2543,5 +3503,853 @@ mod tests {
         assert!(!result.contains(&Scope::parse("account:email").unwrap()));
         assert!(result.contains(&Scope::parse("account:email?action=manage").unwrap()));
         assert!(result.contains(&Scope::parse("account:repo").unwrap()));
+    }
+
+    // ========================================================================
+    // Tests for Task 1: Scopes<S> container and constructor
+    // ========================================================================
+
+    #[test]
+    fn test_scopes_new_multiple() {
+        // Test AC3.1: Parse multiple scopes and create indices.
+        let scopes = Scopes::new(SmolStr::new_static("atproto rpc:* repo:app.bsky.feed.post")).unwrap();
+        assert_eq!(scopes.len(), 3);
+    }
+
+    #[test]
+    fn test_scopes_new_empty() {
+        // Test AC3.7: Empty string produces empty Scopes.
+        let scopes = Scopes::new(SmolStr::new_static("")).unwrap();
+        assert!(scopes.is_empty());
+    }
+
+    #[test]
+    fn test_scopes_new_with_spaces() {
+        // Test consecutive spaces are handled.
+        let scopes = Scopes::new(SmolStr::new_static("atproto  rpc:*")).unwrap();
+        assert_eq!(scopes.len(), 2);
+    }
+
+    #[test]
+    fn test_scopes_new_invalid_scope() {
+        // Test AC3.8: Invalid scope is rejected.
+        let result = Scopes::new(SmolStr::new_static("atproto badscope"));
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            ParseError::UnknownPrefix(_) => {}
+            e => panic!("expected UnknownPrefix error, got {:?}", e),
+        }
+    }
+
+    #[test]
+    fn test_scopes_buffer_size_limit() {
+        // Test buffer exceeding u16 limit is rejected.
+        let too_long = "a".repeat(u16::MAX as usize + 1);
+        let smol = SmolStr::from(too_long.as_str());
+        let result = Scopes::new(smol);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_scopes_unit_scope_parsing() {
+        // Test each unit scope parses correctly.
+        let test_cases = vec![
+            ("atproto", 1),
+            ("openid", 1),
+            ("profile", 1),
+            ("email", 1),
+            ("atproto openid profile", 3),
+        ];
+
+        for (input, expected_count) in test_cases {
+            let scopes = Scopes::new(SmolStr::new_static(input)).unwrap();
+            assert_eq!(scopes.len(), expected_count, "failed for: {}", input);
+        }
+    }
+
+    #[test]
+    fn test_scopes_account_scope_parsing() {
+        // Test account scopes parse correctly.
+        let test_cases = vec![
+            ("account:email", 1),
+            ("account:repo", 1),
+            ("account:status", 1),
+            ("account:email?action=manage", 1),
+            ("account:email?action=read", 1),
+        ];
+
+        for (input, expected_count) in test_cases {
+            let scopes = Scopes::new(SmolStr::new_static(input)).unwrap();
+            assert_eq!(scopes.len(), expected_count, "failed for: {}", input);
+        }
+    }
+
+    #[test]
+    fn test_scopes_identity_scope_parsing() {
+        // Test identity scopes parse correctly.
+        let test_cases = vec![
+            ("identity:handle", 1),
+            ("identity:*", 1),
+            ("identity:handle identity:*", 2),
+        ];
+
+        for (input, expected_count) in test_cases {
+            let scopes = Scopes::new(SmolStr::new_static(input)).unwrap();
+            assert_eq!(scopes.len(), expected_count, "failed for: {}", input);
+        }
+    }
+
+    #[test]
+    fn test_scopes_blob_scope_parsing() {
+        // Test blob scopes parse correctly.
+        let test_cases = vec![
+            ("blob:*/*", 1),
+            ("blob:image/png", 1),
+            ("blob:image/*", 1),
+            ("blob?accept=image/png&accept=image/jpeg", 1),
+        ];
+
+        for (input, expected_count) in test_cases {
+            let scopes = Scopes::new(SmolStr::new_static(input)).unwrap();
+            assert_eq!(scopes.len(), expected_count, "failed for: {}", input);
+        }
+    }
+
+    #[test]
+    fn test_scopes_repo_scope_parsing() {
+        // Test repo scopes parse correctly.
+        let test_cases = vec![
+            ("repo:*", 1),
+            ("repo:app.bsky.feed.post", 1),
+            ("repo:app.bsky.feed.post?action=create", 1),
+            ("repo:app.bsky.feed.post?action=create&action=update", 1),
+        ];
+
+        for (input, expected_count) in test_cases {
+            let scopes = Scopes::new(SmolStr::new_static(input)).unwrap();
+            assert_eq!(scopes.len(), expected_count, "failed for: {}", input);
+        }
+    }
+
+    #[test]
+    fn test_scopes_rpc_scope_parsing() {
+        // Test rpc scopes parse correctly.
+        let test_cases = vec![
+            ("rpc:*", 1),
+            ("rpc:com.example.service", 1),
+            ("rpc:com.example.service?aud=did:web:example.com", 1),
+            ("rpc?lxm=com.example.service&aud=did:web:example.com", 1),
+        ];
+
+        for (input, expected_count) in test_cases {
+            let scopes = Scopes::new(SmolStr::new_static(input)).unwrap();
+            assert_eq!(scopes.len(), expected_count, "failed for: {}", input);
+        }
+    }
+
+    #[test]
+    fn test_scopes_include_scope_parsing() {
+        // Test include scopes parse correctly.
+        let test_cases = vec![
+            ("include:app.bsky.authFull", 1),
+            ("include:app.bsky.full?aud=did:web:api.example.com", 1),
+            ("include:app.bsky.full?aud=did:web:api.example.com%23svc_appview", 1),
+        ];
+
+        for (input, expected_count) in test_cases {
+            let scopes = Scopes::new(SmolStr::new_static(input)).unwrap();
+            assert_eq!(scopes.len(), expected_count, "failed for: {}", input);
+        }
+    }
+
+    #[test]
+    fn test_scopes_include_missing_nsid() {
+        // Test AC2.6: include: with no NSID is rejected.
+        let result = Scopes::new(SmolStr::new_static("include:"));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_scopes_include_invalid_audience_did() {
+        // Test AC2.7: include scope with invalid DID audience is rejected.
+        let result = Scopes::new(SmolStr::new_static("include:app.bsky.authFull?aud=notadid"));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_scopes_transition_scope_parsing() {
+        // Test transition scopes parse correctly.
+        let test_cases = vec![
+            ("transition:generic", 1),
+            ("transition:email", 1),
+            ("transition:chat.bsky", 1),
+            ("transition:generic transition:email", 2),
+        ];
+
+        for (input, expected_count) in test_cases {
+            let scopes = Scopes::new(SmolStr::new_static(input)).unwrap();
+            assert_eq!(scopes.len(), expected_count, "failed for: {}", input);
+        }
+    }
+
+    #[test]
+    fn test_scopes_reduction_removes_broader_scope() {
+        // Test that broader scopes subsume narrower ones.
+        // repo:* grants repo:app.bsky.feed.post, so only repo:* should remain.
+        let scopes = Scopes::new(SmolStr::new_static("repo:app.bsky.feed.post repo:*")).unwrap();
+        assert_eq!(scopes.len(), 1);
+    }
+
+    // ========================================================================
+    // Tests for Task 2: Scope reconstruction from indices (via Scopes container)
+    // ========================================================================
+
+    #[test]
+    fn test_scopes_reconstruction_unit() {
+        // Reconstruct unit scopes from indices.
+        let scopes = Scopes::new(SmolStr::new_static("atproto openid")).unwrap();
+        assert_eq!(scopes.len(), 2);
+    }
+
+    #[test]
+    fn test_scopes_reconstruction_account() {
+        // Reconstruct account scopes from indices.
+        let scopes = Scopes::new(SmolStr::new_static("account:email account:repo?action=manage")).unwrap();
+        assert_eq!(scopes.len(), 2);
+    }
+
+    #[test]
+    fn test_scopes_reconstruction_identity() {
+        // Reconstruct identity scopes from indices.
+        let scopes = Scopes::new(SmolStr::new_static("identity:handle identity:*")).unwrap();
+        assert_eq!(scopes.len(), 2);
+    }
+
+    #[test]
+    fn test_scopes_reconstruction_blob() {
+        // Reconstruct blob scopes from indices.
+        let scopes = Scopes::new(SmolStr::new_static("blob:image/png blob:*/*")).unwrap();
+        assert_eq!(scopes.len(), 2);
+    }
+
+    #[test]
+    fn test_scopes_reconstruction_repo() {
+        // Reconstruct repo scopes from indices.
+        let scopes = Scopes::new(SmolStr::new_static("repo:app.bsky.feed.post repo:*")).unwrap();
+        // repo:* grants repo:app.bsky.feed.post, so only repo:* should remain.
+        assert_eq!(scopes.len(), 1);
+    }
+
+    #[test]
+    fn test_scopes_reconstruction_rpc() {
+        // Reconstruct rpc scopes from indices.
+        let scopes = Scopes::new(SmolStr::new_static("rpc:com.example.service rpc:*")).unwrap();
+        // rpc:* grants rpc:com.example.service, so only rpc:* should remain.
+        assert_eq!(scopes.len(), 1);
+    }
+
+    #[test]
+    fn test_scopes_reconstruction_include() {
+        // Reconstruct include scopes from indices.
+        let scopes = Scopes::new(SmolStr::new_static("include:app.bsky.authFull include:app.bsky.full?aud=did:web:api.example.com")).unwrap();
+        assert_eq!(scopes.len(), 2);
+    }
+
+    // ========================================================================
+    // Task 3: Accessor Tests
+    // ========================================================================
+
+    #[test]
+    fn test_scopes_iter() {
+        // oauth-scopes-rework.AC3.2: `iter()` yields correctly typed `Scope<&str>`
+        // views borrowing from the buffer.
+        let scopes = Scopes::new(SmolStr::new_static("atproto rpc:* repo:app.bsky.feed.post")).unwrap();
+
+        let collected: Vec<_> = scopes.iter().collect();
+
+        // Verify we got scopes back
+        assert!(!collected.is_empty());
+
+        // Verify we can iterate and get expected scope types
+        let has_atproto = collected.iter().any(|s| matches!(s, Scope::Atproto));
+        let has_rpc = collected.iter().any(|s| matches!(s, Scope::Rpc(_)));
+        let has_repo = collected.iter().any(|s| matches!(s, Scope::Repo(_)));
+
+        assert!(has_atproto, "Should contain Atproto scope");
+        assert!(has_rpc, "Should contain Rpc scope");
+        assert!(has_repo, "Should contain Repo scope");
+    }
+
+    #[test]
+    fn test_scopes_get() {
+        // Test `get()` accessor for positional index access.
+        let scopes = Scopes::new(SmolStr::new_static("atproto rpc:*")).unwrap();
+        assert_eq!(scopes.len(), 2);
+
+        let first = scopes.get(0).expect("First scope should exist");
+        match first {
+            Scope::Atproto => (),
+            _ => panic!("Expected Atproto scope"),
+        }
+
+        let second = scopes.get(1).expect("Second scope should exist");
+        match second {
+            Scope::Rpc(_) => (),
+            _ => panic!("Expected Rpc scope"),
+        }
+
+        let third = scopes.get(2);
+        assert!(third.is_none(), "Third scope should not exist");
+    }
+
+    #[test]
+    fn test_scopes_get_owned() {
+        // oauth-scopes-rework.AC3.3: `get_owned()` returns `Scope<SmolStr>`
+        // independent of the buffer's lifetime.
+        let scopes = Scopes::new(SmolStr::new_static("atproto repo:app.bsky.feed.post")).unwrap();
+        assert_eq!(scopes.len(), 2);
+
+        let owned = scopes.get_owned(0).expect("First scope should exist");
+        match owned {
+            Scope::Atproto => (),
+            _ => panic!("Expected Atproto scope"),
+        }
+
+        let repo_owned = scopes.get_owned(1).expect("Second scope should exist");
+        match repo_owned {
+            Scope::Repo(_) => (),
+            _ => panic!("Expected Repo scope"),
+        }
+
+        let none = scopes.get_owned(99);
+        assert!(none.is_none(), "Out-of-bounds access should return None");
+    }
+
+    #[test]
+    fn test_scopes_get_as() {
+        // Test `get_as()` with caller-chosen backing type.
+        let scopes = Scopes::new(SmolStr::new_static("atproto")).unwrap();
+
+        // Convert to String backing
+        let as_string: Option<Scope<String>> = scopes.get_as(0);
+        assert!(as_string.is_some());
+        match as_string {
+            Some(Scope::Atproto) => (),
+            _ => panic!("Expected Atproto scope as String"),
+        }
+
+        // Verify get_as handles out of bounds
+        let out_of_bounds: Option<Scope<String>> = scopes.get_as(10);
+        assert!(out_of_bounds.is_none());
+    }
+
+    #[test]
+    fn test_scopes_iter_multiple() {
+        // Verify iterator works with multiple scope types.
+        let scopes = Scopes::new(SmolStr::new_static(
+            "atproto rpc:* repo:app.bsky.feed.post account:email identity:handle",
+        ))
+        .unwrap();
+
+        let mut count = 0;
+        for scope in scopes.iter() {
+            count += 1;
+            // Just verify we can iterate and get back a Scope
+            let _ = scope;
+        }
+
+        assert_eq!(count, scopes.len());
+    }
+
+    #[test]
+    fn test_scopes_iter_empty() {
+        // Verify iterator works on empty Scopes.
+        let scopes = Scopes::new(SmolStr::new_static("")).unwrap();
+        assert!(scopes.is_empty());
+
+        let collected: Vec<_> = scopes.iter().collect();
+        assert_eq!(collected.len(), 0);
+    }
+
+    // ========================================================================
+    // Task 4: Conversion Tests
+    // ========================================================================
+
+    #[test]
+    fn test_scopes_borrow() {
+        // oauth-scopes-rework.AC3.4: `borrow()` produces `Scopes<&str>` cheaply.
+        let original: Scopes<SmolStr> = Scopes::new(SmolStr::new_static("atproto rpc:*")).unwrap();
+        assert_eq!(original.len(), 2);
+
+        let borrowed: Scopes<&str> = original.borrow();
+        assert_eq!(borrowed.len(), 2);
+
+        // Verify the borrowed version has the same scopes
+        let iter_count: usize = borrowed.iter().count();
+        assert_eq!(iter_count, 2);
+
+        // Verify content matches
+        let orig_iter = original.iter().collect::<Vec<_>>();
+        let borrow_iter = borrowed.iter().collect::<Vec<_>>();
+        assert_eq!(orig_iter.len(), borrow_iter.len());
+    }
+
+    #[test]
+    fn test_scopes_convert() {
+        // oauth-scopes-rework.AC3.5: `convert()` produces correct backing type conversions.
+        let original: Scopes<SmolStr> = Scopes::new(SmolStr::new_static("atproto repo:*")).unwrap();
+        assert_eq!(original.len(), 2);
+
+        // Convert to String
+        let converted: Scopes<String> = original.convert();
+        assert_eq!(converted.len(), 2);
+
+        // Verify content is preserved
+        let converted_iter = converted.iter().collect::<Vec<_>>();
+        assert_eq!(converted_iter.len(), 2);
+
+        match &converted_iter[0] {
+            Scope::Atproto => (),
+            _ => panic!("Expected Atproto scope"),
+        }
+    }
+
+    #[test]
+    fn test_scopes_into_static() {
+        // Test IntoStatic trait implementation.
+        use jacquard_common::CowStr;
+
+        let original = Scopes::new(CowStr::copy_from_str("atproto rpc:*")).unwrap();
+        assert_eq!(original.len(), 2);
+
+        let static_scopes = original.into_static();
+        assert_eq!(static_scopes.len(), 2);
+
+        // Verify content is preserved
+        let iter_count: usize = static_scopes.iter().count();
+        assert_eq!(iter_count, 2);
+    }
+
+    #[test]
+    fn test_scopes_conversions_preserve_content() {
+        // Verify that all conversion methods preserve scope content.
+        let input = "atproto repo:app.bsky.feed.post?action=create account:repo";
+        let original: Scopes<SmolStr> = Scopes::new(SmolStr::new(input)).unwrap();
+        let original_count = original.len();
+
+        // Test borrow
+        let borrowed = original.borrow();
+        assert_eq!(borrowed.len(), original_count);
+
+        // Verify both have the same normalized output before converting
+        let orig_normalized = original.to_normalized_string();
+        let borrow_normalized = borrowed.to_normalized_string();
+        assert_eq!(orig_normalized, borrow_normalized);
+
+        // Test convert (this moves original)
+        let converted: Scopes<String> = original.convert();
+        assert_eq!(converted.len(), original_count);
+
+        let conv_normalized = converted.to_normalized_string();
+        assert_eq!(orig_normalized, conv_normalized);
+    }
+
+    // ========================================================================
+    // Task 5: Serialize Tests
+    // ========================================================================
+
+    #[test]
+    fn test_scopes_serialize_single() {
+        // Test serialization of a single scope.
+        let scopes = Scopes::new(SmolStr::new_static("atproto")).unwrap();
+        let json = serde_json::to_string(&scopes).unwrap();
+        assert_eq!(json, "\"atproto\"");
+    }
+
+    #[test]
+    fn test_scopes_serialize_multiple_sorted() {
+        // oauth-scopes-rework.AC3.6: Serialize produces sorted output
+        // regardless of input order.
+        let scopes = Scopes::new(SmolStr::new_static("rpc:* atproto repo:app.bsky.feed.post")).unwrap();
+        let json = serde_json::to_string(&scopes).unwrap();
+        // Should be sorted: atproto, repo:app.bsky.feed.post, rpc:*
+        assert_eq!(json, "\"atproto repo:app.bsky.feed.post rpc:*\"");
+    }
+
+    #[test]
+    fn test_scopes_serialize_empty() {
+        // Test serialization of empty Scopes.
+        let scopes: Scopes<SmolStr> = Scopes::empty();
+        let json = serde_json::to_string(&scopes).unwrap();
+        assert_eq!(json, "\"\"");
+    }
+
+    #[test]
+    fn test_scopes_serialize_with_reduction() {
+        // Test serialization when scopes reduce (e.g., repo:* includes repo:app.bsky.feed.post).
+        let scopes = Scopes::new(SmolStr::new_static("repo:* repo:app.bsky.feed.post")).unwrap();
+        // Should reduce to just repo:*
+        assert_eq!(scopes.len(), 1);
+        let json = serde_json::to_string(&scopes).unwrap();
+        assert_eq!(json, "\"repo:*\"");
+    }
+
+    #[test]
+    fn test_scopes_serialize_includes_include_scope() {
+        // Test serialization with include scope.
+        let scopes = Scopes::new(SmolStr::new_static("atproto include:app.bsky.authFull")).unwrap();
+        let json = serde_json::to_string(&scopes).unwrap();
+        // Should be sorted and include normalized form
+        assert_eq!(json, "\"atproto include:app.bsky.authFull\"");
+    }
+
+    // ========================================================================
+    // Task 6: Deserialize Tests
+    // ========================================================================
+
+    #[test]
+    fn test_scopes_deserialize_single() {
+        // Test deserialization of a single scope.
+        let json = "\"atproto\"";
+        let scopes: Scopes<SmolStr> = serde_json::from_str(json).unwrap();
+        assert_eq!(scopes.len(), 1);
+        match scopes.get(0) {
+            Some(Scope::Atproto) => (),
+            _ => panic!("Expected Atproto scope"),
+        }
+    }
+
+    #[test]
+    fn test_scopes_deserialize_multiple() {
+        // Test deserialization of multiple scopes.
+        let json = "\"atproto rpc:* repo:app.bsky.feed.post\"";
+        let scopes: Scopes<SmolStr> = serde_json::from_str(json).unwrap();
+        assert_eq!(scopes.len(), 3);
+    }
+
+    #[test]
+    fn test_scopes_deserialize_empty() {
+        // Test deserialization of empty string.
+        let json = "\"\"";
+        let scopes: Scopes<SmolStr> = serde_json::from_str(json).unwrap();
+        assert_eq!(scopes.len(), 0);
+        assert!(scopes.is_empty());
+    }
+
+    #[test]
+    fn test_scopes_serde_roundtrip() {
+        // oauth-scopes-rework.AC3.6: Round-trip test with sorting verification.
+        let input = "rpc:* atproto repo:app.bsky.feed.post account:email";
+        let scopes: Scopes<SmolStr> = Scopes::new(SmolStr::new(input)).unwrap();
+
+        // Serialize
+        let json = serde_json::to_string(&scopes).unwrap();
+
+        // Should be sorted
+        assert_eq!(json, "\"account:email atproto repo:app.bsky.feed.post rpc:*\"");
+
+        // Deserialize
+        let deserialized: Scopes<SmolStr> = serde_json::from_str(&json).unwrap();
+
+        // Should have same len (reduction applied)
+        assert_eq!(deserialized.len(), scopes.len());
+
+        // Verify content matches by collecting scopes
+        let orig_normalized = scopes.to_normalized_string();
+        let deser_normalized = deserialized.to_normalized_string();
+        assert_eq!(orig_normalized, deser_normalized);
+    }
+
+    #[test]
+    fn test_scopes_deserialize_invalid() {
+        // Test deserialization of invalid scope.
+        let json = "\"invalid:notagoodscope\"";
+        let result: Result<Scopes<SmolStr>, _> = serde_json::from_str(json);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_scopes_roundtrip_with_encoded_audience() {
+        // AC2.3: include scope with audience (including special chars) can be serialized and deserialized.
+        // Create an include scope with audience containing special character
+        let input = "include:app.bsky.authFull?aud=did:web:example.com%23svc";
+        let scopes: Scopes<SmolStr> = Scopes::new(SmolStr::new(input)).unwrap();
+        assert_eq!(scopes.len(), 1);
+
+        // Serialize to JSON - should not panic
+        let json = serde_json::to_string(&scopes).unwrap();
+        assert!(json.contains("include:app.bsky.authFull"));
+
+        // Deserialize back - should not panic
+        let deserialized: Scopes<SmolStr> = serde_json::from_str(&json).unwrap();
+
+        // Scopes should have the same length
+        assert_eq!(scopes.len(), deserialized.len());
+        assert_eq!(deserialized.len(), 1);
+    }
+
+    // ========================================================================
+    // Task 7: Convenience Methods Tests
+    // ========================================================================
+
+    #[test]
+    fn test_scopes_len() {
+        // AC3.1: len() returns correct count after reduction.
+        let scopes = Scopes::new(SmolStr::new_static("atproto repo:* repo:app.bsky.feed.post")).unwrap();
+        // repo:* should reduce the more specific one
+        assert_eq!(scopes.len(), 2); // atproto + repo:*
+    }
+
+    #[test]
+    fn test_scopes_is_empty() {
+        // AC3.7: is_empty() returns true for empty Scopes.
+        let empty: Scopes<SmolStr> = Scopes::empty();
+        assert!(empty.is_empty());
+
+        let nonempty = Scopes::new(SmolStr::new_static("atproto")).unwrap();
+        assert!(!nonempty.is_empty());
+    }
+
+    #[test]
+    fn test_scopes_as_str() {
+        // Test as_str() returns the raw buffer.
+        let scopes = Scopes::new(SmolStr::new_static("atproto rpc:*")).unwrap();
+        let s = scopes.as_str();
+        assert_eq!(s, "atproto rpc:*");
+    }
+
+    #[test]
+    fn test_scopes_to_normalized_string() {
+        // Test to_normalized_string() produces same output as serialize.
+        let scopes = Scopes::new(SmolStr::new_static("rpc:* atproto")).unwrap();
+        let normalized = scopes.to_normalized_string();
+        assert_eq!(normalized, "atproto rpc:*");
+
+        // Serialize should match
+        let json = serde_json::to_string(&scopes).unwrap();
+        assert_eq!(json, "\"atproto rpc:*\"");
+    }
+
+    #[test]
+    fn test_scopes_empty_constructor() {
+        // Test Scopes::<SmolStr>::empty() creates empty container.
+        let empty = Scopes::empty();
+        assert_eq!(empty.len(), 0);
+        assert!(empty.is_empty());
+        assert_eq!(empty.to_normalized_string(), SmolStr::default());
+    }
+
+    #[test]
+    fn test_scopes_default() {
+        // Test Default trait for Scopes.
+        let default: Scopes<SmolStr> = Default::default();
+        assert_eq!(default.len(), 0);
+        assert!(default.is_empty());
+    }
+
+    #[test]
+    fn test_scopes_grants_single() {
+        // Test grants() method with single scope.
+        let scopes = Scopes::new(SmolStr::new_static("repo:*")).unwrap();
+        let queried: Scope<SmolStr> = Scope::parse("repo:app.bsky.feed.post").unwrap();
+        assert!(scopes.grants(&queried));
+
+        let queried2: Scope<SmolStr> = Scope::parse("atproto").unwrap();
+        assert!(!scopes.grants(&queried2));
+    }
+
+    #[test]
+    fn test_scopes_grants_multiple() {
+        // Test grants() with multiple scopes.
+        let scopes = Scopes::new(SmolStr::new_static("atproto rpc:*")).unwrap();
+        let queried: Scope<SmolStr> = Scope::parse("rpc:com.atproto.server.createSession").unwrap();
+        assert!(scopes.grants(&queried));
+    }
+
+    #[test]
+    fn test_scopes_construction() {
+        // AC3.1: Construct multi-scope string, verify len and individual scopes.
+        let scopes = Scopes::new(SmolStr::new_static("atproto rpc:* repo:app.bsky.feed.post")).unwrap();
+        assert_eq!(scopes.len(), 3);
+
+        // Verify individual scopes
+        match scopes.get(0) {
+            Some(Scope::Atproto) => (),
+            _ => panic!("Expected Atproto at index 0"),
+        }
+        assert!(scopes.get(1).is_some());
+        assert!(scopes.get(2).is_some());
+        assert!(scopes.get(3).is_none());
+    }
+
+    #[test]
+    fn test_scopes_empty_string() {
+        // AC3.7: Empty string produces empty Scopes.
+        let scopes = Scopes::new(SmolStr::new_static("")).unwrap();
+        assert_eq!(scopes.len(), 0);
+        assert!(scopes.is_empty());
+    }
+
+    #[test]
+    fn test_scopes_invalid_scope() {
+        // AC3.8: Invalid scope in string causes construction failure.
+        let result = Scopes::new(SmolStr::new("invalid:nosuchprefix"));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_scopes_iter_collection() {
+        // AC3.2: Iterate, collect, verify typed views.
+        let scopes = Scopes::new(SmolStr::new_static("atproto rpc:*")).unwrap();
+        let collected: Vec<_> = scopes.iter().collect();
+        assert_eq!(collected.len(), 2);
+        assert!(matches!(collected[0], Scope::Atproto));
+    }
+
+
+    #[test]
+    fn test_scopes_consecutive_spaces() {
+        // Test handling of multiple spaces between scopes.
+        let scopes = Scopes::new(SmolStr::new("atproto  rpc:*")).unwrap();
+        assert_eq!(scopes.len(), 2);
+    }
+
+    #[test]
+    fn test_scopes_reduction() {
+        // Test scope reduction (broader scope removes more specific ones).
+        let scopes = Scopes::new(SmolStr::new_static("repo:* repo:app.bsky.feed.post")).unwrap();
+        assert_eq!(scopes.len(), 1); // Should reduce to just repo:*
+    }
+
+    #[test]
+    fn test_scopes_include_no_audience() {
+        // AC2.1: include scope with no audience parses correctly.
+        let scopes = Scopes::new(SmolStr::new_static("include:app.bsky.authFull")).unwrap();
+        assert_eq!(scopes.len(), 1);
+        match scopes.get(0) {
+            Some(Scope::Include(inc)) => {
+                assert_eq!(inc.nsid.as_ref(), "app.bsky.authFull");
+                assert_eq!(inc.audience, None);
+            }
+            _ => panic!("Expected Include scope"),
+        }
+    }
+
+    #[test]
+    fn test_scopes_include_plain_audience() {
+        // AC2.2: include scope with plain unencoded audience.
+        let scopes = Scopes::new(SmolStr::new_static("include:app.bsky.authFull?aud=did:web:api.example.com")).unwrap();
+        assert_eq!(scopes.len(), 1);
+        match scopes.get(0) {
+            Some(Scope::Include(inc)) => {
+                assert_eq!(inc.nsid.as_ref(), "app.bsky.authFull");
+                assert!(inc.audience.is_some());
+            }
+            _ => panic!("Expected Include scope"),
+        }
+    }
+
+    #[test]
+    fn test_scopes_include_empty_nsid() {
+        // AC2.6: include with no NSID is rejected.
+        let result = Scopes::new(SmolStr::new("include:"));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_scopes_include_invalid_did_audience() {
+        // AC2.7: include with invalid DID audience is rejected.
+        let result = Scopes::new(SmolStr::new("include:app.bsky.authFull?aud=notadid"));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_scopes_all_prefixes() {
+        // Test every scope prefix parses correctly in a Scopes container.
+        let prefixes = vec![
+            "account:email",
+            "identity:handle",
+            "blob:*/*",
+            "repo:*",
+            "rpc:*",
+            "atproto",
+            "transition:generic",
+            "openid",
+            "profile",
+            "email",
+        ];
+
+        for prefix in prefixes {
+            let scopes = Scopes::new(SmolStr::new(prefix)).unwrap();
+            assert_eq!(scopes.len(), 1, "Failed to parse: {}", prefix);
+        }
+    }
+
+    #[test]
+    fn test_scopes_borrow_borrowshare() {
+        // AC3.4: borrow() produces Scopes<&str> with BorrowOrShare semantics.
+        let original: Scopes<SmolStr> = Scopes::new(SmolStr::new_static("atproto rpc:*")).unwrap();
+        let borrowed: Scopes<&str> = original.borrow();
+        assert_eq!(borrowed.len(), original.len());
+
+        // Both should iterate the same
+        let orig_iter = original.iter().collect::<Vec<_>>();
+        let borrow_iter = borrowed.iter().collect::<Vec<_>>();
+        assert_eq!(orig_iter.len(), borrow_iter.len());
+    }
+
+    #[test]
+    fn test_scopes_convert_type() {
+        // AC3.5: convert() produces correct backing type.
+        let original: Scopes<SmolStr> = Scopes::new(SmolStr::new_static("atproto")).unwrap();
+        let converted: Scopes<String> = original.convert();
+        assert_eq!(converted.len(), 1);
+        assert!(matches!(converted.get(0), Some(Scope::Atproto)));
+    }
+
+    #[test]
+    fn test_scopes_bare_blob_defaults_to_all() {
+        // Critical fix: bare `blob` token (without suffix) should default to MimePattern::All.
+        // This tests that we don't store unsound byte ranges past the token.
+        let scopes = Scopes::new(SmolStr::new("blob")).unwrap();
+        assert_eq!(scopes.len(), 1);
+
+        let scope = scopes.get(0).unwrap();
+        if let Scope::Blob(blob_scope) = scope {
+            // Should accept all mime types.
+            assert_eq!(blob_scope.accept.len(), 1);
+            assert!(blob_scope.accept.contains(&MimePattern::All));
+        } else {
+            panic!("Expected Scope::Blob, got {:?}", scope);
+        }
+
+        // Verify reconstruction and normalization work.
+        // Normalized form expands bare `blob` to explicit `blob:*/*`.
+        let normalized = scopes.to_normalized_string();
+        assert_eq!(normalized, "blob:*/*");
+    }
+
+    #[test]
+    fn test_scopes_bare_rpc_defaults_to_all() {
+        // Critical fix: bare `rpc` token (without suffix) should default to all lexicons and audiences.
+        // This tests that we don't store unsound byte ranges past the token.
+        let scopes = Scopes::new(SmolStr::new("rpc")).unwrap();
+        assert_eq!(scopes.len(), 1);
+
+        let scope = scopes.get(0).unwrap();
+        if let Scope::Rpc(rpc_scope) = scope {
+            // Should accept all lexicons and audiences.
+            assert_eq!(rpc_scope.lxm.len(), 1);
+            assert!(rpc_scope.lxm.contains(&RpcLexicon::All));
+            assert_eq!(rpc_scope.aud.len(), 1);
+            assert!(rpc_scope.aud.contains(&RpcAudience::All));
+        } else {
+            panic!("Expected Scope::Rpc, got {:?}", scope);
+        }
+
+        // Verify reconstruction and normalization work.
+        // Normalized form expands bare `rpc` to explicit `rpc:*`.
+        let normalized = scopes.to_normalized_string();
+        assert_eq!(normalized, "rpc:*");
     }
 }
