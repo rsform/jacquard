@@ -414,20 +414,19 @@ pub trait XrpcStreamingClient: XrpcClient + HttpClientExt {
 
     /// Stream an XRPC procedure call and its response
     #[cfg(target_arch = "wasm32")]
-    fn stream<S>(
+    fn stream<S, B>(
         &self,
-        stream: XrpcProcedureSend<S::Frame<'static>>,
+        stream: XrpcProcedureSend<S::Frame<B>>,
     ) -> impl Future<
         Output = Result<
-            XrpcResponseStream<
-                <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>,
-            >,
+            XrpcResponseStream<<<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<B>>,
             StreamError,
         >,
     >
     where
+        B: BosStr + 'static,
         S: XrpcProcedureStream + 'static,
-        <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>: XrpcStreamResp;
+        <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<B>: XrpcStreamResp;
 }
 
 /// Stateless XRPC call builder.
