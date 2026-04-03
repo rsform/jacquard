@@ -3,7 +3,6 @@ use std::future::Future;
 
 use crate::types::{OAuthAuthorizationServerMetadata, OAuthProtectedResourceMetadata};
 use http::{Request, StatusCode};
-#[cfg(not(target_arch = "wasm32"))]
 use jacquard_common::BosStr;
 use jacquard_common::IntoStatic;
 use jacquard_common::deps::fluent_uri::Uri;
