@@ -2365,6 +2365,7 @@ dependencies = [
  "http",
  "jacquard-common",
  "jacquard-identity",
+ "jacquard-lexicon",
  "jose-jwa",
  "jose-jwk",
  "k256",

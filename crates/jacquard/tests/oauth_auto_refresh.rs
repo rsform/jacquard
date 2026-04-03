@@ -237,6 +237,8 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
             token_type: OAuthTokenType::DPoP,
             expires_at: None,
         },
+        #[cfg(feature = "scope-check")]
+        resolved_scopes: None,
     }
     .into_static();
     let client_arc = client.clone();
@@ -265,6 +267,8 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
             token_type: OAuthTokenType::DPoP,
             expires_at: None,
         },
+        #[cfg(feature = "scope-check")]
+        resolved_scopes: None,
     }
     .into_static();
     registry.set(data_store).await.unwrap();
@@ -366,6 +370,8 @@ async fn oauth_xrpc_invalid_token_body_triggers_refresh_and_retries() {
             token_type: OAuthTokenType::DPoP,
             expires_at: None,
         },
+        #[cfg(feature = "scope-check")]
+        resolved_scopes: None,
     }
     .into_static();
     let client_arc = client.clone();

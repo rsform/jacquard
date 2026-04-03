@@ -2207,6 +2207,23 @@ fn parse_query_string(query: &str) -> BTreeMap<SmolStr, Vec<&str>> {
     params
 }
 
+/// Error type for permission set expansion and conversion
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+#[non_exhaustive]
+pub enum PermissionSetConversionError {
+    /// Unknown identity attribute in permission set
+    #[error("unknown identity attribute: {0}")]
+    UnknownIdentityAttr(String),
+
+    /// Unknown account attribute in permission set
+    #[error("unknown account attribute: {0}")]
+    UnknownAccountAttr(String),
+
+    /// Invalid MIME pattern in blob permission
+    #[error("invalid MIME pattern: {0}")]
+    InvalidMimePattern(String),
+}
+
 /// Error type for scope parsing
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic)]
 #[non_exhaustive]
@@ -2238,9 +2255,137 @@ impl fmt::Display for ParseError {
     }
 }
 
+/// Convert a resolved permission set into its constituent scope values.
+///
+/// Each permission entry expands to one or more concrete scopes:
+/// - Repo: one `Scope::Repo` per collection NSID
+/// - Rpc: one `Scope::Rpc` per lxm NSID (with shared aud)
+/// - Blob: one `Scope::Blob` with all accept patterns
+/// - Identity: `Scope::Identity` based on attr
+/// - Account: `Scope::Account` based on attr and action
+/// `inherited_audience` is the audience from the `include:` scope's `?aud=`
+/// parameter. Passed to RPC permissions with `inherit_aud: true`.
+#[cfg(feature = "scope-check")]
+pub fn expand_permission_set(
+    perm_set: &jacquard_lexicon::lexicon::LexPermissionSet<'static>,
+    inherited_audience: Option<&Did<SmolStr>>,
+) -> Result<Vec<Scope<SmolStr>>, PermissionSetConversionError> {
+    use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource};
+
+    let mut scopes = Vec::new();
+
+    for perm in &perm_set.permissions {
+        let LexPermission::Permission { resource } = perm;
+        match resource {
+            LexPermissionResource::Repo { collection, action } => {
+                let actions = action
+                    .as_ref()
+                    .map(|a| a.iter().copied().collect())
+                    .unwrap_or_else(|| {
+                        let mut all = BTreeSet::new();
+                        all.insert(RepoAction::Create);
+                        all.insert(RepoAction::Update);
+                        all.insert(RepoAction::Delete);
+                        all
+                    });
+
+                for col_nsid in collection {
+                    scopes.push(Scope::Repo(RepoScope {
+                        collection: RepoCollection::Nsid(col_nsid.clone().convert()),
+                        actions: actions.clone(),
+                    }));
+                }
+            }
+            LexPermissionResource::Rpc { lxm, aud, inherit_aud } => {
+                // Build the audience set based on priority order
+                let mut aud_set = BTreeSet::new();
+                if let Some(explicit_aud) = aud {
+                    aud_set.insert(RpcAudience::Did(explicit_aud.clone().convert()));
+                } else if inherit_aud.unwrap_or(false) && inherited_audience.is_some() {
+                    aud_set.insert(RpcAudience::Did(inherited_audience.unwrap().clone()));
+                } else {
+                    aud_set.insert(RpcAudience::All);
+                }
+
+                // Create one RpcScope with all lxm NSIDs and the resolved audience
+                let mut lxm_set = BTreeSet::new();
+                for lxm_nsid in lxm {
+                    lxm_set.insert(RpcLexicon::Nsid(lxm_nsid.clone().convert()));
+                }
+
+                if !lxm_set.is_empty() {
+                    scopes.push(Scope::Rpc(RpcScope {
+                        lxm: lxm_set,
+                        aud: aud_set,
+                    }));
+                }
+            }
+            LexPermissionResource::Blob { accept, .. } => {
+                let mut patterns = BTreeSet::new();
+                for mime_type in accept {
+                    let pattern_str = mime_type.as_ref();
+                    match validate_mime_pattern(pattern_str) {
+                        Ok(kind) => {
+                            // For TypeWildcard, strip the `/*` suffix before storing.
+                            let mime_str = match kind {
+                                MimePatternKind::TypeWildcard => {
+                                    SmolStr::new(&pattern_str[..pattern_str.len() - 2])
+                                }
+                                _ => SmolStr::new(pattern_str),
+                            };
+                            let pattern = unsafe { MimePattern::unchecked(mime_str, kind) };
+                            patterns.insert(pattern);
+                        }
+                        Err(_) => {
+                            return Err(PermissionSetConversionError::InvalidMimePattern(
+                                pattern_str.to_string(),
+                            ));
+                        }
+                    }
+                }
+
+                if !patterns.is_empty() {
+                    scopes.push(Scope::Blob(BlobScope { accept: patterns }));
+                }
+            }
+            LexPermissionResource::Identity { attr } => {
+                let identity_scope = match attr.as_ref() {
+                    "handle" => IdentityScope::Handle,
+                    "*" => IdentityScope::All,
+                    other => return Err(PermissionSetConversionError::UnknownIdentityAttr(other.to_string())),
+                };
+                scopes.push(Scope::Identity(identity_scope));
+            }
+            LexPermissionResource::Account { attr, action } => {
+                let resource = match attr.as_ref() {
+                    "email" => AccountResource::Email,
+                    "repo" => AccountResource::Repo,
+                    "status" => AccountResource::Status,
+                    other => return Err(PermissionSetConversionError::UnknownAccountAttr(other.to_string())),
+                };
+
+                let act = action
+                    .as_ref()
+                    .and_then(|a| a.first())
+                    .copied()
+                    .unwrap_or(AccountAction::Read);
+
+                scopes.push(Scope::Account(AccountScope {
+                    resource,
+                    action: act,
+                }));
+            }
+        }
+    }
+
+    Ok(scopes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(feature = "scope-check")]
+    use jacquard_common::CowStr;
 
     #[test]
     fn test_account_scope_parsing() {
@@ -3699,5 +3844,368 @@ mod tests {
         // Normalized form expands bare `rpc` to explicit `rpc:*`.
         let normalized = scopes.to_normalized_string();
         assert_eq!(normalized, "rpc:*");
+    }
+
+    #[cfg(feature = "scope-check")]
+    #[test]
+    fn test_expand_permission_set_repo() {
+        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+
+        // Create a simple permission set with a repo permission
+        let mut perms = Vec::new();
+        perms.push(LexPermission::Permission {
+            resource: LexPermissionResource::Repo {
+                collection: vec![
+                    Nsid::new_static("app.bsky.feed.post").unwrap(),
+                    Nsid::new_static("app.bsky.graph.follow").unwrap(),
+                ],
+                action: Some(vec![RepoAction::Create]),
+            },
+        });
+
+        let perm_set = LexPermissionSet {
+            title: None,
+            title_lang: None,
+            detail: None,
+            detail_lang: None,
+            permissions: perms,
+        };
+
+        let scopes = expand_permission_set(&perm_set, None).unwrap();
+        assert_eq!(scopes.len(), 2);
+
+        // Check that we got the expected repo scopes
+        let mut found_post = false;
+        let mut found_follow = false;
+
+        for scope in &scopes {
+            if let Scope::Repo(repo_scope) = scope {
+                if let RepoCollection::Nsid(nsid) = &repo_scope.collection {
+                    if nsid.as_ref() == "app.bsky.feed.post" {
+                        assert_eq!(repo_scope.actions.len(), 1);
+                        assert!(repo_scope.actions.contains(&RepoAction::Create));
+                        found_post = true;
+                    } else if nsid.as_ref() == "app.bsky.graph.follow" {
+                        assert_eq!(repo_scope.actions.len(), 1);
+                        assert!(repo_scope.actions.contains(&RepoAction::Create));
+                        found_follow = true;
+                    }
+                }
+            }
+        }
+
+        assert!(found_post, "Expected post scope");
+        assert!(found_follow, "Expected follow scope");
+    }
+
+    #[cfg(feature = "scope-check")]
+    #[test]
+    fn test_expand_permission_set_identity() {
+        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+
+        let mut perms = Vec::new();
+        perms.push(LexPermission::Permission {
+            resource: LexPermissionResource::Identity {
+                attr: CowStr::Borrowed("handle"),
+            },
+        });
+
+        let perm_set = LexPermissionSet {
+            title: None,
+            title_lang: None,
+            detail: None,
+            detail_lang: None,
+            permissions: perms,
+        };
+
+        let scopes = expand_permission_set(&perm_set, None).unwrap();
+        assert_eq!(scopes.len(), 1);
+
+        assert_eq!(scopes[0], Scope::Identity(IdentityScope::Handle));
+    }
+
+    #[cfg(feature = "scope-check")]
+    #[test]
+    fn test_expand_permission_set_account() {
+        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+
+        let mut perms = Vec::new();
+        perms.push(LexPermission::Permission {
+            resource: LexPermissionResource::Account {
+                attr: CowStr::Borrowed("email"),
+                action: Some(vec![AccountAction::Manage]),
+            },
+        });
+
+        let perm_set = LexPermissionSet {
+            title: None,
+            title_lang: None,
+            detail: None,
+            detail_lang: None,
+            permissions: perms,
+        };
+
+        let scopes = expand_permission_set(&perm_set, None).unwrap();
+        assert_eq!(scopes.len(), 1);
+
+        assert_eq!(
+            scopes[0],
+            Scope::Account(AccountScope {
+                resource: AccountResource::Email,
+                action: AccountAction::Manage,
+            })
+        );
+    }
+
+    #[cfg(feature = "scope-check")]
+    #[test]
+    fn test_expand_permission_set_rpc_with_inherit_aud() {
+        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+
+        let mut perms = Vec::new();
+        perms.push(LexPermission::Permission {
+            resource: LexPermissionResource::Rpc {
+                lxm: vec![Nsid::new_static("app.bsky.feed.getTimeline").unwrap()],
+                aud: None,
+                inherit_aud: Some(true),
+            },
+        });
+
+        let perm_set = LexPermissionSet {
+            title: None,
+            title_lang: None,
+            detail: None,
+            detail_lang: None,
+            permissions: perms,
+        };
+
+        let inherited_did = Did::new_static("did:web:example.com").unwrap();
+        let scopes = expand_permission_set(&perm_set, Some(&inherited_did)).unwrap();
+        assert_eq!(scopes.len(), 1);
+
+        if let Scope::Rpc(rpc_scope) = &scopes[0] {
+            assert_eq!(rpc_scope.lxm.len(), 1);
+            assert_eq!(rpc_scope.aud.len(), 1);
+            assert!(matches!(rpc_scope.aud.iter().next(), Some(RpcAudience::Did(d)) if d.as_ref() == "did:web:example.com"));
+        } else {
+            panic!("Expected Rpc scope");
+        }
+    }
+
+    #[cfg(feature = "scope-check")]
+    #[test]
+    fn test_expand_permission_set_rpc_explicit_aud() {
+        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+
+        let mut perms = Vec::new();
+        perms.push(LexPermission::Permission {
+            resource: LexPermissionResource::Rpc {
+                lxm: vec![Nsid::new_static("app.bsky.feed.getTimeline").unwrap()],
+                aud: Some(Did::new_static("did:web:custom.com").unwrap()),
+                inherit_aud: None,
+            },
+        });
+
+        let perm_set = LexPermissionSet {
+            title: None,
+            title_lang: None,
+            detail: None,
+            detail_lang: None,
+            permissions: perms,
+        };
+
+        let scopes = expand_permission_set(&perm_set, None).unwrap();
+        assert_eq!(scopes.len(), 1);
+
+        if let Scope::Rpc(rpc_scope) = &scopes[0] {
+            assert_eq!(rpc_scope.aud.len(), 1);
+            assert!(matches!(rpc_scope.aud.iter().next(), Some(RpcAudience::Did(d)) if d.as_ref() == "did:web:custom.com"));
+        } else {
+            panic!("Expected Rpc scope");
+        }
+    }
+
+    #[cfg(feature = "scope-check")]
+    #[test]
+    fn test_expand_permission_set_unknown_identity_attr() {
+        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+
+        let mut perms = Vec::new();
+        perms.push(LexPermission::Permission {
+            resource: LexPermissionResource::Identity {
+                attr: CowStr::Borrowed("invalid"),
+            },
+        });
+
+        let perm_set = LexPermissionSet {
+            title: None,
+            title_lang: None,
+            detail: None,
+            detail_lang: None,
+            permissions: perms,
+        };
+
+        let result = expand_permission_set(&perm_set, None);
+        assert!(matches!(result, Err(PermissionSetConversionError::UnknownIdentityAttr(_))));
+    }
+
+    #[cfg(feature = "scope-check")]
+    #[test]
+    fn test_expand_permission_set_unknown_account_attr() {
+        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+
+        let mut perms = Vec::new();
+        perms.push(LexPermission::Permission {
+            resource: LexPermissionResource::Account {
+                attr: CowStr::Borrowed("invalid"),
+                action: None,
+            },
+        });
+
+        let perm_set = LexPermissionSet {
+            title: None,
+            title_lang: None,
+            detail: None,
+            detail_lang: None,
+            permissions: perms,
+        };
+
+        let result = expand_permission_set(&perm_set, None);
+        assert!(matches!(result, Err(PermissionSetConversionError::UnknownAccountAttr(_))));
+    }
+
+    #[cfg(feature = "scope-check")]
+    #[test]
+    fn test_expand_permission_set_blob() {
+        use jacquard_lexicon::lexicon::{LexPermissionSet, LexPermission, LexPermissionResource};
+        use jacquard_common::types::blob::MimeType;
+
+        // Test exact type
+        let mut perms = Vec::new();
+        perms.push(LexPermission::Permission {
+            resource: LexPermissionResource::Blob {
+                accept: vec![MimeType::new(CowStr::Borrowed("image/png"))],
+                max_size: None,
+            },
+        });
+
+        let perm_set = LexPermissionSet {
+            title: None,
+            title_lang: None,
+            detail: None,
+            detail_lang: None,
+            permissions: perms,
+        };
+
+        let scopes = expand_permission_set(&perm_set, None).expect("should expand blob");
+        assert_eq!(scopes.len(), 1);
+        match &scopes[0] {
+            Scope::Blob(blob_scope) => {
+                assert_eq!(blob_scope.accept.len(), 1);
+                for pattern in &blob_scope.accept {
+                    if let MimePattern::Exact(s) = pattern {
+                        assert_eq!(s.as_ref() as &str, "image/png");
+                    } else {
+                        panic!("expected Exact pattern");
+                    }
+                }
+            }
+            _ => panic!("expected Blob scope"),
+        }
+
+        // Test type wildcard
+        let mut perms = Vec::new();
+        perms.push(LexPermission::Permission {
+            resource: LexPermissionResource::Blob {
+                accept: vec![MimeType::new(CowStr::Borrowed("image/*"))],
+                max_size: None,
+            },
+        });
+
+        let perm_set = LexPermissionSet {
+            title: None,
+            title_lang: None,
+            detail: None,
+            detail_lang: None,
+            permissions: perms,
+        };
+
+        let scopes = expand_permission_set(&perm_set, None).expect("should expand blob");
+        assert_eq!(scopes.len(), 1);
+        match &scopes[0] {
+            Scope::Blob(blob_scope) => {
+                assert_eq!(blob_scope.accept.len(), 1);
+                // TypeWildcard should store only the type prefix (e.g., "image")
+                for pattern in &blob_scope.accept {
+                    if let MimePattern::TypeWildcard(s) = pattern {
+                        assert_eq!(s.as_ref() as &str, "image");
+                    } else {
+                        panic!("expected TypeWildcard pattern");
+                    }
+                }
+            }
+            _ => panic!("expected Blob scope"),
+        }
+
+        // Test all wildcard
+        let mut perms = Vec::new();
+        perms.push(LexPermission::Permission {
+            resource: LexPermissionResource::Blob {
+                accept: vec![MimeType::new(CowStr::Borrowed("*/*"))],
+                max_size: None,
+            },
+        });
+
+        let perm_set = LexPermissionSet {
+            title: None,
+            title_lang: None,
+            detail: None,
+            detail_lang: None,
+            permissions: perms,
+        };
+
+        let scopes = expand_permission_set(&perm_set, None).expect("should expand blob");
+        assert_eq!(scopes.len(), 1);
+        match &scopes[0] {
+            Scope::Blob(blob_scope) => {
+                assert_eq!(blob_scope.accept.len(), 1);
+                assert!(
+                    blob_scope
+                        .accept
+                        .iter()
+                        .any(|p| matches!(p, MimePattern::All))
+                );
+            }
+            _ => panic!("expected Blob scope"),
+        }
+    }
+
+    #[cfg(feature = "scope-check")]
+    #[test]
+    fn test_expand_permission_set_blob_invalid_mime() {
+        use jacquard_common::types::blob::MimeType;
+        use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource, LexPermissionSet};
+
+        let mut perms = Vec::new();
+        perms.push(LexPermission::Permission {
+            resource: LexPermissionResource::Blob {
+                accept: vec![MimeType::new(CowStr::Borrowed("invalid-mime-type"))],
+                max_size: None,
+            },
+        });
+
+        let perm_set = LexPermissionSet {
+            title: None,
+            title_lang: None,
+            detail: None,
+            detail_lang: None,
+            permissions: perms,
+        };
+
+        let result = expand_permission_set(&perm_set, None);
+        assert!(matches!(
+            result,
+            Err(PermissionSetConversionError::InvalidMimePattern(_))
+        ));
     }
 }

@@ -1096,6 +1096,8 @@ mod tests {
                 token_type: crate::types::OAuthTokenType::DPoP,
                 expires_at: None,
             },
+            #[cfg(feature = "scope-check")]
+            resolved_scopes: None,
         };
         let err = super::refresh(&client, session, &meta).await.unwrap_err();
         assert!(matches!(err.kind(), RequestErrorKind::NoRefreshToken));

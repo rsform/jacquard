@@ -19,10 +19,12 @@ browser-open = ["dep:webbrowser"]
 tracing = ["dep:tracing"]
 websocket = ["jacquard-common/websocket"]
 streaming = ["jacquard-common/streaming", "dep:n0-future"]
+scope-check = ["dep:jacquard-lexicon"]
 
 [dependencies]
 jacquard-common = { version = "0.12.0-beta.1", path = "../jacquard-common", features = ["reqwest-client"] }
 jacquard-identity = { version = "0.12.0-beta.1", path = "../jacquard-identity" }
+jacquard-lexicon = { version = "0.12.0-beta.1", path = "../jacquard-lexicon", optional = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 smol_str = { workspace = true }

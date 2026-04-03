@@ -296,7 +296,7 @@ where
                 } else {
                     Scopes::empty()
                 };
-                let client_data = ClientSessionData {
+                let mut client_data = ClientSessionData {
                     account_did: token_set.sub.clone(),
                     session_id: auth_req_info.state,
                     host_url: Uri::parse(token_set.aud.as_str())?.to_owned(),
@@ -313,7 +313,14 @@ where
                             .unwrap_or_default(),
                     },
                     token_set,
+                    #[cfg(feature = "scope-check")]
+                    resolved_scopes: None,
                 };
+
+                // TODO: Phase 5 Task 3 - eagerly resolve include scopes
+                // When scope-check is enabled, iterate the scopes, find any Include scopes,
+                // resolve them via resolve_permission_set(), and populate resolved_scopes.
+                // For now, this is left as None.
 
                 self.create_session(client_data).await
             }

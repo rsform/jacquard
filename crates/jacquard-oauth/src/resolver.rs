@@ -124,6 +124,30 @@ pub enum ResolverErrorKind {
     #[error("url parsing error")]
     #[diagnostic(code(jacquard_oauth::resolver::url))]
     Uri,
+
+    /// Permission set is not a lexicon def
+    #[cfg(feature = "scope-check")]
+    #[error("permission set is not a valid lexicon def")]
+    #[diagnostic(
+        code(jacquard_oauth::resolver::not_a_permission_set),
+        help("ensure the lexicon schema's 'main' def is a permission-set type")
+    )]
+    NotAPermissionSet,
+
+    /// Permission set namespace constraint violation
+    #[cfg(feature = "scope-check")]
+    #[error("permission set namespace violation: {0}")]
+    #[diagnostic(
+        code(jacquard_oauth::resolver::permission_set_namespace),
+        help("all permissions must be within the owning namespace")
+    )]
+    PermissionSetNamespace(SmolStr),
+
+    /// Permission set conversion error
+    #[cfg(feature = "scope-check")]
+    #[error("permission set conversion error: {0}")]
+    #[diagnostic(code(jacquard_oauth::resolver::permission_set_conversion))]
+    PermissionSetConversion(SmolStr),
 }
 
 impl ResolverError {
@@ -257,6 +281,24 @@ impl ResolverError {
     pub fn http_status(status: StatusCode) -> Self {
         Self::new(ResolverErrorKind::HttpStatus(status), None)
     }
+
+    /// Create a "not a permission set" error
+    #[cfg(feature = "scope-check")]
+    pub fn not_a_permission_set() -> Self {
+        Self::new(ResolverErrorKind::NotAPermissionSet, None)
+    }
+
+    /// Create a permission set namespace violation error
+    #[cfg(feature = "scope-check")]
+    pub fn permission_set_namespace(msg: impl Into<SmolStr>) -> Self {
+        Self::new(ResolverErrorKind::PermissionSetNamespace(msg.into()), None)
+    }
+
+    /// Create a permission set conversion error
+    #[cfg(feature = "scope-check")]
+    pub fn permission_set_conversion(msg: impl Into<SmolStr>) -> Self {
+        Self::new(ResolverErrorKind::PermissionSetConversion(msg.into()), None)
+    }
 }
 
 /// Result type for resolver operations
@@ -306,6 +348,16 @@ impl From<jacquard_common::deps::fluent_uri::ParseError> for ResolverError {
         Self::new(ResolverErrorKind::Uri, Some(Box::new(e)))
             .with_context(msg)
             .with_help("ensure URIs are well-formed (e.g., https://example.com)")
+    }
+}
+
+#[cfg(feature = "scope-check")]
+impl From<jacquard_identity::lexicon_resolver::LexiconResolutionError> for ResolverError {
+    fn from(e: jacquard_identity::lexicon_resolver::LexiconResolutionError) -> Self {
+        let msg = smol_str::format_smolstr!("{:?}", e);
+        Self::new(ResolverErrorKind::Transport, Some(Box::new(e)))
+            .with_context(msg)
+            .with_help("failed to resolve lexicon schema; check network connectivity")
     }
 }
 
@@ -764,6 +816,54 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     }
 }
 
+/// Resolve a permission set NSID into its constituent scopes.
+///
+/// Requires both `OAuthResolver` (for identity/HTTP) and
+/// `LexiconSchemaResolver` (for lexicon schema fetching, which uses
+/// the `nsid_to_schema` cache with 7-day TTL).
+#[cfg(feature = "scope-check")]
+pub async fn resolve_permission_set<R, S>(
+    resolver: &R,
+    nsid: &jacquard_common::types::nsid::Nsid<S>,
+    inherited_audience: Option<&jacquard_common::types::did::Did<smol_str::SmolStr>>,
+) -> Result<Vec<crate::scopes::Scope<smol_str::SmolStr>>>
+where
+    R: OAuthResolver + jacquard_identity::lexicon_resolver::LexiconSchemaResolver + Sync,
+    S: jacquard_common::bos::BosStr + Sync,
+{
+    use jacquard_lexicon::lexicon::{LexUserType, PermissionSetError};
+
+    // 1. Fetch the lexicon schema (cached via nsid_to_schema).
+    let schema = resolver.resolve_lexicon_schema(nsid).await?;
+
+    // 2. Extract the "main" def from the LexiconDoc.
+    let main_def = schema.doc.defs.get("main")
+        .ok_or_else(|| ResolverError::not_found())?;
+
+    // 3. Downcast to LexPermissionSet.
+    let perm_set = match main_def {
+        LexUserType::PermissionSet(ps) => ps,
+        _ => return Err(ResolverError::not_a_permission_set()),
+    };
+
+    // 4. Validate namespace constraints.
+    perm_set.validate(nsid.as_ref())
+        .map_err(|e| match e {
+            PermissionSetError::EmptyPermissions => {
+                ResolverError::permission_set_conversion("permission set has empty permissions array")
+            }
+            PermissionSetError::NamespaceViolation { nsid: n, resource: r } => {
+                ResolverError::permission_set_namespace(
+                    smol_str::format_smolstr!("{} references out-of-namespace resource: {}", n, r)
+                )
+            }
+        })?;
+
+    // 5. Expand to concrete scopes, passing inherited audience for inheritAud.
+    crate::scopes::expand_permission_set(perm_set, inherited_audience)
+        .map_err(|e| ResolverError::permission_set_conversion(smol_str::format_smolstr!("{}", e)))
+}
+
 /// Fetch and validate the `/.well-known/oauth-authorization-server` document for `server`.
 ///
 /// Per RFC 8414 §3.3 the `issuer` field in the response must equal the `server` URL exactly;
@@ -917,5 +1017,33 @@ mod tests {
         let issuer_base = CowStr::new_static("https://issuer.example.com");
         let issuer_with_path = CowStr::new_static("https://issuer.example.com/path");
         assert_ne!(issuer_base, issuer_with_path);
+    }
+
+    #[cfg(feature = "scope-check")]
+    #[tokio::test]
+    async fn test_expand_permission_set_exported() {
+        // This is a simple integration test that verifies expand_permission_set is accessible
+        use crate::scopes::expand_permission_set;
+        use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource, LexPermissionSet};
+        use jacquard_common::CowStr;
+
+        let mut perms = Vec::new();
+        perms.push(LexPermission::Permission {
+            resource: LexPermissionResource::Identity {
+                attr: CowStr::Borrowed("handle"),
+            },
+        });
+
+        let perm_set = LexPermissionSet {
+            title: None,
+            title_lang: None,
+            detail: None,
+            detail_lang: None,
+            permissions: perms,
+        };
+
+        let scopes = expand_permission_set(&perm_set, None).expect("should expand permission set");
+        assert_eq!(scopes.len(), 1);
+        assert!(matches!(scopes[0], crate::scopes::Scope::Identity(crate::scopes::IdentityScope::Handle)));
     }
 }

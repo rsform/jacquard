@@ -47,6 +47,7 @@ streaming = [
 cache = ["jacquard-identity/cache"]
 websocket = ["jacquard-common/websocket"]
 zstd = ["jacquard-common/zstd"]
+scope-check = ["jacquard-oauth/scope-check"]
 
 
 

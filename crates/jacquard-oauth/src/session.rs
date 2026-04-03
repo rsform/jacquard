@@ -86,6 +86,13 @@ pub struct ClientSessionData<S: BosStr = DefaultStr> {
     /// Current token set (access token, refresh token, expiry, etc.).
     #[serde(flatten)]
     pub token_set: TokenSet<S>,
+
+    /// Fully expanded scopes with include scopes resolved.
+    /// Populated eagerly at session creation when `scope-check` is enabled.
+    /// `None` when `scope-check` is disabled or no include scopes are present.
+    #[cfg(feature = "scope-check")]
+    #[serde(skip)]
+    pub resolved_scopes: Option<Vec<crate::scopes::Scope<smol_str::SmolStr>>>,
 }
 
 impl<S: BosStr + Ord + IntoStatic + AsRef<str>> IntoStatic for ClientSessionData<S>
@@ -95,6 +102,9 @@ where
     type Output = ClientSessionData<S::Output>;
 
     fn into_static(self) -> Self::Output {
+        #[cfg(feature = "scope-check")]
+        let resolved_scopes = self.resolved_scopes;
+
         ClientSessionData {
             authserver_url: self.authserver_url.into_static(),
             authserver_token_endpoint: self.authserver_token_endpoint.into_static(),
@@ -107,6 +117,8 @@ where
             account_did: self.account_did.into_static(),
             session_id: self.session_id.into_static(),
             host_url: self.host_url.clone(),
+            #[cfg(feature = "scope-check")]
+            resolved_scopes,
         }
     }
 }
