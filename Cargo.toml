@@ -1,11 +1,11 @@
 [workspace]
 resolver = "2"
-members = ["crates/jacquard", "crates/jacquard-common", "crates/jacquard-api", "crates/jacquard-lexgen", "crates/jacquard-lexicon", "crates/jacquard-derive", "crates/jacquard-repo", "crates/mini-moka-wasm"]
+members = ["crates/jacquard", "crates/jacquard-common", "crates/jacquard-api", "crates/jacquard-lexgen", "crates/jacquard-lexicon", "crates/jacquard-derive", "crates/jacquard-repo", "crates/jacquard-codegen-tests", "crates/mini-moka-wasm"]
 
 
 [workspace.package]
 edition = "2024"
-version = "0.12.0-beta.1"
+version = "0.12.0-beta.2"
 authors = ["Orual <orual@nonbinary.computer>"]
 #repository = "https://github.com/rsform/jacquard"
 repository = "https://tangled.org/nonbinary.computer/jacquard"

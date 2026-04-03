@@ -2,7 +2,7 @@
 name = "jacquard-repo"
 description = "AT Protocol repository primitives: MST, commits, CAR I/O"
 edition.workspace = true
-version = "0.12.0-beta.1"
+version = "0.12.0-beta.2"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true

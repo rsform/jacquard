@@ -1,0 +1,74 @@
+{
+  "lexicon": 1,
+  "id": "test.array.types",
+  "defs": {
+    "main": {
+      "type": "object",
+      "properties": {
+        "simpleStrings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unionItems": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": ["#textItem", "#imageItem"]
+          }
+        },
+        "refItems": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#nestedObject"
+          }
+        },
+        "objectItems": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "inline": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "cidLinks": {
+          "type": "array",
+          "items": {
+            "type": "cid-link"
+          }
+        }
+      }
+    },
+    "textItem": {
+      "type": "object",
+      "required": ["text"],
+      "properties": {
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "imageItem": {
+      "type": "object",
+      "required": ["blob"],
+      "properties": {
+        "blob": {
+          "type": "blob"
+        }
+      }
+    },
+    "nestedObject": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

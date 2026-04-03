@@ -1,6 +1,6 @@
 //! AT Protocol OAuth scopes
 //!
-//! Derived from <https://tangled.org/smokesignal.events/atproto-identity-rs/raw/main/crates/atproto-oauth/src/scopes.rs>
+//! Originally derived from <https://tangled.org/nickgerakines.me/atproto-crates/raw/main/crates/atproto-oauth/src/scopes.rs>, since substantially modified.
 //!
 //! This module provides comprehensive support for AT Protocol OAuth scopes,
 //! including parsing, serialization, normalization, and permission checking.
@@ -36,7 +36,7 @@ use jacquard_common::{BorrowOrShare, Bos, FromStaticStr, IntoStatic};
 use serde::de::{Error as DeError, Visitor};
 use serde::{Deserialize, Serialize};
 use smallvec::SmallVec;
-use smol_str::{SmolStr, ToSmolStr, format_smolstr};
+use smol_str::{SmolStr, SmolStrBuilder, ToSmolStr, format_smolstr};
 
 /// Represents an AT Protocol OAuth scope
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -165,7 +165,7 @@ pub enum TransitionScope {
 /// Include scope referencing a permission set NSID with optional audience.
 ///
 /// Represents `include:<nsid>[?aud=<did>]` scopes. The audience is a plain
-/// validated string — a DID optionally followed by `#fragment`. Stored in
+/// validated string - a DID optionally followed by `#fragment`. Stored in
 /// decoded form; `#` is percent-encoded as `%23` on serialisation.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IncludeScope<S: BosStr = DefaultStr> {
@@ -241,9 +241,9 @@ pub(crate) enum MimePatternKind {
 /// Validate a MIME pattern string without allocating.
 ///
 /// Returns the pattern kind. Valid patterns:
-/// - `*/*` → `MimePatternKind::All`
-/// - `<type>/*` (e.g., `image/*`) → `MimePatternKind::TypeWildcard`
-/// - `<type>/<subtype>` (e.g., `image/png`) → `MimePatternKind::Exact`
+/// - `*/*` -> `MimePatternKind::All`
+/// - `<type>/*` (e.g., `image/*`) -> `MimePatternKind::TypeWildcard`
+/// - `<type>/<subtype>` (e.g., `image/png`) -> `MimePatternKind::Exact`
 pub(crate) fn validate_mime_pattern(s: &str) -> Result<MimePatternKind, ParseError> {
     if s == "*/*" {
         Ok(MimePatternKind::All)
@@ -251,7 +251,7 @@ pub(crate) fn validate_mime_pattern(s: &str) -> Result<MimePatternKind, ParseErr
         let type_part = &s[..slash];
         let subtype_part = &s[slash + 1..];
         if type_part.is_empty() || subtype_part.is_empty() {
-            return Err(ParseError::InvalidMimeType(s.to_string()));
+            return Err(ParseError::InvalidMimeType(s.to_smolstr()));
         }
         if subtype_part == "*" {
             Ok(MimePatternKind::TypeWildcard)
@@ -259,7 +259,7 @@ pub(crate) fn validate_mime_pattern(s: &str) -> Result<MimePatternKind, ParseErr
             Ok(MimePatternKind::Exact)
         }
     } else {
-        Err(ParseError::InvalidMimeType(s.to_string()))
+        Err(ParseError::InvalidMimeType(s.to_smolstr()))
     }
 }
 
@@ -290,7 +290,7 @@ impl<S: BosStr> MimePattern<S> {
     ///
     /// The caller must ensure `s` is a valid MIME pattern string
     /// and `kind` matches the pattern. `MimePattern`'s API assumes
-    /// the invariant holds — violating it will produce incorrect
+    /// the invariant holds. Violating it will produce incorrect
     /// results from downstream operations.
     pub(crate) unsafe fn unchecked(s: S, kind: MimePatternKind) -> Self {
         match kind {
@@ -483,11 +483,6 @@ where
     }
 }
 
-// ============================================================================
-// Scope index types — internal infrastructure for Phase 2's Scopes<S> container.
-// All types are pub(crate), consumed by the Scopes<S> container.
-// ============================================================================
-
 /// Byte-range indices for a single scope within a `Scopes` buffer.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct ScopeIndices {
@@ -570,21 +565,14 @@ impl RepoActionFlags {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum IncludeAudience {
     /// Audience in buffer is already decoded (no percent-encoding).
-    /// `grants()` can compare directly. Serialisation must encode `#` → `%23`.
+    /// `grants()` can compare directly. Serialisation must encode `#` -> `%23`.
     Plain(u16, u16),
     /// Audience in buffer contains percent-encoding (e.g., `%23`).
     /// `grants()` must decode before comparing. Serialisation can pass through.
     Encoded(u16, u16),
 }
 
-// ============================================================================
-// Scopes<S> container — validated, zero-copy scope string with indices.
-// ============================================================================
-
 /// Iterator over scopes in a `Scopes<S>` container.
-///
-/// Yields `Scope<&'o str>` views that borrow from the shared buffer.
-/// This type is returned by `Scopes::iter()`.
 pub struct ScopesIter<'i, 'o> {
     buffer: &'o str,
     indices: std::slice::Iter<'i, ScopeIndices>,
@@ -647,7 +635,7 @@ impl<S: Bos<str> + AsRef<str>> Scopes<S> {
         // Check u16 limit on buffer length.
         if s.len() > u16::MAX as usize {
             return Err(ParseError::InvalidResource(
-                "scope string exceeds u16 byte limit".to_string(),
+                "scope string exceeds u16 byte limit".to_smolstr(),
             ));
         }
 
@@ -686,10 +674,6 @@ impl<S: Bos<str> + AsRef<str>> Scopes<S> {
     }
 
     /// Iterate over scopes as `Scope<&'o str>` views borrowing from the buffer.
-    ///
-    /// The iterator borrows from the buffer via the `BorrowOrShare` split lifetimes.
-    /// For example, when `S = &'a str`, the iterator yields `Scope<&'a str>` and
-    /// can outlive the borrow of `self`.
     pub fn iter<'i, 'o>(&'i self) -> ScopesIter<'i, 'o>
     where
         S: BorrowOrShare<'i, 'o, str>,
@@ -732,9 +716,6 @@ impl<S: Bos<str> + AsRef<str>> Scopes<S> {
     }
 
     /// Borrow as `Scopes<&str>`.
-    ///
-    /// Indices are cloned (they're small, no heap strings). The buffer
-    /// is borrowed via `AsRef<str>`.
     pub fn borrow(&self) -> Scopes<&str> {
         Scopes {
             buffer: self.buffer.as_ref(),
@@ -743,9 +724,6 @@ impl<S: Bos<str> + AsRef<str>> Scopes<S> {
     }
 
     /// Convert to `Scopes` with a different backing type.
-    ///
-    /// Indices are moved (no clone). The buffer is converted via `From<S>`.
-    /// Byte offsets remain valid because the buffer content is identical.
     pub fn convert<B: Bos<str> + AsRef<str> + From<S>>(self) -> Scopes<B> {
         Scopes {
             buffer: B::from(self.buffer),
@@ -754,9 +732,6 @@ impl<S: Bos<str> + AsRef<str>> Scopes<S> {
     }
 
     /// Produce the sorted, normalized space-separated scope string.
-    ///
-    /// Same output as `Serialize`, but returns `SmolStr` directly
-    /// without going through a serializer.
     pub fn to_normalized_string(&self) -> SmolStr {
         if self.indices.is_empty() {
             return SmolStr::default();
@@ -772,22 +747,14 @@ impl<S: Bos<str> + AsRef<str>> Scopes<S> {
             .collect();
         normalized.sort();
 
-        // Compute total length for pre-allocation.
-        let total_len = normalized.iter().map(|s| s.len()).sum::<usize>()
-            + if normalized.len() > 1 {
-                normalized.len() - 1
-            } else {
-                0
-            }; // Add length for space separators.
-
-        let mut result = String::with_capacity(total_len);
+        let mut result = SmolStrBuilder::new();
         for (i, s) in normalized.iter().enumerate() {
             if i > 0 {
                 result.push(' ');
             }
             result.push_str(s);
         }
-        result.to_smolstr()
+        result.finish()
     }
 
     /// Check if the container has a scope that grants the given scope.
@@ -837,11 +804,17 @@ impl Scopes<SmolStr> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for Scopes<S> {
+impl<S: Bos<str> + AsRef<str> + Default + FromStaticStr> Default for Scopes<S> {
     fn default() -> Self {
+        let buffer = S::from_static("atproto");
+        let end = (buffer.as_ref().len() - 1) as u16;
         Scopes {
-            buffer: S::default(),
-            indices: Vec::new(),
+            buffer,
+            indices: vec![ScopeIndices {
+                start: 0,
+                end,
+                inner: ScopeInnerIndices::Unit(ScopeKind::Atproto),
+            }],
         }
     }
 }
@@ -901,7 +874,7 @@ fn parse_scope_indices(token: &str, base: u16) -> Result<ScopeInnerIndices, Pars
     }
 
     let prefix = found_prefix.ok_or_else(|| {
-        ParseError::UnknownPrefix(token[..token.find(':').unwrap_or(token.len())].to_string())
+        ParseError::UnknownPrefix(token[..token.find(':').unwrap_or(token.len())].to_smolstr())
     })?;
 
     match prefix {
@@ -916,7 +889,7 @@ fn parse_scope_indices(token: &str, base: u16) -> Result<ScopeInnerIndices, Pars
         "openid" => parse_openid_indices(suffix),
         "profile" => parse_profile_indices(suffix),
         "email" => parse_email_indices(suffix),
-        _ => Err(ParseError::UnknownPrefix(prefix.to_string())),
+        _ => Err(ParseError::UnknownPrefix(prefix.to_smolstr())),
     }
 }
 
@@ -937,7 +910,7 @@ fn parse_account_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, Pars
         "email" => AccountResource::Email,
         "repo" => AccountResource::Repo,
         "status" => AccountResource::Status,
-        _ => return Err(ParseError::InvalidResource(resource_str.to_string())),
+        _ => return Err(ParseError::InvalidResource(resource_str.to_smolstr())),
     };
 
     let action = if let Some(params) = params {
@@ -949,7 +922,7 @@ fn parse_account_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, Pars
         {
             Some("read") => AccountAction::Read,
             Some("manage") => AccountAction::Manage,
-            Some(other) => return Err(ParseError::InvalidAction(other.to_string())),
+            Some(other) => return Err(ParseError::InvalidAction(other.to_smolstr())),
             None => AccountAction::Read,
         }
     } else {
@@ -964,7 +937,7 @@ fn parse_identity_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, Par
     let scope = match suffix {
         Some("handle") => IdentityScope::Handle,
         Some("*") => IdentityScope::All,
-        Some(other) => return Err(ParseError::InvalidResource(other.to_string())),
+        Some(other) => return Err(ParseError::InvalidResource(other.to_smolstr())),
         None => return Err(ParseError::MissingResource),
     };
 
@@ -977,7 +950,7 @@ fn parse_transition_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, P
         Some("generic") => TransitionScope::Generic,
         Some("email") => TransitionScope::Email,
         Some("chat.bsky") => TransitionScope::ChatBsky,
-        Some(other) => return Err(ParseError::InvalidResource(other.to_string())),
+        Some(other) => return Err(ParseError::InvalidResource(other.to_smolstr())),
         None => return Err(ParseError::MissingResource),
     };
 
@@ -988,7 +961,7 @@ fn parse_transition_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, P
 fn parse_atproto_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, ParseError> {
     if suffix.is_some() {
         return Err(ParseError::InvalidResource(
-            "atproto scope does not accept suffixes".to_string(),
+            "atproto scope does not accept suffixes".to_smolstr(),
         ));
     }
     Ok(ScopeInnerIndices::Unit(ScopeKind::Atproto))
@@ -998,7 +971,7 @@ fn parse_atproto_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, Pars
 fn parse_openid_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, ParseError> {
     if suffix.is_some() {
         return Err(ParseError::InvalidResource(
-            "openid scope does not accept suffixes".to_string(),
+            "openid scope does not accept suffixes".to_smolstr(),
         ));
     }
     Ok(ScopeInnerIndices::Unit(ScopeKind::OpenId))
@@ -1008,7 +981,7 @@ fn parse_openid_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, Parse
 fn parse_profile_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, ParseError> {
     if suffix.is_some() {
         return Err(ParseError::InvalidResource(
-            "profile scope does not accept suffixes".to_string(),
+            "profile scope does not accept suffixes".to_smolstr(),
         ));
     }
     Ok(ScopeInnerIndices::Unit(ScopeKind::Profile))
@@ -1018,7 +991,7 @@ fn parse_profile_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, Pars
 fn parse_email_indices(suffix: Option<&str>) -> Result<ScopeInnerIndices, ParseError> {
     if suffix.is_some() {
         return Err(ParseError::InvalidResource(
-            "email scope does not accept suffixes".to_string(),
+            "email scope does not accept suffixes".to_smolstr(),
         ));
     }
     Ok(ScopeInnerIndices::Unit(ScopeKind::Email))
@@ -1091,7 +1064,7 @@ fn parse_repo_indices(
                 let end = start + nsid_str.len() as u16;
                 Some((start, end))
             } else {
-                return Err(ParseError::InvalidResource(nsid_str.to_string()));
+                return Err(ParseError::InvalidResource(nsid_str.to_smolstr()));
             }
         }
     };
@@ -1108,7 +1081,7 @@ fn parse_repo_indices(
                     "update" => flags |= RepoActionFlags::UPDATE,
                     "delete" => flags |= RepoActionFlags::DELETE,
                     "*" => flags = RepoActionFlags::ALL,
-                    other => return Err(ParseError::InvalidAction(other.to_string())),
+                    other => return Err(ParseError::InvalidAction(other.to_smolstr())),
                 }
             }
             actions = RepoActionFlags(flags);
@@ -1252,7 +1225,7 @@ fn parse_include_indices(
     // Find the NSID's byte position in the token.
     let nsid_pos = token
         .find(nsid_str)
-        .ok_or_else(|| ParseError::InvalidResource(nsid_str.to_string()))?;
+        .ok_or_else(|| ParseError::InvalidResource(nsid_str.to_smolstr()))?;
     let nsid_start = base + nsid_pos as u16;
     let nsid_end = nsid_start + nsid_str.len() as u16;
 
@@ -1267,13 +1240,13 @@ fn parse_include_indices(
                     // Validate and decode the percent-encoded value using fluent-uri.
                     let estr = EStr::<Query>::new(aud_value).ok_or_else(|| {
                         ParseError::InvalidResource(
-                            "include audience has invalid percent-encoding".to_string(),
+                            "include audience has invalid percent-encoding".to_smolstr(),
                         )
                     })?;
 
                     let decoded = estr.decode().to_string().map_err(|_| {
                         ParseError::InvalidResource(
-                            "include audience contains invalid UTF-8 sequence".to_string(),
+                            "include audience contains invalid UTF-8 sequence".to_smolstr(),
                         )
                     })?;
 
@@ -1284,7 +1257,7 @@ fn parse_include_indices(
                         let frag = decoded.split('#').nth(1).unwrap_or("");
                         if frag.is_empty() {
                             return Err(ParseError::InvalidResource(
-                                "include audience fragment cannot be empty".to_string(),
+                                "include audience fragment cannot be empty".to_smolstr(),
                             ));
                         }
                     }
@@ -1296,7 +1269,7 @@ fn parse_include_indices(
                         let frag = aud_value.split('#').nth(1).unwrap_or("");
                         if frag.is_empty() {
                             return Err(ParseError::InvalidResource(
-                                "include audience fragment cannot be empty".to_string(),
+                                "include audience fragment cannot be empty".to_smolstr(),
                             ));
                         }
                     }
@@ -1305,7 +1278,7 @@ fn parse_include_indices(
                 // Find the audience's byte position in the token.
                 let aud_pos = token
                     .find(aud_value)
-                    .ok_or_else(|| ParseError::InvalidResource(aud_value.to_string()))?;
+                    .ok_or_else(|| ParseError::InvalidResource(aud_value.to_smolstr()))?;
                 let aud_start = base + aud_pos as u16;
                 let aud_end = aud_start + aud_value.len() as u16;
 
@@ -1612,7 +1585,7 @@ impl<S: BosStr + Ord> Scope<S> {
         let prefix = found_prefix.ok_or_else(|| {
             // If no known prefix found, extract what looks like a prefix for error reporting
             let end = s.find(':').or_else(|| s.find('?')).unwrap_or(s.len());
-            ParseError::UnknownPrefix(s[..end].to_string())
+            ParseError::UnknownPrefix(s[..end].to_smolstr())
         })?;
 
         match prefix {
@@ -1626,7 +1599,7 @@ impl<S: BosStr + Ord> Scope<S> {
             "openid" => Self::parse_openid(suffix),
             "profile" => Self::parse_profile(suffix),
             "email" => Self::parse_email(suffix),
-            _ => Err(ParseError::UnknownPrefix(prefix.to_string())),
+            _ => Err(ParseError::UnknownPrefix(prefix.to_smolstr())),
         }
     }
 
@@ -1646,7 +1619,7 @@ impl<S: BosStr + Ord> Scope<S> {
             "email" => AccountResource::Email,
             "repo" => AccountResource::Repo,
             "status" => AccountResource::Status,
-            _ => return Err(ParseError::InvalidResource(resource_str.to_string())),
+            _ => return Err(ParseError::InvalidResource(resource_str.to_smolstr())),
         };
 
         let action = if let Some(params) = params {
@@ -1658,7 +1631,7 @@ impl<S: BosStr + Ord> Scope<S> {
             {
                 Some("read") => AccountAction::Read,
                 Some("manage") => AccountAction::Manage,
-                Some(other) => return Err(ParseError::InvalidAction(other.to_string())),
+                Some(other) => return Err(ParseError::InvalidAction(other.to_smolstr())),
                 None => AccountAction::Read,
             }
         } else {
@@ -1672,7 +1645,7 @@ impl<S: BosStr + Ord> Scope<S> {
         let scope = match suffix {
             Some("handle") => IdentityScope::Handle,
             Some("*") => IdentityScope::All,
-            Some(other) => return Err(ParseError::InvalidResource(other.to_string())),
+            Some(other) => return Err(ParseError::InvalidResource(other.to_smolstr())),
             None => return Err(ParseError::MissingResource),
         };
 
@@ -1750,7 +1723,7 @@ impl<S: BosStr + Ord> Scope<S> {
                             actions.insert(RepoAction::Update);
                             actions.insert(RepoAction::Delete);
                         }
-                        other => return Err(ParseError::InvalidAction(other.to_string())),
+                        other => return Err(ParseError::InvalidAction(other.to_smolstr())),
                     }
                 }
             }
@@ -1840,7 +1813,7 @@ impl<S: BosStr + Ord> Scope<S> {
     fn parse_atproto(suffix: Option<&str>) -> Result<Self, ParseError> {
         if suffix.is_some() {
             return Err(ParseError::InvalidResource(
-                "atproto scope does not accept suffixes".to_string(),
+                "atproto scope does not accept suffixes".to_smolstr(),
             ));
         }
         Ok(Scope::Atproto)
@@ -1851,7 +1824,7 @@ impl<S: BosStr + Ord> Scope<S> {
             Some("generic") => TransitionScope::Generic,
             Some("email") => TransitionScope::Email,
             Some("chat.bsky") => TransitionScope::ChatBsky,
-            Some(other) => return Err(ParseError::InvalidResource(other.to_string())),
+            Some(other) => return Err(ParseError::InvalidResource(other.to_smolstr())),
             None => return Err(ParseError::MissingResource),
         };
 
@@ -1861,7 +1834,7 @@ impl<S: BosStr + Ord> Scope<S> {
     fn parse_openid(suffix: Option<&str>) -> Result<Self, ParseError> {
         if suffix.is_some() {
             return Err(ParseError::InvalidResource(
-                "openid scope does not accept suffixes".to_string(),
+                "openid scope does not accept suffixes".to_smolstr(),
             ));
         }
         Ok(Scope::OpenId)
@@ -1870,7 +1843,7 @@ impl<S: BosStr + Ord> Scope<S> {
     fn parse_profile(suffix: Option<&str>) -> Result<Self, ParseError> {
         if suffix.is_some() {
             return Err(ParseError::InvalidResource(
-                "profile scope does not accept suffixes".to_string(),
+                "profile scope does not accept suffixes".to_smolstr(),
             ));
         }
         Ok(Scope::Profile)
@@ -1879,7 +1852,7 @@ impl<S: BosStr + Ord> Scope<S> {
     fn parse_email(suffix: Option<&str>) -> Result<Self, ParseError> {
         if suffix.is_some() {
             return Err(ParseError::InvalidResource(
-                "email scope does not accept suffixes".to_string(),
+                "email scope does not accept suffixes".to_smolstr(),
             ));
         }
         Ok(Scope::Email)
@@ -2029,7 +2002,7 @@ impl<S: BosStr + Ord> Scope<S> {
     /// Check if this scope grants the permissions of another scope
     pub fn grants<T: BosStr>(&self, other: &Scope<T>) -> bool {
         match (self, other) {
-            // Atproto only grants itself (it's a required scope, not a permission grant)
+            // Atproto only grants itself
             (Scope::Atproto, Scope::Atproto) => true,
             (Scope::Atproto, _) => false,
             // Nothing else grants atproto
@@ -2090,7 +2063,6 @@ impl<S: BosStr + Ord> Scope<S> {
                 let collection_match = match (&a.collection, &b.collection) {
                     (RepoCollection::All, _) => true,
                     (RepoCollection::Nsid(a_nsid), RepoCollection::Nsid(b_nsid)) => {
-                        // Compare as strings to support cross-type-parameter equality.
                         a_nsid.as_ref() == b_nsid.as_ref()
                     }
                     _ => false,
@@ -2108,7 +2080,6 @@ impl<S: BosStr + Ord> Scope<S> {
                 } else {
                     b.lxm.iter().all(|b_lxm| match b_lxm {
                         RpcLexicon::All => false,
-                        // Compare as strings to support cross-type-parameter equality.
                         RpcLexicon::Nsid(b_nsid) => a.lxm.iter().any(|a_lxm| match a_lxm {
                             RpcLexicon::All => false,
                             RpcLexicon::Nsid(a_nsid) => a_nsid.as_ref() == b_nsid.as_ref(),
@@ -2121,7 +2092,6 @@ impl<S: BosStr + Ord> Scope<S> {
                 } else {
                     b.aud.iter().all(|b_aud| match b_aud {
                         RpcAudience::All => false,
-                        // Compare as strings to support cross-type-parameter equality.
                         RpcAudience::Did(b_did) => a.aud.iter().any(|a_aud| match a_aud {
                             RpcAudience::All => false,
                             RpcAudience::Did(a_did) => a_did.as_ref() == b_did.as_ref(),
@@ -2146,7 +2116,7 @@ impl<S: BosStr> MimePattern<S> {
             }
             (MimePattern::TypeWildcard(a_type), MimePattern::Exact(b_mime)) => b_mime
                 .as_ref()
-                .starts_with(&format!("{}/", a_type.as_ref())),
+                .starts_with(format_smolstr!("{}/", a_type.as_ref()).as_str()),
             (MimePattern::Exact(a), MimePattern::Exact(b)) => a.as_ref() == b.as_ref(),
             _ => false,
         }
@@ -2167,7 +2137,7 @@ where
         } else if s.contains('/') {
             Ok(MimePattern::Exact(S::from_str(s).unwrap()))
         } else {
-            Err(ParseError::InvalidMimeType(s.to_string()))
+            Err(ParseError::InvalidMimeType(s.to_smolstr()))
         }
     }
 }
@@ -2183,7 +2153,7 @@ impl<'a, S: BosStr + From<&'a str>> TryFrom<&'a str> for MimePattern<S> {
         } else if s.contains('/') {
             Ok(MimePattern::Exact(S::from(s)))
         } else {
-            Err(ParseError::InvalidMimeType(s.to_string()))
+            Err(ParseError::InvalidMimeType(s.to_smolstr()))
         }
     }
 }
@@ -2218,15 +2188,15 @@ fn parse_query_string(query: &str) -> BTreeMap<SmolStr, Vec<&str>> {
 pub enum PermissionSetConversionError {
     /// Unknown identity attribute in permission set
     #[error("unknown identity attribute: {0}")]
-    UnknownIdentityAttr(String),
+    UnknownIdentityAttr(SmolStr),
 
     /// Unknown account attribute in permission set
     #[error("unknown account attribute: {0}")]
-    UnknownAccountAttr(String),
+    UnknownAccountAttr(SmolStr),
 
     /// Invalid MIME pattern in blob permission
     #[error("invalid MIME pattern: {0}")]
-    InvalidMimePattern(String),
+    InvalidMimePattern(SmolStr),
 }
 
 /// Error type for scope parsing
@@ -2234,15 +2204,15 @@ pub enum PermissionSetConversionError {
 #[non_exhaustive]
 pub enum ParseError {
     /// Unknown scope prefix
-    UnknownPrefix(String),
+    UnknownPrefix(SmolStr),
     /// Missing required resource
     MissingResource,
     /// Invalid resource type
-    InvalidResource(String),
+    InvalidResource(SmolStr),
     /// Invalid action type
-    InvalidAction(String),
+    InvalidAction(SmolStr),
     /// Invalid MIME type
-    InvalidMimeType(String),
+    InvalidMimeType(SmolStr),
     /// An AT Protocol string type (DID, NSID, etc.) failed validation during scope parsing.
     ParseError(#[from] AtStrError),
 }
@@ -2347,7 +2317,7 @@ pub fn expand_permission_set(
                         }
                         Err(_) => {
                             return Err(PermissionSetConversionError::InvalidMimePattern(
-                                pattern_str.to_string(),
+                                pattern_str.to_smolstr(),
                             ));
                         }
                     }
@@ -2363,7 +2333,7 @@ pub fn expand_permission_set(
                     "*" => IdentityScope::All,
                     other => {
                         return Err(PermissionSetConversionError::UnknownIdentityAttr(
-                            other.to_string(),
+                            other.to_smolstr(),
                         ));
                     }
                 };
@@ -2376,7 +2346,7 @@ pub fn expand_permission_set(
                     "status" => AccountResource::Status,
                     other => {
                         return Err(PermissionSetConversionError::UnknownAccountAttr(
-                            other.to_string(),
+                            other.to_smolstr(),
                         ));
                     }
                 };
@@ -3676,9 +3646,10 @@ mod tests {
     #[test]
     fn test_scopes_default() {
         // Test Default trait for Scopes.
+        // should return atproto scope
         let default: Scopes<SmolStr> = Default::default();
-        assert_eq!(default.len(), 0);
-        assert!(default.is_empty());
+        assert_eq!(default.buffer.as_str(), "atproto");
+        assert!(matches!(default.get(0), Some(Scope::Atproto)));
     }
 
     #[test]

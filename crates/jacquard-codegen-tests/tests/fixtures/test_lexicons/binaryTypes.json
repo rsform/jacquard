@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "test.binary.types",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": ["cid", "data"],
+      "properties": {
+        "cid": {
+          "type": "cid-link",
+          "description": "Content identifier"
+        },
+        "data": {
+          "type": "bytes",
+          "description": "Raw bytes",
+          "maxLength": 5000
+        },
+        "avatar": {
+          "type": "blob",
+          "accept": ["image/*"],
+          "maxSize": 1000000,
+          "description": "Profile avatar"
+        },
+        "optionalCid": {
+          "type": "cid-link"
+        }
+      }
+    }
+  }
+}

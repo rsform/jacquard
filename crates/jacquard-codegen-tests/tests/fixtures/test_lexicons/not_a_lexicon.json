@@ -1,0 +1,7 @@
+{
+  "name": "some random config",
+  "version": "1.0.0",
+  "settings": {
+    "enabled": true
+  }
+}
