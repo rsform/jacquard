@@ -16,9 +16,9 @@ default = []
 
 [dependencies]
 # Internal
-jacquard-common = { path = "../jacquard-common", version = "0.12.0-beta.1", features = ["crypto-ed25519", "crypto-k256", "crypto-p256"] }
-jacquard-derive = { path = "../jacquard-derive", version = "0.12.0-beta.1" }
-jacquard-api = { path = "../jacquard-api", version = "0.12.0-beta.1", features = ["streaming"] }
+jacquard-common = { path = "../jacquard-common", version = "0.12.0-beta.2", features = ["crypto-ed25519", "crypto-k256", "crypto-p256"] }
+jacquard-derive = { path = "../jacquard-derive", version = "0.12.0-beta.2" }
+jacquard-api = { path = "../jacquard-api", version = "0.12.0-beta.2", features = ["streaming"] }
 
 # Serialization
 serde.workspace = true
