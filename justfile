@@ -5,6 +5,28 @@ default:
 pre-commit-all:
     pre-commit run --all-files
 
+# Run tests with default features
+test *ARGS:
+    cargo nextest run {{ARGS}}
+
+# Run tests across the full feature matrix
+test-all:
+    @echo "── default ──"
+    cargo nextest run
+    @echo ""
+    @echo "── scope-check ──"
+    cargo nextest run --features scope-check
+    @echo ""
+    @echo "── streaming ──"
+    cargo nextest run --features streaming
+    @echo ""
+    @echo "── websocket ──"
+    cargo nextest run --features websocket
+
+# Run tests with a specific feature set
+test-feature FEATURE *ARGS:
+    cargo nextest run --features {{FEATURE}} {{ARGS}}
+
 # Check that jacquard-common compiles for wasm32
 check-wasm:
     cargo build --target wasm32-unknown-unknown -p jacquard-common --features websocket,reqwest-client
