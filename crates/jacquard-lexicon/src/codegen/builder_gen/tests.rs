@@ -46,49 +46,50 @@ fn test_common_types_generation() {
     let _parsed: syn::File = syn::parse2(tokens).expect("Generated code should parse");
 }
 
-// TODO: re-enable these tests once i have time to get them to properly check and not be order-dependent
-// #[test]
-// fn test_collect_required_fields_object() {
-//     let obj = LexObject {
-//         description: None,
-//         required: Some(vec![
-//             SmolStr::new_static("foo"),
-//             SmolStr::new_static("barBaz"),
-//         ]),
-//         nullable: None,
-//         properties: Default::default(),
-//     };
+#[test]
+fn test_collect_required_fields_object() {
+    let obj = LexObject {
+        description: None,
+        required: Some(vec![
+            SmolStr::new_static("foo"),
+            SmolStr::new_static("barBaz"),
+        ]),
+        nullable: None,
+        properties: Default::default(),
+    };
 
-//     let schema = BuilderSchema::Object(&obj);
-//     let fields = collect_required_fields(&schema);
+    let schema = BuilderSchema::Object(&obj);
+    let fields = collect_required_fields(&schema);
 
-//     assert_eq!(fields.len(), 2);
-//     assert_eq!(fields[0].name_snake, "foo");
-//     assert_eq!(fields[0].name_pascal, "Foo");
-//     assert_eq!(fields[1].name_snake, "bar_baz");
-//     assert_eq!(fields[1].name_pascal, "BarBaz");
-// }
+    assert_eq!(fields.len(), 2);
+    // bar_baz comes before foo alphabetically
+    assert_eq!(fields[0].name_snake, "bar_baz");
+    assert_eq!(fields[0].name_pascal, "BarBaz");
+    assert_eq!(fields[1].name_snake, "foo");
+    assert_eq!(fields[1].name_pascal, "Foo");
+}
 
-// #[test]
-// fn test_collect_required_fields_parameters() {
-//     let params = LexXrpcParameters {
-//         description: None,
-//         required: Some(vec![
-//             SmolStr::new_static("limit"),
-//             SmolStr::new_static("cursor"),
-//         ]),
-//         properties: Default::default(),
-//     };
+#[test]
+fn test_collect_required_fields_parameters() {
+    let params = LexXrpcParameters {
+        description: None,
+        required: Some(vec![
+            SmolStr::new_static("limit"),
+            SmolStr::new_static("cursor"),
+        ]),
+        properties: Default::default(),
+    };
 
-//     let schema = BuilderSchema::Parameters(&params);
-//     let fields = collect_required_fields(&schema);
+    let schema = BuilderSchema::Parameters(&params);
+    let fields = collect_required_fields(&schema);
 
-//     assert_eq!(fields.len(), 2);
-//     assert_eq!(fields[1].name_snake, "limit");
-//     assert_eq!(fields[1].name_pascal, "Limit");
-//     assert_eq!(fields[0].name_snake, "cursor");
-//     assert_eq!(fields[0].name_pascal, "Cursor");
-// }
+    assert_eq!(fields.len(), 2);
+    // cursor comes before limit alphabetically
+    assert_eq!(fields[0].name_snake, "cursor");
+    assert_eq!(fields[0].name_pascal, "Cursor");
+    assert_eq!(fields[1].name_snake, "limit");
+    assert_eq!(fields[1].name_pascal, "Limit");
+}
 
 #[test]
 fn test_state_module_generation() {

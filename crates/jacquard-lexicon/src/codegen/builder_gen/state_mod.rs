@@ -13,7 +13,7 @@ use quote::{format_ident, quote};
 use crate::codegen::utils::make_ident;
 
 /// Information about a required field for builder state generation
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RequiredField {
     /// Field name (snake_case)
     pub name_snake: SmolStr,
@@ -47,7 +47,9 @@ pub fn collect_required_fields(schema: &super::BuilderSchema<'_>) -> Vec<Require
         })
         .collect();
 
-    set.into_iter().collect()
+    let mut fields: Vec<_> = set.into_iter().collect();
+    fields.sort();
+    fields
 }
 
 /// Generate the complete state module for a builder
