@@ -335,37 +335,37 @@ pub mod collision_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LocalFoo;
         type ExternalFoo;
+        type LocalFoo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LocalFoo = Unset;
         type ExternalFoo = Unset;
-    }
-    ///State transition - sets the `local_foo` field to Set
-    pub struct SetLocalFoo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLocalFoo<St> {}
-    impl<St: State> State for SetLocalFoo<St> {
-        type LocalFoo = Set<members::local_foo>;
-        type ExternalFoo = St::ExternalFoo;
+        type LocalFoo = Unset;
     }
     ///State transition - sets the `external_foo` field to Set
     pub struct SetExternalFoo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetExternalFoo<St> {}
     impl<St: State> State for SetExternalFoo<St> {
-        type LocalFoo = St::LocalFoo;
         type ExternalFoo = Set<members::external_foo>;
+        type LocalFoo = St::LocalFoo;
+    }
+    ///State transition - sets the `local_foo` field to Set
+    pub struct SetLocalFoo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLocalFoo<St> {}
+    impl<St: State> State for SetLocalFoo<St> {
+        type ExternalFoo = St::ExternalFoo;
+        type LocalFoo = Set<members::local_foo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `local_foo` field
-        pub struct local_foo(());
         ///Marker type for the `external_foo` field
         pub struct external_foo(());
+        ///Marker type for the `local_foo` field
+        pub struct local_foo(());
     }
 }
 
@@ -452,8 +452,8 @@ impl<S: jacquard_common::BosStr, St: collision_state::State> CollisionBuilder<S,
 impl<S: jacquard_common::BosStr, St> CollisionBuilder<S, St>
 where
     St: collision_state::State,
-    St::LocalFoo: collision_state::IsSet,
     St::ExternalFoo: collision_state::IsSet,
+    St::LocalFoo: collision_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Collision<S> {

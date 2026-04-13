@@ -647,12 +647,12 @@ impl JacquardResolver {
         .unwrap_or_default();
         let url_str = if qs.is_empty() {
             format!(
-                "{}xrpc/com.bad-example.identity.resolveMiniDoc",
+                "{}xrpc/blue.microcosm.identity.resolveMiniDoc",
                 base.as_str().trim_end_matches('/').to_string() + "/"
             )
         } else {
             format!(
-                "{}xrpc/com.bad-example.identity.resolveMiniDoc?{}",
+                "{}xrpc/blue.microcosm.identity.resolveMiniDoc?{}",
                 base.as_str().trim_end_matches('/').to_string() + "/",
                 qs
             )

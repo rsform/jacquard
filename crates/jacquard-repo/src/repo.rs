@@ -332,25 +332,66 @@ where
         Ok(old_cid)
     }
 
-    // TODO(cursor-based queries): Potential future API additions
-    //
-    // The current API is purely single-record CRUD. Cursor-based traversal (see mst/cursor.rs)
-    // would enable efficient collection/range queries:
-    //
-    // - list_collection(collection: &Nsid) -> Vec<(RecordKey, IpldCid)>
-    //   Enumerate all records in a collection via prefix search on "collection/"
-    //   Uses cursor.advance() + cursor.skip_subtree() to skip irrelevant branches
-    //
-    // - list_collection_range(collection: &Nsid, start: &Rkey, end: &Rkey) -> Vec<...>
-    //   Range query: advance to start key, collect until > end, skip subtrees outside range
-    //   Useful for pagination / time-bounded queries (since Rkeys are often TIDs)
-    //
-    // - list_all_collections() -> Vec<Nsid>
-    //   Walk tree, track collection prefixes, skip subtrees once prefix changes
-    //
-    // Current single-key get() is already optimal (O(log n) targeted lookup).
-    // But these bulk operations would benefit significantly from cursor's skip_subtree()
-    // to avoid traversing unrelated branches when searching lexicographically-organized data.
+    /// List all records in a collection.
+    ///
+    /// Returns `(rkey, cid)` pairs for every record under the given collection
+    /// NSID, sorted lexicographically by rkey. Uses cursor-based traversal with
+    /// subtree skipping for efficiency on large repositories.
+    pub async fn list_collection(
+        &self,
+        collection: &Nsid<S>,
+    ) -> Result<Vec<(smol_str::SmolStr, IpldCid)>> {
+        use crate::mst::cursor::{CursorPosition, MstCursor};
+
+        let prefix = format!("{}/", collection.as_ref());
+        let mut cursor = MstCursor::new(self.mst.clone());
+        let mut results = Vec::new();
+
+        // Step into the root
+        cursor.advance().await?;
+
+        while !cursor.is_end() {
+            match cursor.current().clone() {
+                CursorPosition::Leaf { key, cid } => {
+                    if key.starts_with(&prefix) {
+                        let rkey = smol_str::SmolStr::new(&key[prefix.len()..]);
+                        results.push((rkey, cid));
+                    } else if key.as_str() > prefix.as_str() {
+                        // Past the collection lexicographically — done
+                        break;
+                    }
+                    cursor.advance().await?;
+                }
+                CursorPosition::Tree { .. } => {
+                    cursor.advance().await?;
+                }
+                CursorPosition::End => break,
+            }
+        }
+
+        Ok(results)
+    }
+
+    /// List all records in a collection with their data.
+    ///
+    /// Like [`list_collection`](Self::list_collection) but also reads each
+    /// record's block data from storage and returns it as raw bytes. Records
+    /// whose blocks are missing from storage are silently skipped.
+    pub async fn list_collection_data(
+        &self,
+        collection: &Nsid<S>,
+    ) -> Result<Vec<(smol_str::SmolStr, IpldCid, Bytes)>> {
+        let entries = self.list_collection(collection).await?;
+        let mut results = Vec::with_capacity(entries.len());
+
+        for (rkey, cid) in entries {
+            if let Some(data) = self.storage.get(&cid).await? {
+                results.push((rkey, cid, data));
+            }
+        }
+
+        Ok(results)
+    }
 
     /// Create a commit from record write operations
     ///
@@ -1266,5 +1307,118 @@ mod tests {
                 .unwrap()
                 .is_some()
         );
+    }
+
+    #[tokio::test]
+    async fn test_list_collection() {
+        use crate::mst::RecordWriteOp;
+
+        let storage = Arc::new(MemoryBlockStore::new());
+        let mut repo = create_test_repo(storage.clone()).await;
+
+        let posts = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let likes = Nsid::new("app.bsky.feed.like").unwrap().into_static();
+        let did = Did::new("did:plc:test").unwrap().into_static();
+        let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
+
+        let ops = vec![
+            RecordWriteOp::Create {
+                collection: posts.clone(),
+                rkey: RecordKey(Rkey::new("aaa").unwrap()).into_static(),
+                record: make_test_record(1),
+            },
+            RecordWriteOp::Create {
+                collection: posts.clone(),
+                rkey: RecordKey(Rkey::new("bbb").unwrap()).into_static(),
+                record: make_test_record(2),
+            },
+            RecordWriteOp::Create {
+                collection: posts.clone(),
+                rkey: RecordKey(Rkey::new("ccc").unwrap()).into_static(),
+                record: make_test_record(3),
+            },
+            RecordWriteOp::Create {
+                collection: likes.clone(),
+                rkey: RecordKey(Rkey::new("zzz").unwrap()).into_static(),
+                record: make_test_record(4),
+            },
+        ];
+
+        let (_, commit_data) = repo
+            .create_commit(
+                &ops,
+                &did,
+                Some(repo.current_commit_cid().clone()),
+                &signing_key,
+            )
+            .await
+            .unwrap();
+        repo.apply_commit(commit_data).await.unwrap();
+
+        // List posts — should get 3 entries
+        let post_entries = repo.list_collection(&posts).await.unwrap();
+        assert_eq!(post_entries.len(), 3);
+        let rkeys: Vec<&str> = post_entries.iter().map(|(k, _)| k.as_str()).collect();
+        assert_eq!(rkeys, vec!["aaa", "bbb", "ccc"]);
+
+        // List likes — should get 1 entry
+        let like_entries = repo.list_collection(&likes).await.unwrap();
+        assert_eq!(like_entries.len(), 1);
+        assert_eq!(like_entries[0].0.as_str(), "zzz");
+
+        // List nonexistent collection — should get 0 entries
+        let empty_nsid = Nsid::new("app.bsky.graph.follow").unwrap().into_static();
+        let empty = repo.list_collection(&empty_nsid).await.unwrap();
+        assert!(empty.is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_list_collection_data() {
+        use crate::mst::RecordWriteOp;
+
+        let storage = Arc::new(MemoryBlockStore::new());
+        let mut repo = create_test_repo(storage.clone()).await;
+
+        let posts = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let did = Did::new("did:plc:test").unwrap().into_static();
+        let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
+
+        let ops = vec![
+            RecordWriteOp::Create {
+                collection: posts.clone(),
+                rkey: RecordKey(Rkey::new("post1").unwrap()).into_static(),
+                record: make_test_record(1),
+            },
+            RecordWriteOp::Create {
+                collection: posts.clone(),
+                rkey: RecordKey(Rkey::new("post2").unwrap()).into_static(),
+                record: make_test_record(2),
+            },
+        ];
+
+        let (_, commit_data) = repo
+            .create_commit(
+                &ops,
+                &did,
+                Some(repo.current_commit_cid().clone()),
+                &signing_key,
+            )
+            .await
+            .unwrap();
+        repo.apply_commit(commit_data).await.unwrap();
+
+        let entries = repo.list_collection_data(&posts).await.unwrap();
+        assert_eq!(entries.len(), 2);
+
+        // Verify we can deserialize the record data
+        for (rkey, _cid, data) in &entries {
+            let record: BTreeMap<SmolStr, RawData> =
+                serde_ipld_dagcbor::from_slice(data).unwrap();
+            assert_eq!(
+                record.get(&SmolStr::new("$type")).unwrap(),
+                &RawData::String("app.bsky.feed.post".into())
+            );
+            assert!(rkey.as_str() == "post1" || rkey.as_str() == "post2");
+        }
     }
 }

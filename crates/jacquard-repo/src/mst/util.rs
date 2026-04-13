@@ -11,6 +11,7 @@ use crate::storage::BlockStore;
 use bytes::Bytes;
 use cid::Cid as IpldCid;
 use sha2::{Digest, Sha256};
+use smol_str::{SmolStr, ToSmolStr, format_smolstr};
 
 /// Compute CID from raw bytes
 ///
@@ -129,7 +130,7 @@ pub fn serialize_node_data<'a, S: BlockStore + Sync + 'static>(
         }
 
         // Process remaining entries
-        let mut last_key = String::new();
+        let mut last_key = SmolStr::new("");
         while i < entries.len() {
             let entry = &entries[i];
 
@@ -160,7 +161,7 @@ pub fn serialize_node_data<'a, S: BlockStore + Sync + 'static>(
                     tree: tree_ptr,
                 });
 
-                last_key = key.as_str().to_string();
+                last_key = key.as_str().to_smolstr();
             } else {
                 return Err(
                     MstError::InvalidNode("Two Trees adjacent in flat entries".into()).into(),
@@ -196,17 +197,17 @@ pub fn deserialize_node_data<S: BlockStore + Sync + 'static>(
     }
 
     // Process entries
-    let mut last_key = String::new();
+    let mut last_key = SmolStr::new("");
     for entry in &data.entries {
         // Reconstruct full key from prefix
         let key_str = std::str::from_utf8(&entry.key_suffix)
             .map_err(|e| MstError::InvalidNode(format!("Invalid UTF-8 in key suffix: {}", e)))?;
         let prefix_len = entry.prefix_len as usize;
-        let full_key = format!("{}{}", &last_key[..prefix_len], key_str);
+        let full_key = format_smolstr!("{}{}", &last_key[..prefix_len], key_str);
 
         // Append Leaf
         entries.push(NodeEntry::Leaf {
-            key: smol_str::SmolStr::new(&full_key),
+            key: full_key.clone(),
             value: entry.value,
         });
 

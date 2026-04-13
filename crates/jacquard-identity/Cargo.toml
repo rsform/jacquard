@@ -41,8 +41,7 @@ hickory-resolver = { optional = true, version = "0.24", default-features = false
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-mini-moka = { package = "mini-moka-wasm", version = "0.10",path = "../mini-moka-wasm", features = ["js"],  optional = true }
+
 #ring = { version = "0.17", default-features = false, features = ["wasm32_unknown_unknown_js"]}
 
 [[example]]
