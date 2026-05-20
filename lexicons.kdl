@@ -101,3 +101,11 @@ source "teal-fm" type="git" priority=50 {
     repo "https://github.com/teal-fm/teal"
     pattern "lexicons/**/*.json"
 }
+source "arabica" type="git" priority=50 {
+    repo "https://tangled.org/arabica.social/arabica"
+    pattern "lexicons/social/arabica/alpha/*.json"
+}
+source "oolong" type="git" priority=50 {
+    repo "https://tangled.org/arabica.social/arabica"
+    pattern "lexicons/social/oolong/alpha/*.json"
+}
