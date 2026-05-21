@@ -310,37 +310,37 @@ pub mod byte_slice_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ByteStart;
         type ByteEnd;
+        type ByteStart;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ByteStart = Unset;
         type ByteEnd = Unset;
-    }
-    ///State transition - sets the `byte_start` field to Set
-    pub struct SetByteStart<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetByteStart<St> {}
-    impl<St: State> State for SetByteStart<St> {
-        type ByteStart = Set<members::byte_start>;
-        type ByteEnd = St::ByteEnd;
+        type ByteStart = Unset;
     }
     ///State transition - sets the `byte_end` field to Set
     pub struct SetByteEnd<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetByteEnd<St> {}
     impl<St: State> State for SetByteEnd<St> {
-        type ByteStart = St::ByteStart;
         type ByteEnd = Set<members::byte_end>;
+        type ByteStart = St::ByteStart;
+    }
+    ///State transition - sets the `byte_start` field to Set
+    pub struct SetByteStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetByteStart<St> {}
+    impl<St: State> State for SetByteStart<St> {
+        type ByteEnd = St::ByteEnd;
+        type ByteStart = Set<members::byte_start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `byte_start` field
-        pub struct byte_start(());
         ///Marker type for the `byte_end` field
         pub struct byte_end(());
+        ///Marker type for the `byte_start` field
+        pub struct byte_start(());
     }
 }
 
@@ -354,7 +354,7 @@ pub struct ByteSliceBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl ByteSlice<DefaultStr> {
+impl ByteSlice<jacquard_common::DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
     pub fn new() -> ByteSliceBuilder<
         byte_slice_state::Empty,
@@ -434,8 +434,8 @@ where
 impl<St, S: jacquard_common::BosStr> ByteSliceBuilder<St, S>
 where
     St: byte_slice_state::State,
-    St::ByteStart: byte_slice_state::IsSet,
     St::ByteEnd: byte_slice_state::IsSet,
+    St::ByteStart: byte_slice_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ByteSlice<S> {
@@ -699,7 +699,7 @@ pub struct LinkBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl Link<DefaultStr> {
+impl Link<jacquard_common::DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
     pub fn new() -> LinkBuilder<link_state::Empty, jacquard_common::DefaultStr> {
         LinkBuilder::new()
@@ -838,7 +838,7 @@ pub struct FacetBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl Facet<DefaultStr> {
+impl Facet<jacquard_common::DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
     pub fn new() -> FacetBuilder<facet_state::Empty, jacquard_common::DefaultStr> {
         FacetBuilder::new()
@@ -984,7 +984,7 @@ pub struct MentionBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl Mention<DefaultStr> {
+impl Mention<jacquard_common::DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
     pub fn new() -> MentionBuilder<mention_state::Empty, jacquard_common::DefaultStr> {
         MentionBuilder::new()

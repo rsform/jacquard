@@ -110,7 +110,7 @@ pub struct ConsumerBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl Consumer<DefaultStr> {
+impl Consumer<jacquard_common::DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
     pub fn new() -> ConsumerBuilder<consumer_state::Empty, jacquard_common::DefaultStr> {
         ConsumerBuilder::new()

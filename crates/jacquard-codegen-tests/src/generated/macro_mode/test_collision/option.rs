@@ -180,7 +180,7 @@ pub struct OptionRecordBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl OptionRecord<DefaultStr> {
+impl OptionRecord<jacquard_common::DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
     pub fn new() -> OptionRecordBuilder<
         option_record_state::Empty,

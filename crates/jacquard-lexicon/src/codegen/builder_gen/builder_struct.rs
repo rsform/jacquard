@@ -83,7 +83,7 @@ pub fn generate_builder_struct(
             quote! {}
         };
         quote! {
-            impl #type_ident<DefaultStr> {
+            impl #type_ident<#default_str_path> {
                 /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
                 pub fn new() -> #builder_name<#lifetime #state_mod_name::Empty, #default_str_path> {
                     #builder_name::new()

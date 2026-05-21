@@ -104,7 +104,7 @@ pub struct StrongRefBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl StrongRef<DefaultStr> {
+impl StrongRef<jacquard_common::DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
     pub fn new() -> StrongRefBuilder<
         strong_ref_state::Empty,

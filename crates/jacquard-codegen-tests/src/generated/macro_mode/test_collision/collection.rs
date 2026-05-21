@@ -371,7 +371,7 @@ pub struct CollectionRecordBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl CollectionRecord<DefaultStr> {
+impl CollectionRecord<jacquard_common::DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
     pub fn new() -> CollectionRecordBuilder<
         collection_record_state::Empty,

@@ -72,7 +72,7 @@ async fn main() -> miette::Result<()> {
 
     // Wrap in Agent and fetch the timeline
     let agent: Agent<_> = Agent::from(session);
-    let output = agent.send(GetTimeline::builder().limit(5).build()).await?;
+    let output = agent.send(GetTimeline::new().limit(5).build()).await?;
     let timeline = output.into_output()?;
     for (i, post) in timeline.feed.iter().enumerate() {
         println!("\n{}. by {}", i + 1, post.post.author.handle);

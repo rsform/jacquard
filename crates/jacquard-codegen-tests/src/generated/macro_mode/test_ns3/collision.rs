@@ -149,7 +149,7 @@ pub struct FooBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl Foo<DefaultStr> {
+impl Foo<jacquard_common::DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
     pub fn new() -> FooBuilder<foo_state::Empty, jacquard_common::DefaultStr> {
         FooBuilder::new()
@@ -404,7 +404,7 @@ pub struct CollisionBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl Collision<DefaultStr> {
+impl Collision<jacquard_common::DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
     pub fn new() -> CollisionBuilder<
         collision_state::Empty,

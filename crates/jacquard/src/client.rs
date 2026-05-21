@@ -829,7 +829,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                 "no rkey",
                 ClientError::invalid_request("no rkey"),
             ))?;
-            let request = GetRecord::new()
+            let request = GetRecord::builder()
                 .repo(uri.authority().clone())
                 .collection(collection.clone())
                 .rkey(RecordKey(rkey.clone()))
