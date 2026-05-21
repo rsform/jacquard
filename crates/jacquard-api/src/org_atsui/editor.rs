@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Editor<S: BosStr = DefaultStr> {
     ///AT-URI of the component record to edit
     pub uri: AtUri<S>,
@@ -30,11 +27,9 @@ pub struct Editor<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EditorOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -53,8 +48,9 @@ impl jacquard_common::xrpc::XrpcResp for EditorResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Editor<S> {
     const NSID: &'static str = "org.atsui.Editor";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = EditorResponse;
 }
 
@@ -62,15 +58,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Editor<S> {
 pub struct EditorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for EditorRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Editor";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Editor<S>;
     type Response = EditorResponse;
 }
 
 pub mod editor_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -101,21 +98,28 @@ pub mod editor_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EditorBuilder<S: BosStr, St: editor_state::State> {
+pub struct EditorBuilder<St: editor_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Editor<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EditorBuilder<S, editor_state::Empty> {
+impl Editor<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EditorBuilder<editor_state::Empty, DefaultStr> {
         EditorBuilder::new()
     }
 }
 
-impl<S: BosStr> EditorBuilder<S, editor_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Editor<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EditorBuilder<editor_state::Empty, S> {
+        EditorBuilder::builder()
+    }
+}
+
+impl EditorBuilder<editor_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EditorBuilder {
             _state: PhantomData,
@@ -125,13 +129,27 @@ impl<S: BosStr> EditorBuilder<S, editor_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EditorBuilder<S, St>
+impl<S: BosStr> EditorBuilder<editor_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EditorBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EditorBuilder<St, S>
 where
     St: editor_state::State,
     St::Uri: editor_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(mut self, value: impl Into<AtUri<S>>) -> EditorBuilder<S, editor_state::SetUri<St>> {
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> EditorBuilder<editor_state::SetUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EditorBuilder {
             _state: PhantomData,
@@ -141,7 +159,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EditorBuilder<S, St>
+impl<St, S: BosStr> EditorBuilder<St, S>
 where
     St: editor_state::State,
     St::Uri: editor_state::IsSet,

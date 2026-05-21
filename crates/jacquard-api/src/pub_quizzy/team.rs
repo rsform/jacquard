@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A quiz team
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -122,20 +122,25 @@ impl<S: BosStr> LexiconSchema for Team<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -215,7 +220,7 @@ impl<S: BosStr> LexiconSchema for Team<S> {
 
 pub mod team_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -223,61 +228,63 @@ pub mod team_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Members;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Members = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Members = St::Members;
+        type Name = Unset;
     }
     ///State transition - sets the `members` field to Set
     pub struct SetMembers<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMembers<St> {}
     impl<St: State> State for SetMembers<St> {
-        type Name = St::Name;
         type Members = Set<members::members>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Members = St::Members;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `members` field
         pub struct members(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TeamBuilder<S: BosStr, St: team_state::State> {
+pub struct TeamBuilder<St: team_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<BlobRef<S>>,
-        Option<S>,
-        Option<Vec<Did<S>>>,
-        Option<S>,
-    ),
+    _fields: (Option<BlobRef<S>>, Option<S>, Option<Vec<Did<S>>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Team<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TeamBuilder<S, team_state::Empty> {
+impl Team<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TeamBuilder<team_state::Empty, DefaultStr> {
         TeamBuilder::new()
     }
 }
 
-impl<S: BosStr> TeamBuilder<S, team_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Team<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TeamBuilder<team_state::Empty, S> {
+        TeamBuilder::builder()
+    }
+}
+
+impl TeamBuilder<team_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TeamBuilder {
             _state: PhantomData,
@@ -287,7 +294,18 @@ impl<S: BosStr> TeamBuilder<S, team_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: team_state::State> TeamBuilder<S, St> {
+impl<S: BosStr> TeamBuilder<team_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TeamBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: team_state::State, S: BosStr> TeamBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -300,7 +318,7 @@ impl<S: BosStr, St: team_state::State> TeamBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: team_state::State> TeamBuilder<S, St> {
+impl<St: team_state::State, S: BosStr> TeamBuilder<St, S> {
     /// Set the `avatarAlt` field (optional)
     pub fn avatar_alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -313,7 +331,7 @@ impl<S: BosStr, St: team_state::State> TeamBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TeamBuilder<S, St>
+impl<St, S: BosStr> TeamBuilder<St, S>
 where
     St: team_state::State,
     St::Members: team_state::IsUnset,
@@ -322,7 +340,7 @@ where
     pub fn members(
         mut self,
         value: impl Into<Vec<Did<S>>>,
-    ) -> TeamBuilder<S, team_state::SetMembers<St>> {
+    ) -> TeamBuilder<team_state::SetMembers<St>, S> {
         self._fields.2 = Option::Some(value.into());
         TeamBuilder {
             _state: PhantomData,
@@ -332,13 +350,16 @@ where
     }
 }
 
-impl<S: BosStr, St> TeamBuilder<S, St>
+impl<St, S: BosStr> TeamBuilder<St, S>
 where
     St: team_state::State,
     St::Name: team_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> TeamBuilder<S, team_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> TeamBuilder<team_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         TeamBuilder {
             _state: PhantomData,
@@ -348,11 +369,11 @@ where
     }
 }
 
-impl<S: BosStr, St> TeamBuilder<S, St>
+impl<St, S: BosStr> TeamBuilder<St, S>
 where
     St: team_state::State,
-    St::Name: team_state::IsSet,
     St::Members: team_state::IsSet,
+    St::Name: team_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Team<S> {
@@ -377,10 +398,10 @@ where
 }
 
 fn lexicon_doc_pub_quizzy_team() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.quizzy.team"),
@@ -392,18 +413,17 @@ fn lexicon_doc_pub_quizzy_team() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A quiz team")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("members"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"), SmolStr::new_static("members")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("avatar"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("avatarAlt"),
@@ -416,7 +436,9 @@ fn lexicon_doc_pub_quizzy_team() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("members"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static("DIDs of team members")),
+                                    description: Some(
+                                        CowStr::new_static("DIDs of team members"),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         format: Some(LexStringFormat::Did),
                                         ..Default::default()

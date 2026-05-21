@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::NotebookView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchNotebooks<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<AtIdentifier<S>>,
@@ -43,11 +40,9 @@ pub struct SearchNotebooks<S: BosStr = DefaultStr> {
     pub tags: Option<Vec<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchNotebooksOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -90,7 +85,7 @@ fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod search_notebooks_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -121,7 +116,10 @@ pub mod search_notebooks_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchNotebooksBuilder<S: BosStr, St: search_notebooks_state::State> {
+pub struct SearchNotebooksBuilder<
+    St: search_notebooks_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtIdentifier<S>>,
@@ -135,15 +133,22 @@ pub struct SearchNotebooksBuilder<S: BosStr, St: search_notebooks_state::State> 
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SearchNotebooks<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SearchNotebooksBuilder<S, search_notebooks_state::Empty> {
+impl SearchNotebooks<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SearchNotebooksBuilder<search_notebooks_state::Empty, DefaultStr> {
         SearchNotebooksBuilder::new()
     }
 }
 
-impl<S: BosStr> SearchNotebooksBuilder<S, search_notebooks_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SearchNotebooks<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SearchNotebooksBuilder<search_notebooks_state::Empty, S> {
+        SearchNotebooksBuilder::builder()
+    }
+}
+
+impl SearchNotebooksBuilder<search_notebooks_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SearchNotebooksBuilder {
             _state: PhantomData,
@@ -153,7 +158,18 @@ impl<S: BosStr> SearchNotebooksBuilder<S, search_notebooks_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: search_notebooks_state::State> SearchNotebooksBuilder<S, St> {
+impl<S: BosStr> SearchNotebooksBuilder<search_notebooks_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SearchNotebooksBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: search_notebooks_state::State, S: BosStr> SearchNotebooksBuilder<St, S> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -166,7 +182,7 @@ impl<S: BosStr, St: search_notebooks_state::State> SearchNotebooksBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: search_notebooks_state::State> SearchNotebooksBuilder<S, St> {
+impl<St: search_notebooks_state::State, S: BosStr> SearchNotebooksBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -179,7 +195,7 @@ impl<S: BosStr, St: search_notebooks_state::State> SearchNotebooksBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: search_notebooks_state::State> SearchNotebooksBuilder<S, St> {
+impl<St: search_notebooks_state::State, S: BosStr> SearchNotebooksBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -192,7 +208,7 @@ impl<S: BosStr, St: search_notebooks_state::State> SearchNotebooksBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St> SearchNotebooksBuilder<S, St>
+impl<St, S: BosStr> SearchNotebooksBuilder<St, S>
 where
     St: search_notebooks_state::State,
     St::Q: search_notebooks_state::IsUnset,
@@ -201,7 +217,7 @@ where
     pub fn q(
         mut self,
         value: impl Into<S>,
-    ) -> SearchNotebooksBuilder<S, search_notebooks_state::SetQ<St>> {
+    ) -> SearchNotebooksBuilder<search_notebooks_state::SetQ<St>, S> {
         self._fields.3 = Option::Some(value.into());
         SearchNotebooksBuilder {
             _state: PhantomData,
@@ -211,7 +227,7 @@ where
     }
 }
 
-impl<S: BosStr, St: search_notebooks_state::State> SearchNotebooksBuilder<S, St> {
+impl<St: search_notebooks_state::State, S: BosStr> SearchNotebooksBuilder<St, S> {
     /// Set the `rating` field (optional)
     pub fn rating(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -224,7 +240,7 @@ impl<S: BosStr, St: search_notebooks_state::State> SearchNotebooksBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: search_notebooks_state::State> SearchNotebooksBuilder<S, St> {
+impl<St: search_notebooks_state::State, S: BosStr> SearchNotebooksBuilder<St, S> {
     /// Set the `sort` field (optional)
     pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -237,7 +253,7 @@ impl<S: BosStr, St: search_notebooks_state::State> SearchNotebooksBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: search_notebooks_state::State> SearchNotebooksBuilder<S, St> {
+impl<St: search_notebooks_state::State, S: BosStr> SearchNotebooksBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -250,7 +266,7 @@ impl<S: BosStr, St: search_notebooks_state::State> SearchNotebooksBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St> SearchNotebooksBuilder<S, St>
+impl<St, S: BosStr> SearchNotebooksBuilder<St, S>
 where
     St: search_notebooks_state::State,
     St::Q: search_notebooks_state::IsSet,

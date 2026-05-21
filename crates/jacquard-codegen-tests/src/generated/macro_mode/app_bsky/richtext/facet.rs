@@ -345,21 +345,34 @@ pub mod byte_slice_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ByteSliceBuilder<S: jacquard_common::BosStr, St: byte_slice_state::State> {
+pub struct ByteSliceBuilder<
+    St: byte_slice_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
+> {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (core::option::Option<i64>, core::option::Option<i64>),
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> ByteSlice<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ByteSliceBuilder<S, byte_slice_state::Empty> {
+impl ByteSlice<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ByteSliceBuilder<
+        byte_slice_state::Empty,
+        jacquard_common::DefaultStr,
+    > {
         ByteSliceBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> ByteSliceBuilder<S, byte_slice_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> ByteSlice<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ByteSliceBuilder<byte_slice_state::Empty, S> {
+        ByteSliceBuilder::builder()
+    }
+}
+
+impl ByteSliceBuilder<byte_slice_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ByteSliceBuilder {
             _state: ::core::marker::PhantomData,
@@ -369,7 +382,18 @@ impl<S: jacquard_common::BosStr> ByteSliceBuilder<S, byte_slice_state::Empty> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ByteSliceBuilder<S, St>
+impl<S: jacquard_common::BosStr> ByteSliceBuilder<byte_slice_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ByteSliceBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None, None),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St, S: jacquard_common::BosStr> ByteSliceBuilder<St, S>
 where
     St: byte_slice_state::State,
     St::ByteEnd: byte_slice_state::IsUnset,
@@ -378,7 +402,7 @@ where
     pub fn byte_end(
         mut self,
         value: impl Into<i64>,
-    ) -> ByteSliceBuilder<S, byte_slice_state::SetByteEnd<St>> {
+    ) -> ByteSliceBuilder<byte_slice_state::SetByteEnd<St>, S> {
         self._fields.0 = ::core::option::Option::Some(value.into());
         ByteSliceBuilder {
             _state: ::core::marker::PhantomData,
@@ -388,7 +412,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ByteSliceBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> ByteSliceBuilder<St, S>
 where
     St: byte_slice_state::State,
     St::ByteStart: byte_slice_state::IsUnset,
@@ -397,7 +421,7 @@ where
     pub fn byte_start(
         mut self,
         value: impl Into<i64>,
-    ) -> ByteSliceBuilder<S, byte_slice_state::SetByteStart<St>> {
+    ) -> ByteSliceBuilder<byte_slice_state::SetByteStart<St>, S> {
         self._fields.1 = ::core::option::Option::Some(value.into());
         ByteSliceBuilder {
             _state: ::core::marker::PhantomData,
@@ -407,7 +431,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ByteSliceBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> ByteSliceBuilder<St, S>
 where
     St: byte_slice_state::State,
     St::ByteStart: byte_slice_state::IsSet,
@@ -666,21 +690,31 @@ pub mod link_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LinkBuilder<S: jacquard_common::BosStr, St: link_state::State> {
+pub struct LinkBuilder<
+    St: link_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
+> {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (core::option::Option<jacquard_common::types::string::UriValue<S>>,),
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> Link<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LinkBuilder<S, link_state::Empty> {
+impl Link<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LinkBuilder<link_state::Empty, jacquard_common::DefaultStr> {
         LinkBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> LinkBuilder<S, link_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> Link<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LinkBuilder<link_state::Empty, S> {
+        LinkBuilder::builder()
+    }
+}
+
+impl LinkBuilder<link_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LinkBuilder {
             _state: ::core::marker::PhantomData,
@@ -690,7 +724,18 @@ impl<S: jacquard_common::BosStr> LinkBuilder<S, link_state::Empty> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LinkBuilder<S, St>
+impl<S: jacquard_common::BosStr> LinkBuilder<link_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LinkBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None,),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St, S: jacquard_common::BosStr> LinkBuilder<St, S>
 where
     St: link_state::State,
     St::Uri: link_state::IsUnset,
@@ -699,7 +744,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<jacquard_common::types::string::UriValue<S>>,
-    ) -> LinkBuilder<S, link_state::SetUri<St>> {
+    ) -> LinkBuilder<link_state::SetUri<St>, S> {
         self._fields.0 = ::core::option::Option::Some(value.into());
         LinkBuilder {
             _state: ::core::marker::PhantomData,
@@ -709,7 +754,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LinkBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> LinkBuilder<St, S>
 where
     St: link_state::State,
     St::Uri: link_state::IsSet,
@@ -781,7 +826,10 @@ pub mod facet_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FacetBuilder<S: jacquard_common::BosStr, St: facet_state::State> {
+pub struct FacetBuilder<
+    St: facet_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
+> {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
         core::option::Option<Vec<FacetFeaturesItem<S>>>,
@@ -790,15 +838,22 @@ pub struct FacetBuilder<S: jacquard_common::BosStr, St: facet_state::State> {
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> Facet<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FacetBuilder<S, facet_state::Empty> {
+impl Facet<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FacetBuilder<facet_state::Empty, jacquard_common::DefaultStr> {
         FacetBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> FacetBuilder<S, facet_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> Facet<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FacetBuilder<facet_state::Empty, S> {
+        FacetBuilder::builder()
+    }
+}
+
+impl FacetBuilder<facet_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FacetBuilder {
             _state: ::core::marker::PhantomData,
@@ -808,7 +863,18 @@ impl<S: jacquard_common::BosStr> FacetBuilder<S, facet_state::Empty> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St> FacetBuilder<S, St>
+impl<S: jacquard_common::BosStr> FacetBuilder<facet_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FacetBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None, None),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St, S: jacquard_common::BosStr> FacetBuilder<St, S>
 where
     St: facet_state::State,
     St::Features: facet_state::IsUnset,
@@ -817,7 +883,7 @@ where
     pub fn features(
         mut self,
         value: impl Into<Vec<FacetFeaturesItem<S>>>,
-    ) -> FacetBuilder<S, facet_state::SetFeatures<St>> {
+    ) -> FacetBuilder<facet_state::SetFeatures<St>, S> {
         self._fields.0 = ::core::option::Option::Some(value.into());
         FacetBuilder {
             _state: ::core::marker::PhantomData,
@@ -827,7 +893,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> FacetBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> FacetBuilder<St, S>
 where
     St: facet_state::State,
     St::Index: facet_state::IsUnset,
@@ -836,7 +902,7 @@ where
     pub fn index(
         mut self,
         value: impl Into<crate::macro_mode::app_bsky::richtext::facet::ByteSlice<S>>,
-    ) -> FacetBuilder<S, facet_state::SetIndex<St>> {
+    ) -> FacetBuilder<facet_state::SetIndex<St>, S> {
         self._fields.1 = ::core::option::Option::Some(value.into());
         FacetBuilder {
             _state: ::core::marker::PhantomData,
@@ -846,7 +912,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> FacetBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> FacetBuilder<St, S>
 where
     St: facet_state::State,
     St::Index: facet_state::IsSet,
@@ -909,21 +975,31 @@ pub mod mention_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MentionBuilder<S: jacquard_common::BosStr, St: mention_state::State> {
+pub struct MentionBuilder<
+    St: mention_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
+> {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (core::option::Option<jacquard_common::types::string::Did<S>>,),
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> Mention<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MentionBuilder<S, mention_state::Empty> {
+impl Mention<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MentionBuilder<mention_state::Empty, jacquard_common::DefaultStr> {
         MentionBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> MentionBuilder<S, mention_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> Mention<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MentionBuilder<mention_state::Empty, S> {
+        MentionBuilder::builder()
+    }
+}
+
+impl MentionBuilder<mention_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MentionBuilder {
             _state: ::core::marker::PhantomData,
@@ -933,7 +1009,18 @@ impl<S: jacquard_common::BosStr> MentionBuilder<S, mention_state::Empty> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St> MentionBuilder<S, St>
+impl<S: jacquard_common::BosStr> MentionBuilder<mention_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MentionBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None,),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St, S: jacquard_common::BosStr> MentionBuilder<St, S>
 where
     St: mention_state::State,
     St::Did: mention_state::IsUnset,
@@ -942,7 +1029,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<jacquard_common::types::string::Did<S>>,
-    ) -> MentionBuilder<S, mention_state::SetDid<St>> {
+    ) -> MentionBuilder<mention_state::SetDid<St>, S> {
         self._fields.0 = ::core::option::Option::Some(value.into());
         MentionBuilder {
             _state: ::core::marker::PhantomData,
@@ -952,7 +1039,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> MentionBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> MentionBuilder<St, S>
 where
     St: mention_state::State,
     St::Did: mention_state::IsSet,

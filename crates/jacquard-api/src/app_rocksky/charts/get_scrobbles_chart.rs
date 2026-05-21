@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::charts::ChartsView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::charts::ChartsView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetScrobblesChart<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub albumuri: Option<AtUri<S>>,
@@ -37,11 +34,9 @@ pub struct GetScrobblesChart<S: BosStr = DefaultStr> {
     pub songuri: Option<AtUri<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetScrobblesChartOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: ChartsView<S>,
@@ -75,7 +70,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetScrobblesChartRequest {
 
 pub mod get_scrobbles_chart_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -93,7 +88,10 @@ pub mod get_scrobbles_chart_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetScrobblesChartBuilder<S: BosStr, St: get_scrobbles_chart_state::State> {
+pub struct GetScrobblesChartBuilder<
+    St: get_scrobbles_chart_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
@@ -105,15 +103,25 @@ pub struct GetScrobblesChartBuilder<S: BosStr, St: get_scrobbles_chart_state::St
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetScrobblesChart<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetScrobblesChartBuilder<S, get_scrobbles_chart_state::Empty> {
+impl GetScrobblesChart<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetScrobblesChartBuilder<
+        get_scrobbles_chart_state::Empty,
+        DefaultStr,
+    > {
         GetScrobblesChartBuilder::new()
     }
 }
 
-impl<S: BosStr> GetScrobblesChartBuilder<S, get_scrobbles_chart_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetScrobblesChart<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetScrobblesChartBuilder<get_scrobbles_chart_state::Empty, S> {
+        GetScrobblesChartBuilder::builder()
+    }
+}
+
+impl GetScrobblesChartBuilder<get_scrobbles_chart_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetScrobblesChartBuilder {
             _state: PhantomData,
@@ -123,7 +131,18 @@ impl<S: BosStr> GetScrobblesChartBuilder<S, get_scrobbles_chart_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<S, St> {
+impl<S: BosStr> GetScrobblesChartBuilder<get_scrobbles_chart_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetScrobblesChartBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_scrobbles_chart_state::State, S: BosStr> GetScrobblesChartBuilder<St, S> {
     /// Set the `albumuri` field (optional)
     pub fn albumuri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -136,7 +155,7 @@ impl<S: BosStr, St: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<S
     }
 }
 
-impl<S: BosStr, St: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<S, St> {
+impl<St: get_scrobbles_chart_state::State, S: BosStr> GetScrobblesChartBuilder<St, S> {
     /// Set the `artisturi` field (optional)
     pub fn artisturi(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -149,7 +168,7 @@ impl<S: BosStr, St: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<S
     }
 }
 
-impl<S: BosStr, St: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<S, St> {
+impl<St: get_scrobbles_chart_state::State, S: BosStr> GetScrobblesChartBuilder<St, S> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -162,7 +181,7 @@ impl<S: BosStr, St: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<S
     }
 }
 
-impl<S: BosStr, St: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<S, St> {
+impl<St: get_scrobbles_chart_state::State, S: BosStr> GetScrobblesChartBuilder<St, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -175,7 +194,7 @@ impl<S: BosStr, St: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<S
     }
 }
 
-impl<S: BosStr, St: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<S, St> {
+impl<St: get_scrobbles_chart_state::State, S: BosStr> GetScrobblesChartBuilder<St, S> {
     /// Set the `songuri` field (optional)
     pub fn songuri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -188,7 +207,7 @@ impl<S: BosStr, St: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<S
     }
 }
 
-impl<S: BosStr, St> GetScrobblesChartBuilder<S, St>
+impl<St, S: BosStr> GetScrobblesChartBuilder<St, S>
 where
     St: get_scrobbles_chart_state::State,
 {

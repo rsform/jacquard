@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::actor::ProfileViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::actor::ProfileViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetContributors<S: BosStr = DefaultStr> {
     /// Defaults to `true`.
     #[serde(default = "_default_include_cascaded")]
@@ -31,11 +28,9 @@ pub struct GetContributors<S: BosStr = DefaultStr> {
     pub resource: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetContributorsOutput<S: BosStr = DefaultStr> {
     pub contributors: Vec<ProfileViewBasic<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -72,7 +67,7 @@ fn _default_include_cascaded() -> Option<bool> {
 
 pub mod get_contributors_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -103,21 +98,31 @@ pub mod get_contributors_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetContributorsBuilder<S: BosStr, St: get_contributors_state::State> {
+pub struct GetContributorsBuilder<
+    St: get_contributors_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetContributors<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetContributorsBuilder<S, get_contributors_state::Empty> {
+impl GetContributors<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetContributorsBuilder<get_contributors_state::Empty, DefaultStr> {
         GetContributorsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetContributorsBuilder<S, get_contributors_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetContributors<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetContributorsBuilder<get_contributors_state::Empty, S> {
+        GetContributorsBuilder::builder()
+    }
+}
+
+impl GetContributorsBuilder<get_contributors_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetContributorsBuilder {
             _state: PhantomData,
@@ -127,7 +132,18 @@ impl<S: BosStr> GetContributorsBuilder<S, get_contributors_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_contributors_state::State> GetContributorsBuilder<S, St> {
+impl<S: BosStr> GetContributorsBuilder<get_contributors_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetContributorsBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_contributors_state::State, S: BosStr> GetContributorsBuilder<St, S> {
     /// Set the `includeCascaded` field (optional)
     pub fn include_cascaded(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -140,7 +156,7 @@ impl<S: BosStr, St: get_contributors_state::State> GetContributorsBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St> GetContributorsBuilder<S, St>
+impl<St, S: BosStr> GetContributorsBuilder<St, S>
 where
     St: get_contributors_state::State,
     St::Resource: get_contributors_state::IsUnset,
@@ -149,7 +165,7 @@ where
     pub fn resource(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetContributorsBuilder<S, get_contributors_state::SetResource<St>> {
+    ) -> GetContributorsBuilder<get_contributors_state::SetResource<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetContributorsBuilder {
             _state: PhantomData,
@@ -159,7 +175,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetContributorsBuilder<S, St>
+impl<St, S: BosStr> GetContributorsBuilder<St, S>
 where
     St: get_contributors_state::State,
     St::Resource: get_contributors_state::IsSet,

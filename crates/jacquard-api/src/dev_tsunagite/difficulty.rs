@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A difficulty slot in a game hosting leaderboards via Tsunagite.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -107,7 +107,7 @@ impl<S: BosStr> LexiconSchema for Difficulty<S> {
 
 pub mod difficulty_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -138,21 +138,28 @@ pub mod difficulty_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DifficultyBuilder<S: BosStr, St: difficulty_state::State> {
+pub struct DifficultyBuilder<St: difficulty_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Data<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Difficulty<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DifficultyBuilder<S, difficulty_state::Empty> {
+impl Difficulty<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DifficultyBuilder<difficulty_state::Empty, DefaultStr> {
         DifficultyBuilder::new()
     }
 }
 
-impl<S: BosStr> DifficultyBuilder<S, difficulty_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Difficulty<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DifficultyBuilder<difficulty_state::Empty, S> {
+        DifficultyBuilder::builder()
+    }
+}
+
+impl DifficultyBuilder<difficulty_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DifficultyBuilder {
             _state: PhantomData,
@@ -162,7 +169,18 @@ impl<S: BosStr> DifficultyBuilder<S, difficulty_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: difficulty_state::State> DifficultyBuilder<S, St> {
+impl<S: BosStr> DifficultyBuilder<difficulty_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DifficultyBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: difficulty_state::State, S: BosStr> DifficultyBuilder<St, S> {
     /// Set the `color` field (optional)
     pub fn color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -175,7 +193,7 @@ impl<S: BosStr, St: difficulty_state::State> DifficultyBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DifficultyBuilder<S, St>
+impl<St, S: BosStr> DifficultyBuilder<St, S>
 where
     St: difficulty_state::State,
     St::Name: difficulty_state::IsUnset,
@@ -184,7 +202,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> DifficultyBuilder<S, difficulty_state::SetName<St>> {
+    ) -> DifficultyBuilder<difficulty_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DifficultyBuilder {
             _state: PhantomData,
@@ -194,7 +212,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DifficultyBuilder<S, St>
+impl<St, S: BosStr> DifficultyBuilder<St, S>
 where
     St: difficulty_state::State,
     St::Name: difficulty_state::IsSet,
@@ -208,7 +226,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Difficulty<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Difficulty<S> {
         Difficulty {
             color: self._fields.0,
             name: self._fields.1.unwrap(),
@@ -218,10 +239,10 @@ where
 }
 
 fn lexicon_doc_dev_tsunagite_difficulty() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.tsunagite.difficulty"),
@@ -230,9 +251,11 @@ fn lexicon_doc_dev_tsunagite_difficulty() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A difficulty slot in a game hosting leaderboards via Tsunagite.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A difficulty slot in a game hosting leaderboards via Tsunagite.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("name")]),
@@ -242,9 +265,11 @@ fn lexicon_doc_dev_tsunagite_difficulty() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("color"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The hex code color of the difficulty slot.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The hex code color of the difficulty slot.",
+                                        ),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

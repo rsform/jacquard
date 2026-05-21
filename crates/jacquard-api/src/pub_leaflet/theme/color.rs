@@ -22,13 +22,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Rgb<S: BosStr = DefaultStr> {
     pub b: i64,
     pub g: i64,
@@ -37,11 +34,9 @@ pub struct Rgb<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Rgba<S: BosStr = DefaultStr> {
     pub a: i64,
     pub b: i64,
@@ -223,7 +218,7 @@ impl<S: BosStr> LexiconSchema for Rgba<S> {
 
 pub mod rgb_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -280,21 +275,28 @@ pub mod rgb_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RgbBuilder<S: BosStr, St: rgb_state::State> {
+pub struct RgbBuilder<St: rgb_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Rgb<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RgbBuilder<S, rgb_state::Empty> {
+impl Rgb<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RgbBuilder<rgb_state::Empty, DefaultStr> {
         RgbBuilder::new()
     }
 }
 
-impl<S: BosStr> RgbBuilder<S, rgb_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Rgb<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RgbBuilder<rgb_state::Empty, S> {
+        RgbBuilder::builder()
+    }
+}
+
+impl RgbBuilder<rgb_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RgbBuilder {
             _state: PhantomData,
@@ -304,13 +306,24 @@ impl<S: BosStr> RgbBuilder<S, rgb_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RgbBuilder<S, St>
+impl<S: BosStr> RgbBuilder<rgb_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RgbBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RgbBuilder<St, S>
 where
     St: rgb_state::State,
     St::B: rgb_state::IsUnset,
 {
     /// Set the `b` field (required)
-    pub fn b(mut self, value: impl Into<i64>) -> RgbBuilder<S, rgb_state::SetB<St>> {
+    pub fn b(mut self, value: impl Into<i64>) -> RgbBuilder<rgb_state::SetB<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RgbBuilder {
             _state: PhantomData,
@@ -320,13 +333,13 @@ where
     }
 }
 
-impl<S: BosStr, St> RgbBuilder<S, St>
+impl<St, S: BosStr> RgbBuilder<St, S>
 where
     St: rgb_state::State,
     St::G: rgb_state::IsUnset,
 {
     /// Set the `g` field (required)
-    pub fn g(mut self, value: impl Into<i64>) -> RgbBuilder<S, rgb_state::SetG<St>> {
+    pub fn g(mut self, value: impl Into<i64>) -> RgbBuilder<rgb_state::SetG<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RgbBuilder {
             _state: PhantomData,
@@ -336,13 +349,13 @@ where
     }
 }
 
-impl<S: BosStr, St> RgbBuilder<S, St>
+impl<St, S: BosStr> RgbBuilder<St, S>
 where
     St: rgb_state::State,
     St::R: rgb_state::IsUnset,
 {
     /// Set the `r` field (required)
-    pub fn r(mut self, value: impl Into<i64>) -> RgbBuilder<S, rgb_state::SetR<St>> {
+    pub fn r(mut self, value: impl Into<i64>) -> RgbBuilder<rgb_state::SetR<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RgbBuilder {
             _state: PhantomData,
@@ -352,7 +365,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RgbBuilder<S, St>
+impl<St, S: BosStr> RgbBuilder<St, S>
 where
     St: rgb_state::State,
     St::R: rgb_state::IsSet,
@@ -380,10 +393,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_theme_color() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.theme.color"),
@@ -392,11 +405,12 @@ fn lexicon_doc_pub_leaflet_theme_color() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("rgb"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("r"),
-                        SmolStr::new_static("g"),
-                        SmolStr::new_static("b"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("r"), SmolStr::new_static("g"),
+                            SmolStr::new_static("b")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -432,12 +446,12 @@ fn lexicon_doc_pub_leaflet_theme_color() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("rgba"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("r"),
-                        SmolStr::new_static("g"),
-                        SmolStr::new_static("b"),
-                        SmolStr::new_static("a"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("r"), SmolStr::new_static("g"),
+                            SmolStr::new_static("b"), SmolStr::new_static("a")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -486,7 +500,7 @@ fn lexicon_doc_pub_leaflet_theme_color() -> LexiconDoc<'static> {
 
 pub mod rgba_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -496,8 +510,8 @@ pub mod rgba_state {
     pub trait State: sealed::Sealed {
         type R;
         type B;
-        type G;
         type A;
+        type G;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -505,8 +519,8 @@ pub mod rgba_state {
     impl State for Empty {
         type R = Unset;
         type B = Unset;
-        type G = Unset;
         type A = Unset;
+        type G = Unset;
     }
     ///State transition - sets the `r` field to Set
     pub struct SetR<St: State = Empty>(PhantomData<fn() -> St>);
@@ -514,8 +528,8 @@ pub mod rgba_state {
     impl<St: State> State for SetR<St> {
         type R = Set<members::r>;
         type B = St::B;
-        type G = St::G;
         type A = St::A;
+        type G = St::G;
     }
     ///State transition - sets the `b` field to Set
     pub struct SetB<St: State = Empty>(PhantomData<fn() -> St>);
@@ -523,17 +537,8 @@ pub mod rgba_state {
     impl<St: State> State for SetB<St> {
         type R = St::R;
         type B = Set<members::b>;
+        type A = St::A;
         type G = St::G;
-        type A = St::A;
-    }
-    ///State transition - sets the `g` field to Set
-    pub struct SetG<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetG<St> {}
-    impl<St: State> State for SetG<St> {
-        type R = St::R;
-        type B = St::B;
-        type G = Set<members::g>;
-        type A = St::A;
     }
     ///State transition - sets the `a` field to Set
     pub struct SetA<St: State = Empty>(PhantomData<fn() -> St>);
@@ -541,8 +546,17 @@ pub mod rgba_state {
     impl<St: State> State for SetA<St> {
         type R = St::R;
         type B = St::B;
-        type G = St::G;
         type A = Set<members::a>;
+        type G = St::G;
+    }
+    ///State transition - sets the `g` field to Set
+    pub struct SetG<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetG<St> {}
+    impl<St: State> State for SetG<St> {
+        type R = St::R;
+        type B = St::B;
+        type A = St::A;
+        type G = Set<members::g>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -551,29 +565,36 @@ pub mod rgba_state {
         pub struct r(());
         ///Marker type for the `b` field
         pub struct b(());
-        ///Marker type for the `g` field
-        pub struct g(());
         ///Marker type for the `a` field
         pub struct a(());
+        ///Marker type for the `g` field
+        pub struct g(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RgbaBuilder<S: BosStr, St: rgba_state::State> {
+pub struct RgbaBuilder<St: rgba_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Rgba<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RgbaBuilder<S, rgba_state::Empty> {
+impl Rgba<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RgbaBuilder<rgba_state::Empty, DefaultStr> {
         RgbaBuilder::new()
     }
 }
 
-impl<S: BosStr> RgbaBuilder<S, rgba_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Rgba<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RgbaBuilder<rgba_state::Empty, S> {
+        RgbaBuilder::builder()
+    }
+}
+
+impl RgbaBuilder<rgba_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RgbaBuilder {
             _state: PhantomData,
@@ -583,13 +604,24 @@ impl<S: BosStr> RgbaBuilder<S, rgba_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RgbaBuilder<S, St>
+impl<S: BosStr> RgbaBuilder<rgba_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RgbaBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RgbaBuilder<St, S>
 where
     St: rgba_state::State,
     St::A: rgba_state::IsUnset,
 {
     /// Set the `a` field (required)
-    pub fn a(mut self, value: impl Into<i64>) -> RgbaBuilder<S, rgba_state::SetA<St>> {
+    pub fn a(mut self, value: impl Into<i64>) -> RgbaBuilder<rgba_state::SetA<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RgbaBuilder {
             _state: PhantomData,
@@ -599,13 +631,13 @@ where
     }
 }
 
-impl<S: BosStr, St> RgbaBuilder<S, St>
+impl<St, S: BosStr> RgbaBuilder<St, S>
 where
     St: rgba_state::State,
     St::B: rgba_state::IsUnset,
 {
     /// Set the `b` field (required)
-    pub fn b(mut self, value: impl Into<i64>) -> RgbaBuilder<S, rgba_state::SetB<St>> {
+    pub fn b(mut self, value: impl Into<i64>) -> RgbaBuilder<rgba_state::SetB<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RgbaBuilder {
             _state: PhantomData,
@@ -615,13 +647,13 @@ where
     }
 }
 
-impl<S: BosStr, St> RgbaBuilder<S, St>
+impl<St, S: BosStr> RgbaBuilder<St, S>
 where
     St: rgba_state::State,
     St::G: rgba_state::IsUnset,
 {
     /// Set the `g` field (required)
-    pub fn g(mut self, value: impl Into<i64>) -> RgbaBuilder<S, rgba_state::SetG<St>> {
+    pub fn g(mut self, value: impl Into<i64>) -> RgbaBuilder<rgba_state::SetG<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RgbaBuilder {
             _state: PhantomData,
@@ -631,13 +663,13 @@ where
     }
 }
 
-impl<S: BosStr, St> RgbaBuilder<S, St>
+impl<St, S: BosStr> RgbaBuilder<St, S>
 where
     St: rgba_state::State,
     St::R: rgba_state::IsUnset,
 {
     /// Set the `r` field (required)
-    pub fn r(mut self, value: impl Into<i64>) -> RgbaBuilder<S, rgba_state::SetR<St>> {
+    pub fn r(mut self, value: impl Into<i64>) -> RgbaBuilder<rgba_state::SetR<St>, S> {
         self._fields.3 = Option::Some(value.into());
         RgbaBuilder {
             _state: PhantomData,
@@ -647,13 +679,13 @@ where
     }
 }
 
-impl<S: BosStr, St> RgbaBuilder<S, St>
+impl<St, S: BosStr> RgbaBuilder<St, S>
 where
     St: rgba_state::State,
     St::R: rgba_state::IsSet,
     St::B: rgba_state::IsSet,
-    St::G: rgba_state::IsSet,
     St::A: rgba_state::IsSet,
+    St::G: rgba_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Rgba<S> {

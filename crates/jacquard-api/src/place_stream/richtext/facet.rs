@@ -20,25 +20,23 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::ByteSlice;
 use crate::app_bsky::richtext::facet::Link;
 use crate::app_bsky::richtext::facet::Mention;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// Annotation of a sub-string within rich text.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Facet<S: BosStr = DefaultStr> {
     pub features: Vec<FacetFeaturesItem<S>>,
     pub index: ByteSlice<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -67,7 +65,7 @@ impl<S: BosStr> LexiconSchema for Facet<S> {
 
 pub mod facet_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -75,56 +73,63 @@ pub mod facet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Features;
         type Index;
+        type Features;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Features = Unset;
         type Index = Unset;
-    }
-    ///State transition - sets the `features` field to Set
-    pub struct SetFeatures<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFeatures<St> {}
-    impl<St: State> State for SetFeatures<St> {
-        type Features = Set<members::features>;
-        type Index = St::Index;
+        type Features = Unset;
     }
     ///State transition - sets the `index` field to Set
     pub struct SetIndex<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndex<St> {}
     impl<St: State> State for SetIndex<St> {
-        type Features = St::Features;
         type Index = Set<members::index>;
+        type Features = St::Features;
+    }
+    ///State transition - sets the `features` field to Set
+    pub struct SetFeatures<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFeatures<St> {}
+    impl<St: State> State for SetFeatures<St> {
+        type Index = St::Index;
+        type Features = Set<members::features>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `features` field
-        pub struct features(());
         ///Marker type for the `index` field
         pub struct index(());
+        ///Marker type for the `features` field
+        pub struct features(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FacetBuilder<S: BosStr, St: facet_state::State> {
+pub struct FacetBuilder<St: facet_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<FacetFeaturesItem<S>>>, Option<ByteSlice<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Facet<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FacetBuilder<S, facet_state::Empty> {
+impl Facet<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FacetBuilder<facet_state::Empty, DefaultStr> {
         FacetBuilder::new()
     }
 }
 
-impl<S: BosStr> FacetBuilder<S, facet_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Facet<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FacetBuilder<facet_state::Empty, S> {
+        FacetBuilder::builder()
+    }
+}
+
+impl FacetBuilder<facet_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FacetBuilder {
             _state: PhantomData,
@@ -134,7 +139,18 @@ impl<S: BosStr> FacetBuilder<S, facet_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FacetBuilder<S, St>
+impl<S: BosStr> FacetBuilder<facet_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FacetBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FacetBuilder<St, S>
 where
     St: facet_state::State,
     St::Features: facet_state::IsUnset,
@@ -143,7 +159,7 @@ where
     pub fn features(
         mut self,
         value: impl Into<Vec<FacetFeaturesItem<S>>>,
-    ) -> FacetBuilder<S, facet_state::SetFeatures<St>> {
+    ) -> FacetBuilder<facet_state::SetFeatures<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FacetBuilder {
             _state: PhantomData,
@@ -153,7 +169,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FacetBuilder<S, St>
+impl<St, S: BosStr> FacetBuilder<St, S>
 where
     St: facet_state::State,
     St::Index: facet_state::IsUnset,
@@ -162,7 +178,7 @@ where
     pub fn index(
         mut self,
         value: impl Into<ByteSlice<S>>,
-    ) -> FacetBuilder<S, facet_state::SetIndex<St>> {
+    ) -> FacetBuilder<facet_state::SetIndex<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FacetBuilder {
             _state: PhantomData,
@@ -172,11 +188,11 @@ where
     }
 }
 
-impl<S: BosStr, St> FacetBuilder<S, St>
+impl<St, S: BosStr> FacetBuilder<St, S>
 where
     St: facet_state::State,
-    St::Features: facet_state::IsSet,
     St::Index: facet_state::IsSet,
+    St::Features: facet_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Facet<S> {
@@ -197,10 +213,10 @@ where
 }
 
 fn lexicon_doc_place_stream_richtext_facet() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.richtext.facet"),
@@ -209,13 +225,16 @@ fn lexicon_doc_place_stream_richtext_facet() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Annotation of a sub-string within rich text.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("index"),
-                        SmolStr::new_static("features"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Annotation of a sub-string within rich text.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("index"), SmolStr::new_static("features")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -225,7 +244,7 @@ fn lexicon_doc_place_stream_richtext_facet() -> LexiconDoc<'static> {
                                 items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("app.bsky.richtext.facet#mention"),
-                                        CowStr::new_static("app.bsky.richtext.facet#link"),
+                                        CowStr::new_static("app.bsky.richtext.facet#link")
                                     ],
                                     ..Default::default()
                                 }),
@@ -235,7 +254,9 @@ fn lexicon_doc_place_stream_richtext_facet() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("index"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.richtext.facet#byteSlice"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.richtext.facet#byteSlice",
+                                ),
                                 ..Default::default()
                             }),
                         );

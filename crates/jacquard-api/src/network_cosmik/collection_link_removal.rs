@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A record representing the removal of a collection link by a collection owner when they cannot delete the original link (which exists in another user's repository). The creator of this record (determined from the AT-URI) is the user who performed the removal.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -76,7 +76,8 @@ impl XrpcResp for CollectionLinkRemovalRecord {
     type Err = RecordError;
 }
 
-impl<S: BosStr> From<CollectionLinkRemovalGetRecordOutput<S>> for CollectionLinkRemoval<S> {
+impl<S: BosStr> From<CollectionLinkRemovalGetRecordOutput<S>>
+for CollectionLinkRemoval<S> {
     fn from(output: CollectionLinkRemovalGetRecordOutput<S>) -> Self {
         output.value
     }
@@ -109,7 +110,7 @@ impl<S: BosStr> LexiconSchema for CollectionLinkRemoval<S> {
 
 pub mod collection_link_removal_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -117,70 +118,86 @@ pub mod collection_link_removal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RemovedLink;
         type Collection;
         type RemovedAt;
+        type RemovedLink;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RemovedLink = Unset;
         type Collection = Unset;
         type RemovedAt = Unset;
-    }
-    ///State transition - sets the `removed_link` field to Set
-    pub struct SetRemovedLink<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRemovedLink<St> {}
-    impl<St: State> State for SetRemovedLink<St> {
-        type RemovedLink = Set<members::removed_link>;
-        type Collection = St::Collection;
-        type RemovedAt = St::RemovedAt;
+        type RemovedLink = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
-        type RemovedLink = St::RemovedLink;
         type Collection = Set<members::collection>;
         type RemovedAt = St::RemovedAt;
+        type RemovedLink = St::RemovedLink;
     }
     ///State transition - sets the `removed_at` field to Set
     pub struct SetRemovedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRemovedAt<St> {}
     impl<St: State> State for SetRemovedAt<St> {
-        type RemovedLink = St::RemovedLink;
         type Collection = St::Collection;
         type RemovedAt = Set<members::removed_at>;
+        type RemovedLink = St::RemovedLink;
+    }
+    ///State transition - sets the `removed_link` field to Set
+    pub struct SetRemovedLink<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRemovedLink<St> {}
+    impl<St: State> State for SetRemovedLink<St> {
+        type Collection = St::Collection;
+        type RemovedAt = St::RemovedAt;
+        type RemovedLink = Set<members::removed_link>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `removed_link` field
-        pub struct removed_link(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `removed_at` field
         pub struct removed_at(());
+        ///Marker type for the `removed_link` field
+        pub struct removed_link(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionLinkRemovalBuilder<S: BosStr, St: collection_link_removal_state::State> {
+pub struct CollectionLinkRemovalBuilder<
+    St: collection_link_removal_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>, Option<Datetime>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CollectionLinkRemoval<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CollectionLinkRemovalBuilder<S, collection_link_removal_state::Empty> {
+impl CollectionLinkRemoval<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CollectionLinkRemovalBuilder<
+        collection_link_removal_state::Empty,
+        DefaultStr,
+    > {
         CollectionLinkRemovalBuilder::new()
     }
 }
 
-impl<S: BosStr> CollectionLinkRemovalBuilder<S, collection_link_removal_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CollectionLinkRemoval<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CollectionLinkRemovalBuilder<
+        collection_link_removal_state::Empty,
+        S,
+    > {
+        CollectionLinkRemovalBuilder::builder()
+    }
+}
+
+impl CollectionLinkRemovalBuilder<collection_link_removal_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CollectionLinkRemovalBuilder {
             _state: PhantomData,
@@ -190,7 +207,18 @@ impl<S: BosStr> CollectionLinkRemovalBuilder<S, collection_link_removal_state::E
     }
 }
 
-impl<S: BosStr, St> CollectionLinkRemovalBuilder<S, St>
+impl<S: BosStr> CollectionLinkRemovalBuilder<collection_link_removal_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CollectionLinkRemovalBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CollectionLinkRemovalBuilder<St, S>
 where
     St: collection_link_removal_state::State,
     St::Collection: collection_link_removal_state::IsUnset,
@@ -199,7 +227,10 @@ where
     pub fn collection(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CollectionLinkRemovalBuilder<S, collection_link_removal_state::SetCollection<St>> {
+    ) -> CollectionLinkRemovalBuilder<
+        collection_link_removal_state::SetCollection<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         CollectionLinkRemovalBuilder {
             _state: PhantomData,
@@ -209,7 +240,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CollectionLinkRemovalBuilder<S, St>
+impl<St, S: BosStr> CollectionLinkRemovalBuilder<St, S>
 where
     St: collection_link_removal_state::State,
     St::RemovedAt: collection_link_removal_state::IsUnset,
@@ -218,7 +249,10 @@ where
     pub fn removed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CollectionLinkRemovalBuilder<S, collection_link_removal_state::SetRemovedAt<St>> {
+    ) -> CollectionLinkRemovalBuilder<
+        collection_link_removal_state::SetRemovedAt<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         CollectionLinkRemovalBuilder {
             _state: PhantomData,
@@ -228,7 +262,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CollectionLinkRemovalBuilder<S, St>
+impl<St, S: BosStr> CollectionLinkRemovalBuilder<St, S>
 where
     St: collection_link_removal_state::State,
     St::RemovedLink: collection_link_removal_state::IsUnset,
@@ -237,7 +271,10 @@ where
     pub fn removed_link(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CollectionLinkRemovalBuilder<S, collection_link_removal_state::SetRemovedLink<St>> {
+    ) -> CollectionLinkRemovalBuilder<
+        collection_link_removal_state::SetRemovedLink<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         CollectionLinkRemovalBuilder {
             _state: PhantomData,
@@ -247,12 +284,12 @@ where
     }
 }
 
-impl<S: BosStr, St> CollectionLinkRemovalBuilder<S, St>
+impl<St, S: BosStr> CollectionLinkRemovalBuilder<St, S>
 where
     St: collection_link_removal_state::State,
-    St::RemovedLink: collection_link_removal_state::IsSet,
     St::Collection: collection_link_removal_state::IsSet,
     St::RemovedAt: collection_link_removal_state::IsSet,
+    St::RemovedLink: collection_link_removal_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CollectionLinkRemoval<S> {
@@ -278,10 +315,10 @@ where
 }
 
 fn lexicon_doc_network_cosmik_collectionLinkRemoval() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.cosmik.collectionLinkRemoval"),

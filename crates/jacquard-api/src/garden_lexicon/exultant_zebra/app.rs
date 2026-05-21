@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// An application record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -110,7 +110,7 @@ impl<S: BosStr> LexiconSchema for App<S> {
 
 pub mod app_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -118,56 +118,63 @@ pub mod app_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Distributions;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Distributions = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Distributions = St::Distributions;
+        type Name = Unset;
     }
     ///State transition - sets the `distributions` field to Set
     pub struct SetDistributions<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDistributions<St> {}
     impl<St: State> State for SetDistributions<St> {
-        type Name = St::Name;
         type Distributions = Set<members::distributions>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Distributions = St::Distributions;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `distributions` field
         pub struct distributions(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AppBuilder<S: BosStr, St: app_state::State> {
+pub struct AppBuilder<St: app_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<StrongRef<S>>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> App<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AppBuilder<S, app_state::Empty> {
+impl App<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AppBuilder<app_state::Empty, DefaultStr> {
         AppBuilder::new()
     }
 }
 
-impl<S: BosStr> AppBuilder<S, app_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> App<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AppBuilder<app_state::Empty, S> {
+        AppBuilder::builder()
+    }
+}
+
+impl AppBuilder<app_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AppBuilder {
             _state: PhantomData,
@@ -177,7 +184,18 @@ impl<S: BosStr> AppBuilder<S, app_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: app_state::State> AppBuilder<S, St> {
+impl<S: BosStr> AppBuilder<app_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AppBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: app_state::State, S: BosStr> AppBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -190,7 +208,7 @@ impl<S: BosStr, St: app_state::State> AppBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AppBuilder<S, St>
+impl<St, S: BosStr> AppBuilder<St, S>
 where
     St: app_state::State,
     St::Distributions: app_state::IsUnset,
@@ -199,7 +217,7 @@ where
     pub fn distributions(
         mut self,
         value: impl Into<Vec<StrongRef<S>>>,
-    ) -> AppBuilder<S, app_state::SetDistributions<St>> {
+    ) -> AppBuilder<app_state::SetDistributions<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AppBuilder {
             _state: PhantomData,
@@ -209,13 +227,13 @@ where
     }
 }
 
-impl<S: BosStr, St> AppBuilder<S, St>
+impl<St, S: BosStr> AppBuilder<St, S>
 where
     St: app_state::State,
     St::Name: app_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> AppBuilder<S, app_state::SetName<St>> {
+    pub fn name(mut self, value: impl Into<S>) -> AppBuilder<app_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AppBuilder {
             _state: PhantomData,
@@ -225,11 +243,11 @@ where
     }
 }
 
-impl<S: BosStr, St> AppBuilder<S, St>
+impl<St, S: BosStr> AppBuilder<St, S>
 where
     St: app_state::State,
-    St::Name: app_state::IsSet,
     St::Distributions: app_state::IsSet,
+    St::Name: app_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> App<S> {
@@ -252,10 +270,10 @@ where
 }
 
 fn lexicon_doc_garden_lexicon_exultant_zebra_app() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.lexicon.exultant-zebra.app"),
@@ -267,28 +285,34 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_app() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("An application record.")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("distributions"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("distributions")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "An optional description of the application.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "An optional description of the application.",
+                                        ),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("distributions"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "A list of strong references to distribution records.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "A list of strong references to distribution records.",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
                                         ..Default::default()
@@ -299,9 +323,9 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_app() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The name of the application.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The name of the application."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::org_hypercerts::SmallBlob;
-use crate::org_hypercerts::Uri;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_hypercerts::SmallBlob;
+use crate::org_hypercerts::Uri;
 /// Describes the rights that a contributor and/or an owner has, such as whether the hypercert can be sold, transferred, and under what conditions.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -53,6 +53,7 @@ pub struct Rights<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -171,7 +172,7 @@ impl<S: BosStr> LexiconSchema for Rights<S> {
 
 pub mod rights_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -244,7 +245,7 @@ pub mod rights_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RightsBuilder<S: BosStr, St: rights_state::State> {
+pub struct RightsBuilder<St: rights_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<RightsAttachment<S>>,
@@ -256,15 +257,22 @@ pub struct RightsBuilder<S: BosStr, St: rights_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Rights<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RightsBuilder<S, rights_state::Empty> {
+impl Rights<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RightsBuilder<rights_state::Empty, DefaultStr> {
         RightsBuilder::new()
     }
 }
 
-impl<S: BosStr> RightsBuilder<S, rights_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Rights<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RightsBuilder<rights_state::Empty, S> {
+        RightsBuilder::builder()
+    }
+}
+
+impl RightsBuilder<rights_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RightsBuilder {
             _state: PhantomData,
@@ -274,7 +282,18 @@ impl<S: BosStr> RightsBuilder<S, rights_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: rights_state::State> RightsBuilder<S, St> {
+impl<S: BosStr> RightsBuilder<rights_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RightsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: rights_state::State, S: BosStr> RightsBuilder<St, S> {
     /// Set the `attachment` field (optional)
     pub fn attachment(mut self, value: impl Into<Option<RightsAttachment<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -287,7 +306,7 @@ impl<S: BosStr, St: rights_state::State> RightsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RightsBuilder<S, St>
+impl<St, S: BosStr> RightsBuilder<St, S>
 where
     St: rights_state::State,
     St::CreatedAt: rights_state::IsUnset,
@@ -296,7 +315,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RightsBuilder<S, rights_state::SetCreatedAt<St>> {
+    ) -> RightsBuilder<rights_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RightsBuilder {
             _state: PhantomData,
@@ -306,7 +325,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RightsBuilder<S, St>
+impl<St, S: BosStr> RightsBuilder<St, S>
 where
     St: rights_state::State,
     St::RightsDescription: rights_state::IsUnset,
@@ -315,7 +334,7 @@ where
     pub fn rights_description(
         mut self,
         value: impl Into<S>,
-    ) -> RightsBuilder<S, rights_state::SetRightsDescription<St>> {
+    ) -> RightsBuilder<rights_state::SetRightsDescription<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RightsBuilder {
             _state: PhantomData,
@@ -325,7 +344,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RightsBuilder<S, St>
+impl<St, S: BosStr> RightsBuilder<St, S>
 where
     St: rights_state::State,
     St::RightsName: rights_state::IsUnset,
@@ -334,7 +353,7 @@ where
     pub fn rights_name(
         mut self,
         value: impl Into<S>,
-    ) -> RightsBuilder<S, rights_state::SetRightsName<St>> {
+    ) -> RightsBuilder<rights_state::SetRightsName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         RightsBuilder {
             _state: PhantomData,
@@ -344,7 +363,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RightsBuilder<S, St>
+impl<St, S: BosStr> RightsBuilder<St, S>
 where
     St: rights_state::State,
     St::RightsType: rights_state::IsUnset,
@@ -353,7 +372,7 @@ where
     pub fn rights_type(
         mut self,
         value: impl Into<S>,
-    ) -> RightsBuilder<S, rights_state::SetRightsType<St>> {
+    ) -> RightsBuilder<rights_state::SetRightsType<St>, S> {
         self._fields.4 = Option::Some(value.into());
         RightsBuilder {
             _state: PhantomData,
@@ -363,7 +382,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RightsBuilder<S, St>
+impl<St, S: BosStr> RightsBuilder<St, S>
 where
     St: rights_state::State,
     St::RightsName: rights_state::IsSet,
@@ -396,10 +415,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_claim_rights() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.claim.rights"),

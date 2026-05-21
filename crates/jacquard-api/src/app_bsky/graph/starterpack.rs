@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::graph::starterpack;
-use crate::app_bsky::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::richtext::facet::Facet;
+use crate::app_bsky::graph::starterpack;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FeedItem<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -209,7 +206,7 @@ impl<S: BosStr> LexiconSchema for Starterpack<S> {
 
 pub mod feed_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -240,21 +237,28 @@ pub mod feed_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FeedItemBuilder<S: BosStr, St: feed_item_state::State> {
+pub struct FeedItemBuilder<St: feed_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> FeedItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FeedItemBuilder<S, feed_item_state::Empty> {
+impl FeedItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FeedItemBuilder<feed_item_state::Empty, DefaultStr> {
         FeedItemBuilder::new()
     }
 }
 
-impl<S: BosStr> FeedItemBuilder<S, feed_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> FeedItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FeedItemBuilder<feed_item_state::Empty, S> {
+        FeedItemBuilder::builder()
+    }
+}
+
+impl FeedItemBuilder<feed_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FeedItemBuilder {
             _state: PhantomData,
@@ -264,7 +268,18 @@ impl<S: BosStr> FeedItemBuilder<S, feed_item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FeedItemBuilder<S, St>
+impl<S: BosStr> FeedItemBuilder<feed_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FeedItemBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FeedItemBuilder<St, S>
 where
     St: feed_item_state::State,
     St::Uri: feed_item_state::IsUnset,
@@ -273,7 +288,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> FeedItemBuilder<S, feed_item_state::SetUri<St>> {
+    ) -> FeedItemBuilder<feed_item_state::SetUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FeedItemBuilder {
             _state: PhantomData,
@@ -283,7 +298,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FeedItemBuilder<S, St>
+impl<St, S: BosStr> FeedItemBuilder<St, S>
 where
     St: feed_item_state::State,
     St::Uri: feed_item_state::IsSet,
@@ -305,10 +320,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_graph_starterpack() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.graph.starterpack"),
@@ -336,16 +351,19 @@ fn lexicon_doc_app_bsky_graph_starterpack() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Record defining a starter pack of actors and feeds for new users.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Record defining a starter pack of actors and feeds for new users.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("list"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"), SmolStr::new_static("list"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -388,9 +406,9 @@ fn lexicon_doc_app_bsky_graph_starterpack() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("list"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Reference (AT-URI) to the list record.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Reference (AT-URI) to the list record."),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -398,9 +416,11 @@ fn lexicon_doc_app_bsky_graph_starterpack() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Display name for starter pack; can not be empty.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Display name for starter pack; can not be empty.",
+                                        ),
+                                    ),
                                     min_length: Some(1usize),
                                     max_length: Some(500usize),
                                     max_graphemes: Some(50usize),
@@ -422,7 +442,7 @@ fn lexicon_doc_app_bsky_graph_starterpack() -> LexiconDoc<'static> {
 
 pub mod starterpack_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -479,7 +499,7 @@ pub mod starterpack_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StarterpackBuilder<S: BosStr, St: starterpack_state::State> {
+pub struct StarterpackBuilder<St: starterpack_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -492,15 +512,22 @@ pub struct StarterpackBuilder<S: BosStr, St: starterpack_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Starterpack<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StarterpackBuilder<S, starterpack_state::Empty> {
+impl Starterpack<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StarterpackBuilder<starterpack_state::Empty, DefaultStr> {
         StarterpackBuilder::new()
     }
 }
 
-impl<S: BosStr> StarterpackBuilder<S, starterpack_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Starterpack<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StarterpackBuilder<starterpack_state::Empty, S> {
+        StarterpackBuilder::builder()
+    }
+}
+
+impl StarterpackBuilder<starterpack_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StarterpackBuilder {
             _state: PhantomData,
@@ -510,7 +537,18 @@ impl<S: BosStr> StarterpackBuilder<S, starterpack_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StarterpackBuilder<S, St>
+impl<S: BosStr> StarterpackBuilder<starterpack_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StarterpackBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StarterpackBuilder<St, S>
 where
     St: starterpack_state::State,
     St::CreatedAt: starterpack_state::IsUnset,
@@ -519,7 +557,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StarterpackBuilder<S, starterpack_state::SetCreatedAt<St>> {
+    ) -> StarterpackBuilder<starterpack_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StarterpackBuilder {
             _state: PhantomData,
@@ -529,7 +567,7 @@ where
     }
 }
 
-impl<S: BosStr, St: starterpack_state::State> StarterpackBuilder<S, St> {
+impl<St: starterpack_state::State, S: BosStr> StarterpackBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -542,9 +580,12 @@ impl<S: BosStr, St: starterpack_state::State> StarterpackBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: starterpack_state::State> StarterpackBuilder<S, St> {
+impl<St: starterpack_state::State, S: BosStr> StarterpackBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn description_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -555,9 +596,12 @@ impl<S: BosStr, St: starterpack_state::State> StarterpackBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: starterpack_state::State> StarterpackBuilder<S, St> {
+impl<St: starterpack_state::State, S: BosStr> StarterpackBuilder<St, S> {
     /// Set the `feeds` field (optional)
-    pub fn feeds(mut self, value: impl Into<Option<Vec<starterpack::FeedItem<S>>>>) -> Self {
+    pub fn feeds(
+        mut self,
+        value: impl Into<Option<Vec<starterpack::FeedItem<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -568,7 +612,7 @@ impl<S: BosStr, St: starterpack_state::State> StarterpackBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StarterpackBuilder<S, St>
+impl<St, S: BosStr> StarterpackBuilder<St, S>
 where
     St: starterpack_state::State,
     St::List: starterpack_state::IsUnset,
@@ -577,7 +621,7 @@ where
     pub fn list(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StarterpackBuilder<S, starterpack_state::SetList<St>> {
+    ) -> StarterpackBuilder<starterpack_state::SetList<St>, S> {
         self._fields.4 = Option::Some(value.into());
         StarterpackBuilder {
             _state: PhantomData,
@@ -587,7 +631,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StarterpackBuilder<S, St>
+impl<St, S: BosStr> StarterpackBuilder<St, S>
 where
     St: starterpack_state::State,
     St::Name: starterpack_state::IsUnset,
@@ -596,7 +640,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> StarterpackBuilder<S, starterpack_state::SetName<St>> {
+    ) -> StarterpackBuilder<starterpack_state::SetName<St>, S> {
         self._fields.5 = Option::Some(value.into());
         StarterpackBuilder {
             _state: PhantomData,
@@ -606,7 +650,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StarterpackBuilder<S, St>
+impl<St, S: BosStr> StarterpackBuilder<St, S>
 where
     St: starterpack_state::State,
     St::List: starterpack_state::IsSet,
@@ -626,7 +670,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Starterpack<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Starterpack<S> {
         Starterpack {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

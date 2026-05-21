@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A connection created by scanning someone's QR code
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -105,7 +105,7 @@ impl<S: BosStr> LexiconSchema for Connection<S> {
 
 pub mod connection_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -113,56 +113,63 @@ pub mod connection_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = St::Subject;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
-        type CreatedAt = St::CreatedAt;
         type Subject = Set<members::subject>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ConnectionBuilder<S: BosStr, St: connection_state::State> {
+pub struct ConnectionBuilder<St: connection_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Connection<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ConnectionBuilder<S, connection_state::Empty> {
+impl Connection<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ConnectionBuilder<connection_state::Empty, DefaultStr> {
         ConnectionBuilder::new()
     }
 }
 
-impl<S: BosStr> ConnectionBuilder<S, connection_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Connection<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ConnectionBuilder<connection_state::Empty, S> {
+        ConnectionBuilder::builder()
+    }
+}
+
+impl ConnectionBuilder<connection_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ConnectionBuilder {
             _state: PhantomData,
@@ -172,7 +179,18 @@ impl<S: BosStr> ConnectionBuilder<S, connection_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ConnectionBuilder<S, St>
+impl<S: BosStr> ConnectionBuilder<connection_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ConnectionBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ConnectionBuilder<St, S>
 where
     St: connection_state::State,
     St::CreatedAt: connection_state::IsUnset,
@@ -181,7 +199,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ConnectionBuilder<S, connection_state::SetCreatedAt<St>> {
+    ) -> ConnectionBuilder<connection_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ConnectionBuilder {
             _state: PhantomData,
@@ -191,7 +209,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ConnectionBuilder<S, St>
+impl<St, S: BosStr> ConnectionBuilder<St, S>
 where
     St: connection_state::State,
     St::Subject: connection_state::IsUnset,
@@ -200,7 +218,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ConnectionBuilder<S, connection_state::SetSubject<St>> {
+    ) -> ConnectionBuilder<connection_state::SetSubject<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ConnectionBuilder {
             _state: PhantomData,
@@ -210,11 +228,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ConnectionBuilder<S, St>
+impl<St, S: BosStr> ConnectionBuilder<St, S>
 where
     St: connection_state::State,
-    St::CreatedAt: connection_state::IsSet,
     St::Subject: connection_state::IsSet,
+    St::CreatedAt: connection_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Connection<S> {
@@ -225,7 +243,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Connection<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Connection<S> {
         Connection {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
@@ -235,10 +256,10 @@ where
 }
 
 fn lexicon_doc_at_youandme_connection() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.youandme.connection"),
@@ -247,15 +268,19 @@ fn lexicon_doc_at_youandme_connection() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A connection created by scanning someone's QR code",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A connection created by scanning someone's QR code",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("subject"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -269,9 +294,9 @@ fn lexicon_doc_at_youandme_connection() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("subject"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "DID of the connected user",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("DID of the connected user"),
+                                    ),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),

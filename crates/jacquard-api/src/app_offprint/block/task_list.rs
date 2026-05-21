@@ -20,17 +20,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_offprint::block::task_list;
-use crate::app_offprint::block::text::Text;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_offprint::block::text::Text;
+use crate::app_offprint::block::task_list;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TaskList<S: BosStr = DefaultStr> {
     ///Task items
     pub children: Vec<task_list::TaskItem<S>>,
@@ -38,11 +35,9 @@ pub struct TaskList<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TaskItem<S: BosStr = DefaultStr> {
     ///Whether the task is completed
     pub checked: bool,
@@ -87,7 +82,7 @@ impl<S: BosStr> LexiconSchema for TaskItem<S> {
 
 pub mod task_list_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -118,21 +113,28 @@ pub mod task_list_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TaskListBuilder<S: BosStr, St: task_list_state::State> {
+pub struct TaskListBuilder<St: task_list_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<task_list::TaskItem<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> TaskList<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TaskListBuilder<S, task_list_state::Empty> {
+impl TaskList<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TaskListBuilder<task_list_state::Empty, DefaultStr> {
         TaskListBuilder::new()
     }
 }
 
-impl<S: BosStr> TaskListBuilder<S, task_list_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> TaskList<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TaskListBuilder<task_list_state::Empty, S> {
+        TaskListBuilder::builder()
+    }
+}
+
+impl TaskListBuilder<task_list_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TaskListBuilder {
             _state: PhantomData,
@@ -142,7 +144,18 @@ impl<S: BosStr> TaskListBuilder<S, task_list_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> TaskListBuilder<S, St>
+impl<S: BosStr> TaskListBuilder<task_list_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TaskListBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> TaskListBuilder<St, S>
 where
     St: task_list_state::State,
     St::Children: task_list_state::IsUnset,
@@ -151,7 +164,7 @@ where
     pub fn children(
         mut self,
         value: impl Into<Vec<task_list::TaskItem<S>>>,
-    ) -> TaskListBuilder<S, task_list_state::SetChildren<St>> {
+    ) -> TaskListBuilder<task_list_state::SetChildren<St>, S> {
         self._fields.0 = Option::Some(value.into());
         TaskListBuilder {
             _state: PhantomData,
@@ -161,7 +174,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TaskListBuilder<S, St>
+impl<St, S: BosStr> TaskListBuilder<St, S>
 where
     St: task_list_state::State,
     St::Children: task_list_state::IsSet,
@@ -183,10 +196,10 @@ where
 }
 
 fn lexicon_doc_app_offprint_block_taskList() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.offprint.block.taskList"),
@@ -218,10 +231,12 @@ fn lexicon_doc_app_offprint_block_taskList() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("taskItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("content"),
-                        SmolStr::new_static("checked"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("content"),
+                            SmolStr::new_static("checked")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -262,7 +277,7 @@ fn lexicon_doc_app_offprint_block_taskList() -> LexiconDoc<'static> {
 
 pub mod task_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -305,25 +320,28 @@ pub mod task_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TaskItemBuilder<S: BosStr, St: task_item_state::State> {
+pub struct TaskItemBuilder<St: task_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<bool>,
-        Option<Vec<task_list::TaskItem<S>>>,
-        Option<Text<S>>,
-    ),
+    _fields: (Option<bool>, Option<Vec<task_list::TaskItem<S>>>, Option<Text<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> TaskItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TaskItemBuilder<S, task_item_state::Empty> {
+impl TaskItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TaskItemBuilder<task_item_state::Empty, DefaultStr> {
         TaskItemBuilder::new()
     }
 }
 
-impl<S: BosStr> TaskItemBuilder<S, task_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> TaskItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TaskItemBuilder<task_item_state::Empty, S> {
+        TaskItemBuilder::builder()
+    }
+}
+
+impl TaskItemBuilder<task_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TaskItemBuilder {
             _state: PhantomData,
@@ -333,7 +351,18 @@ impl<S: BosStr> TaskItemBuilder<S, task_item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> TaskItemBuilder<S, St>
+impl<S: BosStr> TaskItemBuilder<task_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TaskItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> TaskItemBuilder<St, S>
 where
     St: task_item_state::State,
     St::Checked: task_item_state::IsUnset,
@@ -342,7 +371,7 @@ where
     pub fn checked(
         mut self,
         value: impl Into<bool>,
-    ) -> TaskItemBuilder<S, task_item_state::SetChecked<St>> {
+    ) -> TaskItemBuilder<task_item_state::SetChecked<St>, S> {
         self._fields.0 = Option::Some(value.into());
         TaskItemBuilder {
             _state: PhantomData,
@@ -352,9 +381,12 @@ where
     }
 }
 
-impl<S: BosStr, St: task_item_state::State> TaskItemBuilder<S, St> {
+impl<St: task_item_state::State, S: BosStr> TaskItemBuilder<St, S> {
     /// Set the `children` field (optional)
-    pub fn children(mut self, value: impl Into<Option<Vec<task_list::TaskItem<S>>>>) -> Self {
+    pub fn children(
+        mut self,
+        value: impl Into<Option<Vec<task_list::TaskItem<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -365,7 +397,7 @@ impl<S: BosStr, St: task_item_state::State> TaskItemBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TaskItemBuilder<S, St>
+impl<St, S: BosStr> TaskItemBuilder<St, S>
 where
     St: task_item_state::State,
     St::Content: task_item_state::IsUnset,
@@ -374,7 +406,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<Text<S>>,
-    ) -> TaskItemBuilder<S, task_item_state::SetContent<St>> {
+    ) -> TaskItemBuilder<task_item_state::SetContent<St>, S> {
         self._fields.2 = Option::Some(value.into());
         TaskItemBuilder {
             _state: PhantomData,
@@ -384,7 +416,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TaskItemBuilder<S, St>
+impl<St, S: BosStr> TaskItemBuilder<St, S>
 where
     St: task_item_state::State,
     St::Checked: task_item_state::IsSet,

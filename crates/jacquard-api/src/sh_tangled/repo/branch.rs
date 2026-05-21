@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,26 +21,21 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::repo::branch;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::repo::branch;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Branch<S: BosStr = DefaultStr> {
     pub name: S,
     pub repo: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BranchOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<branch::Signature<S>>,
@@ -63,9 +58,18 @@ pub struct BranchOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum BranchError {
     /// Repository not found or access denied
@@ -79,10 +83,7 @@ pub enum BranchError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for BranchError {
@@ -120,11 +121,9 @@ impl core::fmt::Display for BranchError {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Signature<S: BosStr = DefaultStr> {
     ///Author email
     pub email: S,
@@ -177,7 +176,7 @@ impl<S: BosStr> LexiconSchema for Signature<S> {
 
 pub mod branch_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -185,56 +184,63 @@ pub mod branch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Name;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Repo = Set<members::repo>;
-        type Name = St::Name;
+        type Repo = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Repo = St::Repo;
         type Name = Set<members::name>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Name = St::Name;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BranchBuilder<S: BosStr, St: branch_state::State> {
+pub struct BranchBuilder<St: branch_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Branch<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BranchBuilder<S, branch_state::Empty> {
+impl Branch<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BranchBuilder<branch_state::Empty, DefaultStr> {
         BranchBuilder::new()
     }
 }
 
-impl<S: BosStr> BranchBuilder<S, branch_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Branch<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BranchBuilder<branch_state::Empty, S> {
+        BranchBuilder::builder()
+    }
+}
+
+impl BranchBuilder<branch_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BranchBuilder {
             _state: PhantomData,
@@ -244,13 +250,27 @@ impl<S: BosStr> BranchBuilder<S, branch_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BranchBuilder<S, St>
+impl<S: BosStr> BranchBuilder<branch_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BranchBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BranchBuilder<St, S>
 where
     St: branch_state::State,
     St::Name: branch_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> BranchBuilder<S, branch_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> BranchBuilder<branch_state::SetName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BranchBuilder {
             _state: PhantomData,
@@ -260,13 +280,16 @@ where
     }
 }
 
-impl<S: BosStr, St> BranchBuilder<S, St>
+impl<St, S: BosStr> BranchBuilder<St, S>
 where
     St: branch_state::State,
     St::Repo: branch_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(mut self, value: impl Into<S>) -> BranchBuilder<S, branch_state::SetRepo<St>> {
+    pub fn repo(
+        mut self,
+        value: impl Into<S>,
+    ) -> BranchBuilder<branch_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BranchBuilder {
             _state: PhantomData,
@@ -276,11 +299,11 @@ where
     }
 }
 
-impl<S: BosStr, St> BranchBuilder<S, St>
+impl<St, S: BosStr> BranchBuilder<St, S>
 where
     St: branch_state::State,
-    St::Repo: branch_state::IsSet,
     St::Name: branch_state::IsSet,
+    St::Repo: branch_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Branch<S> {
@@ -293,7 +316,7 @@ where
 
 pub mod signature_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -350,21 +373,28 @@ pub mod signature_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SignatureBuilder<S: BosStr, St: signature_state::State> {
+pub struct SignatureBuilder<St: signature_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Signature<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SignatureBuilder<S, signature_state::Empty> {
+impl Signature<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SignatureBuilder<signature_state::Empty, DefaultStr> {
         SignatureBuilder::new()
     }
 }
 
-impl<S: BosStr> SignatureBuilder<S, signature_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Signature<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SignatureBuilder<signature_state::Empty, S> {
+        SignatureBuilder::builder()
+    }
+}
+
+impl SignatureBuilder<signature_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SignatureBuilder {
             _state: PhantomData,
@@ -374,7 +404,18 @@ impl<S: BosStr> SignatureBuilder<S, signature_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SignatureBuilder<S, St>
+impl<S: BosStr> SignatureBuilder<signature_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SignatureBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
     St::Email: signature_state::IsUnset,
@@ -383,7 +424,7 @@ where
     pub fn email(
         mut self,
         value: impl Into<S>,
-    ) -> SignatureBuilder<S, signature_state::SetEmail<St>> {
+    ) -> SignatureBuilder<signature_state::SetEmail<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -393,7 +434,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SignatureBuilder<S, St>
+impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
     St::Name: signature_state::IsUnset,
@@ -402,7 +443,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> SignatureBuilder<S, signature_state::SetName<St>> {
+    ) -> SignatureBuilder<signature_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -412,7 +453,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SignatureBuilder<S, St>
+impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
     St::When: signature_state::IsUnset,
@@ -421,7 +462,7 @@ where
     pub fn when(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SignatureBuilder<S, signature_state::SetWhen<St>> {
+    ) -> SignatureBuilder<signature_state::SetWhen<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -431,7 +472,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SignatureBuilder<S, St>
+impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
     St::When: signature_state::IsSet,
@@ -448,7 +489,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Signature<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Signature<S> {
         Signature {
             email: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -459,10 +503,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_branch() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.branch"),
@@ -471,47 +515,53 @@ fn lexicon_doc_sh_tangled_repo_branch() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![
-                            SmolStr::new_static("repo"),
-                            SmolStr::new_static("name"),
-                        ]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("name"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Branch name to get information for",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("repo"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Repository identifier in format 'did:plc:.../repoName'",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(
+                                vec![
+                                    SmolStr::new_static("repo"), SmolStr::new_static("name")
+                                ],
+                            ),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("name"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("Branch name to get information for"),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("repo"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Repository identifier in format 'did:plc:.../repoName'",
+                                            ),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("signature"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("email"),
-                        SmolStr::new_static("when"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("name"), SmolStr::new_static("email"),
+                            SmolStr::new_static("when")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

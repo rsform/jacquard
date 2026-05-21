@@ -8,32 +8,27 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AviHandle<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AviHandleOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -52,8 +47,9 @@ impl jacquard_common::xrpc::XrpcResp for AviHandleResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AviHandle<S> {
     const NSID: &'static str = "mov.danabra.AviHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = AviHandleResponse;
 }
 
@@ -61,15 +57,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AviHandle<S> {
 pub struct AviHandleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AviHandleRequest {
     const PATH: &'static str = "/xrpc/mov.danabra.AviHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = AviHandle<S>;
     type Response = AviHandleResponse;
 }
 
 pub mod avi_handle_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -100,21 +97,28 @@ pub mod avi_handle_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AviHandleBuilder<S: BosStr, St: avi_handle_state::State> {
+pub struct AviHandleBuilder<St: avi_handle_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> AviHandle<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AviHandleBuilder<S, avi_handle_state::Empty> {
+impl AviHandle<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AviHandleBuilder<avi_handle_state::Empty, DefaultStr> {
         AviHandleBuilder::new()
     }
 }
 
-impl<S: BosStr> AviHandleBuilder<S, avi_handle_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> AviHandle<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AviHandleBuilder<avi_handle_state::Empty, S> {
+        AviHandleBuilder::builder()
+    }
+}
+
+impl AviHandleBuilder<avi_handle_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AviHandleBuilder {
             _state: PhantomData,
@@ -124,7 +128,18 @@ impl<S: BosStr> AviHandleBuilder<S, avi_handle_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AviHandleBuilder<S, St>
+impl<S: BosStr> AviHandleBuilder<avi_handle_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AviHandleBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AviHandleBuilder<St, S>
 where
     St: avi_handle_state::State,
     St::Uri: avi_handle_state::IsUnset,
@@ -133,7 +148,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> AviHandleBuilder<S, avi_handle_state::SetUri<St>> {
+    ) -> AviHandleBuilder<avi_handle_state::SetUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AviHandleBuilder {
             _state: PhantomData,
@@ -143,7 +158,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AviHandleBuilder<S, St>
+impl<St, S: BosStr> AviHandleBuilder<St, S>
 where
     St: avi_handle_state::State,
     St::Uri: avi_handle_state::IsSet,
@@ -156,7 +171,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AviHandle<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AviHandle<S> {
         AviHandle {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

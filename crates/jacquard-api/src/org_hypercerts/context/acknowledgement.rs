@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::org_hypercerts::Uri;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::org_hypercerts::Uri;
 /// Acknowledges a record (subject) or its relationship in a context. Created in the acknowledging actor's repo to form a bidirectional link. Examples: a contributor acknowledging inclusion in an activity, an activity owner acknowledging inclusion in a collection, or a record owner acknowledging an evaluation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -54,6 +54,7 @@ pub struct Acknowledgement<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -148,7 +149,7 @@ impl<S: BosStr> LexiconSchema for Acknowledgement<S> {
 
 pub mod acknowledgement_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -156,56 +157,59 @@ pub mod acknowledgement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
-        type CreatedAt;
         type Acknowledged;
+        type CreatedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
-        type CreatedAt = Unset;
         type Acknowledged = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = St::CreatedAt;
-        type Acknowledged = St::Acknowledged;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Subject = St::Subject;
-        type CreatedAt = Set<members::created_at>;
-        type Acknowledged = St::Acknowledged;
+        type CreatedAt = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `acknowledged` field to Set
     pub struct SetAcknowledged<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAcknowledged<St> {}
     impl<St: State> State for SetAcknowledged<St> {
-        type Subject = St::Subject;
-        type CreatedAt = St::CreatedAt;
         type Acknowledged = Set<members::acknowledged>;
+        type CreatedAt = St::CreatedAt;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Acknowledged = St::Acknowledged;
+        type CreatedAt = Set<members::created_at>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Acknowledged = St::Acknowledged;
+        type CreatedAt = St::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `acknowledged` field
         pub struct acknowledged(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AcknowledgementBuilder<S: BosStr, St: acknowledgement_state::State> {
+pub struct AcknowledgementBuilder<
+    St: acknowledgement_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -217,15 +221,22 @@ pub struct AcknowledgementBuilder<S: BosStr, St: acknowledgement_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Acknowledgement<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AcknowledgementBuilder<S, acknowledgement_state::Empty> {
+impl Acknowledgement<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AcknowledgementBuilder<acknowledgement_state::Empty, DefaultStr> {
         AcknowledgementBuilder::new()
     }
 }
 
-impl<S: BosStr> AcknowledgementBuilder<S, acknowledgement_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Acknowledgement<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AcknowledgementBuilder<acknowledgement_state::Empty, S> {
+        AcknowledgementBuilder::builder()
+    }
+}
+
+impl AcknowledgementBuilder<acknowledgement_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AcknowledgementBuilder {
             _state: PhantomData,
@@ -235,7 +246,18 @@ impl<S: BosStr> AcknowledgementBuilder<S, acknowledgement_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AcknowledgementBuilder<S, St>
+impl<S: BosStr> AcknowledgementBuilder<acknowledgement_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AcknowledgementBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AcknowledgementBuilder<St, S>
 where
     St: acknowledgement_state::State,
     St::Acknowledged: acknowledgement_state::IsUnset,
@@ -244,7 +266,7 @@ where
     pub fn acknowledged(
         mut self,
         value: impl Into<bool>,
-    ) -> AcknowledgementBuilder<S, acknowledgement_state::SetAcknowledged<St>> {
+    ) -> AcknowledgementBuilder<acknowledgement_state::SetAcknowledged<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AcknowledgementBuilder {
             _state: PhantomData,
@@ -254,7 +276,7 @@ where
     }
 }
 
-impl<S: BosStr, St: acknowledgement_state::State> AcknowledgementBuilder<S, St> {
+impl<St: acknowledgement_state::State, S: BosStr> AcknowledgementBuilder<St, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -267,9 +289,12 @@ impl<S: BosStr, St: acknowledgement_state::State> AcknowledgementBuilder<S, St> 
     }
 }
 
-impl<S: BosStr, St: acknowledgement_state::State> AcknowledgementBuilder<S, St> {
+impl<St: acknowledgement_state::State, S: BosStr> AcknowledgementBuilder<St, S> {
     /// Set the `context` field (optional)
-    pub fn context(mut self, value: impl Into<Option<AcknowledgementContext<S>>>) -> Self {
+    pub fn context(
+        mut self,
+        value: impl Into<Option<AcknowledgementContext<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -280,7 +305,7 @@ impl<S: BosStr, St: acknowledgement_state::State> AcknowledgementBuilder<S, St> 
     }
 }
 
-impl<S: BosStr, St> AcknowledgementBuilder<S, St>
+impl<St, S: BosStr> AcknowledgementBuilder<St, S>
 where
     St: acknowledgement_state::State,
     St::CreatedAt: acknowledgement_state::IsUnset,
@@ -289,7 +314,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AcknowledgementBuilder<S, acknowledgement_state::SetCreatedAt<St>> {
+    ) -> AcknowledgementBuilder<acknowledgement_state::SetCreatedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         AcknowledgementBuilder {
             _state: PhantomData,
@@ -299,7 +324,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AcknowledgementBuilder<S, St>
+impl<St, S: BosStr> AcknowledgementBuilder<St, S>
 where
     St: acknowledgement_state::State,
     St::Subject: acknowledgement_state::IsUnset,
@@ -308,7 +333,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> AcknowledgementBuilder<S, acknowledgement_state::SetSubject<St>> {
+    ) -> AcknowledgementBuilder<acknowledgement_state::SetSubject<St>, S> {
         self._fields.4 = Option::Some(value.into());
         AcknowledgementBuilder {
             _state: PhantomData,
@@ -318,12 +343,12 @@ where
     }
 }
 
-impl<S: BosStr, St> AcknowledgementBuilder<S, St>
+impl<St, S: BosStr> AcknowledgementBuilder<St, S>
 where
     St: acknowledgement_state::State,
-    St::Subject: acknowledgement_state::IsSet,
-    St::CreatedAt: acknowledgement_state::IsSet,
     St::Acknowledged: acknowledgement_state::IsSet,
+    St::CreatedAt: acknowledgement_state::IsSet,
+    St::Subject: acknowledgement_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Acknowledgement<S> {
@@ -337,7 +362,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Acknowledgement<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Acknowledgement<S> {
         Acknowledgement {
             acknowledged: self._fields.0.unwrap(),
             comment: self._fields.1,
@@ -350,10 +378,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_context_acknowledgement() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.context.acknowledgement"),

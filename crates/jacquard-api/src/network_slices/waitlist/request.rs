@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A request to join the waitlist
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -106,7 +106,7 @@ impl<S: BosStr> LexiconSchema for Request<S> {
 
 pub mod request_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -114,56 +114,63 @@ pub mod request_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slice;
         type CreatedAt;
+        type Slice;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slice = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `slice` field to Set
-    pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSlice<St> {}
-    impl<St: State> State for SetSlice<St> {
-        type Slice = Set<members::slice>;
-        type CreatedAt = St::CreatedAt;
+        type Slice = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Slice = St::Slice;
         type CreatedAt = Set<members::created_at>;
+        type Slice = St::Slice;
+    }
+    ///State transition - sets the `slice` field to Set
+    pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlice<St> {}
+    impl<St: State> State for SetSlice<St> {
+        type CreatedAt = St::CreatedAt;
+        type Slice = Set<members::slice>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slice` field
-        pub struct slice(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `slice` field
+        pub struct slice(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RequestBuilder<S: BosStr, St: request_state::State> {
+pub struct RequestBuilder<St: request_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Request<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RequestBuilder<S, request_state::Empty> {
+impl Request<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RequestBuilder<request_state::Empty, DefaultStr> {
         RequestBuilder::new()
     }
 }
 
-impl<S: BosStr> RequestBuilder<S, request_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Request<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RequestBuilder<request_state::Empty, S> {
+        RequestBuilder::builder()
+    }
+}
+
+impl RequestBuilder<request_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RequestBuilder {
             _state: PhantomData,
@@ -173,7 +180,18 @@ impl<S: BosStr> RequestBuilder<S, request_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RequestBuilder<S, St>
+impl<S: BosStr> RequestBuilder<request_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RequestBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RequestBuilder<St, S>
 where
     St: request_state::State,
     St::CreatedAt: request_state::IsUnset,
@@ -182,7 +200,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RequestBuilder<S, request_state::SetCreatedAt<St>> {
+    ) -> RequestBuilder<request_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
@@ -192,7 +210,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RequestBuilder<S, St>
+impl<St, S: BosStr> RequestBuilder<St, S>
 where
     St: request_state::State,
     St::Slice: request_state::IsUnset,
@@ -201,7 +219,7 @@ where
     pub fn slice(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RequestBuilder<S, request_state::SetSlice<St>> {
+    ) -> RequestBuilder<request_state::SetSlice<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
@@ -211,11 +229,11 @@ where
     }
 }
 
-impl<S: BosStr, St> RequestBuilder<S, St>
+impl<St, S: BosStr> RequestBuilder<St, S>
 where
     St: request_state::State,
-    St::Slice: request_state::IsSet,
     St::CreatedAt: request_state::IsSet,
+    St::Slice: request_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Request<S> {
@@ -236,10 +254,10 @@ where
 }
 
 fn lexicon_doc_network_slices_waitlist_request() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.waitlist.request"),
@@ -248,22 +266,26 @@ fn lexicon_doc_network_slices_waitlist_request() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A request to join the waitlist")),
+                    description: Some(
+                        CowStr::new_static("A request to join the waitlist"),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("slice"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("slice"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When the user joined the waitlist",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When the user joined the waitlist"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -271,9 +293,11 @@ fn lexicon_doc_network_slices_waitlist_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("slice"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The AT URI of the slice being requested access to",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The AT URI of the slice being requested access to",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

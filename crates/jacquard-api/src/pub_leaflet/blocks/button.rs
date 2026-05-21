@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -23,13 +23,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Button<S: BosStr = DefaultStr> {
     pub text: S,
     pub url: UriValue<S>,
@@ -54,7 +51,7 @@ impl<S: BosStr> LexiconSchema for Button<S> {
 
 pub mod button_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -62,56 +59,63 @@ pub mod button_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
         type Url;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetText<St> {}
-    impl<St: State> State for SetText<St> {
-        type Text = Set<members::text>;
-        type Url = St::Url;
+        type Text = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUrl<St> {}
     impl<St: State> State for SetUrl<St> {
-        type Text = St::Text;
         type Url = Set<members::url>;
+        type Text = St::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Url = St::Url;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ButtonBuilder<S: BosStr, St: button_state::State> {
+pub struct ButtonBuilder<St: button_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Button<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ButtonBuilder<S, button_state::Empty> {
+impl Button<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ButtonBuilder<button_state::Empty, DefaultStr> {
         ButtonBuilder::new()
     }
 }
 
-impl<S: BosStr> ButtonBuilder<S, button_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Button<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ButtonBuilder<button_state::Empty, S> {
+        ButtonBuilder::builder()
+    }
+}
+
+impl ButtonBuilder<button_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ButtonBuilder {
             _state: PhantomData,
@@ -121,13 +125,27 @@ impl<S: BosStr> ButtonBuilder<S, button_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ButtonBuilder<S, St>
+impl<S: BosStr> ButtonBuilder<button_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ButtonBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ButtonBuilder<St, S>
 where
     St: button_state::State,
     St::Text: button_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(mut self, value: impl Into<S>) -> ButtonBuilder<S, button_state::SetText<St>> {
+    pub fn text(
+        mut self,
+        value: impl Into<S>,
+    ) -> ButtonBuilder<button_state::SetText<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ButtonBuilder {
             _state: PhantomData,
@@ -137,7 +155,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ButtonBuilder<S, St>
+impl<St, S: BosStr> ButtonBuilder<St, S>
 where
     St: button_state::State,
     St::Url: button_state::IsUnset,
@@ -146,7 +164,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ButtonBuilder<S, button_state::SetUrl<St>> {
+    ) -> ButtonBuilder<button_state::SetUrl<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ButtonBuilder {
             _state: PhantomData,
@@ -156,11 +174,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ButtonBuilder<S, St>
+impl<St, S: BosStr> ButtonBuilder<St, S>
 where
     St: button_state::State,
-    St::Text: button_state::IsSet,
     St::Url: button_state::IsSet,
+    St::Text: button_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Button<S> {
@@ -181,10 +199,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_blocks_button() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.blocks.button"),
@@ -193,18 +211,15 @@ fn lexicon_doc_pub_leaflet_blocks_button() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("text"),
-                        SmolStr::new_static("url"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("text"), SmolStr::new_static("url")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("text"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("url"),

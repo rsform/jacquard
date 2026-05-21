@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, UriValue};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -142,7 +142,7 @@ impl<S: BosStr> LexiconSchema for Proposal<S> {
 
 pub mod proposal_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -150,90 +150,90 @@ pub mod proposal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Src;
         type Typ;
-        type Val;
-        type Cts;
         type Uri;
+        type Val;
+        type Src;
+        type Cts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Src = Unset;
         type Typ = Unset;
-        type Val = Unset;
-        type Cts = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `src` field to Set
-    pub struct SetSrc<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSrc<St> {}
-    impl<St: State> State for SetSrc<St> {
-        type Src = Set<members::src>;
-        type Typ = St::Typ;
-        type Val = St::Val;
-        type Cts = St::Cts;
-        type Uri = St::Uri;
+        type Val = Unset;
+        type Src = Unset;
+        type Cts = Unset;
     }
     ///State transition - sets the `typ` field to Set
     pub struct SetTyp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTyp<St> {}
     impl<St: State> State for SetTyp<St> {
-        type Src = St::Src;
         type Typ = Set<members::typ>;
+        type Uri = St::Uri;
         type Val = St::Val;
-        type Cts = St::Cts;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `val` field to Set
-    pub struct SetVal<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVal<St> {}
-    impl<St: State> State for SetVal<St> {
         type Src = St::Src;
-        type Typ = St::Typ;
-        type Val = Set<members::val>;
         type Cts = St::Cts;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `cts` field to Set
-    pub struct SetCts<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCts<St> {}
-    impl<St: State> State for SetCts<St> {
-        type Src = St::Src;
-        type Typ = St::Typ;
-        type Val = St::Val;
-        type Cts = Set<members::cts>;
-        type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Src = St::Src;
         type Typ = St::Typ;
-        type Val = St::Val;
-        type Cts = St::Cts;
         type Uri = Set<members::uri>;
+        type Val = St::Val;
+        type Src = St::Src;
+        type Cts = St::Cts;
+    }
+    ///State transition - sets the `val` field to Set
+    pub struct SetVal<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVal<St> {}
+    impl<St: State> State for SetVal<St> {
+        type Typ = St::Typ;
+        type Uri = St::Uri;
+        type Val = Set<members::val>;
+        type Src = St::Src;
+        type Cts = St::Cts;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSrc<St> {}
+    impl<St: State> State for SetSrc<St> {
+        type Typ = St::Typ;
+        type Uri = St::Uri;
+        type Val = St::Val;
+        type Src = Set<members::src>;
+        type Cts = St::Cts;
+    }
+    ///State transition - sets the `cts` field to Set
+    pub struct SetCts<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCts<St> {}
+    impl<St: State> State for SetCts<St> {
+        type Typ = St::Typ;
+        type Uri = St::Uri;
+        type Val = St::Val;
+        type Src = St::Src;
+        type Cts = Set<members::cts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `src` field
-        pub struct src(());
         ///Marker type for the `typ` field
         pub struct typ(());
-        ///Marker type for the `val` field
-        pub struct val(());
-        ///Marker type for the `cts` field
-        pub struct cts(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `val` field
+        pub struct val(());
+        ///Marker type for the `src` field
+        pub struct src(());
+        ///Marker type for the `cts` field
+        pub struct cts(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProposalBuilder<S: BosStr, St: proposal_state::State> {
+pub struct ProposalBuilder<St: proposal_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -251,27 +251,43 @@ pub struct ProposalBuilder<S: BosStr, St: proposal_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Proposal<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProposalBuilder<S, proposal_state::Empty> {
+impl Proposal<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProposalBuilder<proposal_state::Empty, DefaultStr> {
         ProposalBuilder::new()
     }
 }
 
-impl<S: BosStr> ProposalBuilder<S, proposal_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Proposal<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProposalBuilder<proposal_state::Empty, S> {
+        ProposalBuilder::builder()
+    }
+}
+
+impl ProposalBuilder<proposal_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProposalBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: proposal_state::State> ProposalBuilder<S, St> {
+impl<S: BosStr> ProposalBuilder<proposal_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProposalBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: proposal_state::State, S: BosStr> ProposalBuilder<St, S> {
     /// Set the `aid` field (optional)
     pub fn aid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -284,7 +300,7 @@ impl<S: BosStr, St: proposal_state::State> ProposalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: proposal_state::State> ProposalBuilder<S, St> {
+impl<St: proposal_state::State, S: BosStr> ProposalBuilder<St, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -297,7 +313,7 @@ impl<S: BosStr, St: proposal_state::State> ProposalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProposalBuilder<S, St>
+impl<St, S: BosStr> ProposalBuilder<St, S>
 where
     St: proposal_state::State,
     St::Cts: proposal_state::IsUnset,
@@ -306,7 +322,7 @@ where
     pub fn cts(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ProposalBuilder<S, proposal_state::SetCts<St>> {
+    ) -> ProposalBuilder<proposal_state::SetCts<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ProposalBuilder {
             _state: PhantomData,
@@ -316,7 +332,7 @@ where
     }
 }
 
-impl<S: BosStr, St: proposal_state::State> ProposalBuilder<S, St> {
+impl<St: proposal_state::State, S: BosStr> ProposalBuilder<St, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -329,7 +345,7 @@ impl<S: BosStr, St: proposal_state::State> ProposalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: proposal_state::State> ProposalBuilder<S, St> {
+impl<St: proposal_state::State, S: BosStr> ProposalBuilder<St, S> {
     /// Set the `reasons` field (optional)
     pub fn reasons(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -342,7 +358,7 @@ impl<S: BosStr, St: proposal_state::State> ProposalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: proposal_state::State> ProposalBuilder<S, St> {
+impl<St: proposal_state::State, S: BosStr> ProposalBuilder<St, S> {
     /// Set the `sig` field (optional)
     pub fn sig(mut self, value: impl Into<Option<Bytes>>) -> Self {
         self._fields.5 = value.into();
@@ -355,7 +371,7 @@ impl<S: BosStr, St: proposal_state::State> ProposalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProposalBuilder<S, St>
+impl<St, S: BosStr> ProposalBuilder<St, S>
 where
     St: proposal_state::State,
     St::Src: proposal_state::IsUnset,
@@ -364,7 +380,7 @@ where
     pub fn src(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ProposalBuilder<S, proposal_state::SetSrc<St>> {
+    ) -> ProposalBuilder<proposal_state::SetSrc<St>, S> {
         self._fields.6 = Option::Some(value.into());
         ProposalBuilder {
             _state: PhantomData,
@@ -374,13 +390,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ProposalBuilder<S, St>
+impl<St, S: BosStr> ProposalBuilder<St, S>
 where
     St: proposal_state::State,
     St::Typ: proposal_state::IsUnset,
 {
     /// Set the `typ` field (required)
-    pub fn typ(mut self, value: impl Into<S>) -> ProposalBuilder<S, proposal_state::SetTyp<St>> {
+    pub fn typ(
+        mut self,
+        value: impl Into<S>,
+    ) -> ProposalBuilder<proposal_state::SetTyp<St>, S> {
         self._fields.7 = Option::Some(value.into());
         ProposalBuilder {
             _state: PhantomData,
@@ -390,7 +409,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProposalBuilder<S, St>
+impl<St, S: BosStr> ProposalBuilder<St, S>
 where
     St: proposal_state::State,
     St::Uri: proposal_state::IsUnset,
@@ -399,7 +418,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ProposalBuilder<S, proposal_state::SetUri<St>> {
+    ) -> ProposalBuilder<proposal_state::SetUri<St>, S> {
         self._fields.8 = Option::Some(value.into());
         ProposalBuilder {
             _state: PhantomData,
@@ -409,13 +428,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ProposalBuilder<S, St>
+impl<St, S: BosStr> ProposalBuilder<St, S>
 where
     St: proposal_state::State,
     St::Val: proposal_state::IsUnset,
 {
     /// Set the `val` field (required)
-    pub fn val(mut self, value: impl Into<S>) -> ProposalBuilder<S, proposal_state::SetVal<St>> {
+    pub fn val(
+        mut self,
+        value: impl Into<S>,
+    ) -> ProposalBuilder<proposal_state::SetVal<St>, S> {
         self._fields.9 = Option::Some(value.into());
         ProposalBuilder {
             _state: PhantomData,
@@ -425,7 +447,7 @@ where
     }
 }
 
-impl<S: BosStr, St: proposal_state::State> ProposalBuilder<S, St> {
+impl<St: proposal_state::State, S: BosStr> ProposalBuilder<St, S> {
     /// Set the `ver` field (optional)
     pub fn ver(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.10 = value.into();
@@ -438,14 +460,14 @@ impl<S: BosStr, St: proposal_state::State> ProposalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProposalBuilder<S, St>
+impl<St, S: BosStr> ProposalBuilder<St, S>
 where
     St: proposal_state::State,
-    St::Src: proposal_state::IsSet,
     St::Typ: proposal_state::IsSet,
-    St::Val: proposal_state::IsSet,
-    St::Cts: proposal_state::IsSet,
     St::Uri: proposal_state::IsSet,
+    St::Val: proposal_state::IsSet,
+    St::Src: proposal_state::IsSet,
+    St::Cts: proposal_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Proposal<S> {
@@ -484,10 +506,10 @@ where
 }
 
 fn lexicon_doc_social_pmsky_proposal() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.pmsky.proposal"),

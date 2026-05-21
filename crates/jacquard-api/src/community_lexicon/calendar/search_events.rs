@@ -10,28 +10,25 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Cid, Did, UriValue};
+use jacquard_common::types::string::{Did, Cid, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::community_lexicon::calendar::search_events;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::community_lexicon::calendar::search_events;
 /// An event record with RSVP counts and URL.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventView<S: BosStr = DefaultStr> {
     ///Number of users who have RSVP'd as going.
     pub count_going: i64,
@@ -45,11 +42,9 @@ pub struct EventView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchEvents<S: BosStr = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -64,20 +59,27 @@ pub struct SearchEvents<S: BosStr = DefaultStr> {
     pub repository: Option<Did<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchEventsOutput<S: BosStr = DefaultStr> {
     pub results: Vec<search_events::EventView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum SearchEventsError {
     #[serde(rename = "InvalidRepository")]
@@ -88,10 +90,7 @@ pub enum SearchEventsError {
     SearchError(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for SearchEventsError {
@@ -170,7 +169,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SearchEventsRequest {
 
 pub mod event_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -178,86 +177,93 @@ pub mod event_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CountGoing;
+        type CountInterested;
         type CountNotGoing;
         type Url;
-        type CountInterested;
-        type CountGoing;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CountGoing = Unset;
+        type CountInterested = Unset;
         type CountNotGoing = Unset;
         type Url = Unset;
-        type CountInterested = Unset;
-        type CountGoing = Unset;
-    }
-    ///State transition - sets the `count_not_going` field to Set
-    pub struct SetCountNotGoing<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCountNotGoing<St> {}
-    impl<St: State> State for SetCountNotGoing<St> {
-        type CountNotGoing = Set<members::count_not_going>;
-        type Url = St::Url;
-        type CountInterested = St::CountInterested;
-        type CountGoing = St::CountGoing;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type CountNotGoing = St::CountNotGoing;
-        type Url = Set<members::url>;
-        type CountInterested = St::CountInterested;
-        type CountGoing = St::CountGoing;
-    }
-    ///State transition - sets the `count_interested` field to Set
-    pub struct SetCountInterested<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCountInterested<St> {}
-    impl<St: State> State for SetCountInterested<St> {
-        type CountNotGoing = St::CountNotGoing;
-        type Url = St::Url;
-        type CountInterested = Set<members::count_interested>;
-        type CountGoing = St::CountGoing;
     }
     ///State transition - sets the `count_going` field to Set
     pub struct SetCountGoing<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCountGoing<St> {}
     impl<St: State> State for SetCountGoing<St> {
+        type CountGoing = Set<members::count_going>;
+        type CountInterested = St::CountInterested;
         type CountNotGoing = St::CountNotGoing;
         type Url = St::Url;
+    }
+    ///State transition - sets the `count_interested` field to Set
+    pub struct SetCountInterested<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCountInterested<St> {}
+    impl<St: State> State for SetCountInterested<St> {
+        type CountGoing = St::CountGoing;
+        type CountInterested = Set<members::count_interested>;
+        type CountNotGoing = St::CountNotGoing;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `count_not_going` field to Set
+    pub struct SetCountNotGoing<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCountNotGoing<St> {}
+    impl<St: State> State for SetCountNotGoing<St> {
+        type CountGoing = St::CountGoing;
         type CountInterested = St::CountInterested;
-        type CountGoing = Set<members::count_going>;
+        type CountNotGoing = Set<members::count_not_going>;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type CountGoing = St::CountGoing;
+        type CountInterested = St::CountInterested;
+        type CountNotGoing = St::CountNotGoing;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `count_going` field
+        pub struct count_going(());
+        ///Marker type for the `count_interested` field
+        pub struct count_interested(());
         ///Marker type for the `count_not_going` field
         pub struct count_not_going(());
         ///Marker type for the `url` field
         pub struct url(());
-        ///Marker type for the `count_interested` field
-        pub struct count_interested(());
-        ///Marker type for the `count_going` field
-        pub struct count_going(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EventViewBuilder<S: BosStr, St: event_view_state::State> {
+pub struct EventViewBuilder<St: event_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<i64>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> EventView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EventViewBuilder<S, event_view_state::Empty> {
+impl EventView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EventViewBuilder<event_view_state::Empty, DefaultStr> {
         EventViewBuilder::new()
     }
 }
 
-impl<S: BosStr> EventViewBuilder<S, event_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> EventView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EventViewBuilder<event_view_state::Empty, S> {
+        EventViewBuilder::builder()
+    }
+}
+
+impl EventViewBuilder<event_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventViewBuilder {
             _state: PhantomData,
@@ -267,7 +273,18 @@ impl<S: BosStr> EventViewBuilder<S, event_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EventViewBuilder<S, St>
+impl<S: BosStr> EventViewBuilder<event_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EventViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EventViewBuilder<St, S>
 where
     St: event_view_state::State,
     St::CountGoing: event_view_state::IsUnset,
@@ -276,7 +293,7 @@ where
     pub fn count_going(
         mut self,
         value: impl Into<i64>,
-    ) -> EventViewBuilder<S, event_view_state::SetCountGoing<St>> {
+    ) -> EventViewBuilder<event_view_state::SetCountGoing<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EventViewBuilder {
             _state: PhantomData,
@@ -286,7 +303,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EventViewBuilder<S, St>
+impl<St, S: BosStr> EventViewBuilder<St, S>
 where
     St: event_view_state::State,
     St::CountInterested: event_view_state::IsUnset,
@@ -295,7 +312,7 @@ where
     pub fn count_interested(
         mut self,
         value: impl Into<i64>,
-    ) -> EventViewBuilder<S, event_view_state::SetCountInterested<St>> {
+    ) -> EventViewBuilder<event_view_state::SetCountInterested<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EventViewBuilder {
             _state: PhantomData,
@@ -305,7 +322,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EventViewBuilder<S, St>
+impl<St, S: BosStr> EventViewBuilder<St, S>
 where
     St: event_view_state::State,
     St::CountNotGoing: event_view_state::IsUnset,
@@ -314,7 +331,7 @@ where
     pub fn count_not_going(
         mut self,
         value: impl Into<i64>,
-    ) -> EventViewBuilder<S, event_view_state::SetCountNotGoing<St>> {
+    ) -> EventViewBuilder<event_view_state::SetCountNotGoing<St>, S> {
         self._fields.2 = Option::Some(value.into());
         EventViewBuilder {
             _state: PhantomData,
@@ -324,7 +341,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EventViewBuilder<S, St>
+impl<St, S: BosStr> EventViewBuilder<St, S>
 where
     St: event_view_state::State,
     St::Url: event_view_state::IsUnset,
@@ -333,7 +350,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> EventViewBuilder<S, event_view_state::SetUrl<St>> {
+    ) -> EventViewBuilder<event_view_state::SetUrl<St>, S> {
         self._fields.3 = Option::Some(value.into());
         EventViewBuilder {
             _state: PhantomData,
@@ -343,13 +360,13 @@ where
     }
 }
 
-impl<S: BosStr, St> EventViewBuilder<S, St>
+impl<St, S: BosStr> EventViewBuilder<St, S>
 where
     St: event_view_state::State,
+    St::CountGoing: event_view_state::IsSet,
+    St::CountInterested: event_view_state::IsSet,
     St::CountNotGoing: event_view_state::IsSet,
     St::Url: event_view_state::IsSet,
-    St::CountInterested: event_view_state::IsSet,
-    St::CountGoing: event_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> EventView<S> {
@@ -362,7 +379,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EventView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EventView<S> {
         EventView {
             count_going: self._fields.0.unwrap(),
             count_interested: self._fields.1.unwrap(),
@@ -374,10 +394,10 @@ where
 }
 
 fn lexicon_doc_community_lexicon_calendar_searchEvents() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("community.lexicon.calendar.searchEvents"),
@@ -386,15 +406,17 @@ fn lexicon_doc_community_lexicon_calendar_searchEvents() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("eventView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "An event record with RSVP counts and URL.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("countGoing"),
-                        SmolStr::new_static("countInterested"),
-                        SmolStr::new_static("countNotGoing"),
-                        SmolStr::new_static("url"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("An event record with RSVP counts and URL."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("countGoing"),
+                            SmolStr::new_static("countInterested"),
+                            SmolStr::new_static("countNotGoing"),
+                            SmolStr::new_static("url")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -419,9 +441,9 @@ fn lexicon_doc_community_lexicon_calendar_searchEvents() -> LexiconDoc<'static> 
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The canonical web URL for this event.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The canonical web URL for this event."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -434,49 +456,53 @@ fn lexicon_doc_community_lexicon_calendar_searchEvents() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("location"),
-                                LexXrpcParametersProperty::Array(LexPrimitiveArray {
-                                    items: LexPrimitiveArrayItem::String(LexString {
-                                        format: Some(LexStringFormat::Cid),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
                                         ..Default::default()
                                     }),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("query"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Full-text search query.",
-                                    )),
-                                    max_length: Some(150usize),
-                                    max_graphemes: Some(150usize),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("repository"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Filter events by DID.")),
-                                    format: Some(LexStringFormat::Did),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("location"),
+                                    LexXrpcParametersProperty::Array(LexPrimitiveArray {
+                                        items: LexPrimitiveArrayItem::String(LexString {
+                                            format: Some(LexStringFormat::Cid),
+                                            ..Default::default()
+                                        }),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("query"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("Full-text search query."),
+                                        ),
+                                        max_length: Some(150usize),
+                                        max_graphemes: Some(150usize),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("repository"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("Filter events by DID."),
+                                        ),
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -492,7 +518,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_events_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -510,21 +536,28 @@ pub mod search_events_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchEventsBuilder<S: BosStr, St: search_events_state::State> {
+pub struct SearchEventsBuilder<St: search_events_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Vec<Cid<S>>>, Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SearchEvents<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SearchEventsBuilder<S, search_events_state::Empty> {
+impl SearchEvents<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SearchEventsBuilder<search_events_state::Empty, DefaultStr> {
         SearchEventsBuilder::new()
     }
 }
 
-impl<S: BosStr> SearchEventsBuilder<S, search_events_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SearchEvents<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SearchEventsBuilder<search_events_state::Empty, S> {
+        SearchEventsBuilder::builder()
+    }
+}
+
+impl SearchEventsBuilder<search_events_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SearchEventsBuilder {
             _state: PhantomData,
@@ -534,7 +567,18 @@ impl<S: BosStr> SearchEventsBuilder<S, search_events_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: search_events_state::State> SearchEventsBuilder<S, St> {
+impl<S: BosStr> SearchEventsBuilder<search_events_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SearchEventsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: search_events_state::State, S: BosStr> SearchEventsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -547,7 +591,7 @@ impl<S: BosStr, St: search_events_state::State> SearchEventsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_events_state::State> SearchEventsBuilder<S, St> {
+impl<St: search_events_state::State, S: BosStr> SearchEventsBuilder<St, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<Vec<Cid<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -560,7 +604,7 @@ impl<S: BosStr, St: search_events_state::State> SearchEventsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_events_state::State> SearchEventsBuilder<S, St> {
+impl<St: search_events_state::State, S: BosStr> SearchEventsBuilder<St, S> {
     /// Set the `query` field (optional)
     pub fn query(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -573,7 +617,7 @@ impl<S: BosStr, St: search_events_state::State> SearchEventsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_events_state::State> SearchEventsBuilder<S, St> {
+impl<St: search_events_state::State, S: BosStr> SearchEventsBuilder<St, S> {
     /// Set the `repository` field (optional)
     pub fn repository(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -586,7 +630,7 @@ impl<S: BosStr, St: search_events_state::State> SearchEventsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SearchEventsBuilder<S, St>
+impl<St, S: BosStr> SearchEventsBuilder<St, S>
 where
     St: search_events_state::State,
 {

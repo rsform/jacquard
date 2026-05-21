@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A did-git ref stored in an AT Protocol repository. Each record maps a repository name and ref name (e.g. refs/heads/main) to the hex SHA-256 object ID it points to.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -141,7 +141,7 @@ impl<S: BosStr> LexiconSchema for Ref<S> {
 
 pub mod ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -149,70 +149,77 @@ pub mod ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RefName;
-        type Repo;
         type ObjectId;
+        type Repo;
+        type RefName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RefName = Unset;
-        type Repo = Unset;
         type ObjectId = Unset;
-    }
-    ///State transition - sets the `ref_name` field to Set
-    pub struct SetRefName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRefName<St> {}
-    impl<St: State> State for SetRefName<St> {
-        type RefName = Set<members::ref_name>;
-        type Repo = St::Repo;
-        type ObjectId = St::ObjectId;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type RefName = St::RefName;
-        type Repo = Set<members::repo>;
-        type ObjectId = St::ObjectId;
+        type Repo = Unset;
+        type RefName = Unset;
     }
     ///State transition - sets the `object_id` field to Set
     pub struct SetObjectId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetObjectId<St> {}
     impl<St: State> State for SetObjectId<St> {
-        type RefName = St::RefName;
-        type Repo = St::Repo;
         type ObjectId = Set<members::object_id>;
+        type Repo = St::Repo;
+        type RefName = St::RefName;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type ObjectId = St::ObjectId;
+        type Repo = Set<members::repo>;
+        type RefName = St::RefName;
+    }
+    ///State transition - sets the `ref_name` field to Set
+    pub struct SetRefName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRefName<St> {}
+    impl<St: State> State for SetRefName<St> {
+        type ObjectId = St::ObjectId;
+        type Repo = St::Repo;
+        type RefName = Set<members::ref_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref_name` field
-        pub struct ref_name(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `object_id` field
         pub struct object_id(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `ref_name` field
+        pub struct ref_name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RefBuilder<S: BosStr, St: ref_state::State> {
+pub struct RefBuilder<St: ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Ref<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RefBuilder<S, ref_state::Empty> {
+impl Ref<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RefBuilder<ref_state::Empty, DefaultStr> {
         RefBuilder::new()
     }
 }
 
-impl<S: BosStr> RefBuilder<S, ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Ref<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RefBuilder<ref_state::Empty, S> {
+        RefBuilder::builder()
+    }
+}
+
+impl RefBuilder<ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RefBuilder {
             _state: PhantomData,
@@ -222,13 +229,27 @@ impl<S: BosStr> RefBuilder<S, ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RefBuilder<S, St>
+impl<S: BosStr> RefBuilder<ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RefBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RefBuilder<St, S>
 where
     St: ref_state::State,
     St::ObjectId: ref_state::IsUnset,
 {
     /// Set the `objectId` field (required)
-    pub fn object_id(mut self, value: impl Into<S>) -> RefBuilder<S, ref_state::SetObjectId<St>> {
+    pub fn object_id(
+        mut self,
+        value: impl Into<S>,
+    ) -> RefBuilder<ref_state::SetObjectId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RefBuilder {
             _state: PhantomData,
@@ -238,13 +259,16 @@ where
     }
 }
 
-impl<S: BosStr, St> RefBuilder<S, St>
+impl<St, S: BosStr> RefBuilder<St, S>
 where
     St: ref_state::State,
     St::RefName: ref_state::IsUnset,
 {
     /// Set the `refName` field (required)
-    pub fn ref_name(mut self, value: impl Into<S>) -> RefBuilder<S, ref_state::SetRefName<St>> {
+    pub fn ref_name(
+        mut self,
+        value: impl Into<S>,
+    ) -> RefBuilder<ref_state::SetRefName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RefBuilder {
             _state: PhantomData,
@@ -254,13 +278,13 @@ where
     }
 }
 
-impl<S: BosStr, St> RefBuilder<S, St>
+impl<St, S: BosStr> RefBuilder<St, S>
 where
     St: ref_state::State,
     St::Repo: ref_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(mut self, value: impl Into<S>) -> RefBuilder<S, ref_state::SetRepo<St>> {
+    pub fn repo(mut self, value: impl Into<S>) -> RefBuilder<ref_state::SetRepo<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RefBuilder {
             _state: PhantomData,
@@ -270,12 +294,12 @@ where
     }
 }
 
-impl<S: BosStr, St> RefBuilder<S, St>
+impl<St, S: BosStr> RefBuilder<St, S>
 where
     St: ref_state::State,
-    St::RefName: ref_state::IsSet,
-    St::Repo: ref_state::IsSet,
     St::ObjectId: ref_state::IsSet,
+    St::Repo: ref_state::IsSet,
+    St::RefName: ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Ref<S> {
@@ -298,10 +322,10 @@ where
 }
 
 fn lexicon_doc_tech_lenooby09_didgit_ref() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tech.lenooby09.didgit.ref"),

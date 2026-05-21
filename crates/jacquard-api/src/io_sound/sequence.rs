@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,12 +25,12 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::io_sound::credit::Credit;
 use crate::io_sound::sequence;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A sequence of timed events. Full documentation at https://github.com/soundio/sequence/.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -180,7 +180,7 @@ impl<S: BosStr> LexiconSchema for Sequence<S> {
 
 pub mod sequence_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -211,7 +211,7 @@ pub mod sequence_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SequenceBuilder<S: BosStr, St: sequence_state::State> {
+pub struct SequenceBuilder<St: sequence_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<StrongRef<S>>,
@@ -229,27 +229,43 @@ pub struct SequenceBuilder<S: BosStr, St: sequence_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Sequence<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SequenceBuilder<S, sequence_state::Empty> {
+impl Sequence<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SequenceBuilder<sequence_state::Empty, DefaultStr> {
         SequenceBuilder::new()
     }
 }
 
-impl<S: BosStr> SequenceBuilder<S, sequence_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Sequence<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SequenceBuilder<sequence_state::Empty, S> {
+        SequenceBuilder::builder()
+    }
+}
+
+impl SequenceBuilder<sequence_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SequenceBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
+impl<S: BosStr> SequenceBuilder<sequence_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SequenceBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: sequence_state::State, S: BosStr> SequenceBuilder<St, S> {
     /// Set the `bskyPostRef` field (optional)
     pub fn bsky_post_ref(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -262,7 +278,7 @@ impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
+impl<St: sequence_state::State, S: BosStr> SequenceBuilder<St, S> {
     /// Set the `credits` field (optional)
     pub fn credits(mut self, value: impl Into<Option<Vec<Credit<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -275,7 +291,7 @@ impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SequenceBuilder<S, St>
+impl<St, S: BosStr> SequenceBuilder<St, S>
 where
     St: sequence_state::State,
     St::Events: sequence_state::IsUnset,
@@ -284,7 +300,7 @@ where
     pub fn events(
         mut self,
         value: impl Into<Bytes>,
-    ) -> SequenceBuilder<S, sequence_state::SetEvents<St>> {
+    ) -> SequenceBuilder<sequence_state::SetEvents<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SequenceBuilder {
             _state: PhantomData,
@@ -294,7 +310,7 @@ where
     }
 }
 
-impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
+impl<St: sequence_state::State, S: BosStr> SequenceBuilder<St, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -307,7 +323,7 @@ impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
+impl<St: sequence_state::State, S: BosStr> SequenceBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -320,7 +336,7 @@ impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
+impl<St: sequence_state::State, S: BosStr> SequenceBuilder<St, S> {
     /// Set the `publishedAt` field (optional)
     pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -333,9 +349,12 @@ impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
+impl<St: sequence_state::State, S: BosStr> SequenceBuilder<St, S> {
     /// Set the `sequences` field (optional)
-    pub fn sequences(mut self, value: impl Into<Option<Vec<sequence::Sequence<S>>>>) -> Self {
+    pub fn sequences(
+        mut self,
+        value: impl Into<Option<Vec<sequence::Sequence<S>>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
@@ -346,7 +365,7 @@ impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
+impl<St: sequence_state::State, S: BosStr> SequenceBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -359,7 +378,7 @@ impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
+impl<St: sequence_state::State, S: BosStr> SequenceBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.8 = value.into();
@@ -372,7 +391,7 @@ impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
+impl<St: sequence_state::State, S: BosStr> SequenceBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -385,7 +404,7 @@ impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
+impl<St: sequence_state::State, S: BosStr> SequenceBuilder<St, S> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.10 = value.into();
@@ -398,7 +417,7 @@ impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SequenceBuilder<S, St>
+impl<St, S: BosStr> SequenceBuilder<St, S>
 where
     St: sequence_state::State,
     St::Events: sequence_state::IsSet,
@@ -440,10 +459,10 @@ where
 }
 
 fn lexicon_doc_io_sound_sequence() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.sound.sequence"),

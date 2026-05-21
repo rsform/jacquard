@@ -22,12 +22,13 @@ pub mod richtext;
 pub mod segment;
 pub mod server;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,18 +39,15 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewBasic;
 use crate::app_bsky::graph::block::Block;
 use crate::place_stream;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlockView<S: BosStr = DefaultStr> {
     pub blocker: ProfileViewBasic<S>,
     pub cid: Cid<S>,
@@ -60,22 +58,18 @@ pub struct BlockView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Rendition<S: BosStr = DefaultStr> {
     pub name: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Renditions<S: BosStr = DefaultStr> {
     pub renditions: Vec<place_stream::Rendition<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -129,7 +123,7 @@ impl<S: BosStr> LexiconSchema for Renditions<S> {
 
 pub mod block_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -137,90 +131,90 @@ pub mod block_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
+        type Blocker;
+        type Cid;
         type Record;
         type IndexedAt;
-        type Cid;
-        type Blocker;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
+        type Blocker = Unset;
+        type Cid = Unset;
         type Record = Unset;
         type IndexedAt = Unset;
-        type Cid = Unset;
-        type Blocker = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Record = St::Record;
-        type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
-        type Blocker = St::Blocker;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
-        type Uri = St::Uri;
-        type Record = Set<members::record>;
-        type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
-        type Blocker = St::Blocker;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
-        type Uri = St::Uri;
-        type Record = St::Record;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = St::Cid;
-        type Blocker = St::Blocker;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
-        type Record = St::Record;
-        type IndexedAt = St::IndexedAt;
-        type Cid = Set<members::cid>;
-        type Blocker = St::Blocker;
+        type Uri = Unset;
     }
     ///State transition - sets the `blocker` field to Set
     pub struct SetBlocker<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlocker<St> {}
     impl<St: State> State for SetBlocker<St> {
-        type Uri = St::Uri;
+        type Blocker = Set<members::blocker>;
+        type Cid = St::Cid;
         type Record = St::Record;
         type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Blocker = St::Blocker;
+        type Cid = Set<members::cid>;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Blocker = St::Blocker;
         type Cid = St::Cid;
-        type Blocker = Set<members::blocker>;
+        type Record = Set<members::record>;
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Blocker = St::Blocker;
+        type Cid = St::Cid;
+        type Record = St::Record;
+        type IndexedAt = Set<members::indexed_at>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Blocker = St::Blocker;
+        type Cid = St::Cid;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
+        ///Marker type for the `blocker` field
+        pub struct blocker(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `blocker` field
-        pub struct blocker(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BlockViewBuilder<S: BosStr, St: block_view_state::State> {
+pub struct BlockViewBuilder<St: block_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileViewBasic<S>>,
@@ -232,15 +226,22 @@ pub struct BlockViewBuilder<S: BosStr, St: block_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> BlockView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BlockViewBuilder<S, block_view_state::Empty> {
+impl BlockView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BlockViewBuilder<block_view_state::Empty, DefaultStr> {
         BlockViewBuilder::new()
     }
 }
 
-impl<S: BosStr> BlockViewBuilder<S, block_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> BlockView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BlockViewBuilder<block_view_state::Empty, S> {
+        BlockViewBuilder::builder()
+    }
+}
+
+impl BlockViewBuilder<block_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BlockViewBuilder {
             _state: PhantomData,
@@ -250,7 +251,18 @@ impl<S: BosStr> BlockViewBuilder<S, block_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BlockViewBuilder<S, St>
+impl<S: BosStr> BlockViewBuilder<block_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BlockViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BlockViewBuilder<St, S>
 where
     St: block_view_state::State,
     St::Blocker: block_view_state::IsUnset,
@@ -259,7 +271,7 @@ where
     pub fn blocker(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> BlockViewBuilder<S, block_view_state::SetBlocker<St>> {
+    ) -> BlockViewBuilder<block_view_state::SetBlocker<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BlockViewBuilder {
             _state: PhantomData,
@@ -269,7 +281,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BlockViewBuilder<S, St>
+impl<St, S: BosStr> BlockViewBuilder<St, S>
 where
     St: block_view_state::State,
     St::Cid: block_view_state::IsUnset,
@@ -278,7 +290,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> BlockViewBuilder<S, block_view_state::SetCid<St>> {
+    ) -> BlockViewBuilder<block_view_state::SetCid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BlockViewBuilder {
             _state: PhantomData,
@@ -288,7 +300,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BlockViewBuilder<S, St>
+impl<St, S: BosStr> BlockViewBuilder<St, S>
 where
     St: block_view_state::State,
     St::IndexedAt: block_view_state::IsUnset,
@@ -297,7 +309,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BlockViewBuilder<S, block_view_state::SetIndexedAt<St>> {
+    ) -> BlockViewBuilder<block_view_state::SetIndexedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         BlockViewBuilder {
             _state: PhantomData,
@@ -307,7 +319,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BlockViewBuilder<S, St>
+impl<St, S: BosStr> BlockViewBuilder<St, S>
 where
     St: block_view_state::State,
     St::Record: block_view_state::IsUnset,
@@ -316,7 +328,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<Block<S>>,
-    ) -> BlockViewBuilder<S, block_view_state::SetRecord<St>> {
+    ) -> BlockViewBuilder<block_view_state::SetRecord<St>, S> {
         self._fields.3 = Option::Some(value.into());
         BlockViewBuilder {
             _state: PhantomData,
@@ -326,7 +338,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BlockViewBuilder<S, St>
+impl<St, S: BosStr> BlockViewBuilder<St, S>
 where
     St: block_view_state::State,
     St::Uri: block_view_state::IsUnset,
@@ -335,7 +347,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> BlockViewBuilder<S, block_view_state::SetUri<St>> {
+    ) -> BlockViewBuilder<block_view_state::SetUri<St>, S> {
         self._fields.4 = Option::Some(value.into());
         BlockViewBuilder {
             _state: PhantomData,
@@ -345,14 +357,14 @@ where
     }
 }
 
-impl<S: BosStr, St> BlockViewBuilder<S, St>
+impl<St, S: BosStr> BlockViewBuilder<St, S>
 where
     St: block_view_state::State,
-    St::Uri: block_view_state::IsSet,
+    St::Blocker: block_view_state::IsSet,
+    St::Cid: block_view_state::IsSet,
     St::Record: block_view_state::IsSet,
     St::IndexedAt: block_view_state::IsSet,
-    St::Cid: block_view_state::IsSet,
-    St::Blocker: block_view_state::IsSet,
+    St::Uri: block_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> BlockView<S> {
@@ -366,7 +378,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BlockView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BlockView<S> {
         BlockView {
             blocker: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -379,10 +394,10 @@ where
 }
 
 fn lexicon_doc_place_stream_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.defs"),
@@ -391,20 +406,23 @@ fn lexicon_doc_place_stream_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("blockView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("blocker"),
-                        SmolStr::new_static("record"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("blocker"),
+                            SmolStr::new_static("record"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("blocker"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -450,9 +468,7 @@ fn lexicon_doc_place_stream_defs() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -489,7 +505,7 @@ fn lexicon_doc_place_stream_defs() -> LexiconDoc<'static> {
 
 pub mod renditions_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -520,21 +536,28 @@ pub mod renditions_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RenditionsBuilder<S: BosStr, St: renditions_state::State> {
+pub struct RenditionsBuilder<St: renditions_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<place_stream::Rendition<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Renditions<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RenditionsBuilder<S, renditions_state::Empty> {
+impl Renditions<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RenditionsBuilder<renditions_state::Empty, DefaultStr> {
         RenditionsBuilder::new()
     }
 }
 
-impl<S: BosStr> RenditionsBuilder<S, renditions_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Renditions<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RenditionsBuilder<renditions_state::Empty, S> {
+        RenditionsBuilder::builder()
+    }
+}
+
+impl RenditionsBuilder<renditions_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RenditionsBuilder {
             _state: PhantomData,
@@ -544,7 +567,18 @@ impl<S: BosStr> RenditionsBuilder<S, renditions_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RenditionsBuilder<S, St>
+impl<S: BosStr> RenditionsBuilder<renditions_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RenditionsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RenditionsBuilder<St, S>
 where
     St: renditions_state::State,
     St::Renditions: renditions_state::IsUnset,
@@ -553,7 +587,7 @@ where
     pub fn renditions(
         mut self,
         value: impl Into<Vec<place_stream::Rendition<S>>>,
-    ) -> RenditionsBuilder<S, renditions_state::SetRenditions<St>> {
+    ) -> RenditionsBuilder<renditions_state::SetRenditions<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RenditionsBuilder {
             _state: PhantomData,
@@ -563,7 +597,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RenditionsBuilder<S, St>
+impl<St, S: BosStr> RenditionsBuilder<St, S>
 where
     St: renditions_state::State,
     St::Renditions: renditions_state::IsSet,
@@ -576,7 +610,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Renditions<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Renditions<S> {
         Renditions {
             renditions: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

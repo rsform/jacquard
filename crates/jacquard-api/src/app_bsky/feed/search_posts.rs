@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::feed::PostView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{Language, UriValue};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::feed::PostView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchPosts<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<AtIdentifier<S>>,
@@ -54,11 +51,9 @@ pub struct SearchPosts<S: BosStr = DefaultStr> {
     pub url: Option<UriValue<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchPostsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -70,19 +65,25 @@ pub struct SearchPostsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum SearchPostsError {
     #[serde(rename = "BadQueryString")]
     BadQueryString(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for SearchPostsError {
@@ -140,7 +141,7 @@ fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod search_posts_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -171,7 +172,7 @@ pub mod search_posts_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchPostsBuilder<S: BosStr, St: search_posts_state::State> {
+pub struct SearchPostsBuilder<St: search_posts_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtIdentifier<S>>,
@@ -190,27 +191,69 @@ pub struct SearchPostsBuilder<S: BosStr, St: search_posts_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SearchPosts<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SearchPostsBuilder<S, search_posts_state::Empty> {
+impl SearchPosts<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SearchPostsBuilder<search_posts_state::Empty, DefaultStr> {
         SearchPostsBuilder::new()
     }
 }
 
-impl<S: BosStr> SearchPostsBuilder<S, search_posts_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SearchPosts<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SearchPostsBuilder<search_posts_state::Empty, S> {
+        SearchPostsBuilder::builder()
+    }
+}
+
+impl SearchPostsBuilder<search_posts_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SearchPostsBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
+impl<S: BosStr> SearchPostsBuilder<search_posts_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SearchPostsBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -223,7 +266,7 @@ impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
+impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -236,7 +279,7 @@ impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
+impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `domain` field (optional)
     pub fn domain(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -249,7 +292,7 @@ impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
+impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `lang` field (optional)
     pub fn lang(mut self, value: impl Into<Option<Language>>) -> Self {
         self._fields.3 = value.into();
@@ -262,7 +305,7 @@ impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
+impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -275,7 +318,7 @@ impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
+impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -288,13 +331,16 @@ impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SearchPostsBuilder<S, St>
+impl<St, S: BosStr> SearchPostsBuilder<St, S>
 where
     St: search_posts_state::State,
     St::Q: search_posts_state::IsUnset,
 {
     /// Set the `q` field (required)
-    pub fn q(mut self, value: impl Into<S>) -> SearchPostsBuilder<S, search_posts_state::SetQ<St>> {
+    pub fn q(
+        mut self,
+        value: impl Into<S>,
+    ) -> SearchPostsBuilder<search_posts_state::SetQ<St>, S> {
         self._fields.6 = Option::Some(value.into());
         SearchPostsBuilder {
             _state: PhantomData,
@@ -304,7 +350,7 @@ where
     }
 }
 
-impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
+impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `since` field (optional)
     pub fn since(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -317,7 +363,7 @@ impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
+impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `sort` field (optional)
     pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -330,7 +376,7 @@ impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
+impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `tag` field (optional)
     pub fn tag(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -343,7 +389,7 @@ impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
+impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `until` field (optional)
     pub fn until(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -356,7 +402,7 @@ impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
+impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.11 = value.into();
@@ -369,7 +415,7 @@ impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SearchPostsBuilder<S, St>
+impl<St, S: BosStr> SearchPostsBuilder<St, S>
 where
     St: search_posts_state::State,
     St::Q: search_posts_state::IsSet,

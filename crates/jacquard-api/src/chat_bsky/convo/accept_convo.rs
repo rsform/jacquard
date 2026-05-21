@@ -10,28 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AcceptConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AcceptConvoOutput<S: BosStr = DefaultStr> {
     ///Rev when the convo was accepted. If not present, the convo was already accepted.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,8 +46,9 @@ impl jacquard_common::xrpc::XrpcResp for AcceptConvoResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AcceptConvo<S> {
     const NSID: &'static str = "chat.bsky.convo.acceptConvo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = AcceptConvoResponse;
 }
 
@@ -60,8 +56,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AcceptConvo<S> {
 pub struct AcceptConvoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AcceptConvoRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.acceptConvo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = AcceptConvo<S>;
     type Response = AcceptConvoResponse;
 }

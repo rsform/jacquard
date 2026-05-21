@@ -9,6 +9,7 @@ pub mod actor;
 pub mod badge;
 pub mod location;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -26,14 +27,11 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A Decentralized Identifier (DID) string.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Did<S: BosStr = DefaultStr> {
     ///The DID string value.
     pub did: jacquard_common::types::string::Did<S>,
@@ -69,7 +67,7 @@ impl<S: BosStr> LexiconSchema for Did<S> {
 
 pub mod did_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -100,21 +98,28 @@ pub mod did_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DidBuilder<S: BosStr, St: did_state::State> {
+pub struct DidBuilder<St: did_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<jacquard_common::types::string::Did<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Did<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DidBuilder<S, did_state::Empty> {
+impl Did<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DidBuilder<did_state::Empty, DefaultStr> {
         DidBuilder::new()
     }
 }
 
-impl<S: BosStr> DidBuilder<S, did_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Did<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DidBuilder<did_state::Empty, S> {
+        DidBuilder::builder()
+    }
+}
+
+impl DidBuilder<did_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DidBuilder {
             _state: PhantomData,
@@ -124,7 +129,18 @@ impl<S: BosStr> DidBuilder<S, did_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DidBuilder<S, St>
+impl<S: BosStr> DidBuilder<did_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DidBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DidBuilder<St, S>
 where
     St: did_state::State,
     St::Did: did_state::IsUnset,
@@ -133,7 +149,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<jacquard_common::types::string::Did<S>>,
-    ) -> DidBuilder<S, did_state::SetDid<St>> {
+    ) -> DidBuilder<did_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DidBuilder {
             _state: PhantomData,
@@ -143,7 +159,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DidBuilder<S, St>
+impl<St, S: BosStr> DidBuilder<St, S>
 where
     St: did_state::State,
     St::Did: did_state::IsSet,
@@ -165,10 +181,10 @@ where
 }
 
 fn lexicon_doc_app_certified_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.certified.defs"),
@@ -177,9 +193,9 @@ fn lexicon_doc_app_certified_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("did"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A Decentralized Identifier (DID) string.",
-                    )),
+                    description: Some(
+                        CowStr::new_static("A Decentralized Identifier (DID) string."),
+                    ),
                     required: Some(vec![SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -187,7 +203,9 @@ fn lexicon_doc_app_certified_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The DID string value.")),
+                                description: Some(
+                                    CowStr::new_static("The DID string value."),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 max_length: Some(256usize),
                                 ..Default::default()

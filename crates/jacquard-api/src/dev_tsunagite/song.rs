@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A song included in a game hosting leaderboards via Tsunagite.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -133,25 +133,31 @@ impl<S: BosStr> LexiconSchema for Song<S> {
         if let Some(ref value) = self.jacket {
             {
                 let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg", "image/jxl", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let accepted: &[&str] = &[
+                    "image/png",
+                    "image/jpeg",
+                    "image/jxl",
+                    "image/webp",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("jacket"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/jxl".to_string(),
-                            "image/webp".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/jxl".to_string(), "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -164,7 +170,7 @@ impl<S: BosStr> LexiconSchema for Song<S> {
 
 pub mod song_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -172,56 +178,56 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Composer;
         type Game;
         type Title;
+        type Composer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Composer = Unset;
         type Game = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `composer` field to Set
-    pub struct SetComposer<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetComposer<St> {}
-    impl<St: State> State for SetComposer<St> {
-        type Composer = Set<members::composer>;
-        type Game = St::Game;
-        type Title = St::Title;
+        type Composer = Unset;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGame<St> {}
     impl<St: State> State for SetGame<St> {
-        type Composer = St::Composer;
         type Game = Set<members::game>;
         type Title = St::Title;
+        type Composer = St::Composer;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Composer = St::Composer;
         type Game = St::Game;
         type Title = Set<members::title>;
+        type Composer = St::Composer;
+    }
+    ///State transition - sets the `composer` field to Set
+    pub struct SetComposer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetComposer<St> {}
+    impl<St: State> State for SetComposer<St> {
+        type Game = St::Game;
+        type Title = St::Title;
+        type Composer = Set<members::composer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `composer` field
-        pub struct composer(());
         ///Marker type for the `game` field
         pub struct game(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `composer` field
+        pub struct composer(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SongBuilder<S: BosStr, St: song_state::State> {
+pub struct SongBuilder<St: song_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Data<S>>,
@@ -236,15 +242,22 @@ pub struct SongBuilder<S: BosStr, St: song_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Song<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SongBuilder<S, song_state::Empty> {
+impl Song<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SongBuilder<song_state::Empty, DefaultStr> {
         SongBuilder::new()
     }
 }
 
-impl<S: BosStr> SongBuilder<S, song_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Song<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SongBuilder<song_state::Empty, S> {
+        SongBuilder::builder()
+    }
+}
+
+impl SongBuilder<song_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SongBuilder {
             _state: PhantomData,
@@ -254,7 +267,18 @@ impl<S: BosStr> SongBuilder<S, song_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SongBuilder<S, St>
+impl<S: BosStr> SongBuilder<song_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SongBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SongBuilder<St, S>
 where
     St: song_state::State,
     St::Composer: song_state::IsUnset,
@@ -263,7 +287,7 @@ where
     pub fn composer(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> SongBuilder<S, song_state::SetComposer<St>> {
+    ) -> SongBuilder<song_state::SetComposer<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
@@ -273,7 +297,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SongBuilder<S, St>
+impl<St, S: BosStr> SongBuilder<St, S>
 where
     St: song_state::State,
     St::Game: song_state::IsUnset,
@@ -282,7 +306,7 @@ where
     pub fn game(
         mut self,
         value: impl Into<Vec<AtUri<S>>>,
-    ) -> SongBuilder<S, song_state::SetGame<St>> {
+    ) -> SongBuilder<song_state::SetGame<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
@@ -292,7 +316,7 @@ where
     }
 }
 
-impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
+impl<St: song_state::State, S: BosStr> SongBuilder<St, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -305,7 +329,7 @@ impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
+impl<St: song_state::State, S: BosStr> SongBuilder<St, S> {
     /// Set the `jacket` field (optional)
     pub fn jacket(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -318,7 +342,7 @@ impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
+impl<St: song_state::State, S: BosStr> SongBuilder<St, S> {
     /// Set the `jacketArtist` field (optional)
     pub fn jacket_artist(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -331,7 +355,7 @@ impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
+impl<St: song_state::State, S: BosStr> SongBuilder<St, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -344,7 +368,7 @@ impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
+impl<St: song_state::State, S: BosStr> SongBuilder<St, S> {
     /// Set the `subtitle` field (optional)
     pub fn subtitle(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -357,13 +381,16 @@ impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SongBuilder<S, St>
+impl<St, S: BosStr> SongBuilder<St, S>
 where
     St: song_state::State,
     St::Title: song_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<Data<S>>) -> SongBuilder<S, song_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> SongBuilder<song_state::SetTitle<St>, S> {
         self._fields.7 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
@@ -373,12 +400,12 @@ where
     }
 }
 
-impl<S: BosStr, St> SongBuilder<S, St>
+impl<St, S: BosStr> SongBuilder<St, S>
 where
     St: song_state::State,
-    St::Composer: song_state::IsSet,
     St::Game: song_state::IsSet,
     St::Title: song_state::IsSet,
+    St::Composer: song_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Song<S> {
@@ -411,10 +438,10 @@ where
 }
 
 fn lexicon_doc_dev_tsunagite_song() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.tsunagite.song"),

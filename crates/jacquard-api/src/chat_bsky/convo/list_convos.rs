@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::chat_bsky::convo::ConvoView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::ConvoView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListConvos<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -35,11 +32,9 @@ pub struct ListConvos<S: BosStr = DefaultStr> {
     pub status: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListConvosOutput<S: BosStr = DefaultStr> {
     pub convos: Vec<ConvoView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -78,7 +73,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_convos_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -96,21 +91,28 @@ pub mod list_convos_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListConvosBuilder<S: BosStr, St: list_convos_state::State> {
+pub struct ListConvosBuilder<St: list_convos_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListConvos<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListConvosBuilder<S, list_convos_state::Empty> {
+impl ListConvos<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListConvosBuilder<list_convos_state::Empty, DefaultStr> {
         ListConvosBuilder::new()
     }
 }
 
-impl<S: BosStr> ListConvosBuilder<S, list_convos_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListConvos<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListConvosBuilder<list_convos_state::Empty, S> {
+        ListConvosBuilder::builder()
+    }
+}
+
+impl ListConvosBuilder<list_convos_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListConvosBuilder {
             _state: PhantomData,
@@ -120,7 +122,18 @@ impl<S: BosStr> ListConvosBuilder<S, list_convos_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: list_convos_state::State> ListConvosBuilder<S, St> {
+impl<S: BosStr> ListConvosBuilder<list_convos_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListConvosBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -133,7 +146,7 @@ impl<S: BosStr, St: list_convos_state::State> ListConvosBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: list_convos_state::State> ListConvosBuilder<S, St> {
+impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -146,7 +159,7 @@ impl<S: BosStr, St: list_convos_state::State> ListConvosBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: list_convos_state::State> ListConvosBuilder<S, St> {
+impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
     /// Set the `readState` field (optional)
     pub fn read_state(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -159,7 +172,7 @@ impl<S: BosStr, St: list_convos_state::State> ListConvosBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: list_convos_state::State> ListConvosBuilder<S, St> {
+impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -172,7 +185,7 @@ impl<S: BosStr, St: list_convos_state::State> ListConvosBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListConvosBuilder<S, St>
+impl<St, S: BosStr> ListConvosBuilder<St, S>
 where
     St: list_convos_state::State,
 {

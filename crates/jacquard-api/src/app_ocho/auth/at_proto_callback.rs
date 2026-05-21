@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AtProtoCallback<S: BosStr = DefaultStr> {
     pub code: S,
     pub iss: S,
@@ -53,7 +50,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for AtProtoCallbackRequest {
 
 pub mod at_proto_callback_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -61,70 +58,80 @@ pub mod at_proto_callback_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Code;
         type State;
+        type Code;
         type Iss;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Code = Unset;
         type State = Unset;
+        type Code = Unset;
         type Iss = Unset;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCode<St> {}
-    impl<St: State> State for SetCode<St> {
-        type Code = Set<members::code>;
-        type State = St::State;
-        type Iss = St::Iss;
     }
     ///State transition - sets the `state` field to Set
     pub struct SetState<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetState<St> {}
     impl<St: State> State for SetState<St> {
-        type Code = St::Code;
         type State = Set<members::state>;
+        type Code = St::Code;
+        type Iss = St::Iss;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCode<St> {}
+    impl<St: State> State for SetCode<St> {
+        type State = St::State;
+        type Code = Set<members::code>;
         type Iss = St::Iss;
     }
     ///State transition - sets the `iss` field to Set
     pub struct SetIss<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIss<St> {}
     impl<St: State> State for SetIss<St> {
-        type Code = St::Code;
         type State = St::State;
+        type Code = St::Code;
         type Iss = Set<members::iss>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `state` field
         pub struct state(());
+        ///Marker type for the `code` field
+        pub struct code(());
         ///Marker type for the `iss` field
         pub struct iss(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AtProtoCallbackBuilder<S: BosStr, St: at_proto_callback_state::State> {
+pub struct AtProtoCallbackBuilder<
+    St: at_proto_callback_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> AtProtoCallback<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AtProtoCallbackBuilder<S, at_proto_callback_state::Empty> {
+impl AtProtoCallback<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AtProtoCallbackBuilder<at_proto_callback_state::Empty, DefaultStr> {
         AtProtoCallbackBuilder::new()
     }
 }
 
-impl<S: BosStr> AtProtoCallbackBuilder<S, at_proto_callback_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> AtProtoCallback<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AtProtoCallbackBuilder<at_proto_callback_state::Empty, S> {
+        AtProtoCallbackBuilder::builder()
+    }
+}
+
+impl AtProtoCallbackBuilder<at_proto_callback_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AtProtoCallbackBuilder {
             _state: PhantomData,
@@ -134,7 +141,18 @@ impl<S: BosStr> AtProtoCallbackBuilder<S, at_proto_callback_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AtProtoCallbackBuilder<S, St>
+impl<S: BosStr> AtProtoCallbackBuilder<at_proto_callback_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AtProtoCallbackBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AtProtoCallbackBuilder<St, S>
 where
     St: at_proto_callback_state::State,
     St::Code: at_proto_callback_state::IsUnset,
@@ -143,7 +161,7 @@ where
     pub fn code(
         mut self,
         value: impl Into<S>,
-    ) -> AtProtoCallbackBuilder<S, at_proto_callback_state::SetCode<St>> {
+    ) -> AtProtoCallbackBuilder<at_proto_callback_state::SetCode<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AtProtoCallbackBuilder {
             _state: PhantomData,
@@ -153,7 +171,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AtProtoCallbackBuilder<S, St>
+impl<St, S: BosStr> AtProtoCallbackBuilder<St, S>
 where
     St: at_proto_callback_state::State,
     St::Iss: at_proto_callback_state::IsUnset,
@@ -162,7 +180,7 @@ where
     pub fn iss(
         mut self,
         value: impl Into<S>,
-    ) -> AtProtoCallbackBuilder<S, at_proto_callback_state::SetIss<St>> {
+    ) -> AtProtoCallbackBuilder<at_proto_callback_state::SetIss<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AtProtoCallbackBuilder {
             _state: PhantomData,
@@ -172,7 +190,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AtProtoCallbackBuilder<S, St>
+impl<St, S: BosStr> AtProtoCallbackBuilder<St, S>
 where
     St: at_proto_callback_state::State,
     St::State: at_proto_callback_state::IsUnset,
@@ -181,7 +199,7 @@ where
     pub fn state(
         mut self,
         value: impl Into<S>,
-    ) -> AtProtoCallbackBuilder<S, at_proto_callback_state::SetState<St>> {
+    ) -> AtProtoCallbackBuilder<at_proto_callback_state::SetState<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AtProtoCallbackBuilder {
             _state: PhantomData,
@@ -191,11 +209,11 @@ where
     }
 }
 
-impl<S: BosStr, St> AtProtoCallbackBuilder<S, St>
+impl<St, S: BosStr> AtProtoCallbackBuilder<St, S>
 where
     St: at_proto_callback_state::State,
-    St::Code: at_proto_callback_state::IsSet,
     St::State: at_proto_callback_state::IsSet,
+    St::Code: at_proto_callback_state::IsSet,
     St::Iss: at_proto_callback_state::IsSet,
 {
     /// Build the final struct.

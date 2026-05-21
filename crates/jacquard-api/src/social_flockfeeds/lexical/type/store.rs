@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,6 +24,9 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::article;
 use crate::social_flockfeeds::lexical::r#type::brand;
 use crate::social_flockfeeds::lexical::r#type::event;
@@ -32,16 +35,10 @@ use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A retail good store.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accepted_payment_method: Option<EmbeddedAcceptedPaymentMethod<S>>,
@@ -276,7 +273,9 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub smoking_allowed: Option<EmbeddedSmokingAllowed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub special_opening_hours_specification: Option<EmbeddedSpecialOpeningHoursSpecification<S>>,
+    pub special_opening_hours_specification: Option<
+        EmbeddedSpecialOpeningHoursSpecification<S>,
+    >,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sponsor: Option<EmbeddedSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -298,6 +297,7 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -347,6 +347,7 @@ pub enum EmbeddedAlumni<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -380,6 +381,7 @@ pub enum EmbeddedBranchOf<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -389,6 +391,7 @@ pub enum EmbeddedBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -438,6 +441,7 @@ pub enum EmbeddedDepartment<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -466,6 +470,7 @@ pub enum EmbeddedDiversityStaffingReport<S: BosStr = DefaultStr> {
     ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -484,6 +489,7 @@ pub enum EmbeddedEmployee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -491,6 +497,7 @@ pub enum EmbeddedEmployees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -505,6 +512,7 @@ pub enum EmbeddedEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -512,6 +520,7 @@ pub enum EmbeddedEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -528,6 +537,7 @@ pub enum EmbeddedFounder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -535,6 +545,7 @@ pub enum EmbeddedFounders<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -555,6 +566,7 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -689,6 +701,7 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -747,6 +760,7 @@ pub enum EmbeddedLegalRepresentative<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -765,6 +779,7 @@ pub enum EmbeddedLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -782,6 +797,7 @@ pub enum EmbeddedMakesOffer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -808,6 +824,7 @@ pub enum EmbeddedMember<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -815,6 +832,7 @@ pub enum EmbeddedMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -825,6 +843,7 @@ pub enum EmbeddedMembers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -869,6 +888,7 @@ pub enum EmbeddedOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -876,6 +896,7 @@ pub enum EmbeddedParentOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -890,6 +911,7 @@ pub enum EmbeddedPhoto<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -897,6 +919,7 @@ pub enum EmbeddedPhotos<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -973,6 +996,7 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -981,6 +1005,7 @@ pub enum EmbeddedSubOrganization<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -988,6 +1013,7 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1260,7 +1286,9 @@ pub struct Store<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub smoking_allowed: Option<StoreSmokingAllowed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub special_opening_hours_specification: Option<StoreSpecialOpeningHoursSpecification<S>>,
+    pub special_opening_hours_specification: Option<
+        StoreSpecialOpeningHoursSpecification<S>,
+    >,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sponsor: Option<StoreSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1282,6 +1310,7 @@ pub struct Store<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1331,6 +1360,7 @@ pub enum StoreAlumni<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1364,6 +1394,7 @@ pub enum StoreBranchOf<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1373,6 +1404,7 @@ pub enum StoreBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1422,6 +1454,7 @@ pub enum StoreDepartment<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1450,6 +1483,7 @@ pub enum StoreDiversityStaffingReport<S: BosStr = DefaultStr> {
     ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1468,6 +1502,7 @@ pub enum StoreEmployee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1475,6 +1510,7 @@ pub enum StoreEmployees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1489,6 +1525,7 @@ pub enum StoreEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1496,6 +1533,7 @@ pub enum StoreEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1512,6 +1550,7 @@ pub enum StoreFounder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1519,6 +1558,7 @@ pub enum StoreFounders<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1539,6 +1579,7 @@ pub enum StoreFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1673,6 +1714,7 @@ pub enum StoreImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1731,6 +1773,7 @@ pub enum StoreLegalRepresentative<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1749,6 +1792,7 @@ pub enum StoreLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1766,6 +1810,7 @@ pub enum StoreMakesOffer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1792,6 +1837,7 @@ pub enum StoreMember<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1799,6 +1845,7 @@ pub enum StoreMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1809,6 +1856,7 @@ pub enum StoreMembers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1853,6 +1901,7 @@ pub enum StoreOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1860,6 +1909,7 @@ pub enum StoreParentOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1874,6 +1924,7 @@ pub enum StorePhoto<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1881,6 +1932,7 @@ pub enum StorePhotos<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1957,6 +2009,7 @@ pub enum StoreSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1965,6 +2018,7 @@ pub enum StoreSubOrganization<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1972,6 +2026,7 @@ pub enum StoreSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2077,10 +2132,10 @@ impl<S: BosStr> LexiconSchema for Store<S> {
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_Store() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.Store"),
@@ -4750,7 +4805,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Store() -> LexiconDoc<'static> {
 
 pub mod store_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4768,7 +4823,7 @@ pub mod store_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StoreBuilder<S: BosStr, St: store_state::State> {
+pub struct StoreBuilder<St: store_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<StoreAcceptedPaymentMethod<S>>,
@@ -4901,35 +4956,297 @@ pub struct StoreBuilder<S: BosStr, St: store_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Store<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StoreBuilder<S, store_state::Empty> {
+impl Store<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StoreBuilder<store_state::Empty, DefaultStr> {
         StoreBuilder::new()
     }
 }
 
-impl<S: BosStr> StoreBuilder<S, store_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Store<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StoreBuilder<store_state::Empty, S> {
+        StoreBuilder::builder()
+    }
+}
+
+impl StoreBuilder<store_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StoreBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<S: BosStr> StoreBuilder<store_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StoreBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `acceptedPaymentMethod` field (optional)
     pub fn accepted_payment_method(
         mut self,
@@ -4948,7 +5265,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `actionableFeedbackPolicy` field (optional)
     pub fn actionable_feedback_policy(
         mut self,
@@ -4967,7 +5284,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `additionalProperty` field (optional)
     pub fn additional_property(
         mut self,
@@ -4977,26 +5294,35 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
         self
     }
     /// Set the `additionalProperty` field to an Option value (optional)
-    pub fn maybe_additional_property(mut self, value: Option<StoreAdditionalProperty<S>>) -> Self {
+    pub fn maybe_additional_property(
+        mut self,
+        value: Option<StoreAdditionalProperty<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `additionalType` field (optional)
-    pub fn additional_type(mut self, value: impl Into<Option<StoreAdditionalType<S>>>) -> Self {
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<StoreAdditionalType<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(mut self, value: Option<StoreAdditionalType<S>>) -> Self {
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<StoreAdditionalType<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `address` field (optional)
     pub fn address(mut self, value: impl Into<Option<StoreAddress<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -5009,7 +5335,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `agentInteractionStatistic` field (optional)
     pub fn agent_interaction_statistic(
         mut self,
@@ -5028,22 +5354,31 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `aggregateRating` field (optional)
-    pub fn aggregate_rating(mut self, value: impl Into<Option<StoreAggregateRating<S>>>) -> Self {
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<StoreAggregateRating<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(mut self, value: Option<StoreAggregateRating<S>>) -> Self {
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<StoreAggregateRating<S>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(mut self, value: impl Into<Option<StoreAlternateName<S>>>) -> Self {
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<StoreAlternateName<S>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
@@ -5054,7 +5389,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `alumni` field (optional)
     pub fn alumni(mut self, value: impl Into<Option<StoreAlumni<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -5067,20 +5402,26 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `amenityFeature` field (optional)
-    pub fn amenity_feature(mut self, value: impl Into<Option<StoreAmenityFeature<S>>>) -> Self {
+    pub fn amenity_feature(
+        mut self,
+        value: impl Into<Option<StoreAmenityFeature<S>>>,
+    ) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `amenityFeature` field to an Option value (optional)
-    pub fn maybe_amenity_feature(mut self, value: Option<StoreAmenityFeature<S>>) -> Self {
+    pub fn maybe_amenity_feature(
+        mut self,
+        value: Option<StoreAmenityFeature<S>>,
+    ) -> Self {
         self._fields.9 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `areaServed` field (optional)
     pub fn area_served(mut self, value: impl Into<Option<StoreAreaServed<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -5093,7 +5434,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<StoreAward<S>>>) -> Self {
         self._fields.11 = value.into();
@@ -5106,7 +5447,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<StoreAwards<S>>>) -> Self {
         self._fields.12 = value.into();
@@ -5119,7 +5460,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `branchCode` field (optional)
     pub fn branch_code(mut self, value: impl Into<Option<StoreBranchCode<S>>>) -> Self {
         self._fields.13 = value.into();
@@ -5132,7 +5473,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `branchOf` field (optional)
     pub fn branch_of(mut self, value: impl Into<Option<StoreBranchOf<S>>>) -> Self {
         self._fields.14 = value.into();
@@ -5145,7 +5486,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `brand` field (optional)
     pub fn brand(mut self, value: impl Into<Option<StoreBrand<S>>>) -> Self {
         self._fields.15 = value.into();
@@ -5158,7 +5499,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `companyRegistration` field (optional)
     pub fn company_registration(
         mut self,
@@ -5177,9 +5518,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `contactPoint` field (optional)
-    pub fn contact_point(mut self, value: impl Into<Option<StoreContactPoint<S>>>) -> Self {
+    pub fn contact_point(
+        mut self,
+        value: impl Into<Option<StoreContactPoint<S>>>,
+    ) -> Self {
         self._fields.17 = value.into();
         self
     }
@@ -5190,9 +5534,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `contactPoints` field (optional)
-    pub fn contact_points(mut self, value: impl Into<Option<StoreContactPoints<S>>>) -> Self {
+    pub fn contact_points(
+        mut self,
+        value: impl Into<Option<StoreContactPoints<S>>>,
+    ) -> Self {
         self._fields.18 = value.into();
         self
     }
@@ -5203,9 +5550,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `containedIn` field (optional)
-    pub fn contained_in(mut self, value: impl Into<Option<StoreContainedIn<S>>>) -> Self {
+    pub fn contained_in(
+        mut self,
+        value: impl Into<Option<StoreContainedIn<S>>>,
+    ) -> Self {
         self._fields.19 = value.into();
         self
     }
@@ -5216,7 +5566,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `containedInPlace` field (optional)
     pub fn contained_in_place(
         mut self,
@@ -5226,15 +5576,21 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
         self
     }
     /// Set the `containedInPlace` field to an Option value (optional)
-    pub fn maybe_contained_in_place(mut self, value: Option<StoreContainedInPlace<S>>) -> Self {
+    pub fn maybe_contained_in_place(
+        mut self,
+        value: Option<StoreContainedInPlace<S>>,
+    ) -> Self {
         self._fields.20 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `containsPlace` field (optional)
-    pub fn contains_place(mut self, value: impl Into<Option<StoreContainsPlace<S>>>) -> Self {
+    pub fn contains_place(
+        mut self,
+        value: impl Into<Option<StoreContainsPlace<S>>>,
+    ) -> Self {
         self._fields.21 = value.into();
         self
     }
@@ -5245,7 +5601,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `correctionsPolicy` field (optional)
     pub fn corrections_policy(
         mut self,
@@ -5255,13 +5611,16 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
         self
     }
     /// Set the `correctionsPolicy` field to an Option value (optional)
-    pub fn maybe_corrections_policy(mut self, value: Option<StoreCorrectionsPolicy<S>>) -> Self {
+    pub fn maybe_corrections_policy(
+        mut self,
+        value: Option<StoreCorrectionsPolicy<S>>,
+    ) -> Self {
         self._fields.22 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `currenciesAccepted` field (optional)
     pub fn currencies_accepted(
         mut self,
@@ -5271,13 +5630,16 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
         self
     }
     /// Set the `currenciesAccepted` field to an Option value (optional)
-    pub fn maybe_currencies_accepted(mut self, value: Option<StoreCurrenciesAccepted<S>>) -> Self {
+    pub fn maybe_currencies_accepted(
+        mut self,
+        value: Option<StoreCurrenciesAccepted<S>>,
+    ) -> Self {
         self._fields.23 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `department` field (optional)
     pub fn department(mut self, value: impl Into<Option<StoreDepartment<S>>>) -> Self {
         self._fields.24 = value.into();
@@ -5290,7 +5652,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<StoreDescription<S>>>) -> Self {
         self._fields.25 = value.into();
@@ -5303,7 +5665,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
@@ -5322,33 +5684,45 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `dissolutionDate` field (optional)
-    pub fn dissolution_date(mut self, value: impl Into<Option<StoreDissolutionDate<S>>>) -> Self {
+    pub fn dissolution_date(
+        mut self,
+        value: impl Into<Option<StoreDissolutionDate<S>>>,
+    ) -> Self {
         self._fields.27 = value.into();
         self
     }
     /// Set the `dissolutionDate` field to an Option value (optional)
-    pub fn maybe_dissolution_date(mut self, value: Option<StoreDissolutionDate<S>>) -> Self {
+    pub fn maybe_dissolution_date(
+        mut self,
+        value: Option<StoreDissolutionDate<S>>,
+    ) -> Self {
         self._fields.27 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `diversityPolicy` field (optional)
-    pub fn diversity_policy(mut self, value: impl Into<Option<StoreDiversityPolicy<S>>>) -> Self {
+    pub fn diversity_policy(
+        mut self,
+        value: impl Into<Option<StoreDiversityPolicy<S>>>,
+    ) -> Self {
         self._fields.28 = value.into();
         self
     }
     /// Set the `diversityPolicy` field to an Option value (optional)
-    pub fn maybe_diversity_policy(mut self, value: Option<StoreDiversityPolicy<S>>) -> Self {
+    pub fn maybe_diversity_policy(
+        mut self,
+        value: Option<StoreDiversityPolicy<S>>,
+    ) -> Self {
         self._fields.28 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `diversityStaffingReport` field (optional)
     pub fn diversity_staffing_report(
         mut self,
@@ -5367,7 +5741,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `duns` field (optional)
     pub fn duns(mut self, value: impl Into<Option<StoreDuns<S>>>) -> Self {
         self._fields.30 = value.into();
@@ -5380,7 +5754,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<StoreEmail<S>>>) -> Self {
         self._fields.31 = value.into();
@@ -5393,7 +5767,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `employee` field (optional)
     pub fn employee(mut self, value: impl Into<Option<StoreEmployee<S>>>) -> Self {
         self._fields.32 = value.into();
@@ -5406,7 +5780,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `employees` field (optional)
     pub fn employees(mut self, value: impl Into<Option<StoreEmployees<S>>>) -> Self {
         self._fields.33 = value.into();
@@ -5419,9 +5793,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `ethicsPolicy` field (optional)
-    pub fn ethics_policy(mut self, value: impl Into<Option<StoreEthicsPolicy<S>>>) -> Self {
+    pub fn ethics_policy(
+        mut self,
+        value: impl Into<Option<StoreEthicsPolicy<S>>>,
+    ) -> Self {
         self._fields.34 = value.into();
         self
     }
@@ -5432,7 +5809,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `event` field (optional)
     pub fn event(mut self, value: impl Into<Option<StoreEvent<S>>>) -> Self {
         self._fields.35 = value.into();
@@ -5445,7 +5822,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `events` field (optional)
     pub fn events(mut self, value: impl Into<Option<StoreEvents<S>>>) -> Self {
         self._fields.36 = value.into();
@@ -5458,7 +5835,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `faxNumber` field (optional)
     pub fn fax_number(mut self, value: impl Into<Option<StoreFaxNumber<S>>>) -> Self {
         self._fields.37 = value.into();
@@ -5471,7 +5848,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `founder` field (optional)
     pub fn founder(mut self, value: impl Into<Option<StoreFounder<S>>>) -> Self {
         self._fields.38 = value.into();
@@ -5484,7 +5861,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `founders` field (optional)
     pub fn founders(mut self, value: impl Into<Option<StoreFounders<S>>>) -> Self {
         self._fields.39 = value.into();
@@ -5497,9 +5874,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `foundingDate` field (optional)
-    pub fn founding_date(mut self, value: impl Into<Option<StoreFoundingDate<S>>>) -> Self {
+    pub fn founding_date(
+        mut self,
+        value: impl Into<Option<StoreFoundingDate<S>>>,
+    ) -> Self {
         self._fields.40 = value.into();
         self
     }
@@ -5510,20 +5890,26 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `foundingLocation` field (optional)
-    pub fn founding_location(mut self, value: impl Into<Option<StoreFoundingLocation<S>>>) -> Self {
+    pub fn founding_location(
+        mut self,
+        value: impl Into<Option<StoreFoundingLocation<S>>>,
+    ) -> Self {
         self._fields.41 = value.into();
         self
     }
     /// Set the `foundingLocation` field to an Option value (optional)
-    pub fn maybe_founding_location(mut self, value: Option<StoreFoundingLocation<S>>) -> Self {
+    pub fn maybe_founding_location(
+        mut self,
+        value: Option<StoreFoundingLocation<S>>,
+    ) -> Self {
         self._fields.41 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<StoreFunder<S>>>) -> Self {
         self._fields.42 = value.into();
@@ -5536,7 +5922,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<StoreFunding<S>>>) -> Self {
         self._fields.43 = value.into();
@@ -5549,7 +5935,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geo` field (optional)
     pub fn geo(mut self, value: impl Into<Option<StoreGeo<S>>>) -> Self {
         self._fields.44 = value.into();
@@ -5562,9 +5948,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoContains` field (optional)
-    pub fn geo_contains(mut self, value: impl Into<Option<StoreGeoContains<S>>>) -> Self {
+    pub fn geo_contains(
+        mut self,
+        value: impl Into<Option<StoreGeoContains<S>>>,
+    ) -> Self {
         self._fields.45 = value.into();
         self
     }
@@ -5575,9 +5964,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoCoveredBy` field (optional)
-    pub fn geo_covered_by(mut self, value: impl Into<Option<StoreGeoCoveredBy<S>>>) -> Self {
+    pub fn geo_covered_by(
+        mut self,
+        value: impl Into<Option<StoreGeoCoveredBy<S>>>,
+    ) -> Self {
         self._fields.46 = value.into();
         self
     }
@@ -5588,7 +5980,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoCovers` field (optional)
     pub fn geo_covers(mut self, value: impl Into<Option<StoreGeoCovers<S>>>) -> Self {
         self._fields.47 = value.into();
@@ -5601,7 +5993,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoCrosses` field (optional)
     pub fn geo_crosses(mut self, value: impl Into<Option<StoreGeoCrosses<S>>>) -> Self {
         self._fields.48 = value.into();
@@ -5614,9 +6006,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoDisjoint` field (optional)
-    pub fn geo_disjoint(mut self, value: impl Into<Option<StoreGeoDisjoint<S>>>) -> Self {
+    pub fn geo_disjoint(
+        mut self,
+        value: impl Into<Option<StoreGeoDisjoint<S>>>,
+    ) -> Self {
         self._fields.49 = value.into();
         self
     }
@@ -5627,7 +6022,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoEquals` field (optional)
     pub fn geo_equals(mut self, value: impl Into<Option<StoreGeoEquals<S>>>) -> Self {
         self._fields.50 = value.into();
@@ -5640,9 +6035,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoIntersects` field (optional)
-    pub fn geo_intersects(mut self, value: impl Into<Option<StoreGeoIntersects<S>>>) -> Self {
+    pub fn geo_intersects(
+        mut self,
+        value: impl Into<Option<StoreGeoIntersects<S>>>,
+    ) -> Self {
         self._fields.51 = value.into();
         self
     }
@@ -5653,9 +6051,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoOverlaps` field (optional)
-    pub fn geo_overlaps(mut self, value: impl Into<Option<StoreGeoOverlaps<S>>>) -> Self {
+    pub fn geo_overlaps(
+        mut self,
+        value: impl Into<Option<StoreGeoOverlaps<S>>>,
+    ) -> Self {
         self._fields.52 = value.into();
         self
     }
@@ -5666,7 +6067,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoTouches` field (optional)
     pub fn geo_touches(mut self, value: impl Into<Option<StoreGeoTouches<S>>>) -> Self {
         self._fields.53 = value.into();
@@ -5679,7 +6080,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoWithin` field (optional)
     pub fn geo_within(mut self, value: impl Into<Option<StoreGeoWithin<S>>>) -> Self {
         self._fields.54 = value.into();
@@ -5692,7 +6093,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `globalLocationNumber` field (optional)
     pub fn global_location_number(
         mut self,
@@ -5711,22 +6112,31 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `hasCertification` field (optional)
-    pub fn has_certification(mut self, value: impl Into<Option<StoreHasCertification<S>>>) -> Self {
+    pub fn has_certification(
+        mut self,
+        value: impl Into<Option<StoreHasCertification<S>>>,
+    ) -> Self {
         self._fields.56 = value.into();
         self
     }
     /// Set the `hasCertification` field to an Option value (optional)
-    pub fn maybe_has_certification(mut self, value: Option<StoreHasCertification<S>>) -> Self {
+    pub fn maybe_has_certification(
+        mut self,
+        value: Option<StoreHasCertification<S>>,
+    ) -> Self {
         self._fields.56 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `hasCredential` field (optional)
-    pub fn has_credential(mut self, value: impl Into<Option<StoreHasCredential<S>>>) -> Self {
+    pub fn has_credential(
+        mut self,
+        value: impl Into<Option<StoreHasCredential<S>>>,
+    ) -> Self {
         self._fields.57 = value.into();
         self
     }
@@ -5737,7 +6147,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `hasDriveThroughService` field (optional)
     pub fn has_drive_through_service(
         mut self,
@@ -5756,7 +6166,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `hasGS1DigitalLink` field (optional)
     pub fn has_gs1_digital_link(
         mut self,
@@ -5766,13 +6176,16 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
         self
     }
     /// Set the `hasGS1DigitalLink` field to an Option value (optional)
-    pub fn maybe_has_gs1_digital_link(mut self, value: Option<StoreHasGs1DigitalLink<S>>) -> Self {
+    pub fn maybe_has_gs1_digital_link(
+        mut self,
+        value: Option<StoreHasGs1DigitalLink<S>>,
+    ) -> Self {
         self._fields.59 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `hasMap` field (optional)
     pub fn has_map(mut self, value: impl Into<Option<StoreHasMap<S>>>) -> Self {
         self._fields.60 = value.into();
@@ -5785,7 +6198,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `hasMemberProgram` field (optional)
     pub fn has_member_program(
         mut self,
@@ -5795,13 +6208,16 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
         self
     }
     /// Set the `hasMemberProgram` field to an Option value (optional)
-    pub fn maybe_has_member_program(mut self, value: Option<StoreHasMemberProgram<S>>) -> Self {
+    pub fn maybe_has_member_program(
+        mut self,
+        value: Option<StoreHasMemberProgram<S>>,
+    ) -> Self {
         self._fields.61 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `hasMerchantReturnPolicy` field (optional)
     pub fn has_merchant_return_policy(
         mut self,
@@ -5820,20 +6236,26 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `hasOfferCatalog` field (optional)
-    pub fn has_offer_catalog(mut self, value: impl Into<Option<StoreHasOfferCatalog<S>>>) -> Self {
+    pub fn has_offer_catalog(
+        mut self,
+        value: impl Into<Option<StoreHasOfferCatalog<S>>>,
+    ) -> Self {
         self._fields.63 = value.into();
         self
     }
     /// Set the `hasOfferCatalog` field to an Option value (optional)
-    pub fn maybe_has_offer_catalog(mut self, value: Option<StoreHasOfferCatalog<S>>) -> Self {
+    pub fn maybe_has_offer_catalog(
+        mut self,
+        value: Option<StoreHasOfferCatalog<S>>,
+    ) -> Self {
         self._fields.63 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `hasPOS` field (optional)
     pub fn has_pos(mut self, value: impl Into<Option<StoreHasPos<S>>>) -> Self {
         self._fields.64 = value.into();
@@ -5846,7 +6268,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `hasProductReturnPolicy` field (optional)
     pub fn has_product_return_policy(
         mut self,
@@ -5865,7 +6287,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `hasShippingService` field (optional)
     pub fn has_shipping_service(
         mut self,
@@ -5875,13 +6297,16 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
         self
     }
     /// Set the `hasShippingService` field to an Option value (optional)
-    pub fn maybe_has_shipping_service(mut self, value: Option<StoreHasShippingService<S>>) -> Self {
+    pub fn maybe_has_shipping_service(
+        mut self,
+        value: Option<StoreHasShippingService<S>>,
+    ) -> Self {
         self._fields.66 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<StoreIdentifier<S>>>) -> Self {
         self._fields.67 = value.into();
@@ -5894,7 +6319,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<StoreImage<S>>>) -> Self {
         self._fields.68 = value.into();
@@ -5907,7 +6332,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `interactionStatistic` field (optional)
     pub fn interaction_statistic(
         mut self,
@@ -5926,7 +6351,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `isAccessibleForFree` field (optional)
     pub fn is_accessible_for_free(
         mut self,
@@ -5945,7 +6370,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `isicV4` field (optional)
     pub fn isic_v4(mut self, value: impl Into<Option<StoreIsicV4<S>>>) -> Self {
         self._fields.71 = value.into();
@@ -5958,9 +6383,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `iso6523Code` field (optional)
-    pub fn iso6523_code(mut self, value: impl Into<Option<StoreIso6523Code<S>>>) -> Self {
+    pub fn iso6523_code(
+        mut self,
+        value: impl Into<Option<StoreIso6523Code<S>>>,
+    ) -> Self {
         self._fields.72 = value.into();
         self
     }
@@ -5971,7 +6399,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<StoreKeywords<S>>>) -> Self {
         self._fields.73 = value.into();
@@ -5984,7 +6412,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `knowsAbout` field (optional)
     pub fn knows_about(mut self, value: impl Into<Option<StoreKnowsAbout<S>>>) -> Self {
         self._fields.74 = value.into();
@@ -5997,9 +6425,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `knowsLanguage` field (optional)
-    pub fn knows_language(mut self, value: impl Into<Option<StoreKnowsLanguage<S>>>) -> Self {
+    pub fn knows_language(
+        mut self,
+        value: impl Into<Option<StoreKnowsLanguage<S>>>,
+    ) -> Self {
         self._fields.75 = value.into();
         self
     }
@@ -6010,7 +6441,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `latitude` field (optional)
     pub fn latitude(mut self, value: impl Into<Option<StoreLatitude<S>>>) -> Self {
         self._fields.76 = value.into();
@@ -6023,9 +6454,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `legalAddress` field (optional)
-    pub fn legal_address(mut self, value: impl Into<Option<StoreLegalAddress<S>>>) -> Self {
+    pub fn legal_address(
+        mut self,
+        value: impl Into<Option<StoreLegalAddress<S>>>,
+    ) -> Self {
         self._fields.77 = value.into();
         self
     }
@@ -6036,7 +6470,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `legalName` field (optional)
     pub fn legal_name(mut self, value: impl Into<Option<StoreLegalName<S>>>) -> Self {
         self._fields.78 = value.into();
@@ -6049,7 +6483,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `legalRepresentative` field (optional)
     pub fn legal_representative(
         mut self,
@@ -6068,7 +6502,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `leiCode` field (optional)
     pub fn lei_code(mut self, value: impl Into<Option<StoreLeiCode<S>>>) -> Self {
         self._fields.80 = value.into();
@@ -6081,7 +6515,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<StoreLocation<S>>>) -> Self {
         self._fields.81 = value.into();
@@ -6094,7 +6528,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `logo` field (optional)
     pub fn logo(mut self, value: impl Into<Option<StoreLogo<S>>>) -> Self {
         self._fields.82 = value.into();
@@ -6107,7 +6541,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `longitude` field (optional)
     pub fn longitude(mut self, value: impl Into<Option<StoreLongitude<S>>>) -> Self {
         self._fields.83 = value.into();
@@ -6120,7 +6554,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
@@ -6130,13 +6564,16 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
-    pub fn maybe_main_entity_of_page(mut self, value: Option<StoreMainEntityOfPage<S>>) -> Self {
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<StoreMainEntityOfPage<S>>,
+    ) -> Self {
         self._fields.84 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `makesOffer` field (optional)
     pub fn makes_offer(mut self, value: impl Into<Option<StoreMakesOffer<S>>>) -> Self {
         self._fields.85 = value.into();
@@ -6149,7 +6586,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `map` field (optional)
     pub fn map(mut self, value: impl Into<Option<StoreMap<S>>>) -> Self {
         self._fields.86 = value.into();
@@ -6162,7 +6599,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `maps` field (optional)
     pub fn maps(mut self, value: impl Into<Option<StoreMaps<S>>>) -> Self {
         self._fields.87 = value.into();
@@ -6175,7 +6612,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `maximumAttendeeCapacity` field (optional)
     pub fn maximum_attendee_capacity(
         mut self,
@@ -6194,7 +6631,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `member` field (optional)
     pub fn member(mut self, value: impl Into<Option<StoreMember<S>>>) -> Self {
         self._fields.89 = value.into();
@@ -6207,7 +6644,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `memberOf` field (optional)
     pub fn member_of(mut self, value: impl Into<Option<StoreMemberOf<S>>>) -> Self {
         self._fields.90 = value.into();
@@ -6220,7 +6657,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `members` field (optional)
     pub fn members(mut self, value: impl Into<Option<StoreMembers<S>>>) -> Self {
         self._fields.91 = value.into();
@@ -6233,7 +6670,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `naics` field (optional)
     pub fn naics(mut self, value: impl Into<Option<StoreNaics<S>>>) -> Self {
         self._fields.92 = value.into();
@@ -6246,7 +6683,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<StoreName<S>>>) -> Self {
         self._fields.93 = value.into();
@@ -6259,20 +6696,26 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `nonprofitStatus` field (optional)
-    pub fn nonprofit_status(mut self, value: impl Into<Option<StoreNonprofitStatus<S>>>) -> Self {
+    pub fn nonprofit_status(
+        mut self,
+        value: impl Into<Option<StoreNonprofitStatus<S>>>,
+    ) -> Self {
         self._fields.94 = value.into();
         self
     }
     /// Set the `nonprofitStatus` field to an Option value (optional)
-    pub fn maybe_nonprofit_status(mut self, value: Option<StoreNonprofitStatus<S>>) -> Self {
+    pub fn maybe_nonprofit_status(
+        mut self,
+        value: Option<StoreNonprofitStatus<S>>,
+    ) -> Self {
         self._fields.94 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `numberOfEmployees` field (optional)
     pub fn number_of_employees(
         mut self,
@@ -6282,15 +6725,21 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
         self
     }
     /// Set the `numberOfEmployees` field to an Option value (optional)
-    pub fn maybe_number_of_employees(mut self, value: Option<StoreNumberOfEmployees<S>>) -> Self {
+    pub fn maybe_number_of_employees(
+        mut self,
+        value: Option<StoreNumberOfEmployees<S>>,
+    ) -> Self {
         self._fields.95 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `openingHours` field (optional)
-    pub fn opening_hours(mut self, value: impl Into<Option<StoreOpeningHours<S>>>) -> Self {
+    pub fn opening_hours(
+        mut self,
+        value: impl Into<Option<StoreOpeningHours<S>>>,
+    ) -> Self {
         self._fields.96 = value.into();
         self
     }
@@ -6301,7 +6750,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `openingHoursSpecification` field (optional)
     pub fn opening_hours_specification(
         mut self,
@@ -6320,7 +6769,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `ownershipFundingInfo` field (optional)
     pub fn ownership_funding_info(
         mut self,
@@ -6339,7 +6788,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `owns` field (optional)
     pub fn owns(mut self, value: impl Into<Option<StoreOwns<S>>>) -> Self {
         self._fields.99 = value.into();
@@ -6352,7 +6801,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `parentOrganization` field (optional)
     pub fn parent_organization(
         mut self,
@@ -6362,26 +6811,35 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
         self
     }
     /// Set the `parentOrganization` field to an Option value (optional)
-    pub fn maybe_parent_organization(mut self, value: Option<StoreParentOrganization<S>>) -> Self {
+    pub fn maybe_parent_organization(
+        mut self,
+        value: Option<StoreParentOrganization<S>>,
+    ) -> Self {
         self._fields.100 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `paymentAccepted` field (optional)
-    pub fn payment_accepted(mut self, value: impl Into<Option<StorePaymentAccepted<S>>>) -> Self {
+    pub fn payment_accepted(
+        mut self,
+        value: impl Into<Option<StorePaymentAccepted<S>>>,
+    ) -> Self {
         self._fields.101 = value.into();
         self
     }
     /// Set the `paymentAccepted` field to an Option value (optional)
-    pub fn maybe_payment_accepted(mut self, value: Option<StorePaymentAccepted<S>>) -> Self {
+    pub fn maybe_payment_accepted(
+        mut self,
+        value: Option<StorePaymentAccepted<S>>,
+    ) -> Self {
         self._fields.101 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `photo` field (optional)
     pub fn photo(mut self, value: impl Into<Option<StorePhoto<S>>>) -> Self {
         self._fields.102 = value.into();
@@ -6394,7 +6852,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `photos` field (optional)
     pub fn photos(mut self, value: impl Into<Option<StorePhotos<S>>>) -> Self {
         self._fields.103 = value.into();
@@ -6407,20 +6865,26 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `potentialAction` field (optional)
-    pub fn potential_action(mut self, value: impl Into<Option<StorePotentialAction<S>>>) -> Self {
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<StorePotentialAction<S>>>,
+    ) -> Self {
         self._fields.104 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(mut self, value: Option<StorePotentialAction<S>>) -> Self {
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<StorePotentialAction<S>>,
+    ) -> Self {
         self._fields.104 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `priceRange` field (optional)
     pub fn price_range(mut self, value: impl Into<Option<StorePriceRange<S>>>) -> Self {
         self._fields.105 = value.into();
@@ -6433,9 +6897,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `publicAccess` field (optional)
-    pub fn public_access(mut self, value: impl Into<Option<StorePublicAccess<S>>>) -> Self {
+    pub fn public_access(
+        mut self,
+        value: impl Into<Option<StorePublicAccess<S>>>,
+    ) -> Self {
         self._fields.106 = value.into();
         self
     }
@@ -6446,7 +6913,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `publishingPrinciples` field (optional)
     pub fn publishing_principles(
         mut self,
@@ -6465,7 +6932,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<StoreReview<S>>>) -> Self {
         self._fields.108 = value.into();
@@ -6478,7 +6945,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<StoreReviews<S>>>) -> Self {
         self._fields.109 = value.into();
@@ -6491,7 +6958,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<StoreSameAs<S>>>) -> Self {
         self._fields.110 = value.into();
@@ -6504,7 +6971,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `seeks` field (optional)
     pub fn seeks(mut self, value: impl Into<Option<StoreSeeks<S>>>) -> Self {
         self._fields.111 = value.into();
@@ -6517,9 +6984,12 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `serviceArea` field (optional)
-    pub fn service_area(mut self, value: impl Into<Option<StoreServiceArea<S>>>) -> Self {
+    pub fn service_area(
+        mut self,
+        value: impl Into<Option<StoreServiceArea<S>>>,
+    ) -> Self {
         self._fields.112 = value.into();
         self
     }
@@ -6530,7 +7000,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `skills` field (optional)
     pub fn skills(mut self, value: impl Into<Option<StoreSkills<S>>>) -> Self {
         self._fields.113 = value.into();
@@ -6543,7 +7013,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `slogan` field (optional)
     pub fn slogan(mut self, value: impl Into<Option<StoreSlogan<S>>>) -> Self {
         self._fields.114 = value.into();
@@ -6556,20 +7026,26 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `smokingAllowed` field (optional)
-    pub fn smoking_allowed(mut self, value: impl Into<Option<StoreSmokingAllowed<S>>>) -> Self {
+    pub fn smoking_allowed(
+        mut self,
+        value: impl Into<Option<StoreSmokingAllowed<S>>>,
+    ) -> Self {
         self._fields.115 = value.into();
         self
     }
     /// Set the `smokingAllowed` field to an Option value (optional)
-    pub fn maybe_smoking_allowed(mut self, value: Option<StoreSmokingAllowed<S>>) -> Self {
+    pub fn maybe_smoking_allowed(
+        mut self,
+        value: Option<StoreSmokingAllowed<S>>,
+    ) -> Self {
         self._fields.115 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `specialOpeningHoursSpecification` field (optional)
     pub fn special_opening_hours_specification(
         mut self,
@@ -6588,7 +7064,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<StoreSponsor<S>>>) -> Self {
         self._fields.117 = value.into();
@@ -6601,20 +7077,26 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `subOrganization` field (optional)
-    pub fn sub_organization(mut self, value: impl Into<Option<StoreSubOrganization<S>>>) -> Self {
+    pub fn sub_organization(
+        mut self,
+        value: impl Into<Option<StoreSubOrganization<S>>>,
+    ) -> Self {
         self._fields.118 = value.into();
         self
     }
     /// Set the `subOrganization` field to an Option value (optional)
-    pub fn maybe_sub_organization(mut self, value: Option<StoreSubOrganization<S>>) -> Self {
+    pub fn maybe_sub_organization(
+        mut self,
+        value: Option<StoreSubOrganization<S>>,
+    ) -> Self {
         self._fields.118 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<StoreSubjectOf<S>>>) -> Self {
         self._fields.119 = value.into();
@@ -6627,7 +7109,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `taxID` field (optional)
     pub fn tax_id(mut self, value: impl Into<Option<StoreTaxId<S>>>) -> Self {
         self._fields.120 = value.into();
@@ -6640,7 +7122,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `telephone` field (optional)
     pub fn telephone(mut self, value: impl Into<Option<StoreTelephone<S>>>) -> Self {
         self._fields.121 = value.into();
@@ -6653,20 +7135,26 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `tourBookingPage` field (optional)
-    pub fn tour_booking_page(mut self, value: impl Into<Option<StoreTourBookingPage<S>>>) -> Self {
+    pub fn tour_booking_page(
+        mut self,
+        value: impl Into<Option<StoreTourBookingPage<S>>>,
+    ) -> Self {
         self._fields.122 = value.into();
         self
     }
     /// Set the `tourBookingPage` field to an Option value (optional)
-    pub fn maybe_tour_booking_page(mut self, value: Option<StoreTourBookingPage<S>>) -> Self {
+    pub fn maybe_tour_booking_page(
+        mut self,
+        value: Option<StoreTourBookingPage<S>>,
+    ) -> Self {
         self._fields.122 = value;
         self
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `unnamedSourcesPolicy` field (optional)
     pub fn unnamed_sources_policy(
         mut self,
@@ -6685,7 +7173,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<StoreUrl<S>>>) -> Self {
         self._fields.124 = value.into();
@@ -6698,7 +7186,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `vatID` field (optional)
     pub fn vat_id(mut self, value: impl Into<Option<StoreVatId<S>>>) -> Self {
         self._fields.125 = value.into();
@@ -6711,7 +7199,7 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StoreBuilder<S, St>
+impl<St, S: BosStr> StoreBuilder<St, S>
 where
     St: store_state::State,
 {

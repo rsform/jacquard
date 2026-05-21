@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did, Handle};
+use jacquard_common::types::string::{Did, Handle, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::tools_ozone::hosting::get_account_history;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::hosting::get_account_history;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AccountCreated<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<S>,
@@ -40,33 +37,27 @@ pub struct AccountCreated<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EmailConfirmed<S: BosStr = DefaultStr> {
     pub email: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EmailUpdated<S: BosStr = DefaultStr> {
     pub email: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Event<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub created_by: S,
@@ -74,6 +65,7 @@ pub struct Event<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -91,22 +83,18 @@ pub enum EventDetails<S: BosStr = DefaultStr> {
     HandleUpdated(Box<get_account_history::HandleUpdated<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HandleUpdated<S: BosStr = DefaultStr> {
     pub handle: Handle<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAccountHistory<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -119,11 +107,9 @@ pub struct GetAccountHistory<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAccountHistoryOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -132,11 +118,9 @@ pub struct GetAccountHistoryOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PasswordUpdated<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -257,10 +241,10 @@ impl<S: BosStr> LexiconSchema for PasswordUpdated<S> {
 }
 
 fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.hosting.getAccountHistory"),
@@ -275,9 +259,7 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("email"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("handle"),
@@ -300,9 +282,7 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("email"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -318,9 +298,7 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("email"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -330,11 +308,13 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("event"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("details"),
-                        SmolStr::new_static("createdBy"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("details"),
+                            SmolStr::new_static("createdBy"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -347,9 +327,7 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("createdBy"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("details"),
@@ -359,7 +337,7 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> LexiconDoc<'static> {
                                     CowStr::new_static("#emailUpdated"),
                                     CowStr::new_static("#emailConfirmed"),
                                     CowStr::new_static("#passwordUpdated"),
-                                    CowStr::new_static("#handleUpdated"),
+                                    CowStr::new_static("#handleUpdated")
                                 ],
                                 ..Default::default()
                             }),
@@ -391,43 +369,45 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("did")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("did"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    format: Some(LexStringFormat::Did),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("events"),
-                                LexXrpcParametersProperty::Array(LexPrimitiveArray {
-                                    items: LexPrimitiveArrayItem::String(LexString {
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("did")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
                                         ..Default::default()
                                     }),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("did"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("events"),
+                                    LexXrpcParametersProperty::Array(LexPrimitiveArray {
+                                        items: LexPrimitiveArrayItem::String(LexString {
+                                            ..Default::default()
+                                        }),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -451,7 +431,7 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> LexiconDoc<'static> {
 
 pub mod event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -508,21 +488,28 @@ pub mod event_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EventBuilder<S: BosStr, St: event_state::State> {
+pub struct EventBuilder<St: event_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<EventDetails<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Event<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EventBuilder<S, event_state::Empty> {
+impl Event<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EventBuilder<event_state::Empty, DefaultStr> {
         EventBuilder::new()
     }
 }
 
-impl<S: BosStr> EventBuilder<S, event_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Event<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EventBuilder<event_state::Empty, S> {
+        EventBuilder::builder()
+    }
+}
+
+impl EventBuilder<event_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventBuilder {
             _state: PhantomData,
@@ -532,7 +519,18 @@ impl<S: BosStr> EventBuilder<S, event_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<S: BosStr> EventBuilder<event_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EventBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::CreatedAt: event_state::IsUnset,
@@ -541,7 +539,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventBuilder<S, event_state::SetCreatedAt<St>> {
+    ) -> EventBuilder<event_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -551,7 +549,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::CreatedBy: event_state::IsUnset,
@@ -560,7 +558,7 @@ where
     pub fn created_by(
         mut self,
         value: impl Into<S>,
-    ) -> EventBuilder<S, event_state::SetCreatedBy<St>> {
+    ) -> EventBuilder<event_state::SetCreatedBy<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -570,7 +568,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::Details: event_state::IsUnset,
@@ -579,7 +577,7 @@ where
     pub fn details(
         mut self,
         value: impl Into<EventDetails<S>>,
-    ) -> EventBuilder<S, event_state::SetDetails<St>> {
+    ) -> EventBuilder<event_state::SetDetails<St>, S> {
         self._fields.2 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -589,7 +587,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::CreatedAt: event_state::IsSet,
@@ -618,7 +616,7 @@ where
 
 pub mod handle_updated_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -649,21 +647,31 @@ pub mod handle_updated_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HandleUpdatedBuilder<S: BosStr, St: handle_updated_state::State> {
+pub struct HandleUpdatedBuilder<
+    St: handle_updated_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Handle<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> HandleUpdated<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> HandleUpdatedBuilder<S, handle_updated_state::Empty> {
+impl HandleUpdated<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> HandleUpdatedBuilder<handle_updated_state::Empty, DefaultStr> {
         HandleUpdatedBuilder::new()
     }
 }
 
-impl<S: BosStr> HandleUpdatedBuilder<S, handle_updated_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> HandleUpdated<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> HandleUpdatedBuilder<handle_updated_state::Empty, S> {
+        HandleUpdatedBuilder::builder()
+    }
+}
+
+impl HandleUpdatedBuilder<handle_updated_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         HandleUpdatedBuilder {
             _state: PhantomData,
@@ -673,7 +681,18 @@ impl<S: BosStr> HandleUpdatedBuilder<S, handle_updated_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> HandleUpdatedBuilder<S, St>
+impl<S: BosStr> HandleUpdatedBuilder<handle_updated_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        HandleUpdatedBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> HandleUpdatedBuilder<St, S>
 where
     St: handle_updated_state::State,
     St::Handle: handle_updated_state::IsUnset,
@@ -682,7 +701,7 @@ where
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> HandleUpdatedBuilder<S, handle_updated_state::SetHandle<St>> {
+    ) -> HandleUpdatedBuilder<handle_updated_state::SetHandle<St>, S> {
         self._fields.0 = Option::Some(value.into());
         HandleUpdatedBuilder {
             _state: PhantomData,
@@ -692,7 +711,7 @@ where
     }
 }
 
-impl<S: BosStr, St> HandleUpdatedBuilder<S, St>
+impl<St, S: BosStr> HandleUpdatedBuilder<St, S>
 where
     St: handle_updated_state::State,
     St::Handle: handle_updated_state::IsSet,
@@ -705,7 +724,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> HandleUpdated<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> HandleUpdated<S> {
         HandleUpdated {
             handle: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -719,7 +741,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_account_history_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -750,21 +772,34 @@ pub mod get_account_history_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetAccountHistoryBuilder<S: BosStr, St: get_account_history_state::State> {
+pub struct GetAccountHistoryBuilder<
+    St: get_account_history_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>, Option<Vec<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetAccountHistory<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetAccountHistoryBuilder<S, get_account_history_state::Empty> {
+impl GetAccountHistory<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetAccountHistoryBuilder<
+        get_account_history_state::Empty,
+        DefaultStr,
+    > {
         GetAccountHistoryBuilder::new()
     }
 }
 
-impl<S: BosStr> GetAccountHistoryBuilder<S, get_account_history_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetAccountHistory<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetAccountHistoryBuilder<get_account_history_state::Empty, S> {
+        GetAccountHistoryBuilder::builder()
+    }
+}
+
+impl GetAccountHistoryBuilder<get_account_history_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetAccountHistoryBuilder {
             _state: PhantomData,
@@ -774,7 +809,18 @@ impl<S: BosStr> GetAccountHistoryBuilder<S, get_account_history_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_account_history_state::State> GetAccountHistoryBuilder<S, St> {
+impl<S: BosStr> GetAccountHistoryBuilder<get_account_history_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetAccountHistoryBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_account_history_state::State, S: BosStr> GetAccountHistoryBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -787,7 +833,7 @@ impl<S: BosStr, St: get_account_history_state::State> GetAccountHistoryBuilder<S
     }
 }
 
-impl<S: BosStr, St> GetAccountHistoryBuilder<S, St>
+impl<St, S: BosStr> GetAccountHistoryBuilder<St, S>
 where
     St: get_account_history_state::State,
     St::Did: get_account_history_state::IsUnset,
@@ -796,7 +842,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetAccountHistoryBuilder<S, get_account_history_state::SetDid<St>> {
+    ) -> GetAccountHistoryBuilder<get_account_history_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetAccountHistoryBuilder {
             _state: PhantomData,
@@ -806,7 +852,7 @@ where
     }
 }
 
-impl<S: BosStr, St: get_account_history_state::State> GetAccountHistoryBuilder<S, St> {
+impl<St: get_account_history_state::State, S: BosStr> GetAccountHistoryBuilder<St, S> {
     /// Set the `events` field (optional)
     pub fn events(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -819,7 +865,7 @@ impl<S: BosStr, St: get_account_history_state::State> GetAccountHistoryBuilder<S
     }
 }
 
-impl<S: BosStr, St: get_account_history_state::State> GetAccountHistoryBuilder<S, St> {
+impl<St: get_account_history_state::State, S: BosStr> GetAccountHistoryBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -832,7 +878,7 @@ impl<S: BosStr, St: get_account_history_state::State> GetAccountHistoryBuilder<S
     }
 }
 
-impl<S: BosStr, St> GetAccountHistoryBuilder<S, St>
+impl<St, S: BosStr> GetAccountHistoryBuilder<St, S>
 where
     St: get_account_history_state::State,
     St::Did: get_account_history_state::IsSet,

@@ -10,19 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetDiff<S: BosStr = DefaultStr> {
     pub repo: AtUri<S>,
     pub rev1: S,
@@ -37,9 +34,18 @@ pub struct GetDiffOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetDiffError {
     /// Repository not found or access denied
@@ -56,10 +62,7 @@ pub enum GetDiffError {
     CompareError(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetDiffError {
@@ -149,7 +152,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetDiffRequest {
 
 pub mod get_diff_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -206,21 +209,28 @@ pub mod get_diff_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetDiffBuilder<S: BosStr, St: get_diff_state::State> {
+pub struct GetDiffBuilder<St: get_diff_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetDiff<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetDiffBuilder<S, get_diff_state::Empty> {
+impl GetDiff<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetDiffBuilder<get_diff_state::Empty, DefaultStr> {
         GetDiffBuilder::new()
     }
 }
 
-impl<S: BosStr> GetDiffBuilder<S, get_diff_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetDiff<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetDiffBuilder<get_diff_state::Empty, S> {
+        GetDiffBuilder::builder()
+    }
+}
+
+impl GetDiffBuilder<get_diff_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetDiffBuilder {
             _state: PhantomData,
@@ -230,7 +240,18 @@ impl<S: BosStr> GetDiffBuilder<S, get_diff_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetDiffBuilder<S, St>
+impl<S: BosStr> GetDiffBuilder<get_diff_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetDiffBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetDiffBuilder<St, S>
 where
     St: get_diff_state::State,
     St::Repo: get_diff_state::IsUnset,
@@ -239,7 +260,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetDiffBuilder<S, get_diff_state::SetRepo<St>> {
+    ) -> GetDiffBuilder<get_diff_state::SetRepo<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetDiffBuilder {
             _state: PhantomData,
@@ -249,13 +270,16 @@ where
     }
 }
 
-impl<S: BosStr, St> GetDiffBuilder<S, St>
+impl<St, S: BosStr> GetDiffBuilder<St, S>
 where
     St: get_diff_state::State,
     St::Rev1: get_diff_state::IsUnset,
 {
     /// Set the `rev1` field (required)
-    pub fn rev1(mut self, value: impl Into<S>) -> GetDiffBuilder<S, get_diff_state::SetRev1<St>> {
+    pub fn rev1(
+        mut self,
+        value: impl Into<S>,
+    ) -> GetDiffBuilder<get_diff_state::SetRev1<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetDiffBuilder {
             _state: PhantomData,
@@ -265,13 +289,16 @@ where
     }
 }
 
-impl<S: BosStr, St> GetDiffBuilder<S, St>
+impl<St, S: BosStr> GetDiffBuilder<St, S>
 where
     St: get_diff_state::State,
     St::Rev2: get_diff_state::IsUnset,
 {
     /// Set the `rev2` field (required)
-    pub fn rev2(mut self, value: impl Into<S>) -> GetDiffBuilder<S, get_diff_state::SetRev2<St>> {
+    pub fn rev2(
+        mut self,
+        value: impl Into<S>,
+    ) -> GetDiffBuilder<get_diff_state::SetRev2<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GetDiffBuilder {
             _state: PhantomData,
@@ -281,7 +308,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetDiffBuilder<S, St>
+impl<St, S: BosStr> GetDiffBuilder<St, S>
 where
     St: get_diff_state::State,
     St::Repo: get_diff_state::IsSet,

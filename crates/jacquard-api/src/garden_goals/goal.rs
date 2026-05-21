@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A goal to track daily completions for a year.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -184,16 +184,19 @@ impl<S: BosStr> LexiconSchema for Goal<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("completed_piece_blob"),
@@ -261,16 +264,19 @@ impl<S: BosStr> LexiconSchema for Goal<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("piece_blob"),
@@ -305,7 +311,7 @@ impl<S: BosStr> LexiconSchema for Goal<S> {
 
 pub mod goal_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -313,72 +319,72 @@ pub mod goal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GoalId;
-        type Name;
         type Year;
         type CreatedAt;
+        type Name;
+        type GoalId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GoalId = Unset;
-        type Name = Unset;
         type Year = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `goal_id` field to Set
-    pub struct SetGoalId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGoalId<St> {}
-    impl<St: State> State for SetGoalId<St> {
-        type GoalId = Set<members::goal_id>;
-        type Name = St::Name;
-        type Year = St::Year;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type GoalId = St::GoalId;
-        type Name = Set<members::name>;
-        type Year = St::Year;
-        type CreatedAt = St::CreatedAt;
+        type Name = Unset;
+        type GoalId = Unset;
     }
     ///State transition - sets the `year` field to Set
     pub struct SetYear<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetYear<St> {}
     impl<St: State> State for SetYear<St> {
-        type GoalId = St::GoalId;
-        type Name = St::Name;
         type Year = Set<members::year>;
         type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type GoalId = St::GoalId;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type GoalId = St::GoalId;
-        type Name = St::Name;
         type Year = St::Year;
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+        type GoalId = St::GoalId;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Year = St::Year;
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
+        type GoalId = St::GoalId;
+    }
+    ///State transition - sets the `goal_id` field to Set
+    pub struct SetGoalId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGoalId<St> {}
+    impl<St: State> State for SetGoalId<St> {
+        type Year = St::Year;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type GoalId = Set<members::goal_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `goal_id` field
-        pub struct goal_id(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `year` field
         pub struct year(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `goal_id` field
+        pub struct goal_id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GoalBuilder<S: BosStr, St: goal_state::State> {
+pub struct GoalBuilder<St: goal_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -400,20 +406,40 @@ pub struct GoalBuilder<S: BosStr, St: goal_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Goal<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GoalBuilder<S, goal_state::Empty> {
+impl Goal<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GoalBuilder<goal_state::Empty, DefaultStr> {
         GoalBuilder::new()
     }
 }
 
-impl<S: BosStr> GoalBuilder<S, goal_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Goal<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GoalBuilder<goal_state::Empty, S> {
+        GoalBuilder::builder()
+    }
+}
+
+impl GoalBuilder<goal_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GoalBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -421,7 +447,34 @@ impl<S: BosStr> GoalBuilder<S, goal_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
+impl<S: BosStr> GoalBuilder<goal_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GoalBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: goal_state::State, S: BosStr> GoalBuilder<St, S> {
     /// Set the `accentColor` field (optional)
     pub fn accent_color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -434,7 +487,7 @@ impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
+impl<St: goal_state::State, S: BosStr> GoalBuilder<St, S> {
     /// Set the `categories` field (optional)
     pub fn categories(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -447,7 +500,7 @@ impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
+impl<St: goal_state::State, S: BosStr> GoalBuilder<St, S> {
     /// Set the `completedAccentColor` field (optional)
     pub fn completed_accent_color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -460,7 +513,7 @@ impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
+impl<St: goal_state::State, S: BosStr> GoalBuilder<St, S> {
     /// Set the `completedPiece` field (optional)
     pub fn completed_piece(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -473,7 +526,7 @@ impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
+impl<St: goal_state::State, S: BosStr> GoalBuilder<St, S> {
     /// Set the `completedPieceBlob` field (optional)
     pub fn completed_piece_blob(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -486,7 +539,7 @@ impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
+impl<St: goal_state::State, S: BosStr> GoalBuilder<St, S> {
     /// Set the `completedPieceUrl` field (optional)
     pub fn completed_piece_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -499,7 +552,7 @@ impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GoalBuilder<S, St>
+impl<St, S: BosStr> GoalBuilder<St, S>
 where
     St: goal_state::State,
     St::CreatedAt: goal_state::IsUnset,
@@ -508,7 +561,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GoalBuilder<S, goal_state::SetCreatedAt<St>> {
+    ) -> GoalBuilder<goal_state::SetCreatedAt<St>, S> {
         self._fields.6 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
@@ -518,7 +571,7 @@ where
     }
 }
 
-impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
+impl<St: goal_state::State, S: BosStr> GoalBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -531,13 +584,16 @@ impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GoalBuilder<S, St>
+impl<St, S: BosStr> GoalBuilder<St, S>
 where
     St: goal_state::State,
     St::GoalId: goal_state::IsUnset,
 {
     /// Set the `goalId` field (required)
-    pub fn goal_id(mut self, value: impl Into<S>) -> GoalBuilder<S, goal_state::SetGoalId<St>> {
+    pub fn goal_id(
+        mut self,
+        value: impl Into<S>,
+    ) -> GoalBuilder<goal_state::SetGoalId<St>, S> {
         self._fields.8 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
@@ -547,13 +603,16 @@ where
     }
 }
 
-impl<S: BosStr, St> GoalBuilder<S, St>
+impl<St, S: BosStr> GoalBuilder<St, S>
 where
     St: goal_state::State,
     St::Name: goal_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> GoalBuilder<S, goal_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> GoalBuilder<goal_state::SetName<St>, S> {
         self._fields.9 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
@@ -563,7 +622,7 @@ where
     }
 }
 
-impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
+impl<St: goal_state::State, S: BosStr> GoalBuilder<St, S> {
     /// Set the `piece` field (optional)
     pub fn piece(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -576,7 +635,7 @@ impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
+impl<St: goal_state::State, S: BosStr> GoalBuilder<St, S> {
     /// Set the `pieceBlob` field (optional)
     pub fn piece_blob(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.11 = value.into();
@@ -589,7 +648,7 @@ impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
+impl<St: goal_state::State, S: BosStr> GoalBuilder<St, S> {
     /// Set the `pieceUrl` field (optional)
     pub fn piece_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.12 = value.into();
@@ -602,7 +661,7 @@ impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
+impl<St: goal_state::State, S: BosStr> GoalBuilder<St, S> {
     /// Set the `targetCount` field (optional)
     pub fn target_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.13 = value.into();
@@ -615,13 +674,16 @@ impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GoalBuilder<S, St>
+impl<St, S: BosStr> GoalBuilder<St, S>
 where
     St: goal_state::State,
     St::Year: goal_state::IsUnset,
 {
     /// Set the `year` field (required)
-    pub fn year(mut self, value: impl Into<i64>) -> GoalBuilder<S, goal_state::SetYear<St>> {
+    pub fn year(
+        mut self,
+        value: impl Into<i64>,
+    ) -> GoalBuilder<goal_state::SetYear<St>, S> {
         self._fields.14 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
@@ -631,13 +693,13 @@ where
     }
 }
 
-impl<S: BosStr, St> GoalBuilder<S, St>
+impl<St, S: BosStr> GoalBuilder<St, S>
 where
     St: goal_state::State,
-    St::GoalId: goal_state::IsSet,
-    St::Name: goal_state::IsSet,
     St::Year: goal_state::IsSet,
     St::CreatedAt: goal_state::IsSet,
+    St::Name: goal_state::IsSet,
+    St::GoalId: goal_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Goal<S> {
@@ -684,10 +746,10 @@ where
 }
 
 fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.goals.goal"),
@@ -696,26 +758,31 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A goal to track daily completions for a year.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A goal to track daily completions for a year.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("goalId"),
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("year"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("goalId"), SmolStr::new_static("name"),
+                                SmolStr::new_static("year"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("accentColor"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Preset name or hex color for incomplete state",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Preset name or hex color for incomplete state",
+                                        ),
+                                    ),
                                     max_length: Some(50usize),
                                     ..Default::default()
                                 }),
@@ -723,9 +790,11 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("categories"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Array of category UUIDs this goal belongs to",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Array of category UUIDs this goal belongs to",
+                                        ),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(64usize),
                                         ..Default::default()
@@ -736,9 +805,11 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("completedAccentColor"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Preset name or hex color for complete state",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Preset name or hex color for complete state",
+                                        ),
+                                    ),
                                     max_length: Some(50usize),
                                     ..Default::default()
                                 }),
@@ -746,25 +817,23 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("completedPiece"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Shape name or emoji for complete state",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Shape name or emoji for complete state"),
+                                    ),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("completedPieceBlob"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("completedPieceUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Favicon URL for complete state",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Favicon URL for complete state"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -772,9 +841,9 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the goal was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp when the goal was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -782,9 +851,9 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Optional description of the goal",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Optional description of the goal"),
+                                    ),
                                     max_length: Some(500usize),
                                     ..Default::default()
                                 }),
@@ -792,9 +861,9 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("goalId"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Unique identifier for the goal (UUID)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Unique identifier for the goal (UUID)"),
+                                    ),
                                     max_length: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -802,9 +871,9 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Display name of the goal",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Display name of the goal"),
+                                    ),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
@@ -812,25 +881,25 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("piece"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Shape name or emoji for incomplete state",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Shape name or emoji for incomplete state",
+                                        ),
+                                    ),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("pieceBlob"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("pieceUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Favicon URL for incomplete state",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Favicon URL for incomplete state"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),

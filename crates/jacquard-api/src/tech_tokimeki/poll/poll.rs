@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A poll record that can be attached to a post via embed.external
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -133,7 +133,7 @@ impl<S: BosStr> LexiconSchema for Poll<S> {
 
 pub mod poll_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -141,75 +141,77 @@ pub mod poll_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type EndsAt;
         type Options;
         type CreatedAt;
-        type EndsAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type EndsAt = Unset;
         type Options = Unset;
         type CreatedAt = Unset;
-        type EndsAt = Unset;
-    }
-    ///State transition - sets the `options` field to Set
-    pub struct SetOptions<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOptions<St> {}
-    impl<St: State> State for SetOptions<St> {
-        type Options = Set<members::options>;
-        type CreatedAt = St::CreatedAt;
-        type EndsAt = St::EndsAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Options = St::Options;
-        type CreatedAt = Set<members::created_at>;
-        type EndsAt = St::EndsAt;
     }
     ///State transition - sets the `ends_at` field to Set
     pub struct SetEndsAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEndsAt<St> {}
     impl<St: State> State for SetEndsAt<St> {
+        type EndsAt = Set<members::ends_at>;
         type Options = St::Options;
         type CreatedAt = St::CreatedAt;
-        type EndsAt = Set<members::ends_at>;
+    }
+    ///State transition - sets the `options` field to Set
+    pub struct SetOptions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOptions<St> {}
+    impl<St: State> State for SetOptions<St> {
+        type EndsAt = St::EndsAt;
+        type Options = Set<members::options>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type EndsAt = St::EndsAt;
+        type Options = St::Options;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `ends_at` field
+        pub struct ends_at(());
         ///Marker type for the `options` field
         pub struct options(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `ends_at` field
-        pub struct ends_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PollBuilder<S: BosStr, St: poll_state::State> {
+pub struct PollBuilder<St: poll_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<Datetime>,
-        Option<Vec<S>>,
-        Option<StrongRef<S>>,
-    ),
+    _fields: (Option<Datetime>, Option<Datetime>, Option<Vec<S>>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Poll<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PollBuilder<S, poll_state::Empty> {
+impl Poll<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PollBuilder<poll_state::Empty, DefaultStr> {
         PollBuilder::new()
     }
 }
 
-impl<S: BosStr> PollBuilder<S, poll_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Poll<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PollBuilder<poll_state::Empty, S> {
+        PollBuilder::builder()
+    }
+}
+
+impl PollBuilder<poll_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PollBuilder {
             _state: PhantomData,
@@ -219,7 +221,18 @@ impl<S: BosStr> PollBuilder<S, poll_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PollBuilder<S, St>
+impl<S: BosStr> PollBuilder<poll_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PollBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PollBuilder<St, S>
 where
     St: poll_state::State,
     St::CreatedAt: poll_state::IsUnset,
@@ -228,7 +241,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PollBuilder<S, poll_state::SetCreatedAt<St>> {
+    ) -> PollBuilder<poll_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PollBuilder {
             _state: PhantomData,
@@ -238,7 +251,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PollBuilder<S, St>
+impl<St, S: BosStr> PollBuilder<St, S>
 where
     St: poll_state::State,
     St::EndsAt: poll_state::IsUnset,
@@ -247,7 +260,7 @@ where
     pub fn ends_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PollBuilder<S, poll_state::SetEndsAt<St>> {
+    ) -> PollBuilder<poll_state::SetEndsAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PollBuilder {
             _state: PhantomData,
@@ -257,7 +270,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PollBuilder<S, St>
+impl<St, S: BosStr> PollBuilder<St, S>
 where
     St: poll_state::State,
     St::Options: poll_state::IsUnset,
@@ -266,7 +279,7 @@ where
     pub fn options(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> PollBuilder<S, poll_state::SetOptions<St>> {
+    ) -> PollBuilder<poll_state::SetOptions<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PollBuilder {
             _state: PhantomData,
@@ -276,7 +289,7 @@ where
     }
 }
 
-impl<S: BosStr, St: poll_state::State> PollBuilder<S, St> {
+impl<St: poll_state::State, S: BosStr> PollBuilder<St, S> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -289,12 +302,12 @@ impl<S: BosStr, St: poll_state::State> PollBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PollBuilder<S, St>
+impl<St, S: BosStr> PollBuilder<St, S>
 where
     St: poll_state::State,
+    St::EndsAt: poll_state::IsSet,
     St::Options: poll_state::IsSet,
     St::CreatedAt: poll_state::IsSet,
-    St::EndsAt: poll_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Poll<S> {
@@ -319,10 +332,10 @@ where
 }
 
 fn lexicon_doc_tech_tokimeki_poll_poll() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tech.tokimeki.poll.poll"),
@@ -331,16 +344,20 @@ fn lexicon_doc_tech_tokimeki_poll_poll() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A poll record that can be attached to a post via embed.external",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A poll record that can be attached to a post via embed.external",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("options"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("endsAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("options"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("endsAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -354,9 +371,9 @@ fn lexicon_doc_tech_tokimeki_poll_poll() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("endsAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When the poll closes for voting",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When the poll closes for voting"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -364,9 +381,9 @@ fn lexicon_doc_tech_tokimeki_poll_poll() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("options"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Poll options (2-4 choices)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Poll options (2-4 choices)"),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(100usize),
                                         max_graphemes: Some(50usize),

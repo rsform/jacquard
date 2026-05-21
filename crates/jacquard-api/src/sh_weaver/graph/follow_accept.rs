@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Acceptance of a follow request. Completes the two-way agreement.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -106,7 +106,7 @@ impl<S: BosStr> LexiconSchema for FollowAccept<S> {
 
 pub mod follow_accept_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -149,21 +149,28 @@ pub mod follow_accept_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FollowAcceptBuilder<S: BosStr, St: follow_accept_state::State> {
+pub struct FollowAcceptBuilder<St: follow_accept_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> FollowAccept<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FollowAcceptBuilder<S, follow_accept_state::Empty> {
+impl FollowAccept<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FollowAcceptBuilder<follow_accept_state::Empty, DefaultStr> {
         FollowAcceptBuilder::new()
     }
 }
 
-impl<S: BosStr> FollowAcceptBuilder<S, follow_accept_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> FollowAccept<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FollowAcceptBuilder<follow_accept_state::Empty, S> {
+        FollowAcceptBuilder::builder()
+    }
+}
+
+impl FollowAcceptBuilder<follow_accept_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FollowAcceptBuilder {
             _state: PhantomData,
@@ -173,7 +180,18 @@ impl<S: BosStr> FollowAcceptBuilder<S, follow_accept_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FollowAcceptBuilder<S, St>
+impl<S: BosStr> FollowAcceptBuilder<follow_accept_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FollowAcceptBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FollowAcceptBuilder<St, S>
 where
     St: follow_accept_state::State,
     St::CreatedAt: follow_accept_state::IsUnset,
@@ -182,7 +200,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FollowAcceptBuilder<S, follow_accept_state::SetCreatedAt<St>> {
+    ) -> FollowAcceptBuilder<follow_accept_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FollowAcceptBuilder {
             _state: PhantomData,
@@ -192,7 +210,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FollowAcceptBuilder<S, St>
+impl<St, S: BosStr> FollowAcceptBuilder<St, S>
 where
     St: follow_accept_state::State,
     St::Follow: follow_accept_state::IsUnset,
@@ -201,7 +219,7 @@ where
     pub fn follow(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> FollowAcceptBuilder<S, follow_accept_state::SetFollow<St>> {
+    ) -> FollowAcceptBuilder<follow_accept_state::SetFollow<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FollowAcceptBuilder {
             _state: PhantomData,
@@ -211,7 +229,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FollowAcceptBuilder<S, St>
+impl<St, S: BosStr> FollowAcceptBuilder<St, S>
 where
     St: follow_accept_state::State,
     St::Follow: follow_accept_state::IsSet,
@@ -226,7 +244,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FollowAccept<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FollowAccept<S> {
         FollowAccept {
             created_at: self._fields.0.unwrap(),
             follow: self._fields.1.unwrap(),
@@ -236,10 +257,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_graph_followAccept() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.graph.followAccept"),
@@ -248,15 +269,19 @@ fn lexicon_doc_sh_weaver_graph_followAccept() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Acceptance of a follow request. Completes the two-way agreement.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Acceptance of a follow request. Completes the two-way agreement.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("follow"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("follow"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

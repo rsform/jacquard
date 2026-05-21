@@ -23,14 +23,11 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A named value with a numeric index for sorting.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Indexable<S: BosStr = DefaultStr> {
     ///The internal ID for the value, limited to the RecordKey character set.
     pub id: RecordKey<Rkey<S>>,
@@ -45,10 +42,7 @@ pub struct Indexable<S: BosStr = DefaultStr> {
 /// A typed record reference that does not require a CID hash.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TypedRef<S: BosStr = DefaultStr> {
     ///The AT URI of the record this object references.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -114,7 +108,7 @@ impl<S: BosStr> LexiconSchema for TypedRef<S> {
 
 pub mod indexable_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -122,70 +116,77 @@ pub mod indexable_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Id;
         type Name;
         type Index;
-        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Id = Unset;
         type Name = Unset;
         type Index = Unset;
-        type Id = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Index = St::Index;
-        type Id = St::Id;
-    }
-    ///State transition - sets the `index` field to Set
-    pub struct SetIndex<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndex<St> {}
-    impl<St: State> State for SetIndex<St> {
-        type Name = St::Name;
-        type Index = Set<members::index>;
-        type Id = St::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
+        type Id = Set<members::id>;
         type Name = St::Name;
         type Index = St::Index;
-        type Id = Set<members::id>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Id = St::Id;
+        type Name = Set<members::name>;
+        type Index = St::Index;
+    }
+    ///State transition - sets the `index` field to Set
+    pub struct SetIndex<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndex<St> {}
+    impl<St: State> State for SetIndex<St> {
+        type Id = St::Id;
+        type Name = St::Name;
+        type Index = Set<members::index>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `index` field
         pub struct index(());
-        ///Marker type for the `id` field
-        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IndexableBuilder<S: BosStr, St: indexable_state::State> {
+pub struct IndexableBuilder<St: indexable_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<RecordKey<Rkey<S>>>, Option<i64>, Option<Data<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Indexable<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> IndexableBuilder<S, indexable_state::Empty> {
+impl Indexable<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> IndexableBuilder<indexable_state::Empty, DefaultStr> {
         IndexableBuilder::new()
     }
 }
 
-impl<S: BosStr> IndexableBuilder<S, indexable_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Indexable<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> IndexableBuilder<indexable_state::Empty, S> {
+        IndexableBuilder::builder()
+    }
+}
+
+impl IndexableBuilder<indexable_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         IndexableBuilder {
             _state: PhantomData,
@@ -195,7 +196,18 @@ impl<S: BosStr> IndexableBuilder<S, indexable_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> IndexableBuilder<S, St>
+impl<S: BosStr> IndexableBuilder<indexable_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        IndexableBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> IndexableBuilder<St, S>
 where
     St: indexable_state::State,
     St::Id: indexable_state::IsUnset,
@@ -204,7 +216,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<RecordKey<Rkey<S>>>,
-    ) -> IndexableBuilder<S, indexable_state::SetId<St>> {
+    ) -> IndexableBuilder<indexable_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         IndexableBuilder {
             _state: PhantomData,
@@ -214,7 +226,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IndexableBuilder<S, St>
+impl<St, S: BosStr> IndexableBuilder<St, S>
 where
     St: indexable_state::State,
     St::Index: indexable_state::IsUnset,
@@ -223,7 +235,7 @@ where
     pub fn index(
         mut self,
         value: impl Into<i64>,
-    ) -> IndexableBuilder<S, indexable_state::SetIndex<St>> {
+    ) -> IndexableBuilder<indexable_state::SetIndex<St>, S> {
         self._fields.1 = Option::Some(value.into());
         IndexableBuilder {
             _state: PhantomData,
@@ -233,7 +245,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IndexableBuilder<S, St>
+impl<St, S: BosStr> IndexableBuilder<St, S>
 where
     St: indexable_state::State,
     St::Name: indexable_state::IsUnset,
@@ -242,7 +254,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> IndexableBuilder<S, indexable_state::SetName<St>> {
+    ) -> IndexableBuilder<indexable_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         IndexableBuilder {
             _state: PhantomData,
@@ -252,12 +264,12 @@ where
     }
 }
 
-impl<S: BosStr, St> IndexableBuilder<S, St>
+impl<St, S: BosStr> IndexableBuilder<St, S>
 where
     St: indexable_state::State,
+    St::Id: indexable_state::IsSet,
     St::Name: indexable_state::IsSet,
     St::Index: indexable_state::IsSet,
-    St::Id: indexable_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Indexable<S> {
@@ -269,7 +281,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Indexable<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Indexable<S> {
         Indexable {
             id: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),
@@ -280,10 +295,10 @@ where
 }
 
 fn lexicon_doc_dev_tsunagite_types() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.tsunagite.types"),
@@ -341,18 +356,22 @@ fn lexicon_doc_dev_tsunagite_types() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("typedRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A typed record reference that does not require a CID hash.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A typed record reference that does not require a CID hash.",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("ref"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The AT URI of the record this object references.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The AT URI of the record this object references.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -360,9 +379,11 @@ fn lexicon_doc_dev_tsunagite_types() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The type of the record this object references.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The type of the record this object references.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::RecordKey),
                                 ..Default::default()
                             }),

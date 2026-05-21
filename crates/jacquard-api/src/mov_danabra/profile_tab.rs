@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileTab<S: BosStr = DefaultStr> {
     /// Defaults to `10`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -33,6 +30,7 @@ pub struct ProfileTab<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProfileTabTab<S: BosStr = DefaultStr> {
@@ -111,11 +109,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileTabOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -134,8 +130,9 @@ impl jacquard_common::xrpc::XrpcResp for ProfileTabResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ProfileTab<S> {
     const NSID: &'static str = "mov.danabra.ProfileTab";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ProfileTabResponse;
 }
 
@@ -143,8 +140,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ProfileTab<S> {
 pub struct ProfileTabRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ProfileTabRequest {
     const PATH: &'static str = "/xrpc/mov.danabra.ProfileTab";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ProfileTab<S>;
     type Response = ProfileTabResponse;
 }
@@ -155,7 +153,7 @@ fn _default_profile_tab_limit() -> Option<i64> {
 
 pub mod profile_tab_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -186,21 +184,28 @@ pub mod profile_tab_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileTabBuilder<S: BosStr, St: profile_tab_state::State> {
+pub struct ProfileTabBuilder<St: profile_tab_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<ProfileTabTab<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ProfileTab<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProfileTabBuilder<S, profile_tab_state::Empty> {
+impl ProfileTab<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProfileTabBuilder<profile_tab_state::Empty, DefaultStr> {
         ProfileTabBuilder::new()
     }
 }
 
-impl<S: BosStr> ProfileTabBuilder<S, profile_tab_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ProfileTab<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProfileTabBuilder<profile_tab_state::Empty, S> {
+        ProfileTabBuilder::builder()
+    }
+}
+
+impl ProfileTabBuilder<profile_tab_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProfileTabBuilder {
             _state: PhantomData,
@@ -210,7 +215,18 @@ impl<S: BosStr> ProfileTabBuilder<S, profile_tab_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: profile_tab_state::State> ProfileTabBuilder<S, St> {
+impl<S: BosStr> ProfileTabBuilder<profile_tab_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProfileTabBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: profile_tab_state::State, S: BosStr> ProfileTabBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -223,7 +239,7 @@ impl<S: BosStr, St: profile_tab_state::State> ProfileTabBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_tab_state::State> ProfileTabBuilder<S, St> {
+impl<St: profile_tab_state::State, S: BosStr> ProfileTabBuilder<St, S> {
     /// Set the `tab` field (optional)
     pub fn tab(mut self, value: impl Into<Option<ProfileTabTab<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -236,7 +252,7 @@ impl<S: BosStr, St: profile_tab_state::State> ProfileTabBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProfileTabBuilder<S, St>
+impl<St, S: BosStr> ProfileTabBuilder<St, S>
 where
     St: profile_tab_state::State,
     St::Uri: profile_tab_state::IsUnset,
@@ -245,7 +261,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ProfileTabBuilder<S, profile_tab_state::SetUri<St>> {
+    ) -> ProfileTabBuilder<profile_tab_state::SetUri<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ProfileTabBuilder {
             _state: PhantomData,
@@ -255,7 +271,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileTabBuilder<S, St>
+impl<St, S: BosStr> ProfileTabBuilder<St, S>
 where
     St: profile_tab_state::State,
     St::Uri: profile_tab_state::IsSet,
@@ -270,7 +286,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileTab<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProfileTab<S> {
         ProfileTab {
             limit: self._fields.0.or_else(|| Some(10i64)),
             tab: self._fields.1,

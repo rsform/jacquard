@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_clippr::feed::ClipView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_clippr::feed::ClipView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetClips<S: BosStr = DefaultStr> {
     pub uris: Vec<AtUri<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetClipsOutput<S: BosStr = DefaultStr> {
     ///An array of hydrated clip views
     pub clips: Vec<ClipView<S>>,
@@ -65,7 +60,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetClipsRequest {
 
 pub mod get_clips_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -96,21 +91,28 @@ pub mod get_clips_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetClipsBuilder<S: BosStr, St: get_clips_state::State> {
+pub struct GetClipsBuilder<St: get_clips_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetClips<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetClipsBuilder<S, get_clips_state::Empty> {
+impl GetClips<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetClipsBuilder<get_clips_state::Empty, DefaultStr> {
         GetClipsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetClipsBuilder<S, get_clips_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetClips<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetClipsBuilder<get_clips_state::Empty, S> {
+        GetClipsBuilder::builder()
+    }
+}
+
+impl GetClipsBuilder<get_clips_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetClipsBuilder {
             _state: PhantomData,
@@ -120,7 +122,18 @@ impl<S: BosStr> GetClipsBuilder<S, get_clips_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetClipsBuilder<S, St>
+impl<S: BosStr> GetClipsBuilder<get_clips_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetClipsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetClipsBuilder<St, S>
 where
     St: get_clips_state::State,
     St::Uris: get_clips_state::IsUnset,
@@ -129,7 +142,7 @@ where
     pub fn uris(
         mut self,
         value: impl Into<Vec<AtUri<S>>>,
-    ) -> GetClipsBuilder<S, get_clips_state::SetUris<St>> {
+    ) -> GetClipsBuilder<get_clips_state::SetUris<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetClipsBuilder {
             _state: PhantomData,
@@ -139,7 +152,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetClipsBuilder<S, St>
+impl<St, S: BosStr> GetClipsBuilder<St, S>
 where
     St: get_clips_state::State,
     St::Uris: get_clips_state::IsSet,

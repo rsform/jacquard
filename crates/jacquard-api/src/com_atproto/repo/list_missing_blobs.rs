@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::list_missing_blobs;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::list_missing_blobs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListMissingBlobs<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -40,11 +37,9 @@ pub struct ListMissingBlobs<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListMissingBlobsOutput<S: BosStr = DefaultStr> {
     pub blobs: Vec<list_missing_blobs::RecordBlob<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,11 +48,9 @@ pub struct ListMissingBlobsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordBlob<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub record_uri: AtUri<S>,
@@ -110,7 +103,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_missing_blobs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -128,21 +121,34 @@ pub mod list_missing_blobs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListMissingBlobsBuilder<S: BosStr, St: list_missing_blobs_state::State> {
+pub struct ListMissingBlobsBuilder<
+    St: list_missing_blobs_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListMissingBlobs<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListMissingBlobsBuilder<S, list_missing_blobs_state::Empty> {
+impl ListMissingBlobs<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListMissingBlobsBuilder<
+        list_missing_blobs_state::Empty,
+        DefaultStr,
+    > {
         ListMissingBlobsBuilder::new()
     }
 }
 
-impl<S: BosStr> ListMissingBlobsBuilder<S, list_missing_blobs_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListMissingBlobs<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListMissingBlobsBuilder<list_missing_blobs_state::Empty, S> {
+        ListMissingBlobsBuilder::builder()
+    }
+}
+
+impl ListMissingBlobsBuilder<list_missing_blobs_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListMissingBlobsBuilder {
             _state: PhantomData,
@@ -152,7 +158,18 @@ impl<S: BosStr> ListMissingBlobsBuilder<S, list_missing_blobs_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: list_missing_blobs_state::State> ListMissingBlobsBuilder<S, St> {
+impl<S: BosStr> ListMissingBlobsBuilder<list_missing_blobs_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListMissingBlobsBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: list_missing_blobs_state::State, S: BosStr> ListMissingBlobsBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -165,7 +182,7 @@ impl<S: BosStr, St: list_missing_blobs_state::State> ListMissingBlobsBuilder<S, 
     }
 }
 
-impl<S: BosStr, St: list_missing_blobs_state::State> ListMissingBlobsBuilder<S, St> {
+impl<St: list_missing_blobs_state::State, S: BosStr> ListMissingBlobsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -178,7 +195,7 @@ impl<S: BosStr, St: list_missing_blobs_state::State> ListMissingBlobsBuilder<S, 
     }
 }
 
-impl<S: BosStr, St> ListMissingBlobsBuilder<S, St>
+impl<St, S: BosStr> ListMissingBlobsBuilder<St, S>
 where
     St: list_missing_blobs_state::State,
 {
@@ -193,7 +210,7 @@ where
 
 pub mod record_blob_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -236,21 +253,28 @@ pub mod record_blob_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RecordBlobBuilder<S: BosStr, St: record_blob_state::State> {
+pub struct RecordBlobBuilder<St: record_blob_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RecordBlob<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RecordBlobBuilder<S, record_blob_state::Empty> {
+impl RecordBlob<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RecordBlobBuilder<record_blob_state::Empty, DefaultStr> {
         RecordBlobBuilder::new()
     }
 }
 
-impl<S: BosStr> RecordBlobBuilder<S, record_blob_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RecordBlob<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RecordBlobBuilder<record_blob_state::Empty, S> {
+        RecordBlobBuilder::builder()
+    }
+}
+
+impl RecordBlobBuilder<record_blob_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RecordBlobBuilder {
             _state: PhantomData,
@@ -260,7 +284,18 @@ impl<S: BosStr> RecordBlobBuilder<S, record_blob_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RecordBlobBuilder<S, St>
+impl<S: BosStr> RecordBlobBuilder<record_blob_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RecordBlobBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RecordBlobBuilder<St, S>
 where
     St: record_blob_state::State,
     St::Cid: record_blob_state::IsUnset,
@@ -269,7 +304,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> RecordBlobBuilder<S, record_blob_state::SetCid<St>> {
+    ) -> RecordBlobBuilder<record_blob_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RecordBlobBuilder {
             _state: PhantomData,
@@ -279,7 +314,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RecordBlobBuilder<S, St>
+impl<St, S: BosStr> RecordBlobBuilder<St, S>
 where
     St: record_blob_state::State,
     St::RecordUri: record_blob_state::IsUnset,
@@ -288,7 +323,7 @@ where
     pub fn record_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RecordBlobBuilder<S, record_blob_state::SetRecordUri<St>> {
+    ) -> RecordBlobBuilder<record_blob_state::SetRecordUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RecordBlobBuilder {
             _state: PhantomData,
@@ -298,7 +333,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RecordBlobBuilder<S, St>
+impl<St, S: BosStr> RecordBlobBuilder<St, S>
 where
     St: record_blob_state::State,
     St::Cid: record_blob_state::IsSet,
@@ -313,7 +348,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordBlob<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RecordBlob<S> {
         RecordBlob {
             cid: self._fields.0.unwrap(),
             record_uri: self._fields.1.unwrap(),
@@ -323,10 +361,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_repo_listMissingBlobs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.repo.listMissingBlobs"),
@@ -335,36 +373,39 @@ fn lexicon_doc_com_atproto_repo_listMissingBlobs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("recordBlob"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("recordUri"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("cid"), SmolStr::new_static("recordUri")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

@@ -21,18 +21,15 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::science_alt::dataset::entry::ShardChecksum;
-use crate::science_alt::dataset::storage_http;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::science_alt::dataset::entry::ShardChecksum;
+use crate::science_alt::dataset::storage_http;
 /// HTTP/HTTPS storage for WebDataset tar archives. Each shard is listed individually with a checksum for integrity verification. Consumers build brace-expansion patterns on the fly when needed.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StorageHttp<S: BosStr = DefaultStr> {
     ///Array of shard entries with URL and integrity checksum
     pub shards: Vec<storage_http::ShardEntry<S>>,
@@ -43,10 +40,7 @@ pub struct StorageHttp<S: BosStr = DefaultStr> {
 /// A single HTTP-accessible shard with integrity checksum
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ShardEntry<S: BosStr = DefaultStr> {
     ///Content hash for integrity verification
     pub checksum: ShardChecksum<S>,
@@ -110,7 +104,7 @@ impl<S: BosStr> LexiconSchema for ShardEntry<S> {
 
 pub mod storage_http_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -141,21 +135,28 @@ pub mod storage_http_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StorageHttpBuilder<S: BosStr, St: storage_http_state::State> {
+pub struct StorageHttpBuilder<St: storage_http_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<storage_http::ShardEntry<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> StorageHttp<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StorageHttpBuilder<S, storage_http_state::Empty> {
+impl StorageHttp<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StorageHttpBuilder<storage_http_state::Empty, DefaultStr> {
         StorageHttpBuilder::new()
     }
 }
 
-impl<S: BosStr> StorageHttpBuilder<S, storage_http_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> StorageHttp<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StorageHttpBuilder<storage_http_state::Empty, S> {
+        StorageHttpBuilder::builder()
+    }
+}
+
+impl StorageHttpBuilder<storage_http_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StorageHttpBuilder {
             _state: PhantomData,
@@ -165,7 +166,18 @@ impl<S: BosStr> StorageHttpBuilder<S, storage_http_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StorageHttpBuilder<S, St>
+impl<S: BosStr> StorageHttpBuilder<storage_http_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StorageHttpBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StorageHttpBuilder<St, S>
 where
     St: storage_http_state::State,
     St::Shards: storage_http_state::IsUnset,
@@ -174,7 +186,7 @@ where
     pub fn shards(
         mut self,
         value: impl Into<Vec<storage_http::ShardEntry<S>>>,
-    ) -> StorageHttpBuilder<S, storage_http_state::SetShards<St>> {
+    ) -> StorageHttpBuilder<storage_http_state::SetShards<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StorageHttpBuilder {
             _state: PhantomData,
@@ -184,7 +196,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StorageHttpBuilder<S, St>
+impl<St, S: BosStr> StorageHttpBuilder<St, S>
 where
     St: storage_http_state::State,
     St::Shards: storage_http_state::IsSet,
@@ -197,7 +209,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StorageHttp<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StorageHttp<S> {
         StorageHttp {
             shards: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -206,10 +221,10 @@ where
 }
 
 fn lexicon_doc_science_alt_dataset_storageHttp() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("science.alt.dataset.storageHttp"),
@@ -251,13 +266,14 @@ fn lexicon_doc_science_alt_dataset_storageHttp() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("shardEntry"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A single HTTP-accessible shard with integrity checksum",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("url"),
-                        SmolStr::new_static("checksum"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A single HTTP-accessible shard with integrity checksum",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("url"), SmolStr::new_static("checksum")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -273,9 +289,11 @@ fn lexicon_doc_science_alt_dataset_storageHttp() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "HTTP/HTTPS URL for this WebDataset tar shard",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "HTTP/HTTPS URL for this WebDataset tar shard",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 max_length: Some(2000usize),
                                 ..Default::default()
@@ -294,7 +312,7 @@ fn lexicon_doc_science_alt_dataset_storageHttp() -> LexiconDoc<'static> {
 
 pub mod shard_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -337,21 +355,28 @@ pub mod shard_entry_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ShardEntryBuilder<S: BosStr, St: shard_entry_state::State> {
+pub struct ShardEntryBuilder<St: shard_entry_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<ShardChecksum<S>>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ShardEntry<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ShardEntryBuilder<S, shard_entry_state::Empty> {
+impl ShardEntry<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ShardEntryBuilder<shard_entry_state::Empty, DefaultStr> {
         ShardEntryBuilder::new()
     }
 }
 
-impl<S: BosStr> ShardEntryBuilder<S, shard_entry_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ShardEntry<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ShardEntryBuilder<shard_entry_state::Empty, S> {
+        ShardEntryBuilder::builder()
+    }
+}
+
+impl ShardEntryBuilder<shard_entry_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ShardEntryBuilder {
             _state: PhantomData,
@@ -361,7 +386,18 @@ impl<S: BosStr> ShardEntryBuilder<S, shard_entry_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ShardEntryBuilder<S, St>
+impl<S: BosStr> ShardEntryBuilder<shard_entry_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ShardEntryBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ShardEntryBuilder<St, S>
 where
     St: shard_entry_state::State,
     St::Checksum: shard_entry_state::IsUnset,
@@ -370,7 +406,7 @@ where
     pub fn checksum(
         mut self,
         value: impl Into<ShardChecksum<S>>,
-    ) -> ShardEntryBuilder<S, shard_entry_state::SetChecksum<St>> {
+    ) -> ShardEntryBuilder<shard_entry_state::SetChecksum<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ShardEntryBuilder {
             _state: PhantomData,
@@ -380,7 +416,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ShardEntryBuilder<S, St>
+impl<St, S: BosStr> ShardEntryBuilder<St, S>
 where
     St: shard_entry_state::State,
     St::Url: shard_entry_state::IsUnset,
@@ -389,7 +425,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ShardEntryBuilder<S, shard_entry_state::SetUrl<St>> {
+    ) -> ShardEntryBuilder<shard_entry_state::SetUrl<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ShardEntryBuilder {
             _state: PhantomData,
@@ -399,7 +435,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ShardEntryBuilder<S, St>
+impl<St, S: BosStr> ShardEntryBuilder<St, S>
 where
     St: shard_entry_state::State,
     St::Checksum: shard_entry_state::IsSet,
@@ -414,7 +450,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ShardEntry<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ShardEntry<S> {
         ShardEntry {
             checksum: self._fields.0.unwrap(),
             url: self._fields.1.unwrap(),

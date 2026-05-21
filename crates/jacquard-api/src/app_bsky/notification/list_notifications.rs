@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,18 +21,15 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::actor::ProfileView;
-use crate::app_bsky::notification::list_notifications;
-use crate::com_atproto::label::Label;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor::ProfileView;
+use crate::com_atproto::label::Label;
+use crate::app_bsky::notification::list_notifications;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListNotifications<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -48,11 +45,9 @@ pub struct ListNotifications<S: BosStr = DefaultStr> {
     pub seen_at: Option<Datetime>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListNotificationsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -65,11 +60,9 @@ pub struct ListNotificationsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Notification<S: BosStr = DefaultStr> {
     pub author: ProfileView<S>,
     pub cid: Cid<S>,
@@ -198,7 +191,9 @@ where
             NotificationReason::Mention => NotificationReason::Mention,
             NotificationReason::Reply => NotificationReason::Reply,
             NotificationReason::Quote => NotificationReason::Quote,
-            NotificationReason::StarterpackJoined => NotificationReason::StarterpackJoined,
+            NotificationReason::StarterpackJoined => {
+                NotificationReason::StarterpackJoined
+            }
             NotificationReason::Verified => NotificationReason::Verified,
             NotificationReason::Unverified => NotificationReason::Unverified,
             NotificationReason::LikeViaRepost => NotificationReason::LikeViaRepost,
@@ -255,7 +250,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_notifications_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -273,27 +268,34 @@ pub mod list_notifications_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListNotificationsBuilder<S: BosStr, St: list_notifications_state::State> {
+pub struct ListNotificationsBuilder<
+    St: list_notifications_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<i64>,
-        Option<bool>,
-        Option<Vec<S>>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<S>, Option<i64>, Option<bool>, Option<Vec<S>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListNotifications<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListNotificationsBuilder<S, list_notifications_state::Empty> {
+impl ListNotifications<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListNotificationsBuilder<
+        list_notifications_state::Empty,
+        DefaultStr,
+    > {
         ListNotificationsBuilder::new()
     }
 }
 
-impl<S: BosStr> ListNotificationsBuilder<S, list_notifications_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListNotifications<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListNotificationsBuilder<list_notifications_state::Empty, S> {
+        ListNotificationsBuilder::builder()
+    }
+}
+
+impl ListNotificationsBuilder<list_notifications_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListNotificationsBuilder {
             _state: PhantomData,
@@ -303,7 +305,18 @@ impl<S: BosStr> ListNotificationsBuilder<S, list_notifications_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S, St> {
+impl<S: BosStr> ListNotificationsBuilder<list_notifications_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListNotificationsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: list_notifications_state::State, S: BosStr> ListNotificationsBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -316,7 +329,7 @@ impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S,
     }
 }
 
-impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S, St> {
+impl<St: list_notifications_state::State, S: BosStr> ListNotificationsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -329,7 +342,7 @@ impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S,
     }
 }
 
-impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S, St> {
+impl<St: list_notifications_state::State, S: BosStr> ListNotificationsBuilder<St, S> {
     /// Set the `priority` field (optional)
     pub fn priority(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -342,7 +355,7 @@ impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S,
     }
 }
 
-impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S, St> {
+impl<St: list_notifications_state::State, S: BosStr> ListNotificationsBuilder<St, S> {
     /// Set the `reasons` field (optional)
     pub fn reasons(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -355,7 +368,7 @@ impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S,
     }
 }
 
-impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S, St> {
+impl<St: list_notifications_state::State, S: BosStr> ListNotificationsBuilder<St, S> {
     /// Set the `seenAt` field (optional)
     pub fn seen_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -368,7 +381,7 @@ impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S,
     }
 }
 
-impl<S: BosStr, St> ListNotificationsBuilder<S, St>
+impl<St, S: BosStr> ListNotificationsBuilder<St, S>
 where
     St: list_notifications_state::State,
 {
@@ -386,7 +399,7 @@ where
 
 pub mod notification_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -394,132 +407,132 @@ pub mod notification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Author;
         type Cid;
         type Reason;
-        type Record;
-        type Uri;
-        type IndexedAt;
         type IsRead;
+        type Author;
+        type Uri;
+        type Record;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Author = Unset;
         type Cid = Unset;
         type Reason = Unset;
-        type Record = Unset;
-        type Uri = Unset;
-        type IndexedAt = Unset;
         type IsRead = Unset;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAuthor<St> {}
-    impl<St: State> State for SetAuthor<St> {
-        type Author = Set<members::author>;
-        type Cid = St::Cid;
-        type Reason = St::Reason;
-        type Record = St::Record;
-        type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
-        type IsRead = St::IsRead;
+        type Author = Unset;
+        type Uri = Unset;
+        type Record = Unset;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Author = St::Author;
         type Cid = Set<members::cid>;
         type Reason = St::Reason;
-        type Record = St::Record;
-        type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
         type IsRead = St::IsRead;
+        type Author = St::Author;
+        type Uri = St::Uri;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetReason<St> {}
     impl<St: State> State for SetReason<St> {
-        type Author = St::Author;
         type Cid = St::Cid;
         type Reason = Set<members::reason>;
-        type Record = St::Record;
-        type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
         type IsRead = St::IsRead;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
         type Author = St::Author;
-        type Cid = St::Cid;
-        type Reason = St::Reason;
-        type Record = Set<members::record>;
         type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
-        type IsRead = St::IsRead;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Author = St::Author;
-        type Cid = St::Cid;
-        type Reason = St::Reason;
         type Record = St::Record;
-        type Uri = Set<members::uri>;
         type IndexedAt = St::IndexedAt;
-        type IsRead = St::IsRead;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
-        type Author = St::Author;
-        type Cid = St::Cid;
-        type Reason = St::Reason;
-        type Record = St::Record;
-        type Uri = St::Uri;
-        type IndexedAt = Set<members::indexed_at>;
-        type IsRead = St::IsRead;
     }
     ///State transition - sets the `is_read` field to Set
     pub struct SetIsRead<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIsRead<St> {}
     impl<St: State> State for SetIsRead<St> {
-        type Author = St::Author;
         type Cid = St::Cid;
         type Reason = St::Reason;
-        type Record = St::Record;
-        type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
         type IsRead = Set<members::is_read>;
+        type Author = St::Author;
+        type Uri = St::Uri;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthor<St> {}
+    impl<St: State> State for SetAuthor<St> {
+        type Cid = St::Cid;
+        type Reason = St::Reason;
+        type IsRead = St::IsRead;
+        type Author = Set<members::author>;
+        type Uri = St::Uri;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type Reason = St::Reason;
+        type IsRead = St::IsRead;
+        type Author = St::Author;
+        type Uri = Set<members::uri>;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Cid = St::Cid;
+        type Reason = St::Reason;
+        type IsRead = St::IsRead;
+        type Author = St::Author;
+        type Uri = St::Uri;
+        type Record = Set<members::record>;
+        type IndexedAt = St::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Cid = St::Cid;
+        type Reason = St::Reason;
+        type IsRead = St::IsRead;
+        type Author = St::Author;
+        type Uri = St::Uri;
+        type Record = St::Record;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `cid` field
         pub struct cid(());
         ///Marker type for the `reason` field
         pub struct reason(());
-        ///Marker type for the `record` field
-        pub struct record(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `is_read` field
         pub struct is_read(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NotificationBuilder<S: BosStr, St: notification_state::State> {
+pub struct NotificationBuilder<St: notification_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileView<S>>,
@@ -535,15 +548,22 @@ pub struct NotificationBuilder<S: BosStr, St: notification_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Notification<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> NotificationBuilder<S, notification_state::Empty> {
+impl Notification<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> NotificationBuilder<notification_state::Empty, DefaultStr> {
         NotificationBuilder::new()
     }
 }
 
-impl<S: BosStr> NotificationBuilder<S, notification_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Notification<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> NotificationBuilder<notification_state::Empty, S> {
+        NotificationBuilder::builder()
+    }
+}
+
+impl NotificationBuilder<notification_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         NotificationBuilder {
             _state: PhantomData,
@@ -553,7 +573,18 @@ impl<S: BosStr> NotificationBuilder<S, notification_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> NotificationBuilder<S, St>
+impl<S: BosStr> NotificationBuilder<notification_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        NotificationBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> NotificationBuilder<St, S>
 where
     St: notification_state::State,
     St::Author: notification_state::IsUnset,
@@ -562,7 +593,7 @@ where
     pub fn author(
         mut self,
         value: impl Into<ProfileView<S>>,
-    ) -> NotificationBuilder<S, notification_state::SetAuthor<St>> {
+    ) -> NotificationBuilder<notification_state::SetAuthor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         NotificationBuilder {
             _state: PhantomData,
@@ -572,7 +603,7 @@ where
     }
 }
 
-impl<S: BosStr, St> NotificationBuilder<S, St>
+impl<St, S: BosStr> NotificationBuilder<St, S>
 where
     St: notification_state::State,
     St::Cid: notification_state::IsUnset,
@@ -581,7 +612,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> NotificationBuilder<S, notification_state::SetCid<St>> {
+    ) -> NotificationBuilder<notification_state::SetCid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         NotificationBuilder {
             _state: PhantomData,
@@ -591,7 +622,7 @@ where
     }
 }
 
-impl<S: BosStr, St> NotificationBuilder<S, St>
+impl<St, S: BosStr> NotificationBuilder<St, S>
 where
     St: notification_state::State,
     St::IndexedAt: notification_state::IsUnset,
@@ -600,7 +631,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> NotificationBuilder<S, notification_state::SetIndexedAt<St>> {
+    ) -> NotificationBuilder<notification_state::SetIndexedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         NotificationBuilder {
             _state: PhantomData,
@@ -610,7 +641,7 @@ where
     }
 }
 
-impl<S: BosStr, St> NotificationBuilder<S, St>
+impl<St, S: BosStr> NotificationBuilder<St, S>
 where
     St: notification_state::State,
     St::IsRead: notification_state::IsUnset,
@@ -619,7 +650,7 @@ where
     pub fn is_read(
         mut self,
         value: impl Into<bool>,
-    ) -> NotificationBuilder<S, notification_state::SetIsRead<St>> {
+    ) -> NotificationBuilder<notification_state::SetIsRead<St>, S> {
         self._fields.3 = Option::Some(value.into());
         NotificationBuilder {
             _state: PhantomData,
@@ -629,7 +660,7 @@ where
     }
 }
 
-impl<S: BosStr, St: notification_state::State> NotificationBuilder<S, St> {
+impl<St: notification_state::State, S: BosStr> NotificationBuilder<St, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -642,7 +673,7 @@ impl<S: BosStr, St: notification_state::State> NotificationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> NotificationBuilder<S, St>
+impl<St, S: BosStr> NotificationBuilder<St, S>
 where
     St: notification_state::State,
     St::Reason: notification_state::IsUnset,
@@ -651,7 +682,7 @@ where
     pub fn reason(
         mut self,
         value: impl Into<NotificationReason<S>>,
-    ) -> NotificationBuilder<S, notification_state::SetReason<St>> {
+    ) -> NotificationBuilder<notification_state::SetReason<St>, S> {
         self._fields.5 = Option::Some(value.into());
         NotificationBuilder {
             _state: PhantomData,
@@ -661,7 +692,7 @@ where
     }
 }
 
-impl<S: BosStr, St: notification_state::State> NotificationBuilder<S, St> {
+impl<St: notification_state::State, S: BosStr> NotificationBuilder<St, S> {
     /// Set the `reasonSubject` field (optional)
     pub fn reason_subject(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -674,7 +705,7 @@ impl<S: BosStr, St: notification_state::State> NotificationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> NotificationBuilder<S, St>
+impl<St, S: BosStr> NotificationBuilder<St, S>
 where
     St: notification_state::State,
     St::Record: notification_state::IsUnset,
@@ -683,7 +714,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> NotificationBuilder<S, notification_state::SetRecord<St>> {
+    ) -> NotificationBuilder<notification_state::SetRecord<St>, S> {
         self._fields.7 = Option::Some(value.into());
         NotificationBuilder {
             _state: PhantomData,
@@ -693,7 +724,7 @@ where
     }
 }
 
-impl<S: BosStr, St> NotificationBuilder<S, St>
+impl<St, S: BosStr> NotificationBuilder<St, S>
 where
     St: notification_state::State,
     St::Uri: notification_state::IsUnset,
@@ -702,7 +733,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> NotificationBuilder<S, notification_state::SetUri<St>> {
+    ) -> NotificationBuilder<notification_state::SetUri<St>, S> {
         self._fields.8 = Option::Some(value.into());
         NotificationBuilder {
             _state: PhantomData,
@@ -712,16 +743,16 @@ where
     }
 }
 
-impl<S: BosStr, St> NotificationBuilder<S, St>
+impl<St, S: BosStr> NotificationBuilder<St, S>
 where
     St: notification_state::State,
-    St::Author: notification_state::IsSet,
     St::Cid: notification_state::IsSet,
     St::Reason: notification_state::IsSet,
-    St::Record: notification_state::IsSet,
-    St::Uri: notification_state::IsSet,
-    St::IndexedAt: notification_state::IsSet,
     St::IsRead: notification_state::IsSet,
+    St::Author: notification_state::IsSet,
+    St::Uri: notification_state::IsSet,
+    St::Record: notification_state::IsSet,
+    St::IndexedAt: notification_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Notification<S> {
@@ -739,7 +770,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Notification<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Notification<S> {
         Notification {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -756,10 +790,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_notification_listNotifications() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.notification.listNotifications"),

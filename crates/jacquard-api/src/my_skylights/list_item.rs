@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,12 +21,12 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::my_skylights::Item;
 use crate::my_skylights::list::List;
 use crate::my_skylights::list_item;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// User gave up on finishing the item
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
@@ -37,17 +37,16 @@ impl core::fmt::Display for Abandoned {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Builtin<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<BuiltinType<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -75,11 +74,9 @@ impl core::fmt::Display for InProgress {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListItem<S: BosStr = DefaultStr> {
     pub added_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -91,6 +88,7 @@ pub struct ListItem<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -163,10 +161,10 @@ impl<S: BosStr> LexiconSchema for ListItem<S> {
 }
 
 fn lexicon_doc_my_skylights_listItem() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("my.skylights.listItem"),
@@ -174,9 +172,7 @@ fn lexicon_doc_my_skylights_listItem() -> LexiconDoc<'static> {
             let mut map = BTreeMap::new();
             map.insert(
                 SmolStr::new_static("abandoned"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("builtin"),
@@ -192,7 +188,7 @@ fn lexicon_doc_my_skylights_listItem() -> LexiconDoc<'static> {
                                     CowStr::new_static("my.skylights.listItem#queue"),
                                     CowStr::new_static("my.skylights.listItem#abandoned"),
                                     CowStr::new_static("my.skylights.listItem#owned"),
-                                    CowStr::new_static("my.skylights.listItem#wishlist"),
+                                    CowStr::new_static("my.skylights.listItem#wishlist")
                                 ],
                                 ..Default::default()
                             }),
@@ -204,18 +200,17 @@ fn lexicon_doc_my_skylights_listItem() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("inProgress"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("list"),
-                        SmolStr::new_static("addedAt"),
-                        SmolStr::new_static("position"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("list"), SmolStr::new_static("addedAt"),
+                            SmolStr::new_static("position")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -238,22 +233,18 @@ fn lexicon_doc_my_skylights_listItem() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("my.skylights.list"),
-                                    CowStr::new_static("#builtin"),
+                                    CowStr::new_static("#builtin")
                                 ],
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("note"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("position"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -262,21 +253,15 @@ fn lexicon_doc_my_skylights_listItem() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("owned"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("queue"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("wishlist"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map
         },
@@ -286,7 +271,7 @@ fn lexicon_doc_my_skylights_listItem() -> LexiconDoc<'static> {
 
 pub mod list_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -294,56 +279,56 @@ pub mod list_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type List;
         type AddedAt;
         type Position;
+        type List;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type List = Unset;
         type AddedAt = Unset;
         type Position = Unset;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetList<St> {}
-    impl<St: State> State for SetList<St> {
-        type List = Set<members::list>;
-        type AddedAt = St::AddedAt;
-        type Position = St::Position;
+        type List = Unset;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAddedAt<St> {}
     impl<St: State> State for SetAddedAt<St> {
-        type List = St::List;
         type AddedAt = Set<members::added_at>;
         type Position = St::Position;
+        type List = St::List;
     }
     ///State transition - sets the `position` field to Set
     pub struct SetPosition<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPosition<St> {}
     impl<St: State> State for SetPosition<St> {
-        type List = St::List;
         type AddedAt = St::AddedAt;
         type Position = Set<members::position>;
+        type List = St::List;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetList<St> {}
+    impl<St: State> State for SetList<St> {
+        type AddedAt = St::AddedAt;
+        type Position = St::Position;
+        type List = Set<members::list>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `list` field
-        pub struct list(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
         ///Marker type for the `position` field
         pub struct position(());
+        ///Marker type for the `list` field
+        pub struct list(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListItemBuilder<S: BosStr, St: list_item_state::State> {
+pub struct ListItemBuilder<St: list_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -355,15 +340,22 @@ pub struct ListItemBuilder<S: BosStr, St: list_item_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListItemBuilder<S, list_item_state::Empty> {
+impl ListItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListItemBuilder<list_item_state::Empty, DefaultStr> {
         ListItemBuilder::new()
     }
 }
 
-impl<S: BosStr> ListItemBuilder<S, list_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListItemBuilder<list_item_state::Empty, S> {
+        ListItemBuilder::builder()
+    }
+}
+
+impl ListItemBuilder<list_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListItemBuilder {
             _state: PhantomData,
@@ -373,7 +365,18 @@ impl<S: BosStr> ListItemBuilder<S, list_item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ListItemBuilder<S, St>
+impl<S: BosStr> ListItemBuilder<list_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ListItemBuilder<St, S>
 where
     St: list_item_state::State,
     St::AddedAt: list_item_state::IsUnset,
@@ -382,7 +385,7 @@ where
     pub fn added_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ListItemBuilder<S, list_item_state::SetAddedAt<St>> {
+    ) -> ListItemBuilder<list_item_state::SetAddedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ListItemBuilder {
             _state: PhantomData,
@@ -392,7 +395,7 @@ where
     }
 }
 
-impl<S: BosStr, St: list_item_state::State> ListItemBuilder<S, St> {
+impl<St: list_item_state::State, S: BosStr> ListItemBuilder<St, S> {
     /// Set the `item` field (optional)
     pub fn item(mut self, value: impl Into<Option<Item<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -405,7 +408,7 @@ impl<S: BosStr, St: list_item_state::State> ListItemBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListItemBuilder<S, St>
+impl<St, S: BosStr> ListItemBuilder<St, S>
 where
     St: list_item_state::State,
     St::List: list_item_state::IsUnset,
@@ -414,7 +417,7 @@ where
     pub fn list(
         mut self,
         value: impl Into<ListItemList<S>>,
-    ) -> ListItemBuilder<S, list_item_state::SetList<St>> {
+    ) -> ListItemBuilder<list_item_state::SetList<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ListItemBuilder {
             _state: PhantomData,
@@ -424,7 +427,7 @@ where
     }
 }
 
-impl<S: BosStr, St: list_item_state::State> ListItemBuilder<S, St> {
+impl<St: list_item_state::State, S: BosStr> ListItemBuilder<St, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -437,7 +440,7 @@ impl<S: BosStr, St: list_item_state::State> ListItemBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListItemBuilder<S, St>
+impl<St, S: BosStr> ListItemBuilder<St, S>
 where
     St: list_item_state::State,
     St::Position: list_item_state::IsUnset,
@@ -446,7 +449,7 @@ where
     pub fn position(
         mut self,
         value: impl Into<S>,
-    ) -> ListItemBuilder<S, list_item_state::SetPosition<St>> {
+    ) -> ListItemBuilder<list_item_state::SetPosition<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ListItemBuilder {
             _state: PhantomData,
@@ -456,12 +459,12 @@ where
     }
 }
 
-impl<S: BosStr, St> ListItemBuilder<S, St>
+impl<St, S: BosStr> ListItemBuilder<St, S>
 where
     St: list_item_state::State,
-    St::List: list_item_state::IsSet,
     St::AddedAt: list_item_state::IsSet,
     St::Position: list_item_state::IsSet,
+    St::List: list_item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ListItem<S> {

@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Missing<S: BosStr = DefaultStr> {
     ///Path segments identifying what is missing
     pub path: Vec<S>,
@@ -29,11 +26,9 @@ pub struct Missing<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MissingOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -52,8 +47,9 @@ impl jacquard_common::xrpc::XrpcResp for MissingResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Missing<S> {
     const NSID: &'static str = "at.inlay.Missing";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = MissingResponse;
 }
 
@@ -61,15 +57,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Missing<S> {
 pub struct MissingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MissingRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Missing";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Missing<S>;
     type Response = MissingResponse;
 }
 
 pub mod missing_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -100,21 +97,28 @@ pub mod missing_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MissingBuilder<S: BosStr, St: missing_state::State> {
+pub struct MissingBuilder<St: missing_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Missing<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MissingBuilder<S, missing_state::Empty> {
+impl Missing<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MissingBuilder<missing_state::Empty, DefaultStr> {
         MissingBuilder::new()
     }
 }
 
-impl<S: BosStr> MissingBuilder<S, missing_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Missing<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MissingBuilder<missing_state::Empty, S> {
+        MissingBuilder::builder()
+    }
+}
+
+impl MissingBuilder<missing_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MissingBuilder {
             _state: PhantomData,
@@ -124,7 +128,18 @@ impl<S: BosStr> MissingBuilder<S, missing_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MissingBuilder<S, St>
+impl<S: BosStr> MissingBuilder<missing_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MissingBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MissingBuilder<St, S>
 where
     St: missing_state::State,
     St::Path: missing_state::IsUnset,
@@ -133,7 +148,7 @@ where
     pub fn path(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> MissingBuilder<S, missing_state::SetPath<St>> {
+    ) -> MissingBuilder<missing_state::SetPath<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MissingBuilder {
             _state: PhantomData,
@@ -143,7 +158,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MissingBuilder<S, St>
+impl<St, S: BosStr> MissingBuilder<St, S>
 where
     St: missing_state::State,
     St::Path: missing_state::IsSet,

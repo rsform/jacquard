@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,16 +20,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::fyi_questionable::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::fyi_questionable::richtext::facet::Facet;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Header<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
@@ -100,7 +97,7 @@ impl<S: BosStr> LexiconSchema for Header<S> {
 
 pub mod header_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -143,21 +140,28 @@ pub mod header_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HeaderBuilder<S: BosStr, St: header_state::State> {
+pub struct HeaderBuilder<St: header_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Facet<S>>>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Header<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> HeaderBuilder<S, header_state::Empty> {
+impl Header<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> HeaderBuilder<header_state::Empty, DefaultStr> {
         HeaderBuilder::new()
     }
 }
 
-impl<S: BosStr> HeaderBuilder<S, header_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Header<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> HeaderBuilder<header_state::Empty, S> {
+        HeaderBuilder::builder()
+    }
+}
+
+impl HeaderBuilder<header_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         HeaderBuilder {
             _state: PhantomData,
@@ -167,7 +171,18 @@ impl<S: BosStr> HeaderBuilder<S, header_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: header_state::State> HeaderBuilder<S, St> {
+impl<S: BosStr> HeaderBuilder<header_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        HeaderBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: header_state::State, S: BosStr> HeaderBuilder<St, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -180,13 +195,16 @@ impl<S: BosStr, St: header_state::State> HeaderBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> HeaderBuilder<S, St>
+impl<St, S: BosStr> HeaderBuilder<St, S>
 where
     St: header_state::State,
     St::Level: header_state::IsUnset,
 {
     /// Set the `level` field (required)
-    pub fn level(mut self, value: impl Into<i64>) -> HeaderBuilder<S, header_state::SetLevel<St>> {
+    pub fn level(
+        mut self,
+        value: impl Into<i64>,
+    ) -> HeaderBuilder<header_state::SetLevel<St>, S> {
         self._fields.1 = Option::Some(value.into());
         HeaderBuilder {
             _state: PhantomData,
@@ -196,7 +214,7 @@ where
     }
 }
 
-impl<S: BosStr, St> HeaderBuilder<S, St>
+impl<St, S: BosStr> HeaderBuilder<St, S>
 where
     St: header_state::State,
     St::Plaintext: header_state::IsUnset,
@@ -205,7 +223,7 @@ where
     pub fn plaintext(
         mut self,
         value: impl Into<S>,
-    ) -> HeaderBuilder<S, header_state::SetPlaintext<St>> {
+    ) -> HeaderBuilder<header_state::SetPlaintext<St>, S> {
         self._fields.2 = Option::Some(value.into());
         HeaderBuilder {
             _state: PhantomData,
@@ -215,7 +233,7 @@ where
     }
 }
 
-impl<S: BosStr, St> HeaderBuilder<S, St>
+impl<St, S: BosStr> HeaderBuilder<St, S>
 where
     St: header_state::State,
     St::Plaintext: header_state::IsSet,
@@ -242,10 +260,10 @@ where
 }
 
 fn lexicon_doc_fyi_questionable_richtext_header() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fyi.questionable.richtext.header"),
@@ -254,10 +272,12 @@ fn lexicon_doc_fyi_questionable_richtext_header() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("plaintext"),
-                        SmolStr::new_static("level"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("plaintext"),
+                            SmolStr::new_static("level")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -265,7 +285,9 @@ fn lexicon_doc_fyi_questionable_richtext_header() -> LexiconDoc<'static> {
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
                                 items: LexArrayItem::Ref(LexRef {
-                                    r#ref: CowStr::new_static("fyi.questionable.richtext.facet"),
+                                    r#ref: CowStr::new_static(
+                                        "fyi.questionable.richtext.facet",
+                                    ),
                                     ..Default::default()
                                 }),
                                 ..Default::default()

@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GoogleCallback<S: BosStr = DefaultStr> {
     pub code: S,
     pub state: S,
@@ -52,7 +49,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GoogleCallbackRequest {
 
 pub mod google_callback_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,21 +92,31 @@ pub mod google_callback_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GoogleCallbackBuilder<S: BosStr, St: google_callback_state::State> {
+pub struct GoogleCallbackBuilder<
+    St: google_callback_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GoogleCallback<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GoogleCallbackBuilder<S, google_callback_state::Empty> {
+impl GoogleCallback<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GoogleCallbackBuilder<google_callback_state::Empty, DefaultStr> {
         GoogleCallbackBuilder::new()
     }
 }
 
-impl<S: BosStr> GoogleCallbackBuilder<S, google_callback_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GoogleCallback<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GoogleCallbackBuilder<google_callback_state::Empty, S> {
+        GoogleCallbackBuilder::builder()
+    }
+}
+
+impl GoogleCallbackBuilder<google_callback_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GoogleCallbackBuilder {
             _state: PhantomData,
@@ -119,7 +126,18 @@ impl<S: BosStr> GoogleCallbackBuilder<S, google_callback_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GoogleCallbackBuilder<S, St>
+impl<S: BosStr> GoogleCallbackBuilder<google_callback_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GoogleCallbackBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GoogleCallbackBuilder<St, S>
 where
     St: google_callback_state::State,
     St::Code: google_callback_state::IsUnset,
@@ -128,7 +146,7 @@ where
     pub fn code(
         mut self,
         value: impl Into<S>,
-    ) -> GoogleCallbackBuilder<S, google_callback_state::SetCode<St>> {
+    ) -> GoogleCallbackBuilder<google_callback_state::SetCode<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GoogleCallbackBuilder {
             _state: PhantomData,
@@ -138,7 +156,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GoogleCallbackBuilder<S, St>
+impl<St, S: BosStr> GoogleCallbackBuilder<St, S>
 where
     St: google_callback_state::State,
     St::State: google_callback_state::IsUnset,
@@ -147,7 +165,7 @@ where
     pub fn state(
         mut self,
         value: impl Into<S>,
-    ) -> GoogleCallbackBuilder<S, google_callback_state::SetState<St>> {
+    ) -> GoogleCallbackBuilder<google_callback_state::SetState<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GoogleCallbackBuilder {
             _state: PhantomData,
@@ -157,7 +175,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GoogleCallbackBuilder<S, St>
+impl<St, S: BosStr> GoogleCallbackBuilder<St, S>
 where
     St: google_callback_state::State,
     St::Code: google_callback_state::IsSet,

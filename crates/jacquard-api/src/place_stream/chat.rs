@@ -9,6 +9,7 @@ pub mod gate;
 pub mod message;
 pub mod profile;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -25,18 +26,15 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::actor::ProfileViewBasic;
-use crate::place_stream::chat;
-use crate::place_stream::chat::profile::Profile;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor::ProfileViewBasic;
+use crate::place_stream::chat::profile::Profile;
+use crate::place_stream::chat;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageView<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,6 +51,7 @@ pub struct MessageView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[jacquard_derive::open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -79,7 +78,7 @@ impl<S: BosStr> LexiconSchema for MessageView<S> {
 
 pub mod message_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -87,90 +86,90 @@ pub mod message_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
+        type Record;
         type Author;
         type IndexedAt;
         type Cid;
-        type Record;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
+        type Record = Unset;
         type Author = Unset;
         type IndexedAt = Unset;
         type Cid = Unset;
-        type Record = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Author = St::Author;
-        type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
-        type Record = St::Record;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAuthor<St> {}
-    impl<St: State> State for SetAuthor<St> {
-        type Uri = St::Uri;
-        type Author = Set<members::author>;
-        type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
-        type Record = St::Record;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
-        type Uri = St::Uri;
-        type Author = St::Author;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = St::Cid;
-        type Record = St::Record;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
-        type Author = St::Author;
-        type IndexedAt = St::IndexedAt;
-        type Cid = Set<members::cid>;
-        type Record = St::Record;
+        type Uri = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecord<St> {}
     impl<St: State> State for SetRecord<St> {
-        type Uri = St::Uri;
+        type Record = Set<members::record>;
         type Author = St::Author;
         type IndexedAt = St::IndexedAt;
         type Cid = St::Cid;
-        type Record = Set<members::record>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthor<St> {}
+    impl<St: State> State for SetAuthor<St> {
+        type Record = St::Record;
+        type Author = Set<members::author>;
+        type IndexedAt = St::IndexedAt;
+        type Cid = St::Cid;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Record = St::Record;
+        type Author = St::Author;
+        type IndexedAt = Set<members::indexed_at>;
+        type Cid = St::Cid;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Record = St::Record;
+        type Author = St::Author;
+        type IndexedAt = St::IndexedAt;
+        type Cid = Set<members::cid>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Record = St::Record;
+        type Author = St::Author;
+        type IndexedAt = St::IndexedAt;
+        type Cid = St::Cid;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `author` field
         pub struct author(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `record` field
-        pub struct record(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MessageViewBuilder<S: BosStr, St: message_view_state::State> {
+pub struct MessageViewBuilder<St: message_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileViewBasic<S>>,
@@ -185,15 +184,22 @@ pub struct MessageViewBuilder<S: BosStr, St: message_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> MessageView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MessageViewBuilder<S, message_view_state::Empty> {
+impl MessageView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MessageViewBuilder<message_view_state::Empty, DefaultStr> {
         MessageViewBuilder::new()
     }
 }
 
-impl<S: BosStr> MessageViewBuilder<S, message_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> MessageView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MessageViewBuilder<message_view_state::Empty, S> {
+        MessageViewBuilder::builder()
+    }
+}
+
+impl MessageViewBuilder<message_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MessageViewBuilder {
             _state: PhantomData,
@@ -203,7 +209,18 @@ impl<S: BosStr> MessageViewBuilder<S, message_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MessageViewBuilder<S, St>
+impl<S: BosStr> MessageViewBuilder<message_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MessageViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MessageViewBuilder<St, S>
 where
     St: message_view_state::State,
     St::Author: message_view_state::IsUnset,
@@ -212,7 +229,7 @@ where
     pub fn author(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> MessageViewBuilder<S, message_view_state::SetAuthor<St>> {
+    ) -> MessageViewBuilder<message_view_state::SetAuthor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
@@ -222,7 +239,7 @@ where
     }
 }
 
-impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
+impl<St: message_view_state::State, S: BosStr> MessageViewBuilder<St, S> {
     /// Set the `chatProfile` field (optional)
     pub fn chat_profile(mut self, value: impl Into<Option<Profile<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -235,7 +252,7 @@ impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MessageViewBuilder<S, St>
+impl<St, S: BosStr> MessageViewBuilder<St, S>
 where
     St: message_view_state::State,
     St::Cid: message_view_state::IsUnset,
@@ -244,7 +261,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> MessageViewBuilder<S, message_view_state::SetCid<St>> {
+    ) -> MessageViewBuilder<message_view_state::SetCid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
@@ -254,7 +271,7 @@ where
     }
 }
 
-impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
+impl<St: message_view_state::State, S: BosStr> MessageViewBuilder<St, S> {
     /// Set the `deleted` field (optional)
     pub fn deleted(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -267,7 +284,7 @@ impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MessageViewBuilder<S, St>
+impl<St, S: BosStr> MessageViewBuilder<St, S>
 where
     St: message_view_state::State,
     St::IndexedAt: message_view_state::IsUnset,
@@ -276,7 +293,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MessageViewBuilder<S, message_view_state::SetIndexedAt<St>> {
+    ) -> MessageViewBuilder<message_view_state::SetIndexedAt<St>, S> {
         self._fields.4 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
@@ -286,7 +303,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageViewBuilder<S, St>
+impl<St, S: BosStr> MessageViewBuilder<St, S>
 where
     St: message_view_state::State,
     St::Record: message_view_state::IsUnset,
@@ -295,7 +312,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> MessageViewBuilder<S, message_view_state::SetRecord<St>> {
+    ) -> MessageViewBuilder<message_view_state::SetRecord<St>, S> {
         self._fields.5 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
@@ -305,7 +322,7 @@ where
     }
 }
 
-impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
+impl<St: message_view_state::State, S: BosStr> MessageViewBuilder<St, S> {
     /// Set the `replyTo` field (optional)
     pub fn reply_to(mut self, value: impl Into<Option<MessageViewReplyTo<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -318,7 +335,7 @@ impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MessageViewBuilder<S, St>
+impl<St, S: BosStr> MessageViewBuilder<St, S>
 where
     St: message_view_state::State,
     St::Uri: message_view_state::IsUnset,
@@ -327,7 +344,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> MessageViewBuilder<S, message_view_state::SetUri<St>> {
+    ) -> MessageViewBuilder<message_view_state::SetUri<St>, S> {
         self._fields.7 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
@@ -337,14 +354,14 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageViewBuilder<S, St>
+impl<St, S: BosStr> MessageViewBuilder<St, S>
 where
     St: message_view_state::State,
-    St::Uri: message_view_state::IsSet,
+    St::Record: message_view_state::IsSet,
     St::Author: message_view_state::IsSet,
     St::IndexedAt: message_view_state::IsSet,
     St::Cid: message_view_state::IsSet,
-    St::Record: message_view_state::IsSet,
+    St::Uri: message_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MessageView<S> {
@@ -361,7 +378,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MessageView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MessageView<S> {
         MessageView {
             author: self._fields.0.unwrap(),
             chat_profile: self._fields.1,
@@ -377,10 +397,10 @@ where
 }
 
 fn lexicon_doc_place_stream_chat_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.chat.defs"),
@@ -389,20 +409,22 @@ fn lexicon_doc_place_stream_chat_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("messageView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("author"),
-                        SmolStr::new_static("record"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("author"), SmolStr::new_static("record"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );

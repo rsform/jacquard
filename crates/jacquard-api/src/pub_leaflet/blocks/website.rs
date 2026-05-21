@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,13 +24,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Website<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -70,16 +67,19 @@ impl<S: BosStr> LexiconSchema for Website<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("preview_image"),
@@ -95,7 +95,7 @@ impl<S: BosStr> LexiconSchema for Website<S> {
 
 pub mod website_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -126,26 +126,28 @@ pub mod website_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WebsiteBuilder<S: BosStr, St: website_state::State> {
+pub struct WebsiteBuilder<St: website_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<BlobRef<S>>,
-        Option<UriValue<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<S>, Option<BlobRef<S>>, Option<UriValue<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Website<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> WebsiteBuilder<S, website_state::Empty> {
+impl Website<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> WebsiteBuilder<website_state::Empty, DefaultStr> {
         WebsiteBuilder::new()
     }
 }
 
-impl<S: BosStr> WebsiteBuilder<S, website_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Website<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> WebsiteBuilder<website_state::Empty, S> {
+        WebsiteBuilder::builder()
+    }
+}
+
+impl WebsiteBuilder<website_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         WebsiteBuilder {
             _state: PhantomData,
@@ -155,7 +157,18 @@ impl<S: BosStr> WebsiteBuilder<S, website_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: website_state::State> WebsiteBuilder<S, St> {
+impl<S: BosStr> WebsiteBuilder<website_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        WebsiteBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: website_state::State, S: BosStr> WebsiteBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -168,7 +181,7 @@ impl<S: BosStr, St: website_state::State> WebsiteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: website_state::State> WebsiteBuilder<S, St> {
+impl<St: website_state::State, S: BosStr> WebsiteBuilder<St, S> {
     /// Set the `previewImage` field (optional)
     pub fn preview_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -181,7 +194,7 @@ impl<S: BosStr, St: website_state::State> WebsiteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WebsiteBuilder<S, St>
+impl<St, S: BosStr> WebsiteBuilder<St, S>
 where
     St: website_state::State,
     St::Src: website_state::IsUnset,
@@ -190,7 +203,7 @@ where
     pub fn src(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> WebsiteBuilder<S, website_state::SetSrc<St>> {
+    ) -> WebsiteBuilder<website_state::SetSrc<St>, S> {
         self._fields.2 = Option::Some(value.into());
         WebsiteBuilder {
             _state: PhantomData,
@@ -200,7 +213,7 @@ where
     }
 }
 
-impl<S: BosStr, St: website_state::State> WebsiteBuilder<S, St> {
+impl<St: website_state::State, S: BosStr> WebsiteBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -213,7 +226,7 @@ impl<S: BosStr, St: website_state::State> WebsiteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WebsiteBuilder<S, St>
+impl<St, S: BosStr> WebsiteBuilder<St, S>
 where
     St: website_state::State,
     St::Src: website_state::IsSet,
@@ -241,10 +254,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_blocks_website() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.blocks.website"),
@@ -259,15 +272,11 @@ fn lexicon_doc_pub_leaflet_blocks_website() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("description"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("previewImage"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("src"),
@@ -278,9 +287,7 @@ fn lexicon_doc_pub_leaflet_blocks_website() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("title"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },

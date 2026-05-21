@@ -8,33 +8,28 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::EntryView;
-use crate::sh_weaver::notebook::NotebookView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::EntryView;
+use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveEntry<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     pub entry: S,
     pub notebook: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveEntryOutput<S: BosStr = DefaultStr> {
     pub entry: EntryView<S>,
     pub notebook_count: i64,
@@ -45,9 +40,18 @@ pub struct ResolveEntryOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ResolveEntryError {
     #[serde(rename = "NotebookNotFound")]
@@ -56,10 +60,7 @@ pub enum ResolveEntryError {
     EntryNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ResolveEntryError {
@@ -116,7 +117,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ResolveEntryRequest {
 
 pub mod resolve_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -173,21 +174,28 @@ pub mod resolve_entry_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ResolveEntryBuilder<S: BosStr, St: resolve_entry_state::State> {
+pub struct ResolveEntryBuilder<St: resolve_entry_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ResolveEntry<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ResolveEntryBuilder<S, resolve_entry_state::Empty> {
+impl ResolveEntry<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ResolveEntryBuilder<resolve_entry_state::Empty, DefaultStr> {
         ResolveEntryBuilder::new()
     }
 }
 
-impl<S: BosStr> ResolveEntryBuilder<S, resolve_entry_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ResolveEntry<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ResolveEntryBuilder<resolve_entry_state::Empty, S> {
+        ResolveEntryBuilder::builder()
+    }
+}
+
+impl ResolveEntryBuilder<resolve_entry_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ResolveEntryBuilder {
             _state: PhantomData,
@@ -197,7 +205,18 @@ impl<S: BosStr> ResolveEntryBuilder<S, resolve_entry_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ResolveEntryBuilder<S, St>
+impl<S: BosStr> ResolveEntryBuilder<resolve_entry_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ResolveEntryBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ResolveEntryBuilder<St, S>
 where
     St: resolve_entry_state::State,
     St::Actor: resolve_entry_state::IsUnset,
@@ -206,7 +225,7 @@ where
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> ResolveEntryBuilder<S, resolve_entry_state::SetActor<St>> {
+    ) -> ResolveEntryBuilder<resolve_entry_state::SetActor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ResolveEntryBuilder {
             _state: PhantomData,
@@ -216,7 +235,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ResolveEntryBuilder<S, St>
+impl<St, S: BosStr> ResolveEntryBuilder<St, S>
 where
     St: resolve_entry_state::State,
     St::Entry: resolve_entry_state::IsUnset,
@@ -225,7 +244,7 @@ where
     pub fn entry(
         mut self,
         value: impl Into<S>,
-    ) -> ResolveEntryBuilder<S, resolve_entry_state::SetEntry<St>> {
+    ) -> ResolveEntryBuilder<resolve_entry_state::SetEntry<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ResolveEntryBuilder {
             _state: PhantomData,
@@ -235,7 +254,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ResolveEntryBuilder<S, St>
+impl<St, S: BosStr> ResolveEntryBuilder<St, S>
 where
     St: resolve_entry_state::State,
     St::Notebook: resolve_entry_state::IsUnset,
@@ -244,7 +263,7 @@ where
     pub fn notebook(
         mut self,
         value: impl Into<S>,
-    ) -> ResolveEntryBuilder<S, resolve_entry_state::SetNotebook<St>> {
+    ) -> ResolveEntryBuilder<resolve_entry_state::SetNotebook<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ResolveEntryBuilder {
             _state: PhantomData,
@@ -254,7 +273,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ResolveEntryBuilder<S, St>
+impl<St, S: BosStr> ResolveEntryBuilder<St, S>
 where
     St: resolve_entry_state::State,
     St::Entry: resolve_entry_state::IsSet,

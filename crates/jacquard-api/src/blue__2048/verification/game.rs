@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blue__2048::verification::VerificationRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blue__2048::verification::VerificationRef;
 /// A record that holds a verification of a game record saying the owner of the repo has verified that it is a valid game played.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -108,7 +108,7 @@ impl<S: BosStr> LexiconSchema for Game<S> {
 
 pub mod game_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -126,21 +126,28 @@ pub mod game_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GameBuilder<S: BosStr, St: game_state::State> {
+pub struct GameBuilder<St: game_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<VerificationRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Game<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GameBuilder<S, game_state::Empty> {
+impl Game<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GameBuilder<game_state::Empty, DefaultStr> {
         GameBuilder::new()
     }
 }
 
-impl<S: BosStr> GameBuilder<S, game_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Game<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GameBuilder<game_state::Empty, S> {
+        GameBuilder::builder()
+    }
+}
+
+impl GameBuilder<game_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GameBuilder {
             _state: PhantomData,
@@ -150,7 +157,18 @@ impl<S: BosStr> GameBuilder<S, game_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<S: BosStr> GameBuilder<game_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GameBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -163,7 +181,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `verifiedRef` field (optional)
     pub fn verified_ref(mut self, value: impl Into<Option<VerificationRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -176,7 +194,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GameBuilder<S, St>
+impl<St, S: BosStr> GameBuilder<St, S>
 where
     St: game_state::State,
 {
@@ -199,10 +217,10 @@ where
 }
 
 fn lexicon_doc_blue_2048_verification_game() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.2048.verification.game"),

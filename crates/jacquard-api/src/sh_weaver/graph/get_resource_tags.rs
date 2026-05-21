@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::graph::ResourceTagsView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::graph::ResourceTagsView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetResourceTags<S: BosStr = DefaultStr> {
     pub resource: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetResourceTagsOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: ResourceTagsView<S>,
@@ -65,7 +60,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetResourceTagsRequest {
 
 pub mod get_resource_tags_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -96,21 +91,31 @@ pub mod get_resource_tags_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetResourceTagsBuilder<S: BosStr, St: get_resource_tags_state::State> {
+pub struct GetResourceTagsBuilder<
+    St: get_resource_tags_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetResourceTags<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetResourceTagsBuilder<S, get_resource_tags_state::Empty> {
+impl GetResourceTags<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetResourceTagsBuilder<get_resource_tags_state::Empty, DefaultStr> {
         GetResourceTagsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetResourceTagsBuilder<S, get_resource_tags_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetResourceTags<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetResourceTagsBuilder<get_resource_tags_state::Empty, S> {
+        GetResourceTagsBuilder::builder()
+    }
+}
+
+impl GetResourceTagsBuilder<get_resource_tags_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetResourceTagsBuilder {
             _state: PhantomData,
@@ -120,7 +125,18 @@ impl<S: BosStr> GetResourceTagsBuilder<S, get_resource_tags_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetResourceTagsBuilder<S, St>
+impl<S: BosStr> GetResourceTagsBuilder<get_resource_tags_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetResourceTagsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetResourceTagsBuilder<St, S>
 where
     St: get_resource_tags_state::State,
     St::Resource: get_resource_tags_state::IsUnset,
@@ -129,7 +145,7 @@ where
     pub fn resource(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetResourceTagsBuilder<S, get_resource_tags_state::SetResource<St>> {
+    ) -> GetResourceTagsBuilder<get_resource_tags_state::SetResource<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetResourceTagsBuilder {
             _state: PhantomData,
@@ -139,7 +155,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetResourceTagsBuilder<S, St>
+impl<St, S: BosStr> GetResourceTagsBuilder<St, S>
 where
     St: get_resource_tags_state::State,
     St::Resource: get_resource_tags_state::IsSet,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::server::list_app_passwords;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::server::list_app_passwords;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AppPassword<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub name: S,
@@ -40,30 +37,34 @@ pub struct AppPassword<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListAppPasswordsOutput<S: BosStr = DefaultStr> {
     pub passwords: Vec<list_app_passwords::AppPassword<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ListAppPasswordsError {
     #[serde(rename = "AccountTakedown")]
     AccountTakedown(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ListAppPasswordsError {
@@ -132,7 +133,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListAppPasswordsRequest {
 
 pub mod app_password_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -140,56 +141,63 @@ pub mod app_password_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type CreatedAt = St::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Name = St::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AppPasswordBuilder<S: BosStr, St: app_password_state::State> {
+pub struct AppPasswordBuilder<St: app_password_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<bool>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> AppPassword<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AppPasswordBuilder<S, app_password_state::Empty> {
+impl AppPassword<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AppPasswordBuilder<app_password_state::Empty, DefaultStr> {
         AppPasswordBuilder::new()
     }
 }
 
-impl<S: BosStr> AppPasswordBuilder<S, app_password_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> AppPassword<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AppPasswordBuilder<app_password_state::Empty, S> {
+        AppPasswordBuilder::builder()
+    }
+}
+
+impl AppPasswordBuilder<app_password_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AppPasswordBuilder {
             _state: PhantomData,
@@ -199,7 +207,18 @@ impl<S: BosStr> AppPasswordBuilder<S, app_password_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AppPasswordBuilder<S, St>
+impl<S: BosStr> AppPasswordBuilder<app_password_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AppPasswordBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AppPasswordBuilder<St, S>
 where
     St: app_password_state::State,
     St::CreatedAt: app_password_state::IsUnset,
@@ -208,7 +227,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AppPasswordBuilder<S, app_password_state::SetCreatedAt<St>> {
+    ) -> AppPasswordBuilder<app_password_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AppPasswordBuilder {
             _state: PhantomData,
@@ -218,7 +237,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AppPasswordBuilder<S, St>
+impl<St, S: BosStr> AppPasswordBuilder<St, S>
 where
     St: app_password_state::State,
     St::Name: app_password_state::IsUnset,
@@ -227,7 +246,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> AppPasswordBuilder<S, app_password_state::SetName<St>> {
+    ) -> AppPasswordBuilder<app_password_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AppPasswordBuilder {
             _state: PhantomData,
@@ -237,7 +256,7 @@ where
     }
 }
 
-impl<S: BosStr, St: app_password_state::State> AppPasswordBuilder<S, St> {
+impl<St: app_password_state::State, S: BosStr> AppPasswordBuilder<St, S> {
     /// Set the `privileged` field (optional)
     pub fn privileged(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -250,11 +269,11 @@ impl<S: BosStr, St: app_password_state::State> AppPasswordBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AppPasswordBuilder<S, St>
+impl<St, S: BosStr> AppPasswordBuilder<St, S>
 where
     St: app_password_state::State,
-    St::Name: app_password_state::IsSet,
     St::CreatedAt: app_password_state::IsSet,
+    St::Name: app_password_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AppPassword<S> {
@@ -266,7 +285,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AppPassword<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AppPassword<S> {
         AppPassword {
             created_at: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -277,10 +299,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_server_listAppPasswords() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.server.listAppPasswords"),
@@ -289,10 +311,11 @@ fn lexicon_doc_com_atproto_server_listAppPasswords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("appPassword"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("name"), SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -305,9 +328,7 @@ fn lexicon_doc_com_atproto_server_listAppPasswords() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("privileged"),

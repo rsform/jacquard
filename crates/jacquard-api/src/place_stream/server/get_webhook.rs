@@ -8,38 +8,42 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::place_stream::server::Webhook;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::server::Webhook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetWebhook<S: BosStr = DefaultStr> {
     pub id: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetWebhookOutput<S: BosStr = DefaultStr> {
     pub webhook: Webhook<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetWebhookError {
     /// The specified webhook was not found.
@@ -50,10 +54,7 @@ pub enum GetWebhookError {
     Unauthorized(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetWebhookError {
@@ -110,7 +111,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetWebhookRequest {
 
 pub mod get_webhook_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -141,21 +142,28 @@ pub mod get_webhook_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetWebhookBuilder<S: BosStr, St: get_webhook_state::State> {
+pub struct GetWebhookBuilder<St: get_webhook_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetWebhook<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetWebhookBuilder<S, get_webhook_state::Empty> {
+impl GetWebhook<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetWebhookBuilder<get_webhook_state::Empty, DefaultStr> {
         GetWebhookBuilder::new()
     }
 }
 
-impl<S: BosStr> GetWebhookBuilder<S, get_webhook_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetWebhook<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetWebhookBuilder<get_webhook_state::Empty, S> {
+        GetWebhookBuilder::builder()
+    }
+}
+
+impl GetWebhookBuilder<get_webhook_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetWebhookBuilder {
             _state: PhantomData,
@@ -165,13 +173,27 @@ impl<S: BosStr> GetWebhookBuilder<S, get_webhook_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetWebhookBuilder<S, St>
+impl<S: BosStr> GetWebhookBuilder<get_webhook_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetWebhookBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetWebhookBuilder<St, S>
 where
     St: get_webhook_state::State,
     St::Id: get_webhook_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<S>) -> GetWebhookBuilder<S, get_webhook_state::SetId<St>> {
+    pub fn id(
+        mut self,
+        value: impl Into<S>,
+    ) -> GetWebhookBuilder<get_webhook_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetWebhookBuilder {
             _state: PhantomData,
@@ -181,7 +203,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetWebhookBuilder<S, St>
+impl<St, S: BosStr> GetWebhookBuilder<St, S>
 where
     St: get_webhook_state::State,
     St::Id: get_webhook_state::IsSet,

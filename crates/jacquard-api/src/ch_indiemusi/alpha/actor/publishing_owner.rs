@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A songwriter, composer, or music publisher who owns the publishing rights to a song or musical work
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -163,7 +163,7 @@ impl<S: BosStr> LexiconSchema for PublishingOwner<S> {
 
 pub mod publishing_owner_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -181,21 +181,31 @@ pub mod publishing_owner_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PublishingOwnerBuilder<S: BosStr, St: publishing_owner_state::State> {
+pub struct PublishingOwnerBuilder<
+    St: publishing_owner_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PublishingOwner<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PublishingOwnerBuilder<S, publishing_owner_state::Empty> {
+impl PublishingOwner<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PublishingOwnerBuilder<publishing_owner_state::Empty, DefaultStr> {
         PublishingOwnerBuilder::new()
     }
 }
 
-impl<S: BosStr> PublishingOwnerBuilder<S, publishing_owner_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PublishingOwner<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PublishingOwnerBuilder<publishing_owner_state::Empty, S> {
+        PublishingOwnerBuilder::builder()
+    }
+}
+
+impl PublishingOwnerBuilder<publishing_owner_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PublishingOwnerBuilder {
             _state: PhantomData,
@@ -205,7 +215,18 @@ impl<S: BosStr> PublishingOwnerBuilder<S, publishing_owner_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St> {
+impl<S: BosStr> PublishingOwnerBuilder<publishing_owner_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PublishingOwnerBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: publishing_owner_state::State, S: BosStr> PublishingOwnerBuilder<St, S> {
     /// Set the `collectingSociety` field (optional)
     pub fn collecting_society(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -218,7 +239,7 @@ impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St> {
+impl<St: publishing_owner_state::State, S: BosStr> PublishingOwnerBuilder<St, S> {
     /// Set the `companyName` field (optional)
     pub fn company_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -231,7 +252,7 @@ impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St> {
+impl<St: publishing_owner_state::State, S: BosStr> PublishingOwnerBuilder<St, S> {
     /// Set the `firstName` field (optional)
     pub fn first_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -244,7 +265,7 @@ impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St> {
+impl<St: publishing_owner_state::State, S: BosStr> PublishingOwnerBuilder<St, S> {
     /// Set the `ipi` field (optional)
     pub fn ipi(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -257,7 +278,7 @@ impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St> {
+impl<St: publishing_owner_state::State, S: BosStr> PublishingOwnerBuilder<St, S> {
     /// Set the `lastName` field (optional)
     pub fn last_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -270,7 +291,7 @@ impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St> PublishingOwnerBuilder<S, St>
+impl<St, S: BosStr> PublishingOwnerBuilder<St, S>
 where
     St: publishing_owner_state::State,
 {
@@ -286,7 +307,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PublishingOwner<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PublishingOwner<S> {
         PublishingOwner {
             collecting_society: self._fields.0,
             company_name: self._fields.1,
@@ -299,10 +323,10 @@ where
 }
 
 fn lexicon_doc_ch_indiemusi_alpha_actor_publishingOwner() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ch.indiemusi.alpha.actor.publishingOwner"),

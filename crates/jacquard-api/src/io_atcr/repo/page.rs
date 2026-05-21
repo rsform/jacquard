@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Repository page metadata including description and avatar. Users can edit this directly in their PDS to customize their repository page.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -125,23 +125,25 @@ impl<S: BosStr> LexiconSchema for Page<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/webp".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -175,7 +177,7 @@ impl<S: BosStr> LexiconSchema for Page<S> {
 
 pub mod page_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -183,56 +185,56 @@ pub mod page_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Repository;
         type UpdatedAt;
+        type Repository;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Repository = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Repository = St::Repository;
-        type UpdatedAt = St::UpdatedAt;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepository<St> {}
-    impl<St: State> State for SetRepository<St> {
-        type CreatedAt = St::CreatedAt;
-        type Repository = Set<members::repository>;
-        type UpdatedAt = St::UpdatedAt;
+        type Repository = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
     impl<St: State> State for SetUpdatedAt<St> {
-        type CreatedAt = St::CreatedAt;
-        type Repository = St::Repository;
         type UpdatedAt = Set<members::updated_at>;
+        type Repository = St::Repository;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepository<St> {}
+    impl<St: State> State for SetRepository<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type Repository = Set<members::repository>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type Repository = St::Repository;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PageBuilder<S: BosStr, St: page_state::State> {
+pub struct PageBuilder<St: page_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
@@ -244,15 +246,22 @@ pub struct PageBuilder<S: BosStr, St: page_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Page<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PageBuilder<S, page_state::Empty> {
+impl Page<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PageBuilder<page_state::Empty, DefaultStr> {
         PageBuilder::new()
     }
 }
 
-impl<S: BosStr> PageBuilder<S, page_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Page<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PageBuilder<page_state::Empty, S> {
+        PageBuilder::builder()
+    }
+}
+
+impl PageBuilder<page_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PageBuilder {
             _state: PhantomData,
@@ -262,7 +271,18 @@ impl<S: BosStr> PageBuilder<S, page_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: page_state::State> PageBuilder<S, St> {
+impl<S: BosStr> PageBuilder<page_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PageBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: page_state::State, S: BosStr> PageBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -275,7 +295,7 @@ impl<S: BosStr, St: page_state::State> PageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PageBuilder<S, St>
+impl<St, S: BosStr> PageBuilder<St, S>
 where
     St: page_state::State,
     St::CreatedAt: page_state::IsUnset,
@@ -284,7 +304,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PageBuilder<S, page_state::SetCreatedAt<St>> {
+    ) -> PageBuilder<page_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PageBuilder {
             _state: PhantomData,
@@ -294,7 +314,7 @@ where
     }
 }
 
-impl<S: BosStr, St: page_state::State> PageBuilder<S, St> {
+impl<St: page_state::State, S: BosStr> PageBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -307,7 +327,7 @@ impl<S: BosStr, St: page_state::State> PageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PageBuilder<S, St>
+impl<St, S: BosStr> PageBuilder<St, S>
 where
     St: page_state::State,
     St::Repository: page_state::IsUnset,
@@ -316,7 +336,7 @@ where
     pub fn repository(
         mut self,
         value: impl Into<S>,
-    ) -> PageBuilder<S, page_state::SetRepository<St>> {
+    ) -> PageBuilder<page_state::SetRepository<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PageBuilder {
             _state: PhantomData,
@@ -326,7 +346,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PageBuilder<S, St>
+impl<St, S: BosStr> PageBuilder<St, S>
 where
     St: page_state::State,
     St::UpdatedAt: page_state::IsUnset,
@@ -335,7 +355,7 @@ where
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PageBuilder<S, page_state::SetUpdatedAt<St>> {
+    ) -> PageBuilder<page_state::SetUpdatedAt<St>, S> {
         self._fields.4 = Option::Some(value.into());
         PageBuilder {
             _state: PhantomData,
@@ -345,12 +365,12 @@ where
     }
 }
 
-impl<S: BosStr, St> PageBuilder<S, St>
+impl<St, S: BosStr> PageBuilder<St, S>
 where
     St: page_state::State,
-    St::CreatedAt: page_state::IsSet,
-    St::Repository: page_state::IsSet,
     St::UpdatedAt: page_state::IsSet,
+    St::Repository: page_state::IsSet,
+    St::CreatedAt: page_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Page<S> {
@@ -377,10 +397,10 @@ where
 }
 
 fn lexicon_doc_io_atcr_repo_page() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.repo.page"),

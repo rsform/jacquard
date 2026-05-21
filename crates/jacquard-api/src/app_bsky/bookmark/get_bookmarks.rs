@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::bookmark::BookmarkView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::bookmark::BookmarkView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBookmarks<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -31,11 +28,9 @@ pub struct GetBookmarks<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBookmarksOutput<S: BosStr = DefaultStr> {
     pub bookmarks: Vec<BookmarkView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -74,7 +69,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_bookmarks_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -92,21 +87,28 @@ pub mod get_bookmarks_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetBookmarksBuilder<S: BosStr, St: get_bookmarks_state::State> {
+pub struct GetBookmarksBuilder<St: get_bookmarks_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetBookmarks<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetBookmarksBuilder<S, get_bookmarks_state::Empty> {
+impl GetBookmarks<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetBookmarksBuilder<get_bookmarks_state::Empty, DefaultStr> {
         GetBookmarksBuilder::new()
     }
 }
 
-impl<S: BosStr> GetBookmarksBuilder<S, get_bookmarks_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetBookmarks<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetBookmarksBuilder<get_bookmarks_state::Empty, S> {
+        GetBookmarksBuilder::builder()
+    }
+}
+
+impl GetBookmarksBuilder<get_bookmarks_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetBookmarksBuilder {
             _state: PhantomData,
@@ -116,7 +118,18 @@ impl<S: BosStr> GetBookmarksBuilder<S, get_bookmarks_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_bookmarks_state::State> GetBookmarksBuilder<S, St> {
+impl<S: BosStr> GetBookmarksBuilder<get_bookmarks_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetBookmarksBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_bookmarks_state::State, S: BosStr> GetBookmarksBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -129,7 +142,7 @@ impl<S: BosStr, St: get_bookmarks_state::State> GetBookmarksBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_bookmarks_state::State> GetBookmarksBuilder<S, St> {
+impl<St: get_bookmarks_state::State, S: BosStr> GetBookmarksBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -142,7 +155,7 @@ impl<S: BosStr, St: get_bookmarks_state::State> GetBookmarksBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetBookmarksBuilder<S, St>
+impl<St, S: BosStr> GetBookmarksBuilder<St, S>
 where
     St: get_bookmarks_state::State,
 {

@@ -13,33 +13,31 @@ pub mod identity;
 pub mod repo;
 pub mod sync;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Cid, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::zone_stratos;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::zone_stratos;
 /// Indicates this record requires hydration from an external service. The stub record on the PDS contains minimal data; full content is fetched from the service endpoint.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Source<S: BosStr = DefaultStr> {
     ///DID of the hydration service, optionally with fragment identifying the service entry (e.g., 'did:plc:abc123#atproto_pns').
     pub service: Did<S>,
@@ -133,10 +131,7 @@ where
 /// A strong reference to a record, including its content hash for verification.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubjectRef<S: BosStr = DefaultStr> {
     ///CID of the full record content for integrity verification.
     pub cid: Cid<S>,
@@ -189,7 +184,7 @@ impl<S: BosStr> LexiconSchema for SubjectRef<S> {
 
 pub mod source_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -198,55 +193,55 @@ pub mod source_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Subject;
-        type Vary;
         type Service;
+        type Vary;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Subject = Unset;
-        type Vary = Unset;
         type Service = Unset;
+        type Vary = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
+        type Service = St::Service;
         type Vary = St::Vary;
-        type Service = St::Service;
-    }
-    ///State transition - sets the `vary` field to Set
-    pub struct SetVary<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVary<St> {}
-    impl<St: State> State for SetVary<St> {
-        type Subject = St::Subject;
-        type Vary = Set<members::vary>;
-        type Service = St::Service;
     }
     ///State transition - sets the `service` field to Set
     pub struct SetService<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetService<St> {}
     impl<St: State> State for SetService<St> {
         type Subject = St::Subject;
-        type Vary = St::Vary;
         type Service = Set<members::service>;
+        type Vary = St::Vary;
+    }
+    ///State transition - sets the `vary` field to Set
+    pub struct SetVary<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVary<St> {}
+    impl<St: State> State for SetVary<St> {
+        type Subject = St::Subject;
+        type Service = St::Service;
+        type Vary = Set<members::vary>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `vary` field
-        pub struct vary(());
         ///Marker type for the `service` field
         pub struct service(());
+        ///Marker type for the `vary` field
+        pub struct vary(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SourceBuilder<S: BosStr, St: source_state::State> {
+pub struct SourceBuilder<St: source_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -256,15 +251,22 @@ pub struct SourceBuilder<S: BosStr, St: source_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Source<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SourceBuilder<S, source_state::Empty> {
+impl Source<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SourceBuilder<source_state::Empty, DefaultStr> {
         SourceBuilder::new()
     }
 }
 
-impl<S: BosStr> SourceBuilder<S, source_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Source<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SourceBuilder<source_state::Empty, S> {
+        SourceBuilder::builder()
+    }
+}
+
+impl SourceBuilder<source_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SourceBuilder {
             _state: PhantomData,
@@ -274,7 +276,18 @@ impl<S: BosStr> SourceBuilder<S, source_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SourceBuilder<S, St>
+impl<S: BosStr> SourceBuilder<source_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SourceBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SourceBuilder<St, S>
 where
     St: source_state::State,
     St::Service: source_state::IsUnset,
@@ -283,7 +296,7 @@ where
     pub fn service(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SourceBuilder<S, source_state::SetService<St>> {
+    ) -> SourceBuilder<source_state::SetService<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SourceBuilder {
             _state: PhantomData,
@@ -293,7 +306,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SourceBuilder<S, St>
+impl<St, S: BosStr> SourceBuilder<St, S>
 where
     St: source_state::State,
     St::Subject: source_state::IsUnset,
@@ -302,7 +315,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<zone_stratos::SubjectRef<S>>,
-    ) -> SourceBuilder<S, source_state::SetSubject<St>> {
+    ) -> SourceBuilder<source_state::SetSubject<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SourceBuilder {
             _state: PhantomData,
@@ -312,7 +325,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SourceBuilder<S, St>
+impl<St, S: BosStr> SourceBuilder<St, S>
 where
     St: source_state::State,
     St::Vary: source_state::IsUnset,
@@ -321,7 +334,7 @@ where
     pub fn vary(
         mut self,
         value: impl Into<SourceVary<S>>,
-    ) -> SourceBuilder<S, source_state::SetVary<St>> {
+    ) -> SourceBuilder<source_state::SetVary<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SourceBuilder {
             _state: PhantomData,
@@ -331,12 +344,12 @@ where
     }
 }
 
-impl<S: BosStr, St> SourceBuilder<S, St>
+impl<St, S: BosStr> SourceBuilder<St, S>
 where
     St: source_state::State,
     St::Subject: source_state::IsSet,
-    St::Vary: source_state::IsSet,
     St::Service: source_state::IsSet,
+    St::Vary: source_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Source<S> {
@@ -359,10 +372,10 @@ where
 }
 
 fn lexicon_doc_zone_stratos_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("zone.stratos.defs"),
@@ -472,7 +485,7 @@ fn lexicon_doc_zone_stratos_defs() -> LexiconDoc<'static> {
 
 pub mod subject_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -515,21 +528,28 @@ pub mod subject_ref_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SubjectRefBuilder<S: BosStr, St: subject_ref_state::State> {
+pub struct SubjectRefBuilder<St: subject_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SubjectRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SubjectRefBuilder<S, subject_ref_state::Empty> {
+impl SubjectRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SubjectRefBuilder<subject_ref_state::Empty, DefaultStr> {
         SubjectRefBuilder::new()
     }
 }
 
-impl<S: BosStr> SubjectRefBuilder<S, subject_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SubjectRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SubjectRefBuilder<subject_ref_state::Empty, S> {
+        SubjectRefBuilder::builder()
+    }
+}
+
+impl SubjectRefBuilder<subject_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SubjectRefBuilder {
             _state: PhantomData,
@@ -539,7 +559,18 @@ impl<S: BosStr> SubjectRefBuilder<S, subject_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SubjectRefBuilder<S, St>
+impl<S: BosStr> SubjectRefBuilder<subject_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SubjectRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SubjectRefBuilder<St, S>
 where
     St: subject_ref_state::State,
     St::Cid: subject_ref_state::IsUnset,
@@ -548,7 +579,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> SubjectRefBuilder<S, subject_ref_state::SetCid<St>> {
+    ) -> SubjectRefBuilder<subject_ref_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SubjectRefBuilder {
             _state: PhantomData,
@@ -558,7 +589,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SubjectRefBuilder<S, St>
+impl<St, S: BosStr> SubjectRefBuilder<St, S>
 where
     St: subject_ref_state::State,
     St::Uri: subject_ref_state::IsUnset,
@@ -567,7 +598,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SubjectRefBuilder<S, subject_ref_state::SetUri<St>> {
+    ) -> SubjectRefBuilder<subject_ref_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SubjectRefBuilder {
             _state: PhantomData,
@@ -577,7 +608,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SubjectRefBuilder<S, St>
+impl<St, S: BosStr> SubjectRefBuilder<St, S>
 where
     St: subject_ref_state::State,
     St::Uri: subject_ref_state::IsSet,
@@ -592,7 +623,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SubjectRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SubjectRef<S> {
         SubjectRef {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),

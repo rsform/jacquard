@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,13 +20,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::sh_weaver::actor::ProfileViewBasic;
 use crate::sh_weaver::graph::ListView;
 use crate::sh_weaver::notebook::NotebookView;
 use crate::sh_weaver::notebook::get_suggested_notebooks;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -37,22 +37,18 @@ pub struct GetSuggestedNotebooks {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSuggestedNotebooksOutput<S: BosStr = DefaultStr> {
     pub notebooks: Vec<get_suggested_notebooks::SuggestedNotebook<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SuggestedNotebook<S: BosStr = DefaultStr> {
     pub notebook: NotebookView<S>,
     pub reason: get_suggested_notebooks::SuggestionReason<S>,
@@ -66,10 +62,7 @@ pub struct SuggestedNotebook<S: BosStr = DefaultStr> {
 /// Why this notebook was suggested.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SuggestionReason<S: BosStr = DefaultStr> {
     ///If followed-author, the author.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -87,6 +80,7 @@ pub struct SuggestionReason<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SuggestionReasonType<S: BosStr = DefaultStr> {
@@ -180,7 +174,9 @@ where
             SuggestionReasonType::PopularInTag => SuggestionReasonType::PopularInTag,
             SuggestionReasonType::Trending => SuggestionReasonType::Trending,
             SuggestionReasonType::FromList => SuggestionReasonType::FromList,
-            SuggestionReasonType::Other(v) => SuggestionReasonType::Other(v.into_static()),
+            SuggestionReasonType::Other(v) => {
+                SuggestionReasonType::Other(v.into_static())
+            }
         }
     }
 }
@@ -245,7 +241,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_suggested_notebooks_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -276,8 +272,18 @@ impl GetSuggestedNotebooks {
 }
 
 impl GetSuggestedNotebooksBuilder<get_suggested_notebooks_state::Empty> {
-    /// Create a new builder with all fields unset.
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
+        GetSuggestedNotebooksBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+        }
+    }
+}
+
+impl GetSuggestedNotebooksBuilder<get_suggested_notebooks_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
         GetSuggestedNotebooksBuilder {
             _state: PhantomData,
             _fields: (None,),
@@ -312,7 +318,7 @@ where
 
 pub mod suggested_notebook_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -355,7 +361,10 @@ pub mod suggested_notebook_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SuggestedNotebookBuilder<S: BosStr, St: suggested_notebook_state::State> {
+pub struct SuggestedNotebookBuilder<
+    St: suggested_notebook_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<NotebookView<S>>,
@@ -365,15 +374,25 @@ pub struct SuggestedNotebookBuilder<S: BosStr, St: suggested_notebook_state::Sta
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SuggestedNotebook<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SuggestedNotebookBuilder<S, suggested_notebook_state::Empty> {
+impl SuggestedNotebook<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SuggestedNotebookBuilder<
+        suggested_notebook_state::Empty,
+        DefaultStr,
+    > {
         SuggestedNotebookBuilder::new()
     }
 }
 
-impl<S: BosStr> SuggestedNotebookBuilder<S, suggested_notebook_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SuggestedNotebook<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SuggestedNotebookBuilder<suggested_notebook_state::Empty, S> {
+        SuggestedNotebookBuilder::builder()
+    }
+}
+
+impl SuggestedNotebookBuilder<suggested_notebook_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SuggestedNotebookBuilder {
             _state: PhantomData,
@@ -383,7 +402,18 @@ impl<S: BosStr> SuggestedNotebookBuilder<S, suggested_notebook_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SuggestedNotebookBuilder<S, St>
+impl<S: BosStr> SuggestedNotebookBuilder<suggested_notebook_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SuggestedNotebookBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SuggestedNotebookBuilder<St, S>
 where
     St: suggested_notebook_state::State,
     St::Notebook: suggested_notebook_state::IsUnset,
@@ -392,7 +422,7 @@ where
     pub fn notebook(
         mut self,
         value: impl Into<NotebookView<S>>,
-    ) -> SuggestedNotebookBuilder<S, suggested_notebook_state::SetNotebook<St>> {
+    ) -> SuggestedNotebookBuilder<suggested_notebook_state::SetNotebook<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SuggestedNotebookBuilder {
             _state: PhantomData,
@@ -402,7 +432,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SuggestedNotebookBuilder<S, St>
+impl<St, S: BosStr> SuggestedNotebookBuilder<St, S>
 where
     St: suggested_notebook_state::State,
     St::Reason: suggested_notebook_state::IsUnset,
@@ -411,7 +441,7 @@ where
     pub fn reason(
         mut self,
         value: impl Into<get_suggested_notebooks::SuggestionReason<S>>,
-    ) -> SuggestedNotebookBuilder<S, suggested_notebook_state::SetReason<St>> {
+    ) -> SuggestedNotebookBuilder<suggested_notebook_state::SetReason<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SuggestedNotebookBuilder {
             _state: PhantomData,
@@ -421,7 +451,7 @@ where
     }
 }
 
-impl<S: BosStr, St: suggested_notebook_state::State> SuggestedNotebookBuilder<S, St> {
+impl<St: suggested_notebook_state::State, S: BosStr> SuggestedNotebookBuilder<St, S> {
     /// Set the `score` field (optional)
     pub fn score(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -434,7 +464,7 @@ impl<S: BosStr, St: suggested_notebook_state::State> SuggestedNotebookBuilder<S,
     }
 }
 
-impl<S: BosStr, St> SuggestedNotebookBuilder<S, St>
+impl<St, S: BosStr> SuggestedNotebookBuilder<St, S>
 where
     St: suggested_notebook_state::State,
     St::Reason: suggested_notebook_state::IsSet,
@@ -450,7 +480,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SuggestedNotebook<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SuggestedNotebook<S> {
         SuggestedNotebook {
             notebook: self._fields.0.unwrap(),
             reason: self._fields.1.unwrap(),
@@ -461,10 +494,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.notebook.getSuggestedNotebooks"),
@@ -473,37 +506,43 @@ fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> LexiconDoc<'static>
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("suggestedNotebook"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("notebook"),
-                        SmolStr::new_static("reason"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("notebook"),
+                            SmolStr::new_static("reason")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("notebook"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("sh.weaver.notebook.defs#notebookView"),
+                                r#ref: CowStr::new_static(
+                                    "sh.weaver.notebook.defs#notebookView",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -528,7 +567,9 @@ fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> LexiconDoc<'static>
             map.insert(
                 SmolStr::new_static("suggestionReason"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Why this notebook was suggested.")),
+                    description: Some(
+                        CowStr::new_static("Why this notebook was suggested."),
+                    ),
                     required: Some(vec![SmolStr::new_static("type")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -536,7 +577,9 @@ fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> LexiconDoc<'static>
                         map.insert(
                             SmolStr::new_static("relatedAuthor"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "sh.weaver.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -550,7 +593,9 @@ fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> LexiconDoc<'static>
                         map.insert(
                             SmolStr::new_static("relatedNotebook"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("sh.weaver.notebook.defs#notebookView"),
+                                r#ref: CowStr::new_static(
+                                    "sh.weaver.notebook.defs#notebookView",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -566,9 +611,7 @@ fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> LexiconDoc<'static>
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },

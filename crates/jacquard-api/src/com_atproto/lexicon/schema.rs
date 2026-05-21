@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Representation of Lexicon schemas themselves, when published as atproto records. Note that the schema language is not defined in Lexicon; this meta schema currently only includes a single version field ('lexicon'). See the atproto specifications for description of the other expected top-level fields ('id', 'defs', etc).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -104,7 +104,7 @@ impl<S: BosStr> LexiconSchema for Schema<S> {
 
 pub mod schema_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -135,21 +135,28 @@ pub mod schema_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SchemaBuilder<S: BosStr, St: schema_state::State> {
+pub struct SchemaBuilder<St: schema_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Schema<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SchemaBuilder<S, schema_state::Empty> {
+impl Schema<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SchemaBuilder<schema_state::Empty, DefaultStr> {
         SchemaBuilder::new()
     }
 }
 
-impl<S: BosStr> SchemaBuilder<S, schema_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Schema<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SchemaBuilder<schema_state::Empty, S> {
+        SchemaBuilder::builder()
+    }
+}
+
+impl SchemaBuilder<schema_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SchemaBuilder {
             _state: PhantomData,
@@ -159,7 +166,18 @@ impl<S: BosStr> SchemaBuilder<S, schema_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SchemaBuilder<S, St>
+impl<S: BosStr> SchemaBuilder<schema_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SchemaBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SchemaBuilder<St, S>
 where
     St: schema_state::State,
     St::Lexicon: schema_state::IsUnset,
@@ -168,7 +186,7 @@ where
     pub fn lexicon(
         mut self,
         value: impl Into<i64>,
-    ) -> SchemaBuilder<S, schema_state::SetLexicon<St>> {
+    ) -> SchemaBuilder<schema_state::SetLexicon<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SchemaBuilder {
             _state: PhantomData,
@@ -178,7 +196,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SchemaBuilder<S, St>
+impl<St, S: BosStr> SchemaBuilder<St, S>
 where
     St: schema_state::State,
     St::Lexicon: schema_state::IsSet,
@@ -200,10 +218,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_lexicon_schema() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.lexicon.schema"),

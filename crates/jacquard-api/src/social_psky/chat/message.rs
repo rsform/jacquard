@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::social_psky::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::social_psky::richtext::facet::Facet;
 /// A Picosky message containing at most 2048 graphemes.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -136,7 +136,7 @@ impl<S: BosStr> LexiconSchema for Message<S> {
 
 pub mod message_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -144,61 +144,63 @@ pub mod message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Room;
         type Content;
+        type Room;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Room = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRoom<St> {}
-    impl<St: State> State for SetRoom<St> {
-        type Room = Set<members::room>;
-        type Content = St::Content;
+        type Room = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
-        type Room = St::Room;
         type Content = Set<members::content>;
+        type Room = St::Room;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoom<St> {}
+    impl<St: State> State for SetRoom<St> {
+        type Content = St::Content;
+        type Room = Set<members::room>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `room` field
-        pub struct room(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `room` field
+        pub struct room(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MessageBuilder<S: BosStr, St: message_state::State> {
+pub struct MessageBuilder<St: message_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<Vec<Facet<S>>>,
-        Option<StrongRef<S>>,
-        Option<AtUri<S>>,
-    ),
+    _fields: (Option<S>, Option<Vec<Facet<S>>>, Option<StrongRef<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Message<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MessageBuilder<S, message_state::Empty> {
+impl Message<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MessageBuilder<message_state::Empty, DefaultStr> {
         MessageBuilder::new()
     }
 }
 
-impl<S: BosStr> MessageBuilder<S, message_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Message<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MessageBuilder<message_state::Empty, S> {
+        MessageBuilder::builder()
+    }
+}
+
+impl MessageBuilder<message_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MessageBuilder {
             _state: PhantomData,
@@ -208,7 +210,18 @@ impl<S: BosStr> MessageBuilder<S, message_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MessageBuilder<S, St>
+impl<S: BosStr> MessageBuilder<message_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MessageBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MessageBuilder<St, S>
 where
     St: message_state::State,
     St::Content: message_state::IsUnset,
@@ -217,7 +230,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> MessageBuilder<S, message_state::SetContent<St>> {
+    ) -> MessageBuilder<message_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MessageBuilder {
             _state: PhantomData,
@@ -227,7 +240,7 @@ where
     }
 }
 
-impl<S: BosStr, St: message_state::State> MessageBuilder<S, St> {
+impl<St: message_state::State, S: BosStr> MessageBuilder<St, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -240,7 +253,7 @@ impl<S: BosStr, St: message_state::State> MessageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: message_state::State> MessageBuilder<S, St> {
+impl<St: message_state::State, S: BosStr> MessageBuilder<St, S> {
     /// Set the `reply` field (optional)
     pub fn reply(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -253,7 +266,7 @@ impl<S: BosStr, St: message_state::State> MessageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MessageBuilder<S, St>
+impl<St, S: BosStr> MessageBuilder<St, S>
 where
     St: message_state::State,
     St::Room: message_state::IsUnset,
@@ -262,7 +275,7 @@ where
     pub fn room(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> MessageBuilder<S, message_state::SetRoom<St>> {
+    ) -> MessageBuilder<message_state::SetRoom<St>, S> {
         self._fields.3 = Option::Some(value.into());
         MessageBuilder {
             _state: PhantomData,
@@ -272,11 +285,11 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageBuilder<S, St>
+impl<St, S: BosStr> MessageBuilder<St, S>
 where
     St: message_state::State,
-    St::Room: message_state::IsSet,
     St::Content: message_state::IsSet,
+    St::Room: message_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Message<S> {
@@ -301,10 +314,10 @@ where
 }
 
 fn lexicon_doc_social_psky_chat_message() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.psky.chat.message"),
@@ -313,15 +326,18 @@ fn lexicon_doc_social_psky_chat_message() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A Picosky message containing at most 2048 graphemes.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A Picosky message containing at most 2048 graphemes.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("content"),
-                            SmolStr::new_static("room"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("content"), SmolStr::new_static("room")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -337,9 +353,11 @@ fn lexicon_doc_social_psky_chat_message() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("facets"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Annotations of text (mentions, URLs, hashtags, etc)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Annotations of text (mentions, URLs, hashtags, etc)",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("social.psky.richtext.facet"),
                                         ..Default::default()

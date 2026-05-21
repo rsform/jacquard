@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A file
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -111,16 +111,19 @@ impl<S: BosStr> LexiconSchema for File<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
@@ -156,16 +159,19 @@ impl<S: BosStr> LexiconSchema for File<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("thumbnail"),
@@ -181,7 +187,7 @@ impl<S: BosStr> LexiconSchema for File<S> {
 
 pub mod file_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -212,7 +218,7 @@ pub mod file_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FileBuilder<S: BosStr, St: file_state::State> {
+pub struct FileBuilder<St: file_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
@@ -224,15 +230,22 @@ pub struct FileBuilder<S: BosStr, St: file_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> File<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FileBuilder<S, file_state::Empty> {
+impl File<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FileBuilder<file_state::Empty, DefaultStr> {
         FileBuilder::new()
     }
 }
 
-impl<S: BosStr> FileBuilder<S, file_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> File<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FileBuilder<file_state::Empty, S> {
+        FileBuilder::builder()
+    }
+}
+
+impl FileBuilder<file_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FileBuilder {
             _state: PhantomData,
@@ -242,13 +255,27 @@ impl<S: BosStr> FileBuilder<S, file_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FileBuilder<S, St>
+impl<S: BosStr> FileBuilder<file_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FileBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FileBuilder<St, S>
 where
     St: file_state::State,
     St::Blob: file_state::IsUnset,
 {
     /// Set the `blob` field (required)
-    pub fn blob(mut self, value: impl Into<BlobRef<S>>) -> FileBuilder<S, file_state::SetBlob<St>> {
+    pub fn blob(
+        mut self,
+        value: impl Into<BlobRef<S>>,
+    ) -> FileBuilder<file_state::SetBlob<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
@@ -258,7 +285,7 @@ where
     }
 }
 
-impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
+impl<St: file_state::State, S: BosStr> FileBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -271,7 +298,7 @@ impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
+impl<St: file_state::State, S: BosStr> FileBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -284,7 +311,7 @@ impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
+impl<St: file_state::State, S: BosStr> FileBuilder<St, S> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -297,7 +324,7 @@ impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
+impl<St: file_state::State, S: BosStr> FileBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -310,7 +337,7 @@ impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> FileBuilder<S, St>
+impl<St, S: BosStr> FileBuilder<St, S>
 where
     St: file_state::State,
     St::Blob: file_state::IsSet,
@@ -340,10 +367,10 @@ where
 }
 
 fn lexicon_doc_at_dropb_file() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.dropb.file"),
@@ -361,9 +388,7 @@ fn lexicon_doc_at_dropb_file() -> LexiconDoc<'static> {
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("blob"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),
@@ -381,9 +406,7 @@ fn lexicon_doc_at_dropb_file() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("thumbnail"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("updatedAt"),

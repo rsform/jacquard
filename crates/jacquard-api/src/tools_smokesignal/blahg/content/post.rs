@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,16 +25,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::tools_smokesignal::blahg::content::post;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_smokesignal::blahg::content::post;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Attachment<S: BosStr = DefaultStr> {
     ///Alt text description of the content, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -116,16 +113,19 @@ impl<S: BosStr> LexiconSchema for Attachment<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("content"),
@@ -193,23 +193,25 @@ impl<S: BosStr> LexiconSchema for Post<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["text/plain", "text/html", "text/markdown"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("content"),
                         accepted: vec![
-                            "text/plain".to_string(),
-                            "text/html".to_string(),
-                            "text/markdown".to_string(),
+                            "text/plain".to_string(), "text/html".to_string(),
+                            "text/markdown".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -254,7 +256,7 @@ impl<S: BosStr> LexiconSchema for Post<S> {
 
 pub mod attachment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -285,21 +287,28 @@ pub mod attachment_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AttachmentBuilder<S: BosStr, St: attachment_state::State> {
+pub struct AttachmentBuilder<St: attachment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Attachment<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AttachmentBuilder<S, attachment_state::Empty> {
+impl Attachment<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AttachmentBuilder<attachment_state::Empty, DefaultStr> {
         AttachmentBuilder::new()
     }
 }
 
-impl<S: BosStr> AttachmentBuilder<S, attachment_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Attachment<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AttachmentBuilder<attachment_state::Empty, S> {
+        AttachmentBuilder::builder()
+    }
+}
+
+impl AttachmentBuilder<attachment_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AttachmentBuilder {
             _state: PhantomData,
@@ -309,7 +318,18 @@ impl<S: BosStr> AttachmentBuilder<S, attachment_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: attachment_state::State> AttachmentBuilder<S, St> {
+impl<S: BosStr> AttachmentBuilder<attachment_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AttachmentBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: attachment_state::State, S: BosStr> AttachmentBuilder<St, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -322,7 +342,7 @@ impl<S: BosStr, St: attachment_state::State> AttachmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AttachmentBuilder<S, St>
+impl<St, S: BosStr> AttachmentBuilder<St, S>
 where
     St: attachment_state::State,
     St::Content: attachment_state::IsUnset,
@@ -331,7 +351,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> AttachmentBuilder<S, attachment_state::SetContent<St>> {
+    ) -> AttachmentBuilder<attachment_state::SetContent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AttachmentBuilder {
             _state: PhantomData,
@@ -341,7 +361,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AttachmentBuilder<S, St>
+impl<St, S: BosStr> AttachmentBuilder<St, S>
 where
     St: attachment_state::State,
     St::Content: attachment_state::IsSet,
@@ -355,7 +375,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Attachment<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Attachment<S> {
         Attachment {
             alt: self._fields.0,
             content: self._fields.1.unwrap(),
@@ -365,10 +388,10 @@ where
 }
 
 fn lexicon_doc_tools_smokesignal_blahg_content_post() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.smokesignal.blahg.content.post"),
@@ -384,17 +407,17 @@ fn lexicon_doc_tools_smokesignal_blahg_content_post() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Alt text description of the content, for accessibility.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Alt text description of the content, for accessibility.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("content"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -422,16 +445,16 @@ fn lexicon_doc_tools_smokesignal_blahg_content_post() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("content"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("langs"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Indicates human language of text content.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Indicates human language of text content.",
+                                        ),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         format: Some(LexStringFormat::Language),
                                         ..Default::default()
@@ -470,7 +493,7 @@ fn lexicon_doc_tools_smokesignal_blahg_content_post() -> LexiconDoc<'static> {
 
 pub mod post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -488,7 +511,7 @@ pub mod post_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PostBuilder<S: BosStr, St: post_state::State> {
+pub struct PostBuilder<St: post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<post::Attachment<S>>>,
@@ -500,15 +523,22 @@ pub struct PostBuilder<S: BosStr, St: post_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Post<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PostBuilder<S, post_state::Empty> {
+impl Post<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PostBuilder<post_state::Empty, DefaultStr> {
         PostBuilder::new()
     }
 }
 
-impl<S: BosStr> PostBuilder<S, post_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Post<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PostBuilder<post_state::Empty, S> {
+        PostBuilder::builder()
+    }
+}
+
+impl PostBuilder<post_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PostBuilder {
             _state: PhantomData,
@@ -518,9 +548,23 @@ impl<S: BosStr> PostBuilder<S, post_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<S: BosStr> PostBuilder<post_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PostBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `attachments` field (optional)
-    pub fn attachments(mut self, value: impl Into<Option<Vec<post::Attachment<S>>>>) -> Self {
+    pub fn attachments(
+        mut self,
+        value: impl Into<Option<Vec<post::Attachment<S>>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -531,7 +575,7 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `content` field (optional)
     pub fn content(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -544,7 +588,7 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `langs` field (optional)
     pub fn langs(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
         self._fields.2 = value.into();
@@ -557,7 +601,7 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `publishedAt` field (optional)
     pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -570,7 +614,7 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -583,7 +627,7 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
 {

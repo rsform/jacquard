@@ -9,34 +9,32 @@ pub mod grant_verifications;
 pub mod list_verifications;
 pub mod revoke_verifications;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Datetime, Did, Handle};
+use jacquard_common::types::string::{Did, Handle, AtUri, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::tools_ozone::moderation::RepoViewDetail;
-use crate::tools_ozone::moderation::RepoViewNotFound;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::RepoViewDetail;
+use crate::tools_ozone::moderation::RepoViewNotFound;
 /// Verification data for the associated subject.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VerificationView<S: BosStr = DefaultStr> {
     ///Timestamp when the verification was created.
     pub created_at: Datetime,
@@ -71,6 +69,7 @@ pub struct VerificationView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -80,6 +79,7 @@ pub enum VerificationViewIssuerRepo<S: BosStr = DefaultStr> {
     #[serde(rename = "tools.ozone.moderation.defs#repoViewNotFound")]
     RepoViewNotFound(Box<RepoViewNotFound<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -108,7 +108,7 @@ impl<S: BosStr> LexiconSchema for VerificationView<S> {
 
 pub mod verification_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -116,110 +116,113 @@ pub mod verification_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Subject;
         type Handle;
-        type Issuer;
+        type Subject;
+        type Uri;
         type DisplayName;
         type CreatedAt;
+        type Issuer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Subject = Unset;
         type Handle = Unset;
-        type Issuer = Unset;
+        type Subject = Unset;
+        type Uri = Unset;
         type DisplayName = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Subject = St::Subject;
-        type Handle = St::Handle;
-        type Issuer = St::Issuer;
-        type DisplayName = St::DisplayName;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Uri = St::Uri;
-        type Subject = Set<members::subject>;
-        type Handle = St::Handle;
-        type Issuer = St::Issuer;
-        type DisplayName = St::DisplayName;
-        type CreatedAt = St::CreatedAt;
+        type Issuer = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHandle<St> {}
     impl<St: State> State for SetHandle<St> {
-        type Uri = St::Uri;
-        type Subject = St::Subject;
         type Handle = Set<members::handle>;
-        type Issuer = St::Issuer;
-        type DisplayName = St::DisplayName;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `issuer` field to Set
-    pub struct SetIssuer<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIssuer<St> {}
-    impl<St: State> State for SetIssuer<St> {
-        type Uri = St::Uri;
         type Subject = St::Subject;
-        type Handle = St::Handle;
-        type Issuer = Set<members::issuer>;
+        type Uri = St::Uri;
         type DisplayName = St::DisplayName;
         type CreatedAt = St::CreatedAt;
+        type Issuer = St::Issuer;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Handle = St::Handle;
+        type Subject = Set<members::subject>;
+        type Uri = St::Uri;
+        type DisplayName = St::DisplayName;
+        type CreatedAt = St::CreatedAt;
+        type Issuer = St::Issuer;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Handle = St::Handle;
+        type Subject = St::Subject;
+        type Uri = Set<members::uri>;
+        type DisplayName = St::DisplayName;
+        type CreatedAt = St::CreatedAt;
+        type Issuer = St::Issuer;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDisplayName<St> {}
     impl<St: State> State for SetDisplayName<St> {
-        type Uri = St::Uri;
-        type Subject = St::Subject;
         type Handle = St::Handle;
-        type Issuer = St::Issuer;
+        type Subject = St::Subject;
+        type Uri = St::Uri;
         type DisplayName = Set<members::display_name>;
         type CreatedAt = St::CreatedAt;
+        type Issuer = St::Issuer;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Uri = St::Uri;
-        type Subject = St::Subject;
         type Handle = St::Handle;
-        type Issuer = St::Issuer;
+        type Subject = St::Subject;
+        type Uri = St::Uri;
         type DisplayName = St::DisplayName;
         type CreatedAt = Set<members::created_at>;
+        type Issuer = St::Issuer;
+    }
+    ///State transition - sets the `issuer` field to Set
+    pub struct SetIssuer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIssuer<St> {}
+    impl<St: State> State for SetIssuer<St> {
+        type Handle = St::Handle;
+        type Subject = St::Subject;
+        type Uri = St::Uri;
+        type DisplayName = St::DisplayName;
+        type CreatedAt = St::CreatedAt;
+        type Issuer = Set<members::issuer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `handle` field
         pub struct handle(());
-        ///Marker type for the `issuer` field
-        pub struct issuer(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `issuer` field
+        pub struct issuer(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct VerificationViewBuilder<S: BosStr, St: verification_view_state::State> {
+pub struct VerificationViewBuilder<
+    St: verification_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -239,27 +242,71 @@ pub struct VerificationViewBuilder<S: BosStr, St: verification_view_state::State
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> VerificationView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> VerificationViewBuilder<S, verification_view_state::Empty> {
+impl VerificationView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> VerificationViewBuilder<verification_view_state::Empty, DefaultStr> {
         VerificationViewBuilder::new()
     }
 }
 
-impl<S: BosStr> VerificationViewBuilder<S, verification_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> VerificationView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> VerificationViewBuilder<verification_view_state::Empty, S> {
+        VerificationViewBuilder::builder()
+    }
+}
+
+impl VerificationViewBuilder<verification_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         VerificationViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St> VerificationViewBuilder<S, St>
+impl<S: BosStr> VerificationViewBuilder<verification_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        VerificationViewBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> VerificationViewBuilder<St, S>
 where
     St: verification_view_state::State,
     St::CreatedAt: verification_view_state::IsUnset,
@@ -268,7 +315,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> VerificationViewBuilder<S, verification_view_state::SetCreatedAt<St>> {
+    ) -> VerificationViewBuilder<verification_view_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         VerificationViewBuilder {
             _state: PhantomData,
@@ -278,7 +325,7 @@ where
     }
 }
 
-impl<S: BosStr, St> VerificationViewBuilder<S, St>
+impl<St, S: BosStr> VerificationViewBuilder<St, S>
 where
     St: verification_view_state::State,
     St::DisplayName: verification_view_state::IsUnset,
@@ -287,7 +334,7 @@ where
     pub fn display_name(
         mut self,
         value: impl Into<S>,
-    ) -> VerificationViewBuilder<S, verification_view_state::SetDisplayName<St>> {
+    ) -> VerificationViewBuilder<verification_view_state::SetDisplayName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         VerificationViewBuilder {
             _state: PhantomData,
@@ -297,7 +344,7 @@ where
     }
 }
 
-impl<S: BosStr, St> VerificationViewBuilder<S, St>
+impl<St, S: BosStr> VerificationViewBuilder<St, S>
 where
     St: verification_view_state::State,
     St::Handle: verification_view_state::IsUnset,
@@ -306,7 +353,7 @@ where
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> VerificationViewBuilder<S, verification_view_state::SetHandle<St>> {
+    ) -> VerificationViewBuilder<verification_view_state::SetHandle<St>, S> {
         self._fields.2 = Option::Some(value.into());
         VerificationViewBuilder {
             _state: PhantomData,
@@ -316,7 +363,7 @@ where
     }
 }
 
-impl<S: BosStr, St> VerificationViewBuilder<S, St>
+impl<St, S: BosStr> VerificationViewBuilder<St, S>
 where
     St: verification_view_state::State,
     St::Issuer: verification_view_state::IsUnset,
@@ -325,7 +372,7 @@ where
     pub fn issuer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> VerificationViewBuilder<S, verification_view_state::SetIssuer<St>> {
+    ) -> VerificationViewBuilder<verification_view_state::SetIssuer<St>, S> {
         self._fields.3 = Option::Some(value.into());
         VerificationViewBuilder {
             _state: PhantomData,
@@ -335,7 +382,7 @@ where
     }
 }
 
-impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, St> {
+impl<St: verification_view_state::State, S: BosStr> VerificationViewBuilder<St, S> {
     /// Set the `issuerProfile` field (optional)
     pub fn issuer_profile(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -348,20 +395,26 @@ impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, S
     }
 }
 
-impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, St> {
+impl<St: verification_view_state::State, S: BosStr> VerificationViewBuilder<St, S> {
     /// Set the `issuerRepo` field (optional)
-    pub fn issuer_repo(mut self, value: impl Into<Option<VerificationViewIssuerRepo<S>>>) -> Self {
+    pub fn issuer_repo(
+        mut self,
+        value: impl Into<Option<VerificationViewIssuerRepo<S>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `issuerRepo` field to an Option value (optional)
-    pub fn maybe_issuer_repo(mut self, value: Option<VerificationViewIssuerRepo<S>>) -> Self {
+    pub fn maybe_issuer_repo(
+        mut self,
+        value: Option<VerificationViewIssuerRepo<S>>,
+    ) -> Self {
         self._fields.5 = value;
         self
     }
 }
 
-impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, St> {
+impl<St: verification_view_state::State, S: BosStr> VerificationViewBuilder<St, S> {
     /// Set the `revokeReason` field (optional)
     pub fn revoke_reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -374,7 +427,7 @@ impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, S
     }
 }
 
-impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, St> {
+impl<St: verification_view_state::State, S: BosStr> VerificationViewBuilder<St, S> {
     /// Set the `revokedAt` field (optional)
     pub fn revoked_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.7 = value.into();
@@ -387,7 +440,7 @@ impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, S
     }
 }
 
-impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, St> {
+impl<St: verification_view_state::State, S: BosStr> VerificationViewBuilder<St, S> {
     /// Set the `revokedBy` field (optional)
     pub fn revoked_by(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -400,7 +453,7 @@ impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, S
     }
 }
 
-impl<S: BosStr, St> VerificationViewBuilder<S, St>
+impl<St, S: BosStr> VerificationViewBuilder<St, S>
 where
     St: verification_view_state::State,
     St::Subject: verification_view_state::IsUnset,
@@ -409,7 +462,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> VerificationViewBuilder<S, verification_view_state::SetSubject<St>> {
+    ) -> VerificationViewBuilder<verification_view_state::SetSubject<St>, S> {
         self._fields.9 = Option::Some(value.into());
         VerificationViewBuilder {
             _state: PhantomData,
@@ -419,7 +472,7 @@ where
     }
 }
 
-impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, St> {
+impl<St: verification_view_state::State, S: BosStr> VerificationViewBuilder<St, S> {
     /// Set the `subjectProfile` field (optional)
     pub fn subject_profile(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -432,7 +485,7 @@ impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, S
     }
 }
 
-impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, St> {
+impl<St: verification_view_state::State, S: BosStr> VerificationViewBuilder<St, S> {
     /// Set the `subjectRepo` field (optional)
     pub fn subject_repo(
         mut self,
@@ -442,13 +495,16 @@ impl<S: BosStr, St: verification_view_state::State> VerificationViewBuilder<S, S
         self
     }
     /// Set the `subjectRepo` field to an Option value (optional)
-    pub fn maybe_subject_repo(mut self, value: Option<VerificationViewSubjectRepo<S>>) -> Self {
+    pub fn maybe_subject_repo(
+        mut self,
+        value: Option<VerificationViewSubjectRepo<S>>,
+    ) -> Self {
         self._fields.11 = value;
         self
     }
 }
 
-impl<S: BosStr, St> VerificationViewBuilder<S, St>
+impl<St, S: BosStr> VerificationViewBuilder<St, S>
 where
     St: verification_view_state::State,
     St::Uri: verification_view_state::IsUnset,
@@ -457,7 +513,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> VerificationViewBuilder<S, verification_view_state::SetUri<St>> {
+    ) -> VerificationViewBuilder<verification_view_state::SetUri<St>, S> {
         self._fields.12 = Option::Some(value.into());
         VerificationViewBuilder {
             _state: PhantomData,
@@ -467,15 +523,15 @@ where
     }
 }
 
-impl<S: BosStr, St> VerificationViewBuilder<S, St>
+impl<St, S: BosStr> VerificationViewBuilder<St, S>
 where
     St: verification_view_state::State,
-    St::Uri: verification_view_state::IsSet,
-    St::Subject: verification_view_state::IsSet,
     St::Handle: verification_view_state::IsSet,
-    St::Issuer: verification_view_state::IsSet,
+    St::Subject: verification_view_state::IsSet,
+    St::Uri: verification_view_state::IsSet,
     St::DisplayName: verification_view_state::IsSet,
     St::CreatedAt: verification_view_state::IsSet,
+    St::Issuer: verification_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> VerificationView<S> {
@@ -497,7 +553,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> VerificationView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> VerificationView<S> {
         VerificationView {
             created_at: self._fields.0.unwrap(),
             display_name: self._fields.1.unwrap(),
@@ -518,10 +577,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_verification_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.verification.defs"),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A signing key for claim attestations. It effectively hosts a JWK on a user's ATProto repo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -134,7 +134,7 @@ impl<S: BosStr> LexiconSchema for ServerPublicKey<S> {
 
 pub mod server_public_key_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -142,70 +142,80 @@ pub mod server_public_key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ValidFrom;
         type PublicJwk;
         type ValidUntil;
+        type ValidFrom;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ValidFrom = Unset;
         type PublicJwk = Unset;
         type ValidUntil = Unset;
-    }
-    ///State transition - sets the `valid_from` field to Set
-    pub struct SetValidFrom<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValidFrom<St> {}
-    impl<St: State> State for SetValidFrom<St> {
-        type ValidFrom = Set<members::valid_from>;
-        type PublicJwk = St::PublicJwk;
-        type ValidUntil = St::ValidUntil;
+        type ValidFrom = Unset;
     }
     ///State transition - sets the `public_jwk` field to Set
     pub struct SetPublicJwk<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPublicJwk<St> {}
     impl<St: State> State for SetPublicJwk<St> {
-        type ValidFrom = St::ValidFrom;
         type PublicJwk = Set<members::public_jwk>;
         type ValidUntil = St::ValidUntil;
+        type ValidFrom = St::ValidFrom;
     }
     ///State transition - sets the `valid_until` field to Set
     pub struct SetValidUntil<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValidUntil<St> {}
     impl<St: State> State for SetValidUntil<St> {
-        type ValidFrom = St::ValidFrom;
         type PublicJwk = St::PublicJwk;
         type ValidUntil = Set<members::valid_until>;
+        type ValidFrom = St::ValidFrom;
+    }
+    ///State transition - sets the `valid_from` field to Set
+    pub struct SetValidFrom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValidFrom<St> {}
+    impl<St: State> State for SetValidFrom<St> {
+        type PublicJwk = St::PublicJwk;
+        type ValidUntil = St::ValidUntil;
+        type ValidFrom = Set<members::valid_from>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `valid_from` field
-        pub struct valid_from(());
         ///Marker type for the `public_jwk` field
         pub struct public_jwk(());
         ///Marker type for the `valid_until` field
         pub struct valid_until(());
+        ///Marker type for the `valid_from` field
+        pub struct valid_from(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ServerPublicKeyBuilder<S: BosStr, St: server_public_key_state::State> {
+pub struct ServerPublicKeyBuilder<
+    St: server_public_key_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<Datetime>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ServerPublicKey<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ServerPublicKeyBuilder<S, server_public_key_state::Empty> {
+impl ServerPublicKey<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ServerPublicKeyBuilder<server_public_key_state::Empty, DefaultStr> {
         ServerPublicKeyBuilder::new()
     }
 }
 
-impl<S: BosStr> ServerPublicKeyBuilder<S, server_public_key_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ServerPublicKey<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ServerPublicKeyBuilder<server_public_key_state::Empty, S> {
+        ServerPublicKeyBuilder::builder()
+    }
+}
+
+impl ServerPublicKeyBuilder<server_public_key_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ServerPublicKeyBuilder {
             _state: PhantomData,
@@ -215,7 +225,18 @@ impl<S: BosStr> ServerPublicKeyBuilder<S, server_public_key_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: server_public_key_state::State> ServerPublicKeyBuilder<S, St> {
+impl<S: BosStr> ServerPublicKeyBuilder<server_public_key_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ServerPublicKeyBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: server_public_key_state::State, S: BosStr> ServerPublicKeyBuilder<St, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -228,7 +249,7 @@ impl<S: BosStr, St: server_public_key_state::State> ServerPublicKeyBuilder<S, St
     }
 }
 
-impl<S: BosStr, St> ServerPublicKeyBuilder<S, St>
+impl<St, S: BosStr> ServerPublicKeyBuilder<St, S>
 where
     St: server_public_key_state::State,
     St::PublicJwk: server_public_key_state::IsUnset,
@@ -237,7 +258,7 @@ where
     pub fn public_jwk(
         mut self,
         value: impl Into<S>,
-    ) -> ServerPublicKeyBuilder<S, server_public_key_state::SetPublicJwk<St>> {
+    ) -> ServerPublicKeyBuilder<server_public_key_state::SetPublicJwk<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ServerPublicKeyBuilder {
             _state: PhantomData,
@@ -247,7 +268,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ServerPublicKeyBuilder<S, St>
+impl<St, S: BosStr> ServerPublicKeyBuilder<St, S>
 where
     St: server_public_key_state::State,
     St::ValidFrom: server_public_key_state::IsUnset,
@@ -256,7 +277,7 @@ where
     pub fn valid_from(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ServerPublicKeyBuilder<S, server_public_key_state::SetValidFrom<St>> {
+    ) -> ServerPublicKeyBuilder<server_public_key_state::SetValidFrom<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ServerPublicKeyBuilder {
             _state: PhantomData,
@@ -266,7 +287,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ServerPublicKeyBuilder<S, St>
+impl<St, S: BosStr> ServerPublicKeyBuilder<St, S>
 where
     St: server_public_key_state::State,
     St::ValidUntil: server_public_key_state::IsUnset,
@@ -275,7 +296,7 @@ where
     pub fn valid_until(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ServerPublicKeyBuilder<S, server_public_key_state::SetValidUntil<St>> {
+    ) -> ServerPublicKeyBuilder<server_public_key_state::SetValidUntil<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ServerPublicKeyBuilder {
             _state: PhantomData,
@@ -285,12 +306,12 @@ where
     }
 }
 
-impl<S: BosStr, St> ServerPublicKeyBuilder<S, St>
+impl<St, S: BosStr> ServerPublicKeyBuilder<St, S>
 where
     St: server_public_key_state::State,
-    St::ValidFrom: server_public_key_state::IsSet,
     St::PublicJwk: server_public_key_state::IsSet,
     St::ValidUntil: server_public_key_state::IsSet,
+    St::ValidFrom: server_public_key_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ServerPublicKey<S> {
@@ -303,7 +324,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ServerPublicKey<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ServerPublicKey<S> {
         ServerPublicKey {
             comment: self._fields.0,
             public_jwk: self._fields.1.unwrap(),
@@ -315,10 +339,10 @@ where
 }
 
 fn lexicon_doc_dev_keytrace_serverPublicKey() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.keytrace.serverPublicKey"),

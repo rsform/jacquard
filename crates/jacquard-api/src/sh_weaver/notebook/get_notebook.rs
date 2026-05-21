@@ -8,31 +8,26 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::sh_weaver::notebook::NotebookView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetNotebook<S: BosStr = DefaultStr> {
     pub notebook: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetNotebookOutput<S: BosStr = DefaultStr> {
     pub entries: Vec<StrongRef<S>>,
     pub notebook: NotebookView<S>,
@@ -66,7 +61,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookRequest {
 
 pub mod get_notebook_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -97,21 +92,28 @@ pub mod get_notebook_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetNotebookBuilder<S: BosStr, St: get_notebook_state::State> {
+pub struct GetNotebookBuilder<St: get_notebook_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetNotebook<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetNotebookBuilder<S, get_notebook_state::Empty> {
+impl GetNotebook<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetNotebookBuilder<get_notebook_state::Empty, DefaultStr> {
         GetNotebookBuilder::new()
     }
 }
 
-impl<S: BosStr> GetNotebookBuilder<S, get_notebook_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetNotebook<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetNotebookBuilder<get_notebook_state::Empty, S> {
+        GetNotebookBuilder::builder()
+    }
+}
+
+impl GetNotebookBuilder<get_notebook_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetNotebookBuilder {
             _state: PhantomData,
@@ -121,7 +123,18 @@ impl<S: BosStr> GetNotebookBuilder<S, get_notebook_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetNotebookBuilder<S, St>
+impl<S: BosStr> GetNotebookBuilder<get_notebook_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetNotebookBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetNotebookBuilder<St, S>
 where
     St: get_notebook_state::State,
     St::Notebook: get_notebook_state::IsUnset,
@@ -130,7 +143,7 @@ where
     pub fn notebook(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetNotebookBuilder<S, get_notebook_state::SetNotebook<St>> {
+    ) -> GetNotebookBuilder<get_notebook_state::SetNotebook<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetNotebookBuilder {
             _state: PhantomData,
@@ -140,7 +153,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetNotebookBuilder<S, St>
+impl<St, S: BosStr> GetNotebookBuilder<St, S>
 where
     St: get_notebook_state::State,
     St::Notebook: get_notebook_state::IsSet,

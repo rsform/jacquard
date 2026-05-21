@@ -10,27 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveEnrollments<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveEnrollmentsOutput<S: BosStr = DefaultStr> {
     ///Boundary domains the user is enrolled in. Empty if not enrolled.
     pub boundaries: Vec<S>,
@@ -67,7 +62,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ResolveEnrollmentsRequest {
 
 pub mod resolve_enrollments_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -98,21 +93,34 @@ pub mod resolve_enrollments_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ResolveEnrollmentsBuilder<S: BosStr, St: resolve_enrollments_state::State> {
+pub struct ResolveEnrollmentsBuilder<
+    St: resolve_enrollments_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ResolveEnrollments<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ResolveEnrollmentsBuilder<S, resolve_enrollments_state::Empty> {
+impl ResolveEnrollments<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ResolveEnrollmentsBuilder<
+        resolve_enrollments_state::Empty,
+        DefaultStr,
+    > {
         ResolveEnrollmentsBuilder::new()
     }
 }
 
-impl<S: BosStr> ResolveEnrollmentsBuilder<S, resolve_enrollments_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ResolveEnrollments<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ResolveEnrollmentsBuilder<resolve_enrollments_state::Empty, S> {
+        ResolveEnrollmentsBuilder::builder()
+    }
+}
+
+impl ResolveEnrollmentsBuilder<resolve_enrollments_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ResolveEnrollmentsBuilder {
             _state: PhantomData,
@@ -122,7 +130,18 @@ impl<S: BosStr> ResolveEnrollmentsBuilder<S, resolve_enrollments_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ResolveEnrollmentsBuilder<S, St>
+impl<S: BosStr> ResolveEnrollmentsBuilder<resolve_enrollments_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ResolveEnrollmentsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ResolveEnrollmentsBuilder<St, S>
 where
     St: resolve_enrollments_state::State,
     St::Did: resolve_enrollments_state::IsUnset,
@@ -131,7 +150,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ResolveEnrollmentsBuilder<S, resolve_enrollments_state::SetDid<St>> {
+    ) -> ResolveEnrollmentsBuilder<resolve_enrollments_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ResolveEnrollmentsBuilder {
             _state: PhantomData,
@@ -141,7 +160,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ResolveEnrollmentsBuilder<S, St>
+impl<St, S: BosStr> ResolveEnrollmentsBuilder<St, S>
 where
     St: resolve_enrollments_state::State,
     St::Did: resolve_enrollments_state::IsSet,

@@ -167,8 +167,8 @@ pub mod option_record_state {
 
 /// Builder for constructing an instance of this type.
 pub struct OptionRecordBuilder<
-    S: jacquard_common::BosStr,
     St: option_record_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
 > {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
@@ -180,15 +180,25 @@ pub struct OptionRecordBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> OptionRecord<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> OptionRecordBuilder<S, option_record_state::Empty> {
+impl OptionRecord<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> OptionRecordBuilder<
+        option_record_state::Empty,
+        jacquard_common::DefaultStr,
+    > {
         OptionRecordBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> OptionRecordBuilder<S, option_record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> OptionRecord<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> OptionRecordBuilder<option_record_state::Empty, S> {
+        OptionRecordBuilder::builder()
+    }
+}
+
+impl OptionRecordBuilder<option_record_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         OptionRecordBuilder {
             _state: ::core::marker::PhantomData,
@@ -198,7 +208,18 @@ impl<S: jacquard_common::BosStr> OptionRecordBuilder<S, option_record_state::Emp
     }
 }
 
-impl<S: jacquard_common::BosStr, St> OptionRecordBuilder<S, St>
+impl<S: jacquard_common::BosStr> OptionRecordBuilder<option_record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        OptionRecordBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None, None),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St, S: jacquard_common::BosStr> OptionRecordBuilder<St, S>
 where
     St: option_record_state::State,
     St::Choice: option_record_state::IsUnset,
@@ -209,7 +230,7 @@ where
         value: impl Into<
             crate::macro_mode::test_collision::option::OptionRecordOption<S>,
         >,
-    ) -> OptionRecordBuilder<S, option_record_state::SetChoice<St>> {
+    ) -> OptionRecordBuilder<option_record_state::SetChoice<St>, S> {
         self._fields.0 = ::core::option::Option::Some(value.into());
         OptionRecordBuilder {
             _state: ::core::marker::PhantomData,
@@ -220,9 +241,9 @@ where
 }
 
 impl<
-    S: jacquard_common::BosStr,
     St: option_record_state::State,
-> OptionRecordBuilder<S, St> {
+    S: jacquard_common::BosStr,
+> OptionRecordBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -235,7 +256,7 @@ impl<
     }
 }
 
-impl<S: jacquard_common::BosStr, St> OptionRecordBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> OptionRecordBuilder<St, S>
 where
     St: option_record_state::State,
     St::Choice: option_record_state::IsSet,

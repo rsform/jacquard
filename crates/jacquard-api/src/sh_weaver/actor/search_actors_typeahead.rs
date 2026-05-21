@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::actor::ProfileViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::actor::ProfileViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchActorsTypeahead<S: BosStr = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 25.
     #[serde(default = "_default_limit")]
@@ -30,11 +27,9 @@ pub struct SearchActorsTypeahead<S: BosStr = DefaultStr> {
     pub q: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchActorsTypeaheadOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<ProfileViewBasic<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -71,7 +66,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_actors_typeahead_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -102,21 +97,37 @@ pub mod search_actors_typeahead_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchActorsTypeaheadBuilder<S: BosStr, St: search_actors_typeahead_state::State> {
+pub struct SearchActorsTypeaheadBuilder<
+    St: search_actors_typeahead_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SearchActorsTypeahead<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SearchActorsTypeaheadBuilder<S, search_actors_typeahead_state::Empty> {
+impl SearchActorsTypeahead<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SearchActorsTypeaheadBuilder<
+        search_actors_typeahead_state::Empty,
+        DefaultStr,
+    > {
         SearchActorsTypeaheadBuilder::new()
     }
 }
 
-impl<S: BosStr> SearchActorsTypeaheadBuilder<S, search_actors_typeahead_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SearchActorsTypeahead<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SearchActorsTypeaheadBuilder<
+        search_actors_typeahead_state::Empty,
+        S,
+    > {
+        SearchActorsTypeaheadBuilder::builder()
+    }
+}
+
+impl SearchActorsTypeaheadBuilder<search_actors_typeahead_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SearchActorsTypeaheadBuilder {
             _state: PhantomData,
@@ -126,7 +137,21 @@ impl<S: BosStr> SearchActorsTypeaheadBuilder<S, search_actors_typeahead_state::E
     }
 }
 
-impl<S: BosStr, St: search_actors_typeahead_state::State> SearchActorsTypeaheadBuilder<S, St> {
+impl<S: BosStr> SearchActorsTypeaheadBuilder<search_actors_typeahead_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SearchActorsTypeaheadBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<
+    St: search_actors_typeahead_state::State,
+    S: BosStr,
+> SearchActorsTypeaheadBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -139,7 +164,7 @@ impl<S: BosStr, St: search_actors_typeahead_state::State> SearchActorsTypeaheadB
     }
 }
 
-impl<S: BosStr, St> SearchActorsTypeaheadBuilder<S, St>
+impl<St, S: BosStr> SearchActorsTypeaheadBuilder<St, S>
 where
     St: search_actors_typeahead_state::State,
     St::Q: search_actors_typeahead_state::IsUnset,
@@ -148,7 +173,7 @@ where
     pub fn q(
         mut self,
         value: impl Into<S>,
-    ) -> SearchActorsTypeaheadBuilder<S, search_actors_typeahead_state::SetQ<St>> {
+    ) -> SearchActorsTypeaheadBuilder<search_actors_typeahead_state::SetQ<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SearchActorsTypeaheadBuilder {
             _state: PhantomData,
@@ -158,7 +183,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SearchActorsTypeaheadBuilder<S, St>
+impl<St, S: BosStr> SearchActorsTypeaheadBuilder<St, S>
 where
     St: search_actors_typeahead_state::State,
     St::Q: search_actors_typeahead_state::IsSet,

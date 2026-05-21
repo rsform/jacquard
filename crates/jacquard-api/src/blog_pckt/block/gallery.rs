@@ -23,13 +23,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Gallery<S: BosStr = DefaultStr> {
     ///Reference to a blog.pckt.gallery record
     pub r#ref: AtUri<S>,
@@ -54,7 +51,7 @@ impl<S: BosStr> LexiconSchema for Gallery<S> {
 
 pub mod gallery_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -85,21 +82,28 @@ pub mod gallery_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GalleryBuilder<S: BosStr, St: gallery_state::State> {
+pub struct GalleryBuilder<St: gallery_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Gallery<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GalleryBuilder<S, gallery_state::Empty> {
+impl Gallery<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GalleryBuilder<gallery_state::Empty, DefaultStr> {
         GalleryBuilder::new()
     }
 }
 
-impl<S: BosStr> GalleryBuilder<S, gallery_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Gallery<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GalleryBuilder<gallery_state::Empty, S> {
+        GalleryBuilder::builder()
+    }
+}
+
+impl GalleryBuilder<gallery_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GalleryBuilder {
             _state: PhantomData,
@@ -109,7 +113,18 @@ impl<S: BosStr> GalleryBuilder<S, gallery_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GalleryBuilder<S, St>
+impl<S: BosStr> GalleryBuilder<gallery_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GalleryBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GalleryBuilder<St, S>
 where
     St: gallery_state::State,
     St::Ref: gallery_state::IsUnset,
@@ -118,7 +133,7 @@ where
     pub fn r#ref(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GalleryBuilder<S, gallery_state::SetRef<St>> {
+    ) -> GalleryBuilder<gallery_state::SetRef<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GalleryBuilder {
             _state: PhantomData,
@@ -128,7 +143,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GalleryBuilder<S, St>
+impl<St, S: BosStr> GalleryBuilder<St, S>
 where
     St: gallery_state::State,
     St::Ref: gallery_state::IsSet,
@@ -150,10 +165,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_block_gallery() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.block.gallery"),
@@ -169,9 +184,11 @@ fn lexicon_doc_blog_pckt_block_gallery() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("ref"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Reference to a blog.pckt.gallery record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Reference to a blog.pckt.gallery record",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),

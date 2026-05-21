@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NextParams<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub player_id: Option<S>,
@@ -41,8 +38,9 @@ impl jacquard_common::xrpc::XrpcResp for NextResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Next {
     const NSID: &'static str = "app.rocksky.player.next";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = NextResponse;
 }
 
@@ -50,15 +48,16 @@ impl jacquard_common::xrpc::XrpcRequest for Next {
 pub struct NextRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NextRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.player.next";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Next;
     type Response = NextResponse;
 }
 
 pub mod next_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -76,21 +75,28 @@ pub mod next_params_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NextParamsBuilder<S: BosStr, St: next_params_state::State> {
+pub struct NextParamsBuilder<St: next_params_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> NextParams<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> NextParamsBuilder<S, next_params_state::Empty> {
+impl NextParams<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> NextParamsBuilder<next_params_state::Empty, DefaultStr> {
         NextParamsBuilder::new()
     }
 }
 
-impl<S: BosStr> NextParamsBuilder<S, next_params_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> NextParams<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> NextParamsBuilder<next_params_state::Empty, S> {
+        NextParamsBuilder::builder()
+    }
+}
+
+impl NextParamsBuilder<next_params_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         NextParamsBuilder {
             _state: PhantomData,
@@ -100,7 +106,18 @@ impl<S: BosStr> NextParamsBuilder<S, next_params_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: next_params_state::State> NextParamsBuilder<S, St> {
+impl<S: BosStr> NextParamsBuilder<next_params_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        NextParamsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: next_params_state::State, S: BosStr> NextParamsBuilder<St, S> {
     /// Set the `playerId` field (optional)
     pub fn player_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -113,7 +130,7 @@ impl<S: BosStr, St: next_params_state::State> NextParamsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> NextParamsBuilder<S, St>
+impl<St, S: BosStr> NextParamsBuilder<St, S>
 where
     St: next_params_state::State,
 {

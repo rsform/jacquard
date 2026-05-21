@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_asadaame5121::at_circle::RingRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_asadaame5121::at_circle::RingRef;
 /// A banner image for a ring
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -119,16 +119,19 @@ impl<S: BosStr> LexiconSchema for Banner<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("banner"),
@@ -144,7 +147,7 @@ impl<S: BosStr> LexiconSchema for Banner<S> {
 
 pub mod banner_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -153,69 +156,76 @@ pub mod banner_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Ring;
-        type Banner;
         type CreatedAt;
+        type Banner;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Ring = Unset;
-        type Banner = Unset;
         type CreatedAt = Unset;
+        type Banner = Unset;
     }
     ///State transition - sets the `ring` field to Set
     pub struct SetRing<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRing<St> {}
     impl<St: State> State for SetRing<St> {
         type Ring = Set<members::ring>;
+        type CreatedAt = St::CreatedAt;
         type Banner = St::Banner;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `banner` field to Set
-    pub struct SetBanner<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBanner<St> {}
-    impl<St: State> State for SetBanner<St> {
-        type Ring = St::Ring;
-        type Banner = Set<members::banner>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type Ring = St::Ring;
-        type Banner = St::Banner;
         type CreatedAt = Set<members::created_at>;
+        type Banner = St::Banner;
+    }
+    ///State transition - sets the `banner` field to Set
+    pub struct SetBanner<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBanner<St> {}
+    impl<St: State> State for SetBanner<St> {
+        type Ring = St::Ring;
+        type CreatedAt = St::CreatedAt;
+        type Banner = Set<members::banner>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `ring` field
         pub struct ring(());
-        ///Marker type for the `banner` field
-        pub struct banner(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `banner` field
+        pub struct banner(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BannerBuilder<S: BosStr, St: banner_state::State> {
+pub struct BannerBuilder<St: banner_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<Datetime>, Option<RingRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Banner<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BannerBuilder<S, banner_state::Empty> {
+impl Banner<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BannerBuilder<banner_state::Empty, DefaultStr> {
         BannerBuilder::new()
     }
 }
 
-impl<S: BosStr> BannerBuilder<S, banner_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Banner<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BannerBuilder<banner_state::Empty, S> {
+        BannerBuilder::builder()
+    }
+}
+
+impl BannerBuilder<banner_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BannerBuilder {
             _state: PhantomData,
@@ -225,7 +235,18 @@ impl<S: BosStr> BannerBuilder<S, banner_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BannerBuilder<S, St>
+impl<S: BosStr> BannerBuilder<banner_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BannerBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BannerBuilder<St, S>
 where
     St: banner_state::State,
     St::Banner: banner_state::IsUnset,
@@ -234,7 +255,7 @@ where
     pub fn banner(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> BannerBuilder<S, banner_state::SetBanner<St>> {
+    ) -> BannerBuilder<banner_state::SetBanner<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BannerBuilder {
             _state: PhantomData,
@@ -244,7 +265,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BannerBuilder<S, St>
+impl<St, S: BosStr> BannerBuilder<St, S>
 where
     St: banner_state::State,
     St::CreatedAt: banner_state::IsUnset,
@@ -253,7 +274,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BannerBuilder<S, banner_state::SetCreatedAt<St>> {
+    ) -> BannerBuilder<banner_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BannerBuilder {
             _state: PhantomData,
@@ -263,7 +284,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BannerBuilder<S, St>
+impl<St, S: BosStr> BannerBuilder<St, S>
 where
     St: banner_state::State,
     St::Ring: banner_state::IsUnset,
@@ -272,7 +293,7 @@ where
     pub fn ring(
         mut self,
         value: impl Into<RingRef<S>>,
-    ) -> BannerBuilder<S, banner_state::SetRing<St>> {
+    ) -> BannerBuilder<banner_state::SetRing<St>, S> {
         self._fields.2 = Option::Some(value.into());
         BannerBuilder {
             _state: PhantomData,
@@ -282,12 +303,12 @@ where
     }
 }
 
-impl<S: BosStr, St> BannerBuilder<S, St>
+impl<St, S: BosStr> BannerBuilder<St, S>
 where
     St: banner_state::State,
     St::Ring: banner_state::IsSet,
-    St::Banner: banner_state::IsSet,
     St::CreatedAt: banner_state::IsSet,
+    St::Banner: banner_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Banner<S> {
@@ -310,10 +331,10 @@ where
 }
 
 fn lexicon_doc_net_asadaame5121_at_circle_banner() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.asadaame5121.at-circle.banner"),
@@ -325,19 +346,18 @@ fn lexicon_doc_net_asadaame5121_at_circle_banner() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A banner image for a ring")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("ring"),
-                            SmolStr::new_static("banner"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("ring"), SmolStr::new_static("banner"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("banner"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),

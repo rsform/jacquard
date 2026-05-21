@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// The entity (person or company) that owns the master recording rights
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -114,7 +114,7 @@ impl<S: BosStr> LexiconSchema for MasterOwner<S> {
 
 pub mod master_owner_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -145,21 +145,28 @@ pub mod master_owner_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MasterOwnerBuilder<S: BosStr, St: master_owner_state::State> {
+pub struct MasterOwnerBuilder<St: master_owner_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> MasterOwner<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MasterOwnerBuilder<S, master_owner_state::Empty> {
+impl MasterOwner<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MasterOwnerBuilder<master_owner_state::Empty, DefaultStr> {
         MasterOwnerBuilder::new()
     }
 }
 
-impl<S: BosStr> MasterOwnerBuilder<S, master_owner_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> MasterOwner<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MasterOwnerBuilder<master_owner_state::Empty, S> {
+        MasterOwnerBuilder::builder()
+    }
+}
+
+impl MasterOwnerBuilder<master_owner_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MasterOwnerBuilder {
             _state: PhantomData,
@@ -169,7 +176,18 @@ impl<S: BosStr> MasterOwnerBuilder<S, master_owner_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MasterOwnerBuilder<S, St>
+impl<S: BosStr> MasterOwnerBuilder<master_owner_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MasterOwnerBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MasterOwnerBuilder<St, S>
 where
     St: master_owner_state::State,
     St::Name: master_owner_state::IsUnset,
@@ -178,7 +196,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> MasterOwnerBuilder<S, master_owner_state::SetName<St>> {
+    ) -> MasterOwnerBuilder<master_owner_state::SetName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MasterOwnerBuilder {
             _state: PhantomData,
@@ -188,7 +206,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MasterOwnerBuilder<S, St>
+impl<St, S: BosStr> MasterOwnerBuilder<St, S>
 where
     St: master_owner_state::State,
     St::Name: master_owner_state::IsSet,
@@ -201,7 +219,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MasterOwner<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MasterOwner<S> {
         MasterOwner {
             name: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -210,10 +231,10 @@ where
 }
 
 fn lexicon_doc_ch_indiemusi_alpha_actor_masterOwner() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ch.indiemusi.alpha.actor.masterOwner"),
@@ -222,9 +243,11 @@ fn lexicon_doc_ch_indiemusi_alpha_actor_masterOwner() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "The entity (person or company) that owns the master recording rights",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "The entity (person or company) that owns the master recording rights",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("name")]),

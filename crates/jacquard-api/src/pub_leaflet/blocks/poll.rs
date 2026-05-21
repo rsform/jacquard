@@ -20,16 +20,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Poll<S: BosStr = DefaultStr> {
     pub poll_ref: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -53,7 +50,7 @@ impl<S: BosStr> LexiconSchema for Poll<S> {
 
 pub mod poll_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -84,21 +81,28 @@ pub mod poll_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PollBuilder<S: BosStr, St: poll_state::State> {
+pub struct PollBuilder<St: poll_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Poll<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PollBuilder<S, poll_state::Empty> {
+impl Poll<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PollBuilder<poll_state::Empty, DefaultStr> {
         PollBuilder::new()
     }
 }
 
-impl<S: BosStr> PollBuilder<S, poll_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Poll<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PollBuilder<poll_state::Empty, S> {
+        PollBuilder::builder()
+    }
+}
+
+impl PollBuilder<poll_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PollBuilder {
             _state: PhantomData,
@@ -108,7 +112,18 @@ impl<S: BosStr> PollBuilder<S, poll_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PollBuilder<S, St>
+impl<S: BosStr> PollBuilder<poll_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PollBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PollBuilder<St, S>
 where
     St: poll_state::State,
     St::PollRef: poll_state::IsUnset,
@@ -117,7 +132,7 @@ where
     pub fn poll_ref(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> PollBuilder<S, poll_state::SetPollRef<St>> {
+    ) -> PollBuilder<poll_state::SetPollRef<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PollBuilder {
             _state: PhantomData,
@@ -127,7 +142,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PollBuilder<S, St>
+impl<St, S: BosStr> PollBuilder<St, S>
 where
     St: poll_state::State,
     St::PollRef: poll_state::IsSet,
@@ -149,10 +164,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_blocks_poll() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.blocks.poll"),

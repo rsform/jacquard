@@ -8,31 +8,26 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::community_lexicon::calendar::rsvp::Rsvp;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Did};
+use jacquard_common::types::string::{Did, AtUri};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::community_lexicon::calendar::rsvp::Rsvp;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRsvp<S: BosStr = DefaultStr> {
     pub event: AtUri<S>,
     pub identity: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRsvpOutput<S: BosStr = DefaultStr> {
     ///CID of the RSVP record.
     pub cid: S,
@@ -44,19 +39,25 @@ pub struct GetRsvpOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetRsvpError {
     #[serde(rename = "NotFound")]
     NotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetRsvpError {
@@ -106,7 +107,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetRsvpRequest {
 
 pub mod get_rsvp_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -149,21 +150,28 @@ pub mod get_rsvp_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetRsvpBuilder<S: BosStr, St: get_rsvp_state::State> {
+pub struct GetRsvpBuilder<St: get_rsvp_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetRsvp<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetRsvpBuilder<S, get_rsvp_state::Empty> {
+impl GetRsvp<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetRsvpBuilder<get_rsvp_state::Empty, DefaultStr> {
         GetRsvpBuilder::new()
     }
 }
 
-impl<S: BosStr> GetRsvpBuilder<S, get_rsvp_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetRsvp<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetRsvpBuilder<get_rsvp_state::Empty, S> {
+        GetRsvpBuilder::builder()
+    }
+}
+
+impl GetRsvpBuilder<get_rsvp_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetRsvpBuilder {
             _state: PhantomData,
@@ -173,7 +181,18 @@ impl<S: BosStr> GetRsvpBuilder<S, get_rsvp_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetRsvpBuilder<S, St>
+impl<S: BosStr> GetRsvpBuilder<get_rsvp_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetRsvpBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetRsvpBuilder<St, S>
 where
     St: get_rsvp_state::State,
     St::Event: get_rsvp_state::IsUnset,
@@ -182,7 +201,7 @@ where
     pub fn event(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetRsvpBuilder<S, get_rsvp_state::SetEvent<St>> {
+    ) -> GetRsvpBuilder<get_rsvp_state::SetEvent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetRsvpBuilder {
             _state: PhantomData,
@@ -192,7 +211,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetRsvpBuilder<S, St>
+impl<St, S: BosStr> GetRsvpBuilder<St, S>
 where
     St: get_rsvp_state::State,
     St::Identity: get_rsvp_state::IsUnset,
@@ -201,7 +220,7 @@ where
     pub fn identity(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetRsvpBuilder<S, get_rsvp_state::SetIdentity<St>> {
+    ) -> GetRsvpBuilder<get_rsvp_state::SetIdentity<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetRsvpBuilder {
             _state: PhantomData,
@@ -211,7 +230,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetRsvpBuilder<S, St>
+impl<St, S: BosStr> GetRsvpBuilder<St, S>
 where
     St: get_rsvp_state::State,
     St::Event: get_rsvp_state::IsSet,

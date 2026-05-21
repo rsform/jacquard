@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateInviteCode<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub for_account: Option<Did<S>>,
@@ -30,11 +27,9 @@ pub struct CreateInviteCode<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateInviteCodeOutput<S: BosStr = DefaultStr> {
     pub code: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -52,8 +47,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateInviteCodeResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateInviteCode<S> {
     const NSID: &'static str = "com.atproto.server.createInviteCode";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateInviteCodeResponse;
 }
 
@@ -61,15 +57,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateInviteCode<S> {
 pub struct CreateInviteCodeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateInviteCodeRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.createInviteCode";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateInviteCode<S>;
     type Response = CreateInviteCodeResponse;
 }
 
 pub mod create_invite_code_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -100,21 +97,34 @@ pub mod create_invite_code_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateInviteCodeBuilder<S: BosStr, St: create_invite_code_state::State> {
+pub struct CreateInviteCodeBuilder<
+    St: create_invite_code_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CreateInviteCode<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CreateInviteCodeBuilder<S, create_invite_code_state::Empty> {
+impl CreateInviteCode<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CreateInviteCodeBuilder<
+        create_invite_code_state::Empty,
+        DefaultStr,
+    > {
         CreateInviteCodeBuilder::new()
     }
 }
 
-impl<S: BosStr> CreateInviteCodeBuilder<S, create_invite_code_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CreateInviteCode<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CreateInviteCodeBuilder<create_invite_code_state::Empty, S> {
+        CreateInviteCodeBuilder::builder()
+    }
+}
+
+impl CreateInviteCodeBuilder<create_invite_code_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CreateInviteCodeBuilder {
             _state: PhantomData,
@@ -124,7 +134,18 @@ impl<S: BosStr> CreateInviteCodeBuilder<S, create_invite_code_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: create_invite_code_state::State> CreateInviteCodeBuilder<S, St> {
+impl<S: BosStr> CreateInviteCodeBuilder<create_invite_code_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CreateInviteCodeBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: create_invite_code_state::State, S: BosStr> CreateInviteCodeBuilder<St, S> {
     /// Set the `forAccount` field (optional)
     pub fn for_account(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -137,7 +158,7 @@ impl<S: BosStr, St: create_invite_code_state::State> CreateInviteCodeBuilder<S, 
     }
 }
 
-impl<S: BosStr, St> CreateInviteCodeBuilder<S, St>
+impl<St, S: BosStr> CreateInviteCodeBuilder<St, S>
 where
     St: create_invite_code_state::State,
     St::UseCount: create_invite_code_state::IsUnset,
@@ -146,7 +167,7 @@ where
     pub fn use_count(
         mut self,
         value: impl Into<i64>,
-    ) -> CreateInviteCodeBuilder<S, create_invite_code_state::SetUseCount<St>> {
+    ) -> CreateInviteCodeBuilder<create_invite_code_state::SetUseCount<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CreateInviteCodeBuilder {
             _state: PhantomData,
@@ -156,7 +177,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CreateInviteCodeBuilder<S, St>
+impl<St, S: BosStr> CreateInviteCodeBuilder<St, S>
 where
     St: create_invite_code_state::State,
     St::UseCount: create_invite_code_state::IsSet,
@@ -170,7 +191,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateInviteCode<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateInviteCode<S> {
         CreateInviteCode {
             for_account: self._fields.0,
             use_count: self._fields.1.unwrap(),

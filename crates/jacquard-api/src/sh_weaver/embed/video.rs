@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,19 +22,16 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::embed::AspectRatio;
 use crate::sh_weaver::embed::PercentSize;
 use crate::sh_weaver::embed::PixelSize;
 use crate::sh_weaver::embed::video;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Caption<S: BosStr = DefaultStr> {
     pub file: BlobRef<S>,
     pub lang: Language,
@@ -42,22 +39,18 @@ pub struct Caption<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VideoRecord<S: BosStr = DefaultStr> {
     pub videos: Vec<video::Video<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Video<S: BosStr = DefaultStr> {
     ///Alt text description of the video, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -74,6 +67,7 @@ pub struct Video<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -86,11 +80,9 @@ pub enum VideoDimensions<S: BosStr = DefaultStr> {
     PixelSize(Box<PixelSize<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct View<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -105,6 +97,7 @@ pub struct View<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -147,16 +140,19 @@ impl<S: BosStr> LexiconSchema for Caption<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["text/vtt"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("file"),
@@ -256,16 +252,19 @@ impl<S: BosStr> LexiconSchema for Video<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["video/mp4"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("video"),
@@ -328,7 +327,7 @@ impl<S: BosStr> LexiconSchema for View<S> {
 
 pub mod caption_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -336,56 +335,63 @@ pub mod caption_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type File;
         type Lang;
+        type File;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type File = Unset;
         type Lang = Unset;
-    }
-    ///State transition - sets the `file` field to Set
-    pub struct SetFile<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFile<St> {}
-    impl<St: State> State for SetFile<St> {
-        type File = Set<members::file>;
-        type Lang = St::Lang;
+        type File = Unset;
     }
     ///State transition - sets the `lang` field to Set
     pub struct SetLang<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLang<St> {}
     impl<St: State> State for SetLang<St> {
-        type File = St::File;
         type Lang = Set<members::lang>;
+        type File = St::File;
+    }
+    ///State transition - sets the `file` field to Set
+    pub struct SetFile<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFile<St> {}
+    impl<St: State> State for SetFile<St> {
+        type Lang = St::Lang;
+        type File = Set<members::file>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `file` field
-        pub struct file(());
         ///Marker type for the `lang` field
         pub struct lang(());
+        ///Marker type for the `file` field
+        pub struct file(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CaptionBuilder<S: BosStr, St: caption_state::State> {
+pub struct CaptionBuilder<St: caption_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<Language>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Caption<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CaptionBuilder<S, caption_state::Empty> {
+impl Caption<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CaptionBuilder<caption_state::Empty, DefaultStr> {
         CaptionBuilder::new()
     }
 }
 
-impl<S: BosStr> CaptionBuilder<S, caption_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Caption<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CaptionBuilder<caption_state::Empty, S> {
+        CaptionBuilder::builder()
+    }
+}
+
+impl CaptionBuilder<caption_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CaptionBuilder {
             _state: PhantomData,
@@ -395,7 +401,18 @@ impl<S: BosStr> CaptionBuilder<S, caption_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CaptionBuilder<S, St>
+impl<S: BosStr> CaptionBuilder<caption_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CaptionBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CaptionBuilder<St, S>
 where
     St: caption_state::State,
     St::File: caption_state::IsUnset,
@@ -404,7 +421,7 @@ where
     pub fn file(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> CaptionBuilder<S, caption_state::SetFile<St>> {
+    ) -> CaptionBuilder<caption_state::SetFile<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CaptionBuilder {
             _state: PhantomData,
@@ -414,7 +431,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CaptionBuilder<S, St>
+impl<St, S: BosStr> CaptionBuilder<St, S>
 where
     St: caption_state::State,
     St::Lang: caption_state::IsUnset,
@@ -423,7 +440,7 @@ where
     pub fn lang(
         mut self,
         value: impl Into<Language>,
-    ) -> CaptionBuilder<S, caption_state::SetLang<St>> {
+    ) -> CaptionBuilder<caption_state::SetLang<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CaptionBuilder {
             _state: PhantomData,
@@ -433,11 +450,11 @@ where
     }
 }
 
-impl<S: BosStr, St> CaptionBuilder<S, St>
+impl<St, S: BosStr> CaptionBuilder<St, S>
 where
     St: caption_state::State,
-    St::File: caption_state::IsSet,
     St::Lang: caption_state::IsSet,
+    St::File: caption_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Caption<S> {
@@ -458,10 +475,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_embed_video() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.embed.video"),
@@ -470,18 +487,15 @@ fn lexicon_doc_sh_weaver_embed_video() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("caption"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("lang"),
-                        SmolStr::new_static("file"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("lang"), SmolStr::new_static("file")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("file"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("lang"),
@@ -527,9 +541,11 @@ fn lexicon_doc_sh_weaver_embed_video() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Alt text description of the video, for accessibility.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Alt text description of the video, for accessibility.",
+                                    ),
+                                ),
                                 max_length: Some(10000usize),
                                 max_graphemes: Some(1000usize),
                                 ..Default::default()
@@ -552,7 +568,7 @@ fn lexicon_doc_sh_weaver_embed_video() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("app.bsky.embed.defs#aspectRatio"),
                                     CowStr::new_static("sh.weaver.embed.defs#percentSize"),
-                                    CowStr::new_static("sh.weaver.embed.defs#pixelSize"),
+                                    CowStr::new_static("sh.weaver.embed.defs#pixelSize")
                                 ],
                                 ..Default::default()
                             }),
@@ -566,9 +582,7 @@ fn lexicon_doc_sh_weaver_embed_video() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("video"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -578,10 +592,9 @@ fn lexicon_doc_sh_weaver_embed_video() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("view"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("playlist"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("cid"), SmolStr::new_static("playlist")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -606,7 +619,7 @@ fn lexicon_doc_sh_weaver_embed_video() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("app.bsky.embed.defs#aspectRatio"),
                                     CowStr::new_static("sh.weaver.embed.defs#percentSize"),
-                                    CowStr::new_static("sh.weaver.embed.defs#pixelSize"),
+                                    CowStr::new_static("sh.weaver.embed.defs#pixelSize")
                                 ],
                                 ..Default::default()
                             }),
@@ -645,7 +658,7 @@ fn lexicon_doc_sh_weaver_embed_video() -> LexiconDoc<'static> {
 
 pub mod video_record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -676,21 +689,28 @@ pub mod video_record_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct VideoRecordBuilder<S: BosStr, St: video_record_state::State> {
+pub struct VideoRecordBuilder<St: video_record_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<video::Video<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> VideoRecord<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> VideoRecordBuilder<S, video_record_state::Empty> {
+impl VideoRecord<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> VideoRecordBuilder<video_record_state::Empty, DefaultStr> {
         VideoRecordBuilder::new()
     }
 }
 
-impl<S: BosStr> VideoRecordBuilder<S, video_record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> VideoRecord<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> VideoRecordBuilder<video_record_state::Empty, S> {
+        VideoRecordBuilder::builder()
+    }
+}
+
+impl VideoRecordBuilder<video_record_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         VideoRecordBuilder {
             _state: PhantomData,
@@ -700,7 +720,18 @@ impl<S: BosStr> VideoRecordBuilder<S, video_record_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> VideoRecordBuilder<S, St>
+impl<S: BosStr> VideoRecordBuilder<video_record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        VideoRecordBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> VideoRecordBuilder<St, S>
 where
     St: video_record_state::State,
     St::Videos: video_record_state::IsUnset,
@@ -709,7 +740,7 @@ where
     pub fn videos(
         mut self,
         value: impl Into<Vec<video::Video<S>>>,
-    ) -> VideoRecordBuilder<S, video_record_state::SetVideos<St>> {
+    ) -> VideoRecordBuilder<video_record_state::SetVideos<St>, S> {
         self._fields.0 = Option::Some(value.into());
         VideoRecordBuilder {
             _state: PhantomData,
@@ -719,7 +750,7 @@ where
     }
 }
 
-impl<S: BosStr, St> VideoRecordBuilder<S, St>
+impl<St, S: BosStr> VideoRecordBuilder<St, S>
 where
     St: video_record_state::State,
     St::Videos: video_record_state::IsSet,
@@ -732,7 +763,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> VideoRecord<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> VideoRecord<S> {
         VideoRecord {
             videos: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -742,7 +776,7 @@ where
 
 pub mod video_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -773,7 +807,7 @@ pub mod video_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct VideoBuilder<S: BosStr, St: video_state::State> {
+pub struct VideoBuilder<St: video_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -785,15 +819,22 @@ pub struct VideoBuilder<S: BosStr, St: video_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Video<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> VideoBuilder<S, video_state::Empty> {
+impl Video<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> VideoBuilder<video_state::Empty, DefaultStr> {
         VideoBuilder::new()
     }
 }
 
-impl<S: BosStr> VideoBuilder<S, video_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Video<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> VideoBuilder<video_state::Empty, S> {
+        VideoBuilder::builder()
+    }
+}
+
+impl VideoBuilder<video_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         VideoBuilder {
             _state: PhantomData,
@@ -803,7 +844,18 @@ impl<S: BosStr> VideoBuilder<S, video_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: video_state::State> VideoBuilder<S, St> {
+impl<S: BosStr> VideoBuilder<video_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        VideoBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: video_state::State, S: BosStr> VideoBuilder<St, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -816,7 +868,7 @@ impl<S: BosStr, St: video_state::State> VideoBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: video_state::State> VideoBuilder<S, St> {
+impl<St: video_state::State, S: BosStr> VideoBuilder<St, S> {
     /// Set the `captions` field (optional)
     pub fn captions(mut self, value: impl Into<Option<Vec<video::Caption<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -829,7 +881,7 @@ impl<S: BosStr, St: video_state::State> VideoBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: video_state::State> VideoBuilder<S, St> {
+impl<St: video_state::State, S: BosStr> VideoBuilder<St, S> {
     /// Set the `dimensions` field (optional)
     pub fn dimensions(mut self, value: impl Into<Option<VideoDimensions<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -842,7 +894,7 @@ impl<S: BosStr, St: video_state::State> VideoBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: video_state::State> VideoBuilder<S, St> {
+impl<St: video_state::State, S: BosStr> VideoBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -855,7 +907,7 @@ impl<S: BosStr, St: video_state::State> VideoBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> VideoBuilder<S, St>
+impl<St, S: BosStr> VideoBuilder<St, S>
 where
     St: video_state::State,
     St::Video: video_state::IsUnset,
@@ -864,7 +916,7 @@ where
     pub fn video(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> VideoBuilder<S, video_state::SetVideo<St>> {
+    ) -> VideoBuilder<video_state::SetVideo<St>, S> {
         self._fields.4 = Option::Some(value.into());
         VideoBuilder {
             _state: PhantomData,
@@ -874,7 +926,7 @@ where
     }
 }
 
-impl<S: BosStr, St> VideoBuilder<S, St>
+impl<St, S: BosStr> VideoBuilder<St, S>
 where
     St: video_state::State,
     St::Video: video_state::IsSet,
@@ -905,7 +957,7 @@ where
 
 pub mod view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -913,42 +965,42 @@ pub mod view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Playlist;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Playlist = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Cid = Set<members::cid>;
-        type Playlist = St::Playlist;
+        type Cid = Unset;
     }
     ///State transition - sets the `playlist` field to Set
     pub struct SetPlaylist<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPlaylist<St> {}
     impl<St: State> State for SetPlaylist<St> {
-        type Cid = St::Cid;
         type Playlist = Set<members::playlist>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Playlist = St::Playlist;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `playlist` field
         pub struct playlist(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ViewBuilder<S: BosStr, St: view_state::State> {
+pub struct ViewBuilder<St: view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -961,15 +1013,22 @@ pub struct ViewBuilder<S: BosStr, St: view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> View<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ViewBuilder<S, view_state::Empty> {
+impl View<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ViewBuilder<view_state::Empty, DefaultStr> {
         ViewBuilder::new()
     }
 }
 
-impl<S: BosStr> ViewBuilder<S, view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> View<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ViewBuilder<view_state::Empty, S> {
+        ViewBuilder::builder()
+    }
+}
+
+impl ViewBuilder<view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ViewBuilder {
             _state: PhantomData,
@@ -979,7 +1038,18 @@ impl<S: BosStr> ViewBuilder<S, view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
+impl<S: BosStr> ViewBuilder<view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: view_state::State, S: BosStr> ViewBuilder<St, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -992,13 +1062,16 @@ impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
     St::Cid: view_state::IsUnset,
 {
     /// Set the `cid` field (required)
-    pub fn cid(mut self, value: impl Into<Cid<S>>) -> ViewBuilder<S, view_state::SetCid<St>> {
+    pub fn cid(
+        mut self,
+        value: impl Into<Cid<S>>,
+    ) -> ViewBuilder<view_state::SetCid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ViewBuilder {
             _state: PhantomData,
@@ -1008,7 +1081,7 @@ where
     }
 }
 
-impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
+impl<St: view_state::State, S: BosStr> ViewBuilder<St, S> {
     /// Set the `dimensions` field (optional)
     pub fn dimensions(mut self, value: impl Into<Option<ViewDimensions<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -1021,7 +1094,7 @@ impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
+impl<St: view_state::State, S: BosStr> ViewBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -1034,7 +1107,7 @@ impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
     St::Playlist: view_state::IsUnset,
@@ -1043,7 +1116,7 @@ where
     pub fn playlist(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ViewBuilder<S, view_state::SetPlaylist<St>> {
+    ) -> ViewBuilder<view_state::SetPlaylist<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ViewBuilder {
             _state: PhantomData,
@@ -1053,7 +1126,7 @@ where
     }
 }
 
-impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
+impl<St: view_state::State, S: BosStr> ViewBuilder<St, S> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -1066,11 +1139,11 @@ impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
-    St::Cid: view_state::IsSet,
     St::Playlist: view_state::IsSet,
+    St::Cid: view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> View<S> {

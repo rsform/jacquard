@@ -10,12 +10,12 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -34,16 +34,22 @@ impl jacquard_common::xrpc::XrpcResp for ImportRepoResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for ImportRepo {
     const NSID: &'static str = "ooo.bsky.authfetch.importRepo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/vnd.ipld.car");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/vnd.ipld.car",
+    );
     type Response = ImportRepoResponse;
-    fn encode_body(&self, buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError>
+    fn encode_body(
+        &self,
+        buffer: &mut Vec<u8>,
+    ) -> Result<(), jacquard_common::xrpc::EncodeError>
     where
         Self: Serialize,
     {
         Ok(buffer.copy_from_slice(self.body.as_ref()))
     }
-    fn decode_body<'de>(body: &'de [u8]) -> Result<Self, jacquard_common::error::DecodeError>
+    fn decode_body<'de>(
+        body: &'de [u8],
+    ) -> Result<Self, jacquard_common::error::DecodeError>
     where
         Self: Deserialize<'de>,
     {
@@ -57,8 +63,9 @@ impl jacquard_common::xrpc::XrpcRequest for ImportRepo {
 pub struct ImportRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ImportRepoRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.importRepo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/vnd.ipld.car");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/vnd.ipld.car",
+    );
     type Request<S: BosStr> = ImportRepo;
     type Response = ImportRepoResponse;
 }

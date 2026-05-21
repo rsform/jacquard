@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AbortUpload<S: BosStr = DefaultStr> {
     ///Upload session ID from initiateUpload
     pub upload_id: S,
@@ -28,11 +25,9 @@ pub struct AbortUpload<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AbortUploadOutput<S: BosStr = DefaultStr> {
     ///Always 'aborted' on success
     pub status: S,
@@ -40,9 +35,18 @@ pub struct AbortUploadOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum AbortUploadError {
     #[serde(rename = "InvalidUploadId")]
@@ -51,10 +55,7 @@ pub enum AbortUploadError {
     AbortFailed(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for AbortUploadError {
@@ -96,8 +97,9 @@ impl jacquard_common::xrpc::XrpcResp for AbortUploadResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AbortUpload<S> {
     const NSID: &'static str = "io.atcr.hold.abortUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = AbortUploadResponse;
 }
 
@@ -105,8 +107,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AbortUpload<S> {
 pub struct AbortUploadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AbortUploadRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.abortUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = AbortUpload<S>;
     type Response = AbortUploadResponse;
 }

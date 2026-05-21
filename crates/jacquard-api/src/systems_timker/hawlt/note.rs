@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,17 +25,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::systems_timker::hawlt::note;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::systems_timker::hawlt::note;
 /// An image attachment with alt text.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Attachment<S: BosStr = DefaultStr> {
     ///Alt text for the image. Required for accessibility.
     pub alt: S,
@@ -59,7 +56,7 @@ pub struct Note<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attachments: Option<Vec<note::Attachment<S>>>,
     /**The primary note content. Max 3000 graphemes, 30000 bytes
-    Note: large string limit is intentional for diary-style entries.*/
+Note: large string limit is intentional for diary-style entries.*/
     pub content: S,
     ///Content warning label. When present, note content should be hidden by default. Max 100 graphemes, 1000 bytes
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -146,16 +143,19 @@ impl<S: BosStr> LexiconSchema for Attachment<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
@@ -289,7 +289,7 @@ impl<S: BosStr> LexiconSchema for Note<S> {
 
 pub mod attachment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -332,21 +332,28 @@ pub mod attachment_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AttachmentBuilder<S: BosStr, St: attachment_state::State> {
+pub struct AttachmentBuilder<St: attachment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Attachment<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AttachmentBuilder<S, attachment_state::Empty> {
+impl Attachment<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AttachmentBuilder<attachment_state::Empty, DefaultStr> {
         AttachmentBuilder::new()
     }
 }
 
-impl<S: BosStr> AttachmentBuilder<S, attachment_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Attachment<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AttachmentBuilder<attachment_state::Empty, S> {
+        AttachmentBuilder::builder()
+    }
+}
+
+impl AttachmentBuilder<attachment_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AttachmentBuilder {
             _state: PhantomData,
@@ -356,7 +363,18 @@ impl<S: BosStr> AttachmentBuilder<S, attachment_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AttachmentBuilder<S, St>
+impl<S: BosStr> AttachmentBuilder<attachment_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AttachmentBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AttachmentBuilder<St, S>
 where
     St: attachment_state::State,
     St::Alt: attachment_state::IsUnset,
@@ -365,7 +383,7 @@ where
     pub fn alt(
         mut self,
         value: impl Into<S>,
-    ) -> AttachmentBuilder<S, attachment_state::SetAlt<St>> {
+    ) -> AttachmentBuilder<attachment_state::SetAlt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AttachmentBuilder {
             _state: PhantomData,
@@ -375,7 +393,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AttachmentBuilder<S, St>
+impl<St, S: BosStr> AttachmentBuilder<St, S>
 where
     St: attachment_state::State,
     St::Image: attachment_state::IsUnset,
@@ -384,7 +402,7 @@ where
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> AttachmentBuilder<S, attachment_state::SetImage<St>> {
+    ) -> AttachmentBuilder<attachment_state::SetImage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AttachmentBuilder {
             _state: PhantomData,
@@ -394,7 +412,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AttachmentBuilder<S, St>
+impl<St, S: BosStr> AttachmentBuilder<St, S>
 where
     St: attachment_state::State,
     St::Image: attachment_state::IsSet,
@@ -409,7 +427,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Attachment<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Attachment<S> {
         Attachment {
             alt: self._fields.0.unwrap(),
             image: self._fields.1.unwrap(),
@@ -419,10 +440,10 @@ where
 }
 
 fn lexicon_doc_systems_timker_hawlt_note() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("systems.timker.hawlt.note"),
@@ -431,20 +452,23 @@ fn lexicon_doc_systems_timker_hawlt_note() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("attachment"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("An image attachment with alt text.")),
-                    required: Some(vec![
-                        SmolStr::new_static("image"),
-                        SmolStr::new_static("alt"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("An image attachment with alt text."),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("image"), SmolStr::new_static("alt")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Alt text for the image. Required for accessibility.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Alt text for the image. Required for accessibility.",
+                                    ),
+                                ),
                                 max_length: Some(10000usize),
                                 max_graphemes: Some(1000usize),
                                 ..Default::default()
@@ -452,9 +476,7 @@ fn lexicon_doc_systems_timker_hawlt_note() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("image"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -585,7 +607,7 @@ fn lexicon_doc_systems_timker_hawlt_note() -> LexiconDoc<'static> {
 
 pub mod note_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -628,7 +650,7 @@ pub mod note_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NoteBuilder<S: BosStr, St: note_state::State> {
+pub struct NoteBuilder<St: note_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<note::Attachment<S>>>,
@@ -641,15 +663,22 @@ pub struct NoteBuilder<S: BosStr, St: note_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Note<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> NoteBuilder<S, note_state::Empty> {
+impl Note<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> NoteBuilder<note_state::Empty, DefaultStr> {
         NoteBuilder::new()
     }
 }
 
-impl<S: BosStr> NoteBuilder<S, note_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Note<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> NoteBuilder<note_state::Empty, S> {
+        NoteBuilder::builder()
+    }
+}
+
+impl NoteBuilder<note_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         NoteBuilder {
             _state: PhantomData,
@@ -659,9 +688,23 @@ impl<S: BosStr> NoteBuilder<S, note_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
+impl<S: BosStr> NoteBuilder<note_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        NoteBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: note_state::State, S: BosStr> NoteBuilder<St, S> {
     /// Set the `attachments` field (optional)
-    pub fn attachments(mut self, value: impl Into<Option<Vec<note::Attachment<S>>>>) -> Self {
+    pub fn attachments(
+        mut self,
+        value: impl Into<Option<Vec<note::Attachment<S>>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -672,13 +715,16 @@ impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> NoteBuilder<S, St>
+impl<St, S: BosStr> NoteBuilder<St, S>
 where
     St: note_state::State,
     St::Content: note_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(mut self, value: impl Into<S>) -> NoteBuilder<S, note_state::SetContent<St>> {
+    pub fn content(
+        mut self,
+        value: impl Into<S>,
+    ) -> NoteBuilder<note_state::SetContent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
@@ -688,7 +734,7 @@ where
     }
 }
 
-impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
+impl<St: note_state::State, S: BosStr> NoteBuilder<St, S> {
     /// Set the `contentWarning` field (optional)
     pub fn content_warning(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -701,7 +747,7 @@ impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> NoteBuilder<S, St>
+impl<St, S: BosStr> NoteBuilder<St, S>
 where
     St: note_state::State,
     St::CreatedAt: note_state::IsUnset,
@@ -710,7 +756,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> NoteBuilder<S, note_state::SetCreatedAt<St>> {
+    ) -> NoteBuilder<note_state::SetCreatedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
@@ -720,7 +766,7 @@ where
     }
 }
 
-impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
+impl<St: note_state::State, S: BosStr> NoteBuilder<St, S> {
     /// Set the `langs` field (optional)
     pub fn langs(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
         self._fields.4 = value.into();
@@ -733,7 +779,7 @@ impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
+impl<St: note_state::State, S: BosStr> NoteBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -746,7 +792,7 @@ impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> NoteBuilder<S, St>
+impl<St, S: BosStr> NoteBuilder<St, S>
 where
     St: note_state::State,
     St::Content: note_state::IsSet,

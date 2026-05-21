@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A completion attestation issued by a librarian
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -108,7 +108,7 @@ impl<S: BosStr> LexiconSchema for Stamp<S> {
 
 pub mod stamp_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -165,21 +165,28 @@ pub mod stamp_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StampBuilder<S: BosStr, St: stamp_state::State> {
+pub struct StampBuilder<St: stamp_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Datetime>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Stamp<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StampBuilder<S, stamp_state::Empty> {
+impl Stamp<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StampBuilder<stamp_state::Empty, DefaultStr> {
         StampBuilder::new()
     }
 }
 
-impl<S: BosStr> StampBuilder<S, stamp_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Stamp<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StampBuilder<stamp_state::Empty, S> {
+        StampBuilder::builder()
+    }
+}
+
+impl StampBuilder<stamp_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StampBuilder {
             _state: PhantomData,
@@ -189,13 +196,27 @@ impl<S: BosStr> StampBuilder<S, stamp_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StampBuilder<S, St>
+impl<S: BosStr> StampBuilder<stamp_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StampBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StampBuilder<St, S>
 where
     St: stamp_state::State,
     St::Book: stamp_state::IsUnset,
 {
     /// Set the `book` field (required)
-    pub fn book(mut self, value: impl Into<AtUri<S>>) -> StampBuilder<S, stamp_state::SetBook<St>> {
+    pub fn book(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> StampBuilder<stamp_state::SetBook<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StampBuilder {
             _state: PhantomData,
@@ -205,7 +226,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StampBuilder<S, St>
+impl<St, S: BosStr> StampBuilder<St, S>
 where
     St: stamp_state::State,
     St::CreatedAt: stamp_state::IsUnset,
@@ -214,7 +235,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StampBuilder<S, stamp_state::SetCreatedAt<St>> {
+    ) -> StampBuilder<stamp_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StampBuilder {
             _state: PhantomData,
@@ -224,13 +245,16 @@ where
     }
 }
 
-impl<S: BosStr, St> StampBuilder<S, St>
+impl<St, S: BosStr> StampBuilder<St, S>
 where
     St: stamp_state::State,
     St::List: stamp_state::IsUnset,
 {
     /// Set the `list` field (required)
-    pub fn list(mut self, value: impl Into<AtUri<S>>) -> StampBuilder<S, stamp_state::SetList<St>> {
+    pub fn list(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> StampBuilder<stamp_state::SetList<St>, S> {
         self._fields.2 = Option::Some(value.into());
         StampBuilder {
             _state: PhantomData,
@@ -240,7 +264,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StampBuilder<S, St>
+impl<St, S: BosStr> StampBuilder<St, S>
 where
     St: stamp_state::State,
     St::CreatedAt: stamp_state::IsSet,
@@ -268,10 +292,10 @@ where
 }
 
 fn lexicon_doc_bond_biblio_stamp() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("bond.biblio.stamp"),

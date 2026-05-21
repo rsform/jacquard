@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,17 +25,14 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::me_linkna::linkinbio;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::me_linkna::linkinbio;
 /// Saved service credentials/identifiers for pre-filling widget forms.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ConnectedServices<S: BosStr = DefaultStr> {
     ///GitHub username.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,10 +47,7 @@ pub struct ConnectedServices<S: BosStr = DefaultStr> {
 /// A single day's contribution data from GitHub.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GithubContributionDay<S: BosStr = DefaultStr> {
     ///Number of contributions on this day.
     pub count: i64,
@@ -68,10 +62,7 @@ pub struct GithubContributionDay<S: BosStr = DefaultStr> {
 /// A book from a Goodreads shelf.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GoodreadsBook<S: BosStr = DefaultStr> {
     ///Book author.
     pub author: S,
@@ -93,10 +84,7 @@ pub struct GoodreadsBook<S: BosStr = DefaultStr> {
 /// A standard link card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LinkCard<S: BosStr = DefaultStr> {
     ///Whether the card is visible on the public page. Defaults to true.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -146,6 +134,7 @@ pub struct Linkinbio<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -174,10 +163,7 @@ pub struct LinkinbioGetRecordOutput<S: BosStr = DefaultStr> {
 /// A social media icon link.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SocialIcon<S: BosStr = DefaultStr> {
     ///Unique identifier for the icon.
     pub id: S,
@@ -192,10 +178,7 @@ pub struct SocialIcon<S: BosStr = DefaultStr> {
 /// A recently played track from teal.fm.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TealfmPlay<S: BosStr = DefaultStr> {
     ///Artist name(s).
     pub artist_name: S,
@@ -220,10 +203,7 @@ pub struct TealfmPlay<S: BosStr = DefaultStr> {
 /// Theme configuration for the page appearance.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ThemeConfig<S: BosStr = DefaultStr> {
     ///Page background color.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -364,7 +344,8 @@ impl<S: BosStr> Serialize for ThemeConfigButtonAlignment<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigButtonAlignment<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ThemeConfigButtonAlignment<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -454,7 +435,8 @@ impl<S: BosStr> Serialize for ThemeConfigCardBorderRadius<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigCardBorderRadius<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ThemeConfigCardBorderRadius<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -576,7 +558,9 @@ where
             ThemeConfigCardShadow::Md => ThemeConfigCardShadow::Md,
             ThemeConfigCardShadow::Lg => ThemeConfigCardShadow::Lg,
             ThemeConfigCardShadow::Xl => ThemeConfigCardShadow::Xl,
-            ThemeConfigCardShadow::Other(v) => ThemeConfigCardShadow::Other(v.into_static()),
+            ThemeConfigCardShadow::Other(v) => {
+                ThemeConfigCardShadow::Other(v.into_static())
+            }
         }
     }
 }
@@ -655,7 +639,9 @@ where
         match self {
             ThemeConfigCursorStyle::Default => ThemeConfigCursorStyle::Default,
             ThemeConfigCursorStyle::HelloKitty => ThemeConfigCursorStyle::HelloKitty,
-            ThemeConfigCursorStyle::Other(v) => ThemeConfigCursorStyle::Other(v.into_static()),
+            ThemeConfigCursorStyle::Other(v) => {
+                ThemeConfigCursorStyle::Other(v.into_static())
+            }
         }
     }
 }
@@ -825,7 +811,9 @@ where
             ThemeConfigParticles::White => ThemeConfigParticles::White,
             ThemeConfigParticles::Blue => ThemeConfigParticles::Blue,
             ThemeConfigParticles::Leaves => ThemeConfigParticles::Leaves,
-            ThemeConfigParticles::Other(v) => ThemeConfigParticles::Other(v.into_static()),
+            ThemeConfigParticles::Other(v) => {
+                ThemeConfigParticles::Other(v.into_static())
+            }
         }
     }
 }
@@ -881,7 +869,8 @@ impl<S: BosStr> Serialize for ThemeConfigProfileAlignment<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigProfileAlignment<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ThemeConfigProfileAlignment<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -966,7 +955,8 @@ impl<S: BosStr> Serialize for ThemeConfigProfilePictureShape<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigProfilePictureShape<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ThemeConfigProfilePictureShape<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -990,9 +980,15 @@ where
     type Output = ThemeConfigProfilePictureShape<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            ThemeConfigProfilePictureShape::Circle => ThemeConfigProfilePictureShape::Circle,
-            ThemeConfigProfilePictureShape::Rounded => ThemeConfigProfilePictureShape::Rounded,
-            ThemeConfigProfilePictureShape::Square => ThemeConfigProfilePictureShape::Square,
+            ThemeConfigProfilePictureShape::Circle => {
+                ThemeConfigProfilePictureShape::Circle
+            }
+            ThemeConfigProfilePictureShape::Rounded => {
+                ThemeConfigProfilePictureShape::Rounded
+            }
+            ThemeConfigProfilePictureShape::Square => {
+                ThemeConfigProfilePictureShape::Square
+            }
             ThemeConfigProfilePictureShape::Other(v) => {
                 ThemeConfigProfilePictureShape::Other(v.into_static())
             }
@@ -1051,7 +1047,8 @@ impl<S: BosStr> Serialize for ThemeConfigProfilePictureSize<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigProfilePictureSize<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ThemeConfigProfilePictureSize<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1133,7 +1130,8 @@ impl<S: BosStr> Serialize for ThemeConfigSocialIconsShape<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigSocialIconsShape<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ThemeConfigSocialIconsShape<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1169,10 +1167,7 @@ where
 /// A GitHub contributions graph widget card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct WidgetGithub<S: BosStr = DefaultStr> {
     ///Contribution data for the last year.
     pub contributions: Vec<linkinbio::GithubContributionDay<S>>,
@@ -1284,10 +1279,7 @@ where
 /// A Goodreads bookshelf widget card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct WidgetGoodreads<S: BosStr = DefaultStr> {
     ///Books on the currently-reading shelf.
     pub books: Vec<linkinbio::GoodreadsBook<S>>,
@@ -1401,10 +1393,7 @@ where
 /// A teal.fm recently played tracks widget card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct WidgetTealfm<S: BosStr = DefaultStr> {
     ///Copyright notice for cover art images.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1724,23 +1713,25 @@ impl<S: BosStr> LexiconSchema for ThemeConfig<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("background_image"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/webp".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -1797,10 +1788,10 @@ impl<S: BosStr> LexiconSchema for WidgetTealfm<S> {
 }
 
 fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("me.linkna.linkinbio"),
@@ -1809,9 +1800,11 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("connectedServices"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Saved service credentials/identifiers for pre-filling widget forms.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Saved service credentials/identifiers for pre-filling widget forms.",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1825,7 +1818,9 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("goodreadsUserId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Goodreads numeric user ID.")),
+                                description: Some(
+                                    CowStr::new_static("Goodreads numeric user ID."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1837,14 +1832,17 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("githubContributionDay"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A single day's contribution data from GitHub.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("date"),
-                        SmolStr::new_static("count"),
-                        SmolStr::new_static("level"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A single day's contribution data from GitHub.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("date"), SmolStr::new_static("count"),
+                            SmolStr::new_static("level")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1857,7 +1855,9 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("date"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Date in YYYY-MM-DD format.")),
+                                description: Some(
+                                    CowStr::new_static("Date in YYYY-MM-DD format."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1877,11 +1877,12 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("goodreadsBook"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A book from a Goodreads shelf.")),
-                    required: Some(vec![
-                        SmolStr::new_static("title"),
-                        SmolStr::new_static("author"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A book from a Goodreads shelf."),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("title"), SmolStr::new_static("author")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1895,18 +1896,18 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("coverUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URL to the book cover image.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("URL to the book cover image."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("link"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URL to the book on Goodreads.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("URL to the book on Goodreads."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2128,11 +2129,15 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("tealfmPlay"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A recently played track from teal.fm.")),
-                    required: Some(vec![
-                        SmolStr::new_static("trackName"),
-                        SmolStr::new_static("artistName"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A recently played track from teal.fm."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("trackName"),
+                            SmolStr::new_static("artistName")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2146,25 +2151,31 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("coverUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URL to the album cover image (from Cover Art Archive).",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "URL to the album cover image (from Cover Art Archive).",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("originUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URL to the track on the original music service.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "URL to the track on the original music service.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("playedTime"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("When the track was played.")),
+                                description: Some(
+                                    CowStr::new_static("When the track was played."),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -2172,7 +2183,9 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("releaseName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Album/release name.")),
+                                description: Some(
+                                    CowStr::new_static("Album/release name."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2473,24 +2486,25 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("widgetGithub"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A GitHub contributions graph widget card.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("githubUsername"),
-                        SmolStr::new_static("contributions"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A GitHub contributions graph widget card."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("type"),
+                            SmolStr::new_static("githubUsername"),
+                            SmolStr::new_static("contributions")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("contributions"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Contribution data for the last year.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Contribution data for the last year."),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#githubContributionDay"),
                                     ..Default::default()
@@ -2514,18 +2528,20 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Unique identifier for the card.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Unique identifier for the card."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("lastSyncedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the contribution data was last fetched from GitHub.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "When the contribution data was last fetched from GitHub.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -2533,9 +2549,9 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("size"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Widget display size. Default: 1x1.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Widget display size. Default: 1x1."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2548,7 +2564,9 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Card type discriminator.")),
+                                description: Some(
+                                    CowStr::new_static("Card type discriminator."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2560,23 +2578,25 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("widgetGoodreads"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A Goodreads bookshelf widget card.")),
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("goodreadsUserId"),
-                        SmolStr::new_static("shelf"),
-                        SmolStr::new_static("books"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A Goodreads bookshelf widget card."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("type"),
+                            SmolStr::new_static("goodreadsUserId"),
+                            SmolStr::new_static("shelf"), SmolStr::new_static("books")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("books"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Books on the currently-reading shelf.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Books on the currently-reading shelf."),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#goodreadsBook"),
                                     ..Default::default()
@@ -2593,25 +2613,29 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("goodreadsUserId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Goodreads numeric user ID.")),
+                                description: Some(
+                                    CowStr::new_static("Goodreads numeric user ID."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Unique identifier for the card.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Unique identifier for the card."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("lastSyncedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the book data was last fetched from Goodreads.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "When the book data was last fetched from Goodreads.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -2619,9 +2643,11 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("readBooks"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Books on the read shelf (used by 1x2 size).",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Books on the read shelf (used by 1x2 size).",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#goodreadsBook"),
                                     ..Default::default()
@@ -2632,25 +2658,29 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("shelf"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Shelf name (currently-reading, read, or to-read).",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Shelf name (currently-reading, read, or to-read).",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("size"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Widget display size. Default: 1x1.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Widget display size. Default: 1x1."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Card type discriminator.")),
+                                description: Some(
+                                    CowStr::new_static("Card type discriminator."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2662,23 +2692,26 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("widgetTealfm"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A teal.fm recently played tracks widget card.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("plays"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A teal.fm recently played tracks widget card.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("type"),
+                            SmolStr::new_static("plays")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("coverArtNotice"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Copyright notice for cover art images.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Copyright notice for cover art images."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2691,18 +2724,20 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Unique identifier for the card.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Unique identifier for the card."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("lastSyncedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the play data was last fetched from the PDS.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "When the play data was last fetched from the PDS.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -2710,7 +2745,9 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("plays"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static("Recently played tracks.")),
+                                description: Some(
+                                    CowStr::new_static("Recently played tracks."),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#tealfmPlay"),
                                     ..Default::default()
@@ -2721,16 +2758,18 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("size"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Widget display size. Default: 1x1.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Widget display size. Default: 1x1."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Card type discriminator.")),
+                                description: Some(
+                                    CowStr::new_static("Card type discriminator."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2747,7 +2786,7 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
 
 pub mod github_contribution_day_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2755,70 +2794,86 @@ pub mod github_contribution_day_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
-        type Count;
         type Date;
+        type Count;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
-        type Count = Unset;
         type Date = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLevel<St> {}
-    impl<St: State> State for SetLevel<St> {
-        type Level = Set<members::level>;
-        type Count = St::Count;
-        type Date = St::Date;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCount<St> {}
-    impl<St: State> State for SetCount<St> {
-        type Level = St::Level;
-        type Count = Set<members::count>;
-        type Date = St::Date;
+        type Count = Unset;
+        type Level = Unset;
     }
     ///State transition - sets the `date` field to Set
     pub struct SetDate<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDate<St> {}
     impl<St: State> State for SetDate<St> {
-        type Level = St::Level;
-        type Count = St::Count;
         type Date = Set<members::date>;
+        type Count = St::Count;
+        type Level = St::Level;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCount<St> {}
+    impl<St: State> State for SetCount<St> {
+        type Date = St::Date;
+        type Count = Set<members::count>;
+        type Level = St::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
+        type Date = St::Date;
+        type Count = St::Count;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
-        ///Marker type for the `count` field
-        pub struct count(());
         ///Marker type for the `date` field
         pub struct date(());
+        ///Marker type for the `count` field
+        pub struct count(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GithubContributionDayBuilder<S: BosStr, St: github_contribution_day_state::State> {
+pub struct GithubContributionDayBuilder<
+    St: github_contribution_day_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GithubContributionDay<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GithubContributionDayBuilder<S, github_contribution_day_state::Empty> {
+impl GithubContributionDay<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GithubContributionDayBuilder<
+        github_contribution_day_state::Empty,
+        DefaultStr,
+    > {
         GithubContributionDayBuilder::new()
     }
 }
 
-impl<S: BosStr> GithubContributionDayBuilder<S, github_contribution_day_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GithubContributionDay<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GithubContributionDayBuilder<
+        github_contribution_day_state::Empty,
+        S,
+    > {
+        GithubContributionDayBuilder::builder()
+    }
+}
+
+impl GithubContributionDayBuilder<github_contribution_day_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GithubContributionDayBuilder {
             _state: PhantomData,
@@ -2828,7 +2883,18 @@ impl<S: BosStr> GithubContributionDayBuilder<S, github_contribution_day_state::E
     }
 }
 
-impl<S: BosStr, St> GithubContributionDayBuilder<S, St>
+impl<S: BosStr> GithubContributionDayBuilder<github_contribution_day_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GithubContributionDayBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GithubContributionDayBuilder<St, S>
 where
     St: github_contribution_day_state::State,
     St::Count: github_contribution_day_state::IsUnset,
@@ -2837,7 +2903,7 @@ where
     pub fn count(
         mut self,
         value: impl Into<i64>,
-    ) -> GithubContributionDayBuilder<S, github_contribution_day_state::SetCount<St>> {
+    ) -> GithubContributionDayBuilder<github_contribution_day_state::SetCount<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GithubContributionDayBuilder {
             _state: PhantomData,
@@ -2847,7 +2913,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GithubContributionDayBuilder<S, St>
+impl<St, S: BosStr> GithubContributionDayBuilder<St, S>
 where
     St: github_contribution_day_state::State,
     St::Date: github_contribution_day_state::IsUnset,
@@ -2856,7 +2922,7 @@ where
     pub fn date(
         mut self,
         value: impl Into<S>,
-    ) -> GithubContributionDayBuilder<S, github_contribution_day_state::SetDate<St>> {
+    ) -> GithubContributionDayBuilder<github_contribution_day_state::SetDate<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GithubContributionDayBuilder {
             _state: PhantomData,
@@ -2866,7 +2932,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GithubContributionDayBuilder<S, St>
+impl<St, S: BosStr> GithubContributionDayBuilder<St, S>
 where
     St: github_contribution_day_state::State,
     St::Level: github_contribution_day_state::IsUnset,
@@ -2875,7 +2941,7 @@ where
     pub fn level(
         mut self,
         value: impl Into<i64>,
-    ) -> GithubContributionDayBuilder<S, github_contribution_day_state::SetLevel<St>> {
+    ) -> GithubContributionDayBuilder<github_contribution_day_state::SetLevel<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GithubContributionDayBuilder {
             _state: PhantomData,
@@ -2885,12 +2951,12 @@ where
     }
 }
 
-impl<S: BosStr, St> GithubContributionDayBuilder<S, St>
+impl<St, S: BosStr> GithubContributionDayBuilder<St, S>
 where
     St: github_contribution_day_state::State,
-    St::Level: github_contribution_day_state::IsSet,
-    St::Count: github_contribution_day_state::IsSet,
     St::Date: github_contribution_day_state::IsSet,
+    St::Count: github_contribution_day_state::IsSet,
+    St::Level: github_contribution_day_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GithubContributionDay<S> {
@@ -2917,7 +2983,7 @@ where
 
 pub mod linkinbio_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2948,7 +3014,7 @@ pub mod linkinbio_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LinkinbioBuilder<S: BosStr, St: linkinbio_state::State> {
+pub struct LinkinbioBuilder<St: linkinbio_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<LinkinbioCardsItem<S>>>,
@@ -2960,15 +3026,22 @@ pub struct LinkinbioBuilder<S: BosStr, St: linkinbio_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Linkinbio<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LinkinbioBuilder<S, linkinbio_state::Empty> {
+impl Linkinbio<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LinkinbioBuilder<linkinbio_state::Empty, DefaultStr> {
         LinkinbioBuilder::new()
     }
 }
 
-impl<S: BosStr> LinkinbioBuilder<S, linkinbio_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Linkinbio<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LinkinbioBuilder<linkinbio_state::Empty, S> {
+        LinkinbioBuilder::builder()
+    }
+}
+
+impl LinkinbioBuilder<linkinbio_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LinkinbioBuilder {
             _state: PhantomData,
@@ -2978,7 +3051,18 @@ impl<S: BosStr> LinkinbioBuilder<S, linkinbio_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LinkinbioBuilder<S, St>
+impl<S: BosStr> LinkinbioBuilder<linkinbio_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LinkinbioBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LinkinbioBuilder<St, S>
 where
     St: linkinbio_state::State,
     St::Cards: linkinbio_state::IsUnset,
@@ -2987,7 +3071,7 @@ where
     pub fn cards(
         mut self,
         value: impl Into<Vec<LinkinbioCardsItem<S>>>,
-    ) -> LinkinbioBuilder<S, linkinbio_state::SetCards<St>> {
+    ) -> LinkinbioBuilder<linkinbio_state::SetCards<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LinkinbioBuilder {
             _state: PhantomData,
@@ -2997,7 +3081,7 @@ where
     }
 }
 
-impl<S: BosStr, St: linkinbio_state::State> LinkinbioBuilder<S, St> {
+impl<St: linkinbio_state::State, S: BosStr> LinkinbioBuilder<St, S> {
     /// Set the `connectedServices` field (optional)
     pub fn connected_services(
         mut self,
@@ -3016,20 +3100,26 @@ impl<S: BosStr, St: linkinbio_state::State> LinkinbioBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: linkinbio_state::State> LinkinbioBuilder<S, St> {
+impl<St: linkinbio_state::State, S: BosStr> LinkinbioBuilder<St, S> {
     /// Set the `socialIcons` field (optional)
-    pub fn social_icons(mut self, value: impl Into<Option<Vec<linkinbio::SocialIcon<S>>>>) -> Self {
+    pub fn social_icons(
+        mut self,
+        value: impl Into<Option<Vec<linkinbio::SocialIcon<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `socialIcons` field to an Option value (optional)
-    pub fn maybe_social_icons(mut self, value: Option<Vec<linkinbio::SocialIcon<S>>>) -> Self {
+    pub fn maybe_social_icons(
+        mut self,
+        value: Option<Vec<linkinbio::SocialIcon<S>>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
 }
 
-impl<S: BosStr, St: linkinbio_state::State> LinkinbioBuilder<S, St> {
+impl<St: linkinbio_state::State, S: BosStr> LinkinbioBuilder<St, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -3042,20 +3132,26 @@ impl<S: BosStr, St: linkinbio_state::State> LinkinbioBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: linkinbio_state::State> LinkinbioBuilder<S, St> {
+impl<St: linkinbio_state::State, S: BosStr> LinkinbioBuilder<St, S> {
     /// Set the `themeConfig` field (optional)
-    pub fn theme_config(mut self, value: impl Into<Option<linkinbio::ThemeConfig<S>>>) -> Self {
+    pub fn theme_config(
+        mut self,
+        value: impl Into<Option<linkinbio::ThemeConfig<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `themeConfig` field to an Option value (optional)
-    pub fn maybe_theme_config(mut self, value: Option<linkinbio::ThemeConfig<S>>) -> Self {
+    pub fn maybe_theme_config(
+        mut self,
+        value: Option<linkinbio::ThemeConfig<S>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
 }
 
-impl<S: BosStr, St> LinkinbioBuilder<S, St>
+impl<St, S: BosStr> LinkinbioBuilder<St, S>
 where
     St: linkinbio_state::State,
     St::Cards: linkinbio_state::IsSet,
@@ -3072,7 +3168,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Linkinbio<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Linkinbio<S> {
         Linkinbio {
             cards: self._fields.0.unwrap(),
             connected_services: self._fields.1,
@@ -3086,7 +3185,7 @@ where
 
 pub mod social_icon_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3143,21 +3242,28 @@ pub mod social_icon_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SocialIconBuilder<S: BosStr, St: social_icon_state::State> {
+pub struct SocialIconBuilder<St: social_icon_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SocialIcon<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SocialIconBuilder<S, social_icon_state::Empty> {
+impl SocialIcon<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SocialIconBuilder<social_icon_state::Empty, DefaultStr> {
         SocialIconBuilder::new()
     }
 }
 
-impl<S: BosStr> SocialIconBuilder<S, social_icon_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SocialIcon<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SocialIconBuilder<social_icon_state::Empty, S> {
+        SocialIconBuilder::builder()
+    }
+}
+
+impl SocialIconBuilder<social_icon_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SocialIconBuilder {
             _state: PhantomData,
@@ -3167,13 +3273,27 @@ impl<S: BosStr> SocialIconBuilder<S, social_icon_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SocialIconBuilder<S, St>
+impl<S: BosStr> SocialIconBuilder<social_icon_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SocialIconBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SocialIconBuilder<St, S>
 where
     St: social_icon_state::State,
     St::Id: social_icon_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<S>) -> SocialIconBuilder<S, social_icon_state::SetId<St>> {
+    pub fn id(
+        mut self,
+        value: impl Into<S>,
+    ) -> SocialIconBuilder<social_icon_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SocialIconBuilder {
             _state: PhantomData,
@@ -3183,7 +3303,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SocialIconBuilder<S, St>
+impl<St, S: BosStr> SocialIconBuilder<St, S>
 where
     St: social_icon_state::State,
     St::Platform: social_icon_state::IsUnset,
@@ -3192,7 +3312,7 @@ where
     pub fn platform(
         mut self,
         value: impl Into<S>,
-    ) -> SocialIconBuilder<S, social_icon_state::SetPlatform<St>> {
+    ) -> SocialIconBuilder<social_icon_state::SetPlatform<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SocialIconBuilder {
             _state: PhantomData,
@@ -3202,7 +3322,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SocialIconBuilder<S, St>
+impl<St, S: BosStr> SocialIconBuilder<St, S>
 where
     St: social_icon_state::State,
     St::Url: social_icon_state::IsUnset,
@@ -3211,7 +3331,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> SocialIconBuilder<S, social_icon_state::SetUrl<St>> {
+    ) -> SocialIconBuilder<social_icon_state::SetUrl<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SocialIconBuilder {
             _state: PhantomData,
@@ -3221,7 +3341,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SocialIconBuilder<S, St>
+impl<St, S: BosStr> SocialIconBuilder<St, S>
 where
     St: social_icon_state::State,
     St::Id: social_icon_state::IsSet,
@@ -3238,7 +3358,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SocialIcon<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SocialIcon<S> {
         SocialIcon {
             id: self._fields.0.unwrap(),
             platform: self._fields.1.unwrap(),
@@ -3250,7 +3373,7 @@ where
 
 pub mod widget_github_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3258,72 +3381,72 @@ pub mod widget_github_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type GithubUsername;
         type Id;
         type Type;
         type Contributions;
-        type GithubUsername;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type GithubUsername = Unset;
         type Id = Unset;
         type Type = Unset;
         type Contributions = Unset;
-        type GithubUsername = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type Type = St::Type;
-        type Contributions = St::Contributions;
-        type GithubUsername = St::GithubUsername;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Id = St::Id;
-        type Type = Set<members::r#type>;
-        type Contributions = St::Contributions;
-        type GithubUsername = St::GithubUsername;
-    }
-    ///State transition - sets the `contributions` field to Set
-    pub struct SetContributions<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContributions<St> {}
-    impl<St: State> State for SetContributions<St> {
-        type Id = St::Id;
-        type Type = St::Type;
-        type Contributions = Set<members::contributions>;
-        type GithubUsername = St::GithubUsername;
     }
     ///State transition - sets the `github_username` field to Set
     pub struct SetGithubUsername<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGithubUsername<St> {}
     impl<St: State> State for SetGithubUsername<St> {
+        type GithubUsername = Set<members::github_username>;
         type Id = St::Id;
         type Type = St::Type;
         type Contributions = St::Contributions;
-        type GithubUsername = Set<members::github_username>;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type GithubUsername = St::GithubUsername;
+        type Id = Set<members::id>;
+        type Type = St::Type;
+        type Contributions = St::Contributions;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type GithubUsername = St::GithubUsername;
+        type Id = St::Id;
+        type Type = Set<members::r#type>;
+        type Contributions = St::Contributions;
+    }
+    ///State transition - sets the `contributions` field to Set
+    pub struct SetContributions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContributions<St> {}
+    impl<St: State> State for SetContributions<St> {
+        type GithubUsername = St::GithubUsername;
+        type Id = St::Id;
+        type Type = St::Type;
+        type Contributions = Set<members::contributions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `github_username` field
+        pub struct github_username(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `contributions` field
         pub struct contributions(());
-        ///Marker type for the `github_username` field
-        pub struct github_username(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WidgetGithubBuilder<S: BosStr, St: widget_github_state::State> {
+pub struct WidgetGithubBuilder<St: widget_github_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<linkinbio::GithubContributionDay<S>>>,
@@ -3338,15 +3461,22 @@ pub struct WidgetGithubBuilder<S: BosStr, St: widget_github_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> WidgetGithub<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> WidgetGithubBuilder<S, widget_github_state::Empty> {
+impl WidgetGithub<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> WidgetGithubBuilder<widget_github_state::Empty, DefaultStr> {
         WidgetGithubBuilder::new()
     }
 }
 
-impl<S: BosStr> WidgetGithubBuilder<S, widget_github_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> WidgetGithub<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> WidgetGithubBuilder<widget_github_state::Empty, S> {
+        WidgetGithubBuilder::builder()
+    }
+}
+
+impl WidgetGithubBuilder<widget_github_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         WidgetGithubBuilder {
             _state: PhantomData,
@@ -3356,7 +3486,18 @@ impl<S: BosStr> WidgetGithubBuilder<S, widget_github_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> WidgetGithubBuilder<S, St>
+impl<S: BosStr> WidgetGithubBuilder<widget_github_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        WidgetGithubBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> WidgetGithubBuilder<St, S>
 where
     St: widget_github_state::State,
     St::Contributions: widget_github_state::IsUnset,
@@ -3365,7 +3506,7 @@ where
     pub fn contributions(
         mut self,
         value: impl Into<Vec<linkinbio::GithubContributionDay<S>>>,
-    ) -> WidgetGithubBuilder<S, widget_github_state::SetContributions<St>> {
+    ) -> WidgetGithubBuilder<widget_github_state::SetContributions<St>, S> {
         self._fields.0 = Option::Some(value.into());
         WidgetGithubBuilder {
             _state: PhantomData,
@@ -3375,7 +3516,7 @@ where
     }
 }
 
-impl<S: BosStr, St: widget_github_state::State> WidgetGithubBuilder<S, St> {
+impl<St: widget_github_state::State, S: BosStr> WidgetGithubBuilder<St, S> {
     /// Set the `enabled` field (optional)
     pub fn enabled(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -3388,7 +3529,7 @@ impl<S: BosStr, St: widget_github_state::State> WidgetGithubBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WidgetGithubBuilder<S, St>
+impl<St, S: BosStr> WidgetGithubBuilder<St, S>
 where
     St: widget_github_state::State,
     St::GithubUsername: widget_github_state::IsUnset,
@@ -3397,7 +3538,7 @@ where
     pub fn github_username(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetGithubBuilder<S, widget_github_state::SetGithubUsername<St>> {
+    ) -> WidgetGithubBuilder<widget_github_state::SetGithubUsername<St>, S> {
         self._fields.2 = Option::Some(value.into());
         WidgetGithubBuilder {
             _state: PhantomData,
@@ -3407,7 +3548,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WidgetGithubBuilder<S, St>
+impl<St, S: BosStr> WidgetGithubBuilder<St, S>
 where
     St: widget_github_state::State,
     St::Id: widget_github_state::IsUnset,
@@ -3416,7 +3557,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetGithubBuilder<S, widget_github_state::SetId<St>> {
+    ) -> WidgetGithubBuilder<widget_github_state::SetId<St>, S> {
         self._fields.3 = Option::Some(value.into());
         WidgetGithubBuilder {
             _state: PhantomData,
@@ -3426,7 +3567,7 @@ where
     }
 }
 
-impl<S: BosStr, St: widget_github_state::State> WidgetGithubBuilder<S, St> {
+impl<St: widget_github_state::State, S: BosStr> WidgetGithubBuilder<St, S> {
     /// Set the `lastSyncedAt` field (optional)
     pub fn last_synced_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -3439,7 +3580,7 @@ impl<S: BosStr, St: widget_github_state::State> WidgetGithubBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: widget_github_state::State> WidgetGithubBuilder<S, St> {
+impl<St: widget_github_state::State, S: BosStr> WidgetGithubBuilder<St, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<WidgetGithubSize<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -3452,7 +3593,7 @@ impl<S: BosStr, St: widget_github_state::State> WidgetGithubBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: widget_github_state::State> WidgetGithubBuilder<S, St> {
+impl<St: widget_github_state::State, S: BosStr> WidgetGithubBuilder<St, S> {
     /// Set the `totalContributions` field (optional)
     pub fn total_contributions(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -3465,7 +3606,7 @@ impl<S: BosStr, St: widget_github_state::State> WidgetGithubBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WidgetGithubBuilder<S, St>
+impl<St, S: BosStr> WidgetGithubBuilder<St, S>
 where
     St: widget_github_state::State,
     St::Type: widget_github_state::IsUnset,
@@ -3474,7 +3615,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetGithubBuilder<S, widget_github_state::SetType<St>> {
+    ) -> WidgetGithubBuilder<widget_github_state::SetType<St>, S> {
         self._fields.7 = Option::Some(value.into());
         WidgetGithubBuilder {
             _state: PhantomData,
@@ -3484,13 +3625,13 @@ where
     }
 }
 
-impl<S: BosStr, St> WidgetGithubBuilder<S, St>
+impl<St, S: BosStr> WidgetGithubBuilder<St, S>
 where
     St: widget_github_state::State,
+    St::GithubUsername: widget_github_state::IsSet,
     St::Id: widget_github_state::IsSet,
     St::Type: widget_github_state::IsSet,
     St::Contributions: widget_github_state::IsSet,
-    St::GithubUsername: widget_github_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> WidgetGithub<S> {
@@ -3507,7 +3648,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> WidgetGithub<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> WidgetGithub<S> {
         WidgetGithub {
             contributions: self._fields.0.unwrap(),
             enabled: self._fields.1,
@@ -3524,7 +3668,7 @@ where
 
 pub mod widget_goodreads_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3533,89 +3677,92 @@ pub mod widget_goodreads_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type GoodreadsUserId;
-        type Id;
-        type Shelf;
         type Books;
         type Type;
+        type Shelf;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type GoodreadsUserId = Unset;
-        type Id = Unset;
-        type Shelf = Unset;
         type Books = Unset;
         type Type = Unset;
+        type Shelf = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `goodreads_user_id` field to Set
     pub struct SetGoodreadsUserId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGoodreadsUserId<St> {}
     impl<St: State> State for SetGoodreadsUserId<St> {
         type GoodreadsUserId = Set<members::goodreads_user_id>;
-        type Id = St::Id;
+        type Books = St::Books;
+        type Type = St::Type;
         type Shelf = St::Shelf;
-        type Books = St::Books;
-        type Type = St::Type;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type GoodreadsUserId = St::GoodreadsUserId;
-        type Id = Set<members::id>;
-        type Shelf = St::Shelf;
-        type Books = St::Books;
-        type Type = St::Type;
-    }
-    ///State transition - sets the `shelf` field to Set
-    pub struct SetShelf<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetShelf<St> {}
-    impl<St: State> State for SetShelf<St> {
-        type GoodreadsUserId = St::GoodreadsUserId;
         type Id = St::Id;
-        type Shelf = Set<members::shelf>;
-        type Books = St::Books;
-        type Type = St::Type;
     }
     ///State transition - sets the `books` field to Set
     pub struct SetBooks<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBooks<St> {}
     impl<St: State> State for SetBooks<St> {
         type GoodreadsUserId = St::GoodreadsUserId;
-        type Id = St::Id;
-        type Shelf = St::Shelf;
         type Books = Set<members::books>;
         type Type = St::Type;
+        type Shelf = St::Shelf;
+        type Id = St::Id;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
         type GoodreadsUserId = St::GoodreadsUserId;
-        type Id = St::Id;
-        type Shelf = St::Shelf;
         type Books = St::Books;
         type Type = Set<members::r#type>;
+        type Shelf = St::Shelf;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `shelf` field to Set
+    pub struct SetShelf<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShelf<St> {}
+    impl<St: State> State for SetShelf<St> {
+        type GoodreadsUserId = St::GoodreadsUserId;
+        type Books = St::Books;
+        type Type = St::Type;
+        type Shelf = Set<members::shelf>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type GoodreadsUserId = St::GoodreadsUserId;
+        type Books = St::Books;
+        type Type = St::Type;
+        type Shelf = St::Shelf;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `goodreads_user_id` field
         pub struct goodreads_user_id(());
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `shelf` field
-        pub struct shelf(());
         ///Marker type for the `books` field
         pub struct books(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `shelf` field
+        pub struct shelf(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WidgetGoodreadsBuilder<S: BosStr, St: widget_goodreads_state::State> {
+pub struct WidgetGoodreadsBuilder<
+    St: widget_goodreads_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<linkinbio::GoodreadsBook<S>>>,
@@ -3631,15 +3778,22 @@ pub struct WidgetGoodreadsBuilder<S: BosStr, St: widget_goodreads_state::State> 
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> WidgetGoodreads<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> WidgetGoodreadsBuilder<S, widget_goodreads_state::Empty> {
+impl WidgetGoodreads<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> WidgetGoodreadsBuilder<widget_goodreads_state::Empty, DefaultStr> {
         WidgetGoodreadsBuilder::new()
     }
 }
 
-impl<S: BosStr> WidgetGoodreadsBuilder<S, widget_goodreads_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> WidgetGoodreads<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> WidgetGoodreadsBuilder<widget_goodreads_state::Empty, S> {
+        WidgetGoodreadsBuilder::builder()
+    }
+}
+
+impl WidgetGoodreadsBuilder<widget_goodreads_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         WidgetGoodreadsBuilder {
             _state: PhantomData,
@@ -3649,7 +3803,18 @@ impl<S: BosStr> WidgetGoodreadsBuilder<S, widget_goodreads_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> WidgetGoodreadsBuilder<S, St>
+impl<S: BosStr> WidgetGoodreadsBuilder<widget_goodreads_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        WidgetGoodreadsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> WidgetGoodreadsBuilder<St, S>
 where
     St: widget_goodreads_state::State,
     St::Books: widget_goodreads_state::IsUnset,
@@ -3658,7 +3823,7 @@ where
     pub fn books(
         mut self,
         value: impl Into<Vec<linkinbio::GoodreadsBook<S>>>,
-    ) -> WidgetGoodreadsBuilder<S, widget_goodreads_state::SetBooks<St>> {
+    ) -> WidgetGoodreadsBuilder<widget_goodreads_state::SetBooks<St>, S> {
         self._fields.0 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
             _state: PhantomData,
@@ -3668,7 +3833,7 @@ where
     }
 }
 
-impl<S: BosStr, St: widget_goodreads_state::State> WidgetGoodreadsBuilder<S, St> {
+impl<St: widget_goodreads_state::State, S: BosStr> WidgetGoodreadsBuilder<St, S> {
     /// Set the `enabled` field (optional)
     pub fn enabled(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -3681,7 +3846,7 @@ impl<S: BosStr, St: widget_goodreads_state::State> WidgetGoodreadsBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St> WidgetGoodreadsBuilder<S, St>
+impl<St, S: BosStr> WidgetGoodreadsBuilder<St, S>
 where
     St: widget_goodreads_state::State,
     St::GoodreadsUserId: widget_goodreads_state::IsUnset,
@@ -3690,7 +3855,7 @@ where
     pub fn goodreads_user_id(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetGoodreadsBuilder<S, widget_goodreads_state::SetGoodreadsUserId<St>> {
+    ) -> WidgetGoodreadsBuilder<widget_goodreads_state::SetGoodreadsUserId<St>, S> {
         self._fields.2 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
             _state: PhantomData,
@@ -3700,7 +3865,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WidgetGoodreadsBuilder<S, St>
+impl<St, S: BosStr> WidgetGoodreadsBuilder<St, S>
 where
     St: widget_goodreads_state::State,
     St::Id: widget_goodreads_state::IsUnset,
@@ -3709,7 +3874,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetGoodreadsBuilder<S, widget_goodreads_state::SetId<St>> {
+    ) -> WidgetGoodreadsBuilder<widget_goodreads_state::SetId<St>, S> {
         self._fields.3 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
             _state: PhantomData,
@@ -3719,7 +3884,7 @@ where
     }
 }
 
-impl<S: BosStr, St: widget_goodreads_state::State> WidgetGoodreadsBuilder<S, St> {
+impl<St: widget_goodreads_state::State, S: BosStr> WidgetGoodreadsBuilder<St, S> {
     /// Set the `lastSyncedAt` field (optional)
     pub fn last_synced_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -3732,7 +3897,7 @@ impl<S: BosStr, St: widget_goodreads_state::State> WidgetGoodreadsBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: widget_goodreads_state::State> WidgetGoodreadsBuilder<S, St> {
+impl<St: widget_goodreads_state::State, S: BosStr> WidgetGoodreadsBuilder<St, S> {
     /// Set the `readBooks` field (optional)
     pub fn read_books(
         mut self,
@@ -3742,13 +3907,16 @@ impl<S: BosStr, St: widget_goodreads_state::State> WidgetGoodreadsBuilder<S, St>
         self
     }
     /// Set the `readBooks` field to an Option value (optional)
-    pub fn maybe_read_books(mut self, value: Option<Vec<linkinbio::GoodreadsBook<S>>>) -> Self {
+    pub fn maybe_read_books(
+        mut self,
+        value: Option<Vec<linkinbio::GoodreadsBook<S>>>,
+    ) -> Self {
         self._fields.5 = value;
         self
     }
 }
 
-impl<S: BosStr, St> WidgetGoodreadsBuilder<S, St>
+impl<St, S: BosStr> WidgetGoodreadsBuilder<St, S>
 where
     St: widget_goodreads_state::State,
     St::Shelf: widget_goodreads_state::IsUnset,
@@ -3757,7 +3925,7 @@ where
     pub fn shelf(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetGoodreadsBuilder<S, widget_goodreads_state::SetShelf<St>> {
+    ) -> WidgetGoodreadsBuilder<widget_goodreads_state::SetShelf<St>, S> {
         self._fields.6 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
             _state: PhantomData,
@@ -3767,7 +3935,7 @@ where
     }
 }
 
-impl<S: BosStr, St: widget_goodreads_state::State> WidgetGoodreadsBuilder<S, St> {
+impl<St: widget_goodreads_state::State, S: BosStr> WidgetGoodreadsBuilder<St, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<WidgetGoodreadsSize<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -3780,7 +3948,7 @@ impl<S: BosStr, St: widget_goodreads_state::State> WidgetGoodreadsBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St> WidgetGoodreadsBuilder<S, St>
+impl<St, S: BosStr> WidgetGoodreadsBuilder<St, S>
 where
     St: widget_goodreads_state::State,
     St::Type: widget_goodreads_state::IsUnset,
@@ -3789,7 +3957,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetGoodreadsBuilder<S, widget_goodreads_state::SetType<St>> {
+    ) -> WidgetGoodreadsBuilder<widget_goodreads_state::SetType<St>, S> {
         self._fields.8 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
             _state: PhantomData,
@@ -3799,14 +3967,14 @@ where
     }
 }
 
-impl<S: BosStr, St> WidgetGoodreadsBuilder<S, St>
+impl<St, S: BosStr> WidgetGoodreadsBuilder<St, S>
 where
     St: widget_goodreads_state::State,
     St::GoodreadsUserId: widget_goodreads_state::IsSet,
-    St::Id: widget_goodreads_state::IsSet,
-    St::Shelf: widget_goodreads_state::IsSet,
     St::Books: widget_goodreads_state::IsSet,
     St::Type: widget_goodreads_state::IsSet,
+    St::Shelf: widget_goodreads_state::IsSet,
+    St::Id: widget_goodreads_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> WidgetGoodreads<S> {
@@ -3824,7 +3992,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> WidgetGoodreads<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> WidgetGoodreads<S> {
         WidgetGoodreads {
             books: self._fields.0.unwrap(),
             enabled: self._fields.1,
@@ -3842,7 +4013,7 @@ where
 
 pub mod widget_tealfm_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3899,7 +4070,7 @@ pub mod widget_tealfm_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WidgetTealfmBuilder<S: BosStr, St: widget_tealfm_state::State> {
+pub struct WidgetTealfmBuilder<St: widget_tealfm_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -3913,15 +4084,22 @@ pub struct WidgetTealfmBuilder<S: BosStr, St: widget_tealfm_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> WidgetTealfm<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> WidgetTealfmBuilder<S, widget_tealfm_state::Empty> {
+impl WidgetTealfm<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> WidgetTealfmBuilder<widget_tealfm_state::Empty, DefaultStr> {
         WidgetTealfmBuilder::new()
     }
 }
 
-impl<S: BosStr> WidgetTealfmBuilder<S, widget_tealfm_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> WidgetTealfm<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> WidgetTealfmBuilder<widget_tealfm_state::Empty, S> {
+        WidgetTealfmBuilder::builder()
+    }
+}
+
+impl WidgetTealfmBuilder<widget_tealfm_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         WidgetTealfmBuilder {
             _state: PhantomData,
@@ -3931,7 +4109,18 @@ impl<S: BosStr> WidgetTealfmBuilder<S, widget_tealfm_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: widget_tealfm_state::State> WidgetTealfmBuilder<S, St> {
+impl<S: BosStr> WidgetTealfmBuilder<widget_tealfm_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        WidgetTealfmBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: widget_tealfm_state::State, S: BosStr> WidgetTealfmBuilder<St, S> {
     /// Set the `coverArtNotice` field (optional)
     pub fn cover_art_notice(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -3944,7 +4133,7 @@ impl<S: BosStr, St: widget_tealfm_state::State> WidgetTealfmBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: widget_tealfm_state::State> WidgetTealfmBuilder<S, St> {
+impl<St: widget_tealfm_state::State, S: BosStr> WidgetTealfmBuilder<St, S> {
     /// Set the `enabled` field (optional)
     pub fn enabled(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -3957,7 +4146,7 @@ impl<S: BosStr, St: widget_tealfm_state::State> WidgetTealfmBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WidgetTealfmBuilder<S, St>
+impl<St, S: BosStr> WidgetTealfmBuilder<St, S>
 where
     St: widget_tealfm_state::State,
     St::Id: widget_tealfm_state::IsUnset,
@@ -3966,7 +4155,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetTealfmBuilder<S, widget_tealfm_state::SetId<St>> {
+    ) -> WidgetTealfmBuilder<widget_tealfm_state::SetId<St>, S> {
         self._fields.2 = Option::Some(value.into());
         WidgetTealfmBuilder {
             _state: PhantomData,
@@ -3976,7 +4165,7 @@ where
     }
 }
 
-impl<S: BosStr, St: widget_tealfm_state::State> WidgetTealfmBuilder<S, St> {
+impl<St: widget_tealfm_state::State, S: BosStr> WidgetTealfmBuilder<St, S> {
     /// Set the `lastSyncedAt` field (optional)
     pub fn last_synced_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -3989,7 +4178,7 @@ impl<S: BosStr, St: widget_tealfm_state::State> WidgetTealfmBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WidgetTealfmBuilder<S, St>
+impl<St, S: BosStr> WidgetTealfmBuilder<St, S>
 where
     St: widget_tealfm_state::State,
     St::Plays: widget_tealfm_state::IsUnset,
@@ -3998,7 +4187,7 @@ where
     pub fn plays(
         mut self,
         value: impl Into<Vec<linkinbio::TealfmPlay<S>>>,
-    ) -> WidgetTealfmBuilder<S, widget_tealfm_state::SetPlays<St>> {
+    ) -> WidgetTealfmBuilder<widget_tealfm_state::SetPlays<St>, S> {
         self._fields.4 = Option::Some(value.into());
         WidgetTealfmBuilder {
             _state: PhantomData,
@@ -4008,7 +4197,7 @@ where
     }
 }
 
-impl<S: BosStr, St: widget_tealfm_state::State> WidgetTealfmBuilder<S, St> {
+impl<St: widget_tealfm_state::State, S: BosStr> WidgetTealfmBuilder<St, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<WidgetTealfmSize<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -4021,7 +4210,7 @@ impl<S: BosStr, St: widget_tealfm_state::State> WidgetTealfmBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WidgetTealfmBuilder<S, St>
+impl<St, S: BosStr> WidgetTealfmBuilder<St, S>
 where
     St: widget_tealfm_state::State,
     St::Type: widget_tealfm_state::IsUnset,
@@ -4030,7 +4219,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetTealfmBuilder<S, widget_tealfm_state::SetType<St>> {
+    ) -> WidgetTealfmBuilder<widget_tealfm_state::SetType<St>, S> {
         self._fields.6 = Option::Some(value.into());
         WidgetTealfmBuilder {
             _state: PhantomData,
@@ -4040,7 +4229,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WidgetTealfmBuilder<S, St>
+impl<St, S: BosStr> WidgetTealfmBuilder<St, S>
 where
     St: widget_tealfm_state::State,
     St::Plays: widget_tealfm_state::IsSet,
@@ -4061,7 +4250,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> WidgetTealfm<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> WidgetTealfm<S> {
         WidgetTealfm {
             cover_art_notice: self._fields.0,
             enabled: self._fields.1,

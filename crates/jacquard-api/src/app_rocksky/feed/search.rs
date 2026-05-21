@@ -8,29 +8,24 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::feed::SearchResultsView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::feed::SearchResultsView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Search<S: BosStr = DefaultStr> {
     pub query: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: SearchResultsView<S>,
@@ -64,7 +59,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SearchRequest {
 
 pub mod search_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,21 +90,28 @@ pub mod search_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchBuilder<S: BosStr, St: search_state::State> {
+pub struct SearchBuilder<St: search_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Search<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SearchBuilder<S, search_state::Empty> {
+impl Search<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SearchBuilder<search_state::Empty, DefaultStr> {
         SearchBuilder::new()
     }
 }
 
-impl<S: BosStr> SearchBuilder<S, search_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Search<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SearchBuilder<search_state::Empty, S> {
+        SearchBuilder::builder()
+    }
+}
+
+impl SearchBuilder<search_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SearchBuilder {
             _state: PhantomData,
@@ -119,13 +121,27 @@ impl<S: BosStr> SearchBuilder<S, search_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SearchBuilder<S, St>
+impl<S: BosStr> SearchBuilder<search_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SearchBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SearchBuilder<St, S>
 where
     St: search_state::State,
     St::Query: search_state::IsUnset,
 {
     /// Set the `query` field (required)
-    pub fn query(mut self, value: impl Into<S>) -> SearchBuilder<S, search_state::SetQuery<St>> {
+    pub fn query(
+        mut self,
+        value: impl Into<S>,
+    ) -> SearchBuilder<search_state::SetQuery<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SearchBuilder {
             _state: PhantomData,
@@ -135,7 +151,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SearchBuilder<S, St>
+impl<St, S: BosStr> SearchBuilder<St, S>
 where
     St: search_state::State,
     St::Query: search_state::IsSet,

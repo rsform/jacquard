@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Site configuration for spores.garden, including title and subtitle.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -552,7 +552,7 @@ impl<S: BosStr> LexiconSchema for Config<S> {
 
 pub mod config_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -570,7 +570,7 @@ pub mod config_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ConfigBuilder<S: BosStr, St: config_state::State> {
+pub struct ConfigBuilder<St: config_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ConfigBodyFont<S>>,
@@ -583,15 +583,22 @@ pub struct ConfigBuilder<S: BosStr, St: config_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Config<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ConfigBuilder<S, config_state::Empty> {
+impl Config<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ConfigBuilder<config_state::Empty, DefaultStr> {
         ConfigBuilder::new()
     }
 }
 
-impl<S: BosStr> ConfigBuilder<S, config_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Config<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ConfigBuilder<config_state::Empty, S> {
+        ConfigBuilder::builder()
+    }
+}
+
+impl ConfigBuilder<config_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ConfigBuilder {
             _state: PhantomData,
@@ -601,7 +608,18 @@ impl<S: BosStr> ConfigBuilder<S, config_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
+impl<S: BosStr> ConfigBuilder<config_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ConfigBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: config_state::State, S: BosStr> ConfigBuilder<St, S> {
     /// Set the `bodyFont` field (optional)
     pub fn body_font(mut self, value: impl Into<Option<ConfigBodyFont<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -614,7 +632,7 @@ impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
+impl<St: config_state::State, S: BosStr> ConfigBuilder<St, S> {
     /// Set the `fontBody` field (optional)
     pub fn font_body(mut self, value: impl Into<Option<ConfigFontBody<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -627,9 +645,12 @@ impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
+impl<St: config_state::State, S: BosStr> ConfigBuilder<St, S> {
     /// Set the `fontHeading` field (optional)
-    pub fn font_heading(mut self, value: impl Into<Option<ConfigFontHeading<S>>>) -> Self {
+    pub fn font_heading(
+        mut self,
+        value: impl Into<Option<ConfigFontHeading<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -640,9 +661,12 @@ impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
+impl<St: config_state::State, S: BosStr> ConfigBuilder<St, S> {
     /// Set the `headingFont` field (optional)
-    pub fn heading_font(mut self, value: impl Into<Option<ConfigHeadingFont<S>>>) -> Self {
+    pub fn heading_font(
+        mut self,
+        value: impl Into<Option<ConfigHeadingFont<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -653,7 +677,7 @@ impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
+impl<St: config_state::State, S: BosStr> ConfigBuilder<St, S> {
     /// Set the `subtitle` field (optional)
     pub fn subtitle(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -666,7 +690,7 @@ impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
+impl<St: config_state::State, S: BosStr> ConfigBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -679,7 +703,7 @@ impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ConfigBuilder<S, St>
+impl<St, S: BosStr> ConfigBuilder<St, S>
 where
     St: config_state::State,
 {
@@ -710,10 +734,10 @@ where
 }
 
 fn lexicon_doc_coop_hypha_spores_site_config() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("coop.hypha.spores.site.config"),
@@ -722,9 +746,11 @@ fn lexicon_doc_coop_hypha_spores_site_config() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Site configuration for spores.garden, including title and subtitle.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Site configuration for spores.garden, including title and subtitle.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         properties: {
@@ -741,9 +767,9 @@ fn lexicon_doc_coop_hypha_spores_site_config() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("fontBody"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Deprecated legacy key for body font ID",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Deprecated legacy key for body font ID"),
+                                    ),
                                     max_length: Some(50usize),
                                     ..Default::default()
                                 }),
@@ -751,9 +777,11 @@ fn lexicon_doc_coop_hypha_spores_site_config() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("fontHeading"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Deprecated legacy key for heading font ID",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Deprecated legacy key for heading font ID",
+                                        ),
+                                    ),
                                     max_length: Some(50usize),
                                     ..Default::default()
                                 }),

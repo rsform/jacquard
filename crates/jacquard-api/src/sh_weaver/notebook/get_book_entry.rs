@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::BookEntryView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::BookEntryView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBookEntry<S: BosStr = DefaultStr> {
     ///Defaults to `0`. Min: 0.
     #[serde(default = "_default_index")]
@@ -31,11 +28,9 @@ pub struct GetBookEntry<S: BosStr = DefaultStr> {
     pub notebook: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBookEntryOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: BookEntryView<S>,
@@ -43,9 +38,18 @@ pub struct GetBookEntryOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetBookEntryError {
     #[serde(rename = "NotebookNotFound")]
@@ -54,10 +58,7 @@ pub enum GetBookEntryError {
     EntryNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetBookEntryError {
@@ -118,7 +119,7 @@ fn _default_index() -> Option<i64> {
 
 pub mod get_book_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -149,21 +150,28 @@ pub mod get_book_entry_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetBookEntryBuilder<S: BosStr, St: get_book_entry_state::State> {
+pub struct GetBookEntryBuilder<St: get_book_entry_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetBookEntry<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetBookEntryBuilder<S, get_book_entry_state::Empty> {
+impl GetBookEntry<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetBookEntryBuilder<get_book_entry_state::Empty, DefaultStr> {
         GetBookEntryBuilder::new()
     }
 }
 
-impl<S: BosStr> GetBookEntryBuilder<S, get_book_entry_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetBookEntry<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetBookEntryBuilder<get_book_entry_state::Empty, S> {
+        GetBookEntryBuilder::builder()
+    }
+}
+
+impl GetBookEntryBuilder<get_book_entry_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetBookEntryBuilder {
             _state: PhantomData,
@@ -173,7 +181,18 @@ impl<S: BosStr> GetBookEntryBuilder<S, get_book_entry_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_book_entry_state::State> GetBookEntryBuilder<S, St> {
+impl<S: BosStr> GetBookEntryBuilder<get_book_entry_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetBookEntryBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_book_entry_state::State, S: BosStr> GetBookEntryBuilder<St, S> {
     /// Set the `index` field (optional)
     pub fn index(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -186,7 +205,7 @@ impl<S: BosStr, St: get_book_entry_state::State> GetBookEntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetBookEntryBuilder<S, St>
+impl<St, S: BosStr> GetBookEntryBuilder<St, S>
 where
     St: get_book_entry_state::State,
     St::Notebook: get_book_entry_state::IsUnset,
@@ -195,7 +214,7 @@ where
     pub fn notebook(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetBookEntryBuilder<S, get_book_entry_state::SetNotebook<St>> {
+    ) -> GetBookEntryBuilder<get_book_entry_state::SetNotebook<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetBookEntryBuilder {
             _state: PhantomData,
@@ -205,7 +224,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetBookEntryBuilder<S, St>
+impl<St, S: BosStr> GetBookEntryBuilder<St, S>
 where
     St: get_book_entry_state::State,
     St::Notebook: get_book_entry_state::IsSet,

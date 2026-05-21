@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AddSecret<S: BosStr = DefaultStr> {
     pub key: S,
     pub repo: AtUri<S>,
@@ -41,8 +38,9 @@ impl jacquard_common::xrpc::XrpcResp for AddSecretResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AddSecret<S> {
     const NSID: &'static str = "sh.tangled.repo.addSecret";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = AddSecretResponse;
 }
 
@@ -50,15 +48,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AddSecret<S> {
 pub struct AddSecretRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddSecretRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.addSecret";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = AddSecret<S>;
     type Response = AddSecretResponse;
 }
 
 pub mod add_secret_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -67,69 +66,76 @@ pub mod add_secret_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Value;
-        type Key;
         type Repo;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Value = Unset;
-        type Key = Unset;
         type Repo = Unset;
+        type Key = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
         type Value = Set<members::value>;
+        type Repo = St::Repo;
         type Key = St::Key;
-        type Repo = St::Repo;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKey<St> {}
-    impl<St: State> State for SetKey<St> {
-        type Value = St::Value;
-        type Key = Set<members::key>;
-        type Repo = St::Repo;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
         type Value = St::Value;
-        type Key = St::Key;
         type Repo = Set<members::repo>;
+        type Key = St::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type Value = St::Value;
+        type Repo = St::Repo;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `value` field
         pub struct value(());
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AddSecretBuilder<S: BosStr, St: add_secret_state::State> {
+pub struct AddSecretBuilder<St: add_secret_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> AddSecret<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AddSecretBuilder<S, add_secret_state::Empty> {
+impl AddSecret<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AddSecretBuilder<add_secret_state::Empty, DefaultStr> {
         AddSecretBuilder::new()
     }
 }
 
-impl<S: BosStr> AddSecretBuilder<S, add_secret_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> AddSecret<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AddSecretBuilder<add_secret_state::Empty, S> {
+        AddSecretBuilder::builder()
+    }
+}
+
+impl AddSecretBuilder<add_secret_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AddSecretBuilder {
             _state: PhantomData,
@@ -139,13 +145,27 @@ impl<S: BosStr> AddSecretBuilder<S, add_secret_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AddSecretBuilder<S, St>
+impl<S: BosStr> AddSecretBuilder<add_secret_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AddSecretBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AddSecretBuilder<St, S>
 where
     St: add_secret_state::State,
     St::Key: add_secret_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(mut self, value: impl Into<S>) -> AddSecretBuilder<S, add_secret_state::SetKey<St>> {
+    pub fn key(
+        mut self,
+        value: impl Into<S>,
+    ) -> AddSecretBuilder<add_secret_state::SetKey<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AddSecretBuilder {
             _state: PhantomData,
@@ -155,7 +175,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AddSecretBuilder<S, St>
+impl<St, S: BosStr> AddSecretBuilder<St, S>
 where
     St: add_secret_state::State,
     St::Repo: add_secret_state::IsUnset,
@@ -164,7 +184,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> AddSecretBuilder<S, add_secret_state::SetRepo<St>> {
+    ) -> AddSecretBuilder<add_secret_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AddSecretBuilder {
             _state: PhantomData,
@@ -174,7 +194,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AddSecretBuilder<S, St>
+impl<St, S: BosStr> AddSecretBuilder<St, S>
 where
     St: add_secret_state::State,
     St::Value: add_secret_state::IsUnset,
@@ -183,7 +203,7 @@ where
     pub fn value(
         mut self,
         value: impl Into<S>,
-    ) -> AddSecretBuilder<S, add_secret_state::SetValue<St>> {
+    ) -> AddSecretBuilder<add_secret_state::SetValue<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AddSecretBuilder {
             _state: PhantomData,
@@ -193,12 +213,12 @@ where
     }
 }
 
-impl<S: BosStr, St> AddSecretBuilder<S, St>
+impl<St, S: BosStr> AddSecretBuilder<St, S>
 where
     St: add_secret_state::State,
     St::Value: add_secret_state::IsSet,
-    St::Key: add_secret_state::IsSet,
     St::Repo: add_secret_state::IsSet,
+    St::Key: add_secret_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AddSecret<S> {
@@ -210,7 +230,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AddSecret<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AddSecret<S> {
         AddSecret {
             key: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),

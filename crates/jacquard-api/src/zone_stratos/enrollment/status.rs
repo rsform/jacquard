@@ -10,27 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did};
-use jacquard_common::types::value::Data;
 use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Status<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StatusOutput<S: BosStr = DefaultStr> {
     ///Authoritative boundaries assigned. Only included when request is authenticated.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -72,7 +67,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for StatusRequest {
 
 pub mod status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -103,21 +98,28 @@ pub mod status_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StatusBuilder<S: BosStr, St: status_state::State> {
+pub struct StatusBuilder<St: status_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Status<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StatusBuilder<S, status_state::Empty> {
+impl Status<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StatusBuilder<status_state::Empty, DefaultStr> {
         StatusBuilder::new()
     }
 }
 
-impl<S: BosStr> StatusBuilder<S, status_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Status<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StatusBuilder<status_state::Empty, S> {
+        StatusBuilder::builder()
+    }
+}
+
+impl StatusBuilder<status_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StatusBuilder {
             _state: PhantomData,
@@ -127,13 +129,27 @@ impl<S: BosStr> StatusBuilder<S, status_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StatusBuilder<S, St>
+impl<S: BosStr> StatusBuilder<status_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StatusBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StatusBuilder<St, S>
 where
     St: status_state::State,
     St::Did: status_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> StatusBuilder<S, status_state::SetDid<St>> {
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> StatusBuilder<status_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
@@ -143,7 +159,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatusBuilder<S, St>
+impl<St, S: BosStr> StatusBuilder<St, S>
 where
     St: status_state::State,
     St::Did: status_state::IsSet,

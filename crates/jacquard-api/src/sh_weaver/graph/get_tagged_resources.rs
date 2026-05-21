@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
 use crate::sh_weaver::graph::TagView;
 use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::NotebookView;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTaggedResources<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -50,11 +47,9 @@ pub struct GetTaggedResources<S: BosStr = DefaultStr> {
     pub tag: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTaggedResourcesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -64,6 +59,7 @@ pub struct GetTaggedResourcesOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -121,7 +117,7 @@ fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_tagged_resources_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -152,7 +148,10 @@ pub mod get_tagged_resources_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetTaggedResourcesBuilder<S: BosStr, St: get_tagged_resources_state::State> {
+pub struct GetTaggedResourcesBuilder<
+    St: get_tagged_resources_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -166,15 +165,25 @@ pub struct GetTaggedResourcesBuilder<S: BosStr, St: get_tagged_resources_state::
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetTaggedResources<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetTaggedResourcesBuilder<S, get_tagged_resources_state::Empty> {
+impl GetTaggedResources<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetTaggedResourcesBuilder<
+        get_tagged_resources_state::Empty,
+        DefaultStr,
+    > {
         GetTaggedResourcesBuilder::new()
     }
 }
 
-impl<S: BosStr> GetTaggedResourcesBuilder<S, get_tagged_resources_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetTaggedResources<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetTaggedResourcesBuilder<get_tagged_resources_state::Empty, S> {
+        GetTaggedResourcesBuilder::builder()
+    }
+}
+
+impl GetTaggedResourcesBuilder<get_tagged_resources_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetTaggedResourcesBuilder {
             _state: PhantomData,
@@ -184,7 +193,18 @@ impl<S: BosStr> GetTaggedResourcesBuilder<S, get_tagged_resources_state::Empty> 
     }
 }
 
-impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder<S, St> {
+impl<S: BosStr> GetTaggedResourcesBuilder<get_tagged_resources_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetTaggedResourcesBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_tagged_resources_state::State, S: BosStr> GetTaggedResourcesBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -197,7 +217,7 @@ impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder
     }
 }
 
-impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder<S, St> {
+impl<St: get_tagged_resources_state::State, S: BosStr> GetTaggedResourcesBuilder<St, S> {
     /// Set the `includeAuthorTags` field (optional)
     pub fn include_author_tags(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -210,7 +230,7 @@ impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder
     }
 }
 
-impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder<S, St> {
+impl<St: get_tagged_resources_state::State, S: BosStr> GetTaggedResourcesBuilder<St, S> {
     /// Set the `includeCommunityTags` field (optional)
     pub fn include_community_tags(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -223,7 +243,7 @@ impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder
     }
 }
 
-impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder<S, St> {
+impl<St: get_tagged_resources_state::State, S: BosStr> GetTaggedResourcesBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -236,7 +256,7 @@ impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder
     }
 }
 
-impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder<S, St> {
+impl<St: get_tagged_resources_state::State, S: BosStr> GetTaggedResourcesBuilder<St, S> {
     /// Set the `resourceType` field (optional)
     pub fn resource_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -249,7 +269,7 @@ impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder
     }
 }
 
-impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder<S, St> {
+impl<St: get_tagged_resources_state::State, S: BosStr> GetTaggedResourcesBuilder<St, S> {
     /// Set the `sort` field (optional)
     pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -262,7 +282,7 @@ impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder
     }
 }
 
-impl<S: BosStr, St> GetTaggedResourcesBuilder<S, St>
+impl<St, S: BosStr> GetTaggedResourcesBuilder<St, S>
 where
     St: get_tagged_resources_state::State,
     St::Tag: get_tagged_resources_state::IsUnset,
@@ -271,7 +291,7 @@ where
     pub fn tag(
         mut self,
         value: impl Into<S>,
-    ) -> GetTaggedResourcesBuilder<S, get_tagged_resources_state::SetTag<St>> {
+    ) -> GetTaggedResourcesBuilder<get_tagged_resources_state::SetTag<St>, S> {
         self._fields.6 = Option::Some(value.into());
         GetTaggedResourcesBuilder {
             _state: PhantomData,
@@ -281,7 +301,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetTaggedResourcesBuilder<S, St>
+impl<St, S: BosStr> GetTaggedResourcesBuilder<St, S>
 where
     St: get_tagged_resources_state::State,
     St::Tag: get_tagged_resources_state::IsSet,

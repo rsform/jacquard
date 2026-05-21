@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A report of inappropriate content on a beacon
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -231,7 +231,7 @@ impl<S: BosStr> LexiconSchema for Report<S> {
 
 pub mod report_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -239,75 +239,77 @@ pub mod report_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BeaconUri;
         type CreatedAt;
+        type BeaconUri;
         type Reason;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BeaconUri = Unset;
         type CreatedAt = Unset;
+        type BeaconUri = Unset;
         type Reason = Unset;
-    }
-    ///State transition - sets the `beacon_uri` field to Set
-    pub struct SetBeaconUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBeaconUri<St> {}
-    impl<St: State> State for SetBeaconUri<St> {
-        type BeaconUri = Set<members::beacon_uri>;
-        type CreatedAt = St::CreatedAt;
-        type Reason = St::Reason;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type BeaconUri = St::BeaconUri;
         type CreatedAt = Set<members::created_at>;
+        type BeaconUri = St::BeaconUri;
+        type Reason = St::Reason;
+    }
+    ///State transition - sets the `beacon_uri` field to Set
+    pub struct SetBeaconUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBeaconUri<St> {}
+    impl<St: State> State for SetBeaconUri<St> {
+        type CreatedAt = St::CreatedAt;
+        type BeaconUri = Set<members::beacon_uri>;
         type Reason = St::Reason;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetReason<St> {}
     impl<St: State> State for SetReason<St> {
-        type BeaconUri = St::BeaconUri;
         type CreatedAt = St::CreatedAt;
+        type BeaconUri = St::BeaconUri;
         type Reason = Set<members::reason>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `beacon_uri` field
-        pub struct beacon_uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `beacon_uri` field
+        pub struct beacon_uri(());
         ///Marker type for the `reason` field
         pub struct reason(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReportBuilder<S: BosStr, St: report_state::State> {
+pub struct ReportBuilder<St: report_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<AtUri<S>>,
-        Option<Datetime>,
-        Option<S>,
-        Option<ReportReason<S>>,
-    ),
+    _fields: (Option<AtUri<S>>, Option<Datetime>, Option<S>, Option<ReportReason<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Report<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ReportBuilder<S, report_state::Empty> {
+impl Report<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReportBuilder<report_state::Empty, DefaultStr> {
         ReportBuilder::new()
     }
 }
 
-impl<S: BosStr> ReportBuilder<S, report_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Report<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReportBuilder<report_state::Empty, S> {
+        ReportBuilder::builder()
+    }
+}
+
+impl ReportBuilder<report_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ReportBuilder {
             _state: PhantomData,
@@ -317,7 +319,18 @@ impl<S: BosStr> ReportBuilder<S, report_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ReportBuilder<S, St>
+impl<S: BosStr> ReportBuilder<report_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReportBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReportBuilder<St, S>
 where
     St: report_state::State,
     St::BeaconUri: report_state::IsUnset,
@@ -326,7 +339,7 @@ where
     pub fn beacon_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ReportBuilder<S, report_state::SetBeaconUri<St>> {
+    ) -> ReportBuilder<report_state::SetBeaconUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ReportBuilder {
             _state: PhantomData,
@@ -336,7 +349,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReportBuilder<S, St>
+impl<St, S: BosStr> ReportBuilder<St, S>
 where
     St: report_state::State,
     St::CreatedAt: report_state::IsUnset,
@@ -345,7 +358,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReportBuilder<S, report_state::SetCreatedAt<St>> {
+    ) -> ReportBuilder<report_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ReportBuilder {
             _state: PhantomData,
@@ -355,7 +368,7 @@ where
     }
 }
 
-impl<S: BosStr, St: report_state::State> ReportBuilder<S, St> {
+impl<St: report_state::State, S: BosStr> ReportBuilder<St, S> {
     /// Set the `details` field (optional)
     pub fn details(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -368,7 +381,7 @@ impl<S: BosStr, St: report_state::State> ReportBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ReportBuilder<S, St>
+impl<St, S: BosStr> ReportBuilder<St, S>
 where
     St: report_state::State,
     St::Reason: report_state::IsUnset,
@@ -377,7 +390,7 @@ where
     pub fn reason(
         mut self,
         value: impl Into<ReportReason<S>>,
-    ) -> ReportBuilder<S, report_state::SetReason<St>> {
+    ) -> ReportBuilder<report_state::SetReason<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ReportBuilder {
             _state: PhantomData,
@@ -387,11 +400,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ReportBuilder<S, St>
+impl<St, S: BosStr> ReportBuilder<St, S>
 where
     St: report_state::State,
-    St::BeaconUri: report_state::IsSet,
     St::CreatedAt: report_state::IsSet,
+    St::BeaconUri: report_state::IsSet,
     St::Reason: report_state::IsSet,
 {
     /// Build the final struct.
@@ -417,10 +430,10 @@ where
 }
 
 fn lexicon_doc_app_beaconbits_report() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.beaconbits.report"),
@@ -429,25 +442,29 @@ fn lexicon_doc_app_beaconbits_report() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A report of inappropriate content on a beacon",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A report of inappropriate content on a beacon",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("beaconUri"),
-                            SmolStr::new_static("reason"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("beaconUri"),
+                                SmolStr::new_static("reason"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("beaconUri"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "AT URI of the beacon being reported",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("AT URI of the beacon being reported"),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -455,9 +472,9 @@ fn lexicon_doc_app_beaconbits_report() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the report was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp when the report was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -465,9 +482,9 @@ fn lexicon_doc_app_beaconbits_report() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("details"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Additional context for the report",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Additional context for the report"),
+                                    ),
                                     max_graphemes: Some(500usize),
                                     ..Default::default()
                                 }),
@@ -475,7 +492,9 @@ fn lexicon_doc_app_beaconbits_report() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("reason"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Reason for the report")),
+                                    description: Some(
+                                        CowStr::new_static("Reason for the report"),
+                                    ),
                                     max_graphemes: Some(64usize),
                                     ..Default::default()
                                 }),

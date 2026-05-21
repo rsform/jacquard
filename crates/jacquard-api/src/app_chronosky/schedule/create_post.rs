@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,6 +21,9 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::embed::external::ExternalRecord;
 use crate::app_bsky::embed::images::Images;
 use crate::app_bsky::embed::record::Record;
@@ -31,17 +34,11 @@ use crate::app_bsky::feed::threadgate::FollowingRule;
 use crate::app_bsky::feed::threadgate::ListRule;
 use crate::app_bsky::feed::threadgate::MentionRule;
 use crate::app_bsky::richtext::facet::Facet;
-use crate::app_chronosky::schedule::create_post;
 use crate::com_atproto::label::SelfLabels;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use crate::app_chronosky::schedule::create_post;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreatePost<S: BosStr = DefaultStr> {
     ///Whether to disable quote posts
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -60,6 +57,7 @@ pub struct CreatePost<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -74,11 +72,9 @@ pub enum CreatePostThreadgateRulesItem<S: BosStr = DefaultStr> {
     ThreadgateListRule(Box<ListRule<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreatePostOutput<S: BosStr = DefaultStr> {
     ///Chronosky schedule ID (parent post ID for threads)
     pub id: S,
@@ -93,10 +89,7 @@ pub struct CreatePostOutput<S: BosStr = DefaultStr> {
 /// Individual post input for thread scheduling.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ThreadPostInput<S: BosStr = DefaultStr> {
     ///Post creation timestamp (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -118,6 +111,7 @@ pub struct ThreadPostInput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -146,8 +140,9 @@ impl jacquard_common::xrpc::XrpcResp for CreatePostResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreatePost<S> {
     const NSID: &'static str = "app.chronosky.schedule.createPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreatePostResponse;
 }
 
@@ -155,8 +150,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreatePost<S> {
 pub struct CreatePostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreatePostRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.schedule.createPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreatePost<S>;
     type Response = CreatePostResponse;
 }
@@ -222,7 +218,7 @@ impl<S: BosStr> LexiconSchema for ThreadPostInput<S> {
 
 pub mod create_post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -265,7 +261,7 @@ pub mod create_post_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreatePostBuilder<S: BosStr, St: create_post_state::State> {
+pub struct CreatePostBuilder<St: create_post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -277,15 +273,22 @@ pub struct CreatePostBuilder<S: BosStr, St: create_post_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CreatePost<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CreatePostBuilder<S, create_post_state::Empty> {
+impl CreatePost<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CreatePostBuilder<create_post_state::Empty, DefaultStr> {
         CreatePostBuilder::new()
     }
 }
 
-impl<S: BosStr> CreatePostBuilder<S, create_post_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CreatePost<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CreatePostBuilder<create_post_state::Empty, S> {
+        CreatePostBuilder::builder()
+    }
+}
+
+impl CreatePostBuilder<create_post_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CreatePostBuilder {
             _state: PhantomData,
@@ -295,7 +298,18 @@ impl<S: BosStr> CreatePostBuilder<S, create_post_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: create_post_state::State> CreatePostBuilder<S, St> {
+impl<S: BosStr> CreatePostBuilder<create_post_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CreatePostBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: create_post_state::State, S: BosStr> CreatePostBuilder<St, S> {
     /// Set the `disableQuotePosts` field (optional)
     pub fn disable_quote_posts(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -308,7 +322,7 @@ impl<S: BosStr, St: create_post_state::State> CreatePostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: create_post_state::State> CreatePostBuilder<S, St> {
+impl<St: create_post_state::State, S: BosStr> CreatePostBuilder<St, S> {
     /// Set the `parentPostId` field (optional)
     pub fn parent_post_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -321,7 +335,7 @@ impl<S: BosStr, St: create_post_state::State> CreatePostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CreatePostBuilder<S, St>
+impl<St, S: BosStr> CreatePostBuilder<St, S>
 where
     St: create_post_state::State,
     St::Posts: create_post_state::IsUnset,
@@ -330,7 +344,7 @@ where
     pub fn posts(
         mut self,
         value: impl Into<Vec<create_post::ThreadPostInput<S>>>,
-    ) -> CreatePostBuilder<S, create_post_state::SetPosts<St>> {
+    ) -> CreatePostBuilder<create_post_state::SetPosts<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CreatePostBuilder {
             _state: PhantomData,
@@ -340,7 +354,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CreatePostBuilder<S, St>
+impl<St, S: BosStr> CreatePostBuilder<St, S>
 where
     St: create_post_state::State,
     St::ScheduledAt: create_post_state::IsUnset,
@@ -349,7 +363,7 @@ where
     pub fn scheduled_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CreatePostBuilder<S, create_post_state::SetScheduledAt<St>> {
+    ) -> CreatePostBuilder<create_post_state::SetScheduledAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         CreatePostBuilder {
             _state: PhantomData,
@@ -359,7 +373,7 @@ where
     }
 }
 
-impl<S: BosStr, St: create_post_state::State> CreatePostBuilder<S, St> {
+impl<St: create_post_state::State, S: BosStr> CreatePostBuilder<St, S> {
     /// Set the `threadgateRules` field (optional)
     pub fn threadgate_rules(
         mut self,
@@ -378,7 +392,7 @@ impl<S: BosStr, St: create_post_state::State> CreatePostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CreatePostBuilder<S, St>
+impl<St, S: BosStr> CreatePostBuilder<St, S>
 where
     St: create_post_state::State,
     St::Posts: create_post_state::IsSet,
@@ -396,7 +410,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreatePost<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreatePost<S> {
         CreatePost {
             disable_quote_posts: self._fields.0,
             parent_post_id: self._fields.1,
@@ -409,10 +426,10 @@ where
 }
 
 fn lexicon_doc_app_chronosky_schedule_createPost() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chronosky.schedule.createPost"),
@@ -514,9 +531,11 @@ fn lexicon_doc_app_chronosky_schedule_createPost() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("threadPostInput"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Individual post input for thread scheduling.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Individual post input for thread scheduling.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("text")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -524,9 +543,9 @@ fn lexicon_doc_app_chronosky_schedule_createPost() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Post creation timestamp (optional)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Post creation timestamp (optional)"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -535,15 +554,17 @@ fn lexicon_doc_app_chronosky_schedule_createPost() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("embed"),
                             LexObjectProperty::Union(LexRefUnion {
-                                description: Some(CowStr::new_static(
-                                    "Embedded content (images, external links, records).",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Embedded content (images, external links, records).",
+                                    ),
+                                ),
                                 refs: vec![
                                     CowStr::new_static("app.bsky.embed.images"),
                                     CowStr::new_static("app.bsky.embed.external"),
                                     CowStr::new_static("app.bsky.embed.record"),
                                     CowStr::new_static("app.bsky.embed.video"),
-                                    CowStr::new_static("app.bsky.embed.recordWithMedia"),
+                                    CowStr::new_static("app.bsky.embed.recordWithMedia")
                                 ],
                                 ..Default::default()
                             }),
@@ -551,9 +572,11 @@ fn lexicon_doc_app_chronosky_schedule_createPost() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Rich text facets (mentions, links, tags)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Rich text facets (mentions, links, tags)",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("app.bsky.richtext.facet"),
                                     ..Default::default()
@@ -565,14 +588,18 @@ fn lexicon_doc_app_chronosky_schedule_createPost() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("labels"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("com.atproto.label.defs#selfLabels"),
+                                r#ref: CowStr::new_static(
+                                    "com.atproto.label.defs#selfLabels",
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("langs"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static("Language codes (ISO 639-1)")),
+                                description: Some(
+                                    CowStr::new_static("Language codes (ISO 639-1)"),
+                                ),
                                 items: LexArrayItem::String(LexString {
                                     format: Some(LexStringFormat::Language),
                                     ..Default::default()

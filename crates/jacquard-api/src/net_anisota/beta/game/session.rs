@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::beta::game::session;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::beta::game::session;
 /// Summary of activity during this session
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ActivitySummary<S: BosStr = DefaultStr> {
     ///Player's current level at the time of this session update
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -60,10 +57,7 @@ pub struct ActivitySummary<S: BosStr = DefaultStr> {
 /// Game-specific actions performed
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GameActions<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub daily_rewards_claimed: Option<i64>,
@@ -153,10 +147,7 @@ pub struct SessionGetRecordOutput<S: BosStr = DefaultStr> {
 /// Additional session metadata
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Metadata<S: BosStr = DefaultStr> {
     ///List of features used during the session
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -173,10 +164,7 @@ pub struct Metadata<S: BosStr = DefaultStr> {
 /// Performance-related data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PerformanceMetrics<S: BosStr = DefaultStr> {
     ///Average API response time in milliseconds (rounded to nearest integer)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -191,10 +179,7 @@ pub struct PerformanceMetrics<S: BosStr = DefaultStr> {
 /// Context about how the session started
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SessionContext<S: BosStr = DefaultStr> {
     ///How the user was authenticated
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -453,10 +438,10 @@ impl<S: BosStr> LexiconSchema for SessionContext<S> {
 }
 
 fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.beta.game.session"),
@@ -465,9 +450,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("activitySummary"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Summary of activity during this session",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Summary of activity during this session"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -495,9 +480,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("pagesVisited"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "List of unique pages/routes visited",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("List of unique pages/routes visited"),
+                                ),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
@@ -526,7 +511,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("gameActions"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Game-specific actions performed")),
+                    description: Some(
+                        CowStr::new_static("Game-specific actions performed"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -786,9 +773,11 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("features"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "List of features used during the session",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "List of features used during the session",
+                                    ),
+                                ),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
@@ -798,9 +787,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("networkCondition"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Network condition during session",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Network condition during session"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -845,25 +834,27 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("sessionContext"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Context about how the session started")),
+                    description: Some(
+                        CowStr::new_static("Context about how the session started"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("authenticationMethod"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "How the user was authenticated",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("How the user was authenticated"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("entryPoint"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "How the user entered the app",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("How the user entered the app"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -876,7 +867,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("referrer"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Referrer URL if applicable")),
+                                description: Some(
+                                    CowStr::new_static("Referrer URL if applicable"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -893,7 +886,7 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
 
 pub mod session_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -902,8 +895,8 @@ pub mod session_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ClientVersion;
-        type Platform;
         type Status;
+        type Platform;
         type StartedAt;
     }
     /// Empty state - all required fields are unset
@@ -911,8 +904,8 @@ pub mod session_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ClientVersion = Unset;
-        type Platform = Unset;
         type Status = Unset;
+        type Platform = Unset;
         type StartedAt = Unset;
     }
     ///State transition - sets the `client_version` field to Set
@@ -920,17 +913,8 @@ pub mod session_state {
     impl<St: State> sealed::Sealed for SetClientVersion<St> {}
     impl<St: State> State for SetClientVersion<St> {
         type ClientVersion = Set<members::client_version>;
+        type Status = St::Status;
         type Platform = St::Platform;
-        type Status = St::Status;
-        type StartedAt = St::StartedAt;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlatform<St> {}
-    impl<St: State> State for SetPlatform<St> {
-        type ClientVersion = St::ClientVersion;
-        type Platform = Set<members::platform>;
-        type Status = St::Status;
         type StartedAt = St::StartedAt;
     }
     ///State transition - sets the `status` field to Set
@@ -938,8 +922,17 @@ pub mod session_state {
     impl<St: State> sealed::Sealed for SetStatus<St> {}
     impl<St: State> State for SetStatus<St> {
         type ClientVersion = St::ClientVersion;
-        type Platform = St::Platform;
         type Status = Set<members::status>;
+        type Platform = St::Platform;
+        type StartedAt = St::StartedAt;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlatform<St> {}
+    impl<St: State> State for SetPlatform<St> {
+        type ClientVersion = St::ClientVersion;
+        type Status = St::Status;
+        type Platform = Set<members::platform>;
         type StartedAt = St::StartedAt;
     }
     ///State transition - sets the `started_at` field to Set
@@ -947,8 +940,8 @@ pub mod session_state {
     impl<St: State> sealed::Sealed for SetStartedAt<St> {}
     impl<St: State> State for SetStartedAt<St> {
         type ClientVersion = St::ClientVersion;
-        type Platform = St::Platform;
         type Status = St::Status;
+        type Platform = St::Platform;
         type StartedAt = Set<members::started_at>;
     }
     /// Marker types for field names
@@ -956,17 +949,17 @@ pub mod session_state {
     pub mod members {
         ///Marker type for the `client_version` field
         pub struct client_version(());
-        ///Marker type for the `platform` field
-        pub struct platform(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SessionBuilder<S: BosStr, St: session_state::State> {
+pub struct SessionBuilder<St: session_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<session::ActivitySummary<S>>,
@@ -990,28 +983,79 @@ pub struct SessionBuilder<S: BosStr, St: session_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Session<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SessionBuilder<S, session_state::Empty> {
+impl Session<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SessionBuilder<session_state::Empty, DefaultStr> {
         SessionBuilder::new()
     }
 }
 
-impl<S: BosStr> SessionBuilder<S, session_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Session<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SessionBuilder<session_state::Empty, S> {
+        SessionBuilder::builder()
+    }
+}
+
+impl SessionBuilder<session_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SessionBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<S: BosStr> SessionBuilder<session_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SessionBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `activitySummary` field (optional)
     pub fn activity_summary(
         mut self,
@@ -1021,13 +1065,16 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
         self
     }
     /// Set the `activitySummary` field to an Option value (optional)
-    pub fn maybe_activity_summary(mut self, value: Option<session::ActivitySummary<S>>) -> Self {
+    pub fn maybe_activity_summary(
+        mut self,
+        value: Option<session::ActivitySummary<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
 }
 
-impl<S: BosStr, St> SessionBuilder<S, St>
+impl<St, S: BosStr> SessionBuilder<St, S>
 where
     St: session_state::State,
     St::ClientVersion: session_state::IsUnset,
@@ -1036,7 +1083,7 @@ where
     pub fn client_version(
         mut self,
         value: impl Into<S>,
-    ) -> SessionBuilder<S, session_state::SetClientVersion<St>> {
+    ) -> SessionBuilder<session_state::SetClientVersion<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SessionBuilder {
             _state: PhantomData,
@@ -1046,7 +1093,7 @@ where
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -1059,7 +1106,7 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -1072,7 +1119,7 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `endReason` field (optional)
     pub fn end_reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -1085,7 +1132,7 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `endedAt` field (optional)
     pub fn ended_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -1098,7 +1145,7 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `lastActivityAt` field (optional)
     pub fn last_activity_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -1111,7 +1158,7 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<session::Metadata<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -1124,7 +1171,7 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `parentSessionUri` field (optional)
     pub fn parent_session_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -1137,7 +1184,7 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SessionBuilder<S, St>
+impl<St, S: BosStr> SessionBuilder<St, S>
 where
     St: session_state::State,
     St::Platform: session_state::IsUnset,
@@ -1146,7 +1193,7 @@ where
     pub fn platform(
         mut self,
         value: impl Into<S>,
-    ) -> SessionBuilder<S, session_state::SetPlatform<St>> {
+    ) -> SessionBuilder<session_state::SetPlatform<St>, S> {
         self._fields.9 = Option::Some(value.into());
         SessionBuilder {
             _state: PhantomData,
@@ -1156,7 +1203,7 @@ where
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `relatedLogUris` field (optional)
     pub fn related_log_uris(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -1169,7 +1216,7 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `relatedProgressUris` field (optional)
     pub fn related_progress_uris(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.11 = value.into();
@@ -1182,7 +1229,7 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `relatedSessionUris` field (optional)
     pub fn related_session_uris(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.12 = value.into();
@@ -1195,20 +1242,26 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `sessionContext` field (optional)
-    pub fn session_context(mut self, value: impl Into<Option<session::SessionContext<S>>>) -> Self {
+    pub fn session_context(
+        mut self,
+        value: impl Into<Option<session::SessionContext<S>>>,
+    ) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `sessionContext` field to an Option value (optional)
-    pub fn maybe_session_context(mut self, value: Option<session::SessionContext<S>>) -> Self {
+    pub fn maybe_session_context(
+        mut self,
+        value: Option<session::SessionContext<S>>,
+    ) -> Self {
         self._fields.13 = value;
         self
     }
 }
 
-impl<S: BosStr, St> SessionBuilder<S, St>
+impl<St, S: BosStr> SessionBuilder<St, S>
 where
     St: session_state::State,
     St::StartedAt: session_state::IsUnset,
@@ -1217,7 +1270,7 @@ where
     pub fn started_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SessionBuilder<S, session_state::SetStartedAt<St>> {
+    ) -> SessionBuilder<session_state::SetStartedAt<St>, S> {
         self._fields.14 = Option::Some(value.into());
         SessionBuilder {
             _state: PhantomData,
@@ -1227,7 +1280,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SessionBuilder<S, St>
+impl<St, S: BosStr> SessionBuilder<St, S>
 where
     St: session_state::State,
     St::Status: session_state::IsUnset,
@@ -1236,7 +1289,7 @@ where
     pub fn status(
         mut self,
         value: impl Into<S>,
-    ) -> SessionBuilder<S, session_state::SetStatus<St>> {
+    ) -> SessionBuilder<session_state::SetStatus<St>, S> {
         self._fields.15 = Option::Some(value.into());
         SessionBuilder {
             _state: PhantomData,
@@ -1246,7 +1299,7 @@ where
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.16 = value.into();
@@ -1259,12 +1312,12 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SessionBuilder<S, St>
+impl<St, S: BosStr> SessionBuilder<St, S>
 where
     St: session_state::State,
     St::ClientVersion: session_state::IsSet,
-    St::Platform: session_state::IsSet,
     St::Status: session_state::IsSet,
+    St::Platform: session_state::IsSet,
     St::StartedAt: session_state::IsSet,
 {
     /// Build the final struct.

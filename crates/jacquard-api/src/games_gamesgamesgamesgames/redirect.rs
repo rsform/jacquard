@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Nsid};
+use jacquard_common::types::string::{AtUri, Nsid, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A redirect mapping a source AT URI to a target AT URI after migration.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -106,7 +106,7 @@ impl<S: BosStr> LexiconSchema for Redirect<S> {
 
 pub mod redirect_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -114,91 +114,93 @@ pub mod redirect_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Collection;
         type TargetUri;
         type SourceUri;
+        type CreatedAt;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Collection = Unset;
         type TargetUri = Unset;
         type SourceUri = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Collection = St::Collection;
-        type TargetUri = St::TargetUri;
-        type SourceUri = St::SourceUri;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCollection<St> {}
-    impl<St: State> State for SetCollection<St> {
-        type CreatedAt = St::CreatedAt;
-        type Collection = Set<members::collection>;
-        type TargetUri = St::TargetUri;
-        type SourceUri = St::SourceUri;
+        type CreatedAt = Unset;
+        type Collection = Unset;
     }
     ///State transition - sets the `target_uri` field to Set
     pub struct SetTargetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTargetUri<St> {}
     impl<St: State> State for SetTargetUri<St> {
-        type CreatedAt = St::CreatedAt;
-        type Collection = St::Collection;
         type TargetUri = Set<members::target_uri>;
         type SourceUri = St::SourceUri;
+        type CreatedAt = St::CreatedAt;
+        type Collection = St::Collection;
     }
     ///State transition - sets the `source_uri` field to Set
     pub struct SetSourceUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSourceUri<St> {}
     impl<St: State> State for SetSourceUri<St> {
-        type CreatedAt = St::CreatedAt;
-        type Collection = St::Collection;
         type TargetUri = St::TargetUri;
         type SourceUri = Set<members::source_uri>;
+        type CreatedAt = St::CreatedAt;
+        type Collection = St::Collection;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type TargetUri = St::TargetUri;
+        type SourceUri = St::SourceUri;
+        type CreatedAt = Set<members::created_at>;
+        type Collection = St::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCollection<St> {}
+    impl<St: State> State for SetCollection<St> {
+        type TargetUri = St::TargetUri;
+        type SourceUri = St::SourceUri;
+        type CreatedAt = St::CreatedAt;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `target_uri` field
         pub struct target_uri(());
         ///Marker type for the `source_uri` field
         pub struct source_uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RedirectBuilder<S: BosStr, St: redirect_state::State> {
+pub struct RedirectBuilder<St: redirect_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Nsid<S>>,
-        Option<Datetime>,
-        Option<AtUri<S>>,
-        Option<AtUri<S>>,
-    ),
+    _fields: (Option<Nsid<S>>, Option<Datetime>, Option<AtUri<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Redirect<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RedirectBuilder<S, redirect_state::Empty> {
+impl Redirect<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RedirectBuilder<redirect_state::Empty, DefaultStr> {
         RedirectBuilder::new()
     }
 }
 
-impl<S: BosStr> RedirectBuilder<S, redirect_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Redirect<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RedirectBuilder<redirect_state::Empty, S> {
+        RedirectBuilder::builder()
+    }
+}
+
+impl RedirectBuilder<redirect_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RedirectBuilder {
             _state: PhantomData,
@@ -208,7 +210,18 @@ impl<S: BosStr> RedirectBuilder<S, redirect_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RedirectBuilder<S, St>
+impl<S: BosStr> RedirectBuilder<redirect_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RedirectBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RedirectBuilder<St, S>
 where
     St: redirect_state::State,
     St::Collection: redirect_state::IsUnset,
@@ -217,7 +230,7 @@ where
     pub fn collection(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> RedirectBuilder<S, redirect_state::SetCollection<St>> {
+    ) -> RedirectBuilder<redirect_state::SetCollection<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RedirectBuilder {
             _state: PhantomData,
@@ -227,7 +240,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RedirectBuilder<S, St>
+impl<St, S: BosStr> RedirectBuilder<St, S>
 where
     St: redirect_state::State,
     St::CreatedAt: redirect_state::IsUnset,
@@ -236,7 +249,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RedirectBuilder<S, redirect_state::SetCreatedAt<St>> {
+    ) -> RedirectBuilder<redirect_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RedirectBuilder {
             _state: PhantomData,
@@ -246,7 +259,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RedirectBuilder<S, St>
+impl<St, S: BosStr> RedirectBuilder<St, S>
 where
     St: redirect_state::State,
     St::SourceUri: redirect_state::IsUnset,
@@ -255,7 +268,7 @@ where
     pub fn source_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RedirectBuilder<S, redirect_state::SetSourceUri<St>> {
+    ) -> RedirectBuilder<redirect_state::SetSourceUri<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RedirectBuilder {
             _state: PhantomData,
@@ -265,7 +278,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RedirectBuilder<S, St>
+impl<St, S: BosStr> RedirectBuilder<St, S>
 where
     St: redirect_state::State,
     St::TargetUri: redirect_state::IsUnset,
@@ -274,7 +287,7 @@ where
     pub fn target_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RedirectBuilder<S, redirect_state::SetTargetUri<St>> {
+    ) -> RedirectBuilder<redirect_state::SetTargetUri<St>, S> {
         self._fields.3 = Option::Some(value.into());
         RedirectBuilder {
             _state: PhantomData,
@@ -284,13 +297,13 @@ where
     }
 }
 
-impl<S: BosStr, St> RedirectBuilder<S, St>
+impl<St, S: BosStr> RedirectBuilder<St, S>
 where
     St: redirect_state::State,
-    St::CreatedAt: redirect_state::IsSet,
-    St::Collection: redirect_state::IsSet,
     St::TargetUri: redirect_state::IsSet,
     St::SourceUri: redirect_state::IsSet,
+    St::CreatedAt: redirect_state::IsSet,
+    St::Collection: redirect_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Redirect<S> {
@@ -315,10 +328,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_redirect() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.redirect"),
@@ -327,17 +340,21 @@ fn lexicon_doc_games_gamesgamesgamesgames_redirect() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A redirect mapping a source AT URI to a target AT URI after migration.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A redirect mapping a source AT URI to a target AT URI after migration.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("sourceUri"),
-                            SmolStr::new_static("targetUri"),
-                            SmolStr::new_static("collection"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("sourceUri"),
+                                SmolStr::new_static("targetUri"),
+                                SmolStr::new_static("collection"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

@@ -28,6 +28,8 @@ pub fn generate_builder_struct(
     // The builder still carries 'a for borrow-scoping via PhantomData.
     let bosstr_path =
         resolved.external_type_tokens(&crate::codegen::prettify::ExternalImport::BosStr);
+    let default_str_path =
+        resolved.external_type_tokens(&crate::codegen::prettify::ExternalImport::DefaultStr);
 
     let lifetime_param = if has_lifetime {
         quote! { 'a, }
@@ -37,14 +39,14 @@ pub fn generate_builder_struct(
 
     // The S type parameter for the builder struct (when has_type_param)
     let builder_s_param = if has_type_param {
-        quote! { S: #bosstr_path, }
+        quote! {, S: #bosstr_path = #default_str_path }
     } else {
         quote! {}
     };
 
     // The S arg for instantiating the builder (bare, no bounds)
     let builder_s_arg = if has_type_param {
-        quote! { S, }
+        quote! {, S }
     } else {
         quote! {}
     };
@@ -81,10 +83,17 @@ pub fn generate_builder_struct(
             quote! {}
         };
         quote! {
-            impl #type_s_impl #type_ident<S> {
-                /// Create a new builder for this type.
-                pub fn new() -> #builder_name<#lifetime #builder_s_arg #state_mod_name::Empty> {
+            impl #type_ident<DefaultStr> {
+                /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+                pub fn new() -> #builder_name<#lifetime #state_mod_name::Empty, #default_str_path> {
                     #builder_name::new()
+                }
+            }
+
+            impl #type_s_impl #type_ident<S> {
+                /// Create a new builder for this type
+                pub fn builder() -> #builder_name<#lifetime #state_mod_name::Empty #builder_s_arg> {
+                    #builder_name::builder()
                 }
             }
         }
@@ -116,7 +125,7 @@ pub fn generate_builder_struct(
 
     quote! {
         /// Builder for constructing an instance of this type.
-        pub struct #builder_name<#lifetime_param #builder_s_param St: #state_mod_name::State> {
+        pub struct #builder_name<#lifetime_param St: #state_mod_name::State #builder_s_param> {
             #field_decls
             #phantom_lifetime_field
             #phantom_s_field
@@ -221,6 +230,8 @@ fn generate_builder_constructor(
     let phantom = resolved.phantom_data();
     let bosstr_path =
         resolved.external_type_tokens(&crate::codegen::prettify::ExternalImport::BosStr);
+    let default_str_path =
+        resolved.external_type_tokens(&crate::codegen::prettify::ExternalImport::DefaultStr);
 
     let lifetime_param = if has_lifetime {
         quote! { 'a, }
@@ -229,15 +240,23 @@ fn generate_builder_constructor(
     };
 
     // S type parameter for the impl block (with bounds)
-    let s_param = if has_type_param {
-        quote! { S: #bosstr_path, }
+    let s_param = if has_type_param && !has_lifetime {
+        quote! {S: #bosstr_path}
+    } else if has_type_param {
+        quote! {, S: #bosstr_path}
     } else {
         quote! {}
     };
 
     // S arg for the builder instantiation path (bare, no bounds)
     let s_arg = if has_type_param {
-        quote! { S, }
+        quote! {, S }
+    } else {
+        quote! {}
+    };
+
+    let default_str_param = if has_type_param {
+        quote! {, #default_str_path }
     } else {
         quote! {}
     };
@@ -276,9 +295,21 @@ fn generate_builder_constructor(
     };
 
     quote! {
-        impl<#lifetime_param #s_param> #builder_name<#lifetime_param #s_arg #state_mod_name::Empty> {
-            /// Create a new builder with all fields unset.
+        impl<#lifetime_param> #builder_name<#lifetime_param #state_mod_name::Empty #default_str_param> {
+            /// Create a new builder with all fields unset, using the default string type, if needed
             pub fn new() -> Self {
+                #builder_name {
+                    #phantom_init
+                    #tuple_init
+                    #phantom_lifetime_init
+                    #phantom_s_init
+                }
+            }
+        }
+
+        impl<#lifetime_param #s_param> #builder_name<#lifetime_param #state_mod_name::Empty #s_arg> {
+            /// Create a new builder with all fields unset
+            pub fn builder() -> Self {
                 #builder_name {
                     #phantom_init
                     #tuple_init

@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Broker attestation proof for a supporter relationship. When inline, cid and signature are required. When remote, only cid is required.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -112,7 +112,7 @@ impl<S: BosStr> LexiconSchema for BrokerProof<S> {
 
 pub mod broker_proof_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -143,21 +143,28 @@ pub mod broker_proof_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BrokerProofBuilder<S: BosStr, St: broker_proof_state::State> {
+pub struct BrokerProofBuilder<St: broker_proof_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<S>, Option<Bytes>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> BrokerProof<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BrokerProofBuilder<S, broker_proof_state::Empty> {
+impl BrokerProof<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BrokerProofBuilder<broker_proof_state::Empty, DefaultStr> {
         BrokerProofBuilder::new()
     }
 }
 
-impl<S: BosStr> BrokerProofBuilder<S, broker_proof_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> BrokerProof<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BrokerProofBuilder<broker_proof_state::Empty, S> {
+        BrokerProofBuilder::builder()
+    }
+}
+
+impl BrokerProofBuilder<broker_proof_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BrokerProofBuilder {
             _state: PhantomData,
@@ -167,7 +174,18 @@ impl<S: BosStr> BrokerProofBuilder<S, broker_proof_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BrokerProofBuilder<S, St>
+impl<S: BosStr> BrokerProofBuilder<broker_proof_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BrokerProofBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BrokerProofBuilder<St, S>
 where
     St: broker_proof_state::State,
     St::Cid: broker_proof_state::IsUnset,
@@ -176,7 +194,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> BrokerProofBuilder<S, broker_proof_state::SetCid<St>> {
+    ) -> BrokerProofBuilder<broker_proof_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BrokerProofBuilder {
             _state: PhantomData,
@@ -186,7 +204,7 @@ where
     }
 }
 
-impl<S: BosStr, St: broker_proof_state::State> BrokerProofBuilder<S, St> {
+impl<St: broker_proof_state::State, S: BosStr> BrokerProofBuilder<St, S> {
     /// Set the `key` field (optional)
     pub fn key(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -199,7 +217,7 @@ impl<S: BosStr, St: broker_proof_state::State> BrokerProofBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: broker_proof_state::State> BrokerProofBuilder<S, St> {
+impl<St: broker_proof_state::State, S: BosStr> BrokerProofBuilder<St, S> {
     /// Set the `signature` field (optional)
     pub fn signature(mut self, value: impl Into<Option<Bytes>>) -> Self {
         self._fields.2 = value.into();
@@ -212,7 +230,7 @@ impl<S: BosStr, St: broker_proof_state::State> BrokerProofBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BrokerProofBuilder<S, St>
+impl<St, S: BosStr> BrokerProofBuilder<St, S>
 where
     St: broker_proof_state::State,
     St::Cid: broker_proof_state::IsSet,
@@ -227,7 +245,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BrokerProof<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BrokerProof<S> {
         BrokerProof {
             cid: self._fields.0.unwrap(),
             key: self._fields.1,
@@ -238,10 +259,10 @@ where
 }
 
 fn lexicon_doc_com_atprotofans_brokerProof() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atprotofans.brokerProof"),

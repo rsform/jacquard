@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Record declaring a savefile of Webfishing.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -104,7 +104,7 @@ impl<S: BosStr> LexiconSchema for Savefile<S> {
 
 pub mod savefile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -112,56 +112,63 @@ pub mod savefile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Name;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Name = St::Name;
+        type Uri = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Uri = St::Uri;
         type Name = Set<members::name>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Name = St::Name;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SavefileBuilder<S: BosStr, St: savefile_state::State> {
+pub struct SavefileBuilder<St: savefile_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Savefile<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SavefileBuilder<S, savefile_state::Empty> {
+impl Savefile<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SavefileBuilder<savefile_state::Empty, DefaultStr> {
         SavefileBuilder::new()
     }
 }
 
-impl<S: BosStr> SavefileBuilder<S, savefile_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Savefile<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SavefileBuilder<savefile_state::Empty, S> {
+        SavefileBuilder::builder()
+    }
+}
+
+impl SavefileBuilder<savefile_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SavefileBuilder {
             _state: PhantomData,
@@ -171,13 +178,27 @@ impl<S: BosStr> SavefileBuilder<S, savefile_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SavefileBuilder<S, St>
+impl<S: BosStr> SavefileBuilder<savefile_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SavefileBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SavefileBuilder<St, S>
 where
     St: savefile_state::State,
     St::Name: savefile_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> SavefileBuilder<S, savefile_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> SavefileBuilder<savefile_state::SetName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SavefileBuilder {
             _state: PhantomData,
@@ -187,7 +208,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SavefileBuilder<S, St>
+impl<St, S: BosStr> SavefileBuilder<St, S>
 where
     St: savefile_state::State,
     St::Uri: savefile_state::IsUnset,
@@ -196,7 +217,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SavefileBuilder<S, savefile_state::SetUri<St>> {
+    ) -> SavefileBuilder<savefile_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SavefileBuilder {
             _state: PhantomData,
@@ -206,11 +227,11 @@ where
     }
 }
 
-impl<S: BosStr, St> SavefileBuilder<S, St>
+impl<St, S: BosStr> SavefileBuilder<St, S>
 where
     St: savefile_state::State,
-    St::Uri: savefile_state::IsSet,
     St::Name: savefile_state::IsSet,
+    St::Uri: savefile_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Savefile<S> {
@@ -231,10 +252,10 @@ where
 }
 
 fn lexicon_doc_dev_regnault_webfishing_savefile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.regnault.webfishing.savefile"),
@@ -243,15 +264,14 @@ fn lexicon_doc_dev_regnault_webfishing_savefile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Record declaring a savefile of Webfishing.",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Record declaring a savefile of Webfishing."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("uri"),
-                        ]),
+                        required: Some(
+                            vec![SmolStr::new_static("name"), SmolStr::new_static("uri")],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

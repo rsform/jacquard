@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Cid, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateGate<S: BosStr = DefaultStr> {
     ///The AT-URI of the chat message to hide.
     pub message_uri: AtUri<S>,
@@ -31,11 +28,9 @@ pub struct CreateGate<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateGateOutput<S: BosStr = DefaultStr> {
     ///The CID of the created gate record.
     pub cid: Cid<S>,
@@ -45,9 +40,18 @@ pub struct CreateGateOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum CreateGateError {
     /// The request lacks valid authentication credentials.
@@ -61,10 +65,7 @@ pub enum CreateGateError {
     SessionNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for CreateGateError {
@@ -113,8 +114,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateGateResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateGate<S> {
     const NSID: &'static str = "place.stream.moderation.createGate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateGateResponse;
 }
 
@@ -122,15 +124,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateGate<S> {
 pub struct CreateGateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateGateRequest {
     const PATH: &'static str = "/xrpc/place.stream.moderation.createGate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateGate<S>;
     type Response = CreateGateResponse;
 }
 
 pub mod create_gate_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -138,56 +141,63 @@ pub mod create_gate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type MessageUri;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type MessageUri = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStreamer<St> {}
-    impl<St: State> State for SetStreamer<St> {
-        type Streamer = Set<members::streamer>;
-        type MessageUri = St::MessageUri;
+        type Streamer = Unset;
     }
     ///State transition - sets the `message_uri` field to Set
     pub struct SetMessageUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessageUri<St> {}
     impl<St: State> State for SetMessageUri<St> {
-        type Streamer = St::Streamer;
         type MessageUri = Set<members::message_uri>;
+        type Streamer = St::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStreamer<St> {}
+    impl<St: State> State for SetStreamer<St> {
+        type MessageUri = St::MessageUri;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `message_uri` field
         pub struct message_uri(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateGateBuilder<S: BosStr, St: create_gate_state::State> {
+pub struct CreateGateBuilder<St: create_gate_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CreateGate<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CreateGateBuilder<S, create_gate_state::Empty> {
+impl CreateGate<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CreateGateBuilder<create_gate_state::Empty, DefaultStr> {
         CreateGateBuilder::new()
     }
 }
 
-impl<S: BosStr> CreateGateBuilder<S, create_gate_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CreateGate<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CreateGateBuilder<create_gate_state::Empty, S> {
+        CreateGateBuilder::builder()
+    }
+}
+
+impl CreateGateBuilder<create_gate_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CreateGateBuilder {
             _state: PhantomData,
@@ -197,7 +207,18 @@ impl<S: BosStr> CreateGateBuilder<S, create_gate_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CreateGateBuilder<S, St>
+impl<S: BosStr> CreateGateBuilder<create_gate_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CreateGateBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CreateGateBuilder<St, S>
 where
     St: create_gate_state::State,
     St::MessageUri: create_gate_state::IsUnset,
@@ -206,7 +227,7 @@ where
     pub fn message_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> CreateGateBuilder<S, create_gate_state::SetMessageUri<St>> {
+    ) -> CreateGateBuilder<create_gate_state::SetMessageUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CreateGateBuilder {
             _state: PhantomData,
@@ -216,7 +237,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CreateGateBuilder<S, St>
+impl<St, S: BosStr> CreateGateBuilder<St, S>
 where
     St: create_gate_state::State,
     St::Streamer: create_gate_state::IsUnset,
@@ -225,7 +246,7 @@ where
     pub fn streamer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> CreateGateBuilder<S, create_gate_state::SetStreamer<St>> {
+    ) -> CreateGateBuilder<create_gate_state::SetStreamer<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CreateGateBuilder {
             _state: PhantomData,
@@ -235,11 +256,11 @@ where
     }
 }
 
-impl<S: BosStr, St> CreateGateBuilder<S, St>
+impl<St, S: BosStr> CreateGateBuilder<St, S>
 where
     St: create_gate_state::State,
-    St::Streamer: create_gate_state::IsSet,
     St::MessageUri: create_gate_state::IsSet,
+    St::Streamer: create_gate_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CreateGate<S> {
@@ -250,7 +271,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateGate<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateGate<S> {
         CreateGate {
             message_uri: self._fields.0.unwrap(),
             streamer: self._fields.1.unwrap(),

@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateAccountEmail<S: BosStr = DefaultStr> {
     ///The handle or DID of the repo.
     pub account: AtIdentifier<S>,
@@ -41,8 +38,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateAccountEmailResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateAccountEmail<S> {
     const NSID: &'static str = "com.atproto.admin.updateAccountEmail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateAccountEmailResponse;
 }
 
@@ -50,15 +48,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateAccountEmail<S> {
 pub struct UpdateAccountEmailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountEmailRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountEmail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateAccountEmail<S>;
     type Response = UpdateAccountEmailResponse;
 }
 
 pub mod update_account_email_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -66,56 +65,69 @@ pub mod update_account_email_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Account;
         type Email;
+        type Account;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Account = Unset;
         type Email = Unset;
-    }
-    ///State transition - sets the `account` field to Set
-    pub struct SetAccount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAccount<St> {}
-    impl<St: State> State for SetAccount<St> {
-        type Account = Set<members::account>;
-        type Email = St::Email;
+        type Account = Unset;
     }
     ///State transition - sets the `email` field to Set
     pub struct SetEmail<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEmail<St> {}
     impl<St: State> State for SetEmail<St> {
-        type Account = St::Account;
         type Email = Set<members::email>;
+        type Account = St::Account;
+    }
+    ///State transition - sets the `account` field to Set
+    pub struct SetAccount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccount<St> {}
+    impl<St: State> State for SetAccount<St> {
+        type Email = St::Email;
+        type Account = Set<members::account>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `account` field
-        pub struct account(());
         ///Marker type for the `email` field
         pub struct email(());
+        ///Marker type for the `account` field
+        pub struct account(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateAccountEmailBuilder<S: BosStr, St: update_account_email_state::State> {
+pub struct UpdateAccountEmailBuilder<
+    St: update_account_email_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UpdateAccountEmail<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UpdateAccountEmailBuilder<S, update_account_email_state::Empty> {
+impl UpdateAccountEmail<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UpdateAccountEmailBuilder<
+        update_account_email_state::Empty,
+        DefaultStr,
+    > {
         UpdateAccountEmailBuilder::new()
     }
 }
 
-impl<S: BosStr> UpdateAccountEmailBuilder<S, update_account_email_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UpdateAccountEmail<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UpdateAccountEmailBuilder<update_account_email_state::Empty, S> {
+        UpdateAccountEmailBuilder::builder()
+    }
+}
+
+impl UpdateAccountEmailBuilder<update_account_email_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UpdateAccountEmailBuilder {
             _state: PhantomData,
@@ -125,7 +137,18 @@ impl<S: BosStr> UpdateAccountEmailBuilder<S, update_account_email_state::Empty> 
     }
 }
 
-impl<S: BosStr, St> UpdateAccountEmailBuilder<S, St>
+impl<S: BosStr> UpdateAccountEmailBuilder<update_account_email_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UpdateAccountEmailBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> UpdateAccountEmailBuilder<St, S>
 where
     St: update_account_email_state::State,
     St::Account: update_account_email_state::IsUnset,
@@ -134,7 +157,7 @@ where
     pub fn account(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> UpdateAccountEmailBuilder<S, update_account_email_state::SetAccount<St>> {
+    ) -> UpdateAccountEmailBuilder<update_account_email_state::SetAccount<St>, S> {
         self._fields.0 = Option::Some(value.into());
         UpdateAccountEmailBuilder {
             _state: PhantomData,
@@ -144,7 +167,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UpdateAccountEmailBuilder<S, St>
+impl<St, S: BosStr> UpdateAccountEmailBuilder<St, S>
 where
     St: update_account_email_state::State,
     St::Email: update_account_email_state::IsUnset,
@@ -153,7 +176,7 @@ where
     pub fn email(
         mut self,
         value: impl Into<S>,
-    ) -> UpdateAccountEmailBuilder<S, update_account_email_state::SetEmail<St>> {
+    ) -> UpdateAccountEmailBuilder<update_account_email_state::SetEmail<St>, S> {
         self._fields.1 = Option::Some(value.into());
         UpdateAccountEmailBuilder {
             _state: PhantomData,
@@ -163,11 +186,11 @@ where
     }
 }
 
-impl<S: BosStr, St> UpdateAccountEmailBuilder<S, St>
+impl<St, S: BosStr> UpdateAccountEmailBuilder<St, S>
 where
     St: update_account_email_state::State,
-    St::Account: update_account_email_state::IsSet,
     St::Email: update_account_email_state::IsSet,
+    St::Account: update_account_email_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> UpdateAccountEmail<S> {
@@ -178,7 +201,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateAccountEmail<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateAccountEmail<S> {
         UpdateAccountEmail {
             account: self._fields.0.unwrap(),
             email: self._fields.1.unwrap(),

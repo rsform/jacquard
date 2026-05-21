@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,19 +24,16 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::place_stream::metadata::content_rights::ContentRights;
 use crate::place_stream::metadata::content_warnings::ContentWarnings;
 use crate::place_stream::metadata::distribution_policy::DistributionPolicy;
 use crate::place_stream::segment;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Audio<S: BosStr = DefaultStr> {
     pub channels: i64,
     pub codec: S,
@@ -45,11 +42,9 @@ pub struct Audio<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Framerate<S: BosStr = DefaultStr> {
     pub den: i64,
     pub num: i64,
@@ -105,11 +100,9 @@ pub struct SegmentGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Segment<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SegmentView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub record: Data<S>,
@@ -117,11 +110,9 @@ pub struct SegmentView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Video<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bframes: Option<bool>,
@@ -244,7 +235,7 @@ impl<S: BosStr> LexiconSchema for Video<S> {
 
 pub mod audio_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -301,21 +292,28 @@ pub mod audio_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AudioBuilder<S: BosStr, St: audio_state::State> {
+pub struct AudioBuilder<St: audio_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Audio<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AudioBuilder<S, audio_state::Empty> {
+impl Audio<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AudioBuilder<audio_state::Empty, DefaultStr> {
         AudioBuilder::new()
     }
 }
 
-impl<S: BosStr> AudioBuilder<S, audio_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Audio<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AudioBuilder<audio_state::Empty, S> {
+        AudioBuilder::builder()
+    }
+}
+
+impl AudioBuilder<audio_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AudioBuilder {
             _state: PhantomData,
@@ -325,7 +323,18 @@ impl<S: BosStr> AudioBuilder<S, audio_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AudioBuilder<S, St>
+impl<S: BosStr> AudioBuilder<audio_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AudioBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AudioBuilder<St, S>
 where
     St: audio_state::State,
     St::Channels: audio_state::IsUnset,
@@ -334,7 +343,7 @@ where
     pub fn channels(
         mut self,
         value: impl Into<i64>,
-    ) -> AudioBuilder<S, audio_state::SetChannels<St>> {
+    ) -> AudioBuilder<audio_state::SetChannels<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AudioBuilder {
             _state: PhantomData,
@@ -344,13 +353,16 @@ where
     }
 }
 
-impl<S: BosStr, St> AudioBuilder<S, St>
+impl<St, S: BosStr> AudioBuilder<St, S>
 where
     St: audio_state::State,
     St::Codec: audio_state::IsUnset,
 {
     /// Set the `codec` field (required)
-    pub fn codec(mut self, value: impl Into<S>) -> AudioBuilder<S, audio_state::SetCodec<St>> {
+    pub fn codec(
+        mut self,
+        value: impl Into<S>,
+    ) -> AudioBuilder<audio_state::SetCodec<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AudioBuilder {
             _state: PhantomData,
@@ -360,13 +372,16 @@ where
     }
 }
 
-impl<S: BosStr, St> AudioBuilder<S, St>
+impl<St, S: BosStr> AudioBuilder<St, S>
 where
     St: audio_state::State,
     St::Rate: audio_state::IsUnset,
 {
     /// Set the `rate` field (required)
-    pub fn rate(mut self, value: impl Into<i64>) -> AudioBuilder<S, audio_state::SetRate<St>> {
+    pub fn rate(
+        mut self,
+        value: impl Into<i64>,
+    ) -> AudioBuilder<audio_state::SetRate<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AudioBuilder {
             _state: PhantomData,
@@ -376,7 +391,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AudioBuilder<S, St>
+impl<St, S: BosStr> AudioBuilder<St, S>
 where
     St: audio_state::State,
     St::Codec: audio_state::IsSet,
@@ -404,10 +419,10 @@ where
 }
 
 fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.segment"),
@@ -416,11 +431,12 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("audio"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("codec"),
-                        SmolStr::new_static("rate"),
-                        SmolStr::new_static("channels"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("codec"), SmolStr::new_static("rate"),
+                            SmolStr::new_static("channels")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -432,9 +448,7 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("codec"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("rate"),
@@ -450,7 +464,9 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("framerate"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("num"), SmolStr::new_static("den")]),
+                    required: Some(
+                        vec![SmolStr::new_static("num"), SmolStr::new_static("den")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -474,17 +490,21 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Media file representing a segment of a livestream",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Media file representing a segment of a livestream",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("id"),
-                            SmolStr::new_static("signingKey"),
-                            SmolStr::new_static("startTime"),
-                            SmolStr::new_static("creator"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("id"),
+                                SmolStr::new_static("signingKey"),
+                                SmolStr::new_static("startTime"),
+                                SmolStr::new_static("creator")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -541,18 +561,20 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("id"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Unique identifier for the segment",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Unique identifier for the segment"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("signingKey"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The DID of the signing key used for this segment",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The DID of the signing key used for this segment",
+                                        ),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
@@ -565,9 +587,9 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("startTime"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When this segment started",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When this segment started"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -592,10 +614,9 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("segmentView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("record"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("cid"), SmolStr::new_static("record")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -620,11 +641,12 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("video"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("codec"),
-                        SmolStr::new_static("width"),
-                        SmolStr::new_static("height"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("codec"), SmolStr::new_static("width"),
+                            SmolStr::new_static("height")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -636,9 +658,7 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("codec"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("framerate"),
@@ -672,7 +692,7 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
 
 pub mod framerate_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -715,21 +735,28 @@ pub mod framerate_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FramerateBuilder<S: BosStr, St: framerate_state::State> {
+pub struct FramerateBuilder<St: framerate_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Framerate<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FramerateBuilder<S, framerate_state::Empty> {
+impl Framerate<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FramerateBuilder<framerate_state::Empty, DefaultStr> {
         FramerateBuilder::new()
     }
 }
 
-impl<S: BosStr> FramerateBuilder<S, framerate_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Framerate<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FramerateBuilder<framerate_state::Empty, S> {
+        FramerateBuilder::builder()
+    }
+}
+
+impl FramerateBuilder<framerate_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FramerateBuilder {
             _state: PhantomData,
@@ -739,7 +766,18 @@ impl<S: BosStr> FramerateBuilder<S, framerate_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FramerateBuilder<S, St>
+impl<S: BosStr> FramerateBuilder<framerate_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FramerateBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FramerateBuilder<St, S>
 where
     St: framerate_state::State,
     St::Den: framerate_state::IsUnset,
@@ -748,7 +786,7 @@ where
     pub fn den(
         mut self,
         value: impl Into<i64>,
-    ) -> FramerateBuilder<S, framerate_state::SetDen<St>> {
+    ) -> FramerateBuilder<framerate_state::SetDen<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FramerateBuilder {
             _state: PhantomData,
@@ -758,7 +796,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FramerateBuilder<S, St>
+impl<St, S: BosStr> FramerateBuilder<St, S>
 where
     St: framerate_state::State,
     St::Num: framerate_state::IsUnset,
@@ -767,7 +805,7 @@ where
     pub fn num(
         mut self,
         value: impl Into<i64>,
-    ) -> FramerateBuilder<S, framerate_state::SetNum<St>> {
+    ) -> FramerateBuilder<framerate_state::SetNum<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FramerateBuilder {
             _state: PhantomData,
@@ -777,7 +815,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FramerateBuilder<S, St>
+impl<St, S: BosStr> FramerateBuilder<St, S>
 where
     St: framerate_state::State,
     St::Den: framerate_state::IsSet,
@@ -792,7 +830,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Framerate<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Framerate<S> {
         Framerate {
             den: self._fields.0.unwrap(),
             num: self._fields.1.unwrap(),
@@ -803,7 +844,7 @@ where
 
 pub mod segment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -811,72 +852,72 @@ pub mod segment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Creator;
         type StartTime;
-        type Id;
         type SigningKey;
+        type Creator;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Creator = Unset;
         type StartTime = Unset;
-        type Id = Unset;
         type SigningKey = Unset;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreator<St> {}
-    impl<St: State> State for SetCreator<St> {
-        type Creator = Set<members::creator>;
-        type StartTime = St::StartTime;
-        type Id = St::Id;
-        type SigningKey = St::SigningKey;
+        type Creator = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `start_time` field to Set
     pub struct SetStartTime<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStartTime<St> {}
     impl<St: State> State for SetStartTime<St> {
-        type Creator = St::Creator;
         type StartTime = Set<members::start_time>;
-        type Id = St::Id;
         type SigningKey = St::SigningKey;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
         type Creator = St::Creator;
-        type StartTime = St::StartTime;
-        type Id = Set<members::id>;
-        type SigningKey = St::SigningKey;
+        type Id = St::Id;
     }
     ///State transition - sets the `signing_key` field to Set
     pub struct SetSigningKey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSigningKey<St> {}
     impl<St: State> State for SetSigningKey<St> {
-        type Creator = St::Creator;
         type StartTime = St::StartTime;
-        type Id = St::Id;
         type SigningKey = Set<members::signing_key>;
+        type Creator = St::Creator;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreator<St> {}
+    impl<St: State> State for SetCreator<St> {
+        type StartTime = St::StartTime;
+        type SigningKey = St::SigningKey;
+        type Creator = Set<members::creator>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type StartTime = St::StartTime;
+        type SigningKey = St::SigningKey;
+        type Creator = St::Creator;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `creator` field
-        pub struct creator(());
         ///Marker type for the `start_time` field
         pub struct start_time(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `signing_key` field
         pub struct signing_key(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SegmentBuilder<S: BosStr, St: segment_state::State> {
+pub struct SegmentBuilder<St: segment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<segment::Audio<S>>>,
@@ -894,27 +935,43 @@ pub struct SegmentBuilder<S: BosStr, St: segment_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Segment<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SegmentBuilder<S, segment_state::Empty> {
+impl Segment<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SegmentBuilder<segment_state::Empty, DefaultStr> {
         SegmentBuilder::new()
     }
 }
 
-impl<S: BosStr> SegmentBuilder<S, segment_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Segment<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SegmentBuilder<segment_state::Empty, S> {
+        SegmentBuilder::builder()
+    }
+}
+
+impl SegmentBuilder<segment_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SegmentBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: segment_state::State> SegmentBuilder<S, St> {
+impl<S: BosStr> SegmentBuilder<segment_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SegmentBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: segment_state::State, S: BosStr> SegmentBuilder<St, S> {
     /// Set the `audio` field (optional)
     pub fn audio(mut self, value: impl Into<Option<Vec<segment::Audio<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -927,7 +984,7 @@ impl<S: BosStr, St: segment_state::State> SegmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: segment_state::State> SegmentBuilder<S, St> {
+impl<St: segment_state::State, S: BosStr> SegmentBuilder<St, S> {
     /// Set the `contentRights` field (optional)
     pub fn content_rights(mut self, value: impl Into<Option<ContentRights<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -940,9 +997,12 @@ impl<S: BosStr, St: segment_state::State> SegmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: segment_state::State> SegmentBuilder<S, St> {
+impl<St: segment_state::State, S: BosStr> SegmentBuilder<St, S> {
     /// Set the `contentWarnings` field (optional)
-    pub fn content_warnings(mut self, value: impl Into<Option<ContentWarnings<S>>>) -> Self {
+    pub fn content_warnings(
+        mut self,
+        value: impl Into<Option<ContentWarnings<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -953,7 +1013,7 @@ impl<S: BosStr, St: segment_state::State> SegmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SegmentBuilder<S, St>
+impl<St, S: BosStr> SegmentBuilder<St, S>
 where
     St: segment_state::State,
     St::Creator: segment_state::IsUnset,
@@ -962,7 +1022,7 @@ where
     pub fn creator(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SegmentBuilder<S, segment_state::SetCreator<St>> {
+    ) -> SegmentBuilder<segment_state::SetCreator<St>, S> {
         self._fields.3 = Option::Some(value.into());
         SegmentBuilder {
             _state: PhantomData,
@@ -972,20 +1032,26 @@ where
     }
 }
 
-impl<S: BosStr, St: segment_state::State> SegmentBuilder<S, St> {
+impl<St: segment_state::State, S: BosStr> SegmentBuilder<St, S> {
     /// Set the `distributionPolicy` field (optional)
-    pub fn distribution_policy(mut self, value: impl Into<Option<DistributionPolicy<S>>>) -> Self {
+    pub fn distribution_policy(
+        mut self,
+        value: impl Into<Option<DistributionPolicy<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `distributionPolicy` field to an Option value (optional)
-    pub fn maybe_distribution_policy(mut self, value: Option<DistributionPolicy<S>>) -> Self {
+    pub fn maybe_distribution_policy(
+        mut self,
+        value: Option<DistributionPolicy<S>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
 }
 
-impl<S: BosStr, St: segment_state::State> SegmentBuilder<S, St> {
+impl<St: segment_state::State, S: BosStr> SegmentBuilder<St, S> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -998,13 +1064,16 @@ impl<S: BosStr, St: segment_state::State> SegmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SegmentBuilder<S, St>
+impl<St, S: BosStr> SegmentBuilder<St, S>
 where
     St: segment_state::State,
     St::Id: segment_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<S>) -> SegmentBuilder<S, segment_state::SetId<St>> {
+    pub fn id(
+        mut self,
+        value: impl Into<S>,
+    ) -> SegmentBuilder<segment_state::SetId<St>, S> {
         self._fields.6 = Option::Some(value.into());
         SegmentBuilder {
             _state: PhantomData,
@@ -1014,7 +1083,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SegmentBuilder<S, St>
+impl<St, S: BosStr> SegmentBuilder<St, S>
 where
     St: segment_state::State,
     St::SigningKey: segment_state::IsUnset,
@@ -1023,7 +1092,7 @@ where
     pub fn signing_key(
         mut self,
         value: impl Into<S>,
-    ) -> SegmentBuilder<S, segment_state::SetSigningKey<St>> {
+    ) -> SegmentBuilder<segment_state::SetSigningKey<St>, S> {
         self._fields.7 = Option::Some(value.into());
         SegmentBuilder {
             _state: PhantomData,
@@ -1033,7 +1102,7 @@ where
     }
 }
 
-impl<S: BosStr, St: segment_state::State> SegmentBuilder<S, St> {
+impl<St: segment_state::State, S: BosStr> SegmentBuilder<St, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.8 = value.into();
@@ -1046,7 +1115,7 @@ impl<S: BosStr, St: segment_state::State> SegmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SegmentBuilder<S, St>
+impl<St, S: BosStr> SegmentBuilder<St, S>
 where
     St: segment_state::State,
     St::StartTime: segment_state::IsUnset,
@@ -1055,7 +1124,7 @@ where
     pub fn start_time(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SegmentBuilder<S, segment_state::SetStartTime<St>> {
+    ) -> SegmentBuilder<segment_state::SetStartTime<St>, S> {
         self._fields.9 = Option::Some(value.into());
         SegmentBuilder {
             _state: PhantomData,
@@ -1065,7 +1134,7 @@ where
     }
 }
 
-impl<S: BosStr, St: segment_state::State> SegmentBuilder<S, St> {
+impl<St: segment_state::State, S: BosStr> SegmentBuilder<St, S> {
     /// Set the `video` field (optional)
     pub fn video(mut self, value: impl Into<Option<Vec<segment::Video<S>>>>) -> Self {
         self._fields.10 = value.into();
@@ -1078,13 +1147,13 @@ impl<S: BosStr, St: segment_state::State> SegmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SegmentBuilder<S, St>
+impl<St, S: BosStr> SegmentBuilder<St, S>
 where
     St: segment_state::State,
-    St::Creator: segment_state::IsSet,
     St::StartTime: segment_state::IsSet,
-    St::Id: segment_state::IsSet,
     St::SigningKey: segment_state::IsSet,
+    St::Creator: segment_state::IsSet,
+    St::Id: segment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Segment<S> {
@@ -1124,7 +1193,7 @@ where
 
 pub mod segment_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1132,56 +1201,63 @@ pub mod segment_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Record;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Cid = Set<members::cid>;
-        type Record = St::Record;
+        type Cid = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecord<St> {}
     impl<St: State> State for SetRecord<St> {
-        type Cid = St::Cid;
         type Record = Set<members::record>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Record = St::Record;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SegmentViewBuilder<S: BosStr, St: segment_view_state::State> {
+pub struct SegmentViewBuilder<St: segment_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<Data<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SegmentView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SegmentViewBuilder<S, segment_view_state::Empty> {
+impl SegmentView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SegmentViewBuilder<segment_view_state::Empty, DefaultStr> {
         SegmentViewBuilder::new()
     }
 }
 
-impl<S: BosStr> SegmentViewBuilder<S, segment_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SegmentView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SegmentViewBuilder<segment_view_state::Empty, S> {
+        SegmentViewBuilder::builder()
+    }
+}
+
+impl SegmentViewBuilder<segment_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SegmentViewBuilder {
             _state: PhantomData,
@@ -1191,7 +1267,18 @@ impl<S: BosStr> SegmentViewBuilder<S, segment_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SegmentViewBuilder<S, St>
+impl<S: BosStr> SegmentViewBuilder<segment_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SegmentViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SegmentViewBuilder<St, S>
 where
     St: segment_view_state::State,
     St::Cid: segment_view_state::IsUnset,
@@ -1200,7 +1287,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> SegmentViewBuilder<S, segment_view_state::SetCid<St>> {
+    ) -> SegmentViewBuilder<segment_view_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SegmentViewBuilder {
             _state: PhantomData,
@@ -1210,7 +1297,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SegmentViewBuilder<S, St>
+impl<St, S: BosStr> SegmentViewBuilder<St, S>
 where
     St: segment_view_state::State,
     St::Record: segment_view_state::IsUnset,
@@ -1219,7 +1306,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> SegmentViewBuilder<S, segment_view_state::SetRecord<St>> {
+    ) -> SegmentViewBuilder<segment_view_state::SetRecord<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SegmentViewBuilder {
             _state: PhantomData,
@@ -1229,11 +1316,11 @@ where
     }
 }
 
-impl<S: BosStr, St> SegmentViewBuilder<S, St>
+impl<St, S: BosStr> SegmentViewBuilder<St, S>
 where
     St: segment_view_state::State,
-    St::Cid: segment_view_state::IsSet,
     St::Record: segment_view_state::IsSet,
+    St::Cid: segment_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SegmentView<S> {
@@ -1244,7 +1331,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SegmentView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SegmentView<S> {
         SegmentView {
             cid: self._fields.0.unwrap(),
             record: self._fields.1.unwrap(),
@@ -1255,7 +1345,7 @@ where
 
 pub mod video_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1263,56 +1353,56 @@ pub mod video_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Height;
         type Width;
+        type Height;
         type Codec;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Height = Unset;
         type Width = Unset;
+        type Height = Unset;
         type Codec = Unset;
-    }
-    ///State transition - sets the `height` field to Set
-    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHeight<St> {}
-    impl<St: State> State for SetHeight<St> {
-        type Height = Set<members::height>;
-        type Width = St::Width;
-        type Codec = St::Codec;
     }
     ///State transition - sets the `width` field to Set
     pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWidth<St> {}
     impl<St: State> State for SetWidth<St> {
-        type Height = St::Height;
         type Width = Set<members::width>;
+        type Height = St::Height;
+        type Codec = St::Codec;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeight<St> {}
+    impl<St: State> State for SetHeight<St> {
+        type Width = St::Width;
+        type Height = Set<members::height>;
         type Codec = St::Codec;
     }
     ///State transition - sets the `codec` field to Set
     pub struct SetCodec<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCodec<St> {}
     impl<St: State> State for SetCodec<St> {
-        type Height = St::Height;
         type Width = St::Width;
+        type Height = St::Height;
         type Codec = Set<members::codec>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `height` field
-        pub struct height(());
         ///Marker type for the `width` field
         pub struct width(());
+        ///Marker type for the `height` field
+        pub struct height(());
         ///Marker type for the `codec` field
         pub struct codec(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct VideoBuilder<S: BosStr, St: video_state::State> {
+pub struct VideoBuilder<St: video_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -1324,15 +1414,22 @@ pub struct VideoBuilder<S: BosStr, St: video_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Video<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> VideoBuilder<S, video_state::Empty> {
+impl Video<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> VideoBuilder<video_state::Empty, DefaultStr> {
         VideoBuilder::new()
     }
 }
 
-impl<S: BosStr> VideoBuilder<S, video_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Video<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> VideoBuilder<video_state::Empty, S> {
+        VideoBuilder::builder()
+    }
+}
+
+impl VideoBuilder<video_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         VideoBuilder {
             _state: PhantomData,
@@ -1342,7 +1439,18 @@ impl<S: BosStr> VideoBuilder<S, video_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: video_state::State> VideoBuilder<S, St> {
+impl<S: BosStr> VideoBuilder<video_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        VideoBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: video_state::State, S: BosStr> VideoBuilder<St, S> {
     /// Set the `bframes` field (optional)
     pub fn bframes(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -1355,13 +1463,16 @@ impl<S: BosStr, St: video_state::State> VideoBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> VideoBuilder<S, St>
+impl<St, S: BosStr> VideoBuilder<St, S>
 where
     St: video_state::State,
     St::Codec: video_state::IsUnset,
 {
     /// Set the `codec` field (required)
-    pub fn codec(mut self, value: impl Into<S>) -> VideoBuilder<S, video_state::SetCodec<St>> {
+    pub fn codec(
+        mut self,
+        value: impl Into<S>,
+    ) -> VideoBuilder<video_state::SetCodec<St>, S> {
         self._fields.1 = Option::Some(value.into());
         VideoBuilder {
             _state: PhantomData,
@@ -1371,7 +1482,7 @@ where
     }
 }
 
-impl<S: BosStr, St: video_state::State> VideoBuilder<S, St> {
+impl<St: video_state::State, S: BosStr> VideoBuilder<St, S> {
     /// Set the `framerate` field (optional)
     pub fn framerate(mut self, value: impl Into<Option<segment::Framerate<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -1384,13 +1495,16 @@ impl<S: BosStr, St: video_state::State> VideoBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> VideoBuilder<S, St>
+impl<St, S: BosStr> VideoBuilder<St, S>
 where
     St: video_state::State,
     St::Height: video_state::IsUnset,
 {
     /// Set the `height` field (required)
-    pub fn height(mut self, value: impl Into<i64>) -> VideoBuilder<S, video_state::SetHeight<St>> {
+    pub fn height(
+        mut self,
+        value: impl Into<i64>,
+    ) -> VideoBuilder<video_state::SetHeight<St>, S> {
         self._fields.3 = Option::Some(value.into());
         VideoBuilder {
             _state: PhantomData,
@@ -1400,13 +1514,16 @@ where
     }
 }
 
-impl<S: BosStr, St> VideoBuilder<S, St>
+impl<St, S: BosStr> VideoBuilder<St, S>
 where
     St: video_state::State,
     St::Width: video_state::IsUnset,
 {
     /// Set the `width` field (required)
-    pub fn width(mut self, value: impl Into<i64>) -> VideoBuilder<S, video_state::SetWidth<St>> {
+    pub fn width(
+        mut self,
+        value: impl Into<i64>,
+    ) -> VideoBuilder<video_state::SetWidth<St>, S> {
         self._fields.4 = Option::Some(value.into());
         VideoBuilder {
             _state: PhantomData,
@@ -1416,11 +1533,11 @@ where
     }
 }
 
-impl<S: BosStr, St> VideoBuilder<S, St>
+impl<St, S: BosStr> VideoBuilder<St, S>
 where
     St: video_state::State,
-    St::Height: video_state::IsSet,
     St::Width: video_state::IsSet,
+    St::Height: video_state::IsSet,
     St::Codec: video_state::IsSet,
 {
     /// Build the final struct.

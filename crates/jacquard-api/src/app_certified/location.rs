@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_certified::location;
-use crate::org_hypercerts::SmallBlob;
-use crate::org_hypercerts::Uri;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_hypercerts::SmallBlob;
+use crate::org_hypercerts::Uri;
+use crate::app_certified::location;
 /// A location reference
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -59,6 +59,7 @@ pub struct Location<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -162,15 +163,21 @@ where
     type Output = LocationLocationType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            LocationLocationType::CoordinateDecimal => LocationLocationType::CoordinateDecimal,
+            LocationLocationType::CoordinateDecimal => {
+                LocationLocationType::CoordinateDecimal
+            }
             LocationLocationType::GeojsonPoint => LocationLocationType::GeojsonPoint,
             LocationLocationType::Geojson => LocationLocationType::Geojson,
             LocationLocationType::H3 => LocationLocationType::H3,
             LocationLocationType::Geohash => LocationLocationType::Geohash,
             LocationLocationType::Wkt => LocationLocationType::Wkt,
             LocationLocationType::Address => LocationLocationType::Address,
-            LocationLocationType::ScaledCoordinates => LocationLocationType::ScaledCoordinates,
-            LocationLocationType::Other(v) => LocationLocationType::Other(v.into_static()),
+            LocationLocationType::ScaledCoordinates => {
+                LocationLocationType::ScaledCoordinates
+            }
+            LocationLocationType::Other(v) => {
+                LocationLocationType::Other(v.into_static())
+            }
         }
     }
 }
@@ -189,10 +196,7 @@ pub struct LocationGetRecordOutput<S: BosStr = DefaultStr> {
 /// A location represented as a string, e.g. coordinates or a small GeoJSON string.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LocationString<S: BosStr = DefaultStr> {
     ///The location string value
     pub string: S,
@@ -366,7 +370,7 @@ impl<S: BosStr> LexiconSchema for LocationString<S> {
 
 pub mod location_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -374,90 +378,90 @@ pub mod location_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Srs;
-        type LocationType;
-        type CreatedAt;
-        type LpVersion;
         type Location;
+        type CreatedAt;
+        type Srs;
+        type LpVersion;
+        type LocationType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Srs = Unset;
-        type LocationType = Unset;
-        type CreatedAt = Unset;
-        type LpVersion = Unset;
         type Location = Unset;
-    }
-    ///State transition - sets the `srs` field to Set
-    pub struct SetSrs<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSrs<St> {}
-    impl<St: State> State for SetSrs<St> {
-        type Srs = Set<members::srs>;
-        type LocationType = St::LocationType;
-        type CreatedAt = St::CreatedAt;
-        type LpVersion = St::LpVersion;
-        type Location = St::Location;
-    }
-    ///State transition - sets the `location_type` field to Set
-    pub struct SetLocationType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLocationType<St> {}
-    impl<St: State> State for SetLocationType<St> {
-        type Srs = St::Srs;
-        type LocationType = Set<members::location_type>;
-        type CreatedAt = St::CreatedAt;
-        type LpVersion = St::LpVersion;
-        type Location = St::Location;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Srs = St::Srs;
-        type LocationType = St::LocationType;
-        type CreatedAt = Set<members::created_at>;
-        type LpVersion = St::LpVersion;
-        type Location = St::Location;
-    }
-    ///State transition - sets the `lp_version` field to Set
-    pub struct SetLpVersion<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLpVersion<St> {}
-    impl<St: State> State for SetLpVersion<St> {
-        type Srs = St::Srs;
-        type LocationType = St::LocationType;
-        type CreatedAt = St::CreatedAt;
-        type LpVersion = Set<members::lp_version>;
-        type Location = St::Location;
+        type CreatedAt = Unset;
+        type Srs = Unset;
+        type LpVersion = Unset;
+        type LocationType = Unset;
     }
     ///State transition - sets the `location` field to Set
     pub struct SetLocation<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLocation<St> {}
     impl<St: State> State for SetLocation<St> {
-        type Srs = St::Srs;
-        type LocationType = St::LocationType;
-        type CreatedAt = St::CreatedAt;
-        type LpVersion = St::LpVersion;
         type Location = Set<members::location>;
+        type CreatedAt = St::CreatedAt;
+        type Srs = St::Srs;
+        type LpVersion = St::LpVersion;
+        type LocationType = St::LocationType;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Location = St::Location;
+        type CreatedAt = Set<members::created_at>;
+        type Srs = St::Srs;
+        type LpVersion = St::LpVersion;
+        type LocationType = St::LocationType;
+    }
+    ///State transition - sets the `srs` field to Set
+    pub struct SetSrs<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSrs<St> {}
+    impl<St: State> State for SetSrs<St> {
+        type Location = St::Location;
+        type CreatedAt = St::CreatedAt;
+        type Srs = Set<members::srs>;
+        type LpVersion = St::LpVersion;
+        type LocationType = St::LocationType;
+    }
+    ///State transition - sets the `lp_version` field to Set
+    pub struct SetLpVersion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLpVersion<St> {}
+    impl<St: State> State for SetLpVersion<St> {
+        type Location = St::Location;
+        type CreatedAt = St::CreatedAt;
+        type Srs = St::Srs;
+        type LpVersion = Set<members::lp_version>;
+        type LocationType = St::LocationType;
+    }
+    ///State transition - sets the `location_type` field to Set
+    pub struct SetLocationType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLocationType<St> {}
+    impl<St: State> State for SetLocationType<St> {
+        type Location = St::Location;
+        type CreatedAt = St::CreatedAt;
+        type Srs = St::Srs;
+        type LpVersion = St::LpVersion;
+        type LocationType = Set<members::location_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `srs` field
-        pub struct srs(());
-        ///Marker type for the `location_type` field
-        pub struct location_type(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `lp_version` field
-        pub struct lp_version(());
         ///Marker type for the `location` field
         pub struct location(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `srs` field
+        pub struct srs(());
+        ///Marker type for the `lp_version` field
+        pub struct lp_version(());
+        ///Marker type for the `location_type` field
+        pub struct location_type(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LocationBuilder<S: BosStr, St: location_state::State> {
+pub struct LocationBuilder<St: location_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -471,15 +475,22 @@ pub struct LocationBuilder<S: BosStr, St: location_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Location<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LocationBuilder<S, location_state::Empty> {
+impl Location<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LocationBuilder<location_state::Empty, DefaultStr> {
         LocationBuilder::new()
     }
 }
 
-impl<S: BosStr> LocationBuilder<S, location_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Location<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LocationBuilder<location_state::Empty, S> {
+        LocationBuilder::builder()
+    }
+}
+
+impl LocationBuilder<location_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LocationBuilder {
             _state: PhantomData,
@@ -489,7 +500,18 @@ impl<S: BosStr> LocationBuilder<S, location_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LocationBuilder<S, St>
+impl<S: BosStr> LocationBuilder<location_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LocationBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LocationBuilder<St, S>
 where
     St: location_state::State,
     St::CreatedAt: location_state::IsUnset,
@@ -498,7 +520,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LocationBuilder<S, location_state::SetCreatedAt<St>> {
+    ) -> LocationBuilder<location_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LocationBuilder {
             _state: PhantomData,
@@ -508,7 +530,7 @@ where
     }
 }
 
-impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
+impl<St: location_state::State, S: BosStr> LocationBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -521,7 +543,7 @@ impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LocationBuilder<S, St>
+impl<St, S: BosStr> LocationBuilder<St, S>
 where
     St: location_state::State,
     St::Location: location_state::IsUnset,
@@ -530,7 +552,7 @@ where
     pub fn location(
         mut self,
         value: impl Into<LocationLocation<S>>,
-    ) -> LocationBuilder<S, location_state::SetLocation<St>> {
+    ) -> LocationBuilder<location_state::SetLocation<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LocationBuilder {
             _state: PhantomData,
@@ -540,7 +562,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LocationBuilder<S, St>
+impl<St, S: BosStr> LocationBuilder<St, S>
 where
     St: location_state::State,
     St::LocationType: location_state::IsUnset,
@@ -549,7 +571,7 @@ where
     pub fn location_type(
         mut self,
         value: impl Into<LocationLocationType<S>>,
-    ) -> LocationBuilder<S, location_state::SetLocationType<St>> {
+    ) -> LocationBuilder<location_state::SetLocationType<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LocationBuilder {
             _state: PhantomData,
@@ -559,7 +581,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LocationBuilder<S, St>
+impl<St, S: BosStr> LocationBuilder<St, S>
 where
     St: location_state::State,
     St::LpVersion: location_state::IsUnset,
@@ -568,7 +590,7 @@ where
     pub fn lp_version(
         mut self,
         value: impl Into<S>,
-    ) -> LocationBuilder<S, location_state::SetLpVersion<St>> {
+    ) -> LocationBuilder<location_state::SetLpVersion<St>, S> {
         self._fields.4 = Option::Some(value.into());
         LocationBuilder {
             _state: PhantomData,
@@ -578,7 +600,7 @@ where
     }
 }
 
-impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
+impl<St: location_state::State, S: BosStr> LocationBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -591,7 +613,7 @@ impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LocationBuilder<S, St>
+impl<St, S: BosStr> LocationBuilder<St, S>
 where
     St: location_state::State,
     St::Srs: location_state::IsUnset,
@@ -600,7 +622,7 @@ where
     pub fn srs(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> LocationBuilder<S, location_state::SetSrs<St>> {
+    ) -> LocationBuilder<location_state::SetSrs<St>, S> {
         self._fields.6 = Option::Some(value.into());
         LocationBuilder {
             _state: PhantomData,
@@ -610,14 +632,14 @@ where
     }
 }
 
-impl<S: BosStr, St> LocationBuilder<S, St>
+impl<St, S: BosStr> LocationBuilder<St, S>
 where
     St: location_state::State,
-    St::Srs: location_state::IsSet,
-    St::LocationType: location_state::IsSet,
-    St::CreatedAt: location_state::IsSet,
-    St::LpVersion: location_state::IsSet,
     St::Location: location_state::IsSet,
+    St::CreatedAt: location_state::IsSet,
+    St::Srs: location_state::IsSet,
+    St::LpVersion: location_state::IsSet,
+    St::LocationType: location_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Location<S> {
@@ -648,10 +670,10 @@ where
 }
 
 fn lexicon_doc_app_certified_location() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.certified.location"),

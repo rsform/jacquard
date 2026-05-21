@@ -11,6 +11,7 @@ pub mod record_with_media;
 pub mod records;
 pub mod video;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -28,14 +29,11 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Proportional size of the embed relative to the viewport in larger windows. The dimensions are percentage out of 100. Could we use more granularity? Maybe, but come on.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PercentSize<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -46,10 +44,7 @@ pub struct PercentSize<S: BosStr = DefaultStr> {
 /// Pixel-exact embed size. The dimensions are logical pixels, subject to scaling, so 200px at X2 scale is 400px.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PixelSize<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -89,7 +84,7 @@ impl<S: BosStr> LexiconSchema for PixelSize<S> {
 
 pub mod percent_size_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -132,21 +127,28 @@ pub mod percent_size_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PercentSizeBuilder<S: BosStr, St: percent_size_state::State> {
+pub struct PercentSizeBuilder<St: percent_size_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PercentSize<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PercentSizeBuilder<S, percent_size_state::Empty> {
+impl PercentSize<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PercentSizeBuilder<percent_size_state::Empty, DefaultStr> {
         PercentSizeBuilder::new()
     }
 }
 
-impl<S: BosStr> PercentSizeBuilder<S, percent_size_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PercentSize<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PercentSizeBuilder<percent_size_state::Empty, S> {
+        PercentSizeBuilder::builder()
+    }
+}
+
+impl PercentSizeBuilder<percent_size_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PercentSizeBuilder {
             _state: PhantomData,
@@ -156,7 +158,18 @@ impl<S: BosStr> PercentSizeBuilder<S, percent_size_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PercentSizeBuilder<S, St>
+impl<S: BosStr> PercentSizeBuilder<percent_size_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PercentSizeBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PercentSizeBuilder<St, S>
 where
     St: percent_size_state::State,
     St::Height: percent_size_state::IsUnset,
@@ -165,7 +178,7 @@ where
     pub fn height(
         mut self,
         value: impl Into<i64>,
-    ) -> PercentSizeBuilder<S, percent_size_state::SetHeight<St>> {
+    ) -> PercentSizeBuilder<percent_size_state::SetHeight<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PercentSizeBuilder {
             _state: PhantomData,
@@ -175,7 +188,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PercentSizeBuilder<S, St>
+impl<St, S: BosStr> PercentSizeBuilder<St, S>
 where
     St: percent_size_state::State,
     St::Width: percent_size_state::IsUnset,
@@ -184,7 +197,7 @@ where
     pub fn width(
         mut self,
         value: impl Into<i64>,
-    ) -> PercentSizeBuilder<S, percent_size_state::SetWidth<St>> {
+    ) -> PercentSizeBuilder<percent_size_state::SetWidth<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PercentSizeBuilder {
             _state: PhantomData,
@@ -194,7 +207,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PercentSizeBuilder<S, St>
+impl<St, S: BosStr> PercentSizeBuilder<St, S>
 where
     St: percent_size_state::State,
     St::Height: percent_size_state::IsSet,
@@ -209,7 +222,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PercentSize<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PercentSize<S> {
         PercentSize {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -219,10 +235,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_embed_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.embed.defs"),
@@ -298,7 +314,7 @@ fn lexicon_doc_sh_weaver_embed_defs() -> LexiconDoc<'static> {
 
 pub mod pixel_size_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -306,56 +322,63 @@ pub mod pixel_size_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Height;
         type Width;
+        type Height;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Height = Unset;
         type Width = Unset;
-    }
-    ///State transition - sets the `height` field to Set
-    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHeight<St> {}
-    impl<St: State> State for SetHeight<St> {
-        type Height = Set<members::height>;
-        type Width = St::Width;
+        type Height = Unset;
     }
     ///State transition - sets the `width` field to Set
     pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWidth<St> {}
     impl<St: State> State for SetWidth<St> {
-        type Height = St::Height;
         type Width = Set<members::width>;
+        type Height = St::Height;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeight<St> {}
+    impl<St: State> State for SetHeight<St> {
+        type Width = St::Width;
+        type Height = Set<members::height>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `height` field
-        pub struct height(());
         ///Marker type for the `width` field
         pub struct width(());
+        ///Marker type for the `height` field
+        pub struct height(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PixelSizeBuilder<S: BosStr, St: pixel_size_state::State> {
+pub struct PixelSizeBuilder<St: pixel_size_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PixelSize<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PixelSizeBuilder<S, pixel_size_state::Empty> {
+impl PixelSize<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PixelSizeBuilder<pixel_size_state::Empty, DefaultStr> {
         PixelSizeBuilder::new()
     }
 }
 
-impl<S: BosStr> PixelSizeBuilder<S, pixel_size_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PixelSize<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PixelSizeBuilder<pixel_size_state::Empty, S> {
+        PixelSizeBuilder::builder()
+    }
+}
+
+impl PixelSizeBuilder<pixel_size_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PixelSizeBuilder {
             _state: PhantomData,
@@ -365,7 +388,18 @@ impl<S: BosStr> PixelSizeBuilder<S, pixel_size_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PixelSizeBuilder<S, St>
+impl<S: BosStr> PixelSizeBuilder<pixel_size_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PixelSizeBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PixelSizeBuilder<St, S>
 where
     St: pixel_size_state::State,
     St::Height: pixel_size_state::IsUnset,
@@ -374,7 +408,7 @@ where
     pub fn height(
         mut self,
         value: impl Into<i64>,
-    ) -> PixelSizeBuilder<S, pixel_size_state::SetHeight<St>> {
+    ) -> PixelSizeBuilder<pixel_size_state::SetHeight<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PixelSizeBuilder {
             _state: PhantomData,
@@ -384,7 +418,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PixelSizeBuilder<S, St>
+impl<St, S: BosStr> PixelSizeBuilder<St, S>
 where
     St: pixel_size_state::State,
     St::Width: pixel_size_state::IsUnset,
@@ -393,7 +427,7 @@ where
     pub fn width(
         mut self,
         value: impl Into<i64>,
-    ) -> PixelSizeBuilder<S, pixel_size_state::SetWidth<St>> {
+    ) -> PixelSizeBuilder<pixel_size_state::SetWidth<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PixelSizeBuilder {
             _state: PhantomData,
@@ -403,11 +437,11 @@ where
     }
 }
 
-impl<S: BosStr, St> PixelSizeBuilder<S, St>
+impl<St, S: BosStr> PixelSizeBuilder<St, S>
 where
     St: pixel_size_state::State,
-    St::Height: pixel_size_state::IsSet,
     St::Width: pixel_size_state::IsSet,
+    St::Height: pixel_size_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PixelSize<S> {
@@ -418,7 +452,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PixelSize<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PixelSize<S> {
         PixelSize {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),

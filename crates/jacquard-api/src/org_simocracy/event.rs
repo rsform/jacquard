@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Tracks user interactions — chat messages, senate hearings launched, and individual sim comments during hearings.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -181,7 +181,7 @@ impl<S: BosStr> LexiconSchema for Event<S> {
 
 pub mod event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -189,72 +189,72 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ActorDid;
+        type SimNames;
         type CreatedAt;
         type Type;
-        type SimNames;
+        type ActorDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ActorDid = Unset;
+        type SimNames = Unset;
         type CreatedAt = Unset;
         type Type = Unset;
-        type SimNames = Unset;
-    }
-    ///State transition - sets the `actor_did` field to Set
-    pub struct SetActorDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetActorDid<St> {}
-    impl<St: State> State for SetActorDid<St> {
-        type ActorDid = Set<members::actor_did>;
-        type CreatedAt = St::CreatedAt;
-        type Type = St::Type;
-        type SimNames = St::SimNames;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type ActorDid = St::ActorDid;
-        type CreatedAt = Set<members::created_at>;
-        type Type = St::Type;
-        type SimNames = St::SimNames;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type ActorDid = St::ActorDid;
-        type CreatedAt = St::CreatedAt;
-        type Type = Set<members::r#type>;
-        type SimNames = St::SimNames;
+        type ActorDid = Unset;
     }
     ///State transition - sets the `sim_names` field to Set
     pub struct SetSimNames<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSimNames<St> {}
     impl<St: State> State for SetSimNames<St> {
-        type ActorDid = St::ActorDid;
+        type SimNames = Set<members::sim_names>;
         type CreatedAt = St::CreatedAt;
         type Type = St::Type;
-        type SimNames = Set<members::sim_names>;
+        type ActorDid = St::ActorDid;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type SimNames = St::SimNames;
+        type CreatedAt = Set<members::created_at>;
+        type Type = St::Type;
+        type ActorDid = St::ActorDid;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type SimNames = St::SimNames;
+        type CreatedAt = St::CreatedAt;
+        type Type = Set<members::r#type>;
+        type ActorDid = St::ActorDid;
+    }
+    ///State transition - sets the `actor_did` field to Set
+    pub struct SetActorDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActorDid<St> {}
+    impl<St: State> State for SetActorDid<St> {
+        type SimNames = St::SimNames;
+        type CreatedAt = St::CreatedAt;
+        type Type = St::Type;
+        type ActorDid = Set<members::actor_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `actor_did` field
-        pub struct actor_did(());
+        ///Marker type for the `sim_names` field
+        pub struct sim_names(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `sim_names` field
-        pub struct sim_names(());
+        ///Marker type for the `actor_did` field
+        pub struct actor_did(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EventBuilder<S: BosStr, St: event_state::State> {
+pub struct EventBuilder<St: event_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -270,15 +270,22 @@ pub struct EventBuilder<S: BosStr, St: event_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Event<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EventBuilder<S, event_state::Empty> {
+impl Event<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EventBuilder<event_state::Empty, DefaultStr> {
         EventBuilder::new()
     }
 }
 
-impl<S: BosStr> EventBuilder<S, event_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Event<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EventBuilder<event_state::Empty, S> {
+        EventBuilder::builder()
+    }
+}
+
+impl EventBuilder<event_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventBuilder {
             _state: PhantomData,
@@ -288,7 +295,18 @@ impl<S: BosStr> EventBuilder<S, event_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<S: BosStr> EventBuilder<event_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EventBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::ActorDid: event_state::IsUnset,
@@ -297,7 +315,7 @@ where
     pub fn actor_did(
         mut self,
         value: impl Into<S>,
-    ) -> EventBuilder<S, event_state::SetActorDid<St>> {
+    ) -> EventBuilder<event_state::SetActorDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -307,7 +325,7 @@ where
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `content` field (optional)
     pub fn content(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -320,7 +338,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::CreatedAt: event_state::IsUnset,
@@ -329,7 +347,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventBuilder<S, event_state::SetCreatedAt<St>> {
+    ) -> EventBuilder<event_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -339,7 +357,7 @@ where
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `proposalTitle` field (optional)
     pub fn proposal_title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -352,7 +370,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `round` field (optional)
     pub fn round(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -365,7 +383,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::SimNames: event_state::IsUnset,
@@ -374,7 +392,7 @@ where
     pub fn sim_names(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> EventBuilder<S, event_state::SetSimNames<St>> {
+    ) -> EventBuilder<event_state::SetSimNames<St>, S> {
         self._fields.5 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -384,7 +402,7 @@ where
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `simUris` field (optional)
     pub fn sim_uris(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -397,13 +415,16 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::Type: event_state::IsUnset,
 {
     /// Set the `type` field (required)
-    pub fn r#type(mut self, value: impl Into<S>) -> EventBuilder<S, event_state::SetType<St>> {
+    pub fn r#type(
+        mut self,
+        value: impl Into<S>,
+    ) -> EventBuilder<event_state::SetType<St>, S> {
         self._fields.7 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -413,7 +434,7 @@ where
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `userMessage` field (optional)
     pub fn user_message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -426,13 +447,13 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
-    St::ActorDid: event_state::IsSet,
+    St::SimNames: event_state::IsSet,
     St::CreatedAt: event_state::IsSet,
     St::Type: event_state::IsSet,
-    St::SimNames: event_state::IsSet,
+    St::ActorDid: event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Event<S> {
@@ -467,10 +488,10 @@ where
 }
 
 fn lexicon_doc_org_simocracy_event() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.simocracy.event"),

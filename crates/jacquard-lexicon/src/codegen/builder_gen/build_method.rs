@@ -27,7 +27,6 @@ pub fn generate_build_method(
 
     let bosstr_path =
         resolved.external_type_tokens(&crate::codegen::prettify::ExternalImport::BosStr);
-
     let lifetime_param = if has_lifetime {
         quote! { 'a, }
     } else {
@@ -36,14 +35,14 @@ pub fn generate_build_method(
 
     // S type parameter for the impl block (with bounds)
     let s_param = if has_type_param {
-        quote! { S: #bosstr_path, }
+        quote! {, S: #bosstr_path }
     } else {
         quote! {}
     };
 
     // S arg for instantiating the builder or type (bare, no bounds)
     let s_arg = if has_type_param {
-        quote! { S, }
+        quote! {, S }
     } else {
         quote! {}
     };
@@ -145,7 +144,7 @@ pub fn generate_build_method(
     };
 
     quote! {
-        impl<#lifetime_param #s_param St> #builder_name<#lifetime_param #s_arg St>
+        impl<#lifetime_param St #s_param> #builder_name<#lifetime_param St #s_arg>
         where
             St: #state_mod_name::State,
             #(#where_clauses)*

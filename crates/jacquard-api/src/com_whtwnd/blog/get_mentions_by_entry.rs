@@ -10,27 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetMentionsByEntry<S: BosStr = DefaultStr> {
     pub post_uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetMentionsByEntryOutput<S: BosStr = DefaultStr> {
     pub mentions: Vec<AtUri<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -63,7 +58,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetMentionsByEntryRequest {
 
 pub mod get_mentions_by_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -94,21 +89,37 @@ pub mod get_mentions_by_entry_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetMentionsByEntryBuilder<S: BosStr, St: get_mentions_by_entry_state::State> {
+pub struct GetMentionsByEntryBuilder<
+    St: get_mentions_by_entry_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetMentionsByEntry<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetMentionsByEntryBuilder<S, get_mentions_by_entry_state::Empty> {
+impl GetMentionsByEntry<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetMentionsByEntryBuilder<
+        get_mentions_by_entry_state::Empty,
+        DefaultStr,
+    > {
         GetMentionsByEntryBuilder::new()
     }
 }
 
-impl<S: BosStr> GetMentionsByEntryBuilder<S, get_mentions_by_entry_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetMentionsByEntry<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetMentionsByEntryBuilder<
+        get_mentions_by_entry_state::Empty,
+        S,
+    > {
+        GetMentionsByEntryBuilder::builder()
+    }
+}
+
+impl GetMentionsByEntryBuilder<get_mentions_by_entry_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetMentionsByEntryBuilder {
             _state: PhantomData,
@@ -118,7 +129,18 @@ impl<S: BosStr> GetMentionsByEntryBuilder<S, get_mentions_by_entry_state::Empty>
     }
 }
 
-impl<S: BosStr, St> GetMentionsByEntryBuilder<S, St>
+impl<S: BosStr> GetMentionsByEntryBuilder<get_mentions_by_entry_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetMentionsByEntryBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetMentionsByEntryBuilder<St, S>
 where
     St: get_mentions_by_entry_state::State,
     St::PostUri: get_mentions_by_entry_state::IsUnset,
@@ -127,7 +149,7 @@ where
     pub fn post_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetMentionsByEntryBuilder<S, get_mentions_by_entry_state::SetPostUri<St>> {
+    ) -> GetMentionsByEntryBuilder<get_mentions_by_entry_state::SetPostUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetMentionsByEntryBuilder {
             _state: PhantomData,
@@ -137,7 +159,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetMentionsByEntryBuilder<S, St>
+impl<St, S: BosStr> GetMentionsByEntryBuilder<St, S>
 where
     St: get_mentions_by_entry_state::State,
     St::PostUri: get_mentions_by_entry_state::IsSet,

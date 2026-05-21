@@ -8,31 +8,26 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFollowingUser<S: BosStr = DefaultStr> {
     pub subject_did: Did<S>,
     pub user_did: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFollowingUserOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub follow: Option<StrongRef<S>>,
@@ -66,7 +61,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetFollowingUserRequest {
 
 pub mod get_following_user_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -74,56 +69,69 @@ pub mod get_following_user_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SubjectDid;
         type UserDid;
+        type SubjectDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SubjectDid = Unset;
         type UserDid = Unset;
-    }
-    ///State transition - sets the `subject_did` field to Set
-    pub struct SetSubjectDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubjectDid<St> {}
-    impl<St: State> State for SetSubjectDid<St> {
-        type SubjectDid = Set<members::subject_did>;
-        type UserDid = St::UserDid;
+        type SubjectDid = Unset;
     }
     ///State transition - sets the `user_did` field to Set
     pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUserDid<St> {}
     impl<St: State> State for SetUserDid<St> {
-        type SubjectDid = St::SubjectDid;
         type UserDid = Set<members::user_did>;
+        type SubjectDid = St::SubjectDid;
+    }
+    ///State transition - sets the `subject_did` field to Set
+    pub struct SetSubjectDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubjectDid<St> {}
+    impl<St: State> State for SetSubjectDid<St> {
+        type UserDid = St::UserDid;
+        type SubjectDid = Set<members::subject_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject_did` field
-        pub struct subject_did(());
         ///Marker type for the `user_did` field
         pub struct user_did(());
+        ///Marker type for the `subject_did` field
+        pub struct subject_did(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetFollowingUserBuilder<S: BosStr, St: get_following_user_state::State> {
+pub struct GetFollowingUserBuilder<
+    St: get_following_user_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetFollowingUser<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetFollowingUserBuilder<S, get_following_user_state::Empty> {
+impl GetFollowingUser<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetFollowingUserBuilder<
+        get_following_user_state::Empty,
+        DefaultStr,
+    > {
         GetFollowingUserBuilder::new()
     }
 }
 
-impl<S: BosStr> GetFollowingUserBuilder<S, get_following_user_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetFollowingUser<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetFollowingUserBuilder<get_following_user_state::Empty, S> {
+        GetFollowingUserBuilder::builder()
+    }
+}
+
+impl GetFollowingUserBuilder<get_following_user_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetFollowingUserBuilder {
             _state: PhantomData,
@@ -133,7 +141,18 @@ impl<S: BosStr> GetFollowingUserBuilder<S, get_following_user_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetFollowingUserBuilder<S, St>
+impl<S: BosStr> GetFollowingUserBuilder<get_following_user_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetFollowingUserBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetFollowingUserBuilder<St, S>
 where
     St: get_following_user_state::State,
     St::SubjectDid: get_following_user_state::IsUnset,
@@ -142,7 +161,7 @@ where
     pub fn subject_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetFollowingUserBuilder<S, get_following_user_state::SetSubjectDid<St>> {
+    ) -> GetFollowingUserBuilder<get_following_user_state::SetSubjectDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetFollowingUserBuilder {
             _state: PhantomData,
@@ -152,7 +171,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetFollowingUserBuilder<S, St>
+impl<St, S: BosStr> GetFollowingUserBuilder<St, S>
 where
     St: get_following_user_state::State,
     St::UserDid: get_following_user_state::IsUnset,
@@ -161,7 +180,7 @@ where
     pub fn user_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetFollowingUserBuilder<S, get_following_user_state::SetUserDid<St>> {
+    ) -> GetFollowingUserBuilder<get_following_user_state::SetUserDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetFollowingUserBuilder {
             _state: PhantomData,
@@ -171,11 +190,11 @@ where
     }
 }
 
-impl<S: BosStr, St> GetFollowingUserBuilder<S, St>
+impl<St, S: BosStr> GetFollowingUserBuilder<St, S>
 where
     St: get_following_user_state::State,
-    St::SubjectDid: get_following_user_state::IsSet,
     St::UserDid: get_following_user_state::IsSet,
+    St::SubjectDid: get_following_user_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GetFollowingUser<S> {

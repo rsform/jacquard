@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::draft::DraftWithId;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::draft::DraftWithId;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateDraft<S: BosStr = DefaultStr> {
     pub draft: DraftWithId<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -39,8 +36,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateDraftResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateDraft<S> {
     const NSID: &'static str = "app.bsky.draft.updateDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateDraftResponse;
 }
 
@@ -48,15 +46,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateDraft<S> {
 pub struct UpdateDraftRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateDraftRequest {
     const PATH: &'static str = "/xrpc/app.bsky.draft.updateDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateDraft<S>;
     type Response = UpdateDraftResponse;
 }
 
 pub mod update_draft_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -87,21 +86,28 @@ pub mod update_draft_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateDraftBuilder<S: BosStr, St: update_draft_state::State> {
+pub struct UpdateDraftBuilder<St: update_draft_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<DraftWithId<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UpdateDraft<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UpdateDraftBuilder<S, update_draft_state::Empty> {
+impl UpdateDraft<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UpdateDraftBuilder<update_draft_state::Empty, DefaultStr> {
         UpdateDraftBuilder::new()
     }
 }
 
-impl<S: BosStr> UpdateDraftBuilder<S, update_draft_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UpdateDraft<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UpdateDraftBuilder<update_draft_state::Empty, S> {
+        UpdateDraftBuilder::builder()
+    }
+}
+
+impl UpdateDraftBuilder<update_draft_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UpdateDraftBuilder {
             _state: PhantomData,
@@ -111,7 +117,18 @@ impl<S: BosStr> UpdateDraftBuilder<S, update_draft_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> UpdateDraftBuilder<S, St>
+impl<S: BosStr> UpdateDraftBuilder<update_draft_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UpdateDraftBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> UpdateDraftBuilder<St, S>
 where
     St: update_draft_state::State,
     St::Draft: update_draft_state::IsUnset,
@@ -120,7 +137,7 @@ where
     pub fn draft(
         mut self,
         value: impl Into<DraftWithId<S>>,
-    ) -> UpdateDraftBuilder<S, update_draft_state::SetDraft<St>> {
+    ) -> UpdateDraftBuilder<update_draft_state::SetDraft<St>, S> {
         self._fields.0 = Option::Some(value.into());
         UpdateDraftBuilder {
             _state: PhantomData,
@@ -130,7 +147,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UpdateDraftBuilder<S, St>
+impl<St, S: BosStr> UpdateDraftBuilder<St, S>
 where
     St: update_draft_state::State,
     St::Draft: update_draft_state::IsSet,
@@ -143,7 +160,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateDraft<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateDraft<S> {
         UpdateDraft {
             draft: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

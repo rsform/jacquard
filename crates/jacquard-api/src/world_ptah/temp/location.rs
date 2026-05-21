@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::world_ptah::temp::location;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::world_ptah::temp::location;
 /// Flexible properties for any kind of world geography. All fields optional — worlds define what matters.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LocationProperties<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub climate: Option<S>,
@@ -104,18 +101,30 @@ pub enum LocationCanonicalStatus<S: BosStr = DefaultStr> {
 impl<S: BosStr> LocationCanonicalStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::CanonicalStatusOfficial => "world.ptah.temp.defs#canonicalStatusOfficial",
-            Self::CanonicalStatusCommunity => "world.ptah.temp.defs#canonicalStatusCommunity",
-            Self::CanonicalStatusApocryphal => "world.ptah.temp.defs#canonicalStatusApocryphal",
+            Self::CanonicalStatusOfficial => {
+                "world.ptah.temp.defs#canonicalStatusOfficial"
+            }
+            Self::CanonicalStatusCommunity => {
+                "world.ptah.temp.defs#canonicalStatusCommunity"
+            }
+            Self::CanonicalStatusApocryphal => {
+                "world.ptah.temp.defs#canonicalStatusApocryphal"
+            }
             Self::Other(s) => s.as_ref(),
         }
     }
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "world.ptah.temp.defs#canonicalStatusOfficial" => Self::CanonicalStatusOfficial,
-            "world.ptah.temp.defs#canonicalStatusCommunity" => Self::CanonicalStatusCommunity,
-            "world.ptah.temp.defs#canonicalStatusApocryphal" => Self::CanonicalStatusApocryphal,
+            "world.ptah.temp.defs#canonicalStatusOfficial" => {
+                Self::CanonicalStatusOfficial
+            }
+            "world.ptah.temp.defs#canonicalStatusCommunity" => {
+                Self::CanonicalStatusCommunity
+            }
+            "world.ptah.temp.defs#canonicalStatusApocryphal" => {
+                Self::CanonicalStatusApocryphal
+            }
             _ => Self::Other(s),
         }
     }
@@ -175,7 +184,9 @@ where
             LocationCanonicalStatus::CanonicalStatusApocryphal => {
                 LocationCanonicalStatus::CanonicalStatusApocryphal
             }
-            LocationCanonicalStatus::Other(v) => LocationCanonicalStatus::Other(v.into_static()),
+            LocationCanonicalStatus::Other(v) => {
+                LocationCanonicalStatus::Other(v.into_static())
+            }
         }
     }
 }
@@ -274,7 +285,9 @@ where
             LocationLocationType::Landmark => LocationLocationType::Landmark,
             LocationLocationType::Vessel => LocationLocationType::Vessel,
             LocationLocationType::AbstractSpace => LocationLocationType::AbstractSpace,
-            LocationLocationType::Other(v) => LocationLocationType::Other(v.into_static()),
+            LocationLocationType::Other(v) => {
+                LocationLocationType::Other(v.into_static())
+            }
         }
     }
 }
@@ -519,10 +532,10 @@ impl<S: BosStr> LexiconSchema for Location<S> {
 }
 
 fn lexicon_doc_world_ptah_temp_location() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("world.ptah.temp.location"),
@@ -730,7 +743,7 @@ fn lexicon_doc_world_ptah_temp_location() -> LexiconDoc<'static> {
 
 pub mod location_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -739,8 +752,8 @@ pub mod location_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type CreatedAt;
         type WorldReference;
+        type CreatedAt;
         type CreatorDid;
     }
     /// Empty state - all required fields are unset
@@ -748,8 +761,8 @@ pub mod location_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type CreatedAt = Unset;
         type WorldReference = Unset;
+        type CreatedAt = Unset;
         type CreatorDid = Unset;
     }
     ///State transition - sets the `name` field to Set
@@ -757,17 +770,8 @@ pub mod location_state {
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type WorldReference = St::WorldReference;
         type CreatedAt = St::CreatedAt;
-        type WorldReference = St::WorldReference;
-        type CreatorDid = St::CreatorDid;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Name = St::Name;
-        type CreatedAt = Set<members::created_at>;
-        type WorldReference = St::WorldReference;
         type CreatorDid = St::CreatorDid;
     }
     ///State transition - sets the `world_reference` field to Set
@@ -775,8 +779,17 @@ pub mod location_state {
     impl<St: State> sealed::Sealed for SetWorldReference<St> {}
     impl<St: State> State for SetWorldReference<St> {
         type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
         type WorldReference = Set<members::world_reference>;
+        type CreatedAt = St::CreatedAt;
+        type CreatorDid = St::CreatorDid;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type WorldReference = St::WorldReference;
+        type CreatedAt = Set<members::created_at>;
         type CreatorDid = St::CreatorDid;
     }
     ///State transition - sets the `creator_did` field to Set
@@ -784,8 +797,8 @@ pub mod location_state {
     impl<St: State> sealed::Sealed for SetCreatorDid<St> {}
     impl<St: State> State for SetCreatorDid<St> {
         type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
         type WorldReference = St::WorldReference;
+        type CreatedAt = St::CreatedAt;
         type CreatorDid = Set<members::creator_did>;
     }
     /// Marker types for field names
@@ -793,17 +806,17 @@ pub mod location_state {
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `world_reference` field
         pub struct world_reference(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `creator_did` field
         pub struct creator_did(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LocationBuilder<S: BosStr, St: location_state::State> {
+pub struct LocationBuilder<St: location_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -821,27 +834,43 @@ pub struct LocationBuilder<S: BosStr, St: location_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Location<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LocationBuilder<S, location_state::Empty> {
+impl Location<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LocationBuilder<location_state::Empty, DefaultStr> {
         LocationBuilder::new()
     }
 }
 
-impl<S: BosStr> LocationBuilder<S, location_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Location<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LocationBuilder<location_state::Empty, S> {
+        LocationBuilder::builder()
+    }
+}
+
+impl LocationBuilder<location_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LocationBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
+impl<S: BosStr> LocationBuilder<location_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LocationBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: location_state::State, S: BosStr> LocationBuilder<St, S> {
     /// Set the `authorshipRecord` field (optional)
     pub fn authorship_record(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -854,7 +883,7 @@ impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
+impl<St: location_state::State, S: BosStr> LocationBuilder<St, S> {
     /// Set the `canonicalStatus` field (optional)
     pub fn canonical_status(
         mut self,
@@ -864,13 +893,16 @@ impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
         self
     }
     /// Set the `canonicalStatus` field to an Option value (optional)
-    pub fn maybe_canonical_status(mut self, value: Option<LocationCanonicalStatus<S>>) -> Self {
+    pub fn maybe_canonical_status(
+        mut self,
+        value: Option<LocationCanonicalStatus<S>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<S: BosStr, St> LocationBuilder<S, St>
+impl<St, S: BosStr> LocationBuilder<St, S>
 where
     St: location_state::State,
     St::CreatedAt: location_state::IsUnset,
@@ -879,7 +911,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LocationBuilder<S, location_state::SetCreatedAt<St>> {
+    ) -> LocationBuilder<location_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LocationBuilder {
             _state: PhantomData,
@@ -889,7 +921,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LocationBuilder<S, St>
+impl<St, S: BosStr> LocationBuilder<St, S>
 where
     St: location_state::State,
     St::CreatorDid: location_state::IsUnset,
@@ -898,7 +930,7 @@ where
     pub fn creator_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> LocationBuilder<S, location_state::SetCreatorDid<St>> {
+    ) -> LocationBuilder<location_state::SetCreatorDid<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LocationBuilder {
             _state: PhantomData,
@@ -908,7 +940,7 @@ where
     }
 }
 
-impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
+impl<St: location_state::State, S: BosStr> LocationBuilder<St, S> {
     /// Set the `depthIndex` field (optional)
     pub fn depth_index(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -921,7 +953,7 @@ impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
+impl<St: location_state::State, S: BosStr> LocationBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -934,26 +966,35 @@ impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
+impl<St: location_state::State, S: BosStr> LocationBuilder<St, S> {
     /// Set the `locationType` field (optional)
-    pub fn location_type(mut self, value: impl Into<Option<LocationLocationType<S>>>) -> Self {
+    pub fn location_type(
+        mut self,
+        value: impl Into<Option<LocationLocationType<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `locationType` field to an Option value (optional)
-    pub fn maybe_location_type(mut self, value: Option<LocationLocationType<S>>) -> Self {
+    pub fn maybe_location_type(
+        mut self,
+        value: Option<LocationLocationType<S>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
 }
 
-impl<S: BosStr, St> LocationBuilder<S, St>
+impl<St, S: BosStr> LocationBuilder<St, S>
 where
     St: location_state::State,
     St::Name: location_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> LocationBuilder<S, location_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> LocationBuilder<location_state::SetName<St>, S> {
         self._fields.7 = Option::Some(value.into());
         LocationBuilder {
             _state: PhantomData,
@@ -963,7 +1004,7 @@ where
     }
 }
 
-impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
+impl<St: location_state::State, S: BosStr> LocationBuilder<St, S> {
     /// Set the `parentLocation` field (optional)
     pub fn parent_location(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -976,20 +1017,26 @@ impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: location_state::State> LocationBuilder<S, St> {
+impl<St: location_state::State, S: BosStr> LocationBuilder<St, S> {
     /// Set the `properties` field (optional)
-    pub fn properties(mut self, value: impl Into<Option<location::LocationProperties<S>>>) -> Self {
+    pub fn properties(
+        mut self,
+        value: impl Into<Option<location::LocationProperties<S>>>,
+    ) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `properties` field to an Option value (optional)
-    pub fn maybe_properties(mut self, value: Option<location::LocationProperties<S>>) -> Self {
+    pub fn maybe_properties(
+        mut self,
+        value: Option<location::LocationProperties<S>>,
+    ) -> Self {
         self._fields.9 = value;
         self
     }
 }
 
-impl<S: BosStr, St> LocationBuilder<S, St>
+impl<St, S: BosStr> LocationBuilder<St, S>
 where
     St: location_state::State,
     St::WorldReference: location_state::IsUnset,
@@ -998,7 +1045,7 @@ where
     pub fn world_reference(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> LocationBuilder<S, location_state::SetWorldReference<St>> {
+    ) -> LocationBuilder<location_state::SetWorldReference<St>, S> {
         self._fields.10 = Option::Some(value.into());
         LocationBuilder {
             _state: PhantomData,
@@ -1008,12 +1055,12 @@ where
     }
 }
 
-impl<S: BosStr, St> LocationBuilder<S, St>
+impl<St, S: BosStr> LocationBuilder<St, S>
 where
     St: location_state::State,
     St::Name: location_state::IsSet,
-    St::CreatedAt: location_state::IsSet,
     St::WorldReference: location_state::IsSet,
+    St::CreatedAt: location_state::IsSet,
     St::CreatorDid: location_state::IsSet,
 {
     /// Build the final struct.

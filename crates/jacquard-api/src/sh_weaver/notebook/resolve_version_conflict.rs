@@ -8,31 +8,26 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::collab::CollaborationStateView;
-use crate::sh_weaver::notebook::PublishedVersionView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::collab::CollaborationStateView;
+use crate::sh_weaver::notebook::PublishedVersionView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveVersionConflict<S: BosStr = DefaultStr> {
     pub uris: Vec<AtUri<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveVersionConflictOutput<S: BosStr = DefaultStr> {
     pub canonical: PublishedVersionView<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -42,9 +37,18 @@ pub struct ResolveVersionConflictOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ResolveVersionConflictError {
     /// The URIs don't appear to be related versions
@@ -52,10 +56,7 @@ pub enum ResolveVersionConflictError {
     NoRelatedVersions(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ResolveVersionConflictError {
@@ -105,7 +106,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ResolveVersionConflictRequest {
 
 pub mod resolve_version_conflict_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -136,21 +137,37 @@ pub mod resolve_version_conflict_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ResolveVersionConflictBuilder<S: BosStr, St: resolve_version_conflict_state::State> {
+pub struct ResolveVersionConflictBuilder<
+    St: resolve_version_conflict_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ResolveVersionConflict<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ResolveVersionConflictBuilder<S, resolve_version_conflict_state::Empty> {
+impl ResolveVersionConflict<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ResolveVersionConflictBuilder<
+        resolve_version_conflict_state::Empty,
+        DefaultStr,
+    > {
         ResolveVersionConflictBuilder::new()
     }
 }
 
-impl<S: BosStr> ResolveVersionConflictBuilder<S, resolve_version_conflict_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ResolveVersionConflict<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ResolveVersionConflictBuilder<
+        resolve_version_conflict_state::Empty,
+        S,
+    > {
+        ResolveVersionConflictBuilder::builder()
+    }
+}
+
+impl ResolveVersionConflictBuilder<resolve_version_conflict_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ResolveVersionConflictBuilder {
             _state: PhantomData,
@@ -160,7 +177,18 @@ impl<S: BosStr> ResolveVersionConflictBuilder<S, resolve_version_conflict_state:
     }
 }
 
-impl<S: BosStr, St> ResolveVersionConflictBuilder<S, St>
+impl<S: BosStr> ResolveVersionConflictBuilder<resolve_version_conflict_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ResolveVersionConflictBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ResolveVersionConflictBuilder<St, S>
 where
     St: resolve_version_conflict_state::State,
     St::Uris: resolve_version_conflict_state::IsUnset,
@@ -169,7 +197,7 @@ where
     pub fn uris(
         mut self,
         value: impl Into<Vec<AtUri<S>>>,
-    ) -> ResolveVersionConflictBuilder<S, resolve_version_conflict_state::SetUris<St>> {
+    ) -> ResolveVersionConflictBuilder<resolve_version_conflict_state::SetUris<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ResolveVersionConflictBuilder {
             _state: PhantomData,
@@ -179,7 +207,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ResolveVersionConflictBuilder<S, St>
+impl<St, S: BosStr> ResolveVersionConflictBuilder<St, S>
 where
     St: resolve_version_conflict_state::State,
     St::Uris: resolve_version_conflict_state::IsSet,

@@ -10,29 +10,26 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::cid::CidLink;
-use jacquard_common::types::string::{Datetime, Did, Tid, UriValue};
+use jacquard_common::types::string::{Did, Tid, Datetime, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::zone_stratos::sync::subscribe_records;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::zone_stratos::sync::subscribe_records;
 /// A commit event containing record operations.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Commit<S: BosStr = DefaultStr> {
     ///The DID of the account.
     pub did: Did<S>,
@@ -51,10 +48,7 @@ pub struct Commit<S: BosStr = DefaultStr> {
 /// An enrollment event indicating a user has enrolled or unenrolled from the service.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Enrollment<S: BosStr = DefaultStr> {
     ///The enrollment action.
     pub action: EnrollmentAction<S>,
@@ -154,10 +148,7 @@ where
 /// An informational message about the subscription state.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Info<S: BosStr = DefaultStr> {
     ///Additional details about the info message.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -243,11 +234,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubscribeRecords<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<i64>,
@@ -259,6 +248,7 @@ pub struct SubscribeRecords<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sync_token: Option<S>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -280,30 +270,49 @@ impl<S: BosStr> SubscribeRecordsMessage<S> {
     where
         S: serde::Deserialize<'de>,
     {
-        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
+            bytes,
+        )?;
         match header.t.as_str() {
             "#commit" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::Commit(Box::new(variant)))
             }
             "#enrollment" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::Enrollment(Box::new(variant)))
             }
             "#info" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::Info(Box::new(variant)))
             }
-            unknown => Err(jacquard_common::error::DecodeError::UnknownEventType(
-                unknown.into(),
-            )),
+            unknown => {
+                Err(
+                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
+                )
+            }
         }
     }
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum SubscribeRecordsError {
     /// Cursor is in the future.
@@ -314,10 +323,7 @@ pub enum SubscribeRecordsError {
     AuthRequired(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for SubscribeRecordsError {
@@ -351,10 +357,7 @@ impl core::fmt::Display for SubscribeRecordsError {
 /// A single record operation within a commit.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordOp<S: BosStr = DefaultStr> {
     ///The type of operation.
     pub action: RecordOpAction<S>,
@@ -535,24 +538,21 @@ impl<S: BosStr> LexiconSchema for Info<S> {
 pub struct SubscribeRecordsStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeRecordsStream {
     const NSID: &'static str = "zone.stratos.sync.subscribeRecords";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Message<S: BosStr> = SubscribeRecordsMessage<S>;
     type Error = SubscribeRecordsError;
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcSubscription for SubscribeRecords<S> {
     const NSID: &'static str = "zone.stratos.sync.subscribeRecords";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Stream = SubscribeRecordsStream;
 }
 
 pub struct SubscribeRecordsEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeRecordsEndpoint {
     const PATH: &'static str = "/xrpc/zone.stratos.sync.subscribeRecords";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Params<S: BosStr> = SubscribeRecords<S>;
     type Stream = SubscribeRecordsStream;
 }
@@ -596,7 +596,7 @@ impl<S: BosStr> LexiconSchema for RecordOp<S> {
 
 pub mod commit_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -604,90 +604,90 @@ pub mod commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Seq;
-        type Rev;
         type Did;
+        type Rev;
         type Ops;
+        type Seq;
         type Time;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Seq = Unset;
-        type Rev = Unset;
         type Did = Unset;
+        type Rev = Unset;
         type Ops = Unset;
+        type Seq = Unset;
         type Time = Unset;
     }
-    ///State transition - sets the `seq` field to Set
-    pub struct SetSeq<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSeq<St> {}
-    impl<St: State> State for SetSeq<St> {
-        type Seq = Set<members::seq>;
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Did = Set<members::did>;
         type Rev = St::Rev;
-        type Did = St::Did;
         type Ops = St::Ops;
+        type Seq = St::Seq;
         type Time = St::Time;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRev<St> {}
     impl<St: State> State for SetRev<St> {
-        type Seq = St::Seq;
-        type Rev = Set<members::rev>;
         type Did = St::Did;
+        type Rev = Set<members::rev>;
         type Ops = St::Ops;
-        type Time = St::Time;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
         type Seq = St::Seq;
-        type Rev = St::Rev;
-        type Did = Set<members::did>;
-        type Ops = St::Ops;
         type Time = St::Time;
     }
     ///State transition - sets the `ops` field to Set
     pub struct SetOps<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOps<St> {}
     impl<St: State> State for SetOps<St> {
-        type Seq = St::Seq;
-        type Rev = St::Rev;
         type Did = St::Did;
+        type Rev = St::Rev;
         type Ops = Set<members::ops>;
+        type Seq = St::Seq;
+        type Time = St::Time;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSeq<St> {}
+    impl<St: State> State for SetSeq<St> {
+        type Did = St::Did;
+        type Rev = St::Rev;
+        type Ops = St::Ops;
+        type Seq = Set<members::seq>;
         type Time = St::Time;
     }
     ///State transition - sets the `time` field to Set
     pub struct SetTime<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTime<St> {}
     impl<St: State> State for SetTime<St> {
-        type Seq = St::Seq;
-        type Rev = St::Rev;
         type Did = St::Did;
+        type Rev = St::Rev;
         type Ops = St::Ops;
+        type Seq = St::Seq;
         type Time = Set<members::time>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `seq` field
-        pub struct seq(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
         ///Marker type for the `ops` field
         pub struct ops(());
+        ///Marker type for the `seq` field
+        pub struct seq(());
         ///Marker type for the `time` field
         pub struct time(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CommitBuilder<S: BosStr, St: commit_state::State> {
+pub struct CommitBuilder<St: commit_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -699,15 +699,22 @@ pub struct CommitBuilder<S: BosStr, St: commit_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Commit<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CommitBuilder<S, commit_state::Empty> {
+impl Commit<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CommitBuilder<commit_state::Empty, DefaultStr> {
         CommitBuilder::new()
     }
 }
 
-impl<S: BosStr> CommitBuilder<S, commit_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Commit<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CommitBuilder<commit_state::Empty, S> {
+        CommitBuilder::builder()
+    }
+}
+
+impl CommitBuilder<commit_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CommitBuilder {
             _state: PhantomData,
@@ -717,13 +724,27 @@ impl<S: BosStr> CommitBuilder<S, commit_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CommitBuilder<S, St>
+impl<S: BosStr> CommitBuilder<commit_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CommitBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CommitBuilder<St, S>
 where
     St: commit_state::State,
     St::Did: commit_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> CommitBuilder<S, commit_state::SetDid<St>> {
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> CommitBuilder<commit_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CommitBuilder {
             _state: PhantomData,
@@ -733,7 +754,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CommitBuilder<S, St>
+impl<St, S: BosStr> CommitBuilder<St, S>
 where
     St: commit_state::State,
     St::Ops: commit_state::IsUnset,
@@ -742,7 +763,7 @@ where
     pub fn ops(
         mut self,
         value: impl Into<Vec<subscribe_records::RecordOp<S>>>,
-    ) -> CommitBuilder<S, commit_state::SetOps<St>> {
+    ) -> CommitBuilder<commit_state::SetOps<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CommitBuilder {
             _state: PhantomData,
@@ -752,13 +773,16 @@ where
     }
 }
 
-impl<S: BosStr, St> CommitBuilder<S, St>
+impl<St, S: BosStr> CommitBuilder<St, S>
 where
     St: commit_state::State,
     St::Rev: commit_state::IsUnset,
 {
     /// Set the `rev` field (required)
-    pub fn rev(mut self, value: impl Into<Tid>) -> CommitBuilder<S, commit_state::SetRev<St>> {
+    pub fn rev(
+        mut self,
+        value: impl Into<Tid>,
+    ) -> CommitBuilder<commit_state::SetRev<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CommitBuilder {
             _state: PhantomData,
@@ -768,13 +792,16 @@ where
     }
 }
 
-impl<S: BosStr, St> CommitBuilder<S, St>
+impl<St, S: BosStr> CommitBuilder<St, S>
 where
     St: commit_state::State,
     St::Seq: commit_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(mut self, value: impl Into<i64>) -> CommitBuilder<S, commit_state::SetSeq<St>> {
+    pub fn seq(
+        mut self,
+        value: impl Into<i64>,
+    ) -> CommitBuilder<commit_state::SetSeq<St>, S> {
         self._fields.3 = Option::Some(value.into());
         CommitBuilder {
             _state: PhantomData,
@@ -784,7 +811,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CommitBuilder<S, St>
+impl<St, S: BosStr> CommitBuilder<St, S>
 where
     St: commit_state::State,
     St::Time: commit_state::IsUnset,
@@ -793,7 +820,7 @@ where
     pub fn time(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CommitBuilder<S, commit_state::SetTime<St>> {
+    ) -> CommitBuilder<commit_state::SetTime<St>, S> {
         self._fields.4 = Option::Some(value.into());
         CommitBuilder {
             _state: PhantomData,
@@ -803,13 +830,13 @@ where
     }
 }
 
-impl<S: BosStr, St> CommitBuilder<S, St>
+impl<St, S: BosStr> CommitBuilder<St, S>
 where
     St: commit_state::State,
-    St::Seq: commit_state::IsSet,
-    St::Rev: commit_state::IsSet,
     St::Did: commit_state::IsSet,
+    St::Rev: commit_state::IsSet,
     St::Ops: commit_state::IsSet,
+    St::Seq: commit_state::IsSet,
     St::Time: commit_state::IsSet,
 {
     /// Build the final struct.
@@ -837,10 +864,10 @@ where
 }
 
 fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("zone.stratos.sync.subscribeRecords"),
@@ -849,23 +876,27 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("commit"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A commit event containing record operations.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("seq"),
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("time"),
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("ops"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A commit event containing record operations.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("seq"), SmolStr::new_static("did"),
+                            SmolStr::new_static("time"), SmolStr::new_static("rev"),
+                            SmolStr::new_static("ops")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The DID of the account.")),
+                                description: Some(
+                                    CowStr::new_static("The DID of the account."),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -873,9 +904,11 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("ops"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "List of record operations in this commit.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "List of record operations in this commit.",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#recordOp"),
                                     ..Default::default()
@@ -900,9 +933,11 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("time"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Timestamp of when the event was sequenced.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Timestamp of when the event was sequenced.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -989,9 +1024,11 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("info"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "An informational message about the subscription state.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "An informational message about the subscription state.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("name")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -999,9 +1036,11 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Additional details about the info message.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Additional details about the info message.",
+                                    ),
+                                ),
                                 max_length: Some(1024usize),
                                 ..Default::default()
                             }),
@@ -1009,7 +1048,9 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The type of info message.")),
+                                description: Some(
+                                    CowStr::new_static("The type of info message."),
+                                ),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),
@@ -1079,20 +1120,21 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("recordOp"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A single record operation within a commit.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("action"),
-                        SmolStr::new_static("path"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A single record operation within a commit."),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("action"), SmolStr::new_static("path")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("action"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The type of operation.")),
+                                description: Some(
+                                    CowStr::new_static("The type of operation."),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -1106,9 +1148,9 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("path"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The record path (collection/rkey).",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The record path (collection/rkey)."),
+                                ),
                                 max_length: Some(512usize),
                                 ..Default::default()
                             }),
@@ -1132,7 +1174,7 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
 
 pub mod enrollment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1141,55 +1183,55 @@ pub mod enrollment_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
-        type Action;
         type Time;
+        type Action;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
-        type Action = Unset;
         type Time = Unset;
+        type Action = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
+        type Time = St::Time;
         type Action = St::Action;
-        type Time = St::Time;
-    }
-    ///State transition - sets the `action` field to Set
-    pub struct SetAction<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAction<St> {}
-    impl<St: State> State for SetAction<St> {
-        type Did = St::Did;
-        type Action = Set<members::action>;
-        type Time = St::Time;
     }
     ///State transition - sets the `time` field to Set
     pub struct SetTime<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTime<St> {}
     impl<St: State> State for SetTime<St> {
         type Did = St::Did;
-        type Action = St::Action;
         type Time = Set<members::time>;
+        type Action = St::Action;
+    }
+    ///State transition - sets the `action` field to Set
+    pub struct SetAction<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAction<St> {}
+    impl<St: State> State for SetAction<St> {
+        type Did = St::Did;
+        type Time = St::Time;
+        type Action = Set<members::action>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `action` field
-        pub struct action(());
         ///Marker type for the `time` field
         pub struct time(());
+        ///Marker type for the `action` field
+        pub struct action(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EnrollmentBuilder<S: BosStr, St: enrollment_state::State> {
+pub struct EnrollmentBuilder<St: enrollment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<EnrollmentAction<S>>,
@@ -1201,15 +1243,22 @@ pub struct EnrollmentBuilder<S: BosStr, St: enrollment_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Enrollment<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EnrollmentBuilder<S, enrollment_state::Empty> {
+impl Enrollment<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EnrollmentBuilder<enrollment_state::Empty, DefaultStr> {
         EnrollmentBuilder::new()
     }
 }
 
-impl<S: BosStr> EnrollmentBuilder<S, enrollment_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Enrollment<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EnrollmentBuilder<enrollment_state::Empty, S> {
+        EnrollmentBuilder::builder()
+    }
+}
+
+impl EnrollmentBuilder<enrollment_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EnrollmentBuilder {
             _state: PhantomData,
@@ -1219,7 +1268,18 @@ impl<S: BosStr> EnrollmentBuilder<S, enrollment_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EnrollmentBuilder<S, St>
+impl<S: BosStr> EnrollmentBuilder<enrollment_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EnrollmentBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EnrollmentBuilder<St, S>
 where
     St: enrollment_state::State,
     St::Action: enrollment_state::IsUnset,
@@ -1228,7 +1288,7 @@ where
     pub fn action(
         mut self,
         value: impl Into<EnrollmentAction<S>>,
-    ) -> EnrollmentBuilder<S, enrollment_state::SetAction<St>> {
+    ) -> EnrollmentBuilder<enrollment_state::SetAction<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EnrollmentBuilder {
             _state: PhantomData,
@@ -1238,7 +1298,7 @@ where
     }
 }
 
-impl<S: BosStr, St: enrollment_state::State> EnrollmentBuilder<S, St> {
+impl<St: enrollment_state::State, S: BosStr> EnrollmentBuilder<St, S> {
     /// Set the `boundaries` field (optional)
     pub fn boundaries(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -1251,7 +1311,7 @@ impl<S: BosStr, St: enrollment_state::State> EnrollmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EnrollmentBuilder<S, St>
+impl<St, S: BosStr> EnrollmentBuilder<St, S>
 where
     St: enrollment_state::State,
     St::Did: enrollment_state::IsUnset,
@@ -1260,7 +1320,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EnrollmentBuilder<S, enrollment_state::SetDid<St>> {
+    ) -> EnrollmentBuilder<enrollment_state::SetDid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         EnrollmentBuilder {
             _state: PhantomData,
@@ -1270,7 +1330,7 @@ where
     }
 }
 
-impl<S: BosStr, St: enrollment_state::State> EnrollmentBuilder<S, St> {
+impl<St: enrollment_state::State, S: BosStr> EnrollmentBuilder<St, S> {
     /// Set the `service` field (optional)
     pub fn service(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -1283,7 +1343,7 @@ impl<S: BosStr, St: enrollment_state::State> EnrollmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EnrollmentBuilder<S, St>
+impl<St, S: BosStr> EnrollmentBuilder<St, S>
 where
     St: enrollment_state::State,
     St::Time: enrollment_state::IsUnset,
@@ -1292,7 +1352,7 @@ where
     pub fn time(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EnrollmentBuilder<S, enrollment_state::SetTime<St>> {
+    ) -> EnrollmentBuilder<enrollment_state::SetTime<St>, S> {
         self._fields.4 = Option::Some(value.into());
         EnrollmentBuilder {
             _state: PhantomData,
@@ -1302,12 +1362,12 @@ where
     }
 }
 
-impl<S: BosStr, St> EnrollmentBuilder<S, St>
+impl<St, S: BosStr> EnrollmentBuilder<St, S>
 where
     St: enrollment_state::State,
     St::Did: enrollment_state::IsSet,
-    St::Action: enrollment_state::IsSet,
     St::Time: enrollment_state::IsSet,
+    St::Action: enrollment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Enrollment<S> {
@@ -1321,7 +1381,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Enrollment<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Enrollment<S> {
         Enrollment {
             action: self._fields.0.unwrap(),
             boundaries: self._fields.1,
@@ -1335,7 +1398,7 @@ where
 
 pub mod subscribe_records_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1353,21 +1416,31 @@ pub mod subscribe_records_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SubscribeRecordsBuilder<S: BosStr, St: subscribe_records_state::State> {
+pub struct SubscribeRecordsBuilder<
+    St: subscribe_records_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Did<S>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SubscribeRecords<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SubscribeRecordsBuilder<S, subscribe_records_state::Empty> {
+impl SubscribeRecords<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SubscribeRecordsBuilder<subscribe_records_state::Empty, DefaultStr> {
         SubscribeRecordsBuilder::new()
     }
 }
 
-impl<S: BosStr> SubscribeRecordsBuilder<S, subscribe_records_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SubscribeRecords<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SubscribeRecordsBuilder<subscribe_records_state::Empty, S> {
+        SubscribeRecordsBuilder::builder()
+    }
+}
+
+impl SubscribeRecordsBuilder<subscribe_records_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SubscribeRecordsBuilder {
             _state: PhantomData,
@@ -1377,7 +1450,18 @@ impl<S: BosStr> SubscribeRecordsBuilder<S, subscribe_records_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: subscribe_records_state::State> SubscribeRecordsBuilder<S, St> {
+impl<S: BosStr> SubscribeRecordsBuilder<subscribe_records_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SubscribeRecordsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: subscribe_records_state::State, S: BosStr> SubscribeRecordsBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -1390,7 +1474,7 @@ impl<S: BosStr, St: subscribe_records_state::State> SubscribeRecordsBuilder<S, S
     }
 }
 
-impl<S: BosStr, St: subscribe_records_state::State> SubscribeRecordsBuilder<S, St> {
+impl<St: subscribe_records_state::State, S: BosStr> SubscribeRecordsBuilder<St, S> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -1403,7 +1487,7 @@ impl<S: BosStr, St: subscribe_records_state::State> SubscribeRecordsBuilder<S, S
     }
 }
 
-impl<S: BosStr, St: subscribe_records_state::State> SubscribeRecordsBuilder<S, St> {
+impl<St: subscribe_records_state::State, S: BosStr> SubscribeRecordsBuilder<St, S> {
     /// Set the `domain` field (optional)
     pub fn domain(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1416,7 +1500,7 @@ impl<S: BosStr, St: subscribe_records_state::State> SubscribeRecordsBuilder<S, S
     }
 }
 
-impl<S: BosStr, St: subscribe_records_state::State> SubscribeRecordsBuilder<S, St> {
+impl<St: subscribe_records_state::State, S: BosStr> SubscribeRecordsBuilder<St, S> {
     /// Set the `syncToken` field (optional)
     pub fn sync_token(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -1429,7 +1513,7 @@ impl<S: BosStr, St: subscribe_records_state::State> SubscribeRecordsBuilder<S, S
     }
 }
 
-impl<S: BosStr, St> SubscribeRecordsBuilder<S, St>
+impl<St, S: BosStr> SubscribeRecordsBuilder<St, S>
 where
     St: subscribe_records_state::State,
 {

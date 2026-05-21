@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,16 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::at_margin::preferences;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_margin::preferences;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LabelPreference<S: BosStr = DefaultStr> {
     ///The label identifier (e.g. sexual, violence, spam).
     pub label: S,
@@ -96,7 +93,8 @@ impl<S: BosStr> Serialize for LabelPreferenceVisibility<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for LabelPreferenceVisibility<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for LabelPreferenceVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -130,11 +128,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LabelerSubscription<S: BosStr = DefaultStr> {
     ///DID of the labeler service.
     pub did: S,
@@ -289,10 +285,10 @@ impl<S: BosStr> LexiconSchema for Preferences<S> {
 }
 
 fn lexicon_doc_at_margin_preferences() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.margin.preferences"),
@@ -301,38 +297,44 @@ fn lexicon_doc_at_margin_preferences() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("labelPreference"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("labelerDid"),
-                        SmolStr::new_static("label"),
-                        SmolStr::new_static("visibility"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("labelerDid"),
+                            SmolStr::new_static("label"),
+                            SmolStr::new_static("visibility")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("label"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The label identifier (e.g. sexual, violence, spam).",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The label identifier (e.g. sexual, violence, spam).",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("labelerDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "DID of the labeler service.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("DID of the labeler service."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("visibility"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "How to handle content with this label: hide, warn, or ignore.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "How to handle content with this label: hide, warn, or ignore.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -351,9 +353,9 @@ fn lexicon_doc_at_margin_preferences() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "DID of the labeler service.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("DID of the labeler service."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -452,7 +454,7 @@ fn lexicon_doc_at_margin_preferences() -> LexiconDoc<'static> {
 
 pub mod preferences_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -483,7 +485,7 @@ pub mod preferences_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PreferencesBuilder<S: BosStr, St: preferences_state::State> {
+pub struct PreferencesBuilder<St: preferences_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -495,15 +497,22 @@ pub struct PreferencesBuilder<S: BosStr, St: preferences_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Preferences<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PreferencesBuilder<S, preferences_state::Empty> {
+impl Preferences<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PreferencesBuilder<preferences_state::Empty, DefaultStr> {
         PreferencesBuilder::new()
     }
 }
 
-impl<S: BosStr> PreferencesBuilder<S, preferences_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Preferences<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PreferencesBuilder<preferences_state::Empty, S> {
+        PreferencesBuilder::builder()
+    }
+}
+
+impl PreferencesBuilder<preferences_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PreferencesBuilder {
             _state: PhantomData,
@@ -513,7 +522,18 @@ impl<S: BosStr> PreferencesBuilder<S, preferences_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PreferencesBuilder<S, St>
+impl<S: BosStr> PreferencesBuilder<preferences_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PreferencesBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PreferencesBuilder<St, S>
 where
     St: preferences_state::State,
     St::CreatedAt: preferences_state::IsUnset,
@@ -522,7 +542,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PreferencesBuilder<S, preferences_state::SetCreatedAt<St>> {
+    ) -> PreferencesBuilder<preferences_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PreferencesBuilder {
             _state: PhantomData,
@@ -532,9 +552,12 @@ where
     }
 }
 
-impl<S: BosStr, St: preferences_state::State> PreferencesBuilder<S, St> {
+impl<St: preferences_state::State, S: BosStr> PreferencesBuilder<St, S> {
     /// Set the `disableExternalLinkWarning` field (optional)
-    pub fn disable_external_link_warning(mut self, value: impl Into<Option<bool>>) -> Self {
+    pub fn disable_external_link_warning(
+        mut self,
+        value: impl Into<Option<bool>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -545,20 +568,26 @@ impl<S: BosStr, St: preferences_state::State> PreferencesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: preferences_state::State> PreferencesBuilder<S, St> {
+impl<St: preferences_state::State, S: BosStr> PreferencesBuilder<St, S> {
     /// Set the `externalLinkSkippedHostnames` field (optional)
-    pub fn external_link_skipped_hostnames(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn external_link_skipped_hostnames(
+        mut self,
+        value: impl Into<Option<Vec<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `externalLinkSkippedHostnames` field to an Option value (optional)
-    pub fn maybe_external_link_skipped_hostnames(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_external_link_skipped_hostnames(
+        mut self,
+        value: Option<Vec<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
 }
 
-impl<S: BosStr, St: preferences_state::State> PreferencesBuilder<S, St> {
+impl<St: preferences_state::State, S: BosStr> PreferencesBuilder<St, S> {
     /// Set the `labelPreferences` field (optional)
     pub fn label_preferences(
         mut self,
@@ -577,7 +606,7 @@ impl<S: BosStr, St: preferences_state::State> PreferencesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: preferences_state::State> PreferencesBuilder<S, St> {
+impl<St: preferences_state::State, S: BosStr> PreferencesBuilder<St, S> {
     /// Set the `subscribedLabelers` field (optional)
     pub fn subscribed_labelers(
         mut self,
@@ -596,7 +625,7 @@ impl<S: BosStr, St: preferences_state::State> PreferencesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PreferencesBuilder<S, St>
+impl<St, S: BosStr> PreferencesBuilder<St, S>
 where
     St: preferences_state::State,
     St::CreatedAt: preferences_state::IsSet,
@@ -613,7 +642,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Preferences<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Preferences<S> {
         Preferences {
             created_at: self._fields.0.unwrap(),
             disable_external_link_warning: self._fields.1,

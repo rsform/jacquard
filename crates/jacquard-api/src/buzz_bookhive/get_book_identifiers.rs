@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::buzz_bookhive::BookIdentifiers;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::buzz_bookhive::BookIdentifiers;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBookIdentifiers<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub goodreads_id: Option<S>,
@@ -33,11 +30,9 @@ pub struct GetBookIdentifiers<S: BosStr = DefaultStr> {
     pub isbn13: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBookIdentifiersOutput<S: BosStr = DefaultStr> {
     pub book_identifiers: BookIdentifiers<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -70,7 +65,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetBookIdentifiersRequest {
 
 pub mod get_book_identifiers_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -88,21 +83,34 @@ pub mod get_book_identifiers_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetBookIdentifiersBuilder<S: BosStr, St: get_book_identifiers_state::State> {
+pub struct GetBookIdentifiersBuilder<
+    St: get_book_identifiers_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetBookIdentifiers<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetBookIdentifiersBuilder<S, get_book_identifiers_state::Empty> {
+impl GetBookIdentifiers<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetBookIdentifiersBuilder<
+        get_book_identifiers_state::Empty,
+        DefaultStr,
+    > {
         GetBookIdentifiersBuilder::new()
     }
 }
 
-impl<S: BosStr> GetBookIdentifiersBuilder<S, get_book_identifiers_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetBookIdentifiers<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetBookIdentifiersBuilder<get_book_identifiers_state::Empty, S> {
+        GetBookIdentifiersBuilder::builder()
+    }
+}
+
+impl GetBookIdentifiersBuilder<get_book_identifiers_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetBookIdentifiersBuilder {
             _state: PhantomData,
@@ -112,7 +120,18 @@ impl<S: BosStr> GetBookIdentifiersBuilder<S, get_book_identifiers_state::Empty> 
     }
 }
 
-impl<S: BosStr, St: get_book_identifiers_state::State> GetBookIdentifiersBuilder<S, St> {
+impl<S: BosStr> GetBookIdentifiersBuilder<get_book_identifiers_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetBookIdentifiersBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_book_identifiers_state::State, S: BosStr> GetBookIdentifiersBuilder<St, S> {
     /// Set the `goodreadsId` field (optional)
     pub fn goodreads_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -125,7 +144,7 @@ impl<S: BosStr, St: get_book_identifiers_state::State> GetBookIdentifiersBuilder
     }
 }
 
-impl<S: BosStr, St: get_book_identifiers_state::State> GetBookIdentifiersBuilder<S, St> {
+impl<St: get_book_identifiers_state::State, S: BosStr> GetBookIdentifiersBuilder<St, S> {
     /// Set the `hiveId` field (optional)
     pub fn hive_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -138,7 +157,7 @@ impl<S: BosStr, St: get_book_identifiers_state::State> GetBookIdentifiersBuilder
     }
 }
 
-impl<S: BosStr, St: get_book_identifiers_state::State> GetBookIdentifiersBuilder<S, St> {
+impl<St: get_book_identifiers_state::State, S: BosStr> GetBookIdentifiersBuilder<St, S> {
     /// Set the `isbn` field (optional)
     pub fn isbn(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -151,7 +170,7 @@ impl<S: BosStr, St: get_book_identifiers_state::State> GetBookIdentifiersBuilder
     }
 }
 
-impl<S: BosStr, St: get_book_identifiers_state::State> GetBookIdentifiersBuilder<S, St> {
+impl<St: get_book_identifiers_state::State, S: BosStr> GetBookIdentifiersBuilder<St, S> {
     /// Set the `isbn13` field (optional)
     pub fn isbn13(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -164,7 +183,7 @@ impl<S: BosStr, St: get_book_identifiers_state::State> GetBookIdentifiersBuilder
     }
 }
 
-impl<S: BosStr, St> GetBookIdentifiersBuilder<S, St>
+impl<St, S: BosStr> GetBookIdentifiersBuilder<St, S>
 where
     St: get_book_identifiers_state::State,
 {

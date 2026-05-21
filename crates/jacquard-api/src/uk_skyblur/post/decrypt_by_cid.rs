@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Cid, Did, UriValue};
+use jacquard_common::types::string::{Did, Cid, UriValue};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DecryptByCid<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub password: S,
@@ -34,10 +31,7 @@ pub struct DecryptByCid<S: BosStr = DefaultStr> {
 /// Returns the encrypted result.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DecryptByCidOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional: Option<S>,
@@ -59,8 +53,9 @@ impl jacquard_common::xrpc::XrpcResp for DecryptByCidResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DecryptByCid<S> {
     const NSID: &'static str = "uk.skyblur.post.decryptByCid";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DecryptByCidResponse;
 }
 
@@ -68,15 +63,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DecryptByCid<S> {
 pub struct DecryptByCidRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DecryptByCidRequest {
     const PATH: &'static str = "/xrpc/uk.skyblur.post.decryptByCid";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DecryptByCid<S>;
     type Response = DecryptByCidResponse;
 }
 
 pub mod decrypt_by_cid_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -84,91 +80,93 @@ pub mod decrypt_by_cid_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Pds;
         type Repo;
         type Password;
         type Cid;
-        type Pds;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Pds = Unset;
         type Repo = Unset;
         type Password = Unset;
         type Cid = Unset;
-        type Pds = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Repo = Set<members::repo>;
-        type Password = St::Password;
-        type Cid = St::Cid;
-        type Pds = St::Pds;
-    }
-    ///State transition - sets the `password` field to Set
-    pub struct SetPassword<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPassword<St> {}
-    impl<St: State> State for SetPassword<St> {
-        type Repo = St::Repo;
-        type Password = Set<members::password>;
-        type Cid = St::Cid;
-        type Pds = St::Pds;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Repo = St::Repo;
-        type Password = St::Password;
-        type Cid = Set<members::cid>;
-        type Pds = St::Pds;
     }
     ///State transition - sets the `pds` field to Set
     pub struct SetPds<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPds<St> {}
     impl<St: State> State for SetPds<St> {
+        type Pds = Set<members::pds>;
         type Repo = St::Repo;
         type Password = St::Password;
         type Cid = St::Cid;
-        type Pds = Set<members::pds>;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Pds = St::Pds;
+        type Repo = Set<members::repo>;
+        type Password = St::Password;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `password` field to Set
+    pub struct SetPassword<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPassword<St> {}
+    impl<St: State> State for SetPassword<St> {
+        type Pds = St::Pds;
+        type Repo = St::Repo;
+        type Password = Set<members::password>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Pds = St::Pds;
+        type Repo = St::Repo;
+        type Password = St::Password;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `pds` field
+        pub struct pds(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `password` field
         pub struct password(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `pds` field
-        pub struct pds(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DecryptByCidBuilder<S: BosStr, St: decrypt_by_cid_state::State> {
+pub struct DecryptByCidBuilder<St: decrypt_by_cid_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Cid<S>>,
-        Option<S>,
-        Option<UriValue<S>>,
-        Option<Did<S>>,
-    ),
+    _fields: (Option<Cid<S>>, Option<S>, Option<UriValue<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DecryptByCid<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DecryptByCidBuilder<S, decrypt_by_cid_state::Empty> {
+impl DecryptByCid<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DecryptByCidBuilder<decrypt_by_cid_state::Empty, DefaultStr> {
         DecryptByCidBuilder::new()
     }
 }
 
-impl<S: BosStr> DecryptByCidBuilder<S, decrypt_by_cid_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DecryptByCid<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DecryptByCidBuilder<decrypt_by_cid_state::Empty, S> {
+        DecryptByCidBuilder::builder()
+    }
+}
+
+impl DecryptByCidBuilder<decrypt_by_cid_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DecryptByCidBuilder {
             _state: PhantomData,
@@ -178,7 +176,18 @@ impl<S: BosStr> DecryptByCidBuilder<S, decrypt_by_cid_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DecryptByCidBuilder<S, St>
+impl<S: BosStr> DecryptByCidBuilder<decrypt_by_cid_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DecryptByCidBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DecryptByCidBuilder<St, S>
 where
     St: decrypt_by_cid_state::State,
     St::Cid: decrypt_by_cid_state::IsUnset,
@@ -187,7 +196,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> DecryptByCidBuilder<S, decrypt_by_cid_state::SetCid<St>> {
+    ) -> DecryptByCidBuilder<decrypt_by_cid_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DecryptByCidBuilder {
             _state: PhantomData,
@@ -197,7 +206,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DecryptByCidBuilder<S, St>
+impl<St, S: BosStr> DecryptByCidBuilder<St, S>
 where
     St: decrypt_by_cid_state::State,
     St::Password: decrypt_by_cid_state::IsUnset,
@@ -206,7 +215,7 @@ where
     pub fn password(
         mut self,
         value: impl Into<S>,
-    ) -> DecryptByCidBuilder<S, decrypt_by_cid_state::SetPassword<St>> {
+    ) -> DecryptByCidBuilder<decrypt_by_cid_state::SetPassword<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DecryptByCidBuilder {
             _state: PhantomData,
@@ -216,7 +225,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DecryptByCidBuilder<S, St>
+impl<St, S: BosStr> DecryptByCidBuilder<St, S>
 where
     St: decrypt_by_cid_state::State,
     St::Pds: decrypt_by_cid_state::IsUnset,
@@ -225,7 +234,7 @@ where
     pub fn pds(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> DecryptByCidBuilder<S, decrypt_by_cid_state::SetPds<St>> {
+    ) -> DecryptByCidBuilder<decrypt_by_cid_state::SetPds<St>, S> {
         self._fields.2 = Option::Some(value.into());
         DecryptByCidBuilder {
             _state: PhantomData,
@@ -235,7 +244,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DecryptByCidBuilder<S, St>
+impl<St, S: BosStr> DecryptByCidBuilder<St, S>
 where
     St: decrypt_by_cid_state::State,
     St::Repo: decrypt_by_cid_state::IsUnset,
@@ -244,7 +253,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> DecryptByCidBuilder<S, decrypt_by_cid_state::SetRepo<St>> {
+    ) -> DecryptByCidBuilder<decrypt_by_cid_state::SetRepo<St>, S> {
         self._fields.3 = Option::Some(value.into());
         DecryptByCidBuilder {
             _state: PhantomData,
@@ -254,13 +263,13 @@ where
     }
 }
 
-impl<S: BosStr, St> DecryptByCidBuilder<S, St>
+impl<St, S: BosStr> DecryptByCidBuilder<St, S>
 where
     St: decrypt_by_cid_state::State,
+    St::Pds: decrypt_by_cid_state::IsSet,
     St::Repo: decrypt_by_cid_state::IsSet,
     St::Password: decrypt_by_cid_state::IsSet,
     St::Cid: decrypt_by_cid_state::IsSet,
-    St::Pds: decrypt_by_cid_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DecryptByCid<S> {
@@ -273,7 +282,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DecryptByCid<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DecryptByCid<S> {
         DecryptByCid {
             cid: self._fields.0.unwrap(),
             password: self._fields.1.unwrap(),

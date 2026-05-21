@@ -8,12 +8,13 @@
 pub mod episode;
 pub mod favorite;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,7 +31,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A recurring open mic show series.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -53,6 +54,7 @@ pub struct Show<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ShowSchedule<S: BosStr = DefaultStr> {
@@ -214,16 +216,19 @@ impl<S: BosStr> LexiconSchema for Show<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("cover_art"),
@@ -260,7 +265,7 @@ impl<S: BosStr> LexiconSchema for Show<S> {
 
 pub mod show_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -268,72 +273,72 @@ pub mod show_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Artist;
         type CreatedAt;
+        type Title;
         type Schedule;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Artist = Unset;
         type CreatedAt = Unset;
+        type Title = Unset;
         type Schedule = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type Artist = St::Artist;
-        type CreatedAt = St::CreatedAt;
-        type Schedule = St::Schedule;
     }
     ///State transition - sets the `artist` field to Set
     pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetArtist<St> {}
     impl<St: State> State for SetArtist<St> {
-        type Title = St::Title;
         type Artist = Set<members::artist>;
         type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
         type Schedule = St::Schedule;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Title = St::Title;
         type Artist = St::Artist;
         type CreatedAt = Set<members::created_at>;
+        type Title = St::Title;
+        type Schedule = St::Schedule;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Artist = St::Artist;
+        type CreatedAt = St::CreatedAt;
+        type Title = Set<members::title>;
         type Schedule = St::Schedule;
     }
     ///State transition - sets the `schedule` field to Set
     pub struct SetSchedule<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSchedule<St> {}
     impl<St: State> State for SetSchedule<St> {
-        type Title = St::Title;
         type Artist = St::Artist;
         type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
         type Schedule = Set<members::schedule>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `artist` field
         pub struct artist(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `schedule` field
         pub struct schedule(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ShowBuilder<S: BosStr, St: show_state::State> {
+pub struct ShowBuilder<St: show_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
@@ -346,15 +351,22 @@ pub struct ShowBuilder<S: BosStr, St: show_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Show<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ShowBuilder<S, show_state::Empty> {
+impl Show<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ShowBuilder<show_state::Empty, DefaultStr> {
         ShowBuilder::new()
     }
 }
 
-impl<S: BosStr> ShowBuilder<S, show_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Show<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ShowBuilder<show_state::Empty, S> {
+        ShowBuilder::builder()
+    }
+}
+
+impl ShowBuilder<show_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ShowBuilder {
             _state: PhantomData,
@@ -364,7 +376,18 @@ impl<S: BosStr> ShowBuilder<S, show_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ShowBuilder<S, St>
+impl<S: BosStr> ShowBuilder<show_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ShowBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ShowBuilder<St, S>
 where
     St: show_state::State,
     St::Artist: show_state::IsUnset,
@@ -373,7 +396,7 @@ where
     pub fn artist(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ShowBuilder<S, show_state::SetArtist<St>> {
+    ) -> ShowBuilder<show_state::SetArtist<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ShowBuilder {
             _state: PhantomData,
@@ -383,7 +406,7 @@ where
     }
 }
 
-impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
+impl<St: show_state::State, S: BosStr> ShowBuilder<St, S> {
     /// Set the `coverArt` field (optional)
     pub fn cover_art(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -396,7 +419,7 @@ impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ShowBuilder<S, St>
+impl<St, S: BosStr> ShowBuilder<St, S>
 where
     St: show_state::State,
     St::CreatedAt: show_state::IsUnset,
@@ -405,7 +428,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ShowBuilder<S, show_state::SetCreatedAt<St>> {
+    ) -> ShowBuilder<show_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ShowBuilder {
             _state: PhantomData,
@@ -415,7 +438,7 @@ where
     }
 }
 
-impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
+impl<St: show_state::State, S: BosStr> ShowBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -428,7 +451,7 @@ impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ShowBuilder<S, St>
+impl<St, S: BosStr> ShowBuilder<St, S>
 where
     St: show_state::State,
     St::Schedule: show_state::IsUnset,
@@ -437,7 +460,7 @@ where
     pub fn schedule(
         mut self,
         value: impl Into<ShowSchedule<S>>,
-    ) -> ShowBuilder<S, show_state::SetSchedule<St>> {
+    ) -> ShowBuilder<show_state::SetSchedule<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ShowBuilder {
             _state: PhantomData,
@@ -447,13 +470,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ShowBuilder<S, St>
+impl<St, S: BosStr> ShowBuilder<St, S>
 where
     St: show_state::State,
     St::Title: show_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> ShowBuilder<S, show_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> ShowBuilder<show_state::SetTitle<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ShowBuilder {
             _state: PhantomData,
@@ -463,12 +489,12 @@ where
     }
 }
 
-impl<S: BosStr, St> ShowBuilder<S, St>
+impl<St, S: BosStr> ShowBuilder<St, S>
 where
     St: show_state::State,
-    St::Title: show_state::IsSet,
     St::Artist: show_state::IsSet,
     St::CreatedAt: show_state::IsSet,
+    St::Title: show_state::IsSet,
     St::Schedule: show_state::IsSet,
 {
     /// Build the final struct.
@@ -498,10 +524,10 @@ where
 }
 
 fn lexicon_doc_haus_opn_mic_show() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("haus.opn.mic.show"),
@@ -510,33 +536,36 @@ fn lexicon_doc_haus_opn_mic_show() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A recurring open mic show series.")),
+                    description: Some(
+                        CowStr::new_static("A recurring open mic show series."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("artist"),
-                            SmolStr::new_static("schedule"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"), SmolStr::new_static("artist"),
+                                SmolStr::new_static("schedule"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("artist"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The AT-URI of the haus.opn.mic.artist record.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The AT-URI of the haus.opn.mic.artist record.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("coverArt"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),

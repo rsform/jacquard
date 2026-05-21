@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Nsid};
+use jacquard_common::types::string::{AtUri, Nsid, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,13 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::labeler::LabelerPolicies;
 use crate::com_atproto::label::SelfLabels;
 use crate::com_atproto::moderation::ReasonType;
 use crate::com_atproto::moderation::SubjectType;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A declaration of the existence of labeler service.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -119,7 +119,7 @@ impl<S: BosStr> LexiconSchema for Service<S> {
 
 pub mod service_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -127,42 +127,42 @@ pub mod service_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Policies;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Policies = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Policies = St::Policies;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `policies` field to Set
     pub struct SetPolicies<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPolicies<St> {}
     impl<St: State> State for SetPolicies<St> {
-        type CreatedAt = St::CreatedAt;
         type Policies = Set<members::policies>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Policies = St::Policies;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `policies` field
         pub struct policies(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ServiceBuilder<S: BosStr, St: service_state::State> {
+pub struct ServiceBuilder<St: service_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -175,15 +175,22 @@ pub struct ServiceBuilder<S: BosStr, St: service_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Service<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ServiceBuilder<S, service_state::Empty> {
+impl Service<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ServiceBuilder<service_state::Empty, DefaultStr> {
         ServiceBuilder::new()
     }
 }
 
-impl<S: BosStr> ServiceBuilder<S, service_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Service<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ServiceBuilder<service_state::Empty, S> {
+        ServiceBuilder::builder()
+    }
+}
+
+impl ServiceBuilder<service_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ServiceBuilder {
             _state: PhantomData,
@@ -193,7 +200,18 @@ impl<S: BosStr> ServiceBuilder<S, service_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ServiceBuilder<S, St>
+impl<S: BosStr> ServiceBuilder<service_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ServiceBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ServiceBuilder<St, S>
 where
     St: service_state::State,
     St::CreatedAt: service_state::IsUnset,
@@ -202,7 +220,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ServiceBuilder<S, service_state::SetCreatedAt<St>> {
+    ) -> ServiceBuilder<service_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ServiceBuilder {
             _state: PhantomData,
@@ -212,7 +230,7 @@ where
     }
 }
 
-impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
+impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -225,7 +243,7 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ServiceBuilder<S, St>
+impl<St, S: BosStr> ServiceBuilder<St, S>
 where
     St: service_state::State,
     St::Policies: service_state::IsUnset,
@@ -234,7 +252,7 @@ where
     pub fn policies(
         mut self,
         value: impl Into<LabelerPolicies<S>>,
-    ) -> ServiceBuilder<S, service_state::SetPolicies<St>> {
+    ) -> ServiceBuilder<service_state::SetPolicies<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ServiceBuilder {
             _state: PhantomData,
@@ -244,7 +262,7 @@ where
     }
 }
 
-impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
+impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `reasonTypes` field (optional)
     pub fn reason_types(mut self, value: impl Into<Option<Vec<ReasonType<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -257,9 +275,12 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
+impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `subjectCollections` field (optional)
-    pub fn subject_collections(mut self, value: impl Into<Option<Vec<Nsid<S>>>>) -> Self {
+    pub fn subject_collections(
+        mut self,
+        value: impl Into<Option<Vec<Nsid<S>>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -270,9 +291,12 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
+impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `subjectTypes` field (optional)
-    pub fn subject_types(mut self, value: impl Into<Option<Vec<SubjectType<S>>>>) -> Self {
+    pub fn subject_types(
+        mut self,
+        value: impl Into<Option<Vec<SubjectType<S>>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -283,11 +307,11 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ServiceBuilder<S, St>
+impl<St, S: BosStr> ServiceBuilder<St, S>
 where
     St: service_state::State,
-    St::CreatedAt: service_state::IsSet,
     St::Policies: service_state::IsSet,
+    St::CreatedAt: service_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Service<S> {
@@ -316,10 +340,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_labeler_service() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.labeler.service"),

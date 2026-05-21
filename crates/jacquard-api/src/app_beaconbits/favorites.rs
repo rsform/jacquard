@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A list of favorited user DIDs (legacy singleton record).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -117,7 +117,7 @@ impl<S: BosStr> LexiconSchema for Favorites<S> {
 
 pub mod favorites_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -160,21 +160,28 @@ pub mod favorites_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FavoritesBuilder<S: BosStr, St: favorites_state::State> {
+pub struct FavoritesBuilder<St: favorites_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Did<S>>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Favorites<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FavoritesBuilder<S, favorites_state::Empty> {
+impl Favorites<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FavoritesBuilder<favorites_state::Empty, DefaultStr> {
         FavoritesBuilder::new()
     }
 }
 
-impl<S: BosStr> FavoritesBuilder<S, favorites_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Favorites<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FavoritesBuilder<favorites_state::Empty, S> {
+        FavoritesBuilder::builder()
+    }
+}
+
+impl FavoritesBuilder<favorites_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FavoritesBuilder {
             _state: PhantomData,
@@ -184,7 +191,18 @@ impl<S: BosStr> FavoritesBuilder<S, favorites_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FavoritesBuilder<S, St>
+impl<S: BosStr> FavoritesBuilder<favorites_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FavoritesBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FavoritesBuilder<St, S>
 where
     St: favorites_state::State,
     St::Dids: favorites_state::IsUnset,
@@ -193,7 +211,7 @@ where
     pub fn dids(
         mut self,
         value: impl Into<Vec<Did<S>>>,
-    ) -> FavoritesBuilder<S, favorites_state::SetDids<St>> {
+    ) -> FavoritesBuilder<favorites_state::SetDids<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FavoritesBuilder {
             _state: PhantomData,
@@ -203,7 +221,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FavoritesBuilder<S, St>
+impl<St, S: BosStr> FavoritesBuilder<St, S>
 where
     St: favorites_state::State,
     St::UpdatedAt: favorites_state::IsUnset,
@@ -212,7 +230,7 @@ where
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FavoritesBuilder<S, favorites_state::SetUpdatedAt<St>> {
+    ) -> FavoritesBuilder<favorites_state::SetUpdatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FavoritesBuilder {
             _state: PhantomData,
@@ -222,7 +240,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FavoritesBuilder<S, St>
+impl<St, S: BosStr> FavoritesBuilder<St, S>
 where
     St: favorites_state::State,
     St::Dids: favorites_state::IsSet,
@@ -237,7 +255,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Favorites<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Favorites<S> {
         Favorites {
             dids: self._fields.0.unwrap(),
             updated_at: self._fields.1.unwrap(),
@@ -247,10 +268,10 @@ where
 }
 
 fn lexicon_doc_app_beaconbits_favorites() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.beaconbits.favorites"),
@@ -259,24 +280,28 @@ fn lexicon_doc_app_beaconbits_favorites() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A list of favorited user DIDs (legacy singleton record).",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A list of favorited user DIDs (legacy singleton record).",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("dids"),
-                            SmolStr::new_static("updatedAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("dids"),
+                                SmolStr::new_static("updatedAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("dids"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "List of favorited user DIDs",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("List of favorited user DIDs"),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         format: Some(LexStringFormat::Did),
                                         ..Default::default()
@@ -288,9 +313,11 @@ fn lexicon_doc_app_beaconbits_favorites() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("updatedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the favorites list was last updated",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp when the favorites list was last updated",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

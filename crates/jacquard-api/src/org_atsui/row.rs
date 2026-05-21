@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Row<S: BosStr = DefaultStr> {
     ///Cross-axis (vertical) alignment of children.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -307,11 +304,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RowOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -330,8 +325,9 @@ impl jacquard_common::xrpc::XrpcResp for RowResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Row<S> {
     const NSID: &'static str = "org.atsui.Row";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RowResponse;
 }
 
@@ -339,15 +335,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Row<S> {
 pub struct RowRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RowRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Row";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Row<S>;
     type Response = RowResponse;
 }
 
 pub mod row_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -378,7 +375,7 @@ pub mod row_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RowBuilder<S: BosStr, St: row_state::State> {
+pub struct RowBuilder<St: row_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<RowAlign<S>>,
@@ -392,15 +389,22 @@ pub struct RowBuilder<S: BosStr, St: row_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Row<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RowBuilder<S, row_state::Empty> {
+impl Row<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RowBuilder<row_state::Empty, DefaultStr> {
         RowBuilder::new()
     }
 }
 
-impl<S: BosStr> RowBuilder<S, row_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Row<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RowBuilder<row_state::Empty, S> {
+        RowBuilder::builder()
+    }
+}
+
+impl RowBuilder<row_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RowBuilder {
             _state: PhantomData,
@@ -410,7 +414,18 @@ impl<S: BosStr> RowBuilder<S, row_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: row_state::State> RowBuilder<S, St> {
+impl<S: BosStr> RowBuilder<row_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RowBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: row_state::State, S: BosStr> RowBuilder<St, S> {
     /// Set the `align` field (optional)
     pub fn align(mut self, value: impl Into<Option<RowAlign<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -423,7 +438,7 @@ impl<S: BosStr, St: row_state::State> RowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RowBuilder<S, St>
+impl<St, S: BosStr> RowBuilder<St, S>
 where
     St: row_state::State,
     St::Children: row_state::IsUnset,
@@ -432,7 +447,7 @@ where
     pub fn children(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> RowBuilder<S, row_state::SetChildren<St>> {
+    ) -> RowBuilder<row_state::SetChildren<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RowBuilder {
             _state: PhantomData,
@@ -442,7 +457,7 @@ where
     }
 }
 
-impl<S: BosStr, St: row_state::State> RowBuilder<S, St> {
+impl<St: row_state::State, S: BosStr> RowBuilder<St, S> {
     /// Set the `gap` field (optional)
     pub fn gap(mut self, value: impl Into<Option<RowGap<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -455,7 +470,7 @@ impl<S: BosStr, St: row_state::State> RowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: row_state::State> RowBuilder<S, St> {
+impl<St: row_state::State, S: BosStr> RowBuilder<St, S> {
     /// Set the `inset` field (optional)
     pub fn inset(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -468,7 +483,7 @@ impl<S: BosStr, St: row_state::State> RowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: row_state::State> RowBuilder<S, St> {
+impl<St: row_state::State, S: BosStr> RowBuilder<St, S> {
     /// Set the `justify` field (optional)
     pub fn justify(mut self, value: impl Into<Option<RowJustify<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -481,7 +496,7 @@ impl<S: BosStr, St: row_state::State> RowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: row_state::State> RowBuilder<S, St> {
+impl<St: row_state::State, S: BosStr> RowBuilder<St, S> {
     /// Set the `opaque` field (optional)
     pub fn opaque(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.5 = value.into();
@@ -494,7 +509,7 @@ impl<S: BosStr, St: row_state::State> RowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: row_state::State> RowBuilder<S, St> {
+impl<St: row_state::State, S: BosStr> RowBuilder<St, S> {
     /// Set the `sticky` field (optional)
     pub fn sticky(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.6 = value.into();
@@ -507,7 +522,7 @@ impl<S: BosStr, St: row_state::State> RowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RowBuilder<S, St>
+impl<St, S: BosStr> RowBuilder<St, S>
 where
     St: row_state::State,
     St::Children: row_state::IsSet,

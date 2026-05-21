@@ -123,21 +123,28 @@ pub mod foo_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FooBuilder<S: BosStr, St: foo_state::State> {
+pub struct FooBuilder<St: foo_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Foo<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FooBuilder<S, foo_state::Empty> {
+impl Foo<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FooBuilder<foo_state::Empty, DefaultStr> {
         FooBuilder::new()
     }
 }
 
-impl<S: BosStr> FooBuilder<S, foo_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Foo<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FooBuilder<foo_state::Empty, S> {
+        FooBuilder::builder()
+    }
+}
+
+impl FooBuilder<foo_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FooBuilder {
             _state: PhantomData,
@@ -147,7 +154,18 @@ impl<S: BosStr> FooBuilder<S, foo_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: foo_state::State> FooBuilder<S, St> {
+impl<S: BosStr> FooBuilder<foo_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FooBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: foo_state::State, S: BosStr> FooBuilder<St, S> {
     /// Set the `label` field (optional)
     pub fn label(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -160,7 +178,7 @@ impl<S: BosStr, St: foo_state::State> FooBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> FooBuilder<S, St>
+impl<St, S: BosStr> FooBuilder<St, S>
 where
     St: foo_state::State,
     St::LocalId: foo_state::IsUnset,
@@ -169,7 +187,7 @@ where
     pub fn local_id(
         mut self,
         value: impl Into<i64>,
-    ) -> FooBuilder<S, foo_state::SetLocalId<St>> {
+    ) -> FooBuilder<foo_state::SetLocalId<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FooBuilder {
             _state: PhantomData,
@@ -179,7 +197,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FooBuilder<S, St>
+impl<St, S: BosStr> FooBuilder<St, S>
 where
     St: foo_state::State,
     St::LocalId: foo_state::IsSet,
@@ -333,21 +351,28 @@ pub mod collision_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollisionBuilder<S: BosStr, St: collision_state::State> {
+pub struct CollisionBuilder<St: collision_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<test_ns1::Foo<S>>, Option<collision::Foo<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Collision<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CollisionBuilder<S, collision_state::Empty> {
+impl Collision<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CollisionBuilder<collision_state::Empty, DefaultStr> {
         CollisionBuilder::new()
     }
 }
 
-impl<S: BosStr> CollisionBuilder<S, collision_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Collision<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CollisionBuilder<collision_state::Empty, S> {
+        CollisionBuilder::builder()
+    }
+}
+
+impl CollisionBuilder<collision_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CollisionBuilder {
             _state: PhantomData,
@@ -357,7 +382,18 @@ impl<S: BosStr> CollisionBuilder<S, collision_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CollisionBuilder<S, St>
+impl<S: BosStr> CollisionBuilder<collision_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CollisionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CollisionBuilder<St, S>
 where
     St: collision_state::State,
     St::ExternalFoo: collision_state::IsUnset,
@@ -366,7 +402,7 @@ where
     pub fn external_foo(
         mut self,
         value: impl Into<test_ns1::Foo<S>>,
-    ) -> CollisionBuilder<S, collision_state::SetExternalFoo<St>> {
+    ) -> CollisionBuilder<collision_state::SetExternalFoo<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CollisionBuilder {
             _state: PhantomData,
@@ -376,7 +412,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CollisionBuilder<S, St>
+impl<St, S: BosStr> CollisionBuilder<St, S>
 where
     St: collision_state::State,
     St::LocalFoo: collision_state::IsUnset,
@@ -385,7 +421,7 @@ where
     pub fn local_foo(
         mut self,
         value: impl Into<collision::Foo<S>>,
-    ) -> CollisionBuilder<S, collision_state::SetLocalFoo<St>> {
+    ) -> CollisionBuilder<collision_state::SetLocalFoo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CollisionBuilder {
             _state: PhantomData,
@@ -395,7 +431,7 @@ where
     }
 }
 
-impl<S: BosStr, St: collision_state::State> CollisionBuilder<S, St> {
+impl<St: collision_state::State, S: BosStr> CollisionBuilder<St, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -408,7 +444,7 @@ impl<S: BosStr, St: collision_state::State> CollisionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CollisionBuilder<S, St>
+impl<St, S: BosStr> CollisionBuilder<St, S>
 where
     St: collision_state::State,
     St::LocalFoo: collision_state::IsSet,

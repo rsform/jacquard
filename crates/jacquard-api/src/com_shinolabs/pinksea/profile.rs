@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::com_shinolabs::pinksea::profile;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::com_shinolabs::pinksea::profile;
 /// A profile of a PinkSea user.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -66,11 +66,9 @@ pub struct ProfileGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Profile<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileLink<S: BosStr = DefaultStr> {
     ///The URL of the link.
     pub link: UriValue<S>,
@@ -223,7 +221,7 @@ impl<S: BosStr> LexiconSchema for ProfileLink<S> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -241,7 +239,7 @@ pub mod profile_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
+pub struct ProfileBuilder<St: profile_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<StrongRef<S>>,
@@ -252,15 +250,22 @@ pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Profile<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProfileBuilder<S, profile_state::Empty> {
+impl Profile<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProfileBuilder<profile_state::Empty, DefaultStr> {
         ProfileBuilder::new()
     }
 }
 
-impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Profile<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProfileBuilder<profile_state::Empty, S> {
+        ProfileBuilder::builder()
+    }
+}
+
+impl ProfileBuilder<profile_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
@@ -270,7 +275,18 @@ impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProfileBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -283,7 +299,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `bio` field (optional)
     pub fn bio(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -296,9 +312,12 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `links` field (optional)
-    pub fn links(mut self, value: impl Into<Option<Vec<profile::ProfileLink<S>>>>) -> Self {
+    pub fn links(
+        mut self,
+        value: impl Into<Option<Vec<profile::ProfileLink<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -309,7 +328,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `nickname` field (optional)
     pub fn nickname(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -322,7 +341,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
 {
@@ -349,10 +368,10 @@ where
 }
 
 fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.shinolabs.pinksea.profile"),
@@ -361,7 +380,9 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A profile of a PinkSea user.")),
+                    description: Some(
+                        CowStr::new_static("A profile of a PinkSea user."),
+                    ),
                     record: LexRecordRecord::Object(LexObject {
                         properties: {
                             #[allow(unused_mut)]
@@ -376,7 +397,9 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("bio"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("The bio of the user.")),
+                                    description: Some(
+                                        CowStr::new_static("The bio of the user."),
+                                    ),
                                     max_length: Some(2400usize),
                                     max_graphemes: Some(240usize),
                                     ..Default::default()
@@ -385,9 +408,11 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("links"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "The links to outside platforms for this user",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The links to outside platforms for this user",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#profileLink"),
                                         ..Default::default()
@@ -399,9 +424,9 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("nickname"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The display name of the user.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The display name of the user."),
+                                    ),
                                     max_length: Some(640usize),
                                     max_graphemes: Some(64usize),
                                     ..Default::default()
@@ -417,17 +442,18 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("profileLink"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("link"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("link")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("link"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URL of the link.")),
+                                description: Some(
+                                    CowStr::new_static("The URL of the link."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -435,7 +461,9 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The name of the link.")),
+                                description: Some(
+                                    CowStr::new_static("The name of the link."),
+                                ),
                                 max_length: Some(500usize),
                                 max_graphemes: Some(50usize),
                                 ..Default::default()
@@ -454,7 +482,7 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
 
 pub mod profile_link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -462,56 +490,63 @@ pub mod profile_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Link;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Link = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Link = St::Link;
+        type Name = Unset;
     }
     ///State transition - sets the `link` field to Set
     pub struct SetLink<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLink<St> {}
     impl<St: State> State for SetLink<St> {
-        type Name = St::Name;
         type Link = Set<members::link>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Link = St::Link;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `link` field
         pub struct link(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileLinkBuilder<S: BosStr, St: profile_link_state::State> {
+pub struct ProfileLinkBuilder<St: profile_link_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ProfileLink<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProfileLinkBuilder<S, profile_link_state::Empty> {
+impl ProfileLink<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProfileLinkBuilder<profile_link_state::Empty, DefaultStr> {
         ProfileLinkBuilder::new()
     }
 }
 
-impl<S: BosStr> ProfileLinkBuilder<S, profile_link_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ProfileLink<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProfileLinkBuilder<profile_link_state::Empty, S> {
+        ProfileLinkBuilder::builder()
+    }
+}
+
+impl ProfileLinkBuilder<profile_link_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProfileLinkBuilder {
             _state: PhantomData,
@@ -521,7 +556,18 @@ impl<S: BosStr> ProfileLinkBuilder<S, profile_link_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ProfileLinkBuilder<S, St>
+impl<S: BosStr> ProfileLinkBuilder<profile_link_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProfileLinkBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ProfileLinkBuilder<St, S>
 where
     St: profile_link_state::State,
     St::Link: profile_link_state::IsUnset,
@@ -530,7 +576,7 @@ where
     pub fn link(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ProfileLinkBuilder<S, profile_link_state::SetLink<St>> {
+    ) -> ProfileLinkBuilder<profile_link_state::SetLink<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ProfileLinkBuilder {
             _state: PhantomData,
@@ -540,7 +586,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileLinkBuilder<S, St>
+impl<St, S: BosStr> ProfileLinkBuilder<St, S>
 where
     St: profile_link_state::State,
     St::Name: profile_link_state::IsUnset,
@@ -549,7 +595,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ProfileLinkBuilder<S, profile_link_state::SetName<St>> {
+    ) -> ProfileLinkBuilder<profile_link_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ProfileLinkBuilder {
             _state: PhantomData,
@@ -559,11 +605,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileLinkBuilder<S, St>
+impl<St, S: BosStr> ProfileLinkBuilder<St, S>
 where
     St: profile_link_state::State,
-    St::Name: profile_link_state::IsSet,
     St::Link: profile_link_state::IsSet,
+    St::Name: profile_link_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ProfileLink<S> {
@@ -574,7 +620,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileLink<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProfileLink<S> {
         ProfileLink {
             link: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

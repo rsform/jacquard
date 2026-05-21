@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Nsid};
+use jacquard_common::types::string::{AtUri, Nsid, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -25,20 +25,17 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::garden_lexicon::exultant_zebra::masl::Masl;
 use crate::garden_lexicon::exultant_zebra::masl::Resource;
 use crate::garden_lexicon::exultant_zebra::tile;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// Declares the AT Protocol interactions a tile performs. Methods listed here gate which XRPC calls the tile is allowed to attempt (the user must still grant per-method consent). Collections and services are informational metadata for display and auditing.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Interactions<S: BosStr = DefaultStr> {
     ///Repository collection NSIDs this tile reads from or writes to.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -183,6 +180,7 @@ where
     }
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -207,10 +205,7 @@ pub struct TileGetRecordOutput<S: BosStr = DefaultStr> {
 /// Declares an input parameter for a tile, similar to XRPC query parameters.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Param<S: BosStr = DefaultStr> {
     ///Default value for this parameter, encoded as a string.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -397,20 +392,25 @@ impl<S: BosStr> LexiconSchema for Tile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("icon"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -432,20 +432,25 @@ impl<S: BosStr> LexiconSchema for Tile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("loading_image"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -492,10 +497,10 @@ impl<S: BosStr> LexiconSchema for Param<S> {
 }
 
 fn lexicon_doc_garden_lexicon_exultant_zebra_tile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.lexicon.exultant-zebra.tile"),
@@ -754,7 +759,7 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_tile() -> LexiconDoc<'static> {
 
 pub mod tile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -797,7 +802,7 @@ pub mod tile_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TileBuilder<S: BosStr, St: tile_state::State> {
+pub struct TileBuilder<St: tile_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<TileAspectRatio<S>>,
@@ -813,15 +818,22 @@ pub struct TileBuilder<S: BosStr, St: tile_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Tile<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TileBuilder<S, tile_state::Empty> {
+impl Tile<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TileBuilder<tile_state::Empty, DefaultStr> {
         TileBuilder::new()
     }
 }
 
-impl<S: BosStr> TileBuilder<S, tile_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Tile<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TileBuilder<tile_state::Empty, S> {
+        TileBuilder::builder()
+    }
+}
+
+impl TileBuilder<tile_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TileBuilder {
             _state: PhantomData,
@@ -831,7 +843,18 @@ impl<S: BosStr> TileBuilder<S, tile_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
+impl<S: BosStr> TileBuilder<tile_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TileBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: tile_state::State, S: BosStr> TileBuilder<St, S> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(mut self, value: impl Into<Option<TileAspectRatio<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -844,7 +867,7 @@ impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TileBuilder<S, St>
+impl<St, S: BosStr> TileBuilder<St, S>
 where
     St: tile_state::State,
     St::Content: tile_state::IsUnset,
@@ -853,7 +876,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<TileContent<S>>,
-    ) -> TileBuilder<S, tile_state::SetContent<St>> {
+    ) -> TileBuilder<tile_state::SetContent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TileBuilder {
             _state: PhantomData,
@@ -863,7 +886,7 @@ where
     }
 }
 
-impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
+impl<St: tile_state::State, S: BosStr> TileBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -876,7 +899,7 @@ impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
+impl<St: tile_state::State, S: BosStr> TileBuilder<St, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -889,7 +912,7 @@ impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
+impl<St: tile_state::State, S: BosStr> TileBuilder<St, S> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -902,9 +925,12 @@ impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
+impl<St: tile_state::State, S: BosStr> TileBuilder<St, S> {
     /// Set the `interactions` field (optional)
-    pub fn interactions(mut self, value: impl Into<Option<tile::Interactions<S>>>) -> Self {
+    pub fn interactions(
+        mut self,
+        value: impl Into<Option<tile::Interactions<S>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -915,7 +941,7 @@ impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
+impl<St: tile_state::State, S: BosStr> TileBuilder<St, S> {
     /// Set the `loadingImage` field (optional)
     pub fn loading_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -928,13 +954,16 @@ impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TileBuilder<S, St>
+impl<St, S: BosStr> TileBuilder<St, S>
 where
     St: tile_state::State,
     St::Name: tile_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> TileBuilder<S, tile_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> TileBuilder<tile_state::SetName<St>, S> {
         self._fields.7 = Option::Some(value.into());
         TileBuilder {
             _state: PhantomData,
@@ -944,7 +973,7 @@ where
     }
 }
 
-impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
+impl<St: tile_state::State, S: BosStr> TileBuilder<St, S> {
     /// Set the `params` field (optional)
     pub fn params(mut self, value: impl Into<Option<Vec<tile::Param<S>>>>) -> Self {
         self._fields.8 = value.into();
@@ -957,7 +986,7 @@ impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TileBuilder<S, St>
+impl<St, S: BosStr> TileBuilder<St, S>
 where
     St: tile_state::State,
     St::Content: tile_state::IsSet,

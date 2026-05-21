@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::pub_leaflet::blocks::image;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::pub_leaflet::blocks::image;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -38,11 +35,9 @@ pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Image<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -97,16 +92,19 @@ impl<S: BosStr> LexiconSchema for Image<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
@@ -122,7 +120,7 @@ impl<S: BosStr> LexiconSchema for Image<S> {
 
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -130,56 +128,63 @@ pub mod aspect_ratio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Width;
         type Height;
+        type Width;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Width = Unset;
         type Height = Unset;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWidth<St> {}
-    impl<St: State> State for SetWidth<St> {
-        type Width = Set<members::width>;
-        type Height = St::Height;
+        type Width = Unset;
     }
     ///State transition - sets the `height` field to Set
     pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHeight<St> {}
     impl<St: State> State for SetHeight<St> {
-        type Width = St::Width;
         type Height = Set<members::height>;
+        type Width = St::Width;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWidth<St> {}
+    impl<St: State> State for SetWidth<St> {
+        type Height = St::Height;
+        type Width = Set<members::width>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `width` field
-        pub struct width(());
         ///Marker type for the `height` field
         pub struct height(());
+        ///Marker type for the `width` field
+        pub struct width(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AspectRatioBuilder<S: BosStr, St: aspect_ratio_state::State> {
+pub struct AspectRatioBuilder<St: aspect_ratio_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> AspectRatio<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
+impl AspectRatio<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AspectRatioBuilder<aspect_ratio_state::Empty, DefaultStr> {
         AspectRatioBuilder::new()
     }
 }
 
-impl<S: BosStr> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> AspectRatio<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AspectRatioBuilder<aspect_ratio_state::Empty, S> {
+        AspectRatioBuilder::builder()
+    }
+}
+
+impl AspectRatioBuilder<aspect_ratio_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AspectRatioBuilder {
             _state: PhantomData,
@@ -189,7 +194,18 @@ impl<S: BosStr> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AspectRatioBuilder<S, St>
+impl<S: BosStr> AspectRatioBuilder<aspect_ratio_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AspectRatioBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
 where
     St: aspect_ratio_state::State,
     St::Height: aspect_ratio_state::IsUnset,
@@ -198,7 +214,7 @@ where
     pub fn height(
         mut self,
         value: impl Into<i64>,
-    ) -> AspectRatioBuilder<S, aspect_ratio_state::SetHeight<St>> {
+    ) -> AspectRatioBuilder<aspect_ratio_state::SetHeight<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AspectRatioBuilder {
             _state: PhantomData,
@@ -208,7 +224,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AspectRatioBuilder<S, St>
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
 where
     St: aspect_ratio_state::State,
     St::Width: aspect_ratio_state::IsUnset,
@@ -217,7 +233,7 @@ where
     pub fn width(
         mut self,
         value: impl Into<i64>,
-    ) -> AspectRatioBuilder<S, aspect_ratio_state::SetWidth<St>> {
+    ) -> AspectRatioBuilder<aspect_ratio_state::SetWidth<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AspectRatioBuilder {
             _state: PhantomData,
@@ -227,11 +243,11 @@ where
     }
 }
 
-impl<S: BosStr, St> AspectRatioBuilder<S, St>
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
 where
     St: aspect_ratio_state::State,
-    St::Width: aspect_ratio_state::IsSet,
     St::Height: aspect_ratio_state::IsSet,
+    St::Width: aspect_ratio_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AspectRatio<S> {
@@ -242,7 +258,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AspectRatio<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -252,10 +271,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_blocks_image() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.blocks.image"),
@@ -264,10 +283,9 @@ fn lexicon_doc_pub_leaflet_blocks_image() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("aspectRatio"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("width"),
-                        SmolStr::new_static("height"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -291,19 +309,23 @@ fn lexicon_doc_pub_leaflet_blocks_image() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("image"),
-                        SmolStr::new_static("aspectRatio"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("image"),
+                            SmolStr::new_static("aspectRatio")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Alt text description of the image, for accessibility.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Alt text description of the image, for accessibility.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -316,9 +338,7 @@ fn lexicon_doc_pub_leaflet_blocks_image() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("image"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -333,7 +353,7 @@ fn lexicon_doc_pub_leaflet_blocks_image() -> LexiconDoc<'static> {
 
 pub mod image_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -341,56 +361,63 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AspectRatio;
         type Image;
+        type AspectRatio;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AspectRatio = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `aspect_ratio` field to Set
-    pub struct SetAspectRatio<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAspectRatio<St> {}
-    impl<St: State> State for SetAspectRatio<St> {
-        type AspectRatio = Set<members::aspect_ratio>;
-        type Image = St::Image;
+        type AspectRatio = Unset;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetImage<St> {}
     impl<St: State> State for SetImage<St> {
-        type AspectRatio = St::AspectRatio;
         type Image = Set<members::image>;
+        type AspectRatio = St::AspectRatio;
+    }
+    ///State transition - sets the `aspect_ratio` field to Set
+    pub struct SetAspectRatio<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAspectRatio<St> {}
+    impl<St: State> State for SetAspectRatio<St> {
+        type Image = St::Image;
+        type AspectRatio = Set<members::aspect_ratio>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `aspect_ratio` field
-        pub struct aspect_ratio(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `aspect_ratio` field
+        pub struct aspect_ratio(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ImageBuilder<S: BosStr, St: image_state::State> {
+pub struct ImageBuilder<St: image_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<image::AspectRatio<S>>, Option<BlobRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Image<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ImageBuilder<S, image_state::Empty> {
+impl Image<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ImageBuilder<image_state::Empty, DefaultStr> {
         ImageBuilder::new()
     }
 }
 
-impl<S: BosStr> ImageBuilder<S, image_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Image<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ImageBuilder<image_state::Empty, S> {
+        ImageBuilder::builder()
+    }
+}
+
+impl ImageBuilder<image_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ImageBuilder {
             _state: PhantomData,
@@ -400,7 +427,18 @@ impl<S: BosStr> ImageBuilder<S, image_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: image_state::State> ImageBuilder<S, St> {
+impl<S: BosStr> ImageBuilder<image_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ImageBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: image_state::State, S: BosStr> ImageBuilder<St, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -413,7 +451,7 @@ impl<S: BosStr, St: image_state::State> ImageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ImageBuilder<S, St>
+impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
     St::AspectRatio: image_state::IsUnset,
@@ -422,7 +460,7 @@ where
     pub fn aspect_ratio(
         mut self,
         value: impl Into<image::AspectRatio<S>>,
-    ) -> ImageBuilder<S, image_state::SetAspectRatio<St>> {
+    ) -> ImageBuilder<image_state::SetAspectRatio<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
@@ -432,7 +470,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ImageBuilder<S, St>
+impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
     St::Image: image_state::IsUnset,
@@ -441,7 +479,7 @@ where
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ImageBuilder<S, image_state::SetImage<St>> {
+    ) -> ImageBuilder<image_state::SetImage<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
@@ -451,11 +489,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ImageBuilder<S, St>
+impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
-    St::AspectRatio: image_state::IsSet,
     St::Image: image_state::IsSet,
+    St::AspectRatio: image_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Image<S> {

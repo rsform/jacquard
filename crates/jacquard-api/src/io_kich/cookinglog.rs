@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -122,7 +122,7 @@ impl<S: BosStr> LexiconSchema for Cookinglog<S> {
 
 pub mod cookinglog_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -130,61 +130,63 @@ pub mod cookinglog_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = St::Subject;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
-        type CreatedAt = St::CreatedAt;
         type Subject = Set<members::subject>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CookinglogBuilder<S: BosStr, St: cookinglog_state::State> {
+pub struct CookinglogBuilder<St: cookinglog_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<S>,
-        Option<Data<S>>,
-        Option<StrongRef<S>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<Data<S>>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Cookinglog<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CookinglogBuilder<S, cookinglog_state::Empty> {
+impl Cookinglog<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CookinglogBuilder<cookinglog_state::Empty, DefaultStr> {
         CookinglogBuilder::new()
     }
 }
 
-impl<S: BosStr> CookinglogBuilder<S, cookinglog_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Cookinglog<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CookinglogBuilder<cookinglog_state::Empty, S> {
+        CookinglogBuilder::builder()
+    }
+}
+
+impl CookinglogBuilder<cookinglog_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CookinglogBuilder {
             _state: PhantomData,
@@ -194,7 +196,18 @@ impl<S: BosStr> CookinglogBuilder<S, cookinglog_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CookinglogBuilder<S, St>
+impl<S: BosStr> CookinglogBuilder<cookinglog_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CookinglogBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CookinglogBuilder<St, S>
 where
     St: cookinglog_state::State,
     St::CreatedAt: cookinglog_state::IsUnset,
@@ -203,7 +216,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CookinglogBuilder<S, cookinglog_state::SetCreatedAt<St>> {
+    ) -> CookinglogBuilder<cookinglog_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CookinglogBuilder {
             _state: PhantomData,
@@ -213,7 +226,7 @@ where
     }
 }
 
-impl<S: BosStr, St: cookinglog_state::State> CookinglogBuilder<S, St> {
+impl<St: cookinglog_state::State, S: BosStr> CookinglogBuilder<St, S> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -226,7 +239,7 @@ impl<S: BosStr, St: cookinglog_state::State> CookinglogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: cookinglog_state::State> CookinglogBuilder<S, St> {
+impl<St: cookinglog_state::State, S: BosStr> CookinglogBuilder<St, S> {
     /// Set the `scaledServings` field (optional)
     pub fn scaled_servings(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -239,7 +252,7 @@ impl<S: BosStr, St: cookinglog_state::State> CookinglogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CookinglogBuilder<S, St>
+impl<St, S: BosStr> CookinglogBuilder<St, S>
 where
     St: cookinglog_state::State,
     St::Subject: cookinglog_state::IsUnset,
@@ -248,7 +261,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CookinglogBuilder<S, cookinglog_state::SetSubject<St>> {
+    ) -> CookinglogBuilder<cookinglog_state::SetSubject<St>, S> {
         self._fields.3 = Option::Some(value.into());
         CookinglogBuilder {
             _state: PhantomData,
@@ -258,11 +271,11 @@ where
     }
 }
 
-impl<S: BosStr, St> CookinglogBuilder<S, St>
+impl<St, S: BosStr> CookinglogBuilder<St, S>
 where
     St: cookinglog_state::State,
-    St::CreatedAt: cookinglog_state::IsSet,
     St::Subject: cookinglog_state::IsSet,
+    St::CreatedAt: cookinglog_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Cookinglog<S> {
@@ -275,7 +288,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Cookinglog<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Cookinglog<S> {
         Cookinglog {
             created_at: self._fields.0.unwrap(),
             notes: self._fields.1,
@@ -287,10 +303,10 @@ where
 }
 
 fn lexicon_doc_io_kich_cookinglog() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.kich.cookinglog"),
@@ -301,19 +317,21 @@ fn lexicon_doc_io_kich_cookinglog() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("subject"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When this cooking log was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When this cooking log was created."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -321,9 +339,11 @@ fn lexicon_doc_io_kich_cookinglog() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("notes"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Optional user notes captured at completion.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Optional user notes captured at completion.",
+                                        ),
+                                    ),
                                     max_length: Some(500usize),
                                     ..Default::default()
                                 }),

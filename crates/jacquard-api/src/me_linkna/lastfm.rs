@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A Last.fm scrobble play record written by Linkname.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -129,7 +129,7 @@ impl<S: BosStr> LexiconSchema for Lastfm<S> {
 
 pub mod lastfm_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -137,56 +137,56 @@ pub mod lastfm_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TrackName;
-        type ArtistNames;
         type CreatedAt;
+        type ArtistNames;
+        type TrackName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TrackName = Unset;
-        type ArtistNames = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `track_name` field to Set
-    pub struct SetTrackName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTrackName<St> {}
-    impl<St: State> State for SetTrackName<St> {
-        type TrackName = Set<members::track_name>;
-        type ArtistNames = St::ArtistNames;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `artist_names` field to Set
-    pub struct SetArtistNames<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetArtistNames<St> {}
-    impl<St: State> State for SetArtistNames<St> {
-        type TrackName = St::TrackName;
-        type ArtistNames = Set<members::artist_names>;
-        type CreatedAt = St::CreatedAt;
+        type ArtistNames = Unset;
+        type TrackName = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type TrackName = St::TrackName;
-        type ArtistNames = St::ArtistNames;
         type CreatedAt = Set<members::created_at>;
+        type ArtistNames = St::ArtistNames;
+        type TrackName = St::TrackName;
+    }
+    ///State transition - sets the `artist_names` field to Set
+    pub struct SetArtistNames<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtistNames<St> {}
+    impl<St: State> State for SetArtistNames<St> {
+        type CreatedAt = St::CreatedAt;
+        type ArtistNames = Set<members::artist_names>;
+        type TrackName = St::TrackName;
+    }
+    ///State transition - sets the `track_name` field to Set
+    pub struct SetTrackName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTrackName<St> {}
+    impl<St: State> State for SetTrackName<St> {
+        type CreatedAt = St::CreatedAt;
+        type ArtistNames = St::ArtistNames;
+        type TrackName = Set<members::track_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `track_name` field
-        pub struct track_name(());
-        ///Marker type for the `artist_names` field
-        pub struct artist_names(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `artist_names` field
+        pub struct artist_names(());
+        ///Marker type for the `track_name` field
+        pub struct track_name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LastfmBuilder<S: BosStr, St: lastfm_state::State> {
+pub struct LastfmBuilder<St: lastfm_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -203,15 +203,22 @@ pub struct LastfmBuilder<S: BosStr, St: lastfm_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Lastfm<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LastfmBuilder<S, lastfm_state::Empty> {
+impl Lastfm<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LastfmBuilder<lastfm_state::Empty, DefaultStr> {
         LastfmBuilder::new()
     }
 }
 
-impl<S: BosStr> LastfmBuilder<S, lastfm_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Lastfm<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LastfmBuilder<lastfm_state::Empty, S> {
+        LastfmBuilder::builder()
+    }
+}
+
+impl LastfmBuilder<lastfm_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LastfmBuilder {
             _state: PhantomData,
@@ -221,7 +228,18 @@ impl<S: BosStr> LastfmBuilder<S, lastfm_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: lastfm_state::State> LastfmBuilder<S, St> {
+impl<S: BosStr> LastfmBuilder<lastfm_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LastfmBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: lastfm_state::State, S: BosStr> LastfmBuilder<St, S> {
     /// Set the `artistMbId` field (optional)
     pub fn artist_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -234,7 +252,7 @@ impl<S: BosStr, St: lastfm_state::State> LastfmBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LastfmBuilder<S, St>
+impl<St, S: BosStr> LastfmBuilder<St, S>
 where
     St: lastfm_state::State,
     St::ArtistNames: lastfm_state::IsUnset,
@@ -243,7 +261,7 @@ where
     pub fn artist_names(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> LastfmBuilder<S, lastfm_state::SetArtistNames<St>> {
+    ) -> LastfmBuilder<lastfm_state::SetArtistNames<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LastfmBuilder {
             _state: PhantomData,
@@ -253,7 +271,7 @@ where
     }
 }
 
-impl<S: BosStr, St: lastfm_state::State> LastfmBuilder<S, St> {
+impl<St: lastfm_state::State, S: BosStr> LastfmBuilder<St, S> {
     /// Set the `coverArtUrl` field (optional)
     pub fn cover_art_url(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -266,7 +284,7 @@ impl<S: BosStr, St: lastfm_state::State> LastfmBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LastfmBuilder<S, St>
+impl<St, S: BosStr> LastfmBuilder<St, S>
 where
     St: lastfm_state::State,
     St::CreatedAt: lastfm_state::IsUnset,
@@ -275,7 +293,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LastfmBuilder<S, lastfm_state::SetCreatedAt<St>> {
+    ) -> LastfmBuilder<lastfm_state::SetCreatedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LastfmBuilder {
             _state: PhantomData,
@@ -285,7 +303,7 @@ where
     }
 }
 
-impl<S: BosStr, St: lastfm_state::State> LastfmBuilder<S, St> {
+impl<St: lastfm_state::State, S: BosStr> LastfmBuilder<St, S> {
     /// Set the `originUrl` field (optional)
     pub fn origin_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -298,7 +316,7 @@ impl<S: BosStr, St: lastfm_state::State> LastfmBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: lastfm_state::State> LastfmBuilder<S, St> {
+impl<St: lastfm_state::State, S: BosStr> LastfmBuilder<St, S> {
     /// Set the `playedTime` field (optional)
     pub fn played_time(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -311,7 +329,7 @@ impl<S: BosStr, St: lastfm_state::State> LastfmBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: lastfm_state::State> LastfmBuilder<S, St> {
+impl<St: lastfm_state::State, S: BosStr> LastfmBuilder<St, S> {
     /// Set the `releaseMbId` field (optional)
     pub fn release_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -324,7 +342,7 @@ impl<S: BosStr, St: lastfm_state::State> LastfmBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: lastfm_state::State> LastfmBuilder<S, St> {
+impl<St: lastfm_state::State, S: BosStr> LastfmBuilder<St, S> {
     /// Set the `releaseName` field (optional)
     pub fn release_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -337,7 +355,7 @@ impl<S: BosStr, St: lastfm_state::State> LastfmBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: lastfm_state::State> LastfmBuilder<S, St> {
+impl<St: lastfm_state::State, S: BosStr> LastfmBuilder<St, S> {
     /// Set the `trackMbId` field (optional)
     pub fn track_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -350,7 +368,7 @@ impl<S: BosStr, St: lastfm_state::State> LastfmBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LastfmBuilder<S, St>
+impl<St, S: BosStr> LastfmBuilder<St, S>
 where
     St: lastfm_state::State,
     St::TrackName: lastfm_state::IsUnset,
@@ -359,7 +377,7 @@ where
     pub fn track_name(
         mut self,
         value: impl Into<S>,
-    ) -> LastfmBuilder<S, lastfm_state::SetTrackName<St>> {
+    ) -> LastfmBuilder<lastfm_state::SetTrackName<St>, S> {
         self._fields.9 = Option::Some(value.into());
         LastfmBuilder {
             _state: PhantomData,
@@ -369,12 +387,12 @@ where
     }
 }
 
-impl<S: BosStr, St> LastfmBuilder<S, St>
+impl<St, S: BosStr> LastfmBuilder<St, S>
 where
     St: lastfm_state::State,
-    St::TrackName: lastfm_state::IsSet,
-    St::ArtistNames: lastfm_state::IsSet,
     St::CreatedAt: lastfm_state::IsSet,
+    St::ArtistNames: lastfm_state::IsSet,
+    St::TrackName: lastfm_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Lastfm<S> {
@@ -411,10 +429,10 @@ where
 }
 
 fn lexicon_doc_me_linkna_lastfm() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("me.linkna.lastfm"),
@@ -423,25 +441,29 @@ fn lexicon_doc_me_linkna_lastfm() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A Last.fm scrobble play record written by Linkname.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A Last.fm scrobble play record written by Linkname.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("trackName"),
-                            SmolStr::new_static("artistNames"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("trackName"),
+                                SmolStr::new_static("artistNames"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("artistMbId"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "MusicBrainz ID for the artist.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("MusicBrainz ID for the artist."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
@@ -458,18 +480,18 @@ fn lexicon_doc_me_linkna_lastfm() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("coverArtUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "URL to the album cover art.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("URL to the album cover art."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When this record was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When this record was created."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -477,9 +499,9 @@ fn lexicon_doc_me_linkna_lastfm() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("originUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "URL to the track on Last.fm.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("URL to the track on Last.fm."),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -487,9 +509,9 @@ fn lexicon_doc_me_linkna_lastfm() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("playedTime"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When the track was played on Last.fm.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When the track was played on Last.fm."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -497,25 +519,27 @@ fn lexicon_doc_me_linkna_lastfm() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("releaseMbId"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "MusicBrainz ID for the release/album.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("MusicBrainz ID for the release/album."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("releaseName"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Album/release name.")),
+                                    description: Some(
+                                        CowStr::new_static("Album/release name."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("trackMbId"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "MusicBrainz ID for the track.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("MusicBrainz ID for the track."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

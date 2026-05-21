@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, Nsid};
+use jacquard_common::types::string::{Did, AtUri, Nsid, Cid, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::network_slices::slice::get_slice_records;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::slice::get_slice_records;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct IndexedRecord<S: BosStr = DefaultStr> {
     ///Content identifier of the record
     pub cid: Cid<S>,
@@ -48,11 +45,9 @@ pub struct IndexedRecord<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSliceRecords<S: BosStr = DefaultStr> {
     ///Pagination cursor from previous response
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -73,11 +68,9 @@ pub struct GetSliceRecords<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSliceRecordsOutput<S: BosStr = DefaultStr> {
     ///Pagination cursor for next page
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -113,8 +106,9 @@ impl jacquard_common::xrpc::XrpcResp for GetSliceRecordsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetSliceRecords<S> {
     const NSID: &'static str = "network.slices.slice.getSliceRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = GetSliceRecordsResponse;
 }
 
@@ -122,15 +116,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetSliceRecords<S> {
 pub struct GetSliceRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSliceRecordsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.getSliceRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = GetSliceRecords<S>;
     type Response = GetSliceRecordsResponse;
 }
 
 pub mod indexed_record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -139,109 +134,112 @@ pub mod indexed_record_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Uri;
-        type Value;
         type IndexedAt;
-        type Cid;
+        type Value;
         type Did;
         type Collection;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Uri = Unset;
-        type Value = Unset;
         type IndexedAt = Unset;
-        type Cid = Unset;
+        type Value = Unset;
         type Did = Unset;
         type Collection = Unset;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
+        type IndexedAt = St::IndexedAt;
         type Value = St::Value;
-        type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
         type Did = St::Did;
         type Collection = St::Collection;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValue<St> {}
-    impl<St: State> State for SetValue<St> {
-        type Uri = St::Uri;
-        type Value = Set<members::value>;
-        type IndexedAt = St::IndexedAt;
         type Cid = St::Cid;
-        type Did = St::Did;
-        type Collection = St::Collection;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
     impl<St: State> State for SetIndexedAt<St> {
         type Uri = St::Uri;
-        type Value = St::Value;
         type IndexedAt = Set<members::indexed_at>;
-        type Cid = St::Cid;
-        type Did = St::Did;
-        type Collection = St::Collection;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
         type Value = St::Value;
-        type IndexedAt = St::IndexedAt;
-        type Cid = Set<members::cid>;
         type Did = St::Did;
         type Collection = St::Collection;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type Uri = St::Uri;
+        type IndexedAt = St::IndexedAt;
+        type Value = Set<members::value>;
+        type Did = St::Did;
+        type Collection = St::Collection;
+        type Cid = St::Cid;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
         type Uri = St::Uri;
-        type Value = St::Value;
         type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
+        type Value = St::Value;
         type Did = Set<members::did>;
         type Collection = St::Collection;
+        type Cid = St::Cid;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
         type Uri = St::Uri;
-        type Value = St::Value;
         type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
+        type Value = St::Value;
         type Did = St::Did;
         type Collection = Set<members::collection>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Uri = St::Uri;
+        type IndexedAt = St::IndexedAt;
+        type Value = St::Value;
+        type Did = St::Did;
+        type Collection = St::Collection;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
+        ///Marker type for the `value` field
+        pub struct value(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IndexedRecordBuilder<S: BosStr, St: indexed_record_state::State> {
+pub struct IndexedRecordBuilder<
+    St: indexed_record_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
@@ -254,15 +252,22 @@ pub struct IndexedRecordBuilder<S: BosStr, St: indexed_record_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> IndexedRecord<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> IndexedRecordBuilder<S, indexed_record_state::Empty> {
+impl IndexedRecord<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> IndexedRecordBuilder<indexed_record_state::Empty, DefaultStr> {
         IndexedRecordBuilder::new()
     }
 }
 
-impl<S: BosStr> IndexedRecordBuilder<S, indexed_record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> IndexedRecord<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> IndexedRecordBuilder<indexed_record_state::Empty, S> {
+        IndexedRecordBuilder::builder()
+    }
+}
+
+impl IndexedRecordBuilder<indexed_record_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         IndexedRecordBuilder {
             _state: PhantomData,
@@ -272,7 +277,18 @@ impl<S: BosStr> IndexedRecordBuilder<S, indexed_record_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> IndexedRecordBuilder<S, St>
+impl<S: BosStr> IndexedRecordBuilder<indexed_record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        IndexedRecordBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> IndexedRecordBuilder<St, S>
 where
     St: indexed_record_state::State,
     St::Cid: indexed_record_state::IsUnset,
@@ -281,7 +297,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> IndexedRecordBuilder<S, indexed_record_state::SetCid<St>> {
+    ) -> IndexedRecordBuilder<indexed_record_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         IndexedRecordBuilder {
             _state: PhantomData,
@@ -291,7 +307,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IndexedRecordBuilder<S, St>
+impl<St, S: BosStr> IndexedRecordBuilder<St, S>
 where
     St: indexed_record_state::State,
     St::Collection: indexed_record_state::IsUnset,
@@ -300,7 +316,7 @@ where
     pub fn collection(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> IndexedRecordBuilder<S, indexed_record_state::SetCollection<St>> {
+    ) -> IndexedRecordBuilder<indexed_record_state::SetCollection<St>, S> {
         self._fields.1 = Option::Some(value.into());
         IndexedRecordBuilder {
             _state: PhantomData,
@@ -310,7 +326,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IndexedRecordBuilder<S, St>
+impl<St, S: BosStr> IndexedRecordBuilder<St, S>
 where
     St: indexed_record_state::State,
     St::Did: indexed_record_state::IsUnset,
@@ -319,7 +335,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> IndexedRecordBuilder<S, indexed_record_state::SetDid<St>> {
+    ) -> IndexedRecordBuilder<indexed_record_state::SetDid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         IndexedRecordBuilder {
             _state: PhantomData,
@@ -329,7 +345,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IndexedRecordBuilder<S, St>
+impl<St, S: BosStr> IndexedRecordBuilder<St, S>
 where
     St: indexed_record_state::State,
     St::IndexedAt: indexed_record_state::IsUnset,
@@ -338,7 +354,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> IndexedRecordBuilder<S, indexed_record_state::SetIndexedAt<St>> {
+    ) -> IndexedRecordBuilder<indexed_record_state::SetIndexedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         IndexedRecordBuilder {
             _state: PhantomData,
@@ -348,7 +364,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IndexedRecordBuilder<S, St>
+impl<St, S: BosStr> IndexedRecordBuilder<St, S>
 where
     St: indexed_record_state::State,
     St::Uri: indexed_record_state::IsUnset,
@@ -357,7 +373,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> IndexedRecordBuilder<S, indexed_record_state::SetUri<St>> {
+    ) -> IndexedRecordBuilder<indexed_record_state::SetUri<St>, S> {
         self._fields.4 = Option::Some(value.into());
         IndexedRecordBuilder {
             _state: PhantomData,
@@ -367,7 +383,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IndexedRecordBuilder<S, St>
+impl<St, S: BosStr> IndexedRecordBuilder<St, S>
 where
     St: indexed_record_state::State,
     St::Value: indexed_record_state::IsUnset,
@@ -376,7 +392,7 @@ where
     pub fn value(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> IndexedRecordBuilder<S, indexed_record_state::SetValue<St>> {
+    ) -> IndexedRecordBuilder<indexed_record_state::SetValue<St>, S> {
         self._fields.5 = Option::Some(value.into());
         IndexedRecordBuilder {
             _state: PhantomData,
@@ -386,15 +402,15 @@ where
     }
 }
 
-impl<S: BosStr, St> IndexedRecordBuilder<S, St>
+impl<St, S: BosStr> IndexedRecordBuilder<St, S>
 where
     St: indexed_record_state::State,
     St::Uri: indexed_record_state::IsSet,
-    St::Value: indexed_record_state::IsSet,
     St::IndexedAt: indexed_record_state::IsSet,
-    St::Cid: indexed_record_state::IsSet,
+    St::Value: indexed_record_state::IsSet,
     St::Did: indexed_record_state::IsSet,
     St::Collection: indexed_record_state::IsSet,
+    St::Cid: indexed_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> IndexedRecord<S> {
@@ -409,7 +425,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> IndexedRecord<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> IndexedRecord<S> {
         IndexedRecord {
             cid: self._fields.0.unwrap(),
             collection: self._fields.1.unwrap(),
@@ -423,10 +442,10 @@ where
 }
 
 fn lexicon_doc_network_slices_slice_getSliceRecords() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.slice.getSliceRecords"),
@@ -435,23 +454,24 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("indexedRecord"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("collection"),
-                        SmolStr::new_static("value"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("did"),
+                            SmolStr::new_static("collection"),
+                            SmolStr::new_static("value"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Content identifier of the record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Content identifier of the record"),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -459,9 +479,11 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("collection"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "NSID of the collection this record belongs to",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "NSID of the collection this record belongs to",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Nsid),
                                 ..Default::default()
                             }),
@@ -469,7 +491,9 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("DID of the record creator")),
+                                description: Some(
+                                    CowStr::new_static("DID of the record creator"),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -477,9 +501,9 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("indexedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When this record was indexed",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When this record was indexed"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -487,7 +511,9 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("AT-URI of the record")),
+                                description: Some(
+                                    CowStr::new_static("AT-URI of the record"),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -508,53 +534,57 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![SmolStr::new_static("slice")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("cursor"),
-                                    LexObjectProperty::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "Pagination cursor from previous response",
-                                        )),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("limit"),
-                                    LexObjectProperty::Integer(LexInteger {
-                                        minimum: Some(1i64),
-                                        maximum: Some(100i64),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("slice"),
-                                    LexObjectProperty::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "AT-URI of the slice to query",
-                                        )),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("sortBy"),
-                                    LexObjectProperty::Unknown(LexUnknown {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("where"),
-                                    LexObjectProperty::Unknown(LexUnknown {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(vec![SmolStr::new_static("slice")]),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("cursor"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static(
+                                                    "Pagination cursor from previous response",
+                                                ),
+                                            ),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("limit"),
+                                        LexObjectProperty::Integer(LexInteger {
+                                            minimum: Some(1i64),
+                                            maximum: Some(100i64),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("slice"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static("AT-URI of the slice to query"),
+                                            ),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("sortBy"),
+                                        LexObjectProperty::Unknown(LexUnknown {
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("where"),
+                                        LexObjectProperty::Unknown(LexUnknown {
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()

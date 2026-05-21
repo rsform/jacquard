@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Record representing a recommend on a document
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -104,7 +104,7 @@ impl<S: BosStr> LexiconSchema for Recommend<S> {
 
 pub mod recommend_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -112,56 +112,63 @@ pub mod recommend_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = St::Subject;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
-        type CreatedAt = St::CreatedAt;
         type Subject = Set<members::subject>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RecommendBuilder<S: BosStr, St: recommend_state::State> {
+pub struct RecommendBuilder<St: recommend_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Recommend<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RecommendBuilder<S, recommend_state::Empty> {
+impl Recommend<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RecommendBuilder<recommend_state::Empty, DefaultStr> {
         RecommendBuilder::new()
     }
 }
 
-impl<S: BosStr> RecommendBuilder<S, recommend_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Recommend<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RecommendBuilder<recommend_state::Empty, S> {
+        RecommendBuilder::builder()
+    }
+}
+
+impl RecommendBuilder<recommend_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RecommendBuilder {
             _state: PhantomData,
@@ -171,7 +178,18 @@ impl<S: BosStr> RecommendBuilder<S, recommend_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RecommendBuilder<S, St>
+impl<S: BosStr> RecommendBuilder<recommend_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RecommendBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RecommendBuilder<St, S>
 where
     St: recommend_state::State,
     St::CreatedAt: recommend_state::IsUnset,
@@ -180,7 +198,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RecommendBuilder<S, recommend_state::SetCreatedAt<St>> {
+    ) -> RecommendBuilder<recommend_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RecommendBuilder {
             _state: PhantomData,
@@ -190,7 +208,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RecommendBuilder<S, St>
+impl<St, S: BosStr> RecommendBuilder<St, S>
 where
     St: recommend_state::State,
     St::Subject: recommend_state::IsUnset,
@@ -199,7 +217,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RecommendBuilder<S, recommend_state::SetSubject<St>> {
+    ) -> RecommendBuilder<recommend_state::SetSubject<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RecommendBuilder {
             _state: PhantomData,
@@ -209,11 +227,11 @@ where
     }
 }
 
-impl<S: BosStr, St> RecommendBuilder<S, St>
+impl<St, S: BosStr> RecommendBuilder<St, S>
 where
     St: recommend_state::State,
-    St::CreatedAt: recommend_state::IsSet,
     St::Subject: recommend_state::IsSet,
+    St::CreatedAt: recommend_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Recommend<S> {
@@ -224,7 +242,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Recommend<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Recommend<S> {
         Recommend {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
@@ -234,10 +255,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_interactions_recommend() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.interactions.recommend"),
@@ -246,15 +267,19 @@ fn lexicon_doc_pub_leaflet_interactions_recommend() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Record representing a recommend on a document",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Record representing a recommend on a document",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("subject"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

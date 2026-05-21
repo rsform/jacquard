@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ToggleLike<S: BosStr = DefaultStr> {
     ///AT URI of the game record to like/unlike.
     pub subject: AtUri<S>,
@@ -29,11 +26,9 @@ pub struct ToggleLike<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ToggleLikeOutput<S: BosStr = DefaultStr> {
     ///Whether the game was liked or unliked.
     pub action: ToggleLikeOutputAction<S>,
@@ -121,7 +116,9 @@ where
         match self {
             ToggleLikeOutputAction::Liked => ToggleLikeOutputAction::Liked,
             ToggleLikeOutputAction::Unliked => ToggleLikeOutputAction::Unliked,
-            ToggleLikeOutputAction::Other(v) => ToggleLikeOutputAction::Other(v.into_static()),
+            ToggleLikeOutputAction::Other(v) => {
+                ToggleLikeOutputAction::Other(v.into_static())
+            }
         }
     }
 }
@@ -137,8 +134,9 @@ impl jacquard_common::xrpc::XrpcResp for ToggleLikeResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ToggleLike<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.graph.toggleLike";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ToggleLikeResponse;
 }
 
@@ -146,15 +144,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ToggleLike<S> {
 pub struct ToggleLikeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ToggleLikeRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.graph.toggleLike";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ToggleLike<S>;
     type Response = ToggleLikeResponse;
 }
 
 pub mod toggle_like_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -185,21 +184,28 @@ pub mod toggle_like_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ToggleLikeBuilder<S: BosStr, St: toggle_like_state::State> {
+pub struct ToggleLikeBuilder<St: toggle_like_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ToggleLike<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ToggleLikeBuilder<S, toggle_like_state::Empty> {
+impl ToggleLike<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ToggleLikeBuilder<toggle_like_state::Empty, DefaultStr> {
         ToggleLikeBuilder::new()
     }
 }
 
-impl<S: BosStr> ToggleLikeBuilder<S, toggle_like_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ToggleLike<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ToggleLikeBuilder<toggle_like_state::Empty, S> {
+        ToggleLikeBuilder::builder()
+    }
+}
+
+impl ToggleLikeBuilder<toggle_like_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ToggleLikeBuilder {
             _state: PhantomData,
@@ -209,7 +215,18 @@ impl<S: BosStr> ToggleLikeBuilder<S, toggle_like_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ToggleLikeBuilder<S, St>
+impl<S: BosStr> ToggleLikeBuilder<toggle_like_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ToggleLikeBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ToggleLikeBuilder<St, S>
 where
     St: toggle_like_state::State,
     St::Subject: toggle_like_state::IsUnset,
@@ -218,7 +235,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ToggleLikeBuilder<S, toggle_like_state::SetSubject<St>> {
+    ) -> ToggleLikeBuilder<toggle_like_state::SetSubject<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ToggleLikeBuilder {
             _state: PhantomData,
@@ -228,7 +245,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ToggleLikeBuilder<S, St>
+impl<St, S: BosStr> ToggleLikeBuilder<St, S>
 where
     St: toggle_like_state::State,
     St::Subject: toggle_like_state::IsSet,
@@ -241,7 +258,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ToggleLike<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ToggleLike<S> {
         ToggleLike {
             subject: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

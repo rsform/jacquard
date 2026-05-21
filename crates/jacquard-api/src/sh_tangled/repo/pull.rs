@@ -8,19 +8,20 @@
 pub mod comment;
 pub mod status;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -28,10 +29,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::repo::pull;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::repo::pull;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -72,11 +73,9 @@ pub struct PullGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Pull<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Source<S: BosStr = DefaultStr> {
     pub branch: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -86,11 +85,9 @@ pub struct Source<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Target<S: BosStr = DefaultStr> {
     pub branch: S,
     pub repo: AtUri<S>,
@@ -147,16 +144,19 @@ impl<S: BosStr> LexiconSchema for Pull<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["text/x-patch"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("patch_blob"),
@@ -224,7 +224,7 @@ impl<S: BosStr> LexiconSchema for Target<S> {
 
 pub mod pull_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -232,72 +232,72 @@ pub mod pull_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Target;
-        type PatchBlob;
         type CreatedAt;
+        type Title;
+        type PatchBlob;
+        type Target;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Target = Unset;
-        type PatchBlob = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type Target = St::Target;
-        type PatchBlob = St::PatchBlob;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTarget<St> {}
-    impl<St: State> State for SetTarget<St> {
-        type Title = St::Title;
-        type Target = Set<members::target>;
-        type PatchBlob = St::PatchBlob;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `patch_blob` field to Set
-    pub struct SetPatchBlob<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPatchBlob<St> {}
-    impl<St: State> State for SetPatchBlob<St> {
-        type Title = St::Title;
-        type Target = St::Target;
-        type PatchBlob = Set<members::patch_blob>;
-        type CreatedAt = St::CreatedAt;
+        type Title = Unset;
+        type PatchBlob = Unset;
+        type Target = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Title = St::Title;
-        type Target = St::Target;
-        type PatchBlob = St::PatchBlob;
         type CreatedAt = Set<members::created_at>;
+        type Title = St::Title;
+        type PatchBlob = St::PatchBlob;
+        type Target = St::Target;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = Set<members::title>;
+        type PatchBlob = St::PatchBlob;
+        type Target = St::Target;
+    }
+    ///State transition - sets the `patch_blob` field to Set
+    pub struct SetPatchBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPatchBlob<St> {}
+    impl<St: State> State for SetPatchBlob<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type PatchBlob = Set<members::patch_blob>;
+        type Target = St::Target;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTarget<St> {}
+    impl<St: State> State for SetTarget<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type PatchBlob = St::PatchBlob;
+        type Target = Set<members::target>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `target` field
-        pub struct target(());
-        ///Marker type for the `patch_blob` field
-        pub struct patch_blob(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `patch_blob` field
+        pub struct patch_blob(());
+        ///Marker type for the `target` field
+        pub struct target(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PullBuilder<S: BosStr, St: pull_state::State> {
+pub struct PullBuilder<St: pull_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -313,15 +313,22 @@ pub struct PullBuilder<S: BosStr, St: pull_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Pull<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PullBuilder<S, pull_state::Empty> {
+impl Pull<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PullBuilder<pull_state::Empty, DefaultStr> {
         PullBuilder::new()
     }
 }
 
-impl<S: BosStr> PullBuilder<S, pull_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Pull<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PullBuilder<pull_state::Empty, S> {
+        PullBuilder::builder()
+    }
+}
+
+impl PullBuilder<pull_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PullBuilder {
             _state: PhantomData,
@@ -331,7 +338,18 @@ impl<S: BosStr> PullBuilder<S, pull_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
+impl<S: BosStr> PullBuilder<pull_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PullBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
     /// Set the `body` field (optional)
     pub fn body(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -344,7 +362,7 @@ impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PullBuilder<S, St>
+impl<St, S: BosStr> PullBuilder<St, S>
 where
     St: pull_state::State,
     St::CreatedAt: pull_state::IsUnset,
@@ -353,7 +371,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PullBuilder<S, pull_state::SetCreatedAt<St>> {
+    ) -> PullBuilder<pull_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PullBuilder {
             _state: PhantomData,
@@ -363,7 +381,7 @@ where
     }
 }
 
-impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
+impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
         self._fields.2 = value.into();
@@ -376,7 +394,7 @@ impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
+impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
     /// Set the `patch` field (optional)
     pub fn patch(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -389,7 +407,7 @@ impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PullBuilder<S, St>
+impl<St, S: BosStr> PullBuilder<St, S>
 where
     St: pull_state::State,
     St::PatchBlob: pull_state::IsUnset,
@@ -398,7 +416,7 @@ where
     pub fn patch_blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> PullBuilder<S, pull_state::SetPatchBlob<St>> {
+    ) -> PullBuilder<pull_state::SetPatchBlob<St>, S> {
         self._fields.4 = Option::Some(value.into());
         PullBuilder {
             _state: PhantomData,
@@ -408,7 +426,7 @@ where
     }
 }
 
-impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
+impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
     /// Set the `references` field (optional)
     pub fn references(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.5 = value.into();
@@ -421,7 +439,7 @@ impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
+impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<pull::Source<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -434,7 +452,7 @@ impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PullBuilder<S, St>
+impl<St, S: BosStr> PullBuilder<St, S>
 where
     St: pull_state::State,
     St::Target: pull_state::IsUnset,
@@ -443,7 +461,7 @@ where
     pub fn target(
         mut self,
         value: impl Into<pull::Target<S>>,
-    ) -> PullBuilder<S, pull_state::SetTarget<St>> {
+    ) -> PullBuilder<pull_state::SetTarget<St>, S> {
         self._fields.7 = Option::Some(value.into());
         PullBuilder {
             _state: PhantomData,
@@ -453,13 +471,16 @@ where
     }
 }
 
-impl<S: BosStr, St> PullBuilder<S, St>
+impl<St, S: BosStr> PullBuilder<St, S>
 where
     St: pull_state::State,
     St::Title: pull_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> PullBuilder<S, pull_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> PullBuilder<pull_state::SetTitle<St>, S> {
         self._fields.8 = Option::Some(value.into());
         PullBuilder {
             _state: PhantomData,
@@ -469,13 +490,13 @@ where
     }
 }
 
-impl<S: BosStr, St> PullBuilder<S, St>
+impl<St, S: BosStr> PullBuilder<St, S>
 where
     St: pull_state::State,
-    St::Title: pull_state::IsSet,
-    St::Target: pull_state::IsSet,
-    St::PatchBlob: pull_state::IsSet,
     St::CreatedAt: pull_state::IsSet,
+    St::Title: pull_state::IsSet,
+    St::PatchBlob: pull_state::IsSet,
+    St::Target: pull_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Pull<S> {
@@ -510,10 +531,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.pull"),
@@ -524,12 +545,13 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("target"),
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("patchBlob"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("target"), SmolStr::new_static("title"),
+                                SmolStr::new_static("patchBlob"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -559,17 +581,15 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("patch"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "(deprecated) use patchBlob instead",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("(deprecated) use patchBlob instead"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("patchBlob"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("references"),
@@ -611,18 +631,15 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("source"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("branch"),
-                        SmolStr::new_static("sha"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("branch"), SmolStr::new_static("sha")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("branch"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("repo"),
@@ -647,18 +664,15 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("target"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("repo"),
-                        SmolStr::new_static("branch"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("repo"), SmolStr::new_static("branch")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("branch"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("repo"),
@@ -680,7 +694,7 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
 
 pub mod target_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -723,21 +737,28 @@ pub mod target_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TargetBuilder<S: BosStr, St: target_state::State> {
+pub struct TargetBuilder<St: target_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Target<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TargetBuilder<S, target_state::Empty> {
+impl Target<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TargetBuilder<target_state::Empty, DefaultStr> {
         TargetBuilder::new()
     }
 }
 
-impl<S: BosStr> TargetBuilder<S, target_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Target<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TargetBuilder<target_state::Empty, S> {
+        TargetBuilder::builder()
+    }
+}
+
+impl TargetBuilder<target_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TargetBuilder {
             _state: PhantomData,
@@ -747,13 +768,27 @@ impl<S: BosStr> TargetBuilder<S, target_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> TargetBuilder<S, St>
+impl<S: BosStr> TargetBuilder<target_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TargetBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> TargetBuilder<St, S>
 where
     St: target_state::State,
     St::Branch: target_state::IsUnset,
 {
     /// Set the `branch` field (required)
-    pub fn branch(mut self, value: impl Into<S>) -> TargetBuilder<S, target_state::SetBranch<St>> {
+    pub fn branch(
+        mut self,
+        value: impl Into<S>,
+    ) -> TargetBuilder<target_state::SetBranch<St>, S> {
         self._fields.0 = Option::Some(value.into());
         TargetBuilder {
             _state: PhantomData,
@@ -763,7 +798,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TargetBuilder<S, St>
+impl<St, S: BosStr> TargetBuilder<St, S>
 where
     St: target_state::State,
     St::Repo: target_state::IsUnset,
@@ -772,7 +807,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> TargetBuilder<S, target_state::SetRepo<St>> {
+    ) -> TargetBuilder<target_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TargetBuilder {
             _state: PhantomData,
@@ -782,7 +817,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TargetBuilder<S, St>
+impl<St, S: BosStr> TargetBuilder<St, S>
 where
     St: target_state::State,
     St::Branch: target_state::IsSet,

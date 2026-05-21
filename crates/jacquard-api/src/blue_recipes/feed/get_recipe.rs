@@ -8,39 +8,43 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::blue_recipes::feed::RecipeView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blue_recipes::feed::RecipeView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecipe<S: BosStr = DefaultStr> {
     pub uris: Vec<AtUri<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecipeOutput<S: BosStr = DefaultStr> {
     pub recipes: Vec<RecipeView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetRecipeError {
     #[serde(rename = "NotFound")]
@@ -49,10 +53,7 @@ pub enum GetRecipeError {
     InvalidUri(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetRecipeError {
@@ -109,7 +110,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetRecipeRequest {
 
 pub mod get_recipe_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -140,21 +141,28 @@ pub mod get_recipe_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetRecipeBuilder<S: BosStr, St: get_recipe_state::State> {
+pub struct GetRecipeBuilder<St: get_recipe_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetRecipe<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetRecipeBuilder<S, get_recipe_state::Empty> {
+impl GetRecipe<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetRecipeBuilder<get_recipe_state::Empty, DefaultStr> {
         GetRecipeBuilder::new()
     }
 }
 
-impl<S: BosStr> GetRecipeBuilder<S, get_recipe_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetRecipe<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetRecipeBuilder<get_recipe_state::Empty, S> {
+        GetRecipeBuilder::builder()
+    }
+}
+
+impl GetRecipeBuilder<get_recipe_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetRecipeBuilder {
             _state: PhantomData,
@@ -164,7 +172,18 @@ impl<S: BosStr> GetRecipeBuilder<S, get_recipe_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetRecipeBuilder<S, St>
+impl<S: BosStr> GetRecipeBuilder<get_recipe_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetRecipeBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetRecipeBuilder<St, S>
 where
     St: get_recipe_state::State,
     St::Uris: get_recipe_state::IsUnset,
@@ -173,7 +192,7 @@ where
     pub fn uris(
         mut self,
         value: impl Into<Vec<AtUri<S>>>,
-    ) -> GetRecipeBuilder<S, get_recipe_state::SetUris<St>> {
+    ) -> GetRecipeBuilder<get_recipe_state::SetUris<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetRecipeBuilder {
             _state: PhantomData,
@@ -183,7 +202,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetRecipeBuilder<S, St>
+impl<St, S: BosStr> GetRecipeBuilder<St, S>
 where
     St: get_recipe_state::State,
     St::Uris: get_recipe_state::IsSet,

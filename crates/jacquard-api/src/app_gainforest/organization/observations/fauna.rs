@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// DEPRECATED: Use app.gainforest.dwc.occurrence instead. A declaration of a fauna observation for an organization.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -106,7 +106,7 @@ impl<S: BosStr> LexiconSchema for Fauna<S> {
 
 pub mod fauna_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -149,21 +149,28 @@ pub mod fauna_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FaunaBuilder<S: BosStr, St: fauna_state::State> {
+pub struct FaunaBuilder<St: fauna_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Fauna<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FaunaBuilder<S, fauna_state::Empty> {
+impl Fauna<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FaunaBuilder<fauna_state::Empty, DefaultStr> {
         FaunaBuilder::new()
     }
 }
 
-impl<S: BosStr> FaunaBuilder<S, fauna_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Fauna<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FaunaBuilder<fauna_state::Empty, S> {
+        FaunaBuilder::builder()
+    }
+}
+
+impl FaunaBuilder<fauna_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FaunaBuilder {
             _state: PhantomData,
@@ -173,7 +180,18 @@ impl<S: BosStr> FaunaBuilder<S, fauna_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FaunaBuilder<S, St>
+impl<S: BosStr> FaunaBuilder<fauna_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FaunaBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FaunaBuilder<St, S>
 where
     St: fauna_state::State,
     St::CreatedAt: fauna_state::IsUnset,
@@ -182,7 +200,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FaunaBuilder<S, fauna_state::SetCreatedAt<St>> {
+    ) -> FaunaBuilder<fauna_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FaunaBuilder {
             _state: PhantomData,
@@ -192,7 +210,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FaunaBuilder<S, St>
+impl<St, S: BosStr> FaunaBuilder<St, S>
 where
     St: fauna_state::State,
     St::GbifTaxonKeys: fauna_state::IsUnset,
@@ -201,7 +219,7 @@ where
     pub fn gbif_taxon_keys(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> FaunaBuilder<S, fauna_state::SetGbifTaxonKeys<St>> {
+    ) -> FaunaBuilder<fauna_state::SetGbifTaxonKeys<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FaunaBuilder {
             _state: PhantomData,
@@ -211,7 +229,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FaunaBuilder<S, St>
+impl<St, S: BosStr> FaunaBuilder<St, S>
 where
     St: fauna_state::State,
     St::GbifTaxonKeys: fauna_state::IsSet,
@@ -236,10 +254,10 @@ where
 }
 
 fn lexicon_doc_app_gainforest_organization_observations_fauna() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.gainforest.organization.observations.fauna"),

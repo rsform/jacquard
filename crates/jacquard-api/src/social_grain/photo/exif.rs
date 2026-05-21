@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Basic EXIF metadata for a photo. Integers are scaled by 1000000 to accommodate decimal values and potentially other tags in the future.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -124,7 +124,7 @@ impl<S: BosStr> LexiconSchema for Exif<S> {
 
 pub mod exif_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -167,7 +167,7 @@ pub mod exif_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ExifBuilder<S: BosStr, St: exif_state::State> {
+pub struct ExifBuilder<St: exif_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -186,27 +186,69 @@ pub struct ExifBuilder<S: BosStr, St: exif_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Exif<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ExifBuilder<S, exif_state::Empty> {
+impl Exif<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ExifBuilder<exif_state::Empty, DefaultStr> {
         ExifBuilder::new()
     }
 }
 
-impl<S: BosStr> ExifBuilder<S, exif_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Exif<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ExifBuilder<exif_state::Empty, S> {
+        ExifBuilder::builder()
+    }
+}
+
+impl ExifBuilder<exif_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ExifBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St> ExifBuilder<S, St>
+impl<S: BosStr> ExifBuilder<exif_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ExifBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ExifBuilder<St, S>
 where
     St: exif_state::State,
     St::CreatedAt: exif_state::IsUnset,
@@ -215,7 +257,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ExifBuilder<S, exif_state::SetCreatedAt<St>> {
+    ) -> ExifBuilder<exif_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ExifBuilder {
             _state: PhantomData,
@@ -225,7 +267,7 @@ where
     }
 }
 
-impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
+impl<St: exif_state::State, S: BosStr> ExifBuilder<St, S> {
     /// Set the `dateTimeOriginal` field (optional)
     pub fn date_time_original(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -238,7 +280,7 @@ impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
+impl<St: exif_state::State, S: BosStr> ExifBuilder<St, S> {
     /// Set the `exposureTime` field (optional)
     pub fn exposure_time(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -251,7 +293,7 @@ impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
+impl<St: exif_state::State, S: BosStr> ExifBuilder<St, S> {
     /// Set the `fNumber` field (optional)
     pub fn f_number(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -264,7 +306,7 @@ impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
+impl<St: exif_state::State, S: BosStr> ExifBuilder<St, S> {
     /// Set the `flash` field (optional)
     pub fn flash(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -277,7 +319,7 @@ impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
+impl<St: exif_state::State, S: BosStr> ExifBuilder<St, S> {
     /// Set the `focalLengthIn35mmFormat` field (optional)
     pub fn focal_length_in35mm_format(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -290,7 +332,7 @@ impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
+impl<St: exif_state::State, S: BosStr> ExifBuilder<St, S> {
     /// Set the `iSO` field (optional)
     pub fn i_so(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -303,7 +345,7 @@ impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
+impl<St: exif_state::State, S: BosStr> ExifBuilder<St, S> {
     /// Set the `lensMake` field (optional)
     pub fn lens_make(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -316,7 +358,7 @@ impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
+impl<St: exif_state::State, S: BosStr> ExifBuilder<St, S> {
     /// Set the `lensModel` field (optional)
     pub fn lens_model(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -329,7 +371,7 @@ impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
+impl<St: exif_state::State, S: BosStr> ExifBuilder<St, S> {
     /// Set the `make` field (optional)
     pub fn make(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -342,7 +384,7 @@ impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
+impl<St: exif_state::State, S: BosStr> ExifBuilder<St, S> {
     /// Set the `model` field (optional)
     pub fn model(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -355,13 +397,16 @@ impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ExifBuilder<S, St>
+impl<St, S: BosStr> ExifBuilder<St, S>
 where
     St: exif_state::State,
     St::Photo: exif_state::IsUnset,
 {
     /// Set the `photo` field (required)
-    pub fn photo(mut self, value: impl Into<AtUri<S>>) -> ExifBuilder<S, exif_state::SetPhoto<St>> {
+    pub fn photo(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> ExifBuilder<exif_state::SetPhoto<St>, S> {
         self._fields.11 = Option::Some(value.into());
         ExifBuilder {
             _state: PhantomData,
@@ -371,7 +416,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ExifBuilder<S, St>
+impl<St, S: BosStr> ExifBuilder<St, S>
 where
     St: exif_state::State,
     St::Photo: exif_state::IsSet,
@@ -416,10 +461,10 @@ where
 }
 
 fn lexicon_doc_social_grain_photo_exif() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.grain.photo.exif"),

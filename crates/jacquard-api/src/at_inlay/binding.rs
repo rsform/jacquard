@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Binding<S: BosStr = DefaultStr> {
     ///Path segments to resolve against scope
     pub path: Vec<S>,
@@ -29,11 +26,9 @@ pub struct Binding<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BindingOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -52,8 +47,9 @@ impl jacquard_common::xrpc::XrpcResp for BindingResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Binding<S> {
     const NSID: &'static str = "at.inlay.Binding";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = BindingResponse;
 }
 
@@ -61,15 +57,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Binding<S> {
 pub struct BindingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for BindingRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Binding";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Binding<S>;
     type Response = BindingResponse;
 }
 
 pub mod binding_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -100,21 +97,28 @@ pub mod binding_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BindingBuilder<S: BosStr, St: binding_state::State> {
+pub struct BindingBuilder<St: binding_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Binding<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BindingBuilder<S, binding_state::Empty> {
+impl Binding<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BindingBuilder<binding_state::Empty, DefaultStr> {
         BindingBuilder::new()
     }
 }
 
-impl<S: BosStr> BindingBuilder<S, binding_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Binding<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BindingBuilder<binding_state::Empty, S> {
+        BindingBuilder::builder()
+    }
+}
+
+impl BindingBuilder<binding_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BindingBuilder {
             _state: PhantomData,
@@ -124,7 +128,18 @@ impl<S: BosStr> BindingBuilder<S, binding_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BindingBuilder<S, St>
+impl<S: BosStr> BindingBuilder<binding_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BindingBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BindingBuilder<St, S>
 where
     St: binding_state::State,
     St::Path: binding_state::IsUnset,
@@ -133,7 +148,7 @@ where
     pub fn path(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> BindingBuilder<S, binding_state::SetPath<St>> {
+    ) -> BindingBuilder<binding_state::SetPath<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BindingBuilder {
             _state: PhantomData,
@@ -143,7 +158,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BindingBuilder<S, St>
+impl<St, S: BosStr> BindingBuilder<St, S>
 where
     St: binding_state::State,
     St::Path: binding_state::IsSet,

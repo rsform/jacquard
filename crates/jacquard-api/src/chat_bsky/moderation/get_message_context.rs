@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::chat_bsky::convo::DeletedMessageView;
-use crate::chat_bsky::convo::MessageView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::DeletedMessageView;
+use crate::chat_bsky::convo::MessageView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetMessageContext<S: BosStr = DefaultStr> {
     ///Defaults to `5`.
     #[serde(default = "_default_after")]
@@ -37,16 +34,15 @@ pub struct GetMessageContext<S: BosStr = DefaultStr> {
     pub message_id: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetMessageContextOutput<S: BosStr = DefaultStr> {
     pub messages: Vec<GetMessageContextOutputMessagesItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -92,7 +88,7 @@ fn _default_before() -> Option<i64> {
 
 pub mod get_message_context_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -123,21 +119,34 @@ pub mod get_message_context_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetMessageContextBuilder<S: BosStr, St: get_message_context_state::State> {
+pub struct GetMessageContextBuilder<
+    St: get_message_context_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetMessageContext<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetMessageContextBuilder<S, get_message_context_state::Empty> {
+impl GetMessageContext<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetMessageContextBuilder<
+        get_message_context_state::Empty,
+        DefaultStr,
+    > {
         GetMessageContextBuilder::new()
     }
 }
 
-impl<S: BosStr> GetMessageContextBuilder<S, get_message_context_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetMessageContext<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetMessageContextBuilder<get_message_context_state::Empty, S> {
+        GetMessageContextBuilder::builder()
+    }
+}
+
+impl GetMessageContextBuilder<get_message_context_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetMessageContextBuilder {
             _state: PhantomData,
@@ -147,7 +156,18 @@ impl<S: BosStr> GetMessageContextBuilder<S, get_message_context_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_message_context_state::State> GetMessageContextBuilder<S, St> {
+impl<S: BosStr> GetMessageContextBuilder<get_message_context_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetMessageContextBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_message_context_state::State, S: BosStr> GetMessageContextBuilder<St, S> {
     /// Set the `after` field (optional)
     pub fn after(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -160,7 +180,7 @@ impl<S: BosStr, St: get_message_context_state::State> GetMessageContextBuilder<S
     }
 }
 
-impl<S: BosStr, St: get_message_context_state::State> GetMessageContextBuilder<S, St> {
+impl<St: get_message_context_state::State, S: BosStr> GetMessageContextBuilder<St, S> {
     /// Set the `before` field (optional)
     pub fn before(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -173,7 +193,7 @@ impl<S: BosStr, St: get_message_context_state::State> GetMessageContextBuilder<S
     }
 }
 
-impl<S: BosStr, St: get_message_context_state::State> GetMessageContextBuilder<S, St> {
+impl<St: get_message_context_state::State, S: BosStr> GetMessageContextBuilder<St, S> {
     /// Set the `convoId` field (optional)
     pub fn convo_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -186,7 +206,7 @@ impl<S: BosStr, St: get_message_context_state::State> GetMessageContextBuilder<S
     }
 }
 
-impl<S: BosStr, St> GetMessageContextBuilder<S, St>
+impl<St, S: BosStr> GetMessageContextBuilder<St, S>
 where
     St: get_message_context_state::State,
     St::MessageId: get_message_context_state::IsUnset,
@@ -195,7 +215,7 @@ where
     pub fn message_id(
         mut self,
         value: impl Into<S>,
-    ) -> GetMessageContextBuilder<S, get_message_context_state::SetMessageId<St>> {
+    ) -> GetMessageContextBuilder<get_message_context_state::SetMessageId<St>, S> {
         self._fields.3 = Option::Some(value.into());
         GetMessageContextBuilder {
             _state: PhantomData,
@@ -205,7 +225,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetMessageContextBuilder<S, St>
+impl<St, S: BosStr> GetMessageContextBuilder<St, S>
 where
     St: get_message_context_state::State,
     St::MessageId: get_message_context_state::IsSet,

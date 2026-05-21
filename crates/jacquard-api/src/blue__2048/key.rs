@@ -8,12 +8,13 @@
 pub mod game;
 pub mod player;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,14 +27,11 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A record that holds a did:key used to verify records. Use the collection to know the type of verification. Example blue.2048.key.game is for blue.2048.game records
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Key<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///A did:key used to verify records came from an at://2048 authority
@@ -45,10 +43,7 @@ pub struct Key<S: BosStr = DefaultStr> {
 /// a signature for an at://2048 record meaning it has been verified by a service. Most likely @2048.blue
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SignatureRef<S: BosStr = DefaultStr> {
     ///The at://uri for the public did:key to verify this record. This also counts as the authority of the verification (example @2048.blue). As well as the type of verification by the collection name (blue.2048.key.game).
     pub at_uri: S,
@@ -91,7 +86,7 @@ impl<S: BosStr> LexiconSchema for SignatureRef<S> {
 
 pub mod key_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -134,21 +129,28 @@ pub mod key_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct KeyBuilder<S: BosStr, St: key_state::State> {
+pub struct KeyBuilder<St: key_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Key<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> KeyBuilder<S, key_state::Empty> {
+impl Key<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> KeyBuilder<key_state::Empty, DefaultStr> {
         KeyBuilder::new()
     }
 }
 
-impl<S: BosStr> KeyBuilder<S, key_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Key<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> KeyBuilder<key_state::Empty, S> {
+        KeyBuilder::builder()
+    }
+}
+
+impl KeyBuilder<key_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         KeyBuilder {
             _state: PhantomData,
@@ -158,7 +160,18 @@ impl<S: BosStr> KeyBuilder<S, key_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> KeyBuilder<S, St>
+impl<S: BosStr> KeyBuilder<key_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        KeyBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> KeyBuilder<St, S>
 where
     St: key_state::State,
     St::CreatedAt: key_state::IsUnset,
@@ -167,7 +180,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> KeyBuilder<S, key_state::SetCreatedAt<St>> {
+    ) -> KeyBuilder<key_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         KeyBuilder {
             _state: PhantomData,
@@ -177,13 +190,13 @@ where
     }
 }
 
-impl<S: BosStr, St> KeyBuilder<S, St>
+impl<St, S: BosStr> KeyBuilder<St, S>
 where
     St: key_state::State,
     St::Key: key_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(mut self, value: impl Into<S>) -> KeyBuilder<S, key_state::SetKey<St>> {
+    pub fn key(mut self, value: impl Into<S>) -> KeyBuilder<key_state::SetKey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         KeyBuilder {
             _state: PhantomData,
@@ -193,7 +206,7 @@ where
     }
 }
 
-impl<S: BosStr, St> KeyBuilder<S, St>
+impl<St, S: BosStr> KeyBuilder<St, S>
 where
     St: key_state::State,
     St::Key: key_state::IsSet,
@@ -218,10 +231,10 @@ where
 }
 
 fn lexicon_doc_blue_2048_key_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.2048.key.defs"),
@@ -326,7 +339,7 @@ fn lexicon_doc_blue_2048_key_defs() -> LexiconDoc<'static> {
 
 pub mod signature_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -334,70 +347,77 @@ pub mod signature_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type AtUri;
         type Signature;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type AtUri = Unset;
         type Signature = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type AtUri = St::AtUri;
-        type Signature = St::Signature;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `at_uri` field to Set
     pub struct SetAtUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAtUri<St> {}
     impl<St: State> State for SetAtUri<St> {
-        type CreatedAt = St::CreatedAt;
         type AtUri = Set<members::at_uri>;
         type Signature = St::Signature;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `signature` field to Set
     pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSignature<St> {}
     impl<St: State> State for SetSignature<St> {
-        type CreatedAt = St::CreatedAt;
         type AtUri = St::AtUri;
         type Signature = Set<members::signature>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type AtUri = St::AtUri;
+        type Signature = St::Signature;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `at_uri` field
         pub struct at_uri(());
         ///Marker type for the `signature` field
         pub struct signature(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SignatureRefBuilder<S: BosStr, St: signature_ref_state::State> {
+pub struct SignatureRefBuilder<St: signature_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SignatureRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SignatureRefBuilder<S, signature_ref_state::Empty> {
+impl SignatureRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SignatureRefBuilder<signature_ref_state::Empty, DefaultStr> {
         SignatureRefBuilder::new()
     }
 }
 
-impl<S: BosStr> SignatureRefBuilder<S, signature_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SignatureRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SignatureRefBuilder<signature_ref_state::Empty, S> {
+        SignatureRefBuilder::builder()
+    }
+}
+
+impl SignatureRefBuilder<signature_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SignatureRefBuilder {
             _state: PhantomData,
@@ -407,7 +427,18 @@ impl<S: BosStr> SignatureRefBuilder<S, signature_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SignatureRefBuilder<S, St>
+impl<S: BosStr> SignatureRefBuilder<signature_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SignatureRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SignatureRefBuilder<St, S>
 where
     St: signature_ref_state::State,
     St::AtUri: signature_ref_state::IsUnset,
@@ -416,7 +447,7 @@ where
     pub fn at_uri(
         mut self,
         value: impl Into<S>,
-    ) -> SignatureRefBuilder<S, signature_ref_state::SetAtUri<St>> {
+    ) -> SignatureRefBuilder<signature_ref_state::SetAtUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SignatureRefBuilder {
             _state: PhantomData,
@@ -426,7 +457,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SignatureRefBuilder<S, St>
+impl<St, S: BosStr> SignatureRefBuilder<St, S>
 where
     St: signature_ref_state::State,
     St::CreatedAt: signature_ref_state::IsUnset,
@@ -435,7 +466,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SignatureRefBuilder<S, signature_ref_state::SetCreatedAt<St>> {
+    ) -> SignatureRefBuilder<signature_ref_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SignatureRefBuilder {
             _state: PhantomData,
@@ -445,7 +476,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SignatureRefBuilder<S, St>
+impl<St, S: BosStr> SignatureRefBuilder<St, S>
 where
     St: signature_ref_state::State,
     St::Signature: signature_ref_state::IsUnset,
@@ -454,7 +485,7 @@ where
     pub fn signature(
         mut self,
         value: impl Into<S>,
-    ) -> SignatureRefBuilder<S, signature_ref_state::SetSignature<St>> {
+    ) -> SignatureRefBuilder<signature_ref_state::SetSignature<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SignatureRefBuilder {
             _state: PhantomData,
@@ -464,12 +495,12 @@ where
     }
 }
 
-impl<S: BosStr, St> SignatureRefBuilder<S, St>
+impl<St, S: BosStr> SignatureRefBuilder<St, S>
 where
     St: signature_ref_state::State,
-    St::CreatedAt: signature_ref_state::IsSet,
     St::AtUri: signature_ref_state::IsSet,
     St::Signature: signature_ref_state::IsSet,
+    St::CreatedAt: signature_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SignatureRef<S> {
@@ -481,7 +512,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SignatureRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SignatureRef<S> {
         SignatureRef {
             at_uri: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

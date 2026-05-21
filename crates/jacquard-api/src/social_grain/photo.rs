@@ -7,12 +7,13 @@
 
 pub mod exif;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,11 +28,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::social_grain::AspectRatio;
-use crate::social_grain::photo;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_grain::AspectRatio;
+use crate::social_grain::photo;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -63,11 +64,9 @@ pub struct PhotoGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Photo<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExifView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -99,11 +98,9 @@ pub struct ExifView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PhotoView<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     pub alt: S,
@@ -184,16 +181,19 @@ impl<S: BosStr> LexiconSchema for Photo<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("photo"),
@@ -239,7 +239,7 @@ impl<S: BosStr> LexiconSchema for PhotoView<S> {
 
 pub mod photo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -282,26 +282,28 @@ pub mod photo_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PhotoBuilder<S: BosStr, St: photo_state::State> {
+pub struct PhotoBuilder<St: photo_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<AspectRatio<S>>,
-        Option<Datetime>,
-        Option<BlobRef<S>>,
-    ),
+    _fields: (Option<S>, Option<AspectRatio<S>>, Option<Datetime>, Option<BlobRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Photo<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PhotoBuilder<S, photo_state::Empty> {
+impl Photo<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PhotoBuilder<photo_state::Empty, DefaultStr> {
         PhotoBuilder::new()
     }
 }
 
-impl<S: BosStr> PhotoBuilder<S, photo_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Photo<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PhotoBuilder<photo_state::Empty, S> {
+        PhotoBuilder::builder()
+    }
+}
+
+impl PhotoBuilder<photo_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PhotoBuilder {
             _state: PhantomData,
@@ -311,13 +313,27 @@ impl<S: BosStr> PhotoBuilder<S, photo_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PhotoBuilder<S, St>
+impl<S: BosStr> PhotoBuilder<photo_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PhotoBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PhotoBuilder<St, S>
 where
     St: photo_state::State,
     St::Alt: photo_state::IsUnset,
 {
     /// Set the `alt` field (required)
-    pub fn alt(mut self, value: impl Into<S>) -> PhotoBuilder<S, photo_state::SetAlt<St>> {
+    pub fn alt(
+        mut self,
+        value: impl Into<S>,
+    ) -> PhotoBuilder<photo_state::SetAlt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PhotoBuilder {
             _state: PhantomData,
@@ -327,7 +343,7 @@ where
     }
 }
 
-impl<S: BosStr, St: photo_state::State> PhotoBuilder<S, St> {
+impl<St: photo_state::State, S: BosStr> PhotoBuilder<St, S> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -340,7 +356,7 @@ impl<S: BosStr, St: photo_state::State> PhotoBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: photo_state::State> PhotoBuilder<S, St> {
+impl<St: photo_state::State, S: BosStr> PhotoBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -353,7 +369,7 @@ impl<S: BosStr, St: photo_state::State> PhotoBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PhotoBuilder<S, St>
+impl<St, S: BosStr> PhotoBuilder<St, S>
 where
     St: photo_state::State,
     St::Photo: photo_state::IsUnset,
@@ -362,7 +378,7 @@ where
     pub fn photo(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> PhotoBuilder<S, photo_state::SetPhoto<St>> {
+    ) -> PhotoBuilder<photo_state::SetPhoto<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PhotoBuilder {
             _state: PhantomData,
@@ -372,7 +388,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PhotoBuilder<S, St>
+impl<St, S: BosStr> PhotoBuilder<St, S>
 where
     St: photo_state::State,
     St::Photo: photo_state::IsSet,
@@ -401,10 +417,10 @@ where
 }
 
 fn lexicon_doc_social_grain_photo() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.grain.photo"),
@@ -415,19 +431,22 @@ fn lexicon_doc_social_grain_photo() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("photo"),
-                            SmolStr::new_static("alt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("photo"), SmolStr::new_static("alt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("alt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Alt text description of the image, for accessibility.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Alt text description of the image, for accessibility.",
+                                        ),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
@@ -447,9 +466,7 @@ fn lexicon_doc_social_grain_photo() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("photo"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map
                         },
@@ -466,7 +483,7 @@ fn lexicon_doc_social_grain_photo() -> LexiconDoc<'static> {
 
 pub mod exif_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -509,7 +526,7 @@ pub mod exif_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ExifViewBuilder<S: BosStr, St: exif_view_state::State> {
+pub struct ExifViewBuilder<St: exif_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
@@ -530,27 +547,73 @@ pub struct ExifViewBuilder<S: BosStr, St: exif_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ExifView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ExifViewBuilder<S, exif_view_state::Empty> {
+impl ExifView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ExifViewBuilder<exif_view_state::Empty, DefaultStr> {
         ExifViewBuilder::new()
     }
 }
 
-impl<S: BosStr> ExifViewBuilder<S, exif_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ExifView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ExifViewBuilder<exif_view_state::Empty, S> {
+        ExifViewBuilder::builder()
+    }
+}
+
+impl ExifViewBuilder<exif_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ExifViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
+impl<S: BosStr> ExifViewBuilder<exif_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ExifViewBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: exif_view_state::State, S: BosStr> ExifViewBuilder<St, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -563,7 +626,7 @@ impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ExifViewBuilder<S, St>
+impl<St, S: BosStr> ExifViewBuilder<St, S>
 where
     St: exif_view_state::State,
     St::CreatedAt: exif_view_state::IsUnset,
@@ -572,7 +635,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ExifViewBuilder<S, exif_view_state::SetCreatedAt<St>> {
+    ) -> ExifViewBuilder<exif_view_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ExifViewBuilder {
             _state: PhantomData,
@@ -582,7 +645,7 @@ where
     }
 }
 
-impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
+impl<St: exif_view_state::State, S: BosStr> ExifViewBuilder<St, S> {
     /// Set the `dateTimeOriginal` field (optional)
     pub fn date_time_original(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -595,7 +658,7 @@ impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
+impl<St: exif_view_state::State, S: BosStr> ExifViewBuilder<St, S> {
     /// Set the `exposureTime` field (optional)
     pub fn exposure_time(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -608,7 +671,7 @@ impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
+impl<St: exif_view_state::State, S: BosStr> ExifViewBuilder<St, S> {
     /// Set the `fNumber` field (optional)
     pub fn f_number(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -621,7 +684,7 @@ impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
+impl<St: exif_view_state::State, S: BosStr> ExifViewBuilder<St, S> {
     /// Set the `flash` field (optional)
     pub fn flash(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -634,7 +697,7 @@ impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
+impl<St: exif_view_state::State, S: BosStr> ExifViewBuilder<St, S> {
     /// Set the `focalLengthIn35mmFormat` field (optional)
     pub fn focal_length_in35mm_format(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -647,7 +710,7 @@ impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
+impl<St: exif_view_state::State, S: BosStr> ExifViewBuilder<St, S> {
     /// Set the `iSO` field (optional)
     pub fn i_so(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.7 = value.into();
@@ -660,7 +723,7 @@ impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
+impl<St: exif_view_state::State, S: BosStr> ExifViewBuilder<St, S> {
     /// Set the `lensMake` field (optional)
     pub fn lens_make(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -673,7 +736,7 @@ impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
+impl<St: exif_view_state::State, S: BosStr> ExifViewBuilder<St, S> {
     /// Set the `lensModel` field (optional)
     pub fn lens_model(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -686,7 +749,7 @@ impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
+impl<St: exif_view_state::State, S: BosStr> ExifViewBuilder<St, S> {
     /// Set the `make` field (optional)
     pub fn make(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -699,7 +762,7 @@ impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
+impl<St: exif_view_state::State, S: BosStr> ExifViewBuilder<St, S> {
     /// Set the `model` field (optional)
     pub fn model(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
@@ -712,7 +775,7 @@ impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ExifViewBuilder<S, St>
+impl<St, S: BosStr> ExifViewBuilder<St, S>
 where
     St: exif_view_state::State,
     St::Photo: exif_view_state::IsUnset,
@@ -721,7 +784,7 @@ where
     pub fn photo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ExifViewBuilder<S, exif_view_state::SetPhoto<St>> {
+    ) -> ExifViewBuilder<exif_view_state::SetPhoto<St>, S> {
         self._fields.12 = Option::Some(value.into());
         ExifViewBuilder {
             _state: PhantomData,
@@ -731,7 +794,7 @@ where
     }
 }
 
-impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
+impl<St: exif_view_state::State, S: BosStr> ExifViewBuilder<St, S> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.13 = value.into();
@@ -744,7 +807,7 @@ impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ExifViewBuilder<S, St>
+impl<St, S: BosStr> ExifViewBuilder<St, S>
 where
     St: exif_view_state::State,
     St::Photo: exif_view_state::IsSet,
@@ -793,10 +856,10 @@ where
 }
 
 fn lexicon_doc_social_grain_photo_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.grain.photo.defs"),
@@ -805,10 +868,12 @@ fn lexicon_doc_social_grain_photo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("exifView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("photo"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("photo"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -828,33 +893,23 @@ fn lexicon_doc_social_grain_photo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("dateTimeOriginal"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("exposureTime"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("fNumber"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("flash"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("focalLengthIn35mmFormat"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("iSO"),
@@ -864,27 +919,19 @@ fn lexicon_doc_social_grain_photo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("lensMake"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("lensModel"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("make"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("model"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("photo"),
@@ -996,7 +1043,7 @@ fn lexicon_doc_social_grain_photo_defs() -> LexiconDoc<'static> {
 
 pub mod photo_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1004,90 +1051,90 @@ pub mod photo_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Uri;
+        type Thumb;
+        type Cid;
         type Alt;
         type Fullsize;
-        type Uri;
-        type Cid;
-        type Thumb;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Uri = Unset;
+        type Thumb = Unset;
+        type Cid = Unset;
         type Alt = Unset;
         type Fullsize = Unset;
-        type Uri = Unset;
-        type Cid = Unset;
-        type Thumb = Unset;
-    }
-    ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAlt<St> {}
-    impl<St: State> State for SetAlt<St> {
-        type Alt = Set<members::alt>;
-        type Fullsize = St::Fullsize;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-        type Thumb = St::Thumb;
-    }
-    ///State transition - sets the `fullsize` field to Set
-    pub struct SetFullsize<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFullsize<St> {}
-    impl<St: State> State for SetFullsize<St> {
-        type Alt = St::Alt;
-        type Fullsize = Set<members::fullsize>;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-        type Thumb = St::Thumb;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Alt = St::Alt;
-        type Fullsize = St::Fullsize;
         type Uri = Set<members::uri>;
-        type Cid = St::Cid;
         type Thumb = St::Thumb;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
+        type Cid = St::Cid;
         type Alt = St::Alt;
         type Fullsize = St::Fullsize;
-        type Uri = St::Uri;
-        type Cid = Set<members::cid>;
-        type Thumb = St::Thumb;
     }
     ///State transition - sets the `thumb` field to Set
     pub struct SetThumb<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetThumb<St> {}
     impl<St: State> State for SetThumb<St> {
+        type Uri = St::Uri;
+        type Thumb = Set<members::thumb>;
+        type Cid = St::Cid;
         type Alt = St::Alt;
         type Fullsize = St::Fullsize;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
         type Uri = St::Uri;
+        type Thumb = St::Thumb;
+        type Cid = Set<members::cid>;
+        type Alt = St::Alt;
+        type Fullsize = St::Fullsize;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlt<St> {}
+    impl<St: State> State for SetAlt<St> {
+        type Uri = St::Uri;
+        type Thumb = St::Thumb;
         type Cid = St::Cid;
-        type Thumb = Set<members::thumb>;
+        type Alt = Set<members::alt>;
+        type Fullsize = St::Fullsize;
+    }
+    ///State transition - sets the `fullsize` field to Set
+    pub struct SetFullsize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFullsize<St> {}
+    impl<St: State> State for SetFullsize<St> {
+        type Uri = St::Uri;
+        type Thumb = St::Thumb;
+        type Cid = St::Cid;
+        type Alt = St::Alt;
+        type Fullsize = Set<members::fullsize>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `thumb` field
+        pub struct thumb(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `alt` field
         pub struct alt(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `thumb` field
-        pub struct thumb(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PhotoViewBuilder<S: BosStr, St: photo_view_state::State> {
+pub struct PhotoViewBuilder<St: photo_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -1101,15 +1148,22 @@ pub struct PhotoViewBuilder<S: BosStr, St: photo_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PhotoView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PhotoViewBuilder<S, photo_view_state::Empty> {
+impl PhotoView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PhotoViewBuilder<photo_view_state::Empty, DefaultStr> {
         PhotoViewBuilder::new()
     }
 }
 
-impl<S: BosStr> PhotoViewBuilder<S, photo_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PhotoView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PhotoViewBuilder<photo_view_state::Empty, S> {
+        PhotoViewBuilder::builder()
+    }
+}
+
+impl PhotoViewBuilder<photo_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PhotoViewBuilder {
             _state: PhantomData,
@@ -1119,13 +1173,27 @@ impl<S: BosStr> PhotoViewBuilder<S, photo_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PhotoViewBuilder<S, St>
+impl<S: BosStr> PhotoViewBuilder<photo_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PhotoViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PhotoViewBuilder<St, S>
 where
     St: photo_view_state::State,
     St::Alt: photo_view_state::IsUnset,
 {
     /// Set the `alt` field (required)
-    pub fn alt(mut self, value: impl Into<S>) -> PhotoViewBuilder<S, photo_view_state::SetAlt<St>> {
+    pub fn alt(
+        mut self,
+        value: impl Into<S>,
+    ) -> PhotoViewBuilder<photo_view_state::SetAlt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PhotoViewBuilder {
             _state: PhantomData,
@@ -1135,7 +1203,7 @@ where
     }
 }
 
-impl<S: BosStr, St: photo_view_state::State> PhotoViewBuilder<S, St> {
+impl<St: photo_view_state::State, S: BosStr> PhotoViewBuilder<St, S> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -1148,7 +1216,7 @@ impl<S: BosStr, St: photo_view_state::State> PhotoViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PhotoViewBuilder<S, St>
+impl<St, S: BosStr> PhotoViewBuilder<St, S>
 where
     St: photo_view_state::State,
     St::Cid: photo_view_state::IsUnset,
@@ -1157,7 +1225,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> PhotoViewBuilder<S, photo_view_state::SetCid<St>> {
+    ) -> PhotoViewBuilder<photo_view_state::SetCid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PhotoViewBuilder {
             _state: PhantomData,
@@ -1167,7 +1235,7 @@ where
     }
 }
 
-impl<S: BosStr, St: photo_view_state::State> PhotoViewBuilder<S, St> {
+impl<St: photo_view_state::State, S: BosStr> PhotoViewBuilder<St, S> {
     /// Set the `exif` field (optional)
     pub fn exif(mut self, value: impl Into<Option<photo::ExifView<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -1180,7 +1248,7 @@ impl<S: BosStr, St: photo_view_state::State> PhotoViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PhotoViewBuilder<S, St>
+impl<St, S: BosStr> PhotoViewBuilder<St, S>
 where
     St: photo_view_state::State,
     St::Fullsize: photo_view_state::IsUnset,
@@ -1189,7 +1257,7 @@ where
     pub fn fullsize(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> PhotoViewBuilder<S, photo_view_state::SetFullsize<St>> {
+    ) -> PhotoViewBuilder<photo_view_state::SetFullsize<St>, S> {
         self._fields.4 = Option::Some(value.into());
         PhotoViewBuilder {
             _state: PhantomData,
@@ -1199,7 +1267,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PhotoViewBuilder<S, St>
+impl<St, S: BosStr> PhotoViewBuilder<St, S>
 where
     St: photo_view_state::State,
     St::Thumb: photo_view_state::IsUnset,
@@ -1208,7 +1276,7 @@ where
     pub fn thumb(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> PhotoViewBuilder<S, photo_view_state::SetThumb<St>> {
+    ) -> PhotoViewBuilder<photo_view_state::SetThumb<St>, S> {
         self._fields.5 = Option::Some(value.into());
         PhotoViewBuilder {
             _state: PhantomData,
@@ -1218,7 +1286,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PhotoViewBuilder<S, St>
+impl<St, S: BosStr> PhotoViewBuilder<St, S>
 where
     St: photo_view_state::State,
     St::Uri: photo_view_state::IsUnset,
@@ -1227,7 +1295,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> PhotoViewBuilder<S, photo_view_state::SetUri<St>> {
+    ) -> PhotoViewBuilder<photo_view_state::SetUri<St>, S> {
         self._fields.6 = Option::Some(value.into());
         PhotoViewBuilder {
             _state: PhantomData,
@@ -1237,14 +1305,14 @@ where
     }
 }
 
-impl<S: BosStr, St> PhotoViewBuilder<S, St>
+impl<St, S: BosStr> PhotoViewBuilder<St, S>
 where
     St: photo_view_state::State,
+    St::Uri: photo_view_state::IsSet,
+    St::Thumb: photo_view_state::IsSet,
+    St::Cid: photo_view_state::IsSet,
     St::Alt: photo_view_state::IsSet,
     St::Fullsize: photo_view_state::IsSet,
-    St::Uri: photo_view_state::IsSet,
-    St::Cid: photo_view_state::IsSet,
-    St::Thumb: photo_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PhotoView<S> {
@@ -1260,7 +1328,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PhotoView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PhotoView<S> {
         PhotoView {
             alt: self._fields.0.unwrap(),
             aspect_ratio: self._fields.1,

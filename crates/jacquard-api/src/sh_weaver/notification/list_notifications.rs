@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notification::Notification;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notification::Notification;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListNotifications<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -36,11 +33,9 @@ pub struct ListNotifications<S: BosStr = DefaultStr> {
     pub seen_at: Option<Datetime>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListNotificationsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -81,7 +76,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_notifications_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -99,21 +94,34 @@ pub mod list_notifications_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListNotificationsBuilder<S: BosStr, St: list_notifications_state::State> {
+pub struct ListNotificationsBuilder<
+    St: list_notifications_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<Vec<S>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListNotifications<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListNotificationsBuilder<S, list_notifications_state::Empty> {
+impl ListNotifications<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListNotificationsBuilder<
+        list_notifications_state::Empty,
+        DefaultStr,
+    > {
         ListNotificationsBuilder::new()
     }
 }
 
-impl<S: BosStr> ListNotificationsBuilder<S, list_notifications_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListNotifications<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListNotificationsBuilder<list_notifications_state::Empty, S> {
+        ListNotificationsBuilder::builder()
+    }
+}
+
+impl ListNotificationsBuilder<list_notifications_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListNotificationsBuilder {
             _state: PhantomData,
@@ -123,7 +131,18 @@ impl<S: BosStr> ListNotificationsBuilder<S, list_notifications_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S, St> {
+impl<S: BosStr> ListNotificationsBuilder<list_notifications_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListNotificationsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: list_notifications_state::State, S: BosStr> ListNotificationsBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -136,7 +155,7 @@ impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S,
     }
 }
 
-impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S, St> {
+impl<St: list_notifications_state::State, S: BosStr> ListNotificationsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -149,7 +168,7 @@ impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S,
     }
 }
 
-impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S, St> {
+impl<St: list_notifications_state::State, S: BosStr> ListNotificationsBuilder<St, S> {
     /// Set the `reasons` field (optional)
     pub fn reasons(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -162,7 +181,7 @@ impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S,
     }
 }
 
-impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S, St> {
+impl<St: list_notifications_state::State, S: BosStr> ListNotificationsBuilder<St, S> {
     /// Set the `seenAt` field (optional)
     pub fn seen_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -175,7 +194,7 @@ impl<S: BosStr, St: list_notifications_state::State> ListNotificationsBuilder<S,
     }
 }
 
-impl<S: BosStr, St> ListNotificationsBuilder<S, St>
+impl<St, S: BosStr> ListNotificationsBuilder<St, S>
 where
     St: list_notifications_state::State,
 {

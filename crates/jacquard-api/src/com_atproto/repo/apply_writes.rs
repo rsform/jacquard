@@ -10,30 +10,27 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_common::types::string::{AtUri, Cid, Nsid, RecordKey, Rkey};
+use jacquard_common::types::string::{AtUri, Nsid, Cid, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::CommitMeta;
-use crate::com_atproto::repo::apply_writes;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::CommitMeta;
+use crate::com_atproto::repo::apply_writes;
 /// Operation which creates a new record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Create<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
     ///NOTE: maxLength is redundant with record-key format. Keeping it temporarily to ensure backwards compatibility.
@@ -44,11 +41,9 @@ pub struct Create<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateResult<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -57,6 +52,7 @@ pub struct CreateResult<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CreateResultValidationStatus<S: BosStr = DefaultStr> {
@@ -104,7 +100,8 @@ impl<S: BosStr> Serialize for CreateResultValidationStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CreateResultValidationStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for CreateResultValidationStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -129,7 +126,9 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             CreateResultValidationStatus::Valid => CreateResultValidationStatus::Valid,
-            CreateResultValidationStatus::Unknown => CreateResultValidationStatus::Unknown,
+            CreateResultValidationStatus::Unknown => {
+                CreateResultValidationStatus::Unknown
+            }
             CreateResultValidationStatus::Other(v) => {
                 CreateResultValidationStatus::Other(v.into_static())
             }
@@ -140,10 +139,7 @@ where
 /// Operation which deletes an existing record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Delete<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
     pub rkey: RecordKey<Rkey<S>>,
@@ -151,21 +147,17 @@ pub struct Delete<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteResult<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ApplyWrites<S: BosStr = DefaultStr> {
     ///The handle or DID of the repo (aka, current account).
     pub repo: AtIdentifier<S>,
@@ -180,6 +172,7 @@ pub struct ApplyWrites<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ApplyWritesWritesItem<S: BosStr = DefaultStr> {
@@ -191,11 +184,9 @@ pub enum ApplyWritesWritesItem<S: BosStr = DefaultStr> {
     Delete(Box<apply_writes::Delete<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ApplyWritesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub commit: Option<CommitMeta<S>>,
@@ -204,6 +195,7 @@ pub struct ApplyWritesOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -216,9 +208,18 @@ pub enum ApplyWritesOutputResultsItem<S: BosStr = DefaultStr> {
     DeleteResult(Box<apply_writes::DeleteResult<S>>),
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ApplyWritesError {
     /// Indicates that the 'swapCommit' parameter did not match current commit.
@@ -226,10 +227,7 @@ pub enum ApplyWritesError {
     InvalidSwap(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ApplyWritesError {
@@ -256,10 +254,7 @@ impl core::fmt::Display for ApplyWritesError {
 /// Operation which updates an existing record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Update<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
     pub rkey: RecordKey<Rkey<S>>,
@@ -268,11 +263,9 @@ pub struct Update<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateResult<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -281,6 +274,7 @@ pub struct UpdateResult<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UpdateResultValidationStatus<S: BosStr = DefaultStr> {
@@ -328,7 +322,8 @@ impl<S: BosStr> Serialize for UpdateResultValidationStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for UpdateResultValidationStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for UpdateResultValidationStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -353,7 +348,9 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             UpdateResultValidationStatus::Valid => UpdateResultValidationStatus::Valid,
-            UpdateResultValidationStatus::Unknown => UpdateResultValidationStatus::Unknown,
+            UpdateResultValidationStatus::Unknown => {
+                UpdateResultValidationStatus::Unknown
+            }
             UpdateResultValidationStatus::Other(v) => {
                 UpdateResultValidationStatus::Other(v.into_static())
             }
@@ -442,8 +439,9 @@ impl jacquard_common::xrpc::XrpcResp for ApplyWritesResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ApplyWrites<S> {
     const NSID: &'static str = "com.atproto.repo.applyWrites";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ApplyWritesResponse;
 }
 
@@ -451,8 +449,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ApplyWrites<S> {
 pub struct ApplyWritesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ApplyWritesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.repo.applyWrites";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ApplyWrites<S>;
     type Response = ApplyWritesResponse;
 }
@@ -489,7 +488,7 @@ impl<S: BosStr> LexiconSchema for UpdateResult<S> {
 
 pub mod create_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -497,56 +496,63 @@ pub mod create_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Collection;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Collection = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValue<St> {}
-    impl<St: State> State for SetValue<St> {
-        type Value = Set<members::value>;
-        type Collection = St::Collection;
+        type Value = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
-        type Value = St::Value;
         type Collection = Set<members::collection>;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type Collection = St::Collection;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateBuilder<S: BosStr, St: create_state::State> {
+pub struct CreateBuilder<St: create_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Nsid<S>>, Option<RecordKey<Rkey<S>>>, Option<Data<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Create<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CreateBuilder<S, create_state::Empty> {
+impl Create<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CreateBuilder<create_state::Empty, DefaultStr> {
         CreateBuilder::new()
     }
 }
 
-impl<S: BosStr> CreateBuilder<S, create_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Create<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CreateBuilder<create_state::Empty, S> {
+        CreateBuilder::builder()
+    }
+}
+
+impl CreateBuilder<create_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CreateBuilder {
             _state: PhantomData,
@@ -556,7 +562,18 @@ impl<S: BosStr> CreateBuilder<S, create_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CreateBuilder<S, St>
+impl<S: BosStr> CreateBuilder<create_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CreateBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CreateBuilder<St, S>
 where
     St: create_state::State,
     St::Collection: create_state::IsUnset,
@@ -565,7 +582,7 @@ where
     pub fn collection(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> CreateBuilder<S, create_state::SetCollection<St>> {
+    ) -> CreateBuilder<create_state::SetCollection<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CreateBuilder {
             _state: PhantomData,
@@ -575,7 +592,7 @@ where
     }
 }
 
-impl<S: BosStr, St: create_state::State> CreateBuilder<S, St> {
+impl<St: create_state::State, S: BosStr> CreateBuilder<St, S> {
     /// Set the `rkey` field (optional)
     pub fn rkey(mut self, value: impl Into<Option<RecordKey<Rkey<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -588,7 +605,7 @@ impl<S: BosStr, St: create_state::State> CreateBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CreateBuilder<S, St>
+impl<St, S: BosStr> CreateBuilder<St, S>
 where
     St: create_state::State,
     St::Value: create_state::IsUnset,
@@ -597,7 +614,7 @@ where
     pub fn value(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> CreateBuilder<S, create_state::SetValue<St>> {
+    ) -> CreateBuilder<create_state::SetValue<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CreateBuilder {
             _state: PhantomData,
@@ -607,11 +624,11 @@ where
     }
 }
 
-impl<S: BosStr, St> CreateBuilder<S, St>
+impl<St, S: BosStr> CreateBuilder<St, S>
 where
     St: create_state::State,
-    St::Value: create_state::IsSet,
     St::Collection: create_state::IsSet,
+    St::Value: create_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Create<S> {
@@ -634,10 +651,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.repo.applyWrites"),
@@ -692,7 +709,9 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("createResult"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -712,9 +731,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("validationStatus"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -724,13 +741,15 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("delete"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Operation which deletes an existing record.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("collection"),
-                        SmolStr::new_static("rkey"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Operation which deletes an existing record."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("collection"),
+                            SmolStr::new_static("rkey")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -837,14 +856,15 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("update"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Operation which updates an existing record.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("collection"),
-                        SmolStr::new_static("rkey"),
-                        SmolStr::new_static("value"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Operation which updates an existing record."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("collection"),
+                            SmolStr::new_static("rkey"), SmolStr::new_static("value")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -876,7 +896,9 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("updateResult"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -896,9 +918,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("validationStatus"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -913,7 +933,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> LexiconDoc<'static> {
 
 pub mod create_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -921,60 +941,63 @@ pub mod create_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Cid = Set<members::cid>;
-        type Uri = St::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Cid = St::Cid;
         type Uri = Set<members::uri>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Uri = St::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateResultBuilder<S: BosStr, St: create_result_state::State> {
+pub struct CreateResultBuilder<St: create_result_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Cid<S>>,
-        Option<AtUri<S>>,
-        Option<CreateResultValidationStatus<S>>,
-    ),
+    _fields: (Option<Cid<S>>, Option<AtUri<S>>, Option<CreateResultValidationStatus<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CreateResult<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CreateResultBuilder<S, create_result_state::Empty> {
+impl CreateResult<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CreateResultBuilder<create_result_state::Empty, DefaultStr> {
         CreateResultBuilder::new()
     }
 }
 
-impl<S: BosStr> CreateResultBuilder<S, create_result_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CreateResult<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CreateResultBuilder<create_result_state::Empty, S> {
+        CreateResultBuilder::builder()
+    }
+}
+
+impl CreateResultBuilder<create_result_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CreateResultBuilder {
             _state: PhantomData,
@@ -984,7 +1007,18 @@ impl<S: BosStr> CreateResultBuilder<S, create_result_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CreateResultBuilder<S, St>
+impl<S: BosStr> CreateResultBuilder<create_result_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CreateResultBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CreateResultBuilder<St, S>
 where
     St: create_result_state::State,
     St::Cid: create_result_state::IsUnset,
@@ -993,7 +1027,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> CreateResultBuilder<S, create_result_state::SetCid<St>> {
+    ) -> CreateResultBuilder<create_result_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CreateResultBuilder {
             _state: PhantomData,
@@ -1003,7 +1037,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CreateResultBuilder<S, St>
+impl<St, S: BosStr> CreateResultBuilder<St, S>
 where
     St: create_result_state::State,
     St::Uri: create_result_state::IsUnset,
@@ -1012,7 +1046,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> CreateResultBuilder<S, create_result_state::SetUri<St>> {
+    ) -> CreateResultBuilder<create_result_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CreateResultBuilder {
             _state: PhantomData,
@@ -1022,7 +1056,7 @@ where
     }
 }
 
-impl<S: BosStr, St: create_result_state::State> CreateResultBuilder<S, St> {
+impl<St: create_result_state::State, S: BosStr> CreateResultBuilder<St, S> {
     /// Set the `validationStatus` field (optional)
     pub fn validation_status(
         mut self,
@@ -1041,11 +1075,11 @@ impl<S: BosStr, St: create_result_state::State> CreateResultBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CreateResultBuilder<S, St>
+impl<St, S: BosStr> CreateResultBuilder<St, S>
 where
     St: create_result_state::State,
-    St::Cid: create_result_state::IsSet,
     St::Uri: create_result_state::IsSet,
+    St::Cid: create_result_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CreateResult<S> {
@@ -1057,7 +1091,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateResult<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateResult<S> {
         CreateResult {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -1069,7 +1106,7 @@ where
 
 pub mod delete_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1077,56 +1114,63 @@ pub mod delete_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
         type Rkey;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCollection<St> {}
-    impl<St: State> State for SetCollection<St> {
-        type Collection = Set<members::collection>;
-        type Rkey = St::Rkey;
+        type Collection = Unset;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRkey<St> {}
     impl<St: State> State for SetRkey<St> {
-        type Collection = St::Collection;
         type Rkey = Set<members::rkey>;
+        type Collection = St::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCollection<St> {}
+    impl<St: State> State for SetCollection<St> {
+        type Rkey = St::Rkey;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeleteBuilder<S: BosStr, St: delete_state::State> {
+pub struct DeleteBuilder<St: delete_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Nsid<S>>, Option<RecordKey<Rkey<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Delete<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DeleteBuilder<S, delete_state::Empty> {
+impl Delete<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DeleteBuilder<delete_state::Empty, DefaultStr> {
         DeleteBuilder::new()
     }
 }
 
-impl<S: BosStr> DeleteBuilder<S, delete_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Delete<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DeleteBuilder<delete_state::Empty, S> {
+        DeleteBuilder::builder()
+    }
+}
+
+impl DeleteBuilder<delete_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DeleteBuilder {
             _state: PhantomData,
@@ -1136,7 +1180,18 @@ impl<S: BosStr> DeleteBuilder<S, delete_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DeleteBuilder<S, St>
+impl<S: BosStr> DeleteBuilder<delete_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DeleteBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DeleteBuilder<St, S>
 where
     St: delete_state::State,
     St::Collection: delete_state::IsUnset,
@@ -1145,7 +1200,7 @@ where
     pub fn collection(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> DeleteBuilder<S, delete_state::SetCollection<St>> {
+    ) -> DeleteBuilder<delete_state::SetCollection<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DeleteBuilder {
             _state: PhantomData,
@@ -1155,7 +1210,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeleteBuilder<S, St>
+impl<St, S: BosStr> DeleteBuilder<St, S>
 where
     St: delete_state::State,
     St::Rkey: delete_state::IsUnset,
@@ -1164,7 +1219,7 @@ where
     pub fn rkey(
         mut self,
         value: impl Into<RecordKey<Rkey<S>>>,
-    ) -> DeleteBuilder<S, delete_state::SetRkey<St>> {
+    ) -> DeleteBuilder<delete_state::SetRkey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DeleteBuilder {
             _state: PhantomData,
@@ -1174,11 +1229,11 @@ where
     }
 }
 
-impl<S: BosStr, St> DeleteBuilder<S, St>
+impl<St, S: BosStr> DeleteBuilder<St, S>
 where
     St: delete_state::State,
-    St::Collection: delete_state::IsSet,
     St::Rkey: delete_state::IsSet,
+    St::Collection: delete_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Delete<S> {
@@ -1200,7 +1255,7 @@ where
 
 pub mod apply_writes_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1208,42 +1263,42 @@ pub mod apply_writes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Writes;
         type Repo;
+        type Writes;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Writes = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `writes` field to Set
-    pub struct SetWrites<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWrites<St> {}
-    impl<St: State> State for SetWrites<St> {
-        type Writes = Set<members::writes>;
-        type Repo = St::Repo;
+        type Writes = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
-        type Writes = St::Writes;
         type Repo = Set<members::repo>;
+        type Writes = St::Writes;
+    }
+    ///State transition - sets the `writes` field to Set
+    pub struct SetWrites<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWrites<St> {}
+    impl<St: State> State for SetWrites<St> {
+        type Repo = St::Repo;
+        type Writes = Set<members::writes>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `writes` field
-        pub struct writes(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `writes` field
+        pub struct writes(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ApplyWritesBuilder<S: BosStr, St: apply_writes_state::State> {
+pub struct ApplyWritesBuilder<St: apply_writes_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtIdentifier<S>>,
@@ -1254,15 +1309,22 @@ pub struct ApplyWritesBuilder<S: BosStr, St: apply_writes_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ApplyWrites<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ApplyWritesBuilder<S, apply_writes_state::Empty> {
+impl ApplyWrites<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ApplyWritesBuilder<apply_writes_state::Empty, DefaultStr> {
         ApplyWritesBuilder::new()
     }
 }
 
-impl<S: BosStr> ApplyWritesBuilder<S, apply_writes_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ApplyWrites<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ApplyWritesBuilder<apply_writes_state::Empty, S> {
+        ApplyWritesBuilder::builder()
+    }
+}
+
+impl ApplyWritesBuilder<apply_writes_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ApplyWritesBuilder {
             _state: PhantomData,
@@ -1272,7 +1334,18 @@ impl<S: BosStr> ApplyWritesBuilder<S, apply_writes_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ApplyWritesBuilder<S, St>
+impl<S: BosStr> ApplyWritesBuilder<apply_writes_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ApplyWritesBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ApplyWritesBuilder<St, S>
 where
     St: apply_writes_state::State,
     St::Repo: apply_writes_state::IsUnset,
@@ -1281,7 +1354,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> ApplyWritesBuilder<S, apply_writes_state::SetRepo<St>> {
+    ) -> ApplyWritesBuilder<apply_writes_state::SetRepo<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ApplyWritesBuilder {
             _state: PhantomData,
@@ -1291,7 +1364,7 @@ where
     }
 }
 
-impl<S: BosStr, St: apply_writes_state::State> ApplyWritesBuilder<S, St> {
+impl<St: apply_writes_state::State, S: BosStr> ApplyWritesBuilder<St, S> {
     /// Set the `swapCommit` field (optional)
     pub fn swap_commit(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -1304,7 +1377,7 @@ impl<S: BosStr, St: apply_writes_state::State> ApplyWritesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: apply_writes_state::State> ApplyWritesBuilder<S, St> {
+impl<St: apply_writes_state::State, S: BosStr> ApplyWritesBuilder<St, S> {
     /// Set the `validate` field (optional)
     pub fn validate(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -1317,7 +1390,7 @@ impl<S: BosStr, St: apply_writes_state::State> ApplyWritesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ApplyWritesBuilder<S, St>
+impl<St, S: BosStr> ApplyWritesBuilder<St, S>
 where
     St: apply_writes_state::State,
     St::Writes: apply_writes_state::IsUnset,
@@ -1326,7 +1399,7 @@ where
     pub fn writes(
         mut self,
         value: impl Into<Vec<ApplyWritesWritesItem<S>>>,
-    ) -> ApplyWritesBuilder<S, apply_writes_state::SetWrites<St>> {
+    ) -> ApplyWritesBuilder<apply_writes_state::SetWrites<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ApplyWritesBuilder {
             _state: PhantomData,
@@ -1336,11 +1409,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ApplyWritesBuilder<S, St>
+impl<St, S: BosStr> ApplyWritesBuilder<St, S>
 where
     St: apply_writes_state::State,
-    St::Writes: apply_writes_state::IsSet,
     St::Repo: apply_writes_state::IsSet,
+    St::Writes: apply_writes_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ApplyWrites<S> {
@@ -1353,7 +1426,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ApplyWrites<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ApplyWrites<S> {
         ApplyWrites {
             repo: self._fields.0.unwrap(),
             swap_commit: self._fields.1,
@@ -1366,7 +1442,7 @@ where
 
 pub mod update_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1375,69 +1451,76 @@ pub mod update_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Rkey;
-        type Value;
         type Collection;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Rkey = Unset;
-        type Value = Unset;
         type Collection = Unset;
+        type Value = Unset;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRkey<St> {}
     impl<St: State> State for SetRkey<St> {
         type Rkey = Set<members::rkey>;
+        type Collection = St::Collection;
         type Value = St::Value;
-        type Collection = St::Collection;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValue<St> {}
-    impl<St: State> State for SetValue<St> {
-        type Rkey = St::Rkey;
-        type Value = Set<members::value>;
-        type Collection = St::Collection;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
         type Rkey = St::Rkey;
-        type Value = St::Value;
         type Collection = Set<members::collection>;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type Rkey = St::Rkey;
+        type Collection = St::Collection;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `rkey` field
         pub struct rkey(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateBuilder<S: BosStr, St: update_state::State> {
+pub struct UpdateBuilder<St: update_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Nsid<S>>, Option<RecordKey<Rkey<S>>>, Option<Data<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Update<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UpdateBuilder<S, update_state::Empty> {
+impl Update<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UpdateBuilder<update_state::Empty, DefaultStr> {
         UpdateBuilder::new()
     }
 }
 
-impl<S: BosStr> UpdateBuilder<S, update_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Update<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UpdateBuilder<update_state::Empty, S> {
+        UpdateBuilder::builder()
+    }
+}
+
+impl UpdateBuilder<update_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UpdateBuilder {
             _state: PhantomData,
@@ -1447,7 +1530,18 @@ impl<S: BosStr> UpdateBuilder<S, update_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> UpdateBuilder<S, St>
+impl<S: BosStr> UpdateBuilder<update_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UpdateBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> UpdateBuilder<St, S>
 where
     St: update_state::State,
     St::Collection: update_state::IsUnset,
@@ -1456,7 +1550,7 @@ where
     pub fn collection(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> UpdateBuilder<S, update_state::SetCollection<St>> {
+    ) -> UpdateBuilder<update_state::SetCollection<St>, S> {
         self._fields.0 = Option::Some(value.into());
         UpdateBuilder {
             _state: PhantomData,
@@ -1466,7 +1560,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UpdateBuilder<S, St>
+impl<St, S: BosStr> UpdateBuilder<St, S>
 where
     St: update_state::State,
     St::Rkey: update_state::IsUnset,
@@ -1475,7 +1569,7 @@ where
     pub fn rkey(
         mut self,
         value: impl Into<RecordKey<Rkey<S>>>,
-    ) -> UpdateBuilder<S, update_state::SetRkey<St>> {
+    ) -> UpdateBuilder<update_state::SetRkey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         UpdateBuilder {
             _state: PhantomData,
@@ -1485,7 +1579,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UpdateBuilder<S, St>
+impl<St, S: BosStr> UpdateBuilder<St, S>
 where
     St: update_state::State,
     St::Value: update_state::IsUnset,
@@ -1494,7 +1588,7 @@ where
     pub fn value(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> UpdateBuilder<S, update_state::SetValue<St>> {
+    ) -> UpdateBuilder<update_state::SetValue<St>, S> {
         self._fields.2 = Option::Some(value.into());
         UpdateBuilder {
             _state: PhantomData,
@@ -1504,12 +1598,12 @@ where
     }
 }
 
-impl<S: BosStr, St> UpdateBuilder<S, St>
+impl<St, S: BosStr> UpdateBuilder<St, S>
 where
     St: update_state::State,
     St::Rkey: update_state::IsSet,
-    St::Value: update_state::IsSet,
     St::Collection: update_state::IsSet,
+    St::Value: update_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Update<S> {
@@ -1533,7 +1627,7 @@ where
 
 pub mod update_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1541,60 +1635,63 @@ pub mod update_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Cid = Set<members::cid>;
-        type Uri = St::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Cid = St::Cid;
         type Uri = Set<members::uri>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Uri = St::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateResultBuilder<S: BosStr, St: update_result_state::State> {
+pub struct UpdateResultBuilder<St: update_result_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Cid<S>>,
-        Option<AtUri<S>>,
-        Option<UpdateResultValidationStatus<S>>,
-    ),
+    _fields: (Option<Cid<S>>, Option<AtUri<S>>, Option<UpdateResultValidationStatus<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UpdateResult<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UpdateResultBuilder<S, update_result_state::Empty> {
+impl UpdateResult<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UpdateResultBuilder<update_result_state::Empty, DefaultStr> {
         UpdateResultBuilder::new()
     }
 }
 
-impl<S: BosStr> UpdateResultBuilder<S, update_result_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UpdateResult<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UpdateResultBuilder<update_result_state::Empty, S> {
+        UpdateResultBuilder::builder()
+    }
+}
+
+impl UpdateResultBuilder<update_result_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UpdateResultBuilder {
             _state: PhantomData,
@@ -1604,7 +1701,18 @@ impl<S: BosStr> UpdateResultBuilder<S, update_result_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> UpdateResultBuilder<S, St>
+impl<S: BosStr> UpdateResultBuilder<update_result_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UpdateResultBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> UpdateResultBuilder<St, S>
 where
     St: update_result_state::State,
     St::Cid: update_result_state::IsUnset,
@@ -1613,7 +1721,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> UpdateResultBuilder<S, update_result_state::SetCid<St>> {
+    ) -> UpdateResultBuilder<update_result_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         UpdateResultBuilder {
             _state: PhantomData,
@@ -1623,7 +1731,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UpdateResultBuilder<S, St>
+impl<St, S: BosStr> UpdateResultBuilder<St, S>
 where
     St: update_result_state::State,
     St::Uri: update_result_state::IsUnset,
@@ -1632,7 +1740,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> UpdateResultBuilder<S, update_result_state::SetUri<St>> {
+    ) -> UpdateResultBuilder<update_result_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         UpdateResultBuilder {
             _state: PhantomData,
@@ -1642,7 +1750,7 @@ where
     }
 }
 
-impl<S: BosStr, St: update_result_state::State> UpdateResultBuilder<S, St> {
+impl<St: update_result_state::State, S: BosStr> UpdateResultBuilder<St, S> {
     /// Set the `validationStatus` field (optional)
     pub fn validation_status(
         mut self,
@@ -1661,11 +1769,11 @@ impl<S: BosStr, St: update_result_state::State> UpdateResultBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> UpdateResultBuilder<S, St>
+impl<St, S: BosStr> UpdateResultBuilder<St, S>
 where
     St: update_result_state::State,
-    St::Cid: update_result_state::IsSet,
     St::Uri: update_result_state::IsSet,
+    St::Cid: update_result_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> UpdateResult<S> {
@@ -1677,7 +1785,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateResult<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateResult<S> {
         UpdateResult {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),

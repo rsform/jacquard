@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did};
+use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SetStats<S: BosStr = DefaultStr> {
     ///RFC3339 timestamp of last pull
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -43,11 +40,9 @@ pub struct SetStats<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SetStatsOutput<S: BosStr = DefaultStr> {
     ///Whether the stats were successfully updated
     pub success: bool,
@@ -55,9 +50,18 @@ pub struct SetStatsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum SetStatsError {
     #[serde(rename = "InvalidOwner")]
@@ -66,10 +70,7 @@ pub enum SetStatsError {
     InvalidRepository(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for SetStatsError {
@@ -111,8 +112,9 @@ impl jacquard_common::xrpc::XrpcResp for SetStatsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SetStats<S> {
     const NSID: &'static str = "io.atcr.hold.setStats";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = SetStatsResponse;
 }
 
@@ -120,15 +122,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SetStats<S> {
 pub struct SetStatsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SetStatsRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.setStats";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = SetStats<S>;
     type Response = SetStatsResponse;
 }
 
 pub mod set_stats_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -171,7 +174,7 @@ pub mod set_stats_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SetStatsBuilder<S: BosStr, St: set_stats_state::State> {
+pub struct SetStatsBuilder<St: set_stats_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -184,15 +187,22 @@ pub struct SetStatsBuilder<S: BosStr, St: set_stats_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SetStats<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SetStatsBuilder<S, set_stats_state::Empty> {
+impl SetStats<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SetStatsBuilder<set_stats_state::Empty, DefaultStr> {
         SetStatsBuilder::new()
     }
 }
 
-impl<S: BosStr> SetStatsBuilder<S, set_stats_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SetStats<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SetStatsBuilder<set_stats_state::Empty, S> {
+        SetStatsBuilder::builder()
+    }
+}
+
+impl SetStatsBuilder<set_stats_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SetStatsBuilder {
             _state: PhantomData,
@@ -202,7 +212,18 @@ impl<S: BosStr> SetStatsBuilder<S, set_stats_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: set_stats_state::State> SetStatsBuilder<S, St> {
+impl<S: BosStr> SetStatsBuilder<set_stats_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SetStatsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: set_stats_state::State, S: BosStr> SetStatsBuilder<St, S> {
     /// Set the `lastPull` field (optional)
     pub fn last_pull(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -215,7 +236,7 @@ impl<S: BosStr, St: set_stats_state::State> SetStatsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: set_stats_state::State> SetStatsBuilder<S, St> {
+impl<St: set_stats_state::State, S: BosStr> SetStatsBuilder<St, S> {
     /// Set the `lastPush` field (optional)
     pub fn last_push(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -228,7 +249,7 @@ impl<S: BosStr, St: set_stats_state::State> SetStatsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SetStatsBuilder<S, St>
+impl<St, S: BosStr> SetStatsBuilder<St, S>
 where
     St: set_stats_state::State,
     St::OwnerDid: set_stats_state::IsUnset,
@@ -237,7 +258,7 @@ where
     pub fn owner_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SetStatsBuilder<S, set_stats_state::SetOwnerDid<St>> {
+    ) -> SetStatsBuilder<set_stats_state::SetOwnerDid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SetStatsBuilder {
             _state: PhantomData,
@@ -247,7 +268,7 @@ where
     }
 }
 
-impl<S: BosStr, St: set_stats_state::State> SetStatsBuilder<S, St> {
+impl<St: set_stats_state::State, S: BosStr> SetStatsBuilder<St, S> {
     /// Set the `pullCount` field (optional)
     pub fn pull_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -260,7 +281,7 @@ impl<S: BosStr, St: set_stats_state::State> SetStatsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: set_stats_state::State> SetStatsBuilder<S, St> {
+impl<St: set_stats_state::State, S: BosStr> SetStatsBuilder<St, S> {
     /// Set the `pushCount` field (optional)
     pub fn push_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -273,7 +294,7 @@ impl<S: BosStr, St: set_stats_state::State> SetStatsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SetStatsBuilder<S, St>
+impl<St, S: BosStr> SetStatsBuilder<St, S>
 where
     St: set_stats_state::State,
     St::Repository: set_stats_state::IsUnset,
@@ -282,7 +303,7 @@ where
     pub fn repository(
         mut self,
         value: impl Into<S>,
-    ) -> SetStatsBuilder<S, set_stats_state::SetRepository<St>> {
+    ) -> SetStatsBuilder<set_stats_state::SetRepository<St>, S> {
         self._fields.5 = Option::Some(value.into());
         SetStatsBuilder {
             _state: PhantomData,
@@ -292,7 +313,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SetStatsBuilder<S, St>
+impl<St, S: BosStr> SetStatsBuilder<St, S>
 where
     St: set_stats_state::State,
     St::Repository: set_stats_state::IsSet,

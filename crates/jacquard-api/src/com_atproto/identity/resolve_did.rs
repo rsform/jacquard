@@ -10,27 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveDid<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveDidOutput<S: BosStr = DefaultStr> {
     ///The complete DID document for the identity.
     pub did_doc: Data<S>,
@@ -38,9 +33,18 @@ pub struct ResolveDidOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ResolveDidError {
     /// The DID resolution process confirmed that there is no current DID.
@@ -51,10 +55,7 @@ pub enum ResolveDidError {
     DidDeactivated(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ResolveDidError {
@@ -111,7 +112,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ResolveDidRequest {
 
 pub mod resolve_did_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -142,21 +143,28 @@ pub mod resolve_did_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ResolveDidBuilder<S: BosStr, St: resolve_did_state::State> {
+pub struct ResolveDidBuilder<St: resolve_did_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ResolveDid<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ResolveDidBuilder<S, resolve_did_state::Empty> {
+impl ResolveDid<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ResolveDidBuilder<resolve_did_state::Empty, DefaultStr> {
         ResolveDidBuilder::new()
     }
 }
 
-impl<S: BosStr> ResolveDidBuilder<S, resolve_did_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ResolveDid<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ResolveDidBuilder<resolve_did_state::Empty, S> {
+        ResolveDidBuilder::builder()
+    }
+}
+
+impl ResolveDidBuilder<resolve_did_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ResolveDidBuilder {
             _state: PhantomData,
@@ -166,7 +174,18 @@ impl<S: BosStr> ResolveDidBuilder<S, resolve_did_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ResolveDidBuilder<S, St>
+impl<S: BosStr> ResolveDidBuilder<resolve_did_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ResolveDidBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ResolveDidBuilder<St, S>
 where
     St: resolve_did_state::State,
     St::Did: resolve_did_state::IsUnset,
@@ -175,7 +194,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ResolveDidBuilder<S, resolve_did_state::SetDid<St>> {
+    ) -> ResolveDidBuilder<resolve_did_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ResolveDidBuilder {
             _state: PhantomData,
@@ -185,7 +204,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ResolveDidBuilder<S, St>
+impl<St, S: BosStr> ResolveDidBuilder<St, S>
 where
     St: resolve_did_state::State,
     St::Did: resolve_did_state::IsSet,

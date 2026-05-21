@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// An entry in a ship's log. Something happened. Someone did it. The Opening of the Mouth ceremony — Ptah opens the mouth and the statue breathes, speaks, acts. The action record is the breath.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -356,7 +356,7 @@ impl<S: BosStr> LexiconSchema for Action<S> {
 
 pub mod action_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -364,56 +364,56 @@ pub mod action_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type ActorDid;
         type WorldReference;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type ActorDid = Unset;
         type WorldReference = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type ActorDid = St::ActorDid;
-        type WorldReference = St::WorldReference;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `actor_did` field to Set
     pub struct SetActorDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetActorDid<St> {}
     impl<St: State> State for SetActorDid<St> {
-        type CreatedAt = St::CreatedAt;
         type ActorDid = Set<members::actor_did>;
         type WorldReference = St::WorldReference;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `world_reference` field to Set
     pub struct SetWorldReference<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWorldReference<St> {}
     impl<St: State> State for SetWorldReference<St> {
-        type CreatedAt = St::CreatedAt;
         type ActorDid = St::ActorDid;
         type WorldReference = Set<members::world_reference>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type ActorDid = St::ActorDid;
+        type WorldReference = St::WorldReference;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `actor_did` field
         pub struct actor_did(());
         ///Marker type for the `world_reference` field
         pub struct world_reference(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ActionBuilder<S: BosStr, St: action_state::State> {
+pub struct ActionBuilder<St: action_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ActionActionType<S>>,
@@ -430,15 +430,22 @@ pub struct ActionBuilder<S: BosStr, St: action_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Action<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ActionBuilder<S, action_state::Empty> {
+impl Action<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ActionBuilder<action_state::Empty, DefaultStr> {
         ActionBuilder::new()
     }
 }
 
-impl<S: BosStr> ActionBuilder<S, action_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Action<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ActionBuilder<action_state::Empty, S> {
+        ActionBuilder::builder()
+    }
+}
+
+impl ActionBuilder<action_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ActionBuilder {
             _state: PhantomData,
@@ -448,7 +455,18 @@ impl<S: BosStr> ActionBuilder<S, action_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: action_state::State> ActionBuilder<S, St> {
+impl<S: BosStr> ActionBuilder<action_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ActionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: action_state::State, S: BosStr> ActionBuilder<St, S> {
     /// Set the `actionType` field (optional)
     pub fn action_type(mut self, value: impl Into<Option<ActionActionType<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -461,7 +479,7 @@ impl<S: BosStr, St: action_state::State> ActionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ActionBuilder<S, St>
+impl<St, S: BosStr> ActionBuilder<St, S>
 where
     St: action_state::State,
     St::ActorDid: action_state::IsUnset,
@@ -470,7 +488,7 @@ where
     pub fn actor_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ActionBuilder<S, action_state::SetActorDid<St>> {
+    ) -> ActionBuilder<action_state::SetActorDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ActionBuilder {
             _state: PhantomData,
@@ -480,7 +498,7 @@ where
     }
 }
 
-impl<S: BosStr, St: action_state::State> ActionBuilder<S, St> {
+impl<St: action_state::State, S: BosStr> ActionBuilder<St, S> {
     /// Set the `characterReference` field (optional)
     pub fn character_reference(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -493,7 +511,7 @@ impl<S: BosStr, St: action_state::State> ActionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: action_state::State> ActionBuilder<S, St> {
+impl<St: action_state::State, S: BosStr> ActionBuilder<St, S> {
     /// Set the `content` field (optional)
     pub fn content(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -506,7 +524,7 @@ impl<S: BosStr, St: action_state::State> ActionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ActionBuilder<S, St>
+impl<St, S: BosStr> ActionBuilder<St, S>
 where
     St: action_state::State,
     St::CreatedAt: action_state::IsUnset,
@@ -515,7 +533,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ActionBuilder<S, action_state::SetCreatedAt<St>> {
+    ) -> ActionBuilder<action_state::SetCreatedAt<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ActionBuilder {
             _state: PhantomData,
@@ -525,7 +543,7 @@ where
     }
 }
 
-impl<S: BosStr, St: action_state::State> ActionBuilder<S, St> {
+impl<St: action_state::State, S: BosStr> ActionBuilder<St, S> {
     /// Set the `locationReference` field (optional)
     pub fn location_reference(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -538,7 +556,7 @@ impl<S: BosStr, St: action_state::State> ActionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: action_state::State> ActionBuilder<S, St> {
+impl<St: action_state::State, S: BosStr> ActionBuilder<St, S> {
     /// Set the `narrativeWeight` field (optional)
     pub fn narrative_weight(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -551,7 +569,7 @@ impl<S: BosStr, St: action_state::State> ActionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: action_state::State> ActionBuilder<S, St> {
+impl<St: action_state::State, S: BosStr> ActionBuilder<St, S> {
     /// Set the `targetReference` field (optional)
     pub fn target_reference(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -564,7 +582,7 @@ impl<S: BosStr, St: action_state::State> ActionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: action_state::State> ActionBuilder<S, St> {
+impl<St: action_state::State, S: BosStr> ActionBuilder<St, S> {
     /// Set the `visibility` field (optional)
     pub fn visibility(mut self, value: impl Into<Option<ActionVisibility<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -577,7 +595,7 @@ impl<S: BosStr, St: action_state::State> ActionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ActionBuilder<S, St>
+impl<St, S: BosStr> ActionBuilder<St, S>
 where
     St: action_state::State,
     St::WorldReference: action_state::IsUnset,
@@ -586,7 +604,7 @@ where
     pub fn world_reference(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ActionBuilder<S, action_state::SetWorldReference<St>> {
+    ) -> ActionBuilder<action_state::SetWorldReference<St>, S> {
         self._fields.9 = Option::Some(value.into());
         ActionBuilder {
             _state: PhantomData,
@@ -596,12 +614,12 @@ where
     }
 }
 
-impl<S: BosStr, St> ActionBuilder<S, St>
+impl<St, S: BosStr> ActionBuilder<St, S>
 where
     St: action_state::State,
-    St::CreatedAt: action_state::IsSet,
     St::ActorDid: action_state::IsSet,
     St::WorldReference: action_state::IsSet,
+    St::CreatedAt: action_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Action<S> {
@@ -638,10 +656,10 @@ where
 }
 
 fn lexicon_doc_world_ptah_temp_action() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("world.ptah.temp.action"),

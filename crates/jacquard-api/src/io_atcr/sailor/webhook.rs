@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Public webhook metadata stored in the user's PDS. Links to a private io.atcr.hold.webhook record on the hold where URL and secret are stored. Part of a two-record split: this record is visible via ATProto (Jetstream), the hold record is not.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -134,7 +134,7 @@ impl<S: BosStr> LexiconSchema for Webhook<S> {
 
 pub mod webhook_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -144,8 +144,8 @@ pub mod webhook_state {
     pub trait State: sealed::Sealed {
         type HoldDid;
         type Triggers;
-        type CreatedAt;
         type PrivateCid;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -153,8 +153,8 @@ pub mod webhook_state {
     impl State for Empty {
         type HoldDid = Unset;
         type Triggers = Unset;
-        type CreatedAt = Unset;
         type PrivateCid = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `hold_did` field to Set
     pub struct SetHoldDid<St: State = Empty>(PhantomData<fn() -> St>);
@@ -162,8 +162,8 @@ pub mod webhook_state {
     impl<St: State> State for SetHoldDid<St> {
         type HoldDid = Set<members::hold_did>;
         type Triggers = St::Triggers;
-        type CreatedAt = St::CreatedAt;
         type PrivateCid = St::PrivateCid;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `triggers` field to Set
     pub struct SetTriggers<St: State = Empty>(PhantomData<fn() -> St>);
@@ -171,17 +171,8 @@ pub mod webhook_state {
     impl<St: State> State for SetTriggers<St> {
         type HoldDid = St::HoldDid;
         type Triggers = Set<members::triggers>;
+        type PrivateCid = St::PrivateCid;
         type CreatedAt = St::CreatedAt;
-        type PrivateCid = St::PrivateCid;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type HoldDid = St::HoldDid;
-        type Triggers = St::Triggers;
-        type CreatedAt = Set<members::created_at>;
-        type PrivateCid = St::PrivateCid;
     }
     ///State transition - sets the `private_cid` field to Set
     pub struct SetPrivateCid<St: State = Empty>(PhantomData<fn() -> St>);
@@ -189,8 +180,17 @@ pub mod webhook_state {
     impl<St: State> State for SetPrivateCid<St> {
         type HoldDid = St::HoldDid;
         type Triggers = St::Triggers;
-        type CreatedAt = St::CreatedAt;
         type PrivateCid = Set<members::private_cid>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type HoldDid = St::HoldDid;
+        type Triggers = St::Triggers;
+        type PrivateCid = St::PrivateCid;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -199,15 +199,15 @@ pub mod webhook_state {
         pub struct hold_did(());
         ///Marker type for the `triggers` field
         pub struct triggers(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `private_cid` field
         pub struct private_cid(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WebhookBuilder<S: BosStr, St: webhook_state::State> {
+pub struct WebhookBuilder<St: webhook_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -219,15 +219,22 @@ pub struct WebhookBuilder<S: BosStr, St: webhook_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Webhook<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> WebhookBuilder<S, webhook_state::Empty> {
+impl Webhook<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> WebhookBuilder<webhook_state::Empty, DefaultStr> {
         WebhookBuilder::new()
     }
 }
 
-impl<S: BosStr> WebhookBuilder<S, webhook_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Webhook<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> WebhookBuilder<webhook_state::Empty, S> {
+        WebhookBuilder::builder()
+    }
+}
+
+impl WebhookBuilder<webhook_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         WebhookBuilder {
             _state: PhantomData,
@@ -237,7 +244,18 @@ impl<S: BosStr> WebhookBuilder<S, webhook_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> WebhookBuilder<S, St>
+impl<S: BosStr> WebhookBuilder<webhook_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        WebhookBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> WebhookBuilder<St, S>
 where
     St: webhook_state::State,
     St::CreatedAt: webhook_state::IsUnset,
@@ -246,7 +264,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WebhookBuilder<S, webhook_state::SetCreatedAt<St>> {
+    ) -> WebhookBuilder<webhook_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         WebhookBuilder {
             _state: PhantomData,
@@ -256,7 +274,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WebhookBuilder<S, St>
+impl<St, S: BosStr> WebhookBuilder<St, S>
 where
     St: webhook_state::State,
     St::HoldDid: webhook_state::IsUnset,
@@ -265,7 +283,7 @@ where
     pub fn hold_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> WebhookBuilder<S, webhook_state::SetHoldDid<St>> {
+    ) -> WebhookBuilder<webhook_state::SetHoldDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         WebhookBuilder {
             _state: PhantomData,
@@ -275,7 +293,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WebhookBuilder<S, St>
+impl<St, S: BosStr> WebhookBuilder<St, S>
 where
     St: webhook_state::State,
     St::PrivateCid: webhook_state::IsUnset,
@@ -284,7 +302,7 @@ where
     pub fn private_cid(
         mut self,
         value: impl Into<S>,
-    ) -> WebhookBuilder<S, webhook_state::SetPrivateCid<St>> {
+    ) -> WebhookBuilder<webhook_state::SetPrivateCid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         WebhookBuilder {
             _state: PhantomData,
@@ -294,7 +312,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WebhookBuilder<S, St>
+impl<St, S: BosStr> WebhookBuilder<St, S>
 where
     St: webhook_state::State,
     St::Triggers: webhook_state::IsUnset,
@@ -303,7 +321,7 @@ where
     pub fn triggers(
         mut self,
         value: impl Into<i64>,
-    ) -> WebhookBuilder<S, webhook_state::SetTriggers<St>> {
+    ) -> WebhookBuilder<webhook_state::SetTriggers<St>, S> {
         self._fields.3 = Option::Some(value.into());
         WebhookBuilder {
             _state: PhantomData,
@@ -313,7 +331,7 @@ where
     }
 }
 
-impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
+impl<St: webhook_state::State, S: BosStr> WebhookBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -326,13 +344,13 @@ impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WebhookBuilder<S, St>
+impl<St, S: BosStr> WebhookBuilder<St, S>
 where
     St: webhook_state::State,
     St::HoldDid: webhook_state::IsSet,
     St::Triggers: webhook_state::IsSet,
-    St::CreatedAt: webhook_state::IsSet,
     St::PrivateCid: webhook_state::IsSet,
+    St::CreatedAt: webhook_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Webhook<S> {
@@ -359,10 +377,10 @@ where
 }
 
 fn lexicon_doc_io_atcr_sailor_webhook() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.sailor.webhook"),

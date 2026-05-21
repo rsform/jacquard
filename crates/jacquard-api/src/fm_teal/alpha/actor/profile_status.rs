@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// This lexicon is in a not officially released state. It is subject to change. | A declaration of the profile status of the actor.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -103,7 +103,8 @@ impl<S: BosStr> Serialize for ProfileStatusCompletedOnboarding<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ProfileStatusCompletedOnboarding<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ProfileStatusCompletedOnboarding<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -127,7 +128,9 @@ where
     type Output = ProfileStatusCompletedOnboarding<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            ProfileStatusCompletedOnboarding::None => ProfileStatusCompletedOnboarding::None,
+            ProfileStatusCompletedOnboarding::None => {
+                ProfileStatusCompletedOnboarding::None
+            }
             ProfileStatusCompletedOnboarding::ProfileOnboarding => {
                 ProfileStatusCompletedOnboarding::ProfileOnboarding
             }
@@ -205,7 +208,7 @@ impl<S: BosStr> LexiconSchema for ProfileStatus<S> {
 
 pub mod profile_status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -236,7 +239,10 @@ pub mod profile_status_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileStatusBuilder<S: BosStr, St: profile_status_state::State> {
+pub struct ProfileStatusBuilder<
+    St: profile_status_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileStatusCompletedOnboarding<S>>,
@@ -246,15 +252,22 @@ pub struct ProfileStatusBuilder<S: BosStr, St: profile_status_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ProfileStatus<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProfileStatusBuilder<S, profile_status_state::Empty> {
+impl ProfileStatus<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProfileStatusBuilder<profile_status_state::Empty, DefaultStr> {
         ProfileStatusBuilder::new()
     }
 }
 
-impl<S: BosStr> ProfileStatusBuilder<S, profile_status_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ProfileStatus<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProfileStatusBuilder<profile_status_state::Empty, S> {
+        ProfileStatusBuilder::builder()
+    }
+}
+
+impl ProfileStatusBuilder<profile_status_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProfileStatusBuilder {
             _state: PhantomData,
@@ -264,7 +277,18 @@ impl<S: BosStr> ProfileStatusBuilder<S, profile_status_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ProfileStatusBuilder<S, St>
+impl<S: BosStr> ProfileStatusBuilder<profile_status_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProfileStatusBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ProfileStatusBuilder<St, S>
 where
     St: profile_status_state::State,
     St::CompletedOnboarding: profile_status_state::IsUnset,
@@ -273,7 +297,7 @@ where
     pub fn completed_onboarding(
         mut self,
         value: impl Into<ProfileStatusCompletedOnboarding<S>>,
-    ) -> ProfileStatusBuilder<S, profile_status_state::SetCompletedOnboarding<St>> {
+    ) -> ProfileStatusBuilder<profile_status_state::SetCompletedOnboarding<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ProfileStatusBuilder {
             _state: PhantomData,
@@ -283,7 +307,7 @@ where
     }
 }
 
-impl<S: BosStr, St: profile_status_state::State> ProfileStatusBuilder<S, St> {
+impl<St: profile_status_state::State, S: BosStr> ProfileStatusBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -296,7 +320,7 @@ impl<S: BosStr, St: profile_status_state::State> ProfileStatusBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_status_state::State> ProfileStatusBuilder<S, St> {
+impl<St: profile_status_state::State, S: BosStr> ProfileStatusBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -309,7 +333,7 @@ impl<S: BosStr, St: profile_status_state::State> ProfileStatusBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProfileStatusBuilder<S, St>
+impl<St, S: BosStr> ProfileStatusBuilder<St, S>
 where
     St: profile_status_state::State,
     St::CompletedOnboarding: profile_status_state::IsSet,
@@ -324,7 +348,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileStatus<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProfileStatus<S> {
         ProfileStatus {
             completed_onboarding: self._fields.0.unwrap(),
             created_at: self._fields.1,
@@ -335,10 +362,10 @@ where
 }
 
 fn lexicon_doc_fm_teal_alpha_actor_profileStatus() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fm.teal.alpha.actor.profileStatus"),

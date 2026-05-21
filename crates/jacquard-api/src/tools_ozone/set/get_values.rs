@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::set::SetView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::set::SetView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetValues<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -32,11 +29,9 @@ pub struct GetValues<S: BosStr = DefaultStr> {
     pub name: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetValuesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -46,9 +41,18 @@ pub struct GetValuesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetValuesError {
     /// set with the given name does not exist
@@ -56,10 +60,7 @@ pub enum GetValuesError {
     SetNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetValuesError {
@@ -113,7 +114,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_values_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -144,21 +145,28 @@ pub mod get_values_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetValuesBuilder<S: BosStr, St: get_values_state::State> {
+pub struct GetValuesBuilder<St: get_values_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetValues<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetValuesBuilder<S, get_values_state::Empty> {
+impl GetValues<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetValuesBuilder<get_values_state::Empty, DefaultStr> {
         GetValuesBuilder::new()
     }
 }
 
-impl<S: BosStr> GetValuesBuilder<S, get_values_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetValues<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetValuesBuilder<get_values_state::Empty, S> {
+        GetValuesBuilder::builder()
+    }
+}
+
+impl GetValuesBuilder<get_values_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetValuesBuilder {
             _state: PhantomData,
@@ -168,7 +176,18 @@ impl<S: BosStr> GetValuesBuilder<S, get_values_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_values_state::State> GetValuesBuilder<S, St> {
+impl<S: BosStr> GetValuesBuilder<get_values_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetValuesBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_values_state::State, S: BosStr> GetValuesBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -181,7 +200,7 @@ impl<S: BosStr, St: get_values_state::State> GetValuesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_values_state::State> GetValuesBuilder<S, St> {
+impl<St: get_values_state::State, S: BosStr> GetValuesBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -194,7 +213,7 @@ impl<S: BosStr, St: get_values_state::State> GetValuesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetValuesBuilder<S, St>
+impl<St, S: BosStr> GetValuesBuilder<St, S>
 where
     St: get_values_state::State,
     St::Name: get_values_state::IsUnset,
@@ -203,7 +222,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> GetValuesBuilder<S, get_values_state::SetName<St>> {
+    ) -> GetValuesBuilder<get_values_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GetValuesBuilder {
             _state: PhantomData,
@@ -213,7 +232,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetValuesBuilder<S, St>
+impl<St, S: BosStr> GetValuesBuilder<St, S>
 where
     St: get_values_state::State,
     St::Name: get_values_state::IsSet,

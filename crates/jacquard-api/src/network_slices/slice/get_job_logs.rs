@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did};
+use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::network_slices::slice::get_job_logs;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::slice::get_job_logs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogEntry<S: BosStr = DefaultStr> {
     ///When the log entry was created
     pub created_at: Datetime,
@@ -58,11 +55,9 @@ pub struct LogEntry<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetJobLogs<S: BosStr = DefaultStr> {
     pub job_id: S,
     ///Defaults to `100`. Min: 1. Max: 1000.
@@ -71,11 +66,9 @@ pub struct GetJobLogs<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetJobLogsOutput<S: BosStr = DefaultStr> {
     pub logs: Vec<get_job_logs::LogEntry<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -123,7 +116,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetJobLogsRequest {
 
 pub mod log_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -131,90 +124,90 @@ pub mod log_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type LogType;
-        type CreatedAt;
-        type Level;
         type Message;
+        type CreatedAt;
+        type LogType;
+        type Level;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type LogType = Unset;
-        type CreatedAt = Unset;
-        type Level = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type LogType = St::LogType;
-        type CreatedAt = St::CreatedAt;
-        type Level = St::Level;
-        type Message = St::Message;
-    }
-    ///State transition - sets the `log_type` field to Set
-    pub struct SetLogType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLogType<St> {}
-    impl<St: State> State for SetLogType<St> {
-        type Id = St::Id;
-        type LogType = Set<members::log_type>;
-        type CreatedAt = St::CreatedAt;
-        type Level = St::Level;
-        type Message = St::Message;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Id = St::Id;
-        type LogType = St::LogType;
-        type CreatedAt = Set<members::created_at>;
-        type Level = St::Level;
-        type Message = St::Message;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLevel<St> {}
-    impl<St: State> State for SetLevel<St> {
-        type Id = St::Id;
-        type LogType = St::LogType;
-        type CreatedAt = St::CreatedAt;
-        type Level = Set<members::level>;
-        type Message = St::Message;
+        type CreatedAt = Unset;
+        type LogType = Unset;
+        type Level = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessage<St> {}
     impl<St: State> State for SetMessage<St> {
-        type Id = St::Id;
-        type LogType = St::LogType;
-        type CreatedAt = St::CreatedAt;
-        type Level = St::Level;
         type Message = Set<members::message>;
+        type CreatedAt = St::CreatedAt;
+        type LogType = St::LogType;
+        type Level = St::Level;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Message = St::Message;
+        type CreatedAt = Set<members::created_at>;
+        type LogType = St::LogType;
+        type Level = St::Level;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `log_type` field to Set
+    pub struct SetLogType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLogType<St> {}
+    impl<St: State> State for SetLogType<St> {
+        type Message = St::Message;
+        type CreatedAt = St::CreatedAt;
+        type LogType = Set<members::log_type>;
+        type Level = St::Level;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
+        type Message = St::Message;
+        type CreatedAt = St::CreatedAt;
+        type LogType = St::LogType;
+        type Level = Set<members::level>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Message = St::Message;
+        type CreatedAt = St::CreatedAt;
+        type LogType = St::LogType;
+        type Level = St::Level;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `log_type` field
-        pub struct log_type(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `log_type` field
+        pub struct log_type(());
+        ///Marker type for the `level` field
+        pub struct level(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogEntryBuilder<S: BosStr, St: log_entry_state::State> {
+pub struct LogEntryBuilder<St: log_entry_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -230,15 +223,22 @@ pub struct LogEntryBuilder<S: BosStr, St: log_entry_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LogEntry<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LogEntryBuilder<S, log_entry_state::Empty> {
+impl LogEntry<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LogEntryBuilder<log_entry_state::Empty, DefaultStr> {
         LogEntryBuilder::new()
     }
 }
 
-impl<S: BosStr> LogEntryBuilder<S, log_entry_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LogEntry<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LogEntryBuilder<log_entry_state::Empty, S> {
+        LogEntryBuilder::builder()
+    }
+}
+
+impl LogEntryBuilder<log_entry_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LogEntryBuilder {
             _state: PhantomData,
@@ -248,7 +248,18 @@ impl<S: BosStr> LogEntryBuilder<S, log_entry_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LogEntryBuilder<S, St>
+impl<S: BosStr> LogEntryBuilder<log_entry_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LogEntryBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LogEntryBuilder<St, S>
 where
     St: log_entry_state::State,
     St::CreatedAt: log_entry_state::IsUnset,
@@ -257,7 +268,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LogEntryBuilder<S, log_entry_state::SetCreatedAt<St>> {
+    ) -> LogEntryBuilder<log_entry_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LogEntryBuilder {
             _state: PhantomData,
@@ -267,13 +278,16 @@ where
     }
 }
 
-impl<S: BosStr, St> LogEntryBuilder<S, St>
+impl<St, S: BosStr> LogEntryBuilder<St, S>
 where
     St: log_entry_state::State,
     St::Id: log_entry_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<i64>) -> LogEntryBuilder<S, log_entry_state::SetId<St>> {
+    pub fn id(
+        mut self,
+        value: impl Into<i64>,
+    ) -> LogEntryBuilder<log_entry_state::SetId<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LogEntryBuilder {
             _state: PhantomData,
@@ -283,7 +297,7 @@ where
     }
 }
 
-impl<S: BosStr, St: log_entry_state::State> LogEntryBuilder<S, St> {
+impl<St: log_entry_state::State, S: BosStr> LogEntryBuilder<St, S> {
     /// Set the `jobId` field (optional)
     pub fn job_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -296,7 +310,7 @@ impl<S: BosStr, St: log_entry_state::State> LogEntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LogEntryBuilder<S, St>
+impl<St, S: BosStr> LogEntryBuilder<St, S>
 where
     St: log_entry_state::State,
     St::Level: log_entry_state::IsUnset,
@@ -305,7 +319,7 @@ where
     pub fn level(
         mut self,
         value: impl Into<S>,
-    ) -> LogEntryBuilder<S, log_entry_state::SetLevel<St>> {
+    ) -> LogEntryBuilder<log_entry_state::SetLevel<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LogEntryBuilder {
             _state: PhantomData,
@@ -315,7 +329,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogEntryBuilder<S, St>
+impl<St, S: BosStr> LogEntryBuilder<St, S>
 where
     St: log_entry_state::State,
     St::LogType: log_entry_state::IsUnset,
@@ -324,7 +338,7 @@ where
     pub fn log_type(
         mut self,
         value: impl Into<S>,
-    ) -> LogEntryBuilder<S, log_entry_state::SetLogType<St>> {
+    ) -> LogEntryBuilder<log_entry_state::SetLogType<St>, S> {
         self._fields.4 = Option::Some(value.into());
         LogEntryBuilder {
             _state: PhantomData,
@@ -334,7 +348,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogEntryBuilder<S, St>
+impl<St, S: BosStr> LogEntryBuilder<St, S>
 where
     St: log_entry_state::State,
     St::Message: log_entry_state::IsUnset,
@@ -343,7 +357,7 @@ where
     pub fn message(
         mut self,
         value: impl Into<S>,
-    ) -> LogEntryBuilder<S, log_entry_state::SetMessage<St>> {
+    ) -> LogEntryBuilder<log_entry_state::SetMessage<St>, S> {
         self._fields.5 = Option::Some(value.into());
         LogEntryBuilder {
             _state: PhantomData,
@@ -353,7 +367,7 @@ where
     }
 }
 
-impl<S: BosStr, St: log_entry_state::State> LogEntryBuilder<S, St> {
+impl<St: log_entry_state::State, S: BosStr> LogEntryBuilder<St, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -366,7 +380,7 @@ impl<S: BosStr, St: log_entry_state::State> LogEntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: log_entry_state::State> LogEntryBuilder<S, St> {
+impl<St: log_entry_state::State, S: BosStr> LogEntryBuilder<St, S> {
     /// Set the `sliceUri` field (optional)
     pub fn slice_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -379,7 +393,7 @@ impl<S: BosStr, St: log_entry_state::State> LogEntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: log_entry_state::State> LogEntryBuilder<S, St> {
+impl<St: log_entry_state::State, S: BosStr> LogEntryBuilder<St, S> {
     /// Set the `userDid` field (optional)
     pub fn user_did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -392,14 +406,14 @@ impl<S: BosStr, St: log_entry_state::State> LogEntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LogEntryBuilder<S, St>
+impl<St, S: BosStr> LogEntryBuilder<St, S>
 where
     St: log_entry_state::State,
-    St::Id: log_entry_state::IsSet,
-    St::LogType: log_entry_state::IsSet,
-    St::CreatedAt: log_entry_state::IsSet,
-    St::Level: log_entry_state::IsSet,
     St::Message: log_entry_state::IsSet,
+    St::CreatedAt: log_entry_state::IsSet,
+    St::LogType: log_entry_state::IsSet,
+    St::Level: log_entry_state::IsSet,
+    St::Id: log_entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LogEntry<S> {
@@ -434,10 +448,10 @@ where
 }
 
 fn lexicon_doc_network_slices_slice_getJobLogs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.slice.getJobLogs"),
@@ -446,22 +460,22 @@ fn lexicon_doc_network_slices_slice_getJobLogs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logEntry"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("createdAt"),
-                        SmolStr::new_static("logType"),
-                        SmolStr::new_static("level"),
-                        SmolStr::new_static("message"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("logType"), SmolStr::new_static("level"),
+                            SmolStr::new_static("message")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the log entry was created",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When the log entry was created"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -475,9 +489,9 @@ fn lexicon_doc_network_slices_slice_getJobLogs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("jobId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "UUID of related job if applicable",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("UUID of related job if applicable"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -511,18 +525,18 @@ fn lexicon_doc_network_slices_slice_getJobLogs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("sliceUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT-URI of related slice if applicable",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("AT-URI of related slice if applicable"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("userDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "DID of related user if applicable",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("DID of related user if applicable"),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -535,28 +549,32 @@ fn lexicon_doc_network_slices_slice_getJobLogs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("jobId")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("jobId"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static("UUID of the sync job")),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("jobId")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("jobId"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("UUID of the sync job"),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -572,7 +590,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_job_logs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -603,21 +621,28 @@ pub mod get_job_logs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetJobLogsBuilder<S: BosStr, St: get_job_logs_state::State> {
+pub struct GetJobLogsBuilder<St: get_job_logs_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetJobLogs<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetJobLogsBuilder<S, get_job_logs_state::Empty> {
+impl GetJobLogs<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetJobLogsBuilder<get_job_logs_state::Empty, DefaultStr> {
         GetJobLogsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetJobLogsBuilder<S, get_job_logs_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetJobLogs<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetJobLogsBuilder<get_job_logs_state::Empty, S> {
+        GetJobLogsBuilder::builder()
+    }
+}
+
+impl GetJobLogsBuilder<get_job_logs_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetJobLogsBuilder {
             _state: PhantomData,
@@ -627,7 +652,18 @@ impl<S: BosStr> GetJobLogsBuilder<S, get_job_logs_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetJobLogsBuilder<S, St>
+impl<S: BosStr> GetJobLogsBuilder<get_job_logs_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetJobLogsBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetJobLogsBuilder<St, S>
 where
     St: get_job_logs_state::State,
     St::JobId: get_job_logs_state::IsUnset,
@@ -636,7 +672,7 @@ where
     pub fn job_id(
         mut self,
         value: impl Into<S>,
-    ) -> GetJobLogsBuilder<S, get_job_logs_state::SetJobId<St>> {
+    ) -> GetJobLogsBuilder<get_job_logs_state::SetJobId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetJobLogsBuilder {
             _state: PhantomData,
@@ -646,7 +682,7 @@ where
     }
 }
 
-impl<S: BosStr, St: get_job_logs_state::State> GetJobLogsBuilder<S, St> {
+impl<St: get_job_logs_state::State, S: BosStr> GetJobLogsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -659,7 +695,7 @@ impl<S: BosStr, St: get_job_logs_state::State> GetJobLogsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetJobLogsBuilder<S, St>
+impl<St, S: BosStr> GetJobLogsBuilder<St, S>
 where
     St: get_job_logs_state::State,
     St::JobId: get_job_logs_state::IsSet,

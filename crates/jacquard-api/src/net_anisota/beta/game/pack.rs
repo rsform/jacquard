@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::beta::game::pack;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::beta::game::pack;
 /// Beta version: Record tracking daily pack openings and streak information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -73,10 +73,7 @@ pub struct PackGetRecordOutput<S: BosStr = DefaultStr> {
 /// A single pack opening entry in the history
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PackHistoryEntry<S: BosStr = DefaultStr> {
     ///Items received from this pack
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -94,10 +91,7 @@ pub struct PackHistoryEntry<S: BosStr = DefaultStr> {
 /// An item received from a pack opening
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReceivedItem<S: BosStr = DefaultStr> {
     ///ID of the item received
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -231,7 +225,7 @@ impl<S: BosStr> LexiconSchema for ReceivedItem<S> {
 
 pub mod pack_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -240,71 +234,71 @@ pub mod pack_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Streak;
+        type CreatedAt;
         type LastOpenTime;
         type TotalOpens;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Streak = Unset;
+        type CreatedAt = Unset;
         type LastOpenTime = Unset;
         type TotalOpens = Unset;
-        type CreatedAt = Unset;
     }
     ///State transition - sets the `streak` field to Set
     pub struct SetStreak<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStreak<St> {}
     impl<St: State> State for SetStreak<St> {
         type Streak = Set<members::streak>;
+        type CreatedAt = St::CreatedAt;
         type LastOpenTime = St::LastOpenTime;
         type TotalOpens = St::TotalOpens;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `last_open_time` field to Set
-    pub struct SetLastOpenTime<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLastOpenTime<St> {}
-    impl<St: State> State for SetLastOpenTime<St> {
-        type Streak = St::Streak;
-        type LastOpenTime = Set<members::last_open_time>;
-        type TotalOpens = St::TotalOpens;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `total_opens` field to Set
-    pub struct SetTotalOpens<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTotalOpens<St> {}
-    impl<St: State> State for SetTotalOpens<St> {
-        type Streak = St::Streak;
-        type LastOpenTime = St::LastOpenTime;
-        type TotalOpens = Set<members::total_opens>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type Streak = St::Streak;
+        type CreatedAt = Set<members::created_at>;
         type LastOpenTime = St::LastOpenTime;
         type TotalOpens = St::TotalOpens;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `last_open_time` field to Set
+    pub struct SetLastOpenTime<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLastOpenTime<St> {}
+    impl<St: State> State for SetLastOpenTime<St> {
+        type Streak = St::Streak;
+        type CreatedAt = St::CreatedAt;
+        type LastOpenTime = Set<members::last_open_time>;
+        type TotalOpens = St::TotalOpens;
+    }
+    ///State transition - sets the `total_opens` field to Set
+    pub struct SetTotalOpens<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTotalOpens<St> {}
+    impl<St: State> State for SetTotalOpens<St> {
+        type Streak = St::Streak;
+        type CreatedAt = St::CreatedAt;
+        type LastOpenTime = St::LastOpenTime;
+        type TotalOpens = Set<members::total_opens>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `streak` field
         pub struct streak(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `last_open_time` field
         pub struct last_open_time(());
         ///Marker type for the `total_opens` field
         pub struct total_opens(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PackBuilder<S: BosStr, St: pack_state::State> {
+pub struct PackBuilder<St: pack_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -318,15 +312,22 @@ pub struct PackBuilder<S: BosStr, St: pack_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Pack<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PackBuilder<S, pack_state::Empty> {
+impl Pack<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PackBuilder<pack_state::Empty, DefaultStr> {
         PackBuilder::new()
     }
 }
 
-impl<S: BosStr> PackBuilder<S, pack_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Pack<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PackBuilder<pack_state::Empty, S> {
+        PackBuilder::builder()
+    }
+}
+
+impl PackBuilder<pack_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PackBuilder {
             _state: PhantomData,
@@ -336,7 +337,18 @@ impl<S: BosStr> PackBuilder<S, pack_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PackBuilder<S, St>
+impl<S: BosStr> PackBuilder<pack_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PackBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PackBuilder<St, S>
 where
     St: pack_state::State,
     St::CreatedAt: pack_state::IsUnset,
@@ -345,7 +357,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PackBuilder<S, pack_state::SetCreatedAt<St>> {
+    ) -> PackBuilder<pack_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PackBuilder {
             _state: PhantomData,
@@ -355,7 +367,7 @@ where
     }
 }
 
-impl<S: BosStr, St: pack_state::State> PackBuilder<S, St> {
+impl<St: pack_state::State, S: BosStr> PackBuilder<St, S> {
     /// Set the `lastModified` field (optional)
     pub fn last_modified(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -368,7 +380,7 @@ impl<S: BosStr, St: pack_state::State> PackBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PackBuilder<S, St>
+impl<St, S: BosStr> PackBuilder<St, S>
 where
     St: pack_state::State,
     St::LastOpenTime: pack_state::IsUnset,
@@ -377,7 +389,7 @@ where
     pub fn last_open_time(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PackBuilder<S, pack_state::SetLastOpenTime<St>> {
+    ) -> PackBuilder<pack_state::SetLastOpenTime<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PackBuilder {
             _state: PhantomData,
@@ -387,7 +399,7 @@ where
     }
 }
 
-impl<S: BosStr, St: pack_state::State> PackBuilder<S, St> {
+impl<St: pack_state::State, S: BosStr> PackBuilder<St, S> {
     /// Set the `longestStreak` field (optional)
     pub fn longest_streak(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -400,7 +412,7 @@ impl<S: BosStr, St: pack_state::State> PackBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: pack_state::State> PackBuilder<S, St> {
+impl<St: pack_state::State, S: BosStr> PackBuilder<St, S> {
     /// Set the `packHistory` field (optional)
     pub fn pack_history(
         mut self,
@@ -410,19 +422,25 @@ impl<S: BosStr, St: pack_state::State> PackBuilder<S, St> {
         self
     }
     /// Set the `packHistory` field to an Option value (optional)
-    pub fn maybe_pack_history(mut self, value: Option<Vec<pack::PackHistoryEntry<S>>>) -> Self {
+    pub fn maybe_pack_history(
+        mut self,
+        value: Option<Vec<pack::PackHistoryEntry<S>>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
 }
 
-impl<S: BosStr, St> PackBuilder<S, St>
+impl<St, S: BosStr> PackBuilder<St, S>
 where
     St: pack_state::State,
     St::Streak: pack_state::IsUnset,
 {
     /// Set the `streak` field (required)
-    pub fn streak(mut self, value: impl Into<i64>) -> PackBuilder<S, pack_state::SetStreak<St>> {
+    pub fn streak(
+        mut self,
+        value: impl Into<i64>,
+    ) -> PackBuilder<pack_state::SetStreak<St>, S> {
         self._fields.5 = Option::Some(value.into());
         PackBuilder {
             _state: PhantomData,
@@ -432,7 +450,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PackBuilder<S, St>
+impl<St, S: BosStr> PackBuilder<St, S>
 where
     St: pack_state::State,
     St::TotalOpens: pack_state::IsUnset,
@@ -441,7 +459,7 @@ where
     pub fn total_opens(
         mut self,
         value: impl Into<i64>,
-    ) -> PackBuilder<S, pack_state::SetTotalOpens<St>> {
+    ) -> PackBuilder<pack_state::SetTotalOpens<St>, S> {
         self._fields.6 = Option::Some(value.into());
         PackBuilder {
             _state: PhantomData,
@@ -451,13 +469,13 @@ where
     }
 }
 
-impl<S: BosStr, St> PackBuilder<S, St>
+impl<St, S: BosStr> PackBuilder<St, S>
 where
     St: pack_state::State,
     St::Streak: pack_state::IsSet,
+    St::CreatedAt: pack_state::IsSet,
     St::LastOpenTime: pack_state::IsSet,
     St::TotalOpens: pack_state::IsSet,
-    St::CreatedAt: pack_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Pack<S> {
@@ -488,10 +506,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.beta.game.pack"),
@@ -500,26 +518,30 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Beta version: Record tracking daily pack openings and streak information",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Beta version: Record tracking daily pack openings and streak information",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("lastOpenTime"),
-                            SmolStr::new_static("totalOpens"),
-                            SmolStr::new_static("streak"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("lastOpenTime"),
+                                SmolStr::new_static("totalOpens"),
+                                SmolStr::new_static("streak"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When the record was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When the record was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -527,9 +549,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("lastModified"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When the record was last modified",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When the record was last modified"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -537,9 +559,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("lastOpenTime"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When daily pack was last opened",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When daily pack was last opened"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -554,9 +576,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("packHistory"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "History of the last few pack openings",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("History of the last few pack openings"),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#packHistoryEntry"),
                                         ..Default::default()
@@ -589,18 +611,18 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("packHistoryEntry"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A single pack opening entry in the history",
-                    )),
+                    description: Some(
+                        CowStr::new_static("A single pack opening entry in the history"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("itemsReceived"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Items received from this pack",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Items received from this pack"),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#receivedItem"),
                                     ..Default::default()
@@ -611,7 +633,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("openTime"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("When this pack was opened")),
+                                description: Some(
+                                    CowStr::new_static("When this pack was opened"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -630,14 +654,18 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("receivedItem"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("An item received from a pack opening")),
+                    description: Some(
+                        CowStr::new_static("An item received from a pack opening"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("itemId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("ID of the item received")),
+                                description: Some(
+                                    CowStr::new_static("ID of the item received"),
+                                ),
                                 ..Default::default()
                             }),
                         );

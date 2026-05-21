@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,16 +25,13 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_fitsky::workout;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_fitsky::workout;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CardioDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
@@ -65,10 +62,7 @@ pub struct CardioDetails<S: BosStr = DefaultStr> {
 /// Time in seconds spent in each heart rate zone
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CardioZoneData<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub zone1_rest: Option<i64>,
@@ -84,11 +78,9 @@ pub struct CardioZoneData<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Exercise<S: BosStr = DefaultStr> {
     pub name: S,
     pub sets: Vec<workout::ExerciseSet<S>>,
@@ -96,11 +88,9 @@ pub struct Exercise<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExerciseSet<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reps: Option<i64>,
@@ -111,11 +101,9 @@ pub struct ExerciseSet<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FlexibilityDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
@@ -134,6 +122,7 @@ pub struct FlexibilityDetails<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FlexibilityDetailsIntensity<S: BosStr = DefaultStr> {
@@ -184,7 +173,8 @@ impl<S: BosStr> Serialize for FlexibilityDetailsIntensity<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for FlexibilityDetailsIntensity<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for FlexibilityDetailsIntensity<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -209,7 +199,9 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             FlexibilityDetailsIntensity::Light => FlexibilityDetailsIntensity::Light,
-            FlexibilityDetailsIntensity::Moderate => FlexibilityDetailsIntensity::Moderate,
+            FlexibilityDetailsIntensity::Moderate => {
+                FlexibilityDetailsIntensity::Moderate
+            }
             FlexibilityDetailsIntensity::Intense => FlexibilityDetailsIntensity::Intense,
             FlexibilityDetailsIntensity::Other(v) => {
                 FlexibilityDetailsIntensity::Other(v.into_static())
@@ -218,11 +210,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HeartRateData<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avg: Option<i64>,
@@ -236,11 +226,9 @@ pub struct HeartRateData<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HeartRateSample<S: BosStr = DefaultStr> {
     pub bpm: i64,
     pub timestamp: Datetime,
@@ -248,11 +236,9 @@ pub struct HeartRateSample<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HiitSportsDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
@@ -282,6 +268,7 @@ pub struct HiitSportsDetails<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum HiitSportsDetailsIntensity<S: BosStr = DefaultStr> {
@@ -332,7 +319,8 @@ impl<S: BosStr> Serialize for HiitSportsDetailsIntensity<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for HiitSportsDetailsIntensity<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for HiitSportsDetailsIntensity<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -405,6 +393,7 @@ pub struct Workout<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -498,6 +487,7 @@ where
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum WorkoutType<S: BosStr = DefaultStr> {
@@ -623,11 +613,9 @@ pub struct WorkoutGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Workout<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Milestone<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub note: Option<S>,
@@ -639,6 +627,7 @@ pub struct Milestone<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MilestoneType<S: BosStr = DefaultStr> {
@@ -721,11 +710,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RoutePoint<S: BosStr = DefaultStr> {
     ///Latitude in microdegrees (degrees * 1,000,000)
     pub lat_e6: i64,
@@ -736,11 +723,9 @@ pub struct RoutePoint<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StrengthDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
@@ -761,10 +746,7 @@ pub struct StrengthDetails<S: BosStr = DefaultStr> {
 /// Controls which fields are visible to other users in the Fitsky UI. Note: ATProto repos are public — this is UI-level privacy only.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VisibilitySettings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<VisibilitySettingsCalories<S>>,
@@ -781,6 +763,7 @@ pub struct VisibilitySettings<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsCalories<S: BosStr = DefaultStr> {
@@ -828,7 +811,8 @@ impl<S: BosStr> Serialize for VisibilitySettingsCalories<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VisibilitySettingsCalories<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for VisibilitySettingsCalories<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -860,6 +844,7 @@ where
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsCardioZones<S: BosStr = DefaultStr> {
@@ -907,7 +892,8 @@ impl<S: BosStr> Serialize for VisibilitySettingsCardioZones<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VisibilitySettingsCardioZones<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for VisibilitySettingsCardioZones<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -931,14 +917,19 @@ where
     type Output = VisibilitySettingsCardioZones<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            VisibilitySettingsCardioZones::Public => VisibilitySettingsCardioZones::Public,
-            VisibilitySettingsCardioZones::Private => VisibilitySettingsCardioZones::Private,
+            VisibilitySettingsCardioZones::Public => {
+                VisibilitySettingsCardioZones::Public
+            }
+            VisibilitySettingsCardioZones::Private => {
+                VisibilitySettingsCardioZones::Private
+            }
             VisibilitySettingsCardioZones::Other(v) => {
                 VisibilitySettingsCardioZones::Other(v.into_static())
             }
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsDetails<S: BosStr = DefaultStr> {
@@ -986,7 +977,8 @@ impl<S: BosStr> Serialize for VisibilitySettingsDetails<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VisibilitySettingsDetails<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for VisibilitySettingsDetails<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1018,6 +1010,7 @@ where
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsHeartRate<S: BosStr = DefaultStr> {
@@ -1065,7 +1058,8 @@ impl<S: BosStr> Serialize for VisibilitySettingsHeartRate<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VisibilitySettingsHeartRate<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for VisibilitySettingsHeartRate<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1097,6 +1091,7 @@ where
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsNotes<S: BosStr = DefaultStr> {
@@ -1170,10 +1165,13 @@ where
         match self {
             VisibilitySettingsNotes::Public => VisibilitySettingsNotes::Public,
             VisibilitySettingsNotes::Private => VisibilitySettingsNotes::Private,
-            VisibilitySettingsNotes::Other(v) => VisibilitySettingsNotes::Other(v.into_static()),
+            VisibilitySettingsNotes::Other(v) => {
+                VisibilitySettingsNotes::Other(v.into_static())
+            }
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsSteps<S: BosStr = DefaultStr> {
@@ -1247,7 +1245,9 @@ where
         match self {
             VisibilitySettingsSteps::Public => VisibilitySettingsSteps::Public,
             VisibilitySettingsSteps::Private => VisibilitySettingsSteps::Private,
-            VisibilitySettingsSteps::Other(v) => VisibilitySettingsSteps::Other(v.into_static()),
+            VisibilitySettingsSteps::Other(v) => {
+                VisibilitySettingsSteps::Other(v.into_static())
+            }
         }
     }
 }
@@ -1547,23 +1547,25 @@ impl<S: BosStr> LexiconSchema for Workout<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("og_image"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/webp".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -1757,10 +1759,10 @@ impl<S: BosStr> LexiconSchema for VisibilitySettings<S> {
 }
 
 fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.fitsky.workout"),
@@ -1826,9 +1828,11 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("routePoints"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "GPS route points recorded during the workout",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "GPS route points recorded during the workout",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#routePoint"),
                                     ..Default::default()
@@ -1850,9 +1854,11 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("cardioZoneData"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Time in seconds spent in each heart rate zone",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Time in seconds spent in each heart rate zone",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1894,10 +1900,9 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("exercise"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("sets"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("sets")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2045,10 +2050,11 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("heartRateSample"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("timestamp"),
-                        SmolStr::new_static("bpm"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("timestamp"), SmolStr::new_static("bpm")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2136,9 +2142,11 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("routePoints"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "GPS route points recorded during the workout",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "GPS route points recorded during the workout",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#routePoint"),
                                     ..Default::default()
@@ -2302,10 +2310,11 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("milestone"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("timestamp"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("type"), SmolStr::new_static("timestamp")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2345,11 +2354,12 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("routePoint"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("latE6"),
-                        SmolStr::new_static("lngE6"),
-                        SmolStr::new_static("timestamp"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("latE6"), SmolStr::new_static("lngE6"),
+                            SmolStr::new_static("timestamp")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2500,7 +2510,7 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
 
 pub mod exercise_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2543,21 +2553,28 @@ pub mod exercise_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ExerciseBuilder<S: BosStr, St: exercise_state::State> {
+pub struct ExerciseBuilder<St: exercise_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<workout::ExerciseSet<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Exercise<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ExerciseBuilder<S, exercise_state::Empty> {
+impl Exercise<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ExerciseBuilder<exercise_state::Empty, DefaultStr> {
         ExerciseBuilder::new()
     }
 }
 
-impl<S: BosStr> ExerciseBuilder<S, exercise_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Exercise<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ExerciseBuilder<exercise_state::Empty, S> {
+        ExerciseBuilder::builder()
+    }
+}
+
+impl ExerciseBuilder<exercise_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ExerciseBuilder {
             _state: PhantomData,
@@ -2567,13 +2584,27 @@ impl<S: BosStr> ExerciseBuilder<S, exercise_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ExerciseBuilder<S, St>
+impl<S: BosStr> ExerciseBuilder<exercise_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ExerciseBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ExerciseBuilder<St, S>
 where
     St: exercise_state::State,
     St::Name: exercise_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> ExerciseBuilder<S, exercise_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> ExerciseBuilder<exercise_state::SetName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ExerciseBuilder {
             _state: PhantomData,
@@ -2583,7 +2614,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ExerciseBuilder<S, St>
+impl<St, S: BosStr> ExerciseBuilder<St, S>
 where
     St: exercise_state::State,
     St::Sets: exercise_state::IsUnset,
@@ -2592,7 +2623,7 @@ where
     pub fn sets(
         mut self,
         value: impl Into<Vec<workout::ExerciseSet<S>>>,
-    ) -> ExerciseBuilder<S, exercise_state::SetSets<St>> {
+    ) -> ExerciseBuilder<exercise_state::SetSets<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ExerciseBuilder {
             _state: PhantomData,
@@ -2602,7 +2633,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ExerciseBuilder<S, St>
+impl<St, S: BosStr> ExerciseBuilder<St, S>
 where
     St: exercise_state::State,
     St::Name: exercise_state::IsSet,
@@ -2628,7 +2659,7 @@ where
 
 pub mod heart_rate_sample_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2636,56 +2667,66 @@ pub mod heart_rate_sample_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Bpm;
         type Timestamp;
+        type Bpm;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Bpm = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `bpm` field to Set
-    pub struct SetBpm<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBpm<St> {}
-    impl<St: State> State for SetBpm<St> {
-        type Bpm = Set<members::bpm>;
-        type Timestamp = St::Timestamp;
+        type Bpm = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTimestamp<St> {}
     impl<St: State> State for SetTimestamp<St> {
-        type Bpm = St::Bpm;
         type Timestamp = Set<members::timestamp>;
+        type Bpm = St::Bpm;
+    }
+    ///State transition - sets the `bpm` field to Set
+    pub struct SetBpm<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBpm<St> {}
+    impl<St: State> State for SetBpm<St> {
+        type Timestamp = St::Timestamp;
+        type Bpm = Set<members::bpm>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bpm` field
-        pub struct bpm(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `bpm` field
+        pub struct bpm(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HeartRateSampleBuilder<S: BosStr, St: heart_rate_sample_state::State> {
+pub struct HeartRateSampleBuilder<
+    St: heart_rate_sample_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> HeartRateSample<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> HeartRateSampleBuilder<S, heart_rate_sample_state::Empty> {
+impl HeartRateSample<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> HeartRateSampleBuilder<heart_rate_sample_state::Empty, DefaultStr> {
         HeartRateSampleBuilder::new()
     }
 }
 
-impl<S: BosStr> HeartRateSampleBuilder<S, heart_rate_sample_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> HeartRateSample<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> HeartRateSampleBuilder<heart_rate_sample_state::Empty, S> {
+        HeartRateSampleBuilder::builder()
+    }
+}
+
+impl HeartRateSampleBuilder<heart_rate_sample_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         HeartRateSampleBuilder {
             _state: PhantomData,
@@ -2695,7 +2736,18 @@ impl<S: BosStr> HeartRateSampleBuilder<S, heart_rate_sample_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> HeartRateSampleBuilder<S, St>
+impl<S: BosStr> HeartRateSampleBuilder<heart_rate_sample_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        HeartRateSampleBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> HeartRateSampleBuilder<St, S>
 where
     St: heart_rate_sample_state::State,
     St::Bpm: heart_rate_sample_state::IsUnset,
@@ -2704,7 +2756,7 @@ where
     pub fn bpm(
         mut self,
         value: impl Into<i64>,
-    ) -> HeartRateSampleBuilder<S, heart_rate_sample_state::SetBpm<St>> {
+    ) -> HeartRateSampleBuilder<heart_rate_sample_state::SetBpm<St>, S> {
         self._fields.0 = Option::Some(value.into());
         HeartRateSampleBuilder {
             _state: PhantomData,
@@ -2714,7 +2766,7 @@ where
     }
 }
 
-impl<S: BosStr, St> HeartRateSampleBuilder<S, St>
+impl<St, S: BosStr> HeartRateSampleBuilder<St, S>
 where
     St: heart_rate_sample_state::State,
     St::Timestamp: heart_rate_sample_state::IsUnset,
@@ -2723,7 +2775,7 @@ where
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> HeartRateSampleBuilder<S, heart_rate_sample_state::SetTimestamp<St>> {
+    ) -> HeartRateSampleBuilder<heart_rate_sample_state::SetTimestamp<St>, S> {
         self._fields.1 = Option::Some(value.into());
         HeartRateSampleBuilder {
             _state: PhantomData,
@@ -2733,11 +2785,11 @@ where
     }
 }
 
-impl<S: BosStr, St> HeartRateSampleBuilder<S, St>
+impl<St, S: BosStr> HeartRateSampleBuilder<St, S>
 where
     St: heart_rate_sample_state::State,
-    St::Bpm: heart_rate_sample_state::IsSet,
     St::Timestamp: heart_rate_sample_state::IsSet,
+    St::Bpm: heart_rate_sample_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> HeartRateSample<S> {
@@ -2748,7 +2800,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> HeartRateSample<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> HeartRateSample<S> {
         HeartRateSample {
             bpm: self._fields.0.unwrap(),
             timestamp: self._fields.1.unwrap(),
@@ -2759,7 +2814,7 @@ where
 
 pub mod workout_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2767,90 +2822,90 @@ pub mod workout_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Duration;
+        type StartedAt;
         type Title;
         type Type;
-        type StartedAt;
+        type Duration;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Duration = Unset;
+        type StartedAt = Unset;
         type Title = Unset;
         type Type = Unset;
-        type StartedAt = Unset;
+        type Duration = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDuration<St> {}
-    impl<St: State> State for SetDuration<St> {
-        type Duration = Set<members::duration>;
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartedAt<St> {}
+    impl<St: State> State for SetStartedAt<St> {
+        type StartedAt = Set<members::started_at>;
         type Title = St::Title;
         type Type = St::Type;
-        type StartedAt = St::StartedAt;
+        type Duration = St::Duration;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Duration = St::Duration;
+        type StartedAt = St::StartedAt;
         type Title = Set<members::title>;
         type Type = St::Type;
-        type StartedAt = St::StartedAt;
+        type Duration = St::Duration;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type Duration = St::Duration;
+        type StartedAt = St::StartedAt;
         type Title = St::Title;
         type Type = Set<members::r#type>;
-        type StartedAt = St::StartedAt;
+        type Duration = St::Duration;
         type CreatedAt = St::CreatedAt;
     }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStartedAt<St> {}
-    impl<St: State> State for SetStartedAt<St> {
-        type Duration = St::Duration;
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDuration<St> {}
+    impl<St: State> State for SetDuration<St> {
+        type StartedAt = St::StartedAt;
         type Title = St::Title;
         type Type = St::Type;
-        type StartedAt = Set<members::started_at>;
+        type Duration = Set<members::duration>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Duration = St::Duration;
+        type StartedAt = St::StartedAt;
         type Title = St::Title;
         type Type = St::Type;
-        type StartedAt = St::StartedAt;
+        type Duration = St::Duration;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `duration` field
-        pub struct duration(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WorkoutBuilder<S: BosStr, St: workout_state::State> {
+pub struct WorkoutBuilder<St: workout_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -2870,27 +2925,71 @@ pub struct WorkoutBuilder<S: BosStr, St: workout_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Workout<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> WorkoutBuilder<S, workout_state::Empty> {
+impl Workout<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> WorkoutBuilder<workout_state::Empty, DefaultStr> {
         WorkoutBuilder::new()
     }
 }
 
-impl<S: BosStr> WorkoutBuilder<S, workout_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Workout<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> WorkoutBuilder<workout_state::Empty, S> {
+        WorkoutBuilder::builder()
+    }
+}
+
+impl WorkoutBuilder<workout_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         WorkoutBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St> WorkoutBuilder<S, St>
+impl<S: BosStr> WorkoutBuilder<workout_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        WorkoutBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> WorkoutBuilder<St, S>
 where
     St: workout_state::State,
     St::CreatedAt: workout_state::IsUnset,
@@ -2899,7 +2998,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WorkoutBuilder<S, workout_state::SetCreatedAt<St>> {
+    ) -> WorkoutBuilder<workout_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
@@ -2909,7 +3008,7 @@ where
     }
 }
 
-impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
+impl<St: workout_state::State, S: BosStr> WorkoutBuilder<St, S> {
     /// Set the `details` field (optional)
     pub fn details(mut self, value: impl Into<Option<WorkoutDetails<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -2922,7 +3021,7 @@ impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WorkoutBuilder<S, St>
+impl<St, S: BosStr> WorkoutBuilder<St, S>
 where
     St: workout_state::State,
     St::Duration: workout_state::IsUnset,
@@ -2931,7 +3030,7 @@ where
     pub fn duration(
         mut self,
         value: impl Into<i64>,
-    ) -> WorkoutBuilder<S, workout_state::SetDuration<St>> {
+    ) -> WorkoutBuilder<workout_state::SetDuration<St>, S> {
         self._fields.2 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
@@ -2941,7 +3040,7 @@ where
     }
 }
 
-impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
+impl<St: workout_state::State, S: BosStr> WorkoutBuilder<St, S> {
     /// Set the `endedAt` field (optional)
     pub fn ended_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -2954,20 +3053,26 @@ impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
+impl<St: workout_state::State, S: BosStr> WorkoutBuilder<St, S> {
     /// Set the `milestones` field (optional)
-    pub fn milestones(mut self, value: impl Into<Option<Vec<workout::Milestone<S>>>>) -> Self {
+    pub fn milestones(
+        mut self,
+        value: impl Into<Option<Vec<workout::Milestone<S>>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `milestones` field to an Option value (optional)
-    pub fn maybe_milestones(mut self, value: Option<Vec<workout::Milestone<S>>>) -> Self {
+    pub fn maybe_milestones(
+        mut self,
+        value: Option<Vec<workout::Milestone<S>>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
 }
 
-impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
+impl<St: workout_state::State, S: BosStr> WorkoutBuilder<St, S> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -2980,7 +3085,7 @@ impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
+impl<St: workout_state::State, S: BosStr> WorkoutBuilder<St, S> {
     /// Set the `ogImage` field (optional)
     pub fn og_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -2993,7 +3098,7 @@ impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
+impl<St: workout_state::State, S: BosStr> WorkoutBuilder<St, S> {
     /// Set the `planUri` field (optional)
     pub fn plan_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -3006,7 +3111,7 @@ impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WorkoutBuilder<S, St>
+impl<St, S: BosStr> WorkoutBuilder<St, S>
 where
     St: workout_state::State,
     St::StartedAt: workout_state::IsUnset,
@@ -3015,7 +3120,7 @@ where
     pub fn started_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WorkoutBuilder<S, workout_state::SetStartedAt<St>> {
+    ) -> WorkoutBuilder<workout_state::SetStartedAt<St>, S> {
         self._fields.8 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
@@ -3025,7 +3130,7 @@ where
     }
 }
 
-impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
+impl<St: workout_state::State, S: BosStr> WorkoutBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<WorkoutStatus<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -3038,13 +3143,16 @@ impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WorkoutBuilder<S, St>
+impl<St, S: BosStr> WorkoutBuilder<St, S>
 where
     St: workout_state::State,
     St::Title: workout_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> WorkoutBuilder<S, workout_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> WorkoutBuilder<workout_state::SetTitle<St>, S> {
         self._fields.10 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
@@ -3054,7 +3162,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WorkoutBuilder<S, St>
+impl<St, S: BosStr> WorkoutBuilder<St, S>
 where
     St: workout_state::State,
     St::Type: workout_state::IsUnset,
@@ -3063,7 +3171,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<WorkoutType<S>>,
-    ) -> WorkoutBuilder<S, workout_state::SetType<St>> {
+    ) -> WorkoutBuilder<workout_state::SetType<St>, S> {
         self._fields.11 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
@@ -3073,26 +3181,32 @@ where
     }
 }
 
-impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
+impl<St: workout_state::State, S: BosStr> WorkoutBuilder<St, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(mut self, value: impl Into<Option<workout::VisibilitySettings<S>>>) -> Self {
+    pub fn visibility(
+        mut self,
+        value: impl Into<Option<workout::VisibilitySettings<S>>>,
+    ) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
-    pub fn maybe_visibility(mut self, value: Option<workout::VisibilitySettings<S>>) -> Self {
+    pub fn maybe_visibility(
+        mut self,
+        value: Option<workout::VisibilitySettings<S>>,
+    ) -> Self {
         self._fields.12 = value;
         self
     }
 }
 
-impl<S: BosStr, St> WorkoutBuilder<S, St>
+impl<St, S: BosStr> WorkoutBuilder<St, S>
 where
     St: workout_state::State,
-    St::Duration: workout_state::IsSet,
+    St::StartedAt: workout_state::IsSet,
     St::Title: workout_state::IsSet,
     St::Type: workout_state::IsSet,
-    St::StartedAt: workout_state::IsSet,
+    St::Duration: workout_state::IsSet,
     St::CreatedAt: workout_state::IsSet,
 {
     /// Build the final struct.
@@ -3137,7 +3251,7 @@ where
 
 pub mod milestone_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3180,26 +3294,28 @@ pub mod milestone_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MilestoneBuilder<S: BosStr, St: milestone_state::State> {
+pub struct MilestoneBuilder<St: milestone_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<Datetime>,
-        Option<MilestoneType<S>>,
-        Option<i64>,
-    ),
+    _fields: (Option<S>, Option<Datetime>, Option<MilestoneType<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Milestone<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MilestoneBuilder<S, milestone_state::Empty> {
+impl Milestone<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MilestoneBuilder<milestone_state::Empty, DefaultStr> {
         MilestoneBuilder::new()
     }
 }
 
-impl<S: BosStr> MilestoneBuilder<S, milestone_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Milestone<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MilestoneBuilder<milestone_state::Empty, S> {
+        MilestoneBuilder::builder()
+    }
+}
+
+impl MilestoneBuilder<milestone_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MilestoneBuilder {
             _state: PhantomData,
@@ -3209,7 +3325,18 @@ impl<S: BosStr> MilestoneBuilder<S, milestone_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: milestone_state::State> MilestoneBuilder<S, St> {
+impl<S: BosStr> MilestoneBuilder<milestone_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MilestoneBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: milestone_state::State, S: BosStr> MilestoneBuilder<St, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -3222,7 +3349,7 @@ impl<S: BosStr, St: milestone_state::State> MilestoneBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MilestoneBuilder<S, St>
+impl<St, S: BosStr> MilestoneBuilder<St, S>
 where
     St: milestone_state::State,
     St::Timestamp: milestone_state::IsUnset,
@@ -3231,7 +3358,7 @@ where
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MilestoneBuilder<S, milestone_state::SetTimestamp<St>> {
+    ) -> MilestoneBuilder<milestone_state::SetTimestamp<St>, S> {
         self._fields.1 = Option::Some(value.into());
         MilestoneBuilder {
             _state: PhantomData,
@@ -3241,7 +3368,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MilestoneBuilder<S, St>
+impl<St, S: BosStr> MilestoneBuilder<St, S>
 where
     St: milestone_state::State,
     St::Type: milestone_state::IsUnset,
@@ -3250,7 +3377,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<MilestoneType<S>>,
-    ) -> MilestoneBuilder<S, milestone_state::SetType<St>> {
+    ) -> MilestoneBuilder<milestone_state::SetType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         MilestoneBuilder {
             _state: PhantomData,
@@ -3260,7 +3387,7 @@ where
     }
 }
 
-impl<S: BosStr, St: milestone_state::State> MilestoneBuilder<S, St> {
+impl<St: milestone_state::State, S: BosStr> MilestoneBuilder<St, S> {
     /// Set the `valueMeters` field (optional)
     pub fn value_meters(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -3273,7 +3400,7 @@ impl<S: BosStr, St: milestone_state::State> MilestoneBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MilestoneBuilder<S, St>
+impl<St, S: BosStr> MilestoneBuilder<St, S>
 where
     St: milestone_state::State,
     St::Timestamp: milestone_state::IsSet,
@@ -3290,7 +3417,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Milestone<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Milestone<S> {
         Milestone {
             note: self._fields.0,
             timestamp: self._fields.1.unwrap(),
@@ -3303,7 +3433,7 @@ where
 
 pub mod route_point_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3311,70 +3441,77 @@ pub mod route_point_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Timestamp;
         type LatE6;
         type LngE6;
-        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Timestamp = Unset;
         type LatE6 = Unset;
         type LngE6 = Unset;
-        type Timestamp = Unset;
-    }
-    ///State transition - sets the `lat_e6` field to Set
-    pub struct SetLatE6<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLatE6<St> {}
-    impl<St: State> State for SetLatE6<St> {
-        type LatE6 = Set<members::lat_e6>;
-        type LngE6 = St::LngE6;
-        type Timestamp = St::Timestamp;
-    }
-    ///State transition - sets the `lng_e6` field to Set
-    pub struct SetLngE6<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLngE6<St> {}
-    impl<St: State> State for SetLngE6<St> {
-        type LatE6 = St::LatE6;
-        type LngE6 = Set<members::lng_e6>;
-        type Timestamp = St::Timestamp;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTimestamp<St> {}
     impl<St: State> State for SetTimestamp<St> {
+        type Timestamp = Set<members::timestamp>;
         type LatE6 = St::LatE6;
         type LngE6 = St::LngE6;
-        type Timestamp = Set<members::timestamp>;
+    }
+    ///State transition - sets the `lat_e6` field to Set
+    pub struct SetLatE6<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLatE6<St> {}
+    impl<St: State> State for SetLatE6<St> {
+        type Timestamp = St::Timestamp;
+        type LatE6 = Set<members::lat_e6>;
+        type LngE6 = St::LngE6;
+    }
+    ///State transition - sets the `lng_e6` field to Set
+    pub struct SetLngE6<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLngE6<St> {}
+    impl<St: State> State for SetLngE6<St> {
+        type Timestamp = St::Timestamp;
+        type LatE6 = St::LatE6;
+        type LngE6 = Set<members::lng_e6>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
         ///Marker type for the `lat_e6` field
         pub struct lat_e6(());
         ///Marker type for the `lng_e6` field
         pub struct lng_e6(());
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RoutePointBuilder<S: BosStr, St: route_point_state::State> {
+pub struct RoutePointBuilder<St: route_point_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RoutePoint<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RoutePointBuilder<S, route_point_state::Empty> {
+impl RoutePoint<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RoutePointBuilder<route_point_state::Empty, DefaultStr> {
         RoutePointBuilder::new()
     }
 }
 
-impl<S: BosStr> RoutePointBuilder<S, route_point_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RoutePoint<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RoutePointBuilder<route_point_state::Empty, S> {
+        RoutePointBuilder::builder()
+    }
+}
+
+impl RoutePointBuilder<route_point_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RoutePointBuilder {
             _state: PhantomData,
@@ -3384,7 +3521,18 @@ impl<S: BosStr> RoutePointBuilder<S, route_point_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RoutePointBuilder<S, St>
+impl<S: BosStr> RoutePointBuilder<route_point_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RoutePointBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RoutePointBuilder<St, S>
 where
     St: route_point_state::State,
     St::LatE6: route_point_state::IsUnset,
@@ -3393,7 +3541,7 @@ where
     pub fn lat_e6(
         mut self,
         value: impl Into<i64>,
-    ) -> RoutePointBuilder<S, route_point_state::SetLatE6<St>> {
+    ) -> RoutePointBuilder<route_point_state::SetLatE6<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RoutePointBuilder {
             _state: PhantomData,
@@ -3403,7 +3551,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RoutePointBuilder<S, St>
+impl<St, S: BosStr> RoutePointBuilder<St, S>
 where
     St: route_point_state::State,
     St::LngE6: route_point_state::IsUnset,
@@ -3412,7 +3560,7 @@ where
     pub fn lng_e6(
         mut self,
         value: impl Into<i64>,
-    ) -> RoutePointBuilder<S, route_point_state::SetLngE6<St>> {
+    ) -> RoutePointBuilder<route_point_state::SetLngE6<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RoutePointBuilder {
             _state: PhantomData,
@@ -3422,7 +3570,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RoutePointBuilder<S, St>
+impl<St, S: BosStr> RoutePointBuilder<St, S>
 where
     St: route_point_state::State,
     St::Timestamp: route_point_state::IsUnset,
@@ -3431,7 +3579,7 @@ where
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RoutePointBuilder<S, route_point_state::SetTimestamp<St>> {
+    ) -> RoutePointBuilder<route_point_state::SetTimestamp<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RoutePointBuilder {
             _state: PhantomData,
@@ -3441,12 +3589,12 @@ where
     }
 }
 
-impl<S: BosStr, St> RoutePointBuilder<S, St>
+impl<St, S: BosStr> RoutePointBuilder<St, S>
 where
     St: route_point_state::State,
+    St::Timestamp: route_point_state::IsSet,
     St::LatE6: route_point_state::IsSet,
     St::LngE6: route_point_state::IsSet,
-    St::Timestamp: route_point_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RoutePoint<S> {
@@ -3458,7 +3606,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RoutePoint<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RoutePoint<S> {
         RoutePoint {
             lat_e6: self._fields.0.unwrap(),
             lng_e6: self._fields.1.unwrap(),

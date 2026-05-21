@@ -9,12 +9,13 @@ pub mod create_scrobble;
 pub mod get_scrobble;
 pub mod get_scrobbles;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,11 +30,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_rocksky::artist::ArtistMbid;
-use crate::app_rocksky::artist::ArtistViewBasic;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::artist::ArtistMbid;
+use crate::app_rocksky::artist::ArtistViewBasic;
 /// A declaration of a scrobble.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -128,11 +129,9 @@ pub struct ScrobbleGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Scrobble<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ScrobbleViewBasic<S: BosStr = DefaultStr> {
     ///The album of the song.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -181,11 +180,9 @@ pub struct ScrobbleViewBasic<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ScrobbleViewDetailed<S: BosStr = DefaultStr> {
     ///The album of the song.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -314,20 +311,25 @@ impl<S: BosStr> LexiconSchema for Scrobble<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("album_art"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -523,7 +525,7 @@ impl<S: BosStr> LexiconSchema for ScrobbleViewDetailed<S> {
 
 pub mod scrobble_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -531,110 +533,110 @@ pub mod scrobble_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Duration;
         type AlbumArtist;
         type Title;
-        type Artist;
-        type CreatedAt;
         type Album;
-        type Duration;
+        type CreatedAt;
+        type Artist;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Duration = Unset;
         type AlbumArtist = Unset;
         type Title = Unset;
-        type Artist = Unset;
-        type CreatedAt = Unset;
         type Album = Unset;
-        type Duration = Unset;
-    }
-    ///State transition - sets the `album_artist` field to Set
-    pub struct SetAlbumArtist<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAlbumArtist<St> {}
-    impl<St: State> State for SetAlbumArtist<St> {
-        type AlbumArtist = Set<members::album_artist>;
-        type Title = St::Title;
-        type Artist = St::Artist;
-        type CreatedAt = St::CreatedAt;
-        type Album = St::Album;
-        type Duration = St::Duration;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type AlbumArtist = St::AlbumArtist;
-        type Title = Set<members::title>;
-        type Artist = St::Artist;
-        type CreatedAt = St::CreatedAt;
-        type Album = St::Album;
-        type Duration = St::Duration;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetArtist<St> {}
-    impl<St: State> State for SetArtist<St> {
-        type AlbumArtist = St::AlbumArtist;
-        type Title = St::Title;
-        type Artist = Set<members::artist>;
-        type CreatedAt = St::CreatedAt;
-        type Album = St::Album;
-        type Duration = St::Duration;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type AlbumArtist = St::AlbumArtist;
-        type Title = St::Title;
-        type Artist = St::Artist;
-        type CreatedAt = Set<members::created_at>;
-        type Album = St::Album;
-        type Duration = St::Duration;
-    }
-    ///State transition - sets the `album` field to Set
-    pub struct SetAlbum<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAlbum<St> {}
-    impl<St: State> State for SetAlbum<St> {
-        type AlbumArtist = St::AlbumArtist;
-        type Title = St::Title;
-        type Artist = St::Artist;
-        type CreatedAt = St::CreatedAt;
-        type Album = Set<members::album>;
-        type Duration = St::Duration;
+        type CreatedAt = Unset;
+        type Artist = Unset;
     }
     ///State transition - sets the `duration` field to Set
     pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDuration<St> {}
     impl<St: State> State for SetDuration<St> {
+        type Duration = Set<members::duration>;
         type AlbumArtist = St::AlbumArtist;
         type Title = St::Title;
-        type Artist = St::Artist;
-        type CreatedAt = St::CreatedAt;
         type Album = St::Album;
-        type Duration = Set<members::duration>;
+        type CreatedAt = St::CreatedAt;
+        type Artist = St::Artist;
+    }
+    ///State transition - sets the `album_artist` field to Set
+    pub struct SetAlbumArtist<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlbumArtist<St> {}
+    impl<St: State> State for SetAlbumArtist<St> {
+        type Duration = St::Duration;
+        type AlbumArtist = Set<members::album_artist>;
+        type Title = St::Title;
+        type Album = St::Album;
+        type CreatedAt = St::CreatedAt;
+        type Artist = St::Artist;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Duration = St::Duration;
+        type AlbumArtist = St::AlbumArtist;
+        type Title = Set<members::title>;
+        type Album = St::Album;
+        type CreatedAt = St::CreatedAt;
+        type Artist = St::Artist;
+    }
+    ///State transition - sets the `album` field to Set
+    pub struct SetAlbum<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlbum<St> {}
+    impl<St: State> State for SetAlbum<St> {
+        type Duration = St::Duration;
+        type AlbumArtist = St::AlbumArtist;
+        type Title = St::Title;
+        type Album = Set<members::album>;
+        type CreatedAt = St::CreatedAt;
+        type Artist = St::Artist;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Duration = St::Duration;
+        type AlbumArtist = St::AlbumArtist;
+        type Title = St::Title;
+        type Album = St::Album;
+        type CreatedAt = Set<members::created_at>;
+        type Artist = St::Artist;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtist<St> {}
+    impl<St: State> State for SetArtist<St> {
+        type Duration = St::Duration;
+        type AlbumArtist = St::AlbumArtist;
+        type Title = St::Title;
+        type Album = St::Album;
+        type CreatedAt = St::CreatedAt;
+        type Artist = Set<members::artist>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `duration` field
+        pub struct duration(());
         ///Marker type for the `album_artist` field
         pub struct album_artist(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `artist` field
-        pub struct artist(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `album` field
         pub struct album(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ScrobbleBuilder<S: BosStr, St: scrobble_state::State> {
+pub struct ScrobbleBuilder<St: scrobble_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -666,28 +668,95 @@ pub struct ScrobbleBuilder<S: BosStr, St: scrobble_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Scrobble<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ScrobbleBuilder<S, scrobble_state::Empty> {
+impl Scrobble<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ScrobbleBuilder<scrobble_state::Empty, DefaultStr> {
         ScrobbleBuilder::new()
     }
 }
 
-impl<S: BosStr> ScrobbleBuilder<S, scrobble_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Scrobble<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ScrobbleBuilder<scrobble_state::Empty, S> {
+        ScrobbleBuilder::builder()
+    }
+}
+
+impl ScrobbleBuilder<scrobble_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ScrobbleBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St> ScrobbleBuilder<S, St>
+impl<S: BosStr> ScrobbleBuilder<scrobble_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ScrobbleBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ScrobbleBuilder<St, S>
 where
     St: scrobble_state::State,
     St::Album: scrobble_state::IsUnset,
@@ -696,7 +765,7 @@ where
     pub fn album(
         mut self,
         value: impl Into<S>,
-    ) -> ScrobbleBuilder<S, scrobble_state::SetAlbum<St>> {
+    ) -> ScrobbleBuilder<scrobble_state::SetAlbum<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ScrobbleBuilder {
             _state: PhantomData,
@@ -706,7 +775,7 @@ where
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `albumArt` field (optional)
     pub fn album_art(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -719,7 +788,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `albumArtUrl` field (optional)
     pub fn album_art_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -732,7 +801,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ScrobbleBuilder<S, St>
+impl<St, S: BosStr> ScrobbleBuilder<St, S>
 where
     St: scrobble_state::State,
     St::AlbumArtist: scrobble_state::IsUnset,
@@ -741,7 +810,7 @@ where
     pub fn album_artist(
         mut self,
         value: impl Into<S>,
-    ) -> ScrobbleBuilder<S, scrobble_state::SetAlbumArtist<St>> {
+    ) -> ScrobbleBuilder<scrobble_state::SetAlbumArtist<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ScrobbleBuilder {
             _state: PhantomData,
@@ -751,7 +820,7 @@ where
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `appleMusicLink` field (optional)
     pub fn apple_music_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -764,7 +833,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ScrobbleBuilder<S, St>
+impl<St, S: BosStr> ScrobbleBuilder<St, S>
 where
     St: scrobble_state::State,
     St::Artist: scrobble_state::IsUnset,
@@ -773,7 +842,7 @@ where
     pub fn artist(
         mut self,
         value: impl Into<S>,
-    ) -> ScrobbleBuilder<S, scrobble_state::SetArtist<St>> {
+    ) -> ScrobbleBuilder<scrobble_state::SetArtist<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ScrobbleBuilder {
             _state: PhantomData,
@@ -783,7 +852,7 @@ where
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `artists` field (optional)
     pub fn artists(mut self, value: impl Into<Option<Vec<ArtistMbid<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -796,7 +865,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `composer` field (optional)
     pub fn composer(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -809,7 +878,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `copyrightMessage` field (optional)
     pub fn copyright_message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -822,7 +891,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ScrobbleBuilder<S, St>
+impl<St, S: BosStr> ScrobbleBuilder<St, S>
 where
     St: scrobble_state::State,
     St::CreatedAt: scrobble_state::IsUnset,
@@ -831,7 +900,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ScrobbleBuilder<S, scrobble_state::SetCreatedAt<St>> {
+    ) -> ScrobbleBuilder<scrobble_state::SetCreatedAt<St>, S> {
         self._fields.9 = Option::Some(value.into());
         ScrobbleBuilder {
             _state: PhantomData,
@@ -841,7 +910,7 @@ where
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `discNumber` field (optional)
     pub fn disc_number(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.10 = value.into();
@@ -854,7 +923,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ScrobbleBuilder<S, St>
+impl<St, S: BosStr> ScrobbleBuilder<St, S>
 where
     St: scrobble_state::State,
     St::Duration: scrobble_state::IsUnset,
@@ -863,7 +932,7 @@ where
     pub fn duration(
         mut self,
         value: impl Into<i64>,
-    ) -> ScrobbleBuilder<S, scrobble_state::SetDuration<St>> {
+    ) -> ScrobbleBuilder<scrobble_state::SetDuration<St>, S> {
         self._fields.11 = Option::Some(value.into());
         ScrobbleBuilder {
             _state: PhantomData,
@@ -873,7 +942,7 @@ where
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
@@ -886,7 +955,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `label` field (optional)
     pub fn label(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.13 = value.into();
@@ -899,7 +968,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `lyrics` field (optional)
     pub fn lyrics(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.14 = value.into();
@@ -912,7 +981,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `mbid` field (optional)
     pub fn mbid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.15 = value.into();
@@ -925,7 +994,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `releaseDate` field (optional)
     pub fn release_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.16 = value.into();
@@ -938,7 +1007,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `spotifyLink` field (optional)
     pub fn spotify_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.17 = value.into();
@@ -951,7 +1020,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.18 = value.into();
@@ -964,7 +1033,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `tidalLink` field (optional)
     pub fn tidal_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.19 = value.into();
@@ -977,7 +1046,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ScrobbleBuilder<S, St>
+impl<St, S: BosStr> ScrobbleBuilder<St, S>
 where
     St: scrobble_state::State,
     St::Title: scrobble_state::IsUnset,
@@ -986,7 +1055,7 @@ where
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ScrobbleBuilder<S, scrobble_state::SetTitle<St>> {
+    ) -> ScrobbleBuilder<scrobble_state::SetTitle<St>, S> {
         self._fields.20 = Option::Some(value.into());
         ScrobbleBuilder {
             _state: PhantomData,
@@ -996,7 +1065,7 @@ where
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `trackNumber` field (optional)
     pub fn track_number(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.21 = value.into();
@@ -1009,7 +1078,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `wiki` field (optional)
     pub fn wiki(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.22 = value.into();
@@ -1022,7 +1091,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `year` field (optional)
     pub fn year(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.23 = value.into();
@@ -1035,7 +1104,7 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
+impl<St: scrobble_state::State, S: BosStr> ScrobbleBuilder<St, S> {
     /// Set the `youtubeLink` field (optional)
     pub fn youtube_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.24 = value.into();
@@ -1048,15 +1117,15 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ScrobbleBuilder<S, St>
+impl<St, S: BosStr> ScrobbleBuilder<St, S>
 where
     St: scrobble_state::State,
+    St::Duration: scrobble_state::IsSet,
     St::AlbumArtist: scrobble_state::IsSet,
     St::Title: scrobble_state::IsSet,
-    St::Artist: scrobble_state::IsSet,
-    St::CreatedAt: scrobble_state::IsSet,
     St::Album: scrobble_state::IsSet,
-    St::Duration: scrobble_state::IsSet,
+    St::CreatedAt: scrobble_state::IsSet,
+    St::Artist: scrobble_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Scrobble<S> {
@@ -1123,10 +1192,10 @@ where
 }
 
 fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.scrobble"),
@@ -1135,24 +1204,29 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A declaration of a scrobble.")),
+                    description: Some(
+                        CowStr::new_static("A declaration of a scrobble."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("artist"),
-                            SmolStr::new_static("album"),
-                            SmolStr::new_static("albumArtist"),
-                            SmolStr::new_static("duration"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"), SmolStr::new_static("artist"),
+                                SmolStr::new_static("album"),
+                                SmolStr::new_static("albumArtist"),
+                                SmolStr::new_static("duration"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("album"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("The album of the song.")),
+                                    description: Some(
+                                        CowStr::new_static("The album of the song."),
+                                    ),
                                     min_length: Some(1usize),
                                     max_length: Some(256usize),
                                     ..Default::default()
@@ -1160,16 +1234,14 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("albumArt"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("albumArtUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The URL of the album art of the song.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The URL of the album art of the song."),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -1177,9 +1249,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("albumArtist"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The album artist of the song.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The album artist of the song."),
+                                    ),
                                     min_length: Some(1usize),
                                     max_length: Some(256usize),
                                     ..Default::default()
@@ -1188,9 +1260,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("appleMusicLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The Apple Music link of the song.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The Apple Music link of the song."),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -1198,9 +1270,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("artist"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The artist of the song.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The artist of the song."),
+                                    ),
                                     min_length: Some(1usize),
                                     max_length: Some(256usize),
                                     ..Default::default()
@@ -1209,9 +1281,11 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("artists"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "The artists of the song with MusicBrainz IDs.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The artists of the song with MusicBrainz IDs.",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static(
                                             "app.rocksky.artist.defs#artistMbid",
@@ -1224,9 +1298,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("composer"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The composer of the song.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The composer of the song."),
+                                    ),
                                     max_length: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -1234,9 +1308,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("copyrightMessage"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The copyright message of the song.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The copyright message of the song."),
+                                    ),
                                     max_length: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -1244,9 +1318,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The date when the song was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The date when the song was created."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -1268,7 +1342,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("genre"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("The genre of the song.")),
+                                    description: Some(
+                                        CowStr::new_static("The genre of the song."),
+                                    ),
                                     max_length: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -1276,7 +1352,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("label"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("The label of the song.")),
+                                    description: Some(
+                                        CowStr::new_static("The label of the song."),
+                                    ),
                                     max_length: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -1284,9 +1362,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("lyrics"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The lyrics of the song.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The lyrics of the song."),
+                                    ),
                                     max_length: Some(10000usize),
                                     ..Default::default()
                                 }),
@@ -1294,18 +1372,18 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("mbid"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The MusicBrainz ID of the song.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The MusicBrainz ID of the song."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("releaseDate"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The release date of the song.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The release date of the song."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -1313,9 +1391,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("spotifyLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The Spotify link of the song.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The Spotify link of the song."),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -1323,7 +1401,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tags"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static("The tags of the song.")),
+                                    description: Some(
+                                        CowStr::new_static("The tags of the song."),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         min_length: Some(1usize),
                                         max_length: Some(256usize),
@@ -1335,9 +1415,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tidalLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The Tidal link of the song.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The Tidal link of the song."),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -1345,7 +1425,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("title"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("The title of the song.")),
+                                    description: Some(
+                                        CowStr::new_static("The title of the song."),
+                                    ),
                                     min_length: Some(1usize),
                                     max_length: Some(512usize),
                                     ..Default::default()
@@ -1361,9 +1443,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("wiki"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Informations about the song",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Informations about the song"),
+                                    ),
                                     max_length: Some(10000usize),
                                     ..Default::default()
                                 }),
@@ -1377,9 +1459,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("youtubeLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The YouTube link of the song.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The YouTube link of the song."),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -1398,10 +1480,10 @@ fn lexicon_doc_app_rocksky_scrobble() -> LexiconDoc<'static> {
 }
 
 fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.scrobble.defs"),
@@ -1416,14 +1498,18 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("album"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The album of the song.")),
+                                description: Some(
+                                    CowStr::new_static("The album of the song."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("albumUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URI of the album.")),
+                                description: Some(
+                                    CowStr::new_static("The URI of the album."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1431,14 +1517,18 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artist"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The artist of the song.")),
+                                description: Some(
+                                    CowStr::new_static("The artist of the song."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("artistUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URI of the artist.")),
+                                description: Some(
+                                    CowStr::new_static("The URI of the artist."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1446,9 +1536,9 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("cover"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The album art URL of the song.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The album art URL of the song."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -1456,9 +1546,11 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("date"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The timestamp when the scrobble was created.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The timestamp when the scrobble was created.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1466,9 +1558,9 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The unique identifier of the scrobble.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The unique identifier of the scrobble."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1487,23 +1579,27 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("sha256"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The SHA256 hash of the scrobble data.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The SHA256 hash of the scrobble data."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The title of the scrobble.")),
+                                description: Some(
+                                    CowStr::new_static("The title of the scrobble."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URI of the scrobble.")),
+                                description: Some(
+                                    CowStr::new_static("The URI of the scrobble."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -1511,18 +1607,22 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("user"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The handle of the user who created the scrobble.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The handle of the user who created the scrobble.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("userAvatar"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The avatar URL of the user who created the scrobble.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The avatar URL of the user who created the scrobble.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -1530,9 +1630,11 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("userDisplayName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The display name of the user who created the scrobble.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The display name of the user who created the scrobble.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1550,14 +1652,18 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("album"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The album of the song.")),
+                                description: Some(
+                                    CowStr::new_static("The album of the song."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("albumUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URI of the album.")),
+                                description: Some(
+                                    CowStr::new_static("The URI of the album."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1565,14 +1671,18 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artist"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The artist of the song.")),
+                                description: Some(
+                                    CowStr::new_static("The artist of the song."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("artistUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URI of the artist.")),
+                                description: Some(
+                                    CowStr::new_static("The URI of the artist."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1592,9 +1702,9 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("cover"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The album art URL of the song.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The album art URL of the song."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -1602,9 +1712,11 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("date"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The timestamp when the scrobble was created.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The timestamp when the scrobble was created.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1612,9 +1724,9 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The unique identifier of the scrobble.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The unique identifier of the scrobble."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1633,23 +1745,27 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("sha256"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The SHA256 hash of the scrobble data.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The SHA256 hash of the scrobble data."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The title of the scrobble.")),
+                                description: Some(
+                                    CowStr::new_static("The title of the scrobble."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URI of the scrobble.")),
+                                description: Some(
+                                    CowStr::new_static("The URI of the scrobble."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -1657,9 +1773,11 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("user"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The handle of the user who created the scrobble.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The handle of the user who created the scrobble.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );

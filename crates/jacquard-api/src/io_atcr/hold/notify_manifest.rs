@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Did};
+use jacquard_common::types::string::{Did, AtUri};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::io_atcr::hold::notify_manifest;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::io_atcr::hold::notify_manifest;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlobInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub digest: Option<S>,
@@ -40,11 +37,9 @@ pub struct BlobInfo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ChildManifestInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub digest: Option<S>,
@@ -58,11 +53,9 @@ pub struct ChildManifestInfo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LayerInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub digest: Option<S>,
@@ -74,11 +67,9 @@ pub struct LayerInfo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotifyManifest<S: BosStr = DefaultStr> {
     pub manifest: notify_manifest::ManifestInfo<S>,
     ///Manifest digest for building layer record AT-URIs
@@ -171,16 +162,16 @@ where
         match self {
             NotifyManifestOperation::Push => NotifyManifestOperation::Push,
             NotifyManifestOperation::Pull => NotifyManifestOperation::Pull,
-            NotifyManifestOperation::Other(v) => NotifyManifestOperation::Other(v.into_static()),
+            NotifyManifestOperation::Other(v) => {
+                NotifyManifestOperation::Other(v.into_static())
+            }
         }
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotifyManifestOutput<S: BosStr = DefaultStr> {
     ///Number of layer records created (push only)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -201,9 +192,18 @@ pub struct NotifyManifestOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum NotifyManifestError {
     #[serde(rename = "InvalidOperation")]
@@ -214,10 +214,7 @@ pub enum NotifyManifestError {
     QuotaExceeded(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for NotifyManifestError {
@@ -258,10 +255,7 @@ impl core::fmt::Display for NotifyManifestError {
 /// OCI manifest information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ManifestInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config: Option<notify_manifest::BlobInfo<S>>,
@@ -277,11 +271,9 @@ pub struct ManifestInfo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlatformInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub architecture: Option<S>,
@@ -397,8 +389,9 @@ impl jacquard_common::xrpc::XrpcResp for NotifyManifestResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for NotifyManifest<S> {
     const NSID: &'static str = "io.atcr.hold.notifyManifest";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = NotifyManifestResponse;
 }
 
@@ -406,8 +399,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for NotifyManifest<S> {
 pub struct NotifyManifestRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NotifyManifestRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.notifyManifest";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = NotifyManifest<S>;
     type Response = NotifyManifestResponse;
 }
@@ -473,10 +467,10 @@ impl<S: BosStr> LexiconSchema for PlatformInfo<S> {
 }
 
 fn lexicon_doc_io_atcr_hold_notifyManifest() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.hold.notifyManifest"),
@@ -693,9 +687,9 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("manifests"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Child manifests for multi-arch images",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Child manifests for multi-arch images"),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#childManifestInfo"),
                                     ..Default::default()
@@ -749,7 +743,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> LexiconDoc<'static> {
 
 pub mod notify_manifest_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -757,8 +751,8 @@ pub mod notify_manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ManifestDigest;
         type Manifest;
+        type ManifestDigest;
         type UserDid;
         type Repository;
     }
@@ -766,26 +760,26 @@ pub mod notify_manifest_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ManifestDigest = Unset;
         type Manifest = Unset;
+        type ManifestDigest = Unset;
         type UserDid = Unset;
         type Repository = Unset;
-    }
-    ///State transition - sets the `manifest_digest` field to Set
-    pub struct SetManifestDigest<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetManifestDigest<St> {}
-    impl<St: State> State for SetManifestDigest<St> {
-        type ManifestDigest = Set<members::manifest_digest>;
-        type Manifest = St::Manifest;
-        type UserDid = St::UserDid;
-        type Repository = St::Repository;
     }
     ///State transition - sets the `manifest` field to Set
     pub struct SetManifest<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetManifest<St> {}
     impl<St: State> State for SetManifest<St> {
-        type ManifestDigest = St::ManifestDigest;
         type Manifest = Set<members::manifest>;
+        type ManifestDigest = St::ManifestDigest;
+        type UserDid = St::UserDid;
+        type Repository = St::Repository;
+    }
+    ///State transition - sets the `manifest_digest` field to Set
+    pub struct SetManifestDigest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetManifestDigest<St> {}
+    impl<St: State> State for SetManifestDigest<St> {
+        type Manifest = St::Manifest;
+        type ManifestDigest = Set<members::manifest_digest>;
         type UserDid = St::UserDid;
         type Repository = St::Repository;
     }
@@ -793,8 +787,8 @@ pub mod notify_manifest_state {
     pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUserDid<St> {}
     impl<St: State> State for SetUserDid<St> {
-        type ManifestDigest = St::ManifestDigest;
         type Manifest = St::Manifest;
+        type ManifestDigest = St::ManifestDigest;
         type UserDid = Set<members::user_did>;
         type Repository = St::Repository;
     }
@@ -802,18 +796,18 @@ pub mod notify_manifest_state {
     pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepository<St> {}
     impl<St: State> State for SetRepository<St> {
-        type ManifestDigest = St::ManifestDigest;
         type Manifest = St::Manifest;
+        type ManifestDigest = St::ManifestDigest;
         type UserDid = St::UserDid;
         type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `manifest_digest` field
-        pub struct manifest_digest(());
         ///Marker type for the `manifest` field
         pub struct manifest(());
+        ///Marker type for the `manifest_digest` field
+        pub struct manifest_digest(());
         ///Marker type for the `user_did` field
         pub struct user_did(());
         ///Marker type for the `repository` field
@@ -822,7 +816,10 @@ pub mod notify_manifest_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NotifyManifestBuilder<S: BosStr, St: notify_manifest_state::State> {
+pub struct NotifyManifestBuilder<
+    St: notify_manifest_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<notify_manifest::ManifestInfo<S>>,
@@ -835,15 +832,22 @@ pub struct NotifyManifestBuilder<S: BosStr, St: notify_manifest_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> NotifyManifest<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> NotifyManifestBuilder<S, notify_manifest_state::Empty> {
+impl NotifyManifest<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> NotifyManifestBuilder<notify_manifest_state::Empty, DefaultStr> {
         NotifyManifestBuilder::new()
     }
 }
 
-impl<S: BosStr> NotifyManifestBuilder<S, notify_manifest_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> NotifyManifest<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> NotifyManifestBuilder<notify_manifest_state::Empty, S> {
+        NotifyManifestBuilder::builder()
+    }
+}
+
+impl NotifyManifestBuilder<notify_manifest_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         NotifyManifestBuilder {
             _state: PhantomData,
@@ -853,7 +857,18 @@ impl<S: BosStr> NotifyManifestBuilder<S, notify_manifest_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> NotifyManifestBuilder<S, St>
+impl<S: BosStr> NotifyManifestBuilder<notify_manifest_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        NotifyManifestBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> NotifyManifestBuilder<St, S>
 where
     St: notify_manifest_state::State,
     St::Manifest: notify_manifest_state::IsUnset,
@@ -862,7 +877,7 @@ where
     pub fn manifest(
         mut self,
         value: impl Into<notify_manifest::ManifestInfo<S>>,
-    ) -> NotifyManifestBuilder<S, notify_manifest_state::SetManifest<St>> {
+    ) -> NotifyManifestBuilder<notify_manifest_state::SetManifest<St>, S> {
         self._fields.0 = Option::Some(value.into());
         NotifyManifestBuilder {
             _state: PhantomData,
@@ -872,7 +887,7 @@ where
     }
 }
 
-impl<S: BosStr, St> NotifyManifestBuilder<S, St>
+impl<St, S: BosStr> NotifyManifestBuilder<St, S>
 where
     St: notify_manifest_state::State,
     St::ManifestDigest: notify_manifest_state::IsUnset,
@@ -881,7 +896,7 @@ where
     pub fn manifest_digest(
         mut self,
         value: impl Into<S>,
-    ) -> NotifyManifestBuilder<S, notify_manifest_state::SetManifestDigest<St>> {
+    ) -> NotifyManifestBuilder<notify_manifest_state::SetManifestDigest<St>, S> {
         self._fields.1 = Option::Some(value.into());
         NotifyManifestBuilder {
             _state: PhantomData,
@@ -891,9 +906,12 @@ where
     }
 }
 
-impl<S: BosStr, St: notify_manifest_state::State> NotifyManifestBuilder<S, St> {
+impl<St: notify_manifest_state::State, S: BosStr> NotifyManifestBuilder<St, S> {
     /// Set the `operation` field (optional)
-    pub fn operation(mut self, value: impl Into<Option<NotifyManifestOperation<S>>>) -> Self {
+    pub fn operation(
+        mut self,
+        value: impl Into<Option<NotifyManifestOperation<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -904,7 +922,7 @@ impl<S: BosStr, St: notify_manifest_state::State> NotifyManifestBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> NotifyManifestBuilder<S, St>
+impl<St, S: BosStr> NotifyManifestBuilder<St, S>
 where
     St: notify_manifest_state::State,
     St::Repository: notify_manifest_state::IsUnset,
@@ -913,7 +931,7 @@ where
     pub fn repository(
         mut self,
         value: impl Into<S>,
-    ) -> NotifyManifestBuilder<S, notify_manifest_state::SetRepository<St>> {
+    ) -> NotifyManifestBuilder<notify_manifest_state::SetRepository<St>, S> {
         self._fields.3 = Option::Some(value.into());
         NotifyManifestBuilder {
             _state: PhantomData,
@@ -923,7 +941,7 @@ where
     }
 }
 
-impl<S: BosStr, St: notify_manifest_state::State> NotifyManifestBuilder<S, St> {
+impl<St: notify_manifest_state::State, S: BosStr> NotifyManifestBuilder<St, S> {
     /// Set the `tag` field (optional)
     pub fn tag(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -936,7 +954,7 @@ impl<S: BosStr, St: notify_manifest_state::State> NotifyManifestBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> NotifyManifestBuilder<S, St>
+impl<St, S: BosStr> NotifyManifestBuilder<St, S>
 where
     St: notify_manifest_state::State,
     St::UserDid: notify_manifest_state::IsUnset,
@@ -945,7 +963,7 @@ where
     pub fn user_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> NotifyManifestBuilder<S, notify_manifest_state::SetUserDid<St>> {
+    ) -> NotifyManifestBuilder<notify_manifest_state::SetUserDid<St>, S> {
         self._fields.5 = Option::Some(value.into());
         NotifyManifestBuilder {
             _state: PhantomData,
@@ -955,11 +973,11 @@ where
     }
 }
 
-impl<S: BosStr, St> NotifyManifestBuilder<S, St>
+impl<St, S: BosStr> NotifyManifestBuilder<St, S>
 where
     St: notify_manifest_state::State,
-    St::ManifestDigest: notify_manifest_state::IsSet,
     St::Manifest: notify_manifest_state::IsSet,
+    St::ManifestDigest: notify_manifest_state::IsSet,
     St::UserDid: notify_manifest_state::IsSet,
     St::Repository: notify_manifest_state::IsSet,
 {
@@ -976,7 +994,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NotifyManifest<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> NotifyManifest<S> {
         NotifyManifest {
             manifest: self._fields.0.unwrap(),
             manifest_digest: self._fields.1.unwrap(),

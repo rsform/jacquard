@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A forum-wide announcement
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -150,7 +150,7 @@ impl<S: BosStr> LexiconSchema for Announcement<S> {
 
 pub mod announcement_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -158,86 +158,93 @@ pub mod announcement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Title;
-        type ExpiresAt;
         type Body;
+        type Title;
+        type CreatedAt;
+        type ExpiresAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Title = Unset;
-        type ExpiresAt = Unset;
         type Body = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Title = St::Title;
-        type ExpiresAt = St::ExpiresAt;
-        type Body = St::Body;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type CreatedAt = St::CreatedAt;
-        type Title = Set<members::title>;
-        type ExpiresAt = St::ExpiresAt;
-        type Body = St::Body;
-    }
-    ///State transition - sets the `expires_at` field to Set
-    pub struct SetExpiresAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetExpiresAt<St> {}
-    impl<St: State> State for SetExpiresAt<St> {
-        type CreatedAt = St::CreatedAt;
-        type Title = St::Title;
-        type ExpiresAt = Set<members::expires_at>;
-        type Body = St::Body;
+        type Title = Unset;
+        type CreatedAt = Unset;
+        type ExpiresAt = Unset;
     }
     ///State transition - sets the `body` field to Set
     pub struct SetBody<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBody<St> {}
     impl<St: State> State for SetBody<St> {
-        type CreatedAt = St::CreatedAt;
-        type Title = St::Title;
-        type ExpiresAt = St::ExpiresAt;
         type Body = Set<members::body>;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type ExpiresAt = St::ExpiresAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Body = St::Body;
+        type Title = Set<members::title>;
+        type CreatedAt = St::CreatedAt;
+        type ExpiresAt = St::ExpiresAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Body = St::Body;
+        type Title = St::Title;
+        type CreatedAt = Set<members::created_at>;
+        type ExpiresAt = St::ExpiresAt;
+    }
+    ///State transition - sets the `expires_at` field to Set
+    pub struct SetExpiresAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetExpiresAt<St> {}
+    impl<St: State> State for SetExpiresAt<St> {
+        type Body = St::Body;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type ExpiresAt = Set<members::expires_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `expires_at` field
-        pub struct expires_at(());
         ///Marker type for the `body` field
         pub struct body(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `expires_at` field
+        pub struct expires_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AnnouncementBuilder<S: BosStr, St: announcement_state::State> {
+pub struct AnnouncementBuilder<St: announcement_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>, Option<Datetime>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Announcement<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AnnouncementBuilder<S, announcement_state::Empty> {
+impl Announcement<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AnnouncementBuilder<announcement_state::Empty, DefaultStr> {
         AnnouncementBuilder::new()
     }
 }
 
-impl<S: BosStr> AnnouncementBuilder<S, announcement_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Announcement<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AnnouncementBuilder<announcement_state::Empty, S> {
+        AnnouncementBuilder::builder()
+    }
+}
+
+impl AnnouncementBuilder<announcement_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AnnouncementBuilder {
             _state: PhantomData,
@@ -247,7 +254,18 @@ impl<S: BosStr> AnnouncementBuilder<S, announcement_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AnnouncementBuilder<S, St>
+impl<S: BosStr> AnnouncementBuilder<announcement_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AnnouncementBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AnnouncementBuilder<St, S>
 where
     St: announcement_state::State,
     St::Body: announcement_state::IsUnset,
@@ -256,7 +274,7 @@ where
     pub fn body(
         mut self,
         value: impl Into<S>,
-    ) -> AnnouncementBuilder<S, announcement_state::SetBody<St>> {
+    ) -> AnnouncementBuilder<announcement_state::SetBody<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AnnouncementBuilder {
             _state: PhantomData,
@@ -266,7 +284,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AnnouncementBuilder<S, St>
+impl<St, S: BosStr> AnnouncementBuilder<St, S>
 where
     St: announcement_state::State,
     St::CreatedAt: announcement_state::IsUnset,
@@ -275,7 +293,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AnnouncementBuilder<S, announcement_state::SetCreatedAt<St>> {
+    ) -> AnnouncementBuilder<announcement_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AnnouncementBuilder {
             _state: PhantomData,
@@ -285,7 +303,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AnnouncementBuilder<S, St>
+impl<St, S: BosStr> AnnouncementBuilder<St, S>
 where
     St: announcement_state::State,
     St::ExpiresAt: announcement_state::IsUnset,
@@ -294,7 +312,7 @@ where
     pub fn expires_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AnnouncementBuilder<S, announcement_state::SetExpiresAt<St>> {
+    ) -> AnnouncementBuilder<announcement_state::SetExpiresAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AnnouncementBuilder {
             _state: PhantomData,
@@ -304,7 +322,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AnnouncementBuilder<S, St>
+impl<St, S: BosStr> AnnouncementBuilder<St, S>
 where
     St: announcement_state::State,
     St::Title: announcement_state::IsUnset,
@@ -313,7 +331,7 @@ where
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> AnnouncementBuilder<S, announcement_state::SetTitle<St>> {
+    ) -> AnnouncementBuilder<announcement_state::SetTitle<St>, S> {
         self._fields.3 = Option::Some(value.into());
         AnnouncementBuilder {
             _state: PhantomData,
@@ -323,13 +341,13 @@ where
     }
 }
 
-impl<S: BosStr, St> AnnouncementBuilder<S, St>
+impl<St, S: BosStr> AnnouncementBuilder<St, S>
 where
     St: announcement_state::State,
-    St::CreatedAt: announcement_state::IsSet,
-    St::Title: announcement_state::IsSet,
-    St::ExpiresAt: announcement_state::IsSet,
     St::Body: announcement_state::IsSet,
+    St::Title: announcement_state::IsSet,
+    St::CreatedAt: announcement_state::IsSet,
+    St::ExpiresAt: announcement_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Announcement<S> {
@@ -342,7 +360,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Announcement<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Announcement<S> {
         Announcement {
             body: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -353,11 +374,13 @@ where
     }
 }
 
-fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
+fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement() -> LexiconDoc<
+    'static,
+> {
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.fudgeu.experimental.atforumv1.forum.announcement"),
@@ -369,12 +392,13 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement() -> Lexicon
                     description: Some(CowStr::new_static("A forum-wide announcement")),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("body"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("expiresAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"), SmolStr::new_static("body"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("expiresAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

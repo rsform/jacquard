@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::scot_comhairle::testing_polis_vote_v1;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::scot_comhairle::testing_polis_vote_v1;
 /// A vote on a statement in the Polis-style deliberation system
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -64,10 +64,7 @@ pub struct TestingPolisVoteV1GetRecordOutput<S: BosStr = DefaultStr> {
 /// Reference to a poll record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PollRef<S: BosStr = DefaultStr> {
     ///Content identifier of the poll record
     pub cid: Cid<S>,
@@ -80,10 +77,7 @@ pub struct PollRef<S: BosStr = DefaultStr> {
 /// Reference to a statement record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StatementRef<S: BosStr = DefaultStr> {
     ///Content identifier of the statement record
     pub cid: Cid<S>,
@@ -173,7 +167,7 @@ impl<S: BosStr> LexiconSchema for StatementRef<S> {
 
 pub mod testing_polis_vote_v1_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -181,72 +175,75 @@ pub mod testing_polis_vote_v1_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
-        type CreatedAt;
         type Subject;
         type Poll;
+        type Value;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
-        type CreatedAt = Unset;
         type Subject = Unset;
         type Poll = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValue<St> {}
-    impl<St: State> State for SetValue<St> {
-        type Value = Set<members::value>;
-        type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
-        type Poll = St::Poll;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Value = St::Value;
-        type CreatedAt = Set<members::created_at>;
-        type Subject = St::Subject;
-        type Poll = St::Poll;
+        type Value = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
-        type Value = St::Value;
-        type CreatedAt = St::CreatedAt;
         type Subject = Set<members::subject>;
         type Poll = St::Poll;
+        type Value = St::Value;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `poll` field to Set
     pub struct SetPoll<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPoll<St> {}
     impl<St: State> State for SetPoll<St> {
-        type Value = St::Value;
-        type CreatedAt = St::CreatedAt;
         type Subject = St::Subject;
         type Poll = Set<members::poll>;
+        type Value = St::Value;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type Subject = St::Subject;
+        type Poll = St::Poll;
+        type Value = Set<members::value>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
+        type Poll = St::Poll;
+        type Value = St::Value;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `poll` field
         pub struct poll(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TestingPolisVoteV1Builder<S: BosStr, St: testing_polis_vote_v1_state::State> {
+pub struct TestingPolisVoteV1Builder<
+    St: testing_polis_vote_v1_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -257,15 +254,28 @@ pub struct TestingPolisVoteV1Builder<S: BosStr, St: testing_polis_vote_v1_state:
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> TestingPolisVoteV1<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TestingPolisVoteV1Builder<S, testing_polis_vote_v1_state::Empty> {
+impl TestingPolisVoteV1<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TestingPolisVoteV1Builder<
+        testing_polis_vote_v1_state::Empty,
+        DefaultStr,
+    > {
         TestingPolisVoteV1Builder::new()
     }
 }
 
-impl<S: BosStr> TestingPolisVoteV1Builder<S, testing_polis_vote_v1_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> TestingPolisVoteV1<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TestingPolisVoteV1Builder<
+        testing_polis_vote_v1_state::Empty,
+        S,
+    > {
+        TestingPolisVoteV1Builder::builder()
+    }
+}
+
+impl TestingPolisVoteV1Builder<testing_polis_vote_v1_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TestingPolisVoteV1Builder {
             _state: PhantomData,
@@ -275,7 +285,18 @@ impl<S: BosStr> TestingPolisVoteV1Builder<S, testing_polis_vote_v1_state::Empty>
     }
 }
 
-impl<S: BosStr, St> TestingPolisVoteV1Builder<S, St>
+impl<S: BosStr> TestingPolisVoteV1Builder<testing_polis_vote_v1_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TestingPolisVoteV1Builder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> TestingPolisVoteV1Builder<St, S>
 where
     St: testing_polis_vote_v1_state::State,
     St::CreatedAt: testing_polis_vote_v1_state::IsUnset,
@@ -284,7 +305,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TestingPolisVoteV1Builder<S, testing_polis_vote_v1_state::SetCreatedAt<St>> {
+    ) -> TestingPolisVoteV1Builder<testing_polis_vote_v1_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         TestingPolisVoteV1Builder {
             _state: PhantomData,
@@ -294,7 +315,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TestingPolisVoteV1Builder<S, St>
+impl<St, S: BosStr> TestingPolisVoteV1Builder<St, S>
 where
     St: testing_polis_vote_v1_state::State,
     St::Poll: testing_polis_vote_v1_state::IsUnset,
@@ -303,7 +324,7 @@ where
     pub fn poll(
         mut self,
         value: impl Into<testing_polis_vote_v1::PollRef<S>>,
-    ) -> TestingPolisVoteV1Builder<S, testing_polis_vote_v1_state::SetPoll<St>> {
+    ) -> TestingPolisVoteV1Builder<testing_polis_vote_v1_state::SetPoll<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TestingPolisVoteV1Builder {
             _state: PhantomData,
@@ -313,7 +334,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TestingPolisVoteV1Builder<S, St>
+impl<St, S: BosStr> TestingPolisVoteV1Builder<St, S>
 where
     St: testing_polis_vote_v1_state::State,
     St::Subject: testing_polis_vote_v1_state::IsUnset,
@@ -322,7 +343,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<testing_polis_vote_v1::StatementRef<S>>,
-    ) -> TestingPolisVoteV1Builder<S, testing_polis_vote_v1_state::SetSubject<St>> {
+    ) -> TestingPolisVoteV1Builder<testing_polis_vote_v1_state::SetSubject<St>, S> {
         self._fields.2 = Option::Some(value.into());
         TestingPolisVoteV1Builder {
             _state: PhantomData,
@@ -332,7 +353,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TestingPolisVoteV1Builder<S, St>
+impl<St, S: BosStr> TestingPolisVoteV1Builder<St, S>
 where
     St: testing_polis_vote_v1_state::State,
     St::Value: testing_polis_vote_v1_state::IsUnset,
@@ -341,7 +362,7 @@ where
     pub fn value(
         mut self,
         value: impl Into<S>,
-    ) -> TestingPolisVoteV1Builder<S, testing_polis_vote_v1_state::SetValue<St>> {
+    ) -> TestingPolisVoteV1Builder<testing_polis_vote_v1_state::SetValue<St>, S> {
         self._fields.3 = Option::Some(value.into());
         TestingPolisVoteV1Builder {
             _state: PhantomData,
@@ -351,13 +372,13 @@ where
     }
 }
 
-impl<S: BosStr, St> TestingPolisVoteV1Builder<S, St>
+impl<St, S: BosStr> TestingPolisVoteV1Builder<St, S>
 where
     St: testing_polis_vote_v1_state::State,
-    St::Value: testing_polis_vote_v1_state::IsSet,
-    St::CreatedAt: testing_polis_vote_v1_state::IsSet,
     St::Subject: testing_polis_vote_v1_state::IsSet,
     St::Poll: testing_polis_vote_v1_state::IsSet,
+    St::Value: testing_polis_vote_v1_state::IsSet,
+    St::CreatedAt: testing_polis_vote_v1_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> TestingPolisVoteV1<S> {
@@ -370,7 +391,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TestingPolisVoteV1<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TestingPolisVoteV1<S> {
         TestingPolisVoteV1 {
             created_at: self._fields.0.unwrap(),
             poll: self._fields.1.unwrap(),
@@ -382,10 +406,10 @@ where
 }
 
 fn lexicon_doc_scot_comhairle_testingPolisVoteV1() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("scot.comhairle.testingPolisVoteV1"),
@@ -394,26 +418,29 @@ fn lexicon_doc_scot_comhairle_testingPolisVoteV1() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A vote on a statement in the Polis-style deliberation system",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A vote on a statement in the Polis-style deliberation system",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("value"),
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("poll"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("value"),
+                                SmolStr::new_static("subject"), SmolStr::new_static("poll"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the vote was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp when the vote was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -450,16 +477,18 @@ fn lexicon_doc_scot_comhairle_testingPolisVoteV1() -> LexiconDoc<'static> {
                 SmolStr::new_static("pollRef"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Reference to a poll record")),
-                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Content identifier of the poll record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Content identifier of the poll record"),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -467,7 +496,9 @@ fn lexicon_doc_scot_comhairle_testingPolisVoteV1() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("AT-URI of the poll record")),
+                                description: Some(
+                                    CowStr::new_static("AT-URI of the poll record"),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -480,17 +511,23 @@ fn lexicon_doc_scot_comhairle_testingPolisVoteV1() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("statementRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Reference to a statement record")),
-                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
+                    description: Some(
+                        CowStr::new_static("Reference to a statement record"),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Content identifier of the statement record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Content identifier of the statement record",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -498,9 +535,9 @@ fn lexicon_doc_scot_comhairle_testingPolisVoteV1() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT-URI of the statement record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("AT-URI of the statement record"),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -518,7 +555,7 @@ fn lexicon_doc_scot_comhairle_testingPolisVoteV1() -> LexiconDoc<'static> {
 
 pub mod poll_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -561,21 +598,28 @@ pub mod poll_ref_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PollRefBuilder<S: BosStr, St: poll_ref_state::State> {
+pub struct PollRefBuilder<St: poll_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PollRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PollRefBuilder<S, poll_ref_state::Empty> {
+impl PollRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PollRefBuilder<poll_ref_state::Empty, DefaultStr> {
         PollRefBuilder::new()
     }
 }
 
-impl<S: BosStr> PollRefBuilder<S, poll_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PollRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PollRefBuilder<poll_ref_state::Empty, S> {
+        PollRefBuilder::builder()
+    }
+}
+
+impl PollRefBuilder<poll_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PollRefBuilder {
             _state: PhantomData,
@@ -585,7 +629,18 @@ impl<S: BosStr> PollRefBuilder<S, poll_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PollRefBuilder<S, St>
+impl<S: BosStr> PollRefBuilder<poll_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PollRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PollRefBuilder<St, S>
 where
     St: poll_ref_state::State,
     St::Cid: poll_ref_state::IsUnset,
@@ -594,7 +649,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> PollRefBuilder<S, poll_ref_state::SetCid<St>> {
+    ) -> PollRefBuilder<poll_ref_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PollRefBuilder {
             _state: PhantomData,
@@ -604,7 +659,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PollRefBuilder<S, St>
+impl<St, S: BosStr> PollRefBuilder<St, S>
 where
     St: poll_ref_state::State,
     St::Uri: poll_ref_state::IsUnset,
@@ -613,7 +668,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> PollRefBuilder<S, poll_ref_state::SetUri<St>> {
+    ) -> PollRefBuilder<poll_ref_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PollRefBuilder {
             _state: PhantomData,
@@ -623,7 +678,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PollRefBuilder<S, St>
+impl<St, S: BosStr> PollRefBuilder<St, S>
 where
     St: poll_ref_state::State,
     St::Uri: poll_ref_state::IsSet,
@@ -649,7 +704,7 @@ where
 
 pub mod statement_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -692,21 +747,28 @@ pub mod statement_ref_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StatementRefBuilder<S: BosStr, St: statement_ref_state::State> {
+pub struct StatementRefBuilder<St: statement_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> StatementRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StatementRefBuilder<S, statement_ref_state::Empty> {
+impl StatementRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StatementRefBuilder<statement_ref_state::Empty, DefaultStr> {
         StatementRefBuilder::new()
     }
 }
 
-impl<S: BosStr> StatementRefBuilder<S, statement_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> StatementRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StatementRefBuilder<statement_ref_state::Empty, S> {
+        StatementRefBuilder::builder()
+    }
+}
+
+impl StatementRefBuilder<statement_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StatementRefBuilder {
             _state: PhantomData,
@@ -716,7 +778,18 @@ impl<S: BosStr> StatementRefBuilder<S, statement_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StatementRefBuilder<S, St>
+impl<S: BosStr> StatementRefBuilder<statement_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StatementRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StatementRefBuilder<St, S>
 where
     St: statement_ref_state::State,
     St::Cid: statement_ref_state::IsUnset,
@@ -725,7 +798,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> StatementRefBuilder<S, statement_ref_state::SetCid<St>> {
+    ) -> StatementRefBuilder<statement_ref_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StatementRefBuilder {
             _state: PhantomData,
@@ -735,7 +808,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatementRefBuilder<S, St>
+impl<St, S: BosStr> StatementRefBuilder<St, S>
 where
     St: statement_ref_state::State,
     St::Uri: statement_ref_state::IsUnset,
@@ -744,7 +817,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StatementRefBuilder<S, statement_ref_state::SetUri<St>> {
+    ) -> StatementRefBuilder<statement_ref_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StatementRefBuilder {
             _state: PhantomData,
@@ -754,7 +827,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatementRefBuilder<S, St>
+impl<St, S: BosStr> StatementRefBuilder<St, S>
 where
     St: statement_ref_state::State,
     St::Uri: statement_ref_state::IsSet,
@@ -769,7 +842,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StatementRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StatementRef<S> {
         StatementRef {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),

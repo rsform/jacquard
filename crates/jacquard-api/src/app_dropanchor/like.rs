@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_dropanchor::like;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_dropanchor::like;
 /// A like record for check-ins in the Anchor app
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -60,10 +60,7 @@ pub struct LikeGetRecordOutput<S: BosStr = DefaultStr> {
 /// A strong reference to another record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StrongRef<S: BosStr = DefaultStr> {
     ///Content identifier (CID) of the referenced record
     pub cid: Cid<S>,
@@ -138,7 +135,7 @@ impl<S: BosStr> LexiconSchema for StrongRef<S> {
 
 pub mod like_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -146,56 +143,63 @@ pub mod like_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type CheckinRef;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type CheckinRef = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type CheckinRef = St::CheckinRef;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `checkin_ref` field to Set
     pub struct SetCheckinRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCheckinRef<St> {}
     impl<St: State> State for SetCheckinRef<St> {
-        type CreatedAt = St::CreatedAt;
         type CheckinRef = Set<members::checkin_ref>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type CheckinRef = St::CheckinRef;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `checkin_ref` field
         pub struct checkin_ref(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LikeBuilder<S: BosStr, St: like_state::State> {
+pub struct LikeBuilder<St: like_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<like::StrongRef<S>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Like<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LikeBuilder<S, like_state::Empty> {
+impl Like<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LikeBuilder<like_state::Empty, DefaultStr> {
         LikeBuilder::new()
     }
 }
 
-impl<S: BosStr> LikeBuilder<S, like_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Like<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LikeBuilder<like_state::Empty, S> {
+        LikeBuilder::builder()
+    }
+}
+
+impl LikeBuilder<like_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LikeBuilder {
             _state: PhantomData,
@@ -205,7 +209,18 @@ impl<S: BosStr> LikeBuilder<S, like_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LikeBuilder<S, St>
+impl<S: BosStr> LikeBuilder<like_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LikeBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LikeBuilder<St, S>
 where
     St: like_state::State,
     St::CheckinRef: like_state::IsUnset,
@@ -214,7 +229,7 @@ where
     pub fn checkin_ref(
         mut self,
         value: impl Into<like::StrongRef<S>>,
-    ) -> LikeBuilder<S, like_state::SetCheckinRef<St>> {
+    ) -> LikeBuilder<like_state::SetCheckinRef<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LikeBuilder {
             _state: PhantomData,
@@ -224,7 +239,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LikeBuilder<S, St>
+impl<St, S: BosStr> LikeBuilder<St, S>
 where
     St: like_state::State,
     St::CreatedAt: like_state::IsUnset,
@@ -233,7 +248,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LikeBuilder<S, like_state::SetCreatedAt<St>> {
+    ) -> LikeBuilder<like_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LikeBuilder {
             _state: PhantomData,
@@ -243,11 +258,11 @@ where
     }
 }
 
-impl<S: BosStr, St> LikeBuilder<S, St>
+impl<St, S: BosStr> LikeBuilder<St, S>
 where
     St: like_state::State,
-    St::CreatedAt: like_state::IsSet,
     St::CheckinRef: like_state::IsSet,
+    St::CreatedAt: like_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Like<S> {
@@ -268,10 +283,10 @@ where
 }
 
 fn lexicon_doc_app_dropanchor_like() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.dropanchor.like"),
@@ -280,15 +295,19 @@ fn lexicon_doc_app_dropanchor_like() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A like record for check-ins in the Anchor app",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A like record for check-ins in the Anchor app",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("checkinRef"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("checkinRef")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -302,9 +321,9 @@ fn lexicon_doc_app_dropanchor_like() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When the like was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When the like was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -319,17 +338,23 @@ fn lexicon_doc_app_dropanchor_like() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("strongRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A strong reference to another record")),
-                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
+                    description: Some(
+                        CowStr::new_static("A strong reference to another record"),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Content identifier (CID) of the referenced record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Content identifier (CID) of the referenced record",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -337,9 +362,11 @@ fn lexicon_doc_app_dropanchor_like() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT Protocol URI of the referenced record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "AT Protocol URI of the referenced record",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -357,7 +384,7 @@ fn lexicon_doc_app_dropanchor_like() -> LexiconDoc<'static> {
 
 pub mod strong_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -365,56 +392,63 @@ pub mod strong_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Cid = St::Cid;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
         type Cid = Set<members::cid>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StrongRefBuilder<S: BosStr, St: strong_ref_state::State> {
+pub struct StrongRefBuilder<St: strong_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> StrongRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StrongRefBuilder<S, strong_ref_state::Empty> {
+impl StrongRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StrongRefBuilder<strong_ref_state::Empty, DefaultStr> {
         StrongRefBuilder::new()
     }
 }
 
-impl<S: BosStr> StrongRefBuilder<S, strong_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> StrongRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StrongRefBuilder<strong_ref_state::Empty, S> {
+        StrongRefBuilder::builder()
+    }
+}
+
+impl StrongRefBuilder<strong_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StrongRefBuilder {
             _state: PhantomData,
@@ -424,7 +458,18 @@ impl<S: BosStr> StrongRefBuilder<S, strong_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StrongRefBuilder<S, St>
+impl<S: BosStr> StrongRefBuilder<strong_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StrongRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StrongRefBuilder<St, S>
 where
     St: strong_ref_state::State,
     St::Cid: strong_ref_state::IsUnset,
@@ -433,7 +478,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> StrongRefBuilder<S, strong_ref_state::SetCid<St>> {
+    ) -> StrongRefBuilder<strong_ref_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StrongRefBuilder {
             _state: PhantomData,
@@ -443,7 +488,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StrongRefBuilder<S, St>
+impl<St, S: BosStr> StrongRefBuilder<St, S>
 where
     St: strong_ref_state::State,
     St::Uri: strong_ref_state::IsUnset,
@@ -452,7 +497,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StrongRefBuilder<S, strong_ref_state::SetUri<St>> {
+    ) -> StrongRefBuilder<strong_ref_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StrongRefBuilder {
             _state: PhantomData,
@@ -462,11 +507,11 @@ where
     }
 }
 
-impl<S: BosStr, St> StrongRefBuilder<S, St>
+impl<St, S: BosStr> StrongRefBuilder<St, S>
 where
     St: strong_ref_state::State,
-    St::Uri: strong_ref_state::IsSet,
     St::Cid: strong_ref_state::IsSet,
+    St::Uri: strong_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> StrongRef<S> {
@@ -477,7 +522,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StrongRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StrongRef<S> {
         StrongRef {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),

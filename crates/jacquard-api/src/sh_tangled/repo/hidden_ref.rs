@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HiddenRef<S: BosStr = DefaultStr> {
     ///Fork reference name
     pub fork_ref: S,
@@ -33,11 +30,9 @@ pub struct HiddenRef<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HiddenRefOutput<S: BosStr = DefaultStr> {
     ///Error message if creation failed
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -62,8 +57,9 @@ impl jacquard_common::xrpc::XrpcResp for HiddenRefResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for HiddenRef<S> {
     const NSID: &'static str = "sh.tangled.repo.hiddenRef";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = HiddenRefResponse;
 }
 
@@ -71,15 +67,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for HiddenRef<S> {
 pub struct HiddenRefRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for HiddenRefRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.hiddenRef";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = HiddenRef<S>;
     type Response = HiddenRefResponse;
 }
 
 pub mod hidden_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -87,70 +84,77 @@ pub mod hidden_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ForkRef;
         type Repo;
         type RemoteRef;
+        type ForkRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ForkRef = Unset;
         type Repo = Unset;
         type RemoteRef = Unset;
-    }
-    ///State transition - sets the `fork_ref` field to Set
-    pub struct SetForkRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetForkRef<St> {}
-    impl<St: State> State for SetForkRef<St> {
-        type ForkRef = Set<members::fork_ref>;
-        type Repo = St::Repo;
-        type RemoteRef = St::RemoteRef;
+        type ForkRef = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
-        type ForkRef = St::ForkRef;
         type Repo = Set<members::repo>;
         type RemoteRef = St::RemoteRef;
+        type ForkRef = St::ForkRef;
     }
     ///State transition - sets the `remote_ref` field to Set
     pub struct SetRemoteRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRemoteRef<St> {}
     impl<St: State> State for SetRemoteRef<St> {
-        type ForkRef = St::ForkRef;
         type Repo = St::Repo;
         type RemoteRef = Set<members::remote_ref>;
+        type ForkRef = St::ForkRef;
+    }
+    ///State transition - sets the `fork_ref` field to Set
+    pub struct SetForkRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetForkRef<St> {}
+    impl<St: State> State for SetForkRef<St> {
+        type Repo = St::Repo;
+        type RemoteRef = St::RemoteRef;
+        type ForkRef = Set<members::fork_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `fork_ref` field
-        pub struct fork_ref(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `remote_ref` field
         pub struct remote_ref(());
+        ///Marker type for the `fork_ref` field
+        pub struct fork_ref(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HiddenRefBuilder<S: BosStr, St: hidden_ref_state::State> {
+pub struct HiddenRefBuilder<St: hidden_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> HiddenRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> HiddenRefBuilder<S, hidden_ref_state::Empty> {
+impl HiddenRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> HiddenRefBuilder<hidden_ref_state::Empty, DefaultStr> {
         HiddenRefBuilder::new()
     }
 }
 
-impl<S: BosStr> HiddenRefBuilder<S, hidden_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> HiddenRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> HiddenRefBuilder<hidden_ref_state::Empty, S> {
+        HiddenRefBuilder::builder()
+    }
+}
+
+impl HiddenRefBuilder<hidden_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         HiddenRefBuilder {
             _state: PhantomData,
@@ -160,7 +164,18 @@ impl<S: BosStr> HiddenRefBuilder<S, hidden_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> HiddenRefBuilder<S, St>
+impl<S: BosStr> HiddenRefBuilder<hidden_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        HiddenRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> HiddenRefBuilder<St, S>
 where
     St: hidden_ref_state::State,
     St::ForkRef: hidden_ref_state::IsUnset,
@@ -169,7 +184,7 @@ where
     pub fn fork_ref(
         mut self,
         value: impl Into<S>,
-    ) -> HiddenRefBuilder<S, hidden_ref_state::SetForkRef<St>> {
+    ) -> HiddenRefBuilder<hidden_ref_state::SetForkRef<St>, S> {
         self._fields.0 = Option::Some(value.into());
         HiddenRefBuilder {
             _state: PhantomData,
@@ -179,7 +194,7 @@ where
     }
 }
 
-impl<S: BosStr, St> HiddenRefBuilder<S, St>
+impl<St, S: BosStr> HiddenRefBuilder<St, S>
 where
     St: hidden_ref_state::State,
     St::RemoteRef: hidden_ref_state::IsUnset,
@@ -188,7 +203,7 @@ where
     pub fn remote_ref(
         mut self,
         value: impl Into<S>,
-    ) -> HiddenRefBuilder<S, hidden_ref_state::SetRemoteRef<St>> {
+    ) -> HiddenRefBuilder<hidden_ref_state::SetRemoteRef<St>, S> {
         self._fields.1 = Option::Some(value.into());
         HiddenRefBuilder {
             _state: PhantomData,
@@ -198,7 +213,7 @@ where
     }
 }
 
-impl<S: BosStr, St> HiddenRefBuilder<S, St>
+impl<St, S: BosStr> HiddenRefBuilder<St, S>
 where
     St: hidden_ref_state::State,
     St::Repo: hidden_ref_state::IsUnset,
@@ -207,7 +222,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> HiddenRefBuilder<S, hidden_ref_state::SetRepo<St>> {
+    ) -> HiddenRefBuilder<hidden_ref_state::SetRepo<St>, S> {
         self._fields.2 = Option::Some(value.into());
         HiddenRefBuilder {
             _state: PhantomData,
@@ -217,12 +232,12 @@ where
     }
 }
 
-impl<S: BosStr, St> HiddenRefBuilder<S, St>
+impl<St, S: BosStr> HiddenRefBuilder<St, S>
 where
     St: hidden_ref_state::State,
-    St::ForkRef: hidden_ref_state::IsSet,
     St::Repo: hidden_ref_state::IsSet,
     St::RemoteRef: hidden_ref_state::IsSet,
+    St::ForkRef: hidden_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> HiddenRef<S> {
@@ -234,7 +249,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> HiddenRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> HiddenRef<S> {
         HiddenRef {
             fork_ref: self._fields.0.unwrap(),
             remote_ref: self._fields.1.unwrap(),

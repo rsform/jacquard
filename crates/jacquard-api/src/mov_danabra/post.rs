@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Post<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub foo: Option<PostFoo<S>>,
@@ -30,6 +27,7 @@ pub struct Post<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PostFoo<S: BosStr = DefaultStr> {
@@ -108,11 +106,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PostOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -131,8 +127,9 @@ impl jacquard_common::xrpc::XrpcResp for PostResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Post<S> {
     const NSID: &'static str = "mov.danabra.Post";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PostResponse;
 }
 
@@ -140,15 +137,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Post<S> {
 pub struct PostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PostRequest {
     const PATH: &'static str = "/xrpc/mov.danabra.Post";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Post<S>;
     type Response = PostResponse;
 }
 
 pub mod post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -179,21 +177,28 @@ pub mod post_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PostBuilder<S: BosStr, St: post_state::State> {
+pub struct PostBuilder<St: post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<PostFoo<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Post<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PostBuilder<S, post_state::Empty> {
+impl Post<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PostBuilder<post_state::Empty, DefaultStr> {
         PostBuilder::new()
     }
 }
 
-impl<S: BosStr> PostBuilder<S, post_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Post<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PostBuilder<post_state::Empty, S> {
+        PostBuilder::builder()
+    }
+}
+
+impl PostBuilder<post_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PostBuilder {
             _state: PhantomData,
@@ -203,7 +208,18 @@ impl<S: BosStr> PostBuilder<S, post_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<S: BosStr> PostBuilder<post_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PostBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `foo` field (optional)
     pub fn foo(mut self, value: impl Into<Option<PostFoo<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -216,13 +232,16 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::Uri: post_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(mut self, value: impl Into<AtUri<S>>) -> PostBuilder<S, post_state::SetUri<St>> {
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> PostBuilder<post_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -232,7 +251,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::Uri: post_state::IsSet,

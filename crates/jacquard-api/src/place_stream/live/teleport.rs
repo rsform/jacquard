@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Record defining a 'teleport', that is active during a certain time.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -127,7 +127,7 @@ impl<S: BosStr> LexiconSchema for Teleport<S> {
 
 pub mod teleport_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -135,56 +135,63 @@ pub mod teleport_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type StartsAt;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type StartsAt = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStreamer<St> {}
-    impl<St: State> State for SetStreamer<St> {
-        type Streamer = Set<members::streamer>;
-        type StartsAt = St::StartsAt;
+        type Streamer = Unset;
     }
     ///State transition - sets the `starts_at` field to Set
     pub struct SetStartsAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStartsAt<St> {}
     impl<St: State> State for SetStartsAt<St> {
-        type Streamer = St::Streamer;
         type StartsAt = Set<members::starts_at>;
+        type Streamer = St::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStreamer<St> {}
+    impl<St: State> State for SetStreamer<St> {
+        type StartsAt = St::StartsAt;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `starts_at` field
         pub struct starts_at(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TeleportBuilder<S: BosStr, St: teleport_state::State> {
+pub struct TeleportBuilder<St: teleport_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Datetime>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Teleport<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TeleportBuilder<S, teleport_state::Empty> {
+impl Teleport<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TeleportBuilder<teleport_state::Empty, DefaultStr> {
         TeleportBuilder::new()
     }
 }
 
-impl<S: BosStr> TeleportBuilder<S, teleport_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Teleport<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TeleportBuilder<teleport_state::Empty, S> {
+        TeleportBuilder::builder()
+    }
+}
+
+impl TeleportBuilder<teleport_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TeleportBuilder {
             _state: PhantomData,
@@ -194,7 +201,18 @@ impl<S: BosStr> TeleportBuilder<S, teleport_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: teleport_state::State> TeleportBuilder<S, St> {
+impl<S: BosStr> TeleportBuilder<teleport_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TeleportBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: teleport_state::State, S: BosStr> TeleportBuilder<St, S> {
     /// Set the `durationSeconds` field (optional)
     pub fn duration_seconds(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -207,7 +225,7 @@ impl<S: BosStr, St: teleport_state::State> TeleportBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TeleportBuilder<S, St>
+impl<St, S: BosStr> TeleportBuilder<St, S>
 where
     St: teleport_state::State,
     St::StartsAt: teleport_state::IsUnset,
@@ -216,7 +234,7 @@ where
     pub fn starts_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TeleportBuilder<S, teleport_state::SetStartsAt<St>> {
+    ) -> TeleportBuilder<teleport_state::SetStartsAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TeleportBuilder {
             _state: PhantomData,
@@ -226,7 +244,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TeleportBuilder<S, St>
+impl<St, S: BosStr> TeleportBuilder<St, S>
 where
     St: teleport_state::State,
     St::Streamer: teleport_state::IsUnset,
@@ -235,7 +253,7 @@ where
     pub fn streamer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> TeleportBuilder<S, teleport_state::SetStreamer<St>> {
+    ) -> TeleportBuilder<teleport_state::SetStreamer<St>, S> {
         self._fields.2 = Option::Some(value.into());
         TeleportBuilder {
             _state: PhantomData,
@@ -245,11 +263,11 @@ where
     }
 }
 
-impl<S: BosStr, St> TeleportBuilder<S, St>
+impl<St, S: BosStr> TeleportBuilder<St, S>
 where
     St: teleport_state::State,
-    St::Streamer: teleport_state::IsSet,
     St::StartsAt: teleport_state::IsSet,
+    St::Streamer: teleport_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Teleport<S> {
@@ -272,10 +290,10 @@ where
 }
 
 fn lexicon_doc_place_stream_live_teleport() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.live.teleport"),
@@ -284,15 +302,19 @@ fn lexicon_doc_place_stream_live_teleport() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Record defining a 'teleport', that is active during a certain time.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Record defining a 'teleport', that is active during a certain time.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("streamer"),
-                            SmolStr::new_static("startsAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("streamer"),
+                                SmolStr::new_static("startsAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -307,9 +329,9 @@ fn lexicon_doc_place_stream_live_teleport() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("startsAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The time the teleport becomes active.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The time the teleport becomes active."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -317,9 +339,11 @@ fn lexicon_doc_place_stream_live_teleport() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("streamer"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The DID of the streamer to teleport to.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The DID of the streamer to teleport to.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),

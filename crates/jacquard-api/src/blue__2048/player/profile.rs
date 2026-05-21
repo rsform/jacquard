@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blue__2048::SyncStatus;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blue__2048::SyncStatus;
 /// A declaration of a at://2048 player's profile
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -113,7 +113,7 @@ fn _default_profile_solo_play() -> bool {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -170,21 +170,28 @@ pub mod profile_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
+pub struct ProfileBuilder<St: profile_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<bool>, Option<SyncStatus<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Profile<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProfileBuilder<S, profile_state::Empty> {
+impl Profile<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProfileBuilder<profile_state::Empty, DefaultStr> {
         ProfileBuilder::new()
     }
 }
 
-impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Profile<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProfileBuilder<profile_state::Empty, S> {
+        ProfileBuilder::builder()
+    }
+}
+
+impl ProfileBuilder<profile_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
@@ -194,7 +201,18 @@ impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProfileBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::CreatedAt: profile_state::IsUnset,
@@ -203,7 +221,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ProfileBuilder<S, profile_state::SetCreatedAt<St>> {
+    ) -> ProfileBuilder<profile_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -213,7 +231,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::SoloPlay: profile_state::IsUnset,
@@ -222,7 +240,7 @@ where
     pub fn solo_play(
         mut self,
         value: impl Into<bool>,
-    ) -> ProfileBuilder<S, profile_state::SetSoloPlay<St>> {
+    ) -> ProfileBuilder<profile_state::SetSoloPlay<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -232,7 +250,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::SyncStatus: profile_state::IsUnset,
@@ -241,7 +259,7 @@ where
     pub fn sync_status(
         mut self,
         value: impl Into<SyncStatus<S>>,
-    ) -> ProfileBuilder<S, profile_state::SetSyncStatus<St>> {
+    ) -> ProfileBuilder<profile_state::SetSyncStatus<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -251,7 +269,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::CreatedAt: profile_state::IsSet,
@@ -279,10 +297,10 @@ where
 }
 
 fn lexicon_doc_blue_2048_player_profile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.2048.player.profile"),
@@ -291,16 +309,20 @@ fn lexicon_doc_blue_2048_player_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A declaration of a at://2048 player's profile",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A declaration of a at://2048 player's profile",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("soloPlay"),
-                            SmolStr::new_static("syncStatus"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("soloPlay"),
+                                SmolStr::new_static("syncStatus"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

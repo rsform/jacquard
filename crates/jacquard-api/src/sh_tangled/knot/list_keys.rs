@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did};
+use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::knot::list_keys;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::knot::list_keys;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListKeys<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -40,11 +37,9 @@ pub struct ListKeys<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListKeysOutput<S: BosStr = DefaultStr> {
     ///Pagination cursor for next page
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,9 +49,18 @@ pub struct ListKeysOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ListKeysError {
     /// Failed to retrieve public keys
@@ -64,10 +68,7 @@ pub enum ListKeysError {
     InternalServerError(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ListKeysError {
@@ -91,11 +92,9 @@ impl core::fmt::Display for ListKeysError {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PublicKey<S: BosStr = DefaultStr> {
     ///Key upload timestamp
     pub created_at: Datetime,
@@ -163,7 +162,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_keys_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -181,21 +180,28 @@ pub mod list_keys_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListKeysBuilder<S: BosStr, St: list_keys_state::State> {
+pub struct ListKeysBuilder<St: list_keys_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListKeys<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListKeysBuilder<S, list_keys_state::Empty> {
+impl ListKeys<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListKeysBuilder<list_keys_state::Empty, DefaultStr> {
         ListKeysBuilder::new()
     }
 }
 
-impl<S: BosStr> ListKeysBuilder<S, list_keys_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListKeys<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListKeysBuilder<list_keys_state::Empty, S> {
+        ListKeysBuilder::builder()
+    }
+}
+
+impl ListKeysBuilder<list_keys_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListKeysBuilder {
             _state: PhantomData,
@@ -205,7 +211,18 @@ impl<S: BosStr> ListKeysBuilder<S, list_keys_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: list_keys_state::State> ListKeysBuilder<S, St> {
+impl<S: BosStr> ListKeysBuilder<list_keys_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListKeysBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: list_keys_state::State, S: BosStr> ListKeysBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -218,7 +235,7 @@ impl<S: BosStr, St: list_keys_state::State> ListKeysBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: list_keys_state::State> ListKeysBuilder<S, St> {
+impl<St: list_keys_state::State, S: BosStr> ListKeysBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -231,7 +248,7 @@ impl<S: BosStr, St: list_keys_state::State> ListKeysBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListKeysBuilder<S, St>
+impl<St, S: BosStr> ListKeysBuilder<St, S>
 where
     St: list_keys_state::State,
 {
@@ -246,7 +263,7 @@ where
 
 pub mod public_key_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -255,69 +272,76 @@ pub mod public_key_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
-        type CreatedAt;
         type Key;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
-        type CreatedAt = Unset;
         type Key = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
+        type Key = St::Key;
         type CreatedAt = St::CreatedAt;
-        type Key = St::Key;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Did = St::Did;
-        type CreatedAt = Set<members::created_at>;
-        type Key = St::Key;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetKey<St> {}
     impl<St: State> State for SetKey<St> {
         type Did = St::Did;
-        type CreatedAt = St::CreatedAt;
         type Key = Set<members::key>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Did = St::Did;
+        type Key = St::Key;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PublicKeyBuilder<S: BosStr, St: public_key_state::State> {
+pub struct PublicKeyBuilder<St: public_key_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Did<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PublicKey<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PublicKeyBuilder<S, public_key_state::Empty> {
+impl PublicKey<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PublicKeyBuilder<public_key_state::Empty, DefaultStr> {
         PublicKeyBuilder::new()
     }
 }
 
-impl<S: BosStr> PublicKeyBuilder<S, public_key_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PublicKey<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PublicKeyBuilder<public_key_state::Empty, S> {
+        PublicKeyBuilder::builder()
+    }
+}
+
+impl PublicKeyBuilder<public_key_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PublicKeyBuilder {
             _state: PhantomData,
@@ -327,7 +351,18 @@ impl<S: BosStr> PublicKeyBuilder<S, public_key_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PublicKeyBuilder<S, St>
+impl<S: BosStr> PublicKeyBuilder<public_key_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PublicKeyBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PublicKeyBuilder<St, S>
 where
     St: public_key_state::State,
     St::CreatedAt: public_key_state::IsUnset,
@@ -336,7 +371,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PublicKeyBuilder<S, public_key_state::SetCreatedAt<St>> {
+    ) -> PublicKeyBuilder<public_key_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PublicKeyBuilder {
             _state: PhantomData,
@@ -346,7 +381,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PublicKeyBuilder<S, St>
+impl<St, S: BosStr> PublicKeyBuilder<St, S>
 where
     St: public_key_state::State,
     St::Did: public_key_state::IsUnset,
@@ -355,7 +390,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> PublicKeyBuilder<S, public_key_state::SetDid<St>> {
+    ) -> PublicKeyBuilder<public_key_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PublicKeyBuilder {
             _state: PhantomData,
@@ -365,13 +400,16 @@ where
     }
 }
 
-impl<S: BosStr, St> PublicKeyBuilder<S, St>
+impl<St, S: BosStr> PublicKeyBuilder<St, S>
 where
     St: public_key_state::State,
     St::Key: public_key_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(mut self, value: impl Into<S>) -> PublicKeyBuilder<S, public_key_state::SetKey<St>> {
+    pub fn key(
+        mut self,
+        value: impl Into<S>,
+    ) -> PublicKeyBuilder<public_key_state::SetKey<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PublicKeyBuilder {
             _state: PhantomData,
@@ -381,12 +419,12 @@ where
     }
 }
 
-impl<S: BosStr, St> PublicKeyBuilder<S, St>
+impl<St, S: BosStr> PublicKeyBuilder<St, S>
 where
     St: public_key_state::State,
     St::Did: public_key_state::IsSet,
-    St::CreatedAt: public_key_state::IsSet,
     St::Key: public_key_state::IsSet,
+    St::CreatedAt: public_key_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PublicKey<S> {
@@ -398,7 +436,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PublicKey<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PublicKey<S> {
         PublicKey {
             created_at: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -409,10 +450,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_knot_listKeys() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.knot.listKeys"),
@@ -421,45 +462,50 @@ fn lexicon_doc_sh_tangled_knot_listKeys() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Pagination cursor")),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(CowStr::new_static("Pagination cursor")),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("publicKey"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("key"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("did"), SmolStr::new_static("key"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Key upload timestamp")),
+                                description: Some(
+                                    CowStr::new_static("Key upload timestamp"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -467,9 +513,9 @@ fn lexicon_doc_sh_tangled_knot_listKeys() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "DID associated with the public key",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("DID associated with the public key"),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -477,7 +523,9 @@ fn lexicon_doc_sh_tangled_knot_listKeys() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("key"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Public key contents")),
+                                description: Some(
+                                    CowStr::new_static("Public key contents"),
+                                ),
                                 max_length: Some(4096usize),
                                 ..Default::default()
                             }),

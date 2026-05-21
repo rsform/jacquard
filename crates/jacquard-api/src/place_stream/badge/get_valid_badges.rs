@@ -8,31 +8,26 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::place_stream::badge::BadgeView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::badge::BadgeView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetValidBadges<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub streamer: Option<Did<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetValidBadgesOutput<S: BosStr = DefaultStr> {
     pub badges: Vec<BadgeView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -65,7 +60,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetValidBadgesRequest {
 
 pub mod get_valid_badges_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -83,21 +78,31 @@ pub mod get_valid_badges_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetValidBadgesBuilder<S: BosStr, St: get_valid_badges_state::State> {
+pub struct GetValidBadgesBuilder<
+    St: get_valid_badges_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetValidBadges<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetValidBadgesBuilder<S, get_valid_badges_state::Empty> {
+impl GetValidBadges<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetValidBadgesBuilder<get_valid_badges_state::Empty, DefaultStr> {
         GetValidBadgesBuilder::new()
     }
 }
 
-impl<S: BosStr> GetValidBadgesBuilder<S, get_valid_badges_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetValidBadges<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetValidBadgesBuilder<get_valid_badges_state::Empty, S> {
+        GetValidBadgesBuilder::builder()
+    }
+}
+
+impl GetValidBadgesBuilder<get_valid_badges_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetValidBadgesBuilder {
             _state: PhantomData,
@@ -107,7 +112,18 @@ impl<S: BosStr> GetValidBadgesBuilder<S, get_valid_badges_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_valid_badges_state::State> GetValidBadgesBuilder<S, St> {
+impl<S: BosStr> GetValidBadgesBuilder<get_valid_badges_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetValidBadgesBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_valid_badges_state::State, S: BosStr> GetValidBadgesBuilder<St, S> {
     /// Set the `streamer` field (optional)
     pub fn streamer(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -120,7 +136,7 @@ impl<S: BosStr, St: get_valid_badges_state::State> GetValidBadgesBuilder<S, St> 
     }
 }
 
-impl<S: BosStr, St> GetValidBadgesBuilder<S, St>
+impl<St, S: BosStr> GetValidBadgesBuilder<St, S>
 where
     St: get_valid_badges_state::State,
 {

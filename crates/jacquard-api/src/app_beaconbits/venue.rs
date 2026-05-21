@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::community_lexicon::location::address::Address;
-use crate::community_lexicon::location::geo::Geo;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::community_lexicon::location::address::Address;
+use crate::community_lexicon::location::geo::Geo;
 /// A user-created venue definition
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -160,7 +160,7 @@ impl<S: BosStr> LexiconSchema for Venue<S> {
 
 pub mod venue_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -168,42 +168,42 @@ pub mod venue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = St::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct VenueBuilder<S: BosStr, St: venue_state::State> {
+pub struct VenueBuilder<St: venue_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -217,15 +217,22 @@ pub struct VenueBuilder<S: BosStr, St: venue_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Venue<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> VenueBuilder<S, venue_state::Empty> {
+impl Venue<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> VenueBuilder<venue_state::Empty, DefaultStr> {
         VenueBuilder::new()
     }
 }
 
-impl<S: BosStr> VenueBuilder<S, venue_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Venue<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> VenueBuilder<venue_state::Empty, S> {
+        VenueBuilder::builder()
+    }
+}
+
+impl VenueBuilder<venue_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         VenueBuilder {
             _state: PhantomData,
@@ -235,7 +242,18 @@ impl<S: BosStr> VenueBuilder<S, venue_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
+impl<S: BosStr> VenueBuilder<venue_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        VenueBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: venue_state::State, S: BosStr> VenueBuilder<St, S> {
     /// Set the `address` field (optional)
     pub fn address(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -248,7 +266,7 @@ impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
+impl<St: venue_state::State, S: BosStr> VenueBuilder<St, S> {
     /// Set the `addressDetails` field (optional)
     pub fn address_details(mut self, value: impl Into<Option<Address<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -261,7 +279,7 @@ impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
+impl<St: venue_state::State, S: BosStr> VenueBuilder<St, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -274,7 +292,7 @@ impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> VenueBuilder<S, St>
+impl<St, S: BosStr> VenueBuilder<St, S>
 where
     St: venue_state::State,
     St::CreatedAt: venue_state::IsUnset,
@@ -283,7 +301,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> VenueBuilder<S, venue_state::SetCreatedAt<St>> {
+    ) -> VenueBuilder<venue_state::SetCreatedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         VenueBuilder {
             _state: PhantomData,
@@ -293,7 +311,7 @@ where
     }
 }
 
-impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
+impl<St: venue_state::State, S: BosStr> VenueBuilder<St, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<Geo<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -306,13 +324,16 @@ impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> VenueBuilder<S, St>
+impl<St, S: BosStr> VenueBuilder<St, S>
 where
     St: venue_state::State,
     St::Name: venue_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> VenueBuilder<S, venue_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> VenueBuilder<venue_state::SetName<St>, S> {
         self._fields.5 = Option::Some(value.into());
         VenueBuilder {
             _state: PhantomData,
@@ -322,7 +343,7 @@ where
     }
 }
 
-impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
+impl<St: venue_state::State, S: BosStr> VenueBuilder<St, S> {
     /// Set the `osmUri` field (optional)
     pub fn osm_uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -335,11 +356,11 @@ impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> VenueBuilder<S, St>
+impl<St, S: BosStr> VenueBuilder<St, S>
 where
     St: venue_state::State,
-    St::CreatedAt: venue_state::IsSet,
     St::Name: venue_state::IsSet,
+    St::CreatedAt: venue_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Venue<S> {
@@ -370,10 +391,10 @@ where
 }
 
 fn lexicon_doc_app_beaconbits_venue() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.beaconbits.venue"),
@@ -382,20 +403,26 @@ fn lexicon_doc_app_beaconbits_venue() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A user-created venue definition")),
+                    description: Some(
+                        CowStr::new_static("A user-created venue definition"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("address"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Human-readable address")),
+                                    description: Some(
+                                        CowStr::new_static("Human-readable address"),
+                                    ),
                                     max_graphemes: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -403,16 +430,20 @@ fn lexicon_doc_app_beaconbits_venue() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("addressDetails"),
                                 LexObjectProperty::Ref(LexRef {
-                                    r#ref: CowStr::new_static("community.lexicon.location.address"),
+                                    r#ref: CowStr::new_static(
+                                        "community.lexicon.location.address",
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("category"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Venue category (bar, cafe, restaurant, etc.)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Venue category (bar, cafe, restaurant, etc.)",
+                                        ),
+                                    ),
                                     max_graphemes: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -420,9 +451,9 @@ fn lexicon_doc_app_beaconbits_venue() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the venue was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp when the venue was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -437,9 +468,9 @@ fn lexicon_doc_app_beaconbits_venue() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Display name of the venue",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Display name of the venue"),
+                                    ),
                                     max_graphemes: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -447,9 +478,11 @@ fn lexicon_doc_app_beaconbits_venue() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("osmUri"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Link to underlying OpenStreetMap entity (osm://node/123)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Link to underlying OpenStreetMap entity (osm://node/123)",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),

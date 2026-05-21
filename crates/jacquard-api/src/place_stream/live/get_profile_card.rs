@@ -10,21 +10,19 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetProfileCard<S: BosStr = DefaultStr> {
     pub id: S,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -32,19 +30,25 @@ pub struct GetProfileCardOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetProfileCardError {
     #[serde(rename = "RepoNotFound")]
     RepoNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetProfileCardError {
@@ -113,7 +117,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetProfileCardRequest {
 
 pub mod get_profile_card_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -144,21 +148,31 @@ pub mod get_profile_card_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetProfileCardBuilder<S: BosStr, St: get_profile_card_state::State> {
+pub struct GetProfileCardBuilder<
+    St: get_profile_card_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetProfileCard<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetProfileCardBuilder<S, get_profile_card_state::Empty> {
+impl GetProfileCard<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetProfileCardBuilder<get_profile_card_state::Empty, DefaultStr> {
         GetProfileCardBuilder::new()
     }
 }
 
-impl<S: BosStr> GetProfileCardBuilder<S, get_profile_card_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetProfileCard<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetProfileCardBuilder<get_profile_card_state::Empty, S> {
+        GetProfileCardBuilder::builder()
+    }
+}
+
+impl GetProfileCardBuilder<get_profile_card_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetProfileCardBuilder {
             _state: PhantomData,
@@ -168,7 +182,18 @@ impl<S: BosStr> GetProfileCardBuilder<S, get_profile_card_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetProfileCardBuilder<S, St>
+impl<S: BosStr> GetProfileCardBuilder<get_profile_card_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetProfileCardBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetProfileCardBuilder<St, S>
 where
     St: get_profile_card_state::State,
     St::Id: get_profile_card_state::IsUnset,
@@ -177,7 +202,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> GetProfileCardBuilder<S, get_profile_card_state::SetId<St>> {
+    ) -> GetProfileCardBuilder<get_profile_card_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetProfileCardBuilder {
             _state: PhantomData,
@@ -187,7 +212,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetProfileCardBuilder<S, St>
+impl<St, S: BosStr> GetProfileCardBuilder<St, S>
 where
     St: get_profile_card_state::State,
     St::Id: get_profile_card_state::IsSet,

@@ -10,21 +10,19 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DownloadFile<S: BosStr = DefaultStr> {
     pub file_id: S,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -77,7 +75,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DownloadFileRequest {
 
 pub mod download_file_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -108,21 +106,28 @@ pub mod download_file_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DownloadFileBuilder<S: BosStr, St: download_file_state::State> {
+pub struct DownloadFileBuilder<St: download_file_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DownloadFile<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DownloadFileBuilder<S, download_file_state::Empty> {
+impl DownloadFile<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DownloadFileBuilder<download_file_state::Empty, DefaultStr> {
         DownloadFileBuilder::new()
     }
 }
 
-impl<S: BosStr> DownloadFileBuilder<S, download_file_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DownloadFile<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DownloadFileBuilder<download_file_state::Empty, S> {
+        DownloadFileBuilder::builder()
+    }
+}
+
+impl DownloadFileBuilder<download_file_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DownloadFileBuilder {
             _state: PhantomData,
@@ -132,7 +137,18 @@ impl<S: BosStr> DownloadFileBuilder<S, download_file_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DownloadFileBuilder<S, St>
+impl<S: BosStr> DownloadFileBuilder<download_file_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DownloadFileBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DownloadFileBuilder<St, S>
 where
     St: download_file_state::State,
     St::FileId: download_file_state::IsUnset,
@@ -141,7 +157,7 @@ where
     pub fn file_id(
         mut self,
         value: impl Into<S>,
-    ) -> DownloadFileBuilder<S, download_file_state::SetFileId<St>> {
+    ) -> DownloadFileBuilder<download_file_state::SetFileId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DownloadFileBuilder {
             _state: PhantomData,
@@ -151,7 +167,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DownloadFileBuilder<S, St>
+impl<St, S: BosStr> DownloadFileBuilder<St, S>
 where
     St: download_file_state::State,
     St::FileId: download_file_state::IsSet,

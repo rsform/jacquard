@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// An at-circle group definition
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -126,7 +126,9 @@ where
         match self {
             RingAcceptancePolicy::Automatic => RingAcceptancePolicy::Automatic,
             RingAcceptancePolicy::Manual => RingAcceptancePolicy::Manual,
-            RingAcceptancePolicy::Other(v) => RingAcceptancePolicy::Other(v.into_static()),
+            RingAcceptancePolicy::Other(v) => {
+                RingAcceptancePolicy::Other(v.into_static())
+            }
         }
     }
 }
@@ -338,7 +340,7 @@ impl<S: BosStr> LexiconSchema for Ring<S> {
 
 pub mod ring_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -346,56 +348,56 @@ pub mod ring_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type CreatedAt;
         type Status;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type CreatedAt = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type CreatedAt = St::CreatedAt;
-        type Status = St::Status;
+        type Title = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Title = St::Title;
         type CreatedAt = Set<members::created_at>;
         type Status = St::Status;
+        type Title = St::Title;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStatus<St> {}
     impl<St: State> State for SetStatus<St> {
-        type Title = St::Title;
         type CreatedAt = St::CreatedAt;
         type Status = Set<members::status>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type Status = St::Status;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RingBuilder<S: BosStr, St: ring_state::State> {
+pub struct RingBuilder<St: ring_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<RingAcceptancePolicy<S>>,
@@ -407,15 +409,22 @@ pub struct RingBuilder<S: BosStr, St: ring_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Ring<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RingBuilder<S, ring_state::Empty> {
+impl Ring<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RingBuilder<ring_state::Empty, DefaultStr> {
         RingBuilder::new()
     }
 }
 
-impl<S: BosStr> RingBuilder<S, ring_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Ring<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RingBuilder<ring_state::Empty, S> {
+        RingBuilder::builder()
+    }
+}
+
+impl RingBuilder<ring_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RingBuilder {
             _state: PhantomData,
@@ -425,20 +434,37 @@ impl<S: BosStr> RingBuilder<S, ring_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: ring_state::State> RingBuilder<S, St> {
+impl<S: BosStr> RingBuilder<ring_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RingBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: ring_state::State, S: BosStr> RingBuilder<St, S> {
     /// Set the `acceptancePolicy` field (optional)
-    pub fn acceptance_policy(mut self, value: impl Into<Option<RingAcceptancePolicy<S>>>) -> Self {
+    pub fn acceptance_policy(
+        mut self,
+        value: impl Into<Option<RingAcceptancePolicy<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `acceptancePolicy` field to an Option value (optional)
-    pub fn maybe_acceptance_policy(mut self, value: Option<RingAcceptancePolicy<S>>) -> Self {
+    pub fn maybe_acceptance_policy(
+        mut self,
+        value: Option<RingAcceptancePolicy<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
 }
 
-impl<S: BosStr, St> RingBuilder<S, St>
+impl<St, S: BosStr> RingBuilder<St, S>
 where
     St: ring_state::State,
     St::CreatedAt: ring_state::IsUnset,
@@ -447,7 +473,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RingBuilder<S, ring_state::SetCreatedAt<St>> {
+    ) -> RingBuilder<ring_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RingBuilder {
             _state: PhantomData,
@@ -457,7 +483,7 @@ where
     }
 }
 
-impl<S: BosStr, St: ring_state::State> RingBuilder<S, St> {
+impl<St: ring_state::State, S: BosStr> RingBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -470,7 +496,7 @@ impl<S: BosStr, St: ring_state::State> RingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RingBuilder<S, St>
+impl<St, S: BosStr> RingBuilder<St, S>
 where
     St: ring_state::State,
     St::Status: ring_state::IsUnset,
@@ -479,7 +505,7 @@ where
     pub fn status(
         mut self,
         value: impl Into<RingStatus<S>>,
-    ) -> RingBuilder<S, ring_state::SetStatus<St>> {
+    ) -> RingBuilder<ring_state::SetStatus<St>, S> {
         self._fields.3 = Option::Some(value.into());
         RingBuilder {
             _state: PhantomData,
@@ -489,13 +515,16 @@ where
     }
 }
 
-impl<S: BosStr, St> RingBuilder<S, St>
+impl<St, S: BosStr> RingBuilder<St, S>
 where
     St: ring_state::State,
     St::Title: ring_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> RingBuilder<S, ring_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> RingBuilder<ring_state::SetTitle<St>, S> {
         self._fields.4 = Option::Some(value.into());
         RingBuilder {
             _state: PhantomData,
@@ -505,12 +534,12 @@ where
     }
 }
 
-impl<S: BosStr, St> RingBuilder<S, St>
+impl<St, S: BosStr> RingBuilder<St, S>
 where
     St: ring_state::State,
-    St::Title: ring_state::IsSet,
     St::CreatedAt: ring_state::IsSet,
     St::Status: ring_state::IsSet,
+    St::Title: ring_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Ring<S> {
@@ -537,10 +566,10 @@ where
 }
 
 fn lexicon_doc_net_asadaame5121_at_circle_ring() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.asadaame5121.at-circle.ring"),
@@ -549,23 +578,27 @@ fn lexicon_doc_net_asadaame5121_at_circle_ring() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("An at-circle group definition")),
+                    description: Some(
+                        CowStr::new_static("An at-circle group definition"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("status"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("status")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("acceptancePolicy"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "How new members are accepted",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("How new members are accepted"),
+                                    ),
                                     max_length: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -580,9 +613,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_ring() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Description of the circle",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Description of the circle"),
+                                    ),
                                     max_length: Some(10000usize),
                                     max_graphemes: Some(1000usize),
                                     ..Default::default()

@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::network_slices::slice::get_o_auth_clients::OauthClientDetails;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::slice::get_o_auth_clients::OauthClientDetails;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateOAuthClient<S: BosStr = DefaultStr> {
     ///Human-readable name of the OAuth client
     pub client_name: S,
@@ -55,11 +52,9 @@ pub struct CreateOAuthClient<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateOAuthClientOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: OauthClientDetails<S>,
@@ -78,8 +73,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateOAuthClientResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateOAuthClient<S> {
     const NSID: &'static str = "network.slices.slice.createOAuthClient";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateOAuthClientResponse;
 }
 
@@ -87,15 +83,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateOAuthClient<S> {
 pub struct CreateOAuthClientRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateOAuthClientRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.createOAuthClient";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateOAuthClient<S>;
     type Response = CreateOAuthClientResponse;
 }
 
 pub mod create_o_auth_client_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -104,55 +101,58 @@ pub mod create_o_auth_client_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type SliceUri;
-        type RedirectUris;
         type ClientName;
+        type RedirectUris;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type SliceUri = Unset;
-        type RedirectUris = Unset;
         type ClientName = Unset;
+        type RedirectUris = Unset;
     }
     ///State transition - sets the `slice_uri` field to Set
     pub struct SetSliceUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSliceUri<St> {}
     impl<St: State> State for SetSliceUri<St> {
         type SliceUri = Set<members::slice_uri>;
+        type ClientName = St::ClientName;
         type RedirectUris = St::RedirectUris;
-        type ClientName = St::ClientName;
-    }
-    ///State transition - sets the `redirect_uris` field to Set
-    pub struct SetRedirectUris<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRedirectUris<St> {}
-    impl<St: State> State for SetRedirectUris<St> {
-        type SliceUri = St::SliceUri;
-        type RedirectUris = Set<members::redirect_uris>;
-        type ClientName = St::ClientName;
     }
     ///State transition - sets the `client_name` field to Set
     pub struct SetClientName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetClientName<St> {}
     impl<St: State> State for SetClientName<St> {
         type SliceUri = St::SliceUri;
-        type RedirectUris = St::RedirectUris;
         type ClientName = Set<members::client_name>;
+        type RedirectUris = St::RedirectUris;
+    }
+    ///State transition - sets the `redirect_uris` field to Set
+    pub struct SetRedirectUris<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRedirectUris<St> {}
+    impl<St: State> State for SetRedirectUris<St> {
+        type SliceUri = St::SliceUri;
+        type ClientName = St::ClientName;
+        type RedirectUris = Set<members::redirect_uris>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `slice_uri` field
         pub struct slice_uri(());
-        ///Marker type for the `redirect_uris` field
-        pub struct redirect_uris(());
         ///Marker type for the `client_name` field
         pub struct client_name(());
+        ///Marker type for the `redirect_uris` field
+        pub struct redirect_uris(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateOAuthClientBuilder<S: BosStr, St: create_o_auth_client_state::State> {
+pub struct CreateOAuthClientBuilder<
+    St: create_o_auth_client_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -169,15 +169,25 @@ pub struct CreateOAuthClientBuilder<S: BosStr, St: create_o_auth_client_state::S
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CreateOAuthClient<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CreateOAuthClientBuilder<S, create_o_auth_client_state::Empty> {
+impl CreateOAuthClient<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CreateOAuthClientBuilder<
+        create_o_auth_client_state::Empty,
+        DefaultStr,
+    > {
         CreateOAuthClientBuilder::new()
     }
 }
 
-impl<S: BosStr> CreateOAuthClientBuilder<S, create_o_auth_client_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CreateOAuthClient<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CreateOAuthClientBuilder<create_o_auth_client_state::Empty, S> {
+        CreateOAuthClientBuilder::builder()
+    }
+}
+
+impl CreateOAuthClientBuilder<create_o_auth_client_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CreateOAuthClientBuilder {
             _state: PhantomData,
@@ -187,7 +197,18 @@ impl<S: BosStr> CreateOAuthClientBuilder<S, create_o_auth_client_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CreateOAuthClientBuilder<S, St>
+impl<S: BosStr> CreateOAuthClientBuilder<create_o_auth_client_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CreateOAuthClientBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CreateOAuthClientBuilder<St, S>
 where
     St: create_o_auth_client_state::State,
     St::ClientName: create_o_auth_client_state::IsUnset,
@@ -196,7 +217,7 @@ where
     pub fn client_name(
         mut self,
         value: impl Into<S>,
-    ) -> CreateOAuthClientBuilder<S, create_o_auth_client_state::SetClientName<St>> {
+    ) -> CreateOAuthClientBuilder<create_o_auth_client_state::SetClientName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CreateOAuthClientBuilder {
             _state: PhantomData,
@@ -206,7 +227,7 @@ where
     }
 }
 
-impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<S, St> {
+impl<St: create_o_auth_client_state::State, S: BosStr> CreateOAuthClientBuilder<St, S> {
     /// Set the `clientUri` field (optional)
     pub fn client_uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -219,7 +240,7 @@ impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<
     }
 }
 
-impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<S, St> {
+impl<St: create_o_auth_client_state::State, S: BosStr> CreateOAuthClientBuilder<St, S> {
     /// Set the `grantTypes` field (optional)
     pub fn grant_types(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -232,7 +253,7 @@ impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<
     }
 }
 
-impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<S, St> {
+impl<St: create_o_auth_client_state::State, S: BosStr> CreateOAuthClientBuilder<St, S> {
     /// Set the `logoUri` field (optional)
     pub fn logo_uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -245,7 +266,7 @@ impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<
     }
 }
 
-impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<S, St> {
+impl<St: create_o_auth_client_state::State, S: BosStr> CreateOAuthClientBuilder<St, S> {
     /// Set the `policyUri` field (optional)
     pub fn policy_uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -258,7 +279,7 @@ impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<
     }
 }
 
-impl<S: BosStr, St> CreateOAuthClientBuilder<S, St>
+impl<St, S: BosStr> CreateOAuthClientBuilder<St, S>
 where
     St: create_o_auth_client_state::State,
     St::RedirectUris: create_o_auth_client_state::IsUnset,
@@ -267,7 +288,7 @@ where
     pub fn redirect_uris(
         mut self,
         value: impl Into<Vec<UriValue<S>>>,
-    ) -> CreateOAuthClientBuilder<S, create_o_auth_client_state::SetRedirectUris<St>> {
+    ) -> CreateOAuthClientBuilder<create_o_auth_client_state::SetRedirectUris<St>, S> {
         self._fields.5 = Option::Some(value.into());
         CreateOAuthClientBuilder {
             _state: PhantomData,
@@ -277,7 +298,7 @@ where
     }
 }
 
-impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<S, St> {
+impl<St: create_o_auth_client_state::State, S: BosStr> CreateOAuthClientBuilder<St, S> {
     /// Set the `responseTypes` field (optional)
     pub fn response_types(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -290,7 +311,7 @@ impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<
     }
 }
 
-impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<S, St> {
+impl<St: create_o_auth_client_state::State, S: BosStr> CreateOAuthClientBuilder<St, S> {
     /// Set the `scope` field (optional)
     pub fn scope(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -303,7 +324,7 @@ impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<
     }
 }
 
-impl<S: BosStr, St> CreateOAuthClientBuilder<S, St>
+impl<St, S: BosStr> CreateOAuthClientBuilder<St, S>
 where
     St: create_o_auth_client_state::State,
     St::SliceUri: create_o_auth_client_state::IsUnset,
@@ -312,7 +333,7 @@ where
     pub fn slice_uri(
         mut self,
         value: impl Into<S>,
-    ) -> CreateOAuthClientBuilder<S, create_o_auth_client_state::SetSliceUri<St>> {
+    ) -> CreateOAuthClientBuilder<create_o_auth_client_state::SetSliceUri<St>, S> {
         self._fields.8 = Option::Some(value.into());
         CreateOAuthClientBuilder {
             _state: PhantomData,
@@ -322,7 +343,7 @@ where
     }
 }
 
-impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<S, St> {
+impl<St: create_o_auth_client_state::State, S: BosStr> CreateOAuthClientBuilder<St, S> {
     /// Set the `tosUri` field (optional)
     pub fn tos_uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -335,12 +356,12 @@ impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<
     }
 }
 
-impl<S: BosStr, St> CreateOAuthClientBuilder<S, St>
+impl<St, S: BosStr> CreateOAuthClientBuilder<St, S>
 where
     St: create_o_auth_client_state::State,
     St::SliceUri: create_o_auth_client_state::IsSet,
-    St::RedirectUris: create_o_auth_client_state::IsSet,
     St::ClientName: create_o_auth_client_state::IsSet,
+    St::RedirectUris: create_o_auth_client_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CreateOAuthClient<S> {
@@ -359,7 +380,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateOAuthClient<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateOAuthClient<S> {
         CreateOAuthClient {
             client_name: self._fields.0.unwrap(),
             client_uri: self._fields.1,

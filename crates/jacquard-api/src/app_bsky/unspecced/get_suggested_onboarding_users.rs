@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::actor::ProfileView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor::ProfileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSuggestedOnboardingUsers<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<S>,
@@ -31,11 +28,9 @@ pub struct GetSuggestedOnboardingUsers<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSuggestedOnboardingUsersOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<ProfileView<S>>,
     ///DEPRECATED: use recIdStr instead.
@@ -78,7 +73,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_suggested_onboarding_users_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -97,24 +92,39 @@ pub mod get_suggested_onboarding_users_state {
 
 /// Builder for constructing an instance of this type.
 pub struct GetSuggestedOnboardingUsersBuilder<
-    S: BosStr,
     St: get_suggested_onboarding_users_state::State,
+    S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetSuggestedOnboardingUsers<S> {
-    /// Create a new builder for this type.
-    pub fn new()
-    -> GetSuggestedOnboardingUsersBuilder<S, get_suggested_onboarding_users_state::Empty> {
+impl GetSuggestedOnboardingUsers<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetSuggestedOnboardingUsersBuilder<
+        get_suggested_onboarding_users_state::Empty,
+        DefaultStr,
+    > {
         GetSuggestedOnboardingUsersBuilder::new()
     }
 }
 
-impl<S: BosStr> GetSuggestedOnboardingUsersBuilder<S, get_suggested_onboarding_users_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetSuggestedOnboardingUsers<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetSuggestedOnboardingUsersBuilder<
+        get_suggested_onboarding_users_state::Empty,
+        S,
+    > {
+        GetSuggestedOnboardingUsersBuilder::builder()
+    }
+}
+
+impl GetSuggestedOnboardingUsersBuilder<
+    get_suggested_onboarding_users_state::Empty,
+    DefaultStr,
+> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetSuggestedOnboardingUsersBuilder {
             _state: PhantomData,
@@ -124,9 +134,23 @@ impl<S: BosStr> GetSuggestedOnboardingUsersBuilder<S, get_suggested_onboarding_u
     }
 }
 
-impl<S: BosStr, St: get_suggested_onboarding_users_state::State>
-    GetSuggestedOnboardingUsersBuilder<S, St>
-{
+impl<
+    S: BosStr,
+> GetSuggestedOnboardingUsersBuilder<get_suggested_onboarding_users_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetSuggestedOnboardingUsersBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<
+    St: get_suggested_onboarding_users_state::State,
+    S: BosStr,
+> GetSuggestedOnboardingUsersBuilder<St, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -139,9 +163,10 @@ impl<S: BosStr, St: get_suggested_onboarding_users_state::State>
     }
 }
 
-impl<S: BosStr, St: get_suggested_onboarding_users_state::State>
-    GetSuggestedOnboardingUsersBuilder<S, St>
-{
+impl<
+    St: get_suggested_onboarding_users_state::State,
+    S: BosStr,
+> GetSuggestedOnboardingUsersBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -154,7 +179,7 @@ impl<S: BosStr, St: get_suggested_onboarding_users_state::State>
     }
 }
 
-impl<S: BosStr, St> GetSuggestedOnboardingUsersBuilder<S, St>
+impl<St, S: BosStr> GetSuggestedOnboardingUsersBuilder<St, S>
 where
     St: get_suggested_onboarding_users_state::State,
 {

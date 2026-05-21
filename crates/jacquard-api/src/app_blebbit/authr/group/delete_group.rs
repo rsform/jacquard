@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteGroupParams<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
@@ -41,8 +38,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteGroupResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for DeleteGroup {
     const NSID: &'static str = "app.blebbit.authr.group.deleteGroup";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteGroupResponse;
 }
 
@@ -50,15 +48,16 @@ impl jacquard_common::xrpc::XrpcRequest for DeleteGroup {
 pub struct DeleteGroupRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteGroupRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.group.deleteGroup";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeleteGroup;
     type Response = DeleteGroupResponse;
 }
 
 pub mod delete_group_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -76,21 +75,34 @@ pub mod delete_group_params_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeleteGroupParamsBuilder<S: BosStr, St: delete_group_params_state::State> {
+pub struct DeleteGroupParamsBuilder<
+    St: delete_group_params_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DeleteGroupParams<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DeleteGroupParamsBuilder<S, delete_group_params_state::Empty> {
+impl DeleteGroupParams<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DeleteGroupParamsBuilder<
+        delete_group_params_state::Empty,
+        DefaultStr,
+    > {
         DeleteGroupParamsBuilder::new()
     }
 }
 
-impl<S: BosStr> DeleteGroupParamsBuilder<S, delete_group_params_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DeleteGroupParams<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DeleteGroupParamsBuilder<delete_group_params_state::Empty, S> {
+        DeleteGroupParamsBuilder::builder()
+    }
+}
+
+impl DeleteGroupParamsBuilder<delete_group_params_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DeleteGroupParamsBuilder {
             _state: PhantomData,
@@ -100,7 +112,18 @@ impl<S: BosStr> DeleteGroupParamsBuilder<S, delete_group_params_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: delete_group_params_state::State> DeleteGroupParamsBuilder<S, St> {
+impl<S: BosStr> DeleteGroupParamsBuilder<delete_group_params_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DeleteGroupParamsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: delete_group_params_state::State, S: BosStr> DeleteGroupParamsBuilder<St, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -113,12 +136,14 @@ impl<S: BosStr, St: delete_group_params_state::State> DeleteGroupParamsBuilder<S
     }
 }
 
-impl<S: BosStr, St> DeleteGroupParamsBuilder<S, St>
+impl<St, S: BosStr> DeleteGroupParamsBuilder<St, S>
 where
     St: delete_group_params_state::State,
 {
     /// Build the final struct.
     pub fn build(self) -> DeleteGroupParams<S> {
-        DeleteGroupParams { id: self._fields.0 }
+        DeleteGroupParams {
+            id: self._fields.0,
+        }
     }
 }

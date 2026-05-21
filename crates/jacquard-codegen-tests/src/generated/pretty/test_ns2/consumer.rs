@@ -97,21 +97,28 @@ pub mod consumer_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ConsumerBuilder<S: BosStr, St: consumer_state::State> {
+pub struct ConsumerBuilder<St: consumer_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Foo<S>>, Option<Vec<Bar<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Consumer<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ConsumerBuilder<S, consumer_state::Empty> {
+impl Consumer<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ConsumerBuilder<consumer_state::Empty, DefaultStr> {
         ConsumerBuilder::new()
     }
 }
 
-impl<S: BosStr> ConsumerBuilder<S, consumer_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Consumer<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ConsumerBuilder<consumer_state::Empty, S> {
+        ConsumerBuilder::builder()
+    }
+}
+
+impl ConsumerBuilder<consumer_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ConsumerBuilder {
             _state: PhantomData,
@@ -121,7 +128,18 @@ impl<S: BosStr> ConsumerBuilder<S, consumer_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: consumer_state::State> ConsumerBuilder<S, St> {
+impl<S: BosStr> ConsumerBuilder<consumer_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ConsumerBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: consumer_state::State, S: BosStr> ConsumerBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -134,7 +152,7 @@ impl<S: BosStr, St: consumer_state::State> ConsumerBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ConsumerBuilder<S, St>
+impl<St, S: BosStr> ConsumerBuilder<St, S>
 where
     St: consumer_state::State,
     St::Item: consumer_state::IsUnset,
@@ -143,7 +161,7 @@ where
     pub fn item(
         mut self,
         value: impl Into<Foo<S>>,
-    ) -> ConsumerBuilder<S, consumer_state::SetItem<St>> {
+    ) -> ConsumerBuilder<consumer_state::SetItem<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ConsumerBuilder {
             _state: PhantomData,
@@ -153,7 +171,7 @@ where
     }
 }
 
-impl<S: BosStr, St: consumer_state::State> ConsumerBuilder<S, St> {
+impl<St: consumer_state::State, S: BosStr> ConsumerBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<Bar<S>>>>) -> Self {
         self._fields.2 = value.into();
@@ -166,7 +184,7 @@ impl<S: BosStr, St: consumer_state::State> ConsumerBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ConsumerBuilder<S, St>
+impl<St, S: BosStr> ConsumerBuilder<St, S>
 where
     St: consumer_state::State,
     St::Item: consumer_state::IsSet,

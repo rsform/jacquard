@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::media_ionosphere::Track;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::media_ionosphere::Track;
 /// Represents information about what was played
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -121,7 +121,7 @@ impl<S: BosStr> LexiconSchema for Log<S> {
 
 pub mod log_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -178,26 +178,28 @@ pub mod log_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogBuilder<S: BosStr, St: log_state::State> {
+pub struct LogBuilder<St: log_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<S>,
-        Option<Track<S>>,
-        Option<AtUri<S>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<Track<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Log<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LogBuilder<S, log_state::Empty> {
+impl Log<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LogBuilder<log_state::Empty, DefaultStr> {
         LogBuilder::new()
     }
 }
 
-impl<S: BosStr> LogBuilder<S, log_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Log<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LogBuilder<log_state::Empty, S> {
+        LogBuilder::builder()
+    }
+}
+
+impl LogBuilder<log_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LogBuilder {
             _state: PhantomData,
@@ -207,7 +209,18 @@ impl<S: BosStr> LogBuilder<S, log_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LogBuilder<S, St>
+impl<S: BosStr> LogBuilder<log_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LogBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LogBuilder<St, S>
 where
     St: log_state::State,
     St::CreatedAt: log_state::IsUnset,
@@ -216,7 +229,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LogBuilder<S, log_state::SetCreatedAt<St>> {
+    ) -> LogBuilder<log_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
@@ -226,7 +239,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogBuilder<S, St>
+impl<St, S: BosStr> LogBuilder<St, S>
 where
     St: log_state::State,
     St::Ionosphere: log_state::IsUnset,
@@ -235,7 +248,7 @@ where
     pub fn ionosphere(
         mut self,
         value: impl Into<S>,
-    ) -> LogBuilder<S, log_state::SetIonosphere<St>> {
+    ) -> LogBuilder<log_state::SetIonosphere<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
@@ -245,13 +258,16 @@ where
     }
 }
 
-impl<S: BosStr, St> LogBuilder<S, St>
+impl<St, S: BosStr> LogBuilder<St, S>
 where
     St: log_state::State,
     St::Item: log_state::IsUnset,
 {
     /// Set the `item` field (required)
-    pub fn item(mut self, value: impl Into<Track<S>>) -> LogBuilder<S, log_state::SetItem<St>> {
+    pub fn item(
+        mut self,
+        value: impl Into<Track<S>>,
+    ) -> LogBuilder<log_state::SetItem<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
@@ -261,7 +277,7 @@ where
     }
 }
 
-impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
+impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `programme` field (optional)
     pub fn programme(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -274,7 +290,7 @@ impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LogBuilder<S, St>
+impl<St, S: BosStr> LogBuilder<St, S>
 where
     St: log_state::State,
     St::CreatedAt: log_state::IsSet,
@@ -304,10 +320,10 @@ where
 }
 
 fn lexicon_doc_media_ionosphere_log() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("media.ionosphere.log"),
@@ -316,16 +332,20 @@ fn lexicon_doc_media_ionosphere_log() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Represents information about what was played",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Represents information about what was played",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("ionosphere"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("item"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("ionosphere"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("item")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -347,16 +367,18 @@ fn lexicon_doc_media_ionosphere_log() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("item"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    refs: vec![CowStr::new_static("media.ionosphere.defs#track")],
+                                    refs: vec![
+                                        CowStr::new_static("media.ionosphere.defs#track")
+                                    ],
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("programme"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The programme this log is a part of",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The programme this log is a part of"),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

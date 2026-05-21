@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,17 +21,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::at_inlay::Element;
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Element;
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct List<S: BosStr = DefaultStr> {
     ///DID of the service that implements the query.
     pub did: Did<S>,
@@ -44,11 +41,9 @@ pub struct List<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -59,10 +54,7 @@ pub struct ListOutput<S: BosStr = DefaultStr> {
 /// Response shape from a List data source query.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Page<S: BosStr = DefaultStr> {
     ///Opaque pagination token. Absent means no more items.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -84,8 +76,9 @@ impl jacquard_common::xrpc::XrpcResp for ListResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for List<S> {
     const NSID: &'static str = "org.atsui.List";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ListResponse;
 }
 
@@ -93,8 +86,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for List<S> {
 pub struct ListRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListRequest {
     const PATH: &'static str = "/xrpc/org.atsui.List";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = List<S>;
     type Response = ListResponse;
 }
@@ -126,7 +120,7 @@ impl<S: BosStr> LexiconSchema for Page<S> {
 
 pub mod list_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -134,56 +128,63 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Query;
         type Did;
+        type Query;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Query = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `query` field to Set
-    pub struct SetQuery<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetQuery<St> {}
-    impl<St: State> State for SetQuery<St> {
-        type Query = Set<members::query>;
-        type Did = St::Did;
+        type Query = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Query = St::Query;
         type Did = Set<members::did>;
+        type Query = St::Query;
+    }
+    ///State transition - sets the `query` field to Set
+    pub struct SetQuery<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuery<St> {}
+    impl<St: State> State for SetQuery<St> {
+        type Did = St::Did;
+        type Query = Set<members::query>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `query` field
-        pub struct query(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `query` field
+        pub struct query(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListBuilder<S: BosStr, St: list_state::State> {
+pub struct ListBuilder<St: list_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Data<S>>, Option<Nsid<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> List<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListBuilder<S, list_state::Empty> {
+impl List<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListBuilder<list_state::Empty, DefaultStr> {
         ListBuilder::new()
     }
 }
 
-impl<S: BosStr> ListBuilder<S, list_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> List<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListBuilder<list_state::Empty, S> {
+        ListBuilder::builder()
+    }
+}
+
+impl ListBuilder<list_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListBuilder {
             _state: PhantomData,
@@ -193,13 +194,27 @@ impl<S: BosStr> ListBuilder<S, list_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<S: BosStr> ListBuilder<list_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
     St::Did: list_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> ListBuilder<S, list_state::SetDid<St>> {
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> ListBuilder<list_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -209,7 +224,7 @@ where
     }
 }
 
-impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
+impl<St: list_state::State, S: BosStr> ListBuilder<St, S> {
     /// Set the `input` field (optional)
     pub fn input(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -222,13 +237,16 @@ impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
     St::Query: list_state::IsUnset,
 {
     /// Set the `query` field (required)
-    pub fn query(mut self, value: impl Into<Nsid<S>>) -> ListBuilder<S, list_state::SetQuery<St>> {
+    pub fn query(
+        mut self,
+        value: impl Into<Nsid<S>>,
+    ) -> ListBuilder<list_state::SetQuery<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -238,11 +256,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
-    St::Query: list_state::IsSet,
     St::Did: list_state::IsSet,
+    St::Query: list_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> List<S> {
@@ -266,7 +284,7 @@ where
 
 pub mod page_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -297,21 +315,28 @@ pub mod page_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PageBuilder<S: BosStr, St: page_state::State> {
+pub struct PageBuilder<St: page_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<Element<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Page<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PageBuilder<S, page_state::Empty> {
+impl Page<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PageBuilder<page_state::Empty, DefaultStr> {
         PageBuilder::new()
     }
 }
 
-impl<S: BosStr> PageBuilder<S, page_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Page<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PageBuilder<page_state::Empty, S> {
+        PageBuilder::builder()
+    }
+}
+
+impl PageBuilder<page_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PageBuilder {
             _state: PhantomData,
@@ -321,7 +346,18 @@ impl<S: BosStr> PageBuilder<S, page_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: page_state::State> PageBuilder<S, St> {
+impl<S: BosStr> PageBuilder<page_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PageBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: page_state::State, S: BosStr> PageBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -334,7 +370,7 @@ impl<S: BosStr, St: page_state::State> PageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PageBuilder<S, St>
+impl<St, S: BosStr> PageBuilder<St, S>
 where
     St: page_state::State,
     St::Items: page_state::IsUnset,
@@ -343,7 +379,7 @@ where
     pub fn items(
         mut self,
         value: impl Into<Vec<Element<S>>>,
-    ) -> PageBuilder<S, page_state::SetItems<St>> {
+    ) -> PageBuilder<page_state::SetItems<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PageBuilder {
             _state: PhantomData,
@@ -353,7 +389,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PageBuilder<S, St>
+impl<St, S: BosStr> PageBuilder<St, S>
 where
     St: page_state::State,
     St::Items: page_state::IsSet,
@@ -377,10 +413,10 @@ where
 }
 
 fn lexicon_doc_org_atsui_List() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.atsui.List"),
@@ -391,44 +427,49 @@ fn lexicon_doc_org_atsui_List() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![
-                                SmolStr::new_static("query"),
-                                SmolStr::new_static("did"),
-                            ]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("did"),
-                                    LexObjectProperty::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "DID of the service that implements the query.",
-                                        )),
-                                        format: Some(LexStringFormat::Did),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("input"),
-                                    LexObjectProperty::Unknown(LexUnknown {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("query"),
-                                    LexObjectProperty::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "XRPC query to call for pages of items.",
-                                        )),
-                                        format: Some(LexStringFormat::Nsid),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(
+                                    vec![
+                                        SmolStr::new_static("query"), SmolStr::new_static("did")
+                                    ],
+                                ),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("did"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static(
+                                                    "DID of the service that implements the query.",
+                                                ),
+                                            ),
+                                            format: Some(LexStringFormat::Did),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("input"),
+                                        LexObjectProperty::Unknown(LexUnknown {
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("query"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static("XRPC query to call for pages of items."),
+                                            ),
+                                            format: Some(LexStringFormat::Nsid),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -437,9 +478,11 @@ fn lexicon_doc_org_atsui_List() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("page"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Response shape from a List data source query.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Response shape from a List data source query.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("items")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -447,9 +490,11 @@ fn lexicon_doc_org_atsui_List() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("cursor"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Opaque pagination token. Absent means no more items.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Opaque pagination token. Absent means no more items.",
+                                    ),
+                                ),
                                 max_length: Some(512usize),
                                 ..Default::default()
                             }),
@@ -457,9 +502,9 @@ fn lexicon_doc_org_atsui_List() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("items"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Elements to render as list rows.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Elements to render as list rows."),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("at.inlay.defs#element"),
                                     ..Default::default()

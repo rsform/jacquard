@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_showcase::ItemImage;
-use crate::social_showcase::ItemView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, UriValue};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_showcase::ItemImage;
+use crate::social_showcase::ItemView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<S>,
@@ -46,6 +43,7 @@ pub struct UpdateItem<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UpdateItemVisibility<S: BosStr = DefaultStr> {
@@ -123,16 +121,16 @@ where
             UpdateItemVisibility::Public => UpdateItemVisibility::Public,
             UpdateItemVisibility::Unlisted => UpdateItemVisibility::Unlisted,
             UpdateItemVisibility::Private => UpdateItemVisibility::Private,
-            UpdateItemVisibility::Other(v) => UpdateItemVisibility::Other(v.into_static()),
+            UpdateItemVisibility::Other(v) => {
+                UpdateItemVisibility::Other(v.into_static())
+            }
         }
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateItemOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: ItemView<S>,
@@ -151,8 +149,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateItemResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateItem<S> {
     const NSID: &'static str = "social.showcase.library.updateItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateItemResponse;
 }
 
@@ -160,15 +159,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateItem<S> {
 pub struct UpdateItemRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateItemRequest {
     const PATH: &'static str = "/xrpc/social.showcase.library.updateItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateItem<S>;
     type Response = UpdateItemResponse;
 }
 
 pub mod update_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -199,7 +199,7 @@ pub mod update_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateItemBuilder<S: BosStr, St: update_item_state::State> {
+pub struct UpdateItemBuilder<St: update_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -215,15 +215,22 @@ pub struct UpdateItemBuilder<S: BosStr, St: update_item_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UpdateItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UpdateItemBuilder<S, update_item_state::Empty> {
+impl UpdateItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UpdateItemBuilder<update_item_state::Empty, DefaultStr> {
         UpdateItemBuilder::new()
     }
 }
 
-impl<S: BosStr> UpdateItemBuilder<S, update_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UpdateItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UpdateItemBuilder<update_item_state::Empty, S> {
+        UpdateItemBuilder::builder()
+    }
+}
+
+impl UpdateItemBuilder<update_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UpdateItemBuilder {
             _state: PhantomData,
@@ -233,7 +240,18 @@ impl<S: BosStr> UpdateItemBuilder<S, update_item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
+impl<S: BosStr> UpdateItemBuilder<update_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UpdateItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: update_item_state::State, S: BosStr> UpdateItemBuilder<St, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -246,7 +264,7 @@ impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
+impl<St: update_item_state::State, S: BosStr> UpdateItemBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -259,7 +277,7 @@ impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
+impl<St: update_item_state::State, S: BosStr> UpdateItemBuilder<St, S> {
     /// Set the `externalLink` field (optional)
     pub fn external_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -272,7 +290,7 @@ impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
+impl<St: update_item_state::State, S: BosStr> UpdateItemBuilder<St, S> {
     /// Set the `images` field (optional)
     pub fn images(mut self, value: impl Into<Option<Vec<ItemImage<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -285,7 +303,7 @@ impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
+impl<St: update_item_state::State, S: BosStr> UpdateItemBuilder<St, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -298,7 +316,7 @@ impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
+impl<St: update_item_state::State, S: BosStr> UpdateItemBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -311,7 +329,7 @@ impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
+impl<St: update_item_state::State, S: BosStr> UpdateItemBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -324,7 +342,7 @@ impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> UpdateItemBuilder<S, St>
+impl<St, S: BosStr> UpdateItemBuilder<St, S>
 where
     St: update_item_state::State,
     St::Uri: update_item_state::IsUnset,
@@ -333,7 +351,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> UpdateItemBuilder<S, update_item_state::SetUri<St>> {
+    ) -> UpdateItemBuilder<update_item_state::SetUri<St>, S> {
         self._fields.7 = Option::Some(value.into());
         UpdateItemBuilder {
             _state: PhantomData,
@@ -343,9 +361,12 @@ where
     }
 }
 
-impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
+impl<St: update_item_state::State, S: BosStr> UpdateItemBuilder<St, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(mut self, value: impl Into<Option<UpdateItemVisibility<S>>>) -> Self {
+    pub fn visibility(
+        mut self,
+        value: impl Into<Option<UpdateItemVisibility<S>>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
@@ -356,7 +377,7 @@ impl<S: BosStr, St: update_item_state::State> UpdateItemBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> UpdateItemBuilder<S, St>
+impl<St, S: BosStr> UpdateItemBuilder<St, S>
 where
     St: update_item_state::State,
     St::Uri: update_item_state::IsSet,
@@ -377,7 +398,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateItem<S> {
         UpdateItem {
             category: self._fields.0,
             description: self._fields.1,

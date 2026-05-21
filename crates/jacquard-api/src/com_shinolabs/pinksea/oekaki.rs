@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,17 +25,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::com_shinolabs::pinksea::oekaki;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::com_shinolabs::pinksea::oekaki;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Image<S: BosStr = DefaultStr> {
     ///The actual atproto image blob.
     pub blob: BlobRef<S>,
@@ -47,10 +44,7 @@ pub struct Image<S: BosStr = DefaultStr> {
 /// A link to the image, it can be either directly to the PDS or to a CDN.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ImageLink<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -131,16 +125,19 @@ impl<S: BosStr> LexiconSchema for Image<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
@@ -223,7 +220,7 @@ impl<S: BosStr> LexiconSchema for Oekaki<S> {
 
 pub mod image_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -231,56 +228,63 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blob;
         type ImageLink;
+        type Blob;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blob = Unset;
         type ImageLink = Unset;
-    }
-    ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBlob<St> {}
-    impl<St: State> State for SetBlob<St> {
-        type Blob = Set<members::blob>;
-        type ImageLink = St::ImageLink;
+        type Blob = Unset;
     }
     ///State transition - sets the `image_link` field to Set
     pub struct SetImageLink<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetImageLink<St> {}
     impl<St: State> State for SetImageLink<St> {
-        type Blob = St::Blob;
         type ImageLink = Set<members::image_link>;
+        type Blob = St::Blob;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlob<St> {}
+    impl<St: State> State for SetBlob<St> {
+        type ImageLink = St::ImageLink;
+        type Blob = Set<members::blob>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blob` field
-        pub struct blob(());
         ///Marker type for the `image_link` field
         pub struct image_link(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ImageBuilder<S: BosStr, St: image_state::State> {
+pub struct ImageBuilder<St: image_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<oekaki::ImageLink<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Image<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ImageBuilder<S, image_state::Empty> {
+impl Image<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ImageBuilder<image_state::Empty, DefaultStr> {
         ImageBuilder::new()
     }
 }
 
-impl<S: BosStr> ImageBuilder<S, image_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Image<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ImageBuilder<image_state::Empty, S> {
+        ImageBuilder::builder()
+    }
+}
+
+impl ImageBuilder<image_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ImageBuilder {
             _state: PhantomData,
@@ -290,7 +294,18 @@ impl<S: BosStr> ImageBuilder<S, image_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ImageBuilder<S, St>
+impl<S: BosStr> ImageBuilder<image_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ImageBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
     St::Blob: image_state::IsUnset,
@@ -299,7 +314,7 @@ where
     pub fn blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ImageBuilder<S, image_state::SetBlob<St>> {
+    ) -> ImageBuilder<image_state::SetBlob<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
@@ -309,7 +324,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ImageBuilder<S, St>
+impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
     St::ImageLink: image_state::IsUnset,
@@ -318,7 +333,7 @@ where
     pub fn image_link(
         mut self,
         value: impl Into<oekaki::ImageLink<S>>,
-    ) -> ImageBuilder<S, image_state::SetImageLink<St>> {
+    ) -> ImageBuilder<image_state::SetImageLink<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
@@ -328,11 +343,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ImageBuilder<S, St>
+impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
-    St::Blob: image_state::IsSet,
     St::ImageLink: image_state::IsSet,
+    St::Blob: image_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Image<S> {
@@ -353,10 +368,10 @@ where
 }
 
 fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.shinolabs.pinksea.oekaki"),
@@ -365,18 +380,17 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("image"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("blob"),
-                        SmolStr::new_static("imageLink"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("blob"), SmolStr::new_static("imageLink")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("blob"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("imageLink"),
@@ -393,9 +407,11 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("imageLink"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A link to the image, it can be either directly to the PDS or to a CDN.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A link to the image, it can be either directly to the PDS or to a CDN.",
+                        ),
+                    ),
                     required: Some(vec![]),
                     properties: {
                         #[allow(unused_mut)]
@@ -403,9 +419,11 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Alt text description of the image, for accessibility.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Alt text description of the image, for accessibility.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -419,19 +437,21 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     description: Some(CowStr::new_static("An oekaki post.")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("image"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("image"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The timestamp of creation.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The timestamp of creation."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -459,9 +479,9 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tags"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "An array of tags this image had.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("An array of tags this image had."),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(640usize),
                                         ..Default::default()
@@ -485,7 +505,7 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
 
 pub mod oekaki_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -493,42 +513,42 @@ pub mod oekaki_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Image;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Image = St::Image;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetImage<St> {}
     impl<St: State> State for SetImage<St> {
-        type CreatedAt = St::CreatedAt;
         type Image = Set<members::image>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Image = St::Image;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct OekakiBuilder<S: BosStr, St: oekaki_state::State> {
+pub struct OekakiBuilder<St: oekaki_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -540,15 +560,22 @@ pub struct OekakiBuilder<S: BosStr, St: oekaki_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Oekaki<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> OekakiBuilder<S, oekaki_state::Empty> {
+impl Oekaki<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> OekakiBuilder<oekaki_state::Empty, DefaultStr> {
         OekakiBuilder::new()
     }
 }
 
-impl<S: BosStr> OekakiBuilder<S, oekaki_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Oekaki<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> OekakiBuilder<oekaki_state::Empty, S> {
+        OekakiBuilder::builder()
+    }
+}
+
+impl OekakiBuilder<oekaki_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         OekakiBuilder {
             _state: PhantomData,
@@ -558,7 +585,18 @@ impl<S: BosStr> OekakiBuilder<S, oekaki_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> OekakiBuilder<S, St>
+impl<S: BosStr> OekakiBuilder<oekaki_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        OekakiBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> OekakiBuilder<St, S>
 where
     St: oekaki_state::State,
     St::CreatedAt: oekaki_state::IsUnset,
@@ -567,7 +605,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> OekakiBuilder<S, oekaki_state::SetCreatedAt<St>> {
+    ) -> OekakiBuilder<oekaki_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         OekakiBuilder {
             _state: PhantomData,
@@ -577,7 +615,7 @@ where
     }
 }
 
-impl<S: BosStr, St> OekakiBuilder<S, St>
+impl<St, S: BosStr> OekakiBuilder<St, S>
 where
     St: oekaki_state::State,
     St::Image: oekaki_state::IsUnset,
@@ -586,7 +624,7 @@ where
     pub fn image(
         mut self,
         value: impl Into<oekaki::Image<S>>,
-    ) -> OekakiBuilder<S, oekaki_state::SetImage<St>> {
+    ) -> OekakiBuilder<oekaki_state::SetImage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         OekakiBuilder {
             _state: PhantomData,
@@ -596,7 +634,7 @@ where
     }
 }
 
-impl<S: BosStr, St: oekaki_state::State> OekakiBuilder<S, St> {
+impl<St: oekaki_state::State, S: BosStr> OekakiBuilder<St, S> {
     /// Set the `inResponseTo` field (optional)
     pub fn in_response_to(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -609,7 +647,7 @@ impl<S: BosStr, St: oekaki_state::State> OekakiBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: oekaki_state::State> OekakiBuilder<S, St> {
+impl<St: oekaki_state::State, S: BosStr> OekakiBuilder<St, S> {
     /// Set the `nsfw` field (optional)
     pub fn nsfw(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -622,7 +660,7 @@ impl<S: BosStr, St: oekaki_state::State> OekakiBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: oekaki_state::State> OekakiBuilder<S, St> {
+impl<St: oekaki_state::State, S: BosStr> OekakiBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -635,11 +673,11 @@ impl<S: BosStr, St: oekaki_state::State> OekakiBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> OekakiBuilder<S, St>
+impl<St, S: BosStr> OekakiBuilder<St, S>
 where
     St: oekaki_state::State,
-    St::CreatedAt: oekaki_state::IsSet,
     St::Image: oekaki_state::IsSet,
+    St::CreatedAt: oekaki_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Oekaki<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::pub_leaflet::poll::definition;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::pub_leaflet::poll::definition;
 /// Record declaring a poll
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -57,11 +57,9 @@ pub struct DefinitionGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Definition<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DefinitionOption<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<S>,
@@ -180,7 +178,7 @@ impl<S: BosStr> LexiconSchema for DefinitionOption<S> {
 
 pub mod definition_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -188,60 +186,63 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Options;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Options = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Options = St::Options;
+        type Name = Unset;
     }
     ///State transition - sets the `options` field to Set
     pub struct SetOptions<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOptions<St> {}
     impl<St: State> State for SetOptions<St> {
-        type Name = St::Name;
         type Options = Set<members::options>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Options = St::Options;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `options` field
         pub struct options(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DefinitionBuilder<S: BosStr, St: definition_state::State> {
+pub struct DefinitionBuilder<St: definition_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<S>,
-        Option<Vec<definition::DefinitionOption<S>>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<Vec<definition::DefinitionOption<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Definition<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DefinitionBuilder<S, definition_state::Empty> {
+impl Definition<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DefinitionBuilder<definition_state::Empty, DefaultStr> {
         DefinitionBuilder::new()
     }
 }
 
-impl<S: BosStr> DefinitionBuilder<S, definition_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Definition<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DefinitionBuilder<definition_state::Empty, S> {
+        DefinitionBuilder::builder()
+    }
+}
+
+impl DefinitionBuilder<definition_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DefinitionBuilder {
             _state: PhantomData,
@@ -251,7 +252,18 @@ impl<S: BosStr> DefinitionBuilder<S, definition_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: definition_state::State> DefinitionBuilder<S, St> {
+impl<S: BosStr> DefinitionBuilder<definition_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DefinitionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: definition_state::State, S: BosStr> DefinitionBuilder<St, S> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -264,7 +276,7 @@ impl<S: BosStr, St: definition_state::State> DefinitionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DefinitionBuilder<S, St>
+impl<St, S: BosStr> DefinitionBuilder<St, S>
 where
     St: definition_state::State,
     St::Name: definition_state::IsUnset,
@@ -273,7 +285,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> DefinitionBuilder<S, definition_state::SetName<St>> {
+    ) -> DefinitionBuilder<definition_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DefinitionBuilder {
             _state: PhantomData,
@@ -283,7 +295,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DefinitionBuilder<S, St>
+impl<St, S: BosStr> DefinitionBuilder<St, S>
 where
     St: definition_state::State,
     St::Options: definition_state::IsUnset,
@@ -292,7 +304,7 @@ where
     pub fn options(
         mut self,
         value: impl Into<Vec<definition::DefinitionOption<S>>>,
-    ) -> DefinitionBuilder<S, definition_state::SetOptions<St>> {
+    ) -> DefinitionBuilder<definition_state::SetOptions<St>, S> {
         self._fields.2 = Option::Some(value.into());
         DefinitionBuilder {
             _state: PhantomData,
@@ -302,11 +314,11 @@ where
     }
 }
 
-impl<S: BosStr, St> DefinitionBuilder<S, St>
+impl<St, S: BosStr> DefinitionBuilder<St, S>
 where
     St: definition_state::State,
-    St::Name: definition_state::IsSet,
     St::Options: definition_state::IsSet,
+    St::Name: definition_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Definition<S> {
@@ -318,7 +330,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Definition<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Definition<S> {
         Definition {
             end_date: self._fields.0,
             name: self._fields.1.unwrap(),
@@ -329,10 +344,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_poll_definition() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.poll.definition"),
@@ -344,10 +359,11 @@ fn lexicon_doc_pub_leaflet_poll_definition() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("Record declaring a poll")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("options"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"), SmolStr::new_static("options")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

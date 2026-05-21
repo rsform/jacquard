@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,13 +24,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExternalVideo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
@@ -45,11 +42,9 @@ pub struct ExternalVideo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct View<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
@@ -89,16 +84,19 @@ impl<S: BosStr> LexiconSchema for ExternalVideo<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("thumb"),
@@ -151,7 +149,7 @@ impl<S: BosStr> LexiconSchema for View<S> {
 
 pub mod external_video_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -182,27 +180,31 @@ pub mod external_video_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ExternalVideoBuilder<S: BosStr, St: external_video_state::State> {
+pub struct ExternalVideoBuilder<
+    St: external_video_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<S>,
-        Option<BlobRef<S>>,
-        Option<S>,
-        Option<UriValue<S>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<BlobRef<S>>, Option<S>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ExternalVideo<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ExternalVideoBuilder<S, external_video_state::Empty> {
+impl ExternalVideo<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ExternalVideoBuilder<external_video_state::Empty, DefaultStr> {
         ExternalVideoBuilder::new()
     }
 }
 
-impl<S: BosStr> ExternalVideoBuilder<S, external_video_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ExternalVideo<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ExternalVideoBuilder<external_video_state::Empty, S> {
+        ExternalVideoBuilder::builder()
+    }
+}
+
+impl ExternalVideoBuilder<external_video_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ExternalVideoBuilder {
             _state: PhantomData,
@@ -212,7 +214,18 @@ impl<S: BosStr> ExternalVideoBuilder<S, external_video_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: external_video_state::State> ExternalVideoBuilder<S, St> {
+impl<S: BosStr> ExternalVideoBuilder<external_video_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ExternalVideoBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: external_video_state::State, S: BosStr> ExternalVideoBuilder<St, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -225,7 +238,7 @@ impl<S: BosStr, St: external_video_state::State> ExternalVideoBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: external_video_state::State> ExternalVideoBuilder<S, St> {
+impl<St: external_video_state::State, S: BosStr> ExternalVideoBuilder<St, S> {
     /// Set the `service` field (optional)
     pub fn service(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -238,7 +251,7 @@ impl<S: BosStr, St: external_video_state::State> ExternalVideoBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: external_video_state::State> ExternalVideoBuilder<S, St> {
+impl<St: external_video_state::State, S: BosStr> ExternalVideoBuilder<St, S> {
     /// Set the `thumb` field (optional)
     pub fn thumb(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -251,7 +264,7 @@ impl<S: BosStr, St: external_video_state::State> ExternalVideoBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: external_video_state::State> ExternalVideoBuilder<S, St> {
+impl<St: external_video_state::State, S: BosStr> ExternalVideoBuilder<St, S> {
     /// Set the `thumbHash` field (optional)
     pub fn thumb_hash(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -264,7 +277,7 @@ impl<S: BosStr, St: external_video_state::State> ExternalVideoBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ExternalVideoBuilder<S, St>
+impl<St, S: BosStr> ExternalVideoBuilder<St, S>
 where
     St: external_video_state::State,
     St::Uri: external_video_state::IsUnset,
@@ -273,7 +286,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ExternalVideoBuilder<S, external_video_state::SetUri<St>> {
+    ) -> ExternalVideoBuilder<external_video_state::SetUri<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ExternalVideoBuilder {
             _state: PhantomData,
@@ -283,7 +296,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ExternalVideoBuilder<S, St>
+impl<St, S: BosStr> ExternalVideoBuilder<St, S>
 where
     St: external_video_state::State,
     St::Uri: external_video_state::IsSet,
@@ -300,7 +313,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ExternalVideo<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ExternalVideo<S> {
         ExternalVideo {
             id: self._fields.0,
             service: self._fields.1,
@@ -313,10 +329,10 @@ where
 }
 
 fn lexicon_doc_art_cllctv_embed_externalVideo() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("art.cllctv.embed.externalVideo"),
@@ -331,21 +347,15 @@ fn lexicon_doc_art_cllctv_embed_externalVideo() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("service"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("thumb"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("thumbHash"),
@@ -376,15 +386,11 @@ fn lexicon_doc_art_cllctv_embed_externalVideo() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("service"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("thumb"),
@@ -413,7 +419,7 @@ fn lexicon_doc_art_cllctv_embed_externalVideo() -> LexiconDoc<'static> {
 
 pub mod view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -444,26 +450,28 @@ pub mod view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ViewBuilder<S: BosStr, St: view_state::State> {
+pub struct ViewBuilder<St: view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<S>,
-        Option<UriValue<S>>,
-        Option<UriValue<S>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<UriValue<S>>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> View<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ViewBuilder<S, view_state::Empty> {
+impl View<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ViewBuilder<view_state::Empty, DefaultStr> {
         ViewBuilder::new()
     }
 }
 
-impl<S: BosStr> ViewBuilder<S, view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> View<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ViewBuilder<view_state::Empty, S> {
+        ViewBuilder::builder()
+    }
+}
+
+impl ViewBuilder<view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ViewBuilder {
             _state: PhantomData,
@@ -473,7 +481,18 @@ impl<S: BosStr> ViewBuilder<S, view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
+impl<S: BosStr> ViewBuilder<view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: view_state::State, S: BosStr> ViewBuilder<St, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -486,7 +505,7 @@ impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
+impl<St: view_state::State, S: BosStr> ViewBuilder<St, S> {
     /// Set the `service` field (optional)
     pub fn service(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -499,7 +518,7 @@ impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
+impl<St: view_state::State, S: BosStr> ViewBuilder<St, S> {
     /// Set the `thumb` field (optional)
     pub fn thumb(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -512,13 +531,16 @@ impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
     St::Uri: view_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(mut self, value: impl Into<UriValue<S>>) -> ViewBuilder<S, view_state::SetUri<St>> {
+    pub fn uri(
+        mut self,
+        value: impl Into<UriValue<S>>,
+    ) -> ViewBuilder<view_state::SetUri<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ViewBuilder {
             _state: PhantomData,
@@ -528,7 +550,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
     St::Uri: view_state::IsSet,

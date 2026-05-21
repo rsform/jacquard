@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Gate settings for a ROOM post (like threadgate)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -115,7 +115,7 @@ fn _default_room_gate_is_closed() -> Option<bool> {
 
 pub mod room_gate_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -158,21 +158,28 @@ pub mod room_gate_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RoomGateBuilder<S: BosStr, St: room_gate_state::State> {
+pub struct RoomGateBuilder<St: room_gate_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<bool>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RoomGate<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RoomGateBuilder<S, room_gate_state::Empty> {
+impl RoomGate<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RoomGateBuilder<room_gate_state::Empty, DefaultStr> {
         RoomGateBuilder::new()
     }
 }
 
-impl<S: BosStr> RoomGateBuilder<S, room_gate_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RoomGate<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RoomGateBuilder<room_gate_state::Empty, S> {
+        RoomGateBuilder::builder()
+    }
+}
+
+impl RoomGateBuilder<room_gate_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RoomGateBuilder {
             _state: PhantomData,
@@ -182,7 +189,18 @@ impl<S: BosStr> RoomGateBuilder<S, room_gate_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RoomGateBuilder<S, St>
+impl<S: BosStr> RoomGateBuilder<room_gate_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RoomGateBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RoomGateBuilder<St, S>
 where
     St: room_gate_state::State,
     St::CreatedAt: room_gate_state::IsUnset,
@@ -191,7 +209,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RoomGateBuilder<S, room_gate_state::SetCreatedAt<St>> {
+    ) -> RoomGateBuilder<room_gate_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RoomGateBuilder {
             _state: PhantomData,
@@ -201,7 +219,7 @@ where
     }
 }
 
-impl<S: BosStr, St: room_gate_state::State> RoomGateBuilder<S, St> {
+impl<St: room_gate_state::State, S: BosStr> RoomGateBuilder<St, S> {
     /// Set the `isClosed` field (optional)
     pub fn is_closed(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -214,7 +232,7 @@ impl<S: BosStr, St: room_gate_state::State> RoomGateBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RoomGateBuilder<S, St>
+impl<St, S: BosStr> RoomGateBuilder<St, S>
 where
     St: room_gate_state::State,
     St::Room: room_gate_state::IsUnset,
@@ -223,7 +241,7 @@ where
     pub fn room(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> RoomGateBuilder<S, room_gate_state::SetRoom<St>> {
+    ) -> RoomGateBuilder<room_gate_state::SetRoom<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RoomGateBuilder {
             _state: PhantomData,
@@ -233,7 +251,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RoomGateBuilder<S, St>
+impl<St, S: BosStr> RoomGateBuilder<St, S>
 where
     St: room_gate_state::State,
     St::CreatedAt: room_gate_state::IsSet,
@@ -260,10 +278,10 @@ where
 }
 
 fn lexicon_doc_tech_tokimeki_kaku_roomGate() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tech.tokimeki.kaku.roomGate"),
@@ -272,24 +290,28 @@ fn lexicon_doc_tech_tokimeki_kaku_roomGate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Gate settings for a ROOM post (like threadgate)",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Gate settings for a ROOM post (like threadgate)",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("room"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("room"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the gate was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp when the gate was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

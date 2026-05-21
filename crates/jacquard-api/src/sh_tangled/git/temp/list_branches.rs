@@ -10,19 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListBranches<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -33,15 +30,25 @@ pub struct ListBranches<S: BosStr = DefaultStr> {
     pub repo: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListBranchesOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ListBranchesError {
     /// Repository not found or access denied
@@ -52,10 +59,7 @@ pub enum ListBranchesError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ListBranchesError {
@@ -135,7 +139,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_branches_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -166,21 +170,28 @@ pub mod list_branches_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListBranchesBuilder<S: BosStr, St: list_branches_state::State> {
+pub struct ListBranchesBuilder<St: list_branches_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListBranches<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListBranchesBuilder<S, list_branches_state::Empty> {
+impl ListBranches<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListBranchesBuilder<list_branches_state::Empty, DefaultStr> {
         ListBranchesBuilder::new()
     }
 }
 
-impl<S: BosStr> ListBranchesBuilder<S, list_branches_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListBranches<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListBranchesBuilder<list_branches_state::Empty, S> {
+        ListBranchesBuilder::builder()
+    }
+}
+
+impl ListBranchesBuilder<list_branches_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListBranchesBuilder {
             _state: PhantomData,
@@ -190,7 +201,18 @@ impl<S: BosStr> ListBranchesBuilder<S, list_branches_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: list_branches_state::State> ListBranchesBuilder<S, St> {
+impl<S: BosStr> ListBranchesBuilder<list_branches_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListBranchesBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: list_branches_state::State, S: BosStr> ListBranchesBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -203,7 +225,7 @@ impl<S: BosStr, St: list_branches_state::State> ListBranchesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: list_branches_state::State> ListBranchesBuilder<S, St> {
+impl<St: list_branches_state::State, S: BosStr> ListBranchesBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -216,7 +238,7 @@ impl<S: BosStr, St: list_branches_state::State> ListBranchesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListBranchesBuilder<S, St>
+impl<St, S: BosStr> ListBranchesBuilder<St, S>
 where
     St: list_branches_state::State,
     St::Repo: list_branches_state::IsUnset,
@@ -225,7 +247,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ListBranchesBuilder<S, list_branches_state::SetRepo<St>> {
+    ) -> ListBranchesBuilder<list_branches_state::SetRepo<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ListBranchesBuilder {
             _state: PhantomData,
@@ -235,7 +257,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ListBranchesBuilder<S, St>
+impl<St, S: BosStr> ListBranchesBuilder<St, S>
 where
     St: list_branches_state::State,
     St::Repo: list_branches_state::IsSet,

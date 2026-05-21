@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::buzz_bookhive::BookProgress;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::buzz_bookhive::BookProgress;
 /// A book in the user's library
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -69,6 +69,7 @@ pub struct Book<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BookStatus<S: BosStr = DefaultStr> {
@@ -252,20 +253,25 @@ impl<S: BosStr> LexiconSchema for Book<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("cover"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -329,7 +335,7 @@ impl<S: BosStr> LexiconSchema for Book<S> {
 
 pub mod book_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -337,72 +343,72 @@ pub mod book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type HiveId;
         type CreatedAt;
         type Title;
-        type HiveId;
         type Authors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type HiveId = Unset;
         type CreatedAt = Unset;
         type Title = Unset;
-        type HiveId = Unset;
         type Authors = Unset;
+    }
+    ///State transition - sets the `hive_id` field to Set
+    pub struct SetHiveId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHiveId<St> {}
+    impl<St: State> State for SetHiveId<St> {
+        type HiveId = Set<members::hive_id>;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type Authors = St::Authors;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type HiveId = St::HiveId;
         type CreatedAt = Set<members::created_at>;
         type Title = St::Title;
-        type HiveId = St::HiveId;
         type Authors = St::Authors;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
+        type HiveId = St::HiveId;
         type CreatedAt = St::CreatedAt;
         type Title = Set<members::title>;
-        type HiveId = St::HiveId;
-        type Authors = St::Authors;
-    }
-    ///State transition - sets the `hive_id` field to Set
-    pub struct SetHiveId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHiveId<St> {}
-    impl<St: State> State for SetHiveId<St> {
-        type CreatedAt = St::CreatedAt;
-        type Title = St::Title;
-        type HiveId = Set<members::hive_id>;
         type Authors = St::Authors;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthors<St> {}
     impl<St: State> State for SetAuthors<St> {
+        type HiveId = St::HiveId;
         type CreatedAt = St::CreatedAt;
         type Title = St::Title;
-        type HiveId = St::HiveId;
         type Authors = Set<members::authors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `hive_id` field
+        pub struct hive_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `hive_id` field
-        pub struct hive_id(());
         ///Marker type for the `authors` field
         pub struct authors(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BookBuilder<S: BosStr, St: book_state::State> {
+pub struct BookBuilder<St: book_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -420,33 +426,52 @@ pub struct BookBuilder<S: BosStr, St: book_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Book<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BookBuilder<S, book_state::Empty> {
+impl Book<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BookBuilder<book_state::Empty, DefaultStr> {
         BookBuilder::new()
     }
 }
 
-impl<S: BosStr> BookBuilder<S, book_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Book<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BookBuilder<book_state::Empty, S> {
+        BookBuilder::builder()
+    }
+}
+
+impl BookBuilder<book_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BookBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St> BookBuilder<S, St>
+impl<S: BosStr> BookBuilder<book_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BookBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BookBuilder<St, S>
 where
     St: book_state::State,
     St::Authors: book_state::IsUnset,
 {
     /// Set the `authors` field (required)
-    pub fn authors(mut self, value: impl Into<S>) -> BookBuilder<S, book_state::SetAuthors<St>> {
+    pub fn authors(
+        mut self,
+        value: impl Into<S>,
+    ) -> BookBuilder<book_state::SetAuthors<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BookBuilder {
             _state: PhantomData,
@@ -456,7 +481,7 @@ where
     }
 }
 
-impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
+impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `bookProgress` field (optional)
     pub fn book_progress(mut self, value: impl Into<Option<BookProgress<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -469,7 +494,7 @@ impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
+impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `cover` field (optional)
     pub fn cover(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -482,7 +507,7 @@ impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BookBuilder<S, St>
+impl<St, S: BosStr> BookBuilder<St, S>
 where
     St: book_state::State,
     St::CreatedAt: book_state::IsUnset,
@@ -491,7 +516,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BookBuilder<S, book_state::SetCreatedAt<St>> {
+    ) -> BookBuilder<book_state::SetCreatedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         BookBuilder {
             _state: PhantomData,
@@ -501,7 +526,7 @@ where
     }
 }
 
-impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
+impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `finishedAt` field (optional)
     pub fn finished_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -514,13 +539,16 @@ impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BookBuilder<S, St>
+impl<St, S: BosStr> BookBuilder<St, S>
 where
     St: book_state::State,
     St::HiveId: book_state::IsUnset,
 {
     /// Set the `hiveId` field (required)
-    pub fn hive_id(mut self, value: impl Into<S>) -> BookBuilder<S, book_state::SetHiveId<St>> {
+    pub fn hive_id(
+        mut self,
+        value: impl Into<S>,
+    ) -> BookBuilder<book_state::SetHiveId<St>, S> {
         self._fields.5 = Option::Some(value.into());
         BookBuilder {
             _state: PhantomData,
@@ -530,7 +558,7 @@ where
     }
 }
 
-impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
+impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -543,7 +571,7 @@ impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
+impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `stars` field (optional)
     pub fn stars(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.7 = value.into();
@@ -556,7 +584,7 @@ impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
+impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `startedAt` field (optional)
     pub fn started_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.8 = value.into();
@@ -569,7 +597,7 @@ impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
+impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<BookStatus<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -582,13 +610,16 @@ impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BookBuilder<S, St>
+impl<St, S: BosStr> BookBuilder<St, S>
 where
     St: book_state::State,
     St::Title: book_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> BookBuilder<S, book_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> BookBuilder<book_state::SetTitle<St>, S> {
         self._fields.10 = Option::Some(value.into());
         BookBuilder {
             _state: PhantomData,
@@ -598,12 +629,12 @@ where
     }
 }
 
-impl<S: BosStr, St> BookBuilder<S, St>
+impl<St, S: BosStr> BookBuilder<St, S>
 where
     St: book_state::State,
+    St::HiveId: book_state::IsSet,
     St::CreatedAt: book_state::IsSet,
     St::Title: book_state::IsSet,
-    St::HiveId: book_state::IsSet,
     St::Authors: book_state::IsSet,
 {
     /// Build the final struct.
@@ -643,10 +674,10 @@ where
 }
 
 fn lexicon_doc_buzz_bookhive_book() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("buzz.bookhive.book"),

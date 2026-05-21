@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,21 +24,19 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_weaver::edit::cursor;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::edit::cursor;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ContainerId<S: BosStr = DefaultStr> {
     pub value: ContainerIdValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -50,11 +48,9 @@ pub enum ContainerIdValue<S: BosStr = DefaultStr> {
     RootContainerId(Box<cursor::RootContainerId<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CursorSide<S: BosStr = DefaultStr> {
     ///The side of an item the cursor is on (left = -1, right = 1, middle = 0)
     pub value: i64,
@@ -62,11 +58,9 @@ pub struct CursorSide<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Id<S: BosStr = DefaultStr> {
     pub counter: i64,
     pub peer: i64,
@@ -103,11 +97,9 @@ pub struct CursorGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Cursor<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NormalContainerId<S: BosStr = DefaultStr> {
     pub container_type: S,
     pub counter: i64,
@@ -116,11 +108,9 @@ pub struct NormalContainerId<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RootContainerId<S: BosStr = DefaultStr> {
     pub container_type: S,
     pub name: S,
@@ -253,7 +243,7 @@ impl<S: BosStr> LexiconSchema for RootContainerId<S> {
 
 pub mod container_id_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -284,21 +274,28 @@ pub mod container_id_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ContainerIdBuilder<S: BosStr, St: container_id_state::State> {
+pub struct ContainerIdBuilder<St: container_id_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<ContainerIdValue<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ContainerId<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ContainerIdBuilder<S, container_id_state::Empty> {
+impl ContainerId<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ContainerIdBuilder<container_id_state::Empty, DefaultStr> {
         ContainerIdBuilder::new()
     }
 }
 
-impl<S: BosStr> ContainerIdBuilder<S, container_id_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ContainerId<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ContainerIdBuilder<container_id_state::Empty, S> {
+        ContainerIdBuilder::builder()
+    }
+}
+
+impl ContainerIdBuilder<container_id_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ContainerIdBuilder {
             _state: PhantomData,
@@ -308,7 +305,18 @@ impl<S: BosStr> ContainerIdBuilder<S, container_id_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ContainerIdBuilder<S, St>
+impl<S: BosStr> ContainerIdBuilder<container_id_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ContainerIdBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ContainerIdBuilder<St, S>
 where
     St: container_id_state::State,
     St::Value: container_id_state::IsUnset,
@@ -317,7 +325,7 @@ where
     pub fn value(
         mut self,
         value: impl Into<ContainerIdValue<S>>,
-    ) -> ContainerIdBuilder<S, container_id_state::SetValue<St>> {
+    ) -> ContainerIdBuilder<container_id_state::SetValue<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ContainerIdBuilder {
             _state: PhantomData,
@@ -327,7 +335,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ContainerIdBuilder<S, St>
+impl<St, S: BosStr> ContainerIdBuilder<St, S>
 where
     St: container_id_state::State,
     St::Value: container_id_state::IsSet,
@@ -340,7 +348,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ContainerId<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ContainerId<S> {
         ContainerId {
             value: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -349,10 +360,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.edit.cursor"),
@@ -370,7 +381,7 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#normalContainerId"),
-                                    CowStr::new_static("#rootContainerId"),
+                                    CowStr::new_static("#rootContainerId")
                                 ],
                                 ..Default::default()
                             }),
@@ -401,10 +412,9 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("id"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("peer"),
-                        SmolStr::new_static("counter"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("peer"), SmolStr::new_static("counter")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -428,13 +438,16 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("An edit record for a notebook.")),
+                    description: Some(
+                        CowStr::new_static("An edit record for a notebook."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("container"),
-                            SmolStr::new_static("id"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("container"), SmolStr::new_static("id")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -469,19 +482,18 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("normalContainerId"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("peer"),
-                        SmolStr::new_static("counter"),
-                        SmolStr::new_static("container_type"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("peer"), SmolStr::new_static("counter"),
+                            SmolStr::new_static("container_type")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("container_type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("counter"),
@@ -503,24 +515,22 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("rootContainerId"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("container_type"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("container_type")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("container_type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -535,7 +545,7 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
 
 pub mod cursor_side_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -566,21 +576,28 @@ pub mod cursor_side_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CursorSideBuilder<S: BosStr, St: cursor_side_state::State> {
+pub struct CursorSideBuilder<St: cursor_side_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CursorSide<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CursorSideBuilder<S, cursor_side_state::Empty> {
+impl CursorSide<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CursorSideBuilder<cursor_side_state::Empty, DefaultStr> {
         CursorSideBuilder::new()
     }
 }
 
-impl<S: BosStr> CursorSideBuilder<S, cursor_side_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CursorSide<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CursorSideBuilder<cursor_side_state::Empty, S> {
+        CursorSideBuilder::builder()
+    }
+}
+
+impl CursorSideBuilder<cursor_side_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CursorSideBuilder {
             _state: PhantomData,
@@ -590,7 +607,18 @@ impl<S: BosStr> CursorSideBuilder<S, cursor_side_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CursorSideBuilder<S, St>
+impl<S: BosStr> CursorSideBuilder<cursor_side_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CursorSideBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CursorSideBuilder<St, S>
 where
     St: cursor_side_state::State,
     St::Value: cursor_side_state::IsUnset,
@@ -599,7 +627,7 @@ where
     pub fn value(
         mut self,
         value: impl Into<i64>,
-    ) -> CursorSideBuilder<S, cursor_side_state::SetValue<St>> {
+    ) -> CursorSideBuilder<cursor_side_state::SetValue<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CursorSideBuilder {
             _state: PhantomData,
@@ -609,7 +637,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CursorSideBuilder<S, St>
+impl<St, S: BosStr> CursorSideBuilder<St, S>
 where
     St: cursor_side_state::State,
     St::Value: cursor_side_state::IsSet,
@@ -622,7 +650,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CursorSide<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CursorSide<S> {
         CursorSide {
             value: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -632,7 +663,7 @@ where
 
 pub mod id_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -675,21 +706,28 @@ pub mod id_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IdBuilder<S: BosStr, St: id_state::State> {
+pub struct IdBuilder<St: id_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Id<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> IdBuilder<S, id_state::Empty> {
+impl Id<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> IdBuilder<id_state::Empty, DefaultStr> {
         IdBuilder::new()
     }
 }
 
-impl<S: BosStr> IdBuilder<S, id_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Id<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> IdBuilder<id_state::Empty, S> {
+        IdBuilder::builder()
+    }
+}
+
+impl IdBuilder<id_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         IdBuilder {
             _state: PhantomData,
@@ -699,13 +737,27 @@ impl<S: BosStr> IdBuilder<S, id_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> IdBuilder<S, St>
+impl<S: BosStr> IdBuilder<id_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        IdBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> IdBuilder<St, S>
 where
     St: id_state::State,
     St::Counter: id_state::IsUnset,
 {
     /// Set the `counter` field (required)
-    pub fn counter(mut self, value: impl Into<i64>) -> IdBuilder<S, id_state::SetCounter<St>> {
+    pub fn counter(
+        mut self,
+        value: impl Into<i64>,
+    ) -> IdBuilder<id_state::SetCounter<St>, S> {
         self._fields.0 = Option::Some(value.into());
         IdBuilder {
             _state: PhantomData,
@@ -715,13 +767,13 @@ where
     }
 }
 
-impl<S: BosStr, St> IdBuilder<S, St>
+impl<St, S: BosStr> IdBuilder<St, S>
 where
     St: id_state::State,
     St::Peer: id_state::IsUnset,
 {
     /// Set the `peer` field (required)
-    pub fn peer(mut self, value: impl Into<i64>) -> IdBuilder<S, id_state::SetPeer<St>> {
+    pub fn peer(mut self, value: impl Into<i64>) -> IdBuilder<id_state::SetPeer<St>, S> {
         self._fields.1 = Option::Some(value.into());
         IdBuilder {
             _state: PhantomData,
@@ -731,7 +783,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IdBuilder<S, St>
+impl<St, S: BosStr> IdBuilder<St, S>
 where
     St: id_state::State,
     St::Peer: id_state::IsSet,
@@ -757,7 +809,7 @@ where
 
 pub mod cursor_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -800,7 +852,7 @@ pub mod cursor_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CursorBuilder<S: BosStr, St: cursor_state::State> {
+pub struct CursorBuilder<St: cursor_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<cursor::ContainerId<S>>,
@@ -810,15 +862,22 @@ pub struct CursorBuilder<S: BosStr, St: cursor_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Cursor<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CursorBuilder<S, cursor_state::Empty> {
+impl Cursor<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CursorBuilder<cursor_state::Empty, DefaultStr> {
         CursorBuilder::new()
     }
 }
 
-impl<S: BosStr> CursorBuilder<S, cursor_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Cursor<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CursorBuilder<cursor_state::Empty, S> {
+        CursorBuilder::builder()
+    }
+}
+
+impl CursorBuilder<cursor_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CursorBuilder {
             _state: PhantomData,
@@ -828,7 +887,18 @@ impl<S: BosStr> CursorBuilder<S, cursor_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CursorBuilder<S, St>
+impl<S: BosStr> CursorBuilder<cursor_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CursorBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CursorBuilder<St, S>
 where
     St: cursor_state::State,
     St::Container: cursor_state::IsUnset,
@@ -837,7 +907,7 @@ where
     pub fn container(
         mut self,
         value: impl Into<cursor::ContainerId<S>>,
-    ) -> CursorBuilder<S, cursor_state::SetContainer<St>> {
+    ) -> CursorBuilder<cursor_state::SetContainer<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CursorBuilder {
             _state: PhantomData,
@@ -847,7 +917,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CursorBuilder<S, St>
+impl<St, S: BosStr> CursorBuilder<St, S>
 where
     St: cursor_state::State,
     St::Id: cursor_state::IsUnset,
@@ -856,7 +926,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<cursor::Id<S>>,
-    ) -> CursorBuilder<S, cursor_state::SetId<St>> {
+    ) -> CursorBuilder<cursor_state::SetId<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CursorBuilder {
             _state: PhantomData,
@@ -866,7 +936,7 @@ where
     }
 }
 
-impl<S: BosStr, St: cursor_state::State> CursorBuilder<S, St> {
+impl<St: cursor_state::State, S: BosStr> CursorBuilder<St, S> {
     /// Set the `side` field (optional)
     pub fn side(mut self, value: impl Into<Option<cursor::CursorSide<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -879,7 +949,7 @@ impl<S: BosStr, St: cursor_state::State> CursorBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CursorBuilder<S, St>
+impl<St, S: BosStr> CursorBuilder<St, S>
 where
     St: cursor_state::State,
     St::Container: cursor_state::IsSet,
@@ -907,7 +977,7 @@ where
 
 pub mod normal_container_id_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -915,70 +985,83 @@ pub mod normal_container_id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ContainerType;
         type Counter;
+        type ContainerType;
         type Peer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ContainerType = Unset;
         type Counter = Unset;
+        type ContainerType = Unset;
         type Peer = Unset;
-    }
-    ///State transition - sets the `container_type` field to Set
-    pub struct SetContainerType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContainerType<St> {}
-    impl<St: State> State for SetContainerType<St> {
-        type ContainerType = Set<members::container_type>;
-        type Counter = St::Counter;
-        type Peer = St::Peer;
     }
     ///State transition - sets the `counter` field to Set
     pub struct SetCounter<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCounter<St> {}
     impl<St: State> State for SetCounter<St> {
-        type ContainerType = St::ContainerType;
         type Counter = Set<members::counter>;
+        type ContainerType = St::ContainerType;
+        type Peer = St::Peer;
+    }
+    ///State transition - sets the `container_type` field to Set
+    pub struct SetContainerType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContainerType<St> {}
+    impl<St: State> State for SetContainerType<St> {
+        type Counter = St::Counter;
+        type ContainerType = Set<members::container_type>;
         type Peer = St::Peer;
     }
     ///State transition - sets the `peer` field to Set
     pub struct SetPeer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPeer<St> {}
     impl<St: State> State for SetPeer<St> {
-        type ContainerType = St::ContainerType;
         type Counter = St::Counter;
+        type ContainerType = St::ContainerType;
         type Peer = Set<members::peer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `container_type` field
-        pub struct container_type(());
         ///Marker type for the `counter` field
         pub struct counter(());
+        ///Marker type for the `container_type` field
+        pub struct container_type(());
         ///Marker type for the `peer` field
         pub struct peer(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NormalContainerIdBuilder<S: BosStr, St: normal_container_id_state::State> {
+pub struct NormalContainerIdBuilder<
+    St: normal_container_id_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> NormalContainerId<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> NormalContainerIdBuilder<S, normal_container_id_state::Empty> {
+impl NormalContainerId<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> NormalContainerIdBuilder<
+        normal_container_id_state::Empty,
+        DefaultStr,
+    > {
         NormalContainerIdBuilder::new()
     }
 }
 
-impl<S: BosStr> NormalContainerIdBuilder<S, normal_container_id_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> NormalContainerId<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> NormalContainerIdBuilder<normal_container_id_state::Empty, S> {
+        NormalContainerIdBuilder::builder()
+    }
+}
+
+impl NormalContainerIdBuilder<normal_container_id_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         NormalContainerIdBuilder {
             _state: PhantomData,
@@ -988,7 +1071,18 @@ impl<S: BosStr> NormalContainerIdBuilder<S, normal_container_id_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> NormalContainerIdBuilder<S, St>
+impl<S: BosStr> NormalContainerIdBuilder<normal_container_id_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        NormalContainerIdBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> NormalContainerIdBuilder<St, S>
 where
     St: normal_container_id_state::State,
     St::ContainerType: normal_container_id_state::IsUnset,
@@ -997,7 +1091,7 @@ where
     pub fn container_type(
         mut self,
         value: impl Into<S>,
-    ) -> NormalContainerIdBuilder<S, normal_container_id_state::SetContainerType<St>> {
+    ) -> NormalContainerIdBuilder<normal_container_id_state::SetContainerType<St>, S> {
         self._fields.0 = Option::Some(value.into());
         NormalContainerIdBuilder {
             _state: PhantomData,
@@ -1007,7 +1101,7 @@ where
     }
 }
 
-impl<S: BosStr, St> NormalContainerIdBuilder<S, St>
+impl<St, S: BosStr> NormalContainerIdBuilder<St, S>
 where
     St: normal_container_id_state::State,
     St::Counter: normal_container_id_state::IsUnset,
@@ -1016,7 +1110,7 @@ where
     pub fn counter(
         mut self,
         value: impl Into<i64>,
-    ) -> NormalContainerIdBuilder<S, normal_container_id_state::SetCounter<St>> {
+    ) -> NormalContainerIdBuilder<normal_container_id_state::SetCounter<St>, S> {
         self._fields.1 = Option::Some(value.into());
         NormalContainerIdBuilder {
             _state: PhantomData,
@@ -1026,7 +1120,7 @@ where
     }
 }
 
-impl<S: BosStr, St> NormalContainerIdBuilder<S, St>
+impl<St, S: BosStr> NormalContainerIdBuilder<St, S>
 where
     St: normal_container_id_state::State,
     St::Peer: normal_container_id_state::IsUnset,
@@ -1035,7 +1129,7 @@ where
     pub fn peer(
         mut self,
         value: impl Into<i64>,
-    ) -> NormalContainerIdBuilder<S, normal_container_id_state::SetPeer<St>> {
+    ) -> NormalContainerIdBuilder<normal_container_id_state::SetPeer<St>, S> {
         self._fields.2 = Option::Some(value.into());
         NormalContainerIdBuilder {
             _state: PhantomData,
@@ -1045,11 +1139,11 @@ where
     }
 }
 
-impl<S: BosStr, St> NormalContainerIdBuilder<S, St>
+impl<St, S: BosStr> NormalContainerIdBuilder<St, S>
 where
     St: normal_container_id_state::State,
-    St::ContainerType: normal_container_id_state::IsSet,
     St::Counter: normal_container_id_state::IsSet,
+    St::ContainerType: normal_container_id_state::IsSet,
     St::Peer: normal_container_id_state::IsSet,
 {
     /// Build the final struct.
@@ -1062,7 +1156,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NormalContainerId<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> NormalContainerId<S> {
         NormalContainerId {
             container_type: self._fields.0.unwrap(),
             counter: self._fields.1.unwrap(),

@@ -20,20 +20,17 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::pub_leaflet::blocks::header::Header;
 use crate::pub_leaflet::blocks::image::Image;
 use crate::pub_leaflet::blocks::ordered_list::OrderedList;
 use crate::pub_leaflet::blocks::text::Text;
 use crate::pub_leaflet::blocks::unordered_list;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListItem<S: BosStr = DefaultStr> {
     ///Nested unordered list items. Mutually exclusive with orderedListChildren; if both are present, children takes precedence.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -45,6 +42,7 @@ pub struct ListItem<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -58,11 +56,9 @@ pub enum ListItemContent<S: BosStr = DefaultStr> {
     Image(Box<Image<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UnorderedList<S: BosStr = DefaultStr> {
     pub children: Vec<unordered_list::ListItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -101,7 +97,7 @@ impl<S: BosStr> LexiconSchema for UnorderedList<S> {
 
 pub mod list_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -132,7 +128,7 @@ pub mod list_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListItemBuilder<S: BosStr, St: list_item_state::State> {
+pub struct ListItemBuilder<St: list_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<unordered_list::ListItem<S>>>,
@@ -142,15 +138,22 @@ pub struct ListItemBuilder<S: BosStr, St: list_item_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListItemBuilder<S, list_item_state::Empty> {
+impl ListItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListItemBuilder<list_item_state::Empty, DefaultStr> {
         ListItemBuilder::new()
     }
 }
 
-impl<S: BosStr> ListItemBuilder<S, list_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListItemBuilder<list_item_state::Empty, S> {
+        ListItemBuilder::builder()
+    }
+}
+
+impl ListItemBuilder<list_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListItemBuilder {
             _state: PhantomData,
@@ -160,20 +163,37 @@ impl<S: BosStr> ListItemBuilder<S, list_item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: list_item_state::State> ListItemBuilder<S, St> {
+impl<S: BosStr> ListItemBuilder<list_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: list_item_state::State, S: BosStr> ListItemBuilder<St, S> {
     /// Set the `children` field (optional)
-    pub fn children(mut self, value: impl Into<Option<Vec<unordered_list::ListItem<S>>>>) -> Self {
+    pub fn children(
+        mut self,
+        value: impl Into<Option<Vec<unordered_list::ListItem<S>>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `children` field to an Option value (optional)
-    pub fn maybe_children(mut self, value: Option<Vec<unordered_list::ListItem<S>>>) -> Self {
+    pub fn maybe_children(
+        mut self,
+        value: Option<Vec<unordered_list::ListItem<S>>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
 }
 
-impl<S: BosStr, St> ListItemBuilder<S, St>
+impl<St, S: BosStr> ListItemBuilder<St, S>
 where
     St: list_item_state::State,
     St::Content: list_item_state::IsUnset,
@@ -182,7 +202,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<ListItemContent<S>>,
-    ) -> ListItemBuilder<S, list_item_state::SetContent<St>> {
+    ) -> ListItemBuilder<list_item_state::SetContent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ListItemBuilder {
             _state: PhantomData,
@@ -192,9 +212,12 @@ where
     }
 }
 
-impl<S: BosStr, St: list_item_state::State> ListItemBuilder<S, St> {
+impl<St: list_item_state::State, S: BosStr> ListItemBuilder<St, S> {
     /// Set the `orderedListChildren` field (optional)
-    pub fn ordered_list_children(mut self, value: impl Into<Option<OrderedList<S>>>) -> Self {
+    pub fn ordered_list_children(
+        mut self,
+        value: impl Into<Option<OrderedList<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -205,7 +228,7 @@ impl<S: BosStr, St: list_item_state::State> ListItemBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListItemBuilder<S, St>
+impl<St, S: BosStr> ListItemBuilder<St, S>
 where
     St: list_item_state::State,
     St::Content: list_item_state::IsSet,
@@ -231,10 +254,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_blocks_unorderedList() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.blocks.unorderedList"),
@@ -315,7 +338,7 @@ fn lexicon_doc_pub_leaflet_blocks_unorderedList() -> LexiconDoc<'static> {
 
 pub mod unordered_list_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -346,21 +369,31 @@ pub mod unordered_list_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UnorderedListBuilder<S: BosStr, St: unordered_list_state::State> {
+pub struct UnorderedListBuilder<
+    St: unordered_list_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<unordered_list::ListItem<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UnorderedList<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UnorderedListBuilder<S, unordered_list_state::Empty> {
+impl UnorderedList<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UnorderedListBuilder<unordered_list_state::Empty, DefaultStr> {
         UnorderedListBuilder::new()
     }
 }
 
-impl<S: BosStr> UnorderedListBuilder<S, unordered_list_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UnorderedList<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UnorderedListBuilder<unordered_list_state::Empty, S> {
+        UnorderedListBuilder::builder()
+    }
+}
+
+impl UnorderedListBuilder<unordered_list_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UnorderedListBuilder {
             _state: PhantomData,
@@ -370,7 +403,18 @@ impl<S: BosStr> UnorderedListBuilder<S, unordered_list_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> UnorderedListBuilder<S, St>
+impl<S: BosStr> UnorderedListBuilder<unordered_list_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UnorderedListBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> UnorderedListBuilder<St, S>
 where
     St: unordered_list_state::State,
     St::Children: unordered_list_state::IsUnset,
@@ -379,7 +423,7 @@ where
     pub fn children(
         mut self,
         value: impl Into<Vec<unordered_list::ListItem<S>>>,
-    ) -> UnorderedListBuilder<S, unordered_list_state::SetChildren<St>> {
+    ) -> UnorderedListBuilder<unordered_list_state::SetChildren<St>, S> {
         self._fields.0 = Option::Some(value.into());
         UnorderedListBuilder {
             _state: PhantomData,
@@ -389,7 +433,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UnorderedListBuilder<S, St>
+impl<St, S: BosStr> UnorderedListBuilder<St, S>
 where
     St: unordered_list_state::State,
     St::Children: unordered_list_state::IsSet,
@@ -402,7 +446,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UnorderedList<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UnorderedList<S> {
         UnorderedList {
             children: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

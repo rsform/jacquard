@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Signals that a participant has finished contributing to answers for this quiz
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -107,7 +107,7 @@ impl<S: BosStr> LexiconSchema for QuizDone<S> {
 
 pub mod quiz_done_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -115,56 +115,63 @@ pub mod quiz_done_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type QuizBegin;
         type Timestamp;
+        type QuizBegin;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type QuizBegin = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `quiz_begin` field to Set
-    pub struct SetQuizBegin<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetQuizBegin<St> {}
-    impl<St: State> State for SetQuizBegin<St> {
-        type QuizBegin = Set<members::quiz_begin>;
-        type Timestamp = St::Timestamp;
+        type QuizBegin = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTimestamp<St> {}
     impl<St: State> State for SetTimestamp<St> {
-        type QuizBegin = St::QuizBegin;
         type Timestamp = Set<members::timestamp>;
+        type QuizBegin = St::QuizBegin;
+    }
+    ///State transition - sets the `quiz_begin` field to Set
+    pub struct SetQuizBegin<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuizBegin<St> {}
+    impl<St: State> State for SetQuizBegin<St> {
+        type Timestamp = St::Timestamp;
+        type QuizBegin = Set<members::quiz_begin>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quiz_begin` field
-        pub struct quiz_begin(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `quiz_begin` field
+        pub struct quiz_begin(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct QuizDoneBuilder<S: BosStr, St: quiz_done_state::State> {
+pub struct QuizDoneBuilder<St: quiz_done_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> QuizDone<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> QuizDoneBuilder<S, quiz_done_state::Empty> {
+impl QuizDone<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> QuizDoneBuilder<quiz_done_state::Empty, DefaultStr> {
         QuizDoneBuilder::new()
     }
 }
 
-impl<S: BosStr> QuizDoneBuilder<S, quiz_done_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> QuizDone<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> QuizDoneBuilder<quiz_done_state::Empty, S> {
+        QuizDoneBuilder::builder()
+    }
+}
+
+impl QuizDoneBuilder<quiz_done_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         QuizDoneBuilder {
             _state: PhantomData,
@@ -174,7 +181,18 @@ impl<S: BosStr> QuizDoneBuilder<S, quiz_done_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> QuizDoneBuilder<S, St>
+impl<S: BosStr> QuizDoneBuilder<quiz_done_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        QuizDoneBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> QuizDoneBuilder<St, S>
 where
     St: quiz_done_state::State,
     St::QuizBegin: quiz_done_state::IsUnset,
@@ -183,7 +201,7 @@ where
     pub fn quiz_begin(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> QuizDoneBuilder<S, quiz_done_state::SetQuizBegin<St>> {
+    ) -> QuizDoneBuilder<quiz_done_state::SetQuizBegin<St>, S> {
         self._fields.0 = Option::Some(value.into());
         QuizDoneBuilder {
             _state: PhantomData,
@@ -193,7 +211,7 @@ where
     }
 }
 
-impl<S: BosStr, St> QuizDoneBuilder<S, St>
+impl<St, S: BosStr> QuizDoneBuilder<St, S>
 where
     St: quiz_done_state::State,
     St::Timestamp: quiz_done_state::IsUnset,
@@ -202,7 +220,7 @@ where
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> QuizDoneBuilder<S, quiz_done_state::SetTimestamp<St>> {
+    ) -> QuizDoneBuilder<quiz_done_state::SetTimestamp<St>, S> {
         self._fields.1 = Option::Some(value.into());
         QuizDoneBuilder {
             _state: PhantomData,
@@ -212,11 +230,11 @@ where
     }
 }
 
-impl<S: BosStr, St> QuizDoneBuilder<S, St>
+impl<St, S: BosStr> QuizDoneBuilder<St, S>
 where
     St: quiz_done_state::State,
-    St::QuizBegin: quiz_done_state::IsSet,
     St::Timestamp: quiz_done_state::IsSet,
+    St::QuizBegin: quiz_done_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> QuizDone<S> {
@@ -237,10 +255,10 @@ where
 }
 
 fn lexicon_doc_pub_quizzy_quizDone() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.quizzy.quizDone"),

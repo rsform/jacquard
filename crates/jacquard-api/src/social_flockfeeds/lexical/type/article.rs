@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,22 +24,19 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::event;
 use crate::social_flockfeeds::lexical::r#type::image_object;
 use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// An article, such as a news article or piece of investigative report. Newspapers and magazines have articles of many different types and this is intended to cover them all.\n\nSee also [blog post](https://blog.schema.org/2014/09/02/schema-org-support-for-bibliographic-relationships-and-periodicals/).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub about: Option<EmbeddedAbout<S>>,
@@ -313,6 +310,7 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -365,6 +363,7 @@ pub enum EmbeddedAccountablePerson<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -436,6 +435,7 @@ pub enum EmbeddedAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -458,6 +458,7 @@ pub enum EmbeddedCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -504,6 +505,7 @@ pub enum EmbeddedContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -513,6 +515,7 @@ pub enum EmbeddedCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -548,6 +551,7 @@ pub enum EmbeddedCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -601,6 +605,7 @@ pub enum EmbeddedEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -657,6 +662,7 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -689,6 +695,7 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -723,6 +730,7 @@ pub enum EmbeddedIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -730,6 +738,7 @@ pub enum EmbeddedIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -781,6 +790,7 @@ pub enum EmbeddedMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -788,6 +798,7 @@ pub enum EmbeddedMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -811,6 +822,7 @@ pub enum EmbeddedOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -852,6 +864,7 @@ pub enum EmbeddedProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -861,6 +874,7 @@ pub enum EmbeddedProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -877,6 +891,7 @@ pub enum EmbeddedPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -884,6 +899,7 @@ pub enum EmbeddedPublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -897,6 +913,7 @@ pub enum EmbeddedRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -943,6 +960,7 @@ pub enum EmbeddedSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -955,6 +973,7 @@ pub enum EmbeddedSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -981,6 +1000,7 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -988,6 +1008,7 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1017,6 +1038,7 @@ pub enum EmbeddedThumbnail<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1041,6 +1063,7 @@ pub enum EmbeddedTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1362,6 +1385,7 @@ pub struct Article<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1414,6 +1438,7 @@ pub enum ArticleAccountablePerson<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1485,6 +1510,7 @@ pub enum ArticleAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1507,6 +1533,7 @@ pub enum ArticleCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1553,6 +1580,7 @@ pub enum ArticleContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1562,6 +1590,7 @@ pub enum ArticleCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1597,6 +1626,7 @@ pub enum ArticleCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1650,6 +1680,7 @@ pub enum ArticleEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1706,6 +1737,7 @@ pub enum ArticleFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1738,6 +1770,7 @@ pub enum ArticleImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1772,6 +1805,7 @@ pub enum ArticleIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1779,6 +1813,7 @@ pub enum ArticleIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1830,6 +1865,7 @@ pub enum ArticleMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1837,6 +1873,7 @@ pub enum ArticleMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1860,6 +1897,7 @@ pub enum ArticleOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1901,6 +1939,7 @@ pub enum ArticleProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1910,6 +1949,7 @@ pub enum ArticleProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1926,6 +1966,7 @@ pub enum ArticlePublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1933,6 +1974,7 @@ pub enum ArticlePublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1946,6 +1988,7 @@ pub enum ArticleRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1992,6 +2035,7 @@ pub enum ArticleSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2004,6 +2048,7 @@ pub enum ArticleSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2030,6 +2075,7 @@ pub enum ArticleSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2037,6 +2083,7 @@ pub enum ArticleSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2066,6 +2113,7 @@ pub enum ArticleThumbnail<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2090,6 +2138,7 @@ pub enum ArticleTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2205,10 +2254,10 @@ impl<S: BosStr> LexiconSchema for Article<S> {
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_Article() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.Article"),
@@ -5042,7 +5091,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Article() -> LexiconDoc<'static> {
 
 pub mod article_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5060,7 +5109,7 @@ pub mod article_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ArticleBuilder<S: BosStr, St: article_state::State> {
+pub struct ArticleBuilder<St: article_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ArticleAbout<S>>,
@@ -5201,36 +5250,313 @@ pub struct ArticleBuilder<S: BosStr, St: article_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Article<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ArticleBuilder<S, article_state::Empty> {
+impl Article<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ArticleBuilder<article_state::Empty, DefaultStr> {
         ArticleBuilder::new()
     }
 }
 
-impl<S: BosStr> ArticleBuilder<S, article_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Article<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ArticleBuilder<article_state::Empty, S> {
+        ArticleBuilder::builder()
+    }
+}
+
+impl ArticleBuilder<article_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ArticleBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<S: BosStr> ArticleBuilder<article_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ArticleBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `about` field (optional)
     pub fn about(mut self, value: impl Into<Option<ArticleAbout<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -5243,7 +5569,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `abstract` field (optional)
     pub fn r#abstract(mut self, value: impl Into<Option<ArticleAbstract<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -5256,9 +5582,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `accessMode` field (optional)
-    pub fn access_mode(mut self, value: impl Into<Option<ArticleAccessMode<S>>>) -> Self {
+    pub fn access_mode(
+        mut self,
+        value: impl Into<Option<ArticleAccessMode<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -5269,7 +5598,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `accessModeSufficient` field (optional)
     pub fn access_mode_sufficient(
         mut self,
@@ -5288,7 +5617,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `accessibilityAPI` field (optional)
     pub fn accessibility_api(
         mut self,
@@ -5298,13 +5627,16 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
         self
     }
     /// Set the `accessibilityAPI` field to an Option value (optional)
-    pub fn maybe_accessibility_api(mut self, value: Option<ArticleAccessibilityApi<S>>) -> Self {
+    pub fn maybe_accessibility_api(
+        mut self,
+        value: Option<ArticleAccessibilityApi<S>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `accessibilityControl` field (optional)
     pub fn accessibility_control(
         mut self,
@@ -5323,7 +5655,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `accessibilityFeature` field (optional)
     pub fn accessibility_feature(
         mut self,
@@ -5342,7 +5674,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `accessibilityHazard` field (optional)
     pub fn accessibility_hazard(
         mut self,
@@ -5361,7 +5693,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `accessibilitySummary` field (optional)
     pub fn accessibility_summary(
         mut self,
@@ -5380,7 +5712,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `accountablePerson` field (optional)
     pub fn accountable_person(
         mut self,
@@ -5390,13 +5722,16 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
         self
     }
     /// Set the `accountablePerson` field to an Option value (optional)
-    pub fn maybe_accountable_person(mut self, value: Option<ArticleAccountablePerson<S>>) -> Self {
+    pub fn maybe_accountable_person(
+        mut self,
+        value: Option<ArticleAccountablePerson<S>>,
+    ) -> Self {
         self._fields.9 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `acquireLicensePage` field (optional)
     pub fn acquire_license_page(
         mut self,
@@ -5415,46 +5750,64 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `additionalType` field (optional)
-    pub fn additional_type(mut self, value: impl Into<Option<ArticleAdditionalType<S>>>) -> Self {
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<ArticleAdditionalType<S>>>,
+    ) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(mut self, value: Option<ArticleAdditionalType<S>>) -> Self {
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<ArticleAdditionalType<S>>,
+    ) -> Self {
         self._fields.11 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `aggregateRating` field (optional)
-    pub fn aggregate_rating(mut self, value: impl Into<Option<ArticleAggregateRating<S>>>) -> Self {
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<ArticleAggregateRating<S>>>,
+    ) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(mut self, value: Option<ArticleAggregateRating<S>>) -> Self {
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<ArticleAggregateRating<S>>,
+    ) -> Self {
         self._fields.12 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(mut self, value: impl Into<Option<ArticleAlternateName<S>>>) -> Self {
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<ArticleAlternateName<S>>>,
+    ) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(mut self, value: Option<ArticleAlternateName<S>>) -> Self {
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<ArticleAlternateName<S>>,
+    ) -> Self {
         self._fields.13 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `alternativeHeadline` field (optional)
     pub fn alternative_headline(
         mut self,
@@ -5473,9 +5826,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `archivedAt` field (optional)
-    pub fn archived_at(mut self, value: impl Into<Option<ArticleArchivedAt<S>>>) -> Self {
+    pub fn archived_at(
+        mut self,
+        value: impl Into<Option<ArticleArchivedAt<S>>>,
+    ) -> Self {
         self._fields.15 = value.into();
         self
     }
@@ -5486,9 +5842,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `articleBody` field (optional)
-    pub fn article_body(mut self, value: impl Into<Option<ArticleArticleBody<S>>>) -> Self {
+    pub fn article_body(
+        mut self,
+        value: impl Into<Option<ArticleArticleBody<S>>>,
+    ) -> Self {
         self._fields.16 = value.into();
         self
     }
@@ -5499,20 +5858,26 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `articleSection` field (optional)
-    pub fn article_section(mut self, value: impl Into<Option<ArticleArticleSection<S>>>) -> Self {
+    pub fn article_section(
+        mut self,
+        value: impl Into<Option<ArticleArticleSection<S>>>,
+    ) -> Self {
         self._fields.17 = value.into();
         self
     }
     /// Set the `articleSection` field to an Option value (optional)
-    pub fn maybe_article_section(mut self, value: Option<ArticleArticleSection<S>>) -> Self {
+    pub fn maybe_article_section(
+        mut self,
+        value: Option<ArticleArticleSection<S>>,
+    ) -> Self {
         self._fields.17 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `assesses` field (optional)
     pub fn assesses(mut self, value: impl Into<Option<ArticleAssesses<S>>>) -> Self {
         self._fields.18 = value.into();
@@ -5525,20 +5890,26 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `associatedMedia` field (optional)
-    pub fn associated_media(mut self, value: impl Into<Option<ArticleAssociatedMedia<S>>>) -> Self {
+    pub fn associated_media(
+        mut self,
+        value: impl Into<Option<ArticleAssociatedMedia<S>>>,
+    ) -> Self {
         self._fields.19 = value.into();
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
-    pub fn maybe_associated_media(mut self, value: Option<ArticleAssociatedMedia<S>>) -> Self {
+    pub fn maybe_associated_media(
+        mut self,
+        value: Option<ArticleAssociatedMedia<S>>,
+    ) -> Self {
         self._fields.19 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `audience` field (optional)
     pub fn audience(mut self, value: impl Into<Option<ArticleAudience<S>>>) -> Self {
         self._fields.20 = value.into();
@@ -5551,7 +5922,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `audio` field (optional)
     pub fn audio(mut self, value: impl Into<Option<ArticleAudio<S>>>) -> Self {
         self._fields.21 = value.into();
@@ -5564,7 +5935,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<ArticleAuthor<S>>>) -> Self {
         self._fields.22 = value.into();
@@ -5577,7 +5948,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<ArticleAward<S>>>) -> Self {
         self._fields.23 = value.into();
@@ -5590,7 +5961,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<ArticleAwards<S>>>) -> Self {
         self._fields.24 = value.into();
@@ -5603,7 +5974,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `backstory` field (optional)
     pub fn backstory(mut self, value: impl Into<Option<ArticleBackstory<S>>>) -> Self {
         self._fields.25 = value.into();
@@ -5616,7 +5987,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `character` field (optional)
     pub fn character(mut self, value: impl Into<Option<ArticleCharacter<S>>>) -> Self {
         self._fields.26 = value.into();
@@ -5629,7 +6000,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `citation` field (optional)
     pub fn citation(mut self, value: impl Into<Option<ArticleCitation<S>>>) -> Self {
         self._fields.27 = value.into();
@@ -5642,7 +6013,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<ArticleComment<S>>>) -> Self {
         self._fields.28 = value.into();
@@ -5655,9 +6026,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `commentCount` field (optional)
-    pub fn comment_count(mut self, value: impl Into<Option<ArticleCommentCount<S>>>) -> Self {
+    pub fn comment_count(
+        mut self,
+        value: impl Into<Option<ArticleCommentCount<S>>>,
+    ) -> Self {
         self._fields.29 = value.into();
         self
     }
@@ -5668,7 +6042,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `conditionsOfAccess` field (optional)
     pub fn conditions_of_access(
         mut self,
@@ -5687,33 +6061,45 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `contentLocation` field (optional)
-    pub fn content_location(mut self, value: impl Into<Option<ArticleContentLocation<S>>>) -> Self {
+    pub fn content_location(
+        mut self,
+        value: impl Into<Option<ArticleContentLocation<S>>>,
+    ) -> Self {
         self._fields.31 = value.into();
         self
     }
     /// Set the `contentLocation` field to an Option value (optional)
-    pub fn maybe_content_location(mut self, value: Option<ArticleContentLocation<S>>) -> Self {
+    pub fn maybe_content_location(
+        mut self,
+        value: Option<ArticleContentLocation<S>>,
+    ) -> Self {
         self._fields.31 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `contentRating` field (optional)
-    pub fn content_rating(mut self, value: impl Into<Option<ArticleContentRating<S>>>) -> Self {
+    pub fn content_rating(
+        mut self,
+        value: impl Into<Option<ArticleContentRating<S>>>,
+    ) -> Self {
         self._fields.32 = value.into();
         self
     }
     /// Set the `contentRating` field to an Option value (optional)
-    pub fn maybe_content_rating(mut self, value: Option<ArticleContentRating<S>>) -> Self {
+    pub fn maybe_content_rating(
+        mut self,
+        value: Option<ArticleContentRating<S>>,
+    ) -> Self {
         self._fields.32 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `contentReferenceTime` field (optional)
     pub fn content_reference_time(
         mut self,
@@ -5732,9 +6118,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `contributor` field (optional)
-    pub fn contributor(mut self, value: impl Into<Option<ArticleContributor<S>>>) -> Self {
+    pub fn contributor(
+        mut self,
+        value: impl Into<Option<ArticleContributor<S>>>,
+    ) -> Self {
         self._fields.34 = value.into();
         self
     }
@@ -5745,46 +6134,64 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `copyrightHolder` field (optional)
-    pub fn copyright_holder(mut self, value: impl Into<Option<ArticleCopyrightHolder<S>>>) -> Self {
+    pub fn copyright_holder(
+        mut self,
+        value: impl Into<Option<ArticleCopyrightHolder<S>>>,
+    ) -> Self {
         self._fields.35 = value.into();
         self
     }
     /// Set the `copyrightHolder` field to an Option value (optional)
-    pub fn maybe_copyright_holder(mut self, value: Option<ArticleCopyrightHolder<S>>) -> Self {
+    pub fn maybe_copyright_holder(
+        mut self,
+        value: Option<ArticleCopyrightHolder<S>>,
+    ) -> Self {
         self._fields.35 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `copyrightNotice` field (optional)
-    pub fn copyright_notice(mut self, value: impl Into<Option<ArticleCopyrightNotice<S>>>) -> Self {
+    pub fn copyright_notice(
+        mut self,
+        value: impl Into<Option<ArticleCopyrightNotice<S>>>,
+    ) -> Self {
         self._fields.36 = value.into();
         self
     }
     /// Set the `copyrightNotice` field to an Option value (optional)
-    pub fn maybe_copyright_notice(mut self, value: Option<ArticleCopyrightNotice<S>>) -> Self {
+    pub fn maybe_copyright_notice(
+        mut self,
+        value: Option<ArticleCopyrightNotice<S>>,
+    ) -> Self {
         self._fields.36 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `copyrightYear` field (optional)
-    pub fn copyright_year(mut self, value: impl Into<Option<ArticleCopyrightYear<S>>>) -> Self {
+    pub fn copyright_year(
+        mut self,
+        value: impl Into<Option<ArticleCopyrightYear<S>>>,
+    ) -> Self {
         self._fields.37 = value.into();
         self
     }
     /// Set the `copyrightYear` field to an Option value (optional)
-    pub fn maybe_copyright_year(mut self, value: Option<ArticleCopyrightYear<S>>) -> Self {
+    pub fn maybe_copyright_year(
+        mut self,
+        value: Option<ArticleCopyrightYear<S>>,
+    ) -> Self {
         self._fields.37 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `correction` field (optional)
     pub fn correction(mut self, value: impl Into<Option<ArticleCorrection<S>>>) -> Self {
         self._fields.38 = value.into();
@@ -5797,7 +6204,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `countryOfOrigin` field (optional)
     pub fn country_of_origin(
         mut self,
@@ -5807,13 +6214,16 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
         self
     }
     /// Set the `countryOfOrigin` field to an Option value (optional)
-    pub fn maybe_country_of_origin(mut self, value: Option<ArticleCountryOfOrigin<S>>) -> Self {
+    pub fn maybe_country_of_origin(
+        mut self,
+        value: Option<ArticleCountryOfOrigin<S>>,
+    ) -> Self {
         self._fields.39 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `creativeWorkStatus` field (optional)
     pub fn creative_work_status(
         mut self,
@@ -5832,7 +6242,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `creator` field (optional)
     pub fn creator(mut self, value: impl Into<Option<ArticleCreator<S>>>) -> Self {
         self._fields.41 = value.into();
@@ -5845,9 +6255,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `creditText` field (optional)
-    pub fn credit_text(mut self, value: impl Into<Option<ArticleCreditText<S>>>) -> Self {
+    pub fn credit_text(
+        mut self,
+        value: impl Into<Option<ArticleCreditText<S>>>,
+    ) -> Self {
         self._fields.42 = value.into();
         self
     }
@@ -5858,9 +6271,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `dateCreated` field (optional)
-    pub fn date_created(mut self, value: impl Into<Option<ArticleDateCreated<S>>>) -> Self {
+    pub fn date_created(
+        mut self,
+        value: impl Into<Option<ArticleDateCreated<S>>>,
+    ) -> Self {
         self._fields.43 = value.into();
         self
     }
@@ -5871,9 +6287,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `dateModified` field (optional)
-    pub fn date_modified(mut self, value: impl Into<Option<ArticleDateModified<S>>>) -> Self {
+    pub fn date_modified(
+        mut self,
+        value: impl Into<Option<ArticleDateModified<S>>>,
+    ) -> Self {
         self._fields.44 = value.into();
         self
     }
@@ -5884,22 +6303,31 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `datePublished` field (optional)
-    pub fn date_published(mut self, value: impl Into<Option<ArticleDatePublished<S>>>) -> Self {
+    pub fn date_published(
+        mut self,
+        value: impl Into<Option<ArticleDatePublished<S>>>,
+    ) -> Self {
         self._fields.45 = value.into();
         self
     }
     /// Set the `datePublished` field to an Option value (optional)
-    pub fn maybe_date_published(mut self, value: Option<ArticleDatePublished<S>>) -> Self {
+    pub fn maybe_date_published(
+        mut self,
+        value: Option<ArticleDatePublished<S>>,
+    ) -> Self {
         self._fields.45 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<ArticleDescription<S>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<ArticleDescription<S>>>,
+    ) -> Self {
         self._fields.46 = value.into();
         self
     }
@@ -5910,7 +6338,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `digitalSourceType` field (optional)
     pub fn digital_source_type(
         mut self,
@@ -5920,13 +6348,16 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
         self
     }
     /// Set the `digitalSourceType` field to an Option value (optional)
-    pub fn maybe_digital_source_type(mut self, value: Option<ArticleDigitalSourceType<S>>) -> Self {
+    pub fn maybe_digital_source_type(
+        mut self,
+        value: Option<ArticleDigitalSourceType<S>>,
+    ) -> Self {
         self._fields.47 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
@@ -5945,20 +6376,26 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `discussionUrl` field (optional)
-    pub fn discussion_url(mut self, value: impl Into<Option<ArticleDiscussionUrl<S>>>) -> Self {
+    pub fn discussion_url(
+        mut self,
+        value: impl Into<Option<ArticleDiscussionUrl<S>>>,
+    ) -> Self {
         self._fields.49 = value.into();
         self
     }
     /// Set the `discussionUrl` field to an Option value (optional)
-    pub fn maybe_discussion_url(mut self, value: Option<ArticleDiscussionUrl<S>>) -> Self {
+    pub fn maybe_discussion_url(
+        mut self,
+        value: Option<ArticleDiscussionUrl<S>>,
+    ) -> Self {
         self._fields.49 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `editEIDR` field (optional)
     pub fn edit_eidr(mut self, value: impl Into<Option<ArticleEditEidr<S>>>) -> Self {
         self._fields.50 = value.into();
@@ -5971,7 +6408,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `editor` field (optional)
     pub fn editor(mut self, value: impl Into<Option<ArticleEditor<S>>>) -> Self {
         self._fields.51 = value.into();
@@ -5984,7 +6421,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `educationalAlignment` field (optional)
     pub fn educational_alignment(
         mut self,
@@ -6003,7 +6440,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `educationalLevel` field (optional)
     pub fn educational_level(
         mut self,
@@ -6013,26 +6450,35 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
         self
     }
     /// Set the `educationalLevel` field to an Option value (optional)
-    pub fn maybe_educational_level(mut self, value: Option<ArticleEducationalLevel<S>>) -> Self {
+    pub fn maybe_educational_level(
+        mut self,
+        value: Option<ArticleEducationalLevel<S>>,
+    ) -> Self {
         self._fields.53 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `educationalUse` field (optional)
-    pub fn educational_use(mut self, value: impl Into<Option<ArticleEducationalUse<S>>>) -> Self {
+    pub fn educational_use(
+        mut self,
+        value: impl Into<Option<ArticleEducationalUse<S>>>,
+    ) -> Self {
         self._fields.54 = value.into();
         self
     }
     /// Set the `educationalUse` field to an Option value (optional)
-    pub fn maybe_educational_use(mut self, value: Option<ArticleEducationalUse<S>>) -> Self {
+    pub fn maybe_educational_use(
+        mut self,
+        value: Option<ArticleEducationalUse<S>>,
+    ) -> Self {
         self._fields.54 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `encoding` field (optional)
     pub fn encoding(mut self, value: impl Into<Option<ArticleEncoding<S>>>) -> Self {
         self._fields.55 = value.into();
@@ -6045,20 +6491,26 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `encodingFormat` field (optional)
-    pub fn encoding_format(mut self, value: impl Into<Option<ArticleEncodingFormat<S>>>) -> Self {
+    pub fn encoding_format(
+        mut self,
+        value: impl Into<Option<ArticleEncodingFormat<S>>>,
+    ) -> Self {
         self._fields.56 = value.into();
         self
     }
     /// Set the `encodingFormat` field to an Option value (optional)
-    pub fn maybe_encoding_format(mut self, value: Option<ArticleEncodingFormat<S>>) -> Self {
+    pub fn maybe_encoding_format(
+        mut self,
+        value: Option<ArticleEncodingFormat<S>>,
+    ) -> Self {
         self._fields.56 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `encodings` field (optional)
     pub fn encodings(mut self, value: impl Into<Option<ArticleEncodings<S>>>) -> Self {
         self._fields.57 = value.into();
@@ -6071,20 +6523,26 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `exampleOfWork` field (optional)
-    pub fn example_of_work(mut self, value: impl Into<Option<ArticleExampleOfWork<S>>>) -> Self {
+    pub fn example_of_work(
+        mut self,
+        value: impl Into<Option<ArticleExampleOfWork<S>>>,
+    ) -> Self {
         self._fields.58 = value.into();
         self
     }
     /// Set the `exampleOfWork` field to an Option value (optional)
-    pub fn maybe_example_of_work(mut self, value: Option<ArticleExampleOfWork<S>>) -> Self {
+    pub fn maybe_example_of_work(
+        mut self,
+        value: Option<ArticleExampleOfWork<S>>,
+    ) -> Self {
         self._fields.58 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `expires` field (optional)
     pub fn expires(mut self, value: impl Into<Option<ArticleExpires<S>>>) -> Self {
         self._fields.59 = value.into();
@@ -6097,9 +6555,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `fileFormat` field (optional)
-    pub fn file_format(mut self, value: impl Into<Option<ArticleFileFormat<S>>>) -> Self {
+    pub fn file_format(
+        mut self,
+        value: impl Into<Option<ArticleFileFormat<S>>>,
+    ) -> Self {
         self._fields.60 = value.into();
         self
     }
@@ -6110,7 +6571,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<ArticleFunder<S>>>) -> Self {
         self._fields.61 = value.into();
@@ -6123,7 +6584,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<ArticleFunding<S>>>) -> Self {
         self._fields.62 = value.into();
@@ -6136,7 +6597,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<ArticleGenre<S>>>) -> Self {
         self._fields.63 = value.into();
@@ -6149,7 +6610,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `hasPart` field (optional)
     pub fn has_part(mut self, value: impl Into<Option<ArticleHasPart<S>>>) -> Self {
         self._fields.64 = value.into();
@@ -6162,7 +6623,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `headline` field (optional)
     pub fn headline(mut self, value: impl Into<Option<ArticleHeadline<S>>>) -> Self {
         self._fields.65 = value.into();
@@ -6175,7 +6636,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<ArticleIdentifier<S>>>) -> Self {
         self._fields.66 = value.into();
@@ -6188,7 +6649,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<ArticleImage<S>>>) -> Self {
         self._fields.67 = value.into();
@@ -6201,9 +6662,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `inLanguage` field (optional)
-    pub fn in_language(mut self, value: impl Into<Option<ArticleInLanguage<S>>>) -> Self {
+    pub fn in_language(
+        mut self,
+        value: impl Into<Option<ArticleInLanguage<S>>>,
+    ) -> Self {
         self._fields.68 = value.into();
         self
     }
@@ -6214,7 +6678,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `interactionStatistic` field (optional)
     pub fn interaction_statistic(
         mut self,
@@ -6233,7 +6697,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `interactivityType` field (optional)
     pub fn interactivity_type(
         mut self,
@@ -6243,13 +6707,16 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
         self
     }
     /// Set the `interactivityType` field to an Option value (optional)
-    pub fn maybe_interactivity_type(mut self, value: Option<ArticleInteractivityType<S>>) -> Self {
+    pub fn maybe_interactivity_type(
+        mut self,
+        value: Option<ArticleInteractivityType<S>>,
+    ) -> Self {
         self._fields.70 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `interpretedAsClaim` field (optional)
     pub fn interpreted_as_claim(
         mut self,
@@ -6268,7 +6735,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `isAccessibleForFree` field (optional)
     pub fn is_accessible_for_free(
         mut self,
@@ -6287,7 +6754,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `isBasedOn` field (optional)
     pub fn is_based_on(mut self, value: impl Into<Option<ArticleIsBasedOn<S>>>) -> Self {
         self._fields.73 = value.into();
@@ -6300,20 +6767,26 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `isBasedOnUrl` field (optional)
-    pub fn is_based_on_url(mut self, value: impl Into<Option<ArticleIsBasedOnUrl<S>>>) -> Self {
+    pub fn is_based_on_url(
+        mut self,
+        value: impl Into<Option<ArticleIsBasedOnUrl<S>>>,
+    ) -> Self {
         self._fields.74 = value.into();
         self
     }
     /// Set the `isBasedOnUrl` field to an Option value (optional)
-    pub fn maybe_is_based_on_url(mut self, value: Option<ArticleIsBasedOnUrl<S>>) -> Self {
+    pub fn maybe_is_based_on_url(
+        mut self,
+        value: Option<ArticleIsBasedOnUrl<S>>,
+    ) -> Self {
         self._fields.74 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `isFamilyFriendly` field (optional)
     pub fn is_family_friendly(
         mut self,
@@ -6323,13 +6796,16 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
-    pub fn maybe_is_family_friendly(mut self, value: Option<ArticleIsFamilyFriendly<S>>) -> Self {
+    pub fn maybe_is_family_friendly(
+        mut self,
+        value: Option<ArticleIsFamilyFriendly<S>>,
+    ) -> Self {
         self._fields.75 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `isPartOf` field (optional)
     pub fn is_part_of(mut self, value: impl Into<Option<ArticleIsPartOf<S>>>) -> Self {
         self._fields.76 = value.into();
@@ -6342,7 +6818,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<ArticleKeywords<S>>>) -> Self {
         self._fields.77 = value.into();
@@ -6355,7 +6831,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `learningResourceType` field (optional)
     pub fn learning_resource_type(
         mut self,
@@ -6374,7 +6850,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `license` field (optional)
     pub fn license(mut self, value: impl Into<Option<ArticleLicense<S>>>) -> Self {
         self._fields.79 = value.into();
@@ -6387,22 +6863,31 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `locationCreated` field (optional)
-    pub fn location_created(mut self, value: impl Into<Option<ArticleLocationCreated<S>>>) -> Self {
+    pub fn location_created(
+        mut self,
+        value: impl Into<Option<ArticleLocationCreated<S>>>,
+    ) -> Self {
         self._fields.80 = value.into();
         self
     }
     /// Set the `locationCreated` field to an Option value (optional)
-    pub fn maybe_location_created(mut self, value: Option<ArticleLocationCreated<S>>) -> Self {
+    pub fn maybe_location_created(
+        mut self,
+        value: Option<ArticleLocationCreated<S>>,
+    ) -> Self {
         self._fields.80 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `mainEntity` field (optional)
-    pub fn main_entity(mut self, value: impl Into<Option<ArticleMainEntity<S>>>) -> Self {
+    pub fn main_entity(
+        mut self,
+        value: impl Into<Option<ArticleMainEntity<S>>>,
+    ) -> Self {
         self._fields.81 = value.into();
         self
     }
@@ -6413,7 +6898,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
@@ -6423,13 +6908,16 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
-    pub fn maybe_main_entity_of_page(mut self, value: Option<ArticleMainEntityOfPage<S>>) -> Self {
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<ArticleMainEntityOfPage<S>>,
+    ) -> Self {
         self._fields.82 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `maintainer` field (optional)
     pub fn maintainer(mut self, value: impl Into<Option<ArticleMaintainer<S>>>) -> Self {
         self._fields.83 = value.into();
@@ -6442,7 +6930,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `material` field (optional)
     pub fn material(mut self, value: impl Into<Option<ArticleMaterial<S>>>) -> Self {
         self._fields.84 = value.into();
@@ -6455,20 +6943,26 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `materialExtent` field (optional)
-    pub fn material_extent(mut self, value: impl Into<Option<ArticleMaterialExtent<S>>>) -> Self {
+    pub fn material_extent(
+        mut self,
+        value: impl Into<Option<ArticleMaterialExtent<S>>>,
+    ) -> Self {
         self._fields.85 = value.into();
         self
     }
     /// Set the `materialExtent` field to an Option value (optional)
-    pub fn maybe_material_extent(mut self, value: Option<ArticleMaterialExtent<S>>) -> Self {
+    pub fn maybe_material_extent(
+        mut self,
+        value: Option<ArticleMaterialExtent<S>>,
+    ) -> Self {
         self._fields.85 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<ArticleMentions<S>>>) -> Self {
         self._fields.86 = value.into();
@@ -6481,7 +6975,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<ArticleName<S>>>) -> Self {
         self._fields.87 = value.into();
@@ -6494,7 +6988,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `offers` field (optional)
     pub fn offers(mut self, value: impl Into<Option<ArticleOffers<S>>>) -> Self {
         self._fields.88 = value.into();
@@ -6507,7 +7001,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `pageEnd` field (optional)
     pub fn page_end(mut self, value: impl Into<Option<ArticlePageEnd<S>>>) -> Self {
         self._fields.89 = value.into();
@@ -6520,7 +7014,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `pageStart` field (optional)
     pub fn page_start(mut self, value: impl Into<Option<ArticlePageStart<S>>>) -> Self {
         self._fields.90 = value.into();
@@ -6533,7 +7027,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `pagination` field (optional)
     pub fn pagination(mut self, value: impl Into<Option<ArticlePagination<S>>>) -> Self {
         self._fields.91 = value.into();
@@ -6546,7 +7040,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `pattern` field (optional)
     pub fn pattern(mut self, value: impl Into<Option<ArticlePattern<S>>>) -> Self {
         self._fields.92 = value.into();
@@ -6559,7 +7053,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `position` field (optional)
     pub fn position(mut self, value: impl Into<Option<ArticlePosition<S>>>) -> Self {
         self._fields.93 = value.into();
@@ -6572,20 +7066,26 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `potentialAction` field (optional)
-    pub fn potential_action(mut self, value: impl Into<Option<ArticlePotentialAction<S>>>) -> Self {
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<ArticlePotentialAction<S>>>,
+    ) -> Self {
         self._fields.94 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(mut self, value: Option<ArticlePotentialAction<S>>) -> Self {
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<ArticlePotentialAction<S>>,
+    ) -> Self {
         self._fields.94 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `producer` field (optional)
     pub fn producer(mut self, value: impl Into<Option<ArticleProducer<S>>>) -> Self {
         self._fields.95 = value.into();
@@ -6598,7 +7098,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `provider` field (optional)
     pub fn provider(mut self, value: impl Into<Option<ArticleProvider<S>>>) -> Self {
         self._fields.96 = value.into();
@@ -6611,9 +7111,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `publication` field (optional)
-    pub fn publication(mut self, value: impl Into<Option<ArticlePublication<S>>>) -> Self {
+    pub fn publication(
+        mut self,
+        value: impl Into<Option<ArticlePublication<S>>>,
+    ) -> Self {
         self._fields.97 = value.into();
         self
     }
@@ -6624,7 +7127,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `publisher` field (optional)
     pub fn publisher(mut self, value: impl Into<Option<ArticlePublisher<S>>>) -> Self {
         self._fields.98 = value.into();
@@ -6637,7 +7140,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `publisherImprint` field (optional)
     pub fn publisher_imprint(
         mut self,
@@ -6647,13 +7150,16 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
         self
     }
     /// Set the `publisherImprint` field to an Option value (optional)
-    pub fn maybe_publisher_imprint(mut self, value: Option<ArticlePublisherImprint<S>>) -> Self {
+    pub fn maybe_publisher_imprint(
+        mut self,
+        value: Option<ArticlePublisherImprint<S>>,
+    ) -> Self {
         self._fields.99 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `publishingPrinciples` field (optional)
     pub fn publishing_principles(
         mut self,
@@ -6672,9 +7178,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `recordedAt` field (optional)
-    pub fn recorded_at(mut self, value: impl Into<Option<ArticleRecordedAt<S>>>) -> Self {
+    pub fn recorded_at(
+        mut self,
+        value: impl Into<Option<ArticleRecordedAt<S>>>,
+    ) -> Self {
         self._fields.101 = value.into();
         self
     }
@@ -6685,20 +7194,26 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `releasedEvent` field (optional)
-    pub fn released_event(mut self, value: impl Into<Option<ArticleReleasedEvent<S>>>) -> Self {
+    pub fn released_event(
+        mut self,
+        value: impl Into<Option<ArticleReleasedEvent<S>>>,
+    ) -> Self {
         self._fields.102 = value.into();
         self
     }
     /// Set the `releasedEvent` field to an Option value (optional)
-    pub fn maybe_released_event(mut self, value: Option<ArticleReleasedEvent<S>>) -> Self {
+    pub fn maybe_released_event(
+        mut self,
+        value: Option<ArticleReleasedEvent<S>>,
+    ) -> Self {
         self._fields.102 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<ArticleReview<S>>>) -> Self {
         self._fields.103 = value.into();
@@ -6711,7 +7226,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<ArticleReviews<S>>>) -> Self {
         self._fields.104 = value.into();
@@ -6724,7 +7239,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<ArticleSameAs<S>>>) -> Self {
         self._fields.105 = value.into();
@@ -6737,20 +7252,26 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `schemaVersion` field (optional)
-    pub fn schema_version(mut self, value: impl Into<Option<ArticleSchemaVersion<S>>>) -> Self {
+    pub fn schema_version(
+        mut self,
+        value: impl Into<Option<ArticleSchemaVersion<S>>>,
+    ) -> Self {
         self._fields.106 = value.into();
         self
     }
     /// Set the `schemaVersion` field to an Option value (optional)
-    pub fn maybe_schema_version(mut self, value: Option<ArticleSchemaVersion<S>>) -> Self {
+    pub fn maybe_schema_version(
+        mut self,
+        value: Option<ArticleSchemaVersion<S>>,
+    ) -> Self {
         self._fields.106 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `sdDatePublished` field (optional)
     pub fn sd_date_published(
         mut self,
@@ -6760,13 +7281,16 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
         self
     }
     /// Set the `sdDatePublished` field to an Option value (optional)
-    pub fn maybe_sd_date_published(mut self, value: Option<ArticleSdDatePublished<S>>) -> Self {
+    pub fn maybe_sd_date_published(
+        mut self,
+        value: Option<ArticleSdDatePublished<S>>,
+    ) -> Self {
         self._fields.107 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `sdLicense` field (optional)
     pub fn sd_license(mut self, value: impl Into<Option<ArticleSdLicense<S>>>) -> Self {
         self._fields.108 = value.into();
@@ -6779,9 +7303,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `sdPublisher` field (optional)
-    pub fn sd_publisher(mut self, value: impl Into<Option<ArticleSdPublisher<S>>>) -> Self {
+    pub fn sd_publisher(
+        mut self,
+        value: impl Into<Option<ArticleSdPublisher<S>>>,
+    ) -> Self {
         self._fields.109 = value.into();
         self
     }
@@ -6792,7 +7319,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<ArticleSize<S>>>) -> Self {
         self._fields.110 = value.into();
@@ -6805,7 +7332,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `sourceOrganization` field (optional)
     pub fn source_organization(
         mut self,
@@ -6824,7 +7351,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `spatial` field (optional)
     pub fn spatial(mut self, value: impl Into<Option<ArticleSpatial<S>>>) -> Self {
         self._fields.112 = value.into();
@@ -6837,20 +7364,26 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `spatialCoverage` field (optional)
-    pub fn spatial_coverage(mut self, value: impl Into<Option<ArticleSpatialCoverage<S>>>) -> Self {
+    pub fn spatial_coverage(
+        mut self,
+        value: impl Into<Option<ArticleSpatialCoverage<S>>>,
+    ) -> Self {
         self._fields.113 = value.into();
         self
     }
     /// Set the `spatialCoverage` field to an Option value (optional)
-    pub fn maybe_spatial_coverage(mut self, value: Option<ArticleSpatialCoverage<S>>) -> Self {
+    pub fn maybe_spatial_coverage(
+        mut self,
+        value: Option<ArticleSpatialCoverage<S>>,
+    ) -> Self {
         self._fields.113 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `speakable` field (optional)
     pub fn speakable(mut self, value: impl Into<Option<ArticleSpeakable<S>>>) -> Self {
         self._fields.114 = value.into();
@@ -6863,7 +7396,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<ArticleSponsor<S>>>) -> Self {
         self._fields.115 = value.into();
@@ -6876,7 +7409,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<ArticleSubjectOf<S>>>) -> Self {
         self._fields.116 = value.into();
@@ -6889,7 +7422,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `teaches` field (optional)
     pub fn teaches(mut self, value: impl Into<Option<ArticleTeaches<S>>>) -> Self {
         self._fields.117 = value.into();
@@ -6902,7 +7435,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `temporal` field (optional)
     pub fn temporal(mut self, value: impl Into<Option<ArticleTemporal<S>>>) -> Self {
         self._fields.118 = value.into();
@@ -6915,7 +7448,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `temporalCoverage` field (optional)
     pub fn temporal_coverage(
         mut self,
@@ -6925,13 +7458,16 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
         self
     }
     /// Set the `temporalCoverage` field to an Option value (optional)
-    pub fn maybe_temporal_coverage(mut self, value: Option<ArticleTemporalCoverage<S>>) -> Self {
+    pub fn maybe_temporal_coverage(
+        mut self,
+        value: Option<ArticleTemporalCoverage<S>>,
+    ) -> Self {
         self._fields.119 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<ArticleText<S>>>) -> Self {
         self._fields.120 = value.into();
@@ -6944,7 +7480,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<ArticleThumbnail<S>>>) -> Self {
         self._fields.121 = value.into();
@@ -6957,9 +7493,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `thumbnailUrl` field (optional)
-    pub fn thumbnail_url(mut self, value: impl Into<Option<ArticleThumbnailUrl<S>>>) -> Self {
+    pub fn thumbnail_url(
+        mut self,
+        value: impl Into<Option<ArticleThumbnailUrl<S>>>,
+    ) -> Self {
         self._fields.122 = value.into();
         self
     }
@@ -6970,9 +7509,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `timeRequired` field (optional)
-    pub fn time_required(mut self, value: impl Into<Option<ArticleTimeRequired<S>>>) -> Self {
+    pub fn time_required(
+        mut self,
+        value: impl Into<Option<ArticleTimeRequired<S>>>,
+    ) -> Self {
         self._fields.123 = value.into();
         self
     }
@@ -6983,7 +7525,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `translationOfWork` field (optional)
     pub fn translation_of_work(
         mut self,
@@ -6993,13 +7535,16 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
         self
     }
     /// Set the `translationOfWork` field to an Option value (optional)
-    pub fn maybe_translation_of_work(mut self, value: Option<ArticleTranslationOfWork<S>>) -> Self {
+    pub fn maybe_translation_of_work(
+        mut self,
+        value: Option<ArticleTranslationOfWork<S>>,
+    ) -> Self {
         self._fields.124 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `translator` field (optional)
     pub fn translator(mut self, value: impl Into<Option<ArticleTranslator<S>>>) -> Self {
         self._fields.125 = value.into();
@@ -7012,7 +7557,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `typicalAgeRange` field (optional)
     pub fn typical_age_range(
         mut self,
@@ -7022,13 +7567,16 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
-    pub fn maybe_typical_age_range(mut self, value: Option<ArticleTypicalAgeRange<S>>) -> Self {
+    pub fn maybe_typical_age_range(
+        mut self,
+        value: Option<ArticleTypicalAgeRange<S>>,
+    ) -> Self {
         self._fields.126 = value;
         self
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<ArticleUrl<S>>>) -> Self {
         self._fields.127 = value.into();
@@ -7041,7 +7589,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `usageInfo` field (optional)
     pub fn usage_info(mut self, value: impl Into<Option<ArticleUsageInfo<S>>>) -> Self {
         self._fields.128 = value.into();
@@ -7054,7 +7602,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<ArticleVersion<S>>>) -> Self {
         self._fields.129 = value.into();
@@ -7067,7 +7615,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `video` field (optional)
     pub fn video(mut self, value: impl Into<Option<ArticleVideo<S>>>) -> Self {
         self._fields.130 = value.into();
@@ -7080,7 +7628,7 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `wordCount` field (optional)
     pub fn word_count(mut self, value: impl Into<Option<ArticleWordCount<S>>>) -> Self {
         self._fields.131 = value.into();
@@ -7093,9 +7641,12 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `workExample` field (optional)
-    pub fn work_example(mut self, value: impl Into<Option<ArticleWorkExample<S>>>) -> Self {
+    pub fn work_example(
+        mut self,
+        value: impl Into<Option<ArticleWorkExample<S>>>,
+    ) -> Self {
         self._fields.132 = value.into();
         self
     }
@@ -7106,20 +7657,26 @@ impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: article_state::State> ArticleBuilder<S, St> {
+impl<St: article_state::State, S: BosStr> ArticleBuilder<St, S> {
     /// Set the `workTranslation` field (optional)
-    pub fn work_translation(mut self, value: impl Into<Option<ArticleWorkTranslation<S>>>) -> Self {
+    pub fn work_translation(
+        mut self,
+        value: impl Into<Option<ArticleWorkTranslation<S>>>,
+    ) -> Self {
         self._fields.133 = value.into();
         self
     }
     /// Set the `workTranslation` field to an Option value (optional)
-    pub fn maybe_work_translation(mut self, value: Option<ArticleWorkTranslation<S>>) -> Self {
+    pub fn maybe_work_translation(
+        mut self,
+        value: Option<ArticleWorkTranslation<S>>,
+    ) -> Self {
         self._fields.133 = value;
         self
     }
 }
 
-impl<S: BosStr, St> ArticleBuilder<S, St>
+impl<St, S: BosStr> ArticleBuilder<St, S>
 where
     St: article_state::State,
 {

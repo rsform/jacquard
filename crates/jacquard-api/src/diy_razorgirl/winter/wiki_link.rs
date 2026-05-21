@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -52,6 +52,7 @@ pub struct WikiLink<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum WikiLinkLinkType<S: BosStr = DefaultStr> {
@@ -229,7 +230,7 @@ impl<S: BosStr> LexiconSchema for WikiLink<S> {
 
 pub mod wiki_link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -237,72 +238,72 @@ pub mod wiki_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LinkType;
-        type Target;
-        type Source;
         type CreatedAt;
+        type Target;
+        type LinkType;
+        type Source;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LinkType = Unset;
-        type Target = Unset;
-        type Source = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `link_type` field to Set
-    pub struct SetLinkType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLinkType<St> {}
-    impl<St: State> State for SetLinkType<St> {
-        type LinkType = Set<members::link_type>;
-        type Target = St::Target;
-        type Source = St::Source;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTarget<St> {}
-    impl<St: State> State for SetTarget<St> {
-        type LinkType = St::LinkType;
-        type Target = Set<members::target>;
-        type Source = St::Source;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `source` field to Set
-    pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSource<St> {}
-    impl<St: State> State for SetSource<St> {
-        type LinkType = St::LinkType;
-        type Target = St::Target;
-        type Source = Set<members::source>;
-        type CreatedAt = St::CreatedAt;
+        type Target = Unset;
+        type LinkType = Unset;
+        type Source = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type LinkType = St::LinkType;
-        type Target = St::Target;
-        type Source = St::Source;
         type CreatedAt = Set<members::created_at>;
+        type Target = St::Target;
+        type LinkType = St::LinkType;
+        type Source = St::Source;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTarget<St> {}
+    impl<St: State> State for SetTarget<St> {
+        type CreatedAt = St::CreatedAt;
+        type Target = Set<members::target>;
+        type LinkType = St::LinkType;
+        type Source = St::Source;
+    }
+    ///State transition - sets the `link_type` field to Set
+    pub struct SetLinkType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLinkType<St> {}
+    impl<St: State> State for SetLinkType<St> {
+        type CreatedAt = St::CreatedAt;
+        type Target = St::Target;
+        type LinkType = Set<members::link_type>;
+        type Source = St::Source;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSource<St> {}
+    impl<St: State> State for SetSource<St> {
+        type CreatedAt = St::CreatedAt;
+        type Target = St::Target;
+        type LinkType = St::LinkType;
+        type Source = Set<members::source>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `link_type` field
-        pub struct link_type(());
-        ///Marker type for the `target` field
-        pub struct target(());
-        ///Marker type for the `source` field
-        pub struct source(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `target` field
+        pub struct target(());
+        ///Marker type for the `link_type` field
+        pub struct link_type(());
+        ///Marker type for the `source` field
+        pub struct source(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WikiLinkBuilder<S: BosStr, St: wiki_link_state::State> {
+pub struct WikiLinkBuilder<St: wiki_link_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -316,15 +317,22 @@ pub struct WikiLinkBuilder<S: BosStr, St: wiki_link_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> WikiLink<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> WikiLinkBuilder<S, wiki_link_state::Empty> {
+impl WikiLink<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> WikiLinkBuilder<wiki_link_state::Empty, DefaultStr> {
         WikiLinkBuilder::new()
     }
 }
 
-impl<S: BosStr> WikiLinkBuilder<S, wiki_link_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> WikiLink<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> WikiLinkBuilder<wiki_link_state::Empty, S> {
+        WikiLinkBuilder::builder()
+    }
+}
+
+impl WikiLinkBuilder<wiki_link_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         WikiLinkBuilder {
             _state: PhantomData,
@@ -334,7 +342,18 @@ impl<S: BosStr> WikiLinkBuilder<S, wiki_link_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: wiki_link_state::State> WikiLinkBuilder<S, St> {
+impl<S: BosStr> WikiLinkBuilder<wiki_link_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        WikiLinkBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: wiki_link_state::State, S: BosStr> WikiLinkBuilder<St, S> {
     /// Set the `context` field (optional)
     pub fn context(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -347,7 +366,7 @@ impl<S: BosStr, St: wiki_link_state::State> WikiLinkBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WikiLinkBuilder<S, St>
+impl<St, S: BosStr> WikiLinkBuilder<St, S>
 where
     St: wiki_link_state::State,
     St::CreatedAt: wiki_link_state::IsUnset,
@@ -356,7 +375,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WikiLinkBuilder<S, wiki_link_state::SetCreatedAt<St>> {
+    ) -> WikiLinkBuilder<wiki_link_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         WikiLinkBuilder {
             _state: PhantomData,
@@ -366,7 +385,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WikiLinkBuilder<S, St>
+impl<St, S: BosStr> WikiLinkBuilder<St, S>
 where
     St: wiki_link_state::State,
     St::LinkType: wiki_link_state::IsUnset,
@@ -375,7 +394,7 @@ where
     pub fn link_type(
         mut self,
         value: impl Into<WikiLinkLinkType<S>>,
-    ) -> WikiLinkBuilder<S, wiki_link_state::SetLinkType<St>> {
+    ) -> WikiLinkBuilder<wiki_link_state::SetLinkType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         WikiLinkBuilder {
             _state: PhantomData,
@@ -385,7 +404,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WikiLinkBuilder<S, St>
+impl<St, S: BosStr> WikiLinkBuilder<St, S>
 where
     St: wiki_link_state::State,
     St::Source: wiki_link_state::IsUnset,
@@ -394,7 +413,7 @@ where
     pub fn source(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> WikiLinkBuilder<S, wiki_link_state::SetSource<St>> {
+    ) -> WikiLinkBuilder<wiki_link_state::SetSource<St>, S> {
         self._fields.3 = Option::Some(value.into());
         WikiLinkBuilder {
             _state: PhantomData,
@@ -404,7 +423,7 @@ where
     }
 }
 
-impl<S: BosStr, St: wiki_link_state::State> WikiLinkBuilder<S, St> {
+impl<St: wiki_link_state::State, S: BosStr> WikiLinkBuilder<St, S> {
     /// Set the `sourceAnchor` field (optional)
     pub fn source_anchor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -417,7 +436,7 @@ impl<S: BosStr, St: wiki_link_state::State> WikiLinkBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WikiLinkBuilder<S, St>
+impl<St, S: BosStr> WikiLinkBuilder<St, S>
 where
     St: wiki_link_state::State,
     St::Target: wiki_link_state::IsUnset,
@@ -426,7 +445,7 @@ where
     pub fn target(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> WikiLinkBuilder<S, wiki_link_state::SetTarget<St>> {
+    ) -> WikiLinkBuilder<wiki_link_state::SetTarget<St>, S> {
         self._fields.5 = Option::Some(value.into());
         WikiLinkBuilder {
             _state: PhantomData,
@@ -436,7 +455,7 @@ where
     }
 }
 
-impl<S: BosStr, St: wiki_link_state::State> WikiLinkBuilder<S, St> {
+impl<St: wiki_link_state::State, S: BosStr> WikiLinkBuilder<St, S> {
     /// Set the `targetAnchor` field (optional)
     pub fn target_anchor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -449,13 +468,13 @@ impl<S: BosStr, St: wiki_link_state::State> WikiLinkBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WikiLinkBuilder<S, St>
+impl<St, S: BosStr> WikiLinkBuilder<St, S>
 where
     St: wiki_link_state::State,
-    St::LinkType: wiki_link_state::IsSet,
-    St::Target: wiki_link_state::IsSet,
-    St::Source: wiki_link_state::IsSet,
     St::CreatedAt: wiki_link_state::IsSet,
+    St::Target: wiki_link_state::IsSet,
+    St::LinkType: wiki_link_state::IsSet,
+    St::Source: wiki_link_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> WikiLink<S> {
@@ -486,10 +505,10 @@ where
 }
 
 fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("diy.razorgirl.winter.wikiLink"),
@@ -500,19 +519,23 @@ fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("source"),
-                            SmolStr::new_static("target"),
-                            SmolStr::new_static("linkType"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("source"),
+                                SmolStr::new_static("target"),
+                                SmolStr::new_static("linkType"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("context"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Why this link exists")),
+                                    description: Some(
+                                        CowStr::new_static("Why this link exists"),
+                                    ),
                                     max_length: Some(512usize),
                                     ..Default::default()
                                 }),
@@ -540,9 +563,9 @@ fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("sourceAnchor"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Section heading slug in source",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Section heading slug in source"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
@@ -556,9 +579,9 @@ fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("targetAnchor"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Section heading slug in target",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Section heading slug in target"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

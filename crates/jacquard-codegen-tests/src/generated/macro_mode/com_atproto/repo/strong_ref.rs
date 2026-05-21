@@ -57,42 +57,45 @@ pub mod strong_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Cid = Set<members::cid>;
-        type Uri = St::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Cid = St::Cid;
         type Uri = Set<members::uri>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Uri = St::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StrongRefBuilder<S: jacquard_common::BosStr, St: strong_ref_state::State> {
+pub struct StrongRefBuilder<
+    St: strong_ref_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
+> {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
         core::option::Option<jacquard_common::types::string::Cid<S>>,
@@ -101,15 +104,25 @@ pub struct StrongRefBuilder<S: jacquard_common::BosStr, St: strong_ref_state::St
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> StrongRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StrongRefBuilder<S, strong_ref_state::Empty> {
+impl StrongRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StrongRefBuilder<
+        strong_ref_state::Empty,
+        jacquard_common::DefaultStr,
+    > {
         StrongRefBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> StrongRefBuilder<S, strong_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> StrongRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StrongRefBuilder<strong_ref_state::Empty, S> {
+        StrongRefBuilder::builder()
+    }
+}
+
+impl StrongRefBuilder<strong_ref_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StrongRefBuilder {
             _state: ::core::marker::PhantomData,
@@ -119,7 +132,18 @@ impl<S: jacquard_common::BosStr> StrongRefBuilder<S, strong_ref_state::Empty> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St> StrongRefBuilder<S, St>
+impl<S: jacquard_common::BosStr> StrongRefBuilder<strong_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StrongRefBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None, None),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St, S: jacquard_common::BosStr> StrongRefBuilder<St, S>
 where
     St: strong_ref_state::State,
     St::Cid: strong_ref_state::IsUnset,
@@ -128,7 +152,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<jacquard_common::types::string::Cid<S>>,
-    ) -> StrongRefBuilder<S, strong_ref_state::SetCid<St>> {
+    ) -> StrongRefBuilder<strong_ref_state::SetCid<St>, S> {
         self._fields.0 = ::core::option::Option::Some(value.into());
         StrongRefBuilder {
             _state: ::core::marker::PhantomData,
@@ -138,7 +162,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> StrongRefBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> StrongRefBuilder<St, S>
 where
     St: strong_ref_state::State,
     St::Uri: strong_ref_state::IsUnset,
@@ -147,7 +171,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<jacquard_common::types::string::AtUri<S>>,
-    ) -> StrongRefBuilder<S, strong_ref_state::SetUri<St>> {
+    ) -> StrongRefBuilder<strong_ref_state::SetUri<St>, S> {
         self._fields.1 = ::core::option::Option::Some(value.into());
         StrongRefBuilder {
             _state: ::core::marker::PhantomData,
@@ -157,11 +181,11 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> StrongRefBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> StrongRefBuilder<St, S>
 where
     St: strong_ref_state::State,
-    St::Cid: strong_ref_state::IsSet,
     St::Uri: strong_ref_state::IsSet,
+    St::Cid: strong_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> StrongRef<S> {

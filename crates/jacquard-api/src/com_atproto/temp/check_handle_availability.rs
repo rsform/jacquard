@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Handle};
+use jacquard_common::types::string::{Handle, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::temp::check_handle_availability;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::temp::check_handle_availability;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CheckHandleAvailability<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub birth_date: Option<Datetime>,
@@ -39,11 +36,9 @@ pub struct CheckHandleAvailability<S: BosStr = DefaultStr> {
     pub handle: Handle<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CheckHandleAvailabilityOutput<S: BosStr = DefaultStr> {
     ///Echo of the input handle.
     pub handle: Handle<S>,
@@ -51,6 +46,7 @@ pub struct CheckHandleAvailabilityOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -62,9 +58,18 @@ pub enum CheckHandleAvailabilityOutputResult<S: BosStr = DefaultStr> {
     ResultUnavailable(Box<check_handle_availability::ResultUnavailable<S>>),
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum CheckHandleAvailabilityError {
     /// An invalid email was provided.
@@ -72,10 +77,7 @@ pub enum CheckHandleAvailabilityError {
     InvalidEmail(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for CheckHandleAvailabilityError {
@@ -102,10 +104,7 @@ impl core::fmt::Display for CheckHandleAvailabilityError {
 /// Indicates the provided handle is available.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResultAvailable<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -114,10 +113,7 @@ pub struct ResultAvailable<S: BosStr = DefaultStr> {
 /// Indicates the provided handle is unavailable and gives suggestions of available handles.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResultUnavailable<S: BosStr = DefaultStr> {
     ///List of suggested handles based on the provided inputs.
     pub suggestions: Vec<check_handle_availability::Suggestion<S>>,
@@ -125,11 +121,9 @@ pub struct ResultUnavailable<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Suggestion<S: BosStr = DefaultStr> {
     pub handle: Handle<S>,
     ///Method used to build this suggestion. Should be considered opaque to clients. Can be used for metrics.
@@ -209,7 +203,7 @@ impl<S: BosStr> LexiconSchema for Suggestion<S> {
 
 pub mod check_handle_availability_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -240,21 +234,37 @@ pub mod check_handle_availability_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CheckHandleAvailabilityBuilder<S: BosStr, St: check_handle_availability_state::State> {
+pub struct CheckHandleAvailabilityBuilder<
+    St: check_handle_availability_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<Handle<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CheckHandleAvailability<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CheckHandleAvailabilityBuilder<S, check_handle_availability_state::Empty> {
+impl CheckHandleAvailability<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CheckHandleAvailabilityBuilder<
+        check_handle_availability_state::Empty,
+        DefaultStr,
+    > {
         CheckHandleAvailabilityBuilder::new()
     }
 }
 
-impl<S: BosStr> CheckHandleAvailabilityBuilder<S, check_handle_availability_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CheckHandleAvailability<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CheckHandleAvailabilityBuilder<
+        check_handle_availability_state::Empty,
+        S,
+    > {
+        CheckHandleAvailabilityBuilder::builder()
+    }
+}
+
+impl CheckHandleAvailabilityBuilder<check_handle_availability_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CheckHandleAvailabilityBuilder {
             _state: PhantomData,
@@ -264,7 +274,23 @@ impl<S: BosStr> CheckHandleAvailabilityBuilder<S, check_handle_availability_stat
     }
 }
 
-impl<S: BosStr, St: check_handle_availability_state::State> CheckHandleAvailabilityBuilder<S, St> {
+impl<
+    S: BosStr,
+> CheckHandleAvailabilityBuilder<check_handle_availability_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CheckHandleAvailabilityBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<
+    St: check_handle_availability_state::State,
+    S: BosStr,
+> CheckHandleAvailabilityBuilder<St, S> {
     /// Set the `birthDate` field (optional)
     pub fn birth_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -277,7 +303,10 @@ impl<S: BosStr, St: check_handle_availability_state::State> CheckHandleAvailabil
     }
 }
 
-impl<S: BosStr, St: check_handle_availability_state::State> CheckHandleAvailabilityBuilder<S, St> {
+impl<
+    St: check_handle_availability_state::State,
+    S: BosStr,
+> CheckHandleAvailabilityBuilder<St, S> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -290,7 +319,7 @@ impl<S: BosStr, St: check_handle_availability_state::State> CheckHandleAvailabil
     }
 }
 
-impl<S: BosStr, St> CheckHandleAvailabilityBuilder<S, St>
+impl<St, S: BosStr> CheckHandleAvailabilityBuilder<St, S>
 where
     St: check_handle_availability_state::State,
     St::Handle: check_handle_availability_state::IsUnset,
@@ -299,7 +328,10 @@ where
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> CheckHandleAvailabilityBuilder<S, check_handle_availability_state::SetHandle<St>> {
+    ) -> CheckHandleAvailabilityBuilder<
+        check_handle_availability_state::SetHandle<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         CheckHandleAvailabilityBuilder {
             _state: PhantomData,
@@ -309,7 +341,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CheckHandleAvailabilityBuilder<S, St>
+impl<St, S: BosStr> CheckHandleAvailabilityBuilder<St, S>
 where
     St: check_handle_availability_state::State,
     St::Handle: check_handle_availability_state::IsSet,
@@ -325,10 +357,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.temp.checkHandleAvailability"),
@@ -389,9 +421,9 @@ fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> LexiconDoc<'static>
             map.insert(
                 SmolStr::new_static("resultAvailable"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Indicates the provided handle is available.",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Indicates the provided handle is available."),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -474,7 +506,7 @@ fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> LexiconDoc<'static>
 
 pub mod result_unavailable_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -505,21 +537,34 @@ pub mod result_unavailable_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ResultUnavailableBuilder<S: BosStr, St: result_unavailable_state::State> {
+pub struct ResultUnavailableBuilder<
+    St: result_unavailable_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<check_handle_availability::Suggestion<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ResultUnavailable<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ResultUnavailableBuilder<S, result_unavailable_state::Empty> {
+impl ResultUnavailable<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ResultUnavailableBuilder<
+        result_unavailable_state::Empty,
+        DefaultStr,
+    > {
         ResultUnavailableBuilder::new()
     }
 }
 
-impl<S: BosStr> ResultUnavailableBuilder<S, result_unavailable_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ResultUnavailable<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ResultUnavailableBuilder<result_unavailable_state::Empty, S> {
+        ResultUnavailableBuilder::builder()
+    }
+}
+
+impl ResultUnavailableBuilder<result_unavailable_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ResultUnavailableBuilder {
             _state: PhantomData,
@@ -529,7 +574,18 @@ impl<S: BosStr> ResultUnavailableBuilder<S, result_unavailable_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ResultUnavailableBuilder<S, St>
+impl<S: BosStr> ResultUnavailableBuilder<result_unavailable_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ResultUnavailableBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ResultUnavailableBuilder<St, S>
 where
     St: result_unavailable_state::State,
     St::Suggestions: result_unavailable_state::IsUnset,
@@ -538,7 +594,7 @@ where
     pub fn suggestions(
         mut self,
         value: impl Into<Vec<check_handle_availability::Suggestion<S>>>,
-    ) -> ResultUnavailableBuilder<S, result_unavailable_state::SetSuggestions<St>> {
+    ) -> ResultUnavailableBuilder<result_unavailable_state::SetSuggestions<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ResultUnavailableBuilder {
             _state: PhantomData,
@@ -548,7 +604,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ResultUnavailableBuilder<S, St>
+impl<St, S: BosStr> ResultUnavailableBuilder<St, S>
 where
     St: result_unavailable_state::State,
     St::Suggestions: result_unavailable_state::IsSet,
@@ -561,7 +617,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ResultUnavailable<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ResultUnavailable<S> {
         ResultUnavailable {
             suggestions: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -571,7 +630,7 @@ where
 
 pub mod suggestion_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -614,21 +673,28 @@ pub mod suggestion_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SuggestionBuilder<S: BosStr, St: suggestion_state::State> {
+pub struct SuggestionBuilder<St: suggestion_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Handle<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Suggestion<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SuggestionBuilder<S, suggestion_state::Empty> {
+impl Suggestion<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SuggestionBuilder<suggestion_state::Empty, DefaultStr> {
         SuggestionBuilder::new()
     }
 }
 
-impl<S: BosStr> SuggestionBuilder<S, suggestion_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Suggestion<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SuggestionBuilder<suggestion_state::Empty, S> {
+        SuggestionBuilder::builder()
+    }
+}
+
+impl SuggestionBuilder<suggestion_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SuggestionBuilder {
             _state: PhantomData,
@@ -638,7 +704,18 @@ impl<S: BosStr> SuggestionBuilder<S, suggestion_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SuggestionBuilder<S, St>
+impl<S: BosStr> SuggestionBuilder<suggestion_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SuggestionBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SuggestionBuilder<St, S>
 where
     St: suggestion_state::State,
     St::Handle: suggestion_state::IsUnset,
@@ -647,7 +724,7 @@ where
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> SuggestionBuilder<S, suggestion_state::SetHandle<St>> {
+    ) -> SuggestionBuilder<suggestion_state::SetHandle<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SuggestionBuilder {
             _state: PhantomData,
@@ -657,7 +734,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SuggestionBuilder<S, St>
+impl<St, S: BosStr> SuggestionBuilder<St, S>
 where
     St: suggestion_state::State,
     St::Method: suggestion_state::IsUnset,
@@ -666,7 +743,7 @@ where
     pub fn method(
         mut self,
         value: impl Into<S>,
-    ) -> SuggestionBuilder<S, suggestion_state::SetMethod<St>> {
+    ) -> SuggestionBuilder<suggestion_state::SetMethod<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SuggestionBuilder {
             _state: PhantomData,
@@ -676,7 +753,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SuggestionBuilder<S, St>
+impl<St, S: BosStr> SuggestionBuilder<St, S>
 where
     St: suggestion_state::State,
     St::Handle: suggestion_state::IsSet,
@@ -691,7 +768,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Suggestion<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Suggestion<S> {
         Suggestion {
             handle: self._fields.0.unwrap(),
             method: self._fields.1.unwrap(),

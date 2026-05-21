@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A stage role vs a performance of that role. The Opening of the Mouth was performed on a type of figure — the Role is the type. The Character instance is the specific statue that gets its mouth opened.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -124,7 +124,8 @@ impl<S: BosStr> Serialize for RoleCanonicalReferencePolicy<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for RoleCanonicalReferencePolicy<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for RoleCanonicalReferencePolicy<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -149,8 +150,12 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             RoleCanonicalReferencePolicy::Fixed => RoleCanonicalReferencePolicy::Fixed,
-            RoleCanonicalReferencePolicy::Updatable => RoleCanonicalReferencePolicy::Updatable,
-            RoleCanonicalReferencePolicy::Community => RoleCanonicalReferencePolicy::Community,
+            RoleCanonicalReferencePolicy::Updatable => {
+                RoleCanonicalReferencePolicy::Updatable
+            }
+            RoleCanonicalReferencePolicy::Community => {
+                RoleCanonicalReferencePolicy::Community
+            }
             RoleCanonicalReferencePolicy::Other(v) => {
                 RoleCanonicalReferencePolicy::Other(v.into_static())
             }
@@ -171,18 +176,30 @@ pub enum RoleCanonicalStatus<S: BosStr = DefaultStr> {
 impl<S: BosStr> RoleCanonicalStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::CanonicalStatusOfficial => "world.ptah.temp.defs#canonicalStatusOfficial",
-            Self::CanonicalStatusCommunity => "world.ptah.temp.defs#canonicalStatusCommunity",
-            Self::CanonicalStatusApocryphal => "world.ptah.temp.defs#canonicalStatusApocryphal",
+            Self::CanonicalStatusOfficial => {
+                "world.ptah.temp.defs#canonicalStatusOfficial"
+            }
+            Self::CanonicalStatusCommunity => {
+                "world.ptah.temp.defs#canonicalStatusCommunity"
+            }
+            Self::CanonicalStatusApocryphal => {
+                "world.ptah.temp.defs#canonicalStatusApocryphal"
+            }
             Self::Other(s) => s.as_ref(),
         }
     }
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "world.ptah.temp.defs#canonicalStatusOfficial" => Self::CanonicalStatusOfficial,
-            "world.ptah.temp.defs#canonicalStatusCommunity" => Self::CanonicalStatusCommunity,
-            "world.ptah.temp.defs#canonicalStatusApocryphal" => Self::CanonicalStatusApocryphal,
+            "world.ptah.temp.defs#canonicalStatusOfficial" => {
+                Self::CanonicalStatusOfficial
+            }
+            "world.ptah.temp.defs#canonicalStatusCommunity" => {
+                Self::CanonicalStatusCommunity
+            }
+            "world.ptah.temp.defs#canonicalStatusApocryphal" => {
+                Self::CanonicalStatusApocryphal
+            }
             _ => Self::Other(s),
         }
     }
@@ -403,7 +420,9 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             RoleSourceType::SourceTypeOriginalIp => RoleSourceType::SourceTypeOriginalIp,
-            RoleSourceType::SourceTypePublicDomain => RoleSourceType::SourceTypePublicDomain,
+            RoleSourceType::SourceTypePublicDomain => {
+                RoleSourceType::SourceTypePublicDomain
+            }
             RoleSourceType::Other(v) => RoleSourceType::Other(v.into_static()),
         }
     }
@@ -538,7 +557,7 @@ impl<S: BosStr> LexiconSchema for Role<S> {
 
 pub mod role_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -547,8 +566,8 @@ pub mod role_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type WorldReference;
-        type CreatorDid;
         type Name;
+        type CreatorDid;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -556,8 +575,8 @@ pub mod role_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type WorldReference = Unset;
-        type CreatorDid = Unset;
         type Name = Unset;
+        type CreatorDid = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `world_reference` field to Set
@@ -565,17 +584,8 @@ pub mod role_state {
     impl<St: State> sealed::Sealed for SetWorldReference<St> {}
     impl<St: State> State for SetWorldReference<St> {
         type WorldReference = Set<members::world_reference>;
+        type Name = St::Name;
         type CreatorDid = St::CreatorDid;
-        type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `creator_did` field to Set
-    pub struct SetCreatorDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatorDid<St> {}
-    impl<St: State> State for SetCreatorDid<St> {
-        type WorldReference = St::WorldReference;
-        type CreatorDid = Set<members::creator_did>;
-        type Name = St::Name;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `name` field to Set
@@ -583,8 +593,17 @@ pub mod role_state {
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
         type WorldReference = St::WorldReference;
-        type CreatorDid = St::CreatorDid;
         type Name = Set<members::name>;
+        type CreatorDid = St::CreatorDid;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `creator_did` field to Set
+    pub struct SetCreatorDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatorDid<St> {}
+    impl<St: State> State for SetCreatorDid<St> {
+        type WorldReference = St::WorldReference;
+        type Name = St::Name;
+        type CreatorDid = Set<members::creator_did>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
@@ -592,8 +611,8 @@ pub mod role_state {
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type WorldReference = St::WorldReference;
-        type CreatorDid = St::CreatorDid;
         type Name = St::Name;
+        type CreatorDid = St::CreatorDid;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -601,17 +620,17 @@ pub mod role_state {
     pub mod members {
         ///Marker type for the `world_reference` field
         pub struct world_reference(());
-        ///Marker type for the `creator_did` field
-        pub struct creator_did(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `creator_did` field
+        pub struct creator_did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RoleBuilder<S: BosStr, St: role_state::State> {
+pub struct RoleBuilder<St: role_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -630,27 +649,69 @@ pub struct RoleBuilder<S: BosStr, St: role_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Role<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RoleBuilder<S, role_state::Empty> {
+impl Role<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RoleBuilder<role_state::Empty, DefaultStr> {
         RoleBuilder::new()
     }
 }
 
-impl<S: BosStr> RoleBuilder<S, role_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Role<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RoleBuilder<role_state::Empty, S> {
+        RoleBuilder::builder()
+    }
+}
+
+impl RoleBuilder<role_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RoleBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: role_state::State> RoleBuilder<S, St> {
+impl<S: BosStr> RoleBuilder<role_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RoleBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: role_state::State, S: BosStr> RoleBuilder<St, S> {
     /// Set the `authorshipRecord` field (optional)
     pub fn authorship_record(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -663,20 +724,26 @@ impl<S: BosStr, St: role_state::State> RoleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: role_state::State> RoleBuilder<S, St> {
+impl<St: role_state::State, S: BosStr> RoleBuilder<St, S> {
     /// Set the `canonicalCharacterReference` field (optional)
-    pub fn canonical_character_reference(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
+    pub fn canonical_character_reference(
+        mut self,
+        value: impl Into<Option<AtUri<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `canonicalCharacterReference` field to an Option value (optional)
-    pub fn maybe_canonical_character_reference(mut self, value: Option<AtUri<S>>) -> Self {
+    pub fn maybe_canonical_character_reference(
+        mut self,
+        value: Option<AtUri<S>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<S: BosStr, St: role_state::State> RoleBuilder<S, St> {
+impl<St: role_state::State, S: BosStr> RoleBuilder<St, S> {
     /// Set the `canonicalReferencePolicy` field (optional)
     pub fn canonical_reference_policy(
         mut self,
@@ -695,20 +762,26 @@ impl<S: BosStr, St: role_state::State> RoleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: role_state::State> RoleBuilder<S, St> {
+impl<St: role_state::State, S: BosStr> RoleBuilder<St, S> {
     /// Set the `canonicalStatus` field (optional)
-    pub fn canonical_status(mut self, value: impl Into<Option<RoleCanonicalStatus<S>>>) -> Self {
+    pub fn canonical_status(
+        mut self,
+        value: impl Into<Option<RoleCanonicalStatus<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `canonicalStatus` field to an Option value (optional)
-    pub fn maybe_canonical_status(mut self, value: Option<RoleCanonicalStatus<S>>) -> Self {
+    pub fn maybe_canonical_status(
+        mut self,
+        value: Option<RoleCanonicalStatus<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
 }
 
-impl<S: BosStr, St> RoleBuilder<S, St>
+impl<St, S: BosStr> RoleBuilder<St, S>
 where
     St: role_state::State,
     St::CreatedAt: role_state::IsUnset,
@@ -717,7 +790,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RoleBuilder<S, role_state::SetCreatedAt<St>> {
+    ) -> RoleBuilder<role_state::SetCreatedAt<St>, S> {
         self._fields.4 = Option::Some(value.into());
         RoleBuilder {
             _state: PhantomData,
@@ -727,7 +800,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RoleBuilder<S, St>
+impl<St, S: BosStr> RoleBuilder<St, S>
 where
     St: role_state::State,
     St::CreatorDid: role_state::IsUnset,
@@ -736,7 +809,7 @@ where
     pub fn creator_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> RoleBuilder<S, role_state::SetCreatorDid<St>> {
+    ) -> RoleBuilder<role_state::SetCreatorDid<St>, S> {
         self._fields.5 = Option::Some(value.into());
         RoleBuilder {
             _state: PhantomData,
@@ -746,7 +819,7 @@ where
     }
 }
 
-impl<S: BosStr, St: role_state::State> RoleBuilder<S, St> {
+impl<St: role_state::State, S: BosStr> RoleBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -759,26 +832,35 @@ impl<S: BosStr, St: role_state::State> RoleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: role_state::State> RoleBuilder<S, St> {
+impl<St: role_state::State, S: BosStr> RoleBuilder<St, S> {
     /// Set the `instancePolicy` field (optional)
-    pub fn instance_policy(mut self, value: impl Into<Option<RoleInstancePolicy<S>>>) -> Self {
+    pub fn instance_policy(
+        mut self,
+        value: impl Into<Option<RoleInstancePolicy<S>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `instancePolicy` field to an Option value (optional)
-    pub fn maybe_instance_policy(mut self, value: Option<RoleInstancePolicy<S>>) -> Self {
+    pub fn maybe_instance_policy(
+        mut self,
+        value: Option<RoleInstancePolicy<S>>,
+    ) -> Self {
         self._fields.7 = value;
         self
     }
 }
 
-impl<S: BosStr, St> RoleBuilder<S, St>
+impl<St, S: BosStr> RoleBuilder<St, S>
 where
     St: role_state::State,
     St::Name: role_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> RoleBuilder<S, role_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> RoleBuilder<role_state::SetName<St>, S> {
         self._fields.8 = Option::Some(value.into());
         RoleBuilder {
             _state: PhantomData,
@@ -788,7 +870,7 @@ where
     }
 }
 
-impl<S: BosStr, St: role_state::State> RoleBuilder<S, St> {
+impl<St: role_state::State, S: BosStr> RoleBuilder<St, S> {
     /// Set the `sourceReference` field (optional)
     pub fn source_reference(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -801,7 +883,7 @@ impl<S: BosStr, St: role_state::State> RoleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: role_state::State> RoleBuilder<S, St> {
+impl<St: role_state::State, S: BosStr> RoleBuilder<St, S> {
     /// Set the `sourceType` field (optional)
     pub fn source_type(mut self, value: impl Into<Option<RoleSourceType<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -814,7 +896,7 @@ impl<S: BosStr, St: role_state::State> RoleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RoleBuilder<S, St>
+impl<St, S: BosStr> RoleBuilder<St, S>
 where
     St: role_state::State,
     St::WorldReference: role_state::IsUnset,
@@ -823,7 +905,7 @@ where
     pub fn world_reference(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RoleBuilder<S, role_state::SetWorldReference<St>> {
+    ) -> RoleBuilder<role_state::SetWorldReference<St>, S> {
         self._fields.11 = Option::Some(value.into());
         RoleBuilder {
             _state: PhantomData,
@@ -833,12 +915,12 @@ where
     }
 }
 
-impl<S: BosStr, St> RoleBuilder<S, St>
+impl<St, S: BosStr> RoleBuilder<St, S>
 where
     St: role_state::State,
     St::WorldReference: role_state::IsSet,
-    St::CreatorDid: role_state::IsSet,
     St::Name: role_state::IsSet,
+    St::CreatorDid: role_state::IsSet,
     St::CreatedAt: role_state::IsSet,
 {
     /// Build the final struct.
@@ -880,10 +962,10 @@ where
 }
 
 fn lexicon_doc_world_ptah_temp_role() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("world.ptah.temp.role"),

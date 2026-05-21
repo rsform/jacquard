@@ -8,23 +8,20 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_showcase::CollectionItem;
-use crate::social_showcase::CollectionView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_showcase::CollectionItem;
+use crate::social_showcase::CollectionView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateCollection<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_image: Option<BlobRef<S>>,
@@ -43,6 +40,7 @@ pub struct UpdateCollection<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UpdateCollectionVisibility<S: BosStr = DefaultStr> {
@@ -90,7 +88,8 @@ impl<S: BosStr> Serialize for UpdateCollectionVisibility<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for UpdateCollectionVisibility<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for UpdateCollectionVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -123,11 +122,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateCollectionOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: CollectionView<S>,
@@ -146,8 +143,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateCollectionResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateCollection<S> {
     const NSID: &'static str = "social.showcase.collection.updateCollection";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateCollectionResponse;
 }
 
@@ -155,15 +153,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateCollection<S> {
 pub struct UpdateCollectionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateCollectionRequest {
     const PATH: &'static str = "/xrpc/social.showcase.collection.updateCollection";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateCollection<S>;
     type Response = UpdateCollectionResponse;
 }
 
 pub mod update_collection_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -194,7 +193,10 @@ pub mod update_collection_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateCollectionBuilder<S: BosStr, St: update_collection_state::State> {
+pub struct UpdateCollectionBuilder<
+    St: update_collection_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
@@ -208,15 +210,22 @@ pub struct UpdateCollectionBuilder<S: BosStr, St: update_collection_state::State
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UpdateCollection<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UpdateCollectionBuilder<S, update_collection_state::Empty> {
+impl UpdateCollection<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UpdateCollectionBuilder<update_collection_state::Empty, DefaultStr> {
         UpdateCollectionBuilder::new()
     }
 }
 
-impl<S: BosStr> UpdateCollectionBuilder<S, update_collection_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UpdateCollection<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UpdateCollectionBuilder<update_collection_state::Empty, S> {
+        UpdateCollectionBuilder::builder()
+    }
+}
+
+impl UpdateCollectionBuilder<update_collection_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UpdateCollectionBuilder {
             _state: PhantomData,
@@ -226,7 +235,18 @@ impl<S: BosStr> UpdateCollectionBuilder<S, update_collection_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: update_collection_state::State> UpdateCollectionBuilder<S, St> {
+impl<S: BosStr> UpdateCollectionBuilder<update_collection_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UpdateCollectionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: update_collection_state::State, S: BosStr> UpdateCollectionBuilder<St, S> {
     /// Set the `coverImage` field (optional)
     pub fn cover_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -239,7 +259,7 @@ impl<S: BosStr, St: update_collection_state::State> UpdateCollectionBuilder<S, S
     }
 }
 
-impl<S: BosStr, St: update_collection_state::State> UpdateCollectionBuilder<S, St> {
+impl<St: update_collection_state::State, S: BosStr> UpdateCollectionBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -252,7 +272,7 @@ impl<S: BosStr, St: update_collection_state::State> UpdateCollectionBuilder<S, S
     }
 }
 
-impl<S: BosStr, St: update_collection_state::State> UpdateCollectionBuilder<S, St> {
+impl<St: update_collection_state::State, S: BosStr> UpdateCollectionBuilder<St, S> {
     /// Set the `items` field (optional)
     pub fn items(mut self, value: impl Into<Option<Vec<CollectionItem<S>>>>) -> Self {
         self._fields.2 = value.into();
@@ -265,7 +285,7 @@ impl<S: BosStr, St: update_collection_state::State> UpdateCollectionBuilder<S, S
     }
 }
 
-impl<S: BosStr, St: update_collection_state::State> UpdateCollectionBuilder<S, St> {
+impl<St: update_collection_state::State, S: BosStr> UpdateCollectionBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -278,7 +298,7 @@ impl<S: BosStr, St: update_collection_state::State> UpdateCollectionBuilder<S, S
     }
 }
 
-impl<S: BosStr, St: update_collection_state::State> UpdateCollectionBuilder<S, St> {
+impl<St: update_collection_state::State, S: BosStr> UpdateCollectionBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -291,7 +311,7 @@ impl<S: BosStr, St: update_collection_state::State> UpdateCollectionBuilder<S, S
     }
 }
 
-impl<S: BosStr, St> UpdateCollectionBuilder<S, St>
+impl<St, S: BosStr> UpdateCollectionBuilder<St, S>
 where
     St: update_collection_state::State,
     St::Uri: update_collection_state::IsUnset,
@@ -300,7 +320,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> UpdateCollectionBuilder<S, update_collection_state::SetUri<St>> {
+    ) -> UpdateCollectionBuilder<update_collection_state::SetUri<St>, S> {
         self._fields.5 = Option::Some(value.into());
         UpdateCollectionBuilder {
             _state: PhantomData,
@@ -310,20 +330,26 @@ where
     }
 }
 
-impl<S: BosStr, St: update_collection_state::State> UpdateCollectionBuilder<S, St> {
+impl<St: update_collection_state::State, S: BosStr> UpdateCollectionBuilder<St, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(mut self, value: impl Into<Option<UpdateCollectionVisibility<S>>>) -> Self {
+    pub fn visibility(
+        mut self,
+        value: impl Into<Option<UpdateCollectionVisibility<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
-    pub fn maybe_visibility(mut self, value: Option<UpdateCollectionVisibility<S>>) -> Self {
+    pub fn maybe_visibility(
+        mut self,
+        value: Option<UpdateCollectionVisibility<S>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
 }
 
-impl<S: BosStr, St> UpdateCollectionBuilder<S, St>
+impl<St, S: BosStr> UpdateCollectionBuilder<St, S>
 where
     St: update_collection_state::State,
     St::Uri: update_collection_state::IsSet,
@@ -342,7 +368,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateCollection<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateCollection<S> {
         UpdateCollection {
             cover_image: self._fields.0,
             description: self._fields.1,

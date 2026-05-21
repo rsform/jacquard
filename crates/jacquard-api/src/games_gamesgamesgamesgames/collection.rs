@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::games_gamesgamesgamesgames::MediaItem;
-use crate::games_gamesgamesgamesgames::Website;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::MediaItem;
+use crate::games_gamesgamesgamesgames::Website;
 /// A grouping of games — franchise, series, or curated list.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -56,6 +56,7 @@ pub struct Collection<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CollectionType<S: BosStr = DefaultStr> {
@@ -199,7 +200,7 @@ impl<S: BosStr> LexiconSchema for Collection<S> {
 
 pub mod collection_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -207,42 +208,42 @@ pub mod collection_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type CreatedAt = St::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Name = St::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionBuilder<S: BosStr, St: collection_state::State> {
+pub struct CollectionBuilder<St: collection_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -257,15 +258,22 @@ pub struct CollectionBuilder<S: BosStr, St: collection_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Collection<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CollectionBuilder<S, collection_state::Empty> {
+impl Collection<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CollectionBuilder<collection_state::Empty, DefaultStr> {
         CollectionBuilder::new()
     }
 }
 
-impl<S: BosStr> CollectionBuilder<S, collection_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Collection<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CollectionBuilder<collection_state::Empty, S> {
+        CollectionBuilder::builder()
+    }
+}
+
+impl CollectionBuilder<collection_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CollectionBuilder {
             _state: PhantomData,
@@ -275,7 +283,18 @@ impl<S: BosStr> CollectionBuilder<S, collection_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CollectionBuilder<S, St>
+impl<S: BosStr> CollectionBuilder<collection_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CollectionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CollectionBuilder<St, S>
 where
     St: collection_state::State,
     St::CreatedAt: collection_state::IsUnset,
@@ -284,7 +303,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CollectionBuilder<S, collection_state::SetCreatedAt<St>> {
+    ) -> CollectionBuilder<collection_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CollectionBuilder {
             _state: PhantomData,
@@ -294,7 +313,7 @@ where
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -307,7 +326,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `games` field (optional)
     pub fn games(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.2 = value.into();
@@ -320,7 +339,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `media` field (optional)
     pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -333,7 +352,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CollectionBuilder<S, St>
+impl<St, S: BosStr> CollectionBuilder<St, S>
 where
     St: collection_state::State,
     St::Name: collection_state::IsUnset,
@@ -342,7 +361,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> CollectionBuilder<S, collection_state::SetName<St>> {
+    ) -> CollectionBuilder<collection_state::SetName<St>, S> {
         self._fields.4 = Option::Some(value.into());
         CollectionBuilder {
             _state: PhantomData,
@@ -352,7 +371,7 @@ where
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -365,7 +384,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `type` field (optional)
     pub fn r#type(mut self, value: impl Into<Option<CollectionType<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -378,7 +397,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `websites` field (optional)
     pub fn websites(mut self, value: impl Into<Option<Vec<Website<S>>>>) -> Self {
         self._fields.7 = value.into();
@@ -391,11 +410,11 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CollectionBuilder<S, St>
+impl<St, S: BosStr> CollectionBuilder<St, S>
 where
     St: collection_state::State,
-    St::Name: collection_state::IsSet,
     St::CreatedAt: collection_state::IsSet,
+    St::Name: collection_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Collection<S> {
@@ -412,7 +431,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Collection<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Collection<S> {
         Collection {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -428,10 +450,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_collection() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.collection"),
@@ -440,15 +462,19 @@ fn lexicon_doc_games_gamesgamesgamesgames_collection() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A grouping of games — franchise, series, or curated list.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A grouping of games — franchise, series, or curated list.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

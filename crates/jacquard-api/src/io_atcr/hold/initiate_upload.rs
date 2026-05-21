@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct InitiateUpload<S: BosStr = DefaultStr> {
     ///The blob digest (e.g., sha256:abc123...)
     pub digest: S,
@@ -28,11 +25,9 @@ pub struct InitiateUpload<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct InitiateUploadOutput<S: BosStr = DefaultStr> {
     ///Unique identifier for this upload session
     pub upload_id: S,
@@ -40,19 +35,25 @@ pub struct InitiateUploadOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum InitiateUploadError {
     #[serde(rename = "InvalidDigest")]
     InvalidDigest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for InitiateUploadError {
@@ -87,8 +88,9 @@ impl jacquard_common::xrpc::XrpcResp for InitiateUploadResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for InitiateUpload<S> {
     const NSID: &'static str = "io.atcr.hold.initiateUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = InitiateUploadResponse;
 }
 
@@ -96,8 +98,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for InitiateUpload<S> {
 pub struct InitiateUploadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for InitiateUploadRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.initiateUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = InitiateUpload<S>;
     type Response = InitiateUploadResponse;
 }

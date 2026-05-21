@@ -269,56 +269,66 @@ pub mod collection_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Items;
         type Name;
+        type Items;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Items = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `items` field to Set
-    pub struct SetItems<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetItems<St> {}
-    impl<St: State> State for SetItems<St> {
-        type Items = Set<members::items>;
-        type Name = St::Name;
+        type Items = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Items = St::Items;
         type Name = Set<members::name>;
+        type Items = St::Items;
+    }
+    ///State transition - sets the `items` field to Set
+    pub struct SetItems<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItems<St> {}
+    impl<St: State> State for SetItems<St> {
+        type Name = St::Name;
+        type Items = Set<members::items>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `items` field
-        pub struct items(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `items` field
+        pub struct items(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionRecordBuilder<S: BosStr, St: collection_record_state::State> {
+pub struct CollectionRecordBuilder<
+    St: collection_record_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Vec<collection::Collection<S>>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CollectionRecord<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CollectionRecordBuilder<S, collection_record_state::Empty> {
+impl CollectionRecord<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CollectionRecordBuilder<collection_record_state::Empty, DefaultStr> {
         CollectionRecordBuilder::new()
     }
 }
 
-impl<S: BosStr> CollectionRecordBuilder<S, collection_record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CollectionRecord<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CollectionRecordBuilder<collection_record_state::Empty, S> {
+        CollectionRecordBuilder::builder()
+    }
+}
+
+impl CollectionRecordBuilder<collection_record_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CollectionRecordBuilder {
             _state: PhantomData,
@@ -328,7 +338,18 @@ impl<S: BosStr> CollectionRecordBuilder<S, collection_record_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: collection_record_state::State> CollectionRecordBuilder<S, St> {
+impl<S: BosStr> CollectionRecordBuilder<collection_record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CollectionRecordBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: collection_record_state::State, S: BosStr> CollectionRecordBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -341,7 +362,7 @@ impl<S: BosStr, St: collection_record_state::State> CollectionRecordBuilder<S, S
     }
 }
 
-impl<S: BosStr, St> CollectionRecordBuilder<S, St>
+impl<St, S: BosStr> CollectionRecordBuilder<St, S>
 where
     St: collection_record_state::State,
     St::Items: collection_record_state::IsUnset,
@@ -350,7 +371,7 @@ where
     pub fn items(
         mut self,
         value: impl Into<Vec<collection::Collection<S>>>,
-    ) -> CollectionRecordBuilder<S, collection_record_state::SetItems<St>> {
+    ) -> CollectionRecordBuilder<collection_record_state::SetItems<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CollectionRecordBuilder {
             _state: PhantomData,
@@ -360,7 +381,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CollectionRecordBuilder<S, St>
+impl<St, S: BosStr> CollectionRecordBuilder<St, S>
 where
     St: collection_record_state::State,
     St::Name: collection_record_state::IsUnset,
@@ -369,7 +390,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> CollectionRecordBuilder<S, collection_record_state::SetName<St>> {
+    ) -> CollectionRecordBuilder<collection_record_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CollectionRecordBuilder {
             _state: PhantomData,
@@ -379,11 +400,11 @@ where
     }
 }
 
-impl<S: BosStr, St> CollectionRecordBuilder<S, St>
+impl<St, S: BosStr> CollectionRecordBuilder<St, S>
 where
     St: collection_record_state::State,
-    St::Items: collection_record_state::IsSet,
     St::Name: collection_record_state::IsSet,
+    St::Items: collection_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CollectionRecord<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Settings controlling follow approval behavior. Absence means auto-accept.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -119,7 +119,7 @@ fn _default_follow_gate_require_approval() -> Option<bool> {
 
 pub mod follow_gate_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -150,21 +150,28 @@ pub mod follow_gate_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FollowGateBuilder<S: BosStr, St: follow_gate_state::State> {
+pub struct FollowGateBuilder<St: follow_gate_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<bool>, Option<bool>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> FollowGate<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FollowGateBuilder<S, follow_gate_state::Empty> {
+impl FollowGate<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FollowGateBuilder<follow_gate_state::Empty, DefaultStr> {
         FollowGateBuilder::new()
     }
 }
 
-impl<S: BosStr> FollowGateBuilder<S, follow_gate_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> FollowGate<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FollowGateBuilder<follow_gate_state::Empty, S> {
+        FollowGateBuilder::builder()
+    }
+}
+
+impl FollowGateBuilder<follow_gate_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FollowGateBuilder {
             _state: PhantomData,
@@ -174,7 +181,18 @@ impl<S: BosStr> FollowGateBuilder<S, follow_gate_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FollowGateBuilder<S, St>
+impl<S: BosStr> FollowGateBuilder<follow_gate_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FollowGateBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FollowGateBuilder<St, S>
 where
     St: follow_gate_state::State,
     St::CreatedAt: follow_gate_state::IsUnset,
@@ -183,7 +201,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FollowGateBuilder<S, follow_gate_state::SetCreatedAt<St>> {
+    ) -> FollowGateBuilder<follow_gate_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FollowGateBuilder {
             _state: PhantomData,
@@ -193,7 +211,7 @@ where
     }
 }
 
-impl<S: BosStr, St: follow_gate_state::State> FollowGateBuilder<S, St> {
+impl<St: follow_gate_state::State, S: BosStr> FollowGateBuilder<St, S> {
     /// Set the `invalidatePrior` field (optional)
     pub fn invalidate_prior(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -206,7 +224,7 @@ impl<S: BosStr, St: follow_gate_state::State> FollowGateBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: follow_gate_state::State> FollowGateBuilder<S, St> {
+impl<St: follow_gate_state::State, S: BosStr> FollowGateBuilder<St, S> {
     /// Set the `requireApproval` field (optional)
     pub fn require_approval(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -219,7 +237,7 @@ impl<S: BosStr, St: follow_gate_state::State> FollowGateBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> FollowGateBuilder<S, St>
+impl<St, S: BosStr> FollowGateBuilder<St, S>
 where
     St: follow_gate_state::State,
     St::CreatedAt: follow_gate_state::IsSet,
@@ -234,7 +252,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FollowGate<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FollowGate<S> {
         FollowGate {
             created_at: self._fields.0.unwrap(),
             invalidate_prior: self._fields.1.or_else(|| Some(false)),
@@ -245,10 +266,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_graph_followGate() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.graph.followGate"),
@@ -257,9 +278,11 @@ fn lexicon_doc_sh_weaver_graph_followGate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Settings controlling follow approval behavior. Absence means auto-accept.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Settings controlling follow approval behavior. Absence means auto-accept.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("self")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("createdAt")]),

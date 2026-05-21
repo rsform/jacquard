@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAuthorFeed<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
     ///Defaults to `50`. Min: 1. Max: 50.
@@ -34,11 +31,9 @@ pub struct GetAuthorFeed<S: BosStr = DefaultStr> {
     pub since: Option<Datetime>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAuthorFeedOutput<S: BosStr = DefaultStr> {
     pub oekaki: Vec<HydratedOekaki<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -75,7 +70,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_author_feed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -106,21 +101,31 @@ pub mod get_author_feed_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetAuthorFeedBuilder<S: BosStr, St: get_author_feed_state::State> {
+pub struct GetAuthorFeedBuilder<
+    St: get_author_feed_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<i64>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetAuthorFeed<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetAuthorFeedBuilder<S, get_author_feed_state::Empty> {
+impl GetAuthorFeed<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetAuthorFeedBuilder<get_author_feed_state::Empty, DefaultStr> {
         GetAuthorFeedBuilder::new()
     }
 }
 
-impl<S: BosStr> GetAuthorFeedBuilder<S, get_author_feed_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetAuthorFeed<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetAuthorFeedBuilder<get_author_feed_state::Empty, S> {
+        GetAuthorFeedBuilder::builder()
+    }
+}
+
+impl GetAuthorFeedBuilder<get_author_feed_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetAuthorFeedBuilder {
             _state: PhantomData,
@@ -130,7 +135,18 @@ impl<S: BosStr> GetAuthorFeedBuilder<S, get_author_feed_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetAuthorFeedBuilder<S, St>
+impl<S: BosStr> GetAuthorFeedBuilder<get_author_feed_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetAuthorFeedBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetAuthorFeedBuilder<St, S>
 where
     St: get_author_feed_state::State,
     St::Did: get_author_feed_state::IsUnset,
@@ -139,7 +155,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetAuthorFeedBuilder<S, get_author_feed_state::SetDid<St>> {
+    ) -> GetAuthorFeedBuilder<get_author_feed_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetAuthorFeedBuilder {
             _state: PhantomData,
@@ -149,7 +165,7 @@ where
     }
 }
 
-impl<S: BosStr, St: get_author_feed_state::State> GetAuthorFeedBuilder<S, St> {
+impl<St: get_author_feed_state::State, S: BosStr> GetAuthorFeedBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -162,7 +178,7 @@ impl<S: BosStr, St: get_author_feed_state::State> GetAuthorFeedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_author_feed_state::State> GetAuthorFeedBuilder<S, St> {
+impl<St: get_author_feed_state::State, S: BosStr> GetAuthorFeedBuilder<St, S> {
     /// Set the `since` field (optional)
     pub fn since(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -175,7 +191,7 @@ impl<S: BosStr, St: get_author_feed_state::State> GetAuthorFeedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetAuthorFeedBuilder<S, St>
+impl<St, S: BosStr> GetAuthorFeedBuilder<St, S>
 where
     St: get_author_feed_state::State,
     St::Did: get_author_feed_state::IsSet,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::unspecced::get_config;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::unspecced::get_config;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LiveNowConfig<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub domains: Vec<S>,
@@ -38,11 +35,9 @@ pub struct LiveNowConfig<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetConfigOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub check_email_confirmed: Option<bool>,
@@ -97,7 +92,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetConfigRequest {
 
 pub mod live_now_config_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -140,21 +135,31 @@ pub mod live_now_config_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LiveNowConfigBuilder<S: BosStr, St: live_now_config_state::State> {
+pub struct LiveNowConfigBuilder<
+    St: live_now_config_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LiveNowConfig<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LiveNowConfigBuilder<S, live_now_config_state::Empty> {
+impl LiveNowConfig<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LiveNowConfigBuilder<live_now_config_state::Empty, DefaultStr> {
         LiveNowConfigBuilder::new()
     }
 }
 
-impl<S: BosStr> LiveNowConfigBuilder<S, live_now_config_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LiveNowConfig<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LiveNowConfigBuilder<live_now_config_state::Empty, S> {
+        LiveNowConfigBuilder::builder()
+    }
+}
+
+impl LiveNowConfigBuilder<live_now_config_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LiveNowConfigBuilder {
             _state: PhantomData,
@@ -164,7 +169,18 @@ impl<S: BosStr> LiveNowConfigBuilder<S, live_now_config_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LiveNowConfigBuilder<S, St>
+impl<S: BosStr> LiveNowConfigBuilder<live_now_config_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LiveNowConfigBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LiveNowConfigBuilder<St, S>
 where
     St: live_now_config_state::State,
     St::Did: live_now_config_state::IsUnset,
@@ -173,7 +189,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> LiveNowConfigBuilder<S, live_now_config_state::SetDid<St>> {
+    ) -> LiveNowConfigBuilder<live_now_config_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LiveNowConfigBuilder {
             _state: PhantomData,
@@ -183,7 +199,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LiveNowConfigBuilder<S, St>
+impl<St, S: BosStr> LiveNowConfigBuilder<St, S>
 where
     St: live_now_config_state::State,
     St::Domains: live_now_config_state::IsUnset,
@@ -192,7 +208,7 @@ where
     pub fn domains(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> LiveNowConfigBuilder<S, live_now_config_state::SetDomains<St>> {
+    ) -> LiveNowConfigBuilder<live_now_config_state::SetDomains<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LiveNowConfigBuilder {
             _state: PhantomData,
@@ -202,7 +218,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LiveNowConfigBuilder<S, St>
+impl<St, S: BosStr> LiveNowConfigBuilder<St, S>
 where
     St: live_now_config_state::State,
     St::Domains: live_now_config_state::IsSet,
@@ -217,7 +233,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LiveNowConfig<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LiveNowConfig<S> {
         LiveNowConfig {
             did: self._fields.0.unwrap(),
             domains: self._fields.1.unwrap(),
@@ -227,10 +246,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_unspecced_getConfig() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.unspecced.getConfig"),
@@ -239,10 +258,9 @@ fn lexicon_doc_app_bsky_unspecced_getConfig() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("liveNowConfig"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("domains"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("did"), SmolStr::new_static("domains")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,19 +24,16 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewBasic;
 use crate::sh_weaver::actor::ProfileView;
 use crate::sh_weaver::notebook::authors;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A single author in a Weaver notebook.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AuthorListItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub index: Option<i64>,
@@ -45,6 +42,7 @@ pub struct AuthorListItem<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -149,7 +147,7 @@ impl<S: BosStr> LexiconSchema for Authors<S> {
 
 pub mod author_list_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -180,21 +178,31 @@ pub mod author_list_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AuthorListItemBuilder<S: BosStr, St: author_list_item_state::State> {
+pub struct AuthorListItemBuilder<
+    St: author_list_item_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<AuthorListItemProfile<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> AuthorListItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AuthorListItemBuilder<S, author_list_item_state::Empty> {
+impl AuthorListItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AuthorListItemBuilder<author_list_item_state::Empty, DefaultStr> {
         AuthorListItemBuilder::new()
     }
 }
 
-impl<S: BosStr> AuthorListItemBuilder<S, author_list_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> AuthorListItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AuthorListItemBuilder<author_list_item_state::Empty, S> {
+        AuthorListItemBuilder::builder()
+    }
+}
+
+impl AuthorListItemBuilder<author_list_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AuthorListItemBuilder {
             _state: PhantomData,
@@ -204,7 +212,18 @@ impl<S: BosStr> AuthorListItemBuilder<S, author_list_item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: author_list_item_state::State> AuthorListItemBuilder<S, St> {
+impl<S: BosStr> AuthorListItemBuilder<author_list_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AuthorListItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: author_list_item_state::State, S: BosStr> AuthorListItemBuilder<St, S> {
     /// Set the `index` field (optional)
     pub fn index(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -217,9 +236,12 @@ impl<S: BosStr, St: author_list_item_state::State> AuthorListItemBuilder<S, St> 
     }
 }
 
-impl<S: BosStr, St: author_list_item_state::State> AuthorListItemBuilder<S, St> {
+impl<St: author_list_item_state::State, S: BosStr> AuthorListItemBuilder<St, S> {
     /// Set the `profile` field (optional)
-    pub fn profile(mut self, value: impl Into<Option<AuthorListItemProfile<S>>>) -> Self {
+    pub fn profile(
+        mut self,
+        value: impl Into<Option<AuthorListItemProfile<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -230,7 +252,7 @@ impl<S: BosStr, St: author_list_item_state::State> AuthorListItemBuilder<S, St> 
     }
 }
 
-impl<S: BosStr, St> AuthorListItemBuilder<S, St>
+impl<St, S: BosStr> AuthorListItemBuilder<St, S>
 where
     St: author_list_item_state::State,
     St::ProfileIndex: author_list_item_state::IsSet,
@@ -244,7 +266,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AuthorListItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AuthorListItem<S> {
         AuthorListItem {
             index: self._fields.0,
             profile: self._fields.1,
@@ -254,10 +279,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_notebook_authors() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.notebook.authors"),
@@ -266,7 +291,9 @@ fn lexicon_doc_sh_weaver_notebook_authors() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("authorListItem"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A single author in a Weaver notebook.")),
+                    description: Some(
+                        CowStr::new_static("A single author in a Weaver notebook."),
+                    ),
                     required: Some(vec![SmolStr::new_static("profile, index")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -282,7 +309,7 @@ fn lexicon_doc_sh_weaver_notebook_authors() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
-                                    CowStr::new_static("sh.weaver.actor.defs#profileView"),
+                                    CowStr::new_static("sh.weaver.actor.defs#profileView")
                                 ],
                                 ..Default::default()
                             }),
@@ -295,7 +322,9 @@ fn lexicon_doc_sh_weaver_notebook_authors() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("Authors of a Weaver notebook.")),
+                    description: Some(
+                        CowStr::new_static("Authors of a Weaver notebook."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("authorList")]),
@@ -334,7 +363,7 @@ fn lexicon_doc_sh_weaver_notebook_authors() -> LexiconDoc<'static> {
 
 pub mod authors_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -365,21 +394,28 @@ pub mod authors_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AuthorsBuilder<S: BosStr, St: authors_state::State> {
+pub struct AuthorsBuilder<St: authors_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<authors::AuthorListItem<S>>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Authors<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AuthorsBuilder<S, authors_state::Empty> {
+impl Authors<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AuthorsBuilder<authors_state::Empty, DefaultStr> {
         AuthorsBuilder::new()
     }
 }
 
-impl<S: BosStr> AuthorsBuilder<S, authors_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Authors<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AuthorsBuilder<authors_state::Empty, S> {
+        AuthorsBuilder::builder()
+    }
+}
+
+impl AuthorsBuilder<authors_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AuthorsBuilder {
             _state: PhantomData,
@@ -389,7 +425,18 @@ impl<S: BosStr> AuthorsBuilder<S, authors_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AuthorsBuilder<S, St>
+impl<S: BosStr> AuthorsBuilder<authors_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AuthorsBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AuthorsBuilder<St, S>
 where
     St: authors_state::State,
     St::AuthorList: authors_state::IsUnset,
@@ -398,7 +445,7 @@ where
     pub fn author_list(
         mut self,
         value: impl Into<Vec<authors::AuthorListItem<S>>>,
-    ) -> AuthorsBuilder<S, authors_state::SetAuthorList<St>> {
+    ) -> AuthorsBuilder<authors_state::SetAuthorList<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AuthorsBuilder {
             _state: PhantomData,
@@ -408,7 +455,7 @@ where
     }
 }
 
-impl<S: BosStr, St: authors_state::State> AuthorsBuilder<S, St> {
+impl<St: authors_state::State, S: BosStr> AuthorsBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -421,7 +468,7 @@ impl<S: BosStr, St: authors_state::State> AuthorsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AuthorsBuilder<S, St>
+impl<St, S: BosStr> AuthorsBuilder<St, S>
 where
     St: authors_state::State,
     St::AuthorList: authors_state::IsSet,

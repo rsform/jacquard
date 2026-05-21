@@ -264,42 +264,45 @@ pub mod did_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Identifier;
         type Owner;
+        type Identifier;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Identifier = Unset;
         type Owner = Unset;
-    }
-    ///State transition - sets the `identifier` field to Set
-    pub struct SetIdentifier<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIdentifier<St> {}
-    impl<St: State> State for SetIdentifier<St> {
-        type Identifier = Set<members::identifier>;
-        type Owner = St::Owner;
+        type Identifier = Unset;
     }
     ///State transition - sets the `owner` field to Set
     pub struct SetOwner<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOwner<St> {}
     impl<St: State> State for SetOwner<St> {
-        type Identifier = St::Identifier;
         type Owner = Set<members::owner>;
+        type Identifier = St::Identifier;
+    }
+    ///State transition - sets the `identifier` field to Set
+    pub struct SetIdentifier<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIdentifier<St> {}
+    impl<St: State> State for SetIdentifier<St> {
+        type Owner = St::Owner;
+        type Identifier = Set<members::identifier>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `identifier` field
-        pub struct identifier(());
         ///Marker type for the `owner` field
         pub struct owner(());
+        ///Marker type for the `identifier` field
+        pub struct identifier(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DidRecordBuilder<S: jacquard_common::BosStr, St: did_record_state::State> {
+pub struct DidRecordBuilder<
+    St: did_record_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
+> {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
         core::option::Option<crate::macro_mode::test_collision::did::Did<S>>,
@@ -309,15 +312,25 @@ pub struct DidRecordBuilder<S: jacquard_common::BosStr, St: did_record_state::St
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> DidRecord<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DidRecordBuilder<S, did_record_state::Empty> {
+impl DidRecord<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DidRecordBuilder<
+        did_record_state::Empty,
+        jacquard_common::DefaultStr,
+    > {
         DidRecordBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> DidRecordBuilder<S, did_record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> DidRecord<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DidRecordBuilder<did_record_state::Empty, S> {
+        DidRecordBuilder::builder()
+    }
+}
+
+impl DidRecordBuilder<did_record_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DidRecordBuilder {
             _state: ::core::marker::PhantomData,
@@ -327,7 +340,18 @@ impl<S: jacquard_common::BosStr> DidRecordBuilder<S, did_record_state::Empty> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St> DidRecordBuilder<S, St>
+impl<S: jacquard_common::BosStr> DidRecordBuilder<did_record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DidRecordBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None, None, None),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St, S: jacquard_common::BosStr> DidRecordBuilder<St, S>
 where
     St: did_record_state::State,
     St::Identifier: did_record_state::IsUnset,
@@ -336,7 +360,7 @@ where
     pub fn identifier(
         mut self,
         value: impl Into<crate::macro_mode::test_collision::did::Did<S>>,
-    ) -> DidRecordBuilder<S, did_record_state::SetIdentifier<St>> {
+    ) -> DidRecordBuilder<did_record_state::SetIdentifier<St>, S> {
         self._fields.0 = ::core::option::Option::Some(value.into());
         DidRecordBuilder {
             _state: ::core::marker::PhantomData,
@@ -346,7 +370,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St: did_record_state::State> DidRecordBuilder<S, St> {
+impl<St: did_record_state::State, S: jacquard_common::BosStr> DidRecordBuilder<St, S> {
     /// Set the `label` field (optional)
     pub fn label(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -359,7 +383,7 @@ impl<S: jacquard_common::BosStr, St: did_record_state::State> DidRecordBuilder<S
     }
 }
 
-impl<S: jacquard_common::BosStr, St> DidRecordBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> DidRecordBuilder<St, S>
 where
     St: did_record_state::State,
     St::Owner: did_record_state::IsUnset,
@@ -368,7 +392,7 @@ where
     pub fn owner(
         mut self,
         value: impl Into<jacquard_common::types::string::Did<S>>,
-    ) -> DidRecordBuilder<S, did_record_state::SetOwner<St>> {
+    ) -> DidRecordBuilder<did_record_state::SetOwner<St>, S> {
         self._fields.2 = ::core::option::Option::Some(value.into());
         DidRecordBuilder {
             _state: ::core::marker::PhantomData,
@@ -378,11 +402,11 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> DidRecordBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> DidRecordBuilder<St, S>
 where
     St: did_record_state::State,
-    St::Identifier: did_record_state::IsSet,
     St::Owner: did_record_state::IsSet,
+    St::Identifier: did_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DidRecord<S> {

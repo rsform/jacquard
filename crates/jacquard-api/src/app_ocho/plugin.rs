@@ -10,12 +10,13 @@ pub mod get_manifest;
 pub mod put_hosting_url;
 pub mod service;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,16 +28,13 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_ocho::plugin;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_ocho::plugin;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AdaptiveIcon<S: BosStr = DefaultStr> {
     ///The background color of the adaptive icon.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,11 +48,9 @@ pub struct AdaptiveIcon<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Android<S: BosStr = DefaultStr> {
     ///Configuration for the adaptive icon on Android.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,10 +65,7 @@ pub struct Android<S: BosStr = DefaultStr> {
 /// Android status bar configuration.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AndroidStatusBar<S: BosStr = DefaultStr> {
     ///The background color of the Android status bar.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -81,11 +74,9 @@ pub struct AndroidStatusBar<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Asset<S: BosStr = DefaultStr> {
     ///The blob of the asset
     pub blob: BlobRef<S>,
@@ -100,11 +91,9 @@ pub struct Asset<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Db<S: BosStr = DefaultStr> {
     ///The ID of the database.
     pub id: S,
@@ -112,11 +101,9 @@ pub struct Db<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Developer<S: BosStr = DefaultStr> {
     ///The tool used for development, e.g., 'expo-cli'.
     pub tool: S,
@@ -124,11 +111,9 @@ pub struct Developer<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExpoClient<S: BosStr = DefaultStr> {
     ///Android-specific configuration for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -186,11 +171,9 @@ pub struct ExpoClient<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExpoGo<S: BosStr = DefaultStr> {
     ///Developer-specific configuration for the Expo Go app.
     pub developer: plugin::Developer<S>,
@@ -198,11 +181,9 @@ pub struct ExpoGo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Ios<S: BosStr = DefaultStr> {
     ///Whether the app supports iPad.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -211,11 +192,9 @@ pub struct Ios<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LaunchAsset<S: BosStr = DefaultStr> {
     ///The MIME type of the asset, e.g., 'image/png'.
     pub content_type: S,
@@ -227,11 +206,9 @@ pub struct LaunchAsset<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Manifest<S: BosStr = DefaultStr> {
     ///The date and time when this plugin manifest was created.
     pub created_at: Datetime,
@@ -248,17 +225,16 @@ pub struct Manifest<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ManifestExtra<S: BosStr = DefaultStr> {
     pub expo_client: plugin::ExpoClient<S>,
     pub expo_go: plugin::ExpoGo<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -276,10 +252,7 @@ pub type PluginConfig<S = DefaultStr> = Data<S>;
 pub type StringId<S = DefaultStr> = S;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Web<S: BosStr = DefaultStr> {
     ///The bundler used for the web app.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -492,10 +465,10 @@ impl<S: BosStr> LexiconSchema for Web<S> {
 }
 
 fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.ocho.plugin.defs"),
@@ -510,26 +483,28 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("backgroundColor"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The background color of the adaptive icon.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The background color of the adaptive icon.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("foregroundImage"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URL to the foreground image of the adaptive icon.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The URL to the foreground image of the adaptive icon.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("foregroundImageBlob"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -563,16 +538,20 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("androidStatusBar"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Android status bar configuration.")),
+                    description: Some(
+                        CowStr::new_static("Android status bar configuration."),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("backgroundColor"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The background color of the Android status bar.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The background color of the Android status bar.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -642,7 +621,9 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The ID of the database.")),
+                                description: Some(
+                                    CowStr::new_static("The ID of the database."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -661,9 +642,11 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("tool"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The tool used for development, e.g., 'expo-cli'.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The tool used for development, e.g., 'expo-cli'.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -675,10 +658,9 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("expoClient"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("slug"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("slug")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -711,7 +693,9 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("icon"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URL to the app icon.")),
+                                description: Some(
+                                    CowStr::new_static("The URL to the app icon."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -731,9 +715,11 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The name of the Expo client application.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The name of the Expo client application.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -746,18 +732,18 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("orientation"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The default orientation of the app.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The default orientation of the app."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("platforms"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "The platforms supported by the app.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The platforms supported by the app."),
+                                ),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
@@ -773,43 +759,47 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("scheme"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The custom URI scheme for deep linking.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The custom URI scheme for deep linking.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sdkVersion"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The SDK version of the Expo client.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The SDK version of the Expo client."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("slug"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "A URL-friendly identifier for the app.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("A URL-friendly identifier for the app."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("userInterfaceStyle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The default user interface style.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The default user interface style."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("version"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The version of the app.")),
+                                description: Some(
+                                    CowStr::new_static("The version of the app."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -993,10 +983,12 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("manifestExtra"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("expoClient"),
-                        SmolStr::new_static("expoGo"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("expoClient"),
+                            SmolStr::new_static("expoGo")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1025,7 +1017,7 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                     items: LexArrayItem::Union(LexRefUnion {
                         refs: vec![
                             CowStr::new_static("#stringId"),
-                            CowStr::new_static("#pluginConfig"),
+                            CowStr::new_static("#pluginConfig")
                         ],
                         ..Default::default()
                     }),
@@ -1034,16 +1026,16 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("pluginConfig"),
-                LexUserType::Unknown(LexUnknown {
-                    ..Default::default()
-                }),
+                LexUserType::Unknown(LexUnknown { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("stringId"),
                 LexUserType::String(LexString {
-                    description: Some(CowStr::new_static(
-                        "A string identifier for a plugin, used to reference it in the app.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A string identifier for a plugin, used to reference it in the app.",
+                        ),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -1056,33 +1048,33 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("bundler"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The bundler used for the web app.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The bundler used for the web app."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("favicon"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URL to the favicon for the web app.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The URL to the favicon for the web app.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("faviconBlob"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("output"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The output directory for the web app.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The output directory for the web app."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1099,7 +1091,7 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
 
 pub mod asset_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1107,70 +1099,77 @@ pub mod asset_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Blob;
         type Type;
         type Hash;
-        type Blob;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Blob = Unset;
         type Type = Unset;
         type Hash = Unset;
-        type Blob = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Type = Set<members::r#type>;
-        type Hash = St::Hash;
-        type Blob = St::Blob;
-    }
-    ///State transition - sets the `hash` field to Set
-    pub struct SetHash<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHash<St> {}
-    impl<St: State> State for SetHash<St> {
-        type Type = St::Type;
-        type Hash = Set<members::hash>;
-        type Blob = St::Blob;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlob<St> {}
     impl<St: State> State for SetBlob<St> {
+        type Blob = Set<members::blob>;
         type Type = St::Type;
         type Hash = St::Hash;
-        type Blob = Set<members::blob>;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Blob = St::Blob;
+        type Type = Set<members::r#type>;
+        type Hash = St::Hash;
+    }
+    ///State transition - sets the `hash` field to Set
+    pub struct SetHash<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHash<St> {}
+    impl<St: State> State for SetHash<St> {
+        type Blob = St::Blob;
+        type Type = St::Type;
+        type Hash = Set<members::hash>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `blob` field
+        pub struct blob(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `hash` field
         pub struct hash(());
-        ///Marker type for the `blob` field
-        pub struct blob(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AssetBuilder<S: BosStr, St: asset_state::State> {
+pub struct AssetBuilder<St: asset_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<S>, Option<S>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Asset<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AssetBuilder<S, asset_state::Empty> {
+impl Asset<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AssetBuilder<asset_state::Empty, DefaultStr> {
         AssetBuilder::new()
     }
 }
 
-impl<S: BosStr> AssetBuilder<S, asset_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Asset<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AssetBuilder<asset_state::Empty, S> {
+        AssetBuilder::builder()
+    }
+}
+
+impl AssetBuilder<asset_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AssetBuilder {
             _state: PhantomData,
@@ -1180,7 +1179,18 @@ impl<S: BosStr> AssetBuilder<S, asset_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AssetBuilder<S, St>
+impl<S: BosStr> AssetBuilder<asset_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AssetBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AssetBuilder<St, S>
 where
     St: asset_state::State,
     St::Blob: asset_state::IsUnset,
@@ -1189,7 +1199,7 @@ where
     pub fn blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> AssetBuilder<S, asset_state::SetBlob<St>> {
+    ) -> AssetBuilder<asset_state::SetBlob<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AssetBuilder {
             _state: PhantomData,
@@ -1199,13 +1209,16 @@ where
     }
 }
 
-impl<S: BosStr, St> AssetBuilder<S, St>
+impl<St, S: BosStr> AssetBuilder<St, S>
 where
     St: asset_state::State,
     St::Hash: asset_state::IsUnset,
 {
     /// Set the `hash` field (required)
-    pub fn hash(mut self, value: impl Into<S>) -> AssetBuilder<S, asset_state::SetHash<St>> {
+    pub fn hash(
+        mut self,
+        value: impl Into<S>,
+    ) -> AssetBuilder<asset_state::SetHash<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AssetBuilder {
             _state: PhantomData,
@@ -1215,13 +1228,16 @@ where
     }
 }
 
-impl<S: BosStr, St> AssetBuilder<S, St>
+impl<St, S: BosStr> AssetBuilder<St, S>
 where
     St: asset_state::State,
     St::Type: asset_state::IsUnset,
 {
     /// Set the `type` field (required)
-    pub fn r#type(mut self, value: impl Into<S>) -> AssetBuilder<S, asset_state::SetType<St>> {
+    pub fn r#type(
+        mut self,
+        value: impl Into<S>,
+    ) -> AssetBuilder<asset_state::SetType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AssetBuilder {
             _state: PhantomData,
@@ -1231,7 +1247,7 @@ where
     }
 }
 
-impl<S: BosStr, St: asset_state::State> AssetBuilder<S, St> {
+impl<St: asset_state::State, S: BosStr> AssetBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -1244,12 +1260,12 @@ impl<S: BosStr, St: asset_state::State> AssetBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AssetBuilder<S, St>
+impl<St, S: BosStr> AssetBuilder<St, S>
 where
     St: asset_state::State,
+    St::Blob: asset_state::IsSet,
     St::Type: asset_state::IsSet,
     St::Hash: asset_state::IsSet,
-    St::Blob: asset_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Asset<S> {
@@ -1275,7 +1291,7 @@ where
 
 pub mod expo_go_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1306,21 +1322,28 @@ pub mod expo_go_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ExpoGoBuilder<S: BosStr, St: expo_go_state::State> {
+pub struct ExpoGoBuilder<St: expo_go_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<plugin::Developer<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ExpoGo<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ExpoGoBuilder<S, expo_go_state::Empty> {
+impl ExpoGo<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ExpoGoBuilder<expo_go_state::Empty, DefaultStr> {
         ExpoGoBuilder::new()
     }
 }
 
-impl<S: BosStr> ExpoGoBuilder<S, expo_go_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ExpoGo<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ExpoGoBuilder<expo_go_state::Empty, S> {
+        ExpoGoBuilder::builder()
+    }
+}
+
+impl ExpoGoBuilder<expo_go_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ExpoGoBuilder {
             _state: PhantomData,
@@ -1330,7 +1353,18 @@ impl<S: BosStr> ExpoGoBuilder<S, expo_go_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ExpoGoBuilder<S, St>
+impl<S: BosStr> ExpoGoBuilder<expo_go_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ExpoGoBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ExpoGoBuilder<St, S>
 where
     St: expo_go_state::State,
     St::Developer: expo_go_state::IsUnset,
@@ -1339,7 +1373,7 @@ where
     pub fn developer(
         mut self,
         value: impl Into<plugin::Developer<S>>,
-    ) -> ExpoGoBuilder<S, expo_go_state::SetDeveloper<St>> {
+    ) -> ExpoGoBuilder<expo_go_state::SetDeveloper<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ExpoGoBuilder {
             _state: PhantomData,
@@ -1349,7 +1383,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ExpoGoBuilder<S, St>
+impl<St, S: BosStr> ExpoGoBuilder<St, S>
 where
     St: expo_go_state::State,
     St::Developer: expo_go_state::IsSet,
@@ -1372,7 +1406,7 @@ where
 
 pub mod launch_asset_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1381,69 +1415,76 @@ pub mod launch_asset_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ContentType;
-        type Url;
         type Key;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ContentType = Unset;
-        type Url = Unset;
         type Key = Unset;
+        type Url = Unset;
     }
     ///State transition - sets the `content_type` field to Set
     pub struct SetContentType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContentType<St> {}
     impl<St: State> State for SetContentType<St> {
         type ContentType = Set<members::content_type>;
+        type Key = St::Key;
         type Url = St::Url;
-        type Key = St::Key;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type ContentType = St::ContentType;
-        type Url = Set<members::url>;
-        type Key = St::Key;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetKey<St> {}
     impl<St: State> State for SetKey<St> {
         type ContentType = St::ContentType;
-        type Url = St::Url;
         type Key = Set<members::key>;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type ContentType = St::ContentType;
+        type Key = St::Key;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `content_type` field
         pub struct content_type(());
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LaunchAssetBuilder<S: BosStr, St: launch_asset_state::State> {
+pub struct LaunchAssetBuilder<St: launch_asset_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LaunchAsset<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LaunchAssetBuilder<S, launch_asset_state::Empty> {
+impl LaunchAsset<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LaunchAssetBuilder<launch_asset_state::Empty, DefaultStr> {
         LaunchAssetBuilder::new()
     }
 }
 
-impl<S: BosStr> LaunchAssetBuilder<S, launch_asset_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LaunchAsset<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LaunchAssetBuilder<launch_asset_state::Empty, S> {
+        LaunchAssetBuilder::builder()
+    }
+}
+
+impl LaunchAssetBuilder<launch_asset_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LaunchAssetBuilder {
             _state: PhantomData,
@@ -1453,7 +1494,18 @@ impl<S: BosStr> LaunchAssetBuilder<S, launch_asset_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LaunchAssetBuilder<S, St>
+impl<S: BosStr> LaunchAssetBuilder<launch_asset_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LaunchAssetBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LaunchAssetBuilder<St, S>
 where
     St: launch_asset_state::State,
     St::ContentType: launch_asset_state::IsUnset,
@@ -1462,7 +1514,7 @@ where
     pub fn content_type(
         mut self,
         value: impl Into<S>,
-    ) -> LaunchAssetBuilder<S, launch_asset_state::SetContentType<St>> {
+    ) -> LaunchAssetBuilder<launch_asset_state::SetContentType<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LaunchAssetBuilder {
             _state: PhantomData,
@@ -1472,7 +1524,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LaunchAssetBuilder<S, St>
+impl<St, S: BosStr> LaunchAssetBuilder<St, S>
 where
     St: launch_asset_state::State,
     St::Key: launch_asset_state::IsUnset,
@@ -1481,7 +1533,7 @@ where
     pub fn key(
         mut self,
         value: impl Into<S>,
-    ) -> LaunchAssetBuilder<S, launch_asset_state::SetKey<St>> {
+    ) -> LaunchAssetBuilder<launch_asset_state::SetKey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LaunchAssetBuilder {
             _state: PhantomData,
@@ -1491,7 +1543,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LaunchAssetBuilder<S, St>
+impl<St, S: BosStr> LaunchAssetBuilder<St, S>
 where
     St: launch_asset_state::State,
     St::Url: launch_asset_state::IsUnset,
@@ -1500,7 +1552,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> LaunchAssetBuilder<S, launch_asset_state::SetUrl<St>> {
+    ) -> LaunchAssetBuilder<launch_asset_state::SetUrl<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LaunchAssetBuilder {
             _state: PhantomData,
@@ -1510,12 +1562,12 @@ where
     }
 }
 
-impl<S: BosStr, St> LaunchAssetBuilder<S, St>
+impl<St, S: BosStr> LaunchAssetBuilder<St, S>
 where
     St: launch_asset_state::State,
     St::ContentType: launch_asset_state::IsSet,
-    St::Url: launch_asset_state::IsSet,
     St::Key: launch_asset_state::IsSet,
+    St::Url: launch_asset_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LaunchAsset<S> {
@@ -1527,7 +1579,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LaunchAsset<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LaunchAsset<S> {
         LaunchAsset {
             content_type: self._fields.0.unwrap(),
             key: self._fields.1.unwrap(),
@@ -1539,7 +1594,7 @@ where
 
 pub mod manifest_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1547,110 +1602,110 @@ pub mod manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Metadata;
-        type Extra;
         type CreatedAt;
+        type Extra;
+        type Metadata;
         type Id;
-        type LaunchAsset;
         type RuntimeVersion;
+        type LaunchAsset;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Metadata = Unset;
-        type Extra = Unset;
         type CreatedAt = Unset;
+        type Extra = Unset;
+        type Metadata = Unset;
         type Id = Unset;
-        type LaunchAsset = Unset;
         type RuntimeVersion = Unset;
-    }
-    ///State transition - sets the `metadata` field to Set
-    pub struct SetMetadata<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMetadata<St> {}
-    impl<St: State> State for SetMetadata<St> {
-        type Metadata = Set<members::metadata>;
-        type Extra = St::Extra;
-        type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
-        type LaunchAsset = St::LaunchAsset;
-        type RuntimeVersion = St::RuntimeVersion;
-    }
-    ///State transition - sets the `extra` field to Set
-    pub struct SetExtra<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetExtra<St> {}
-    impl<St: State> State for SetExtra<St> {
-        type Metadata = St::Metadata;
-        type Extra = Set<members::extra>;
-        type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
-        type LaunchAsset = St::LaunchAsset;
-        type RuntimeVersion = St::RuntimeVersion;
+        type LaunchAsset = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Metadata = St::Metadata;
-        type Extra = St::Extra;
         type CreatedAt = Set<members::created_at>;
+        type Extra = St::Extra;
+        type Metadata = St::Metadata;
         type Id = St::Id;
-        type LaunchAsset = St::LaunchAsset;
         type RuntimeVersion = St::RuntimeVersion;
+        type LaunchAsset = St::LaunchAsset;
+    }
+    ///State transition - sets the `extra` field to Set
+    pub struct SetExtra<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetExtra<St> {}
+    impl<St: State> State for SetExtra<St> {
+        type CreatedAt = St::CreatedAt;
+        type Extra = Set<members::extra>;
+        type Metadata = St::Metadata;
+        type Id = St::Id;
+        type RuntimeVersion = St::RuntimeVersion;
+        type LaunchAsset = St::LaunchAsset;
+    }
+    ///State transition - sets the `metadata` field to Set
+    pub struct SetMetadata<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMetadata<St> {}
+    impl<St: State> State for SetMetadata<St> {
+        type CreatedAt = St::CreatedAt;
+        type Extra = St::Extra;
+        type Metadata = Set<members::metadata>;
+        type Id = St::Id;
+        type RuntimeVersion = St::RuntimeVersion;
+        type LaunchAsset = St::LaunchAsset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type Metadata = St::Metadata;
-        type Extra = St::Extra;
         type CreatedAt = St::CreatedAt;
+        type Extra = St::Extra;
+        type Metadata = St::Metadata;
         type Id = Set<members::id>;
+        type RuntimeVersion = St::RuntimeVersion;
         type LaunchAsset = St::LaunchAsset;
-        type RuntimeVersion = St::RuntimeVersion;
-    }
-    ///State transition - sets the `launch_asset` field to Set
-    pub struct SetLaunchAsset<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLaunchAsset<St> {}
-    impl<St: State> State for SetLaunchAsset<St> {
-        type Metadata = St::Metadata;
-        type Extra = St::Extra;
-        type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
-        type LaunchAsset = Set<members::launch_asset>;
-        type RuntimeVersion = St::RuntimeVersion;
     }
     ///State transition - sets the `runtime_version` field to Set
     pub struct SetRuntimeVersion<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRuntimeVersion<St> {}
     impl<St: State> State for SetRuntimeVersion<St> {
-        type Metadata = St::Metadata;
-        type Extra = St::Extra;
         type CreatedAt = St::CreatedAt;
+        type Extra = St::Extra;
+        type Metadata = St::Metadata;
         type Id = St::Id;
-        type LaunchAsset = St::LaunchAsset;
         type RuntimeVersion = Set<members::runtime_version>;
+        type LaunchAsset = St::LaunchAsset;
+    }
+    ///State transition - sets the `launch_asset` field to Set
+    pub struct SetLaunchAsset<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLaunchAsset<St> {}
+    impl<St: State> State for SetLaunchAsset<St> {
+        type CreatedAt = St::CreatedAt;
+        type Extra = St::Extra;
+        type Metadata = St::Metadata;
+        type Id = St::Id;
+        type RuntimeVersion = St::RuntimeVersion;
+        type LaunchAsset = Set<members::launch_asset>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `metadata` field
-        pub struct metadata(());
-        ///Marker type for the `extra` field
-        pub struct extra(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `extra` field
+        pub struct extra(());
+        ///Marker type for the `metadata` field
+        pub struct metadata(());
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `launch_asset` field
-        pub struct launch_asset(());
         ///Marker type for the `runtime_version` field
         pub struct runtime_version(());
+        ///Marker type for the `launch_asset` field
+        pub struct launch_asset(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ManifestBuilder<S: BosStr, St: manifest_state::State> {
+pub struct ManifestBuilder<St: manifest_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -1663,15 +1718,22 @@ pub struct ManifestBuilder<S: BosStr, St: manifest_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Manifest<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ManifestBuilder<S, manifest_state::Empty> {
+impl Manifest<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ManifestBuilder<manifest_state::Empty, DefaultStr> {
         ManifestBuilder::new()
     }
 }
 
-impl<S: BosStr> ManifestBuilder<S, manifest_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Manifest<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ManifestBuilder<manifest_state::Empty, S> {
+        ManifestBuilder::builder()
+    }
+}
+
+impl ManifestBuilder<manifest_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ManifestBuilder {
             _state: PhantomData,
@@ -1681,7 +1743,18 @@ impl<S: BosStr> ManifestBuilder<S, manifest_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ManifestBuilder<S, St>
+impl<S: BosStr> ManifestBuilder<manifest_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ManifestBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ManifestBuilder<St, S>
 where
     St: manifest_state::State,
     St::CreatedAt: manifest_state::IsUnset,
@@ -1690,7 +1763,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ManifestBuilder<S, manifest_state::SetCreatedAt<St>> {
+    ) -> ManifestBuilder<manifest_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ManifestBuilder {
             _state: PhantomData,
@@ -1700,7 +1773,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ManifestBuilder<S, St>
+impl<St, S: BosStr> ManifestBuilder<St, S>
 where
     St: manifest_state::State,
     St::Extra: manifest_state::IsUnset,
@@ -1709,7 +1782,7 @@ where
     pub fn extra(
         mut self,
         value: impl Into<plugin::ManifestExtra<S>>,
-    ) -> ManifestBuilder<S, manifest_state::SetExtra<St>> {
+    ) -> ManifestBuilder<manifest_state::SetExtra<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ManifestBuilder {
             _state: PhantomData,
@@ -1719,13 +1792,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ManifestBuilder<S, St>
+impl<St, S: BosStr> ManifestBuilder<St, S>
 where
     St: manifest_state::State,
     St::Id: manifest_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<S>) -> ManifestBuilder<S, manifest_state::SetId<St>> {
+    pub fn id(
+        mut self,
+        value: impl Into<S>,
+    ) -> ManifestBuilder<manifest_state::SetId<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ManifestBuilder {
             _state: PhantomData,
@@ -1735,7 +1811,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ManifestBuilder<S, St>
+impl<St, S: BosStr> ManifestBuilder<St, S>
 where
     St: manifest_state::State,
     St::LaunchAsset: manifest_state::IsUnset,
@@ -1744,7 +1820,7 @@ where
     pub fn launch_asset(
         mut self,
         value: impl Into<plugin::LaunchAsset<S>>,
-    ) -> ManifestBuilder<S, manifest_state::SetLaunchAsset<St>> {
+    ) -> ManifestBuilder<manifest_state::SetLaunchAsset<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ManifestBuilder {
             _state: PhantomData,
@@ -1754,7 +1830,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ManifestBuilder<S, St>
+impl<St, S: BosStr> ManifestBuilder<St, S>
 where
     St: manifest_state::State,
     St::Metadata: manifest_state::IsUnset,
@@ -1763,7 +1839,7 @@ where
     pub fn metadata(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> ManifestBuilder<S, manifest_state::SetMetadata<St>> {
+    ) -> ManifestBuilder<manifest_state::SetMetadata<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ManifestBuilder {
             _state: PhantomData,
@@ -1773,7 +1849,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ManifestBuilder<S, St>
+impl<St, S: BosStr> ManifestBuilder<St, S>
 where
     St: manifest_state::State,
     St::RuntimeVersion: manifest_state::IsUnset,
@@ -1782,7 +1858,7 @@ where
     pub fn runtime_version(
         mut self,
         value: impl Into<S>,
-    ) -> ManifestBuilder<S, manifest_state::SetRuntimeVersion<St>> {
+    ) -> ManifestBuilder<manifest_state::SetRuntimeVersion<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ManifestBuilder {
             _state: PhantomData,
@@ -1792,15 +1868,15 @@ where
     }
 }
 
-impl<S: BosStr, St> ManifestBuilder<S, St>
+impl<St, S: BosStr> ManifestBuilder<St, S>
 where
     St: manifest_state::State,
-    St::Metadata: manifest_state::IsSet,
-    St::Extra: manifest_state::IsSet,
     St::CreatedAt: manifest_state::IsSet,
+    St::Extra: manifest_state::IsSet,
+    St::Metadata: manifest_state::IsSet,
     St::Id: manifest_state::IsSet,
-    St::LaunchAsset: manifest_state::IsSet,
     St::RuntimeVersion: manifest_state::IsSet,
+    St::LaunchAsset: manifest_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Manifest<S> {
@@ -1830,7 +1906,7 @@ where
 
 pub mod manifest_extra_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1838,56 +1914,66 @@ pub mod manifest_extra_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ExpoClient;
         type ExpoGo;
+        type ExpoClient;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ExpoClient = Unset;
         type ExpoGo = Unset;
-    }
-    ///State transition - sets the `expo_client` field to Set
-    pub struct SetExpoClient<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetExpoClient<St> {}
-    impl<St: State> State for SetExpoClient<St> {
-        type ExpoClient = Set<members::expo_client>;
-        type ExpoGo = St::ExpoGo;
+        type ExpoClient = Unset;
     }
     ///State transition - sets the `expo_go` field to Set
     pub struct SetExpoGo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetExpoGo<St> {}
     impl<St: State> State for SetExpoGo<St> {
-        type ExpoClient = St::ExpoClient;
         type ExpoGo = Set<members::expo_go>;
+        type ExpoClient = St::ExpoClient;
+    }
+    ///State transition - sets the `expo_client` field to Set
+    pub struct SetExpoClient<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetExpoClient<St> {}
+    impl<St: State> State for SetExpoClient<St> {
+        type ExpoGo = St::ExpoGo;
+        type ExpoClient = Set<members::expo_client>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `expo_client` field
-        pub struct expo_client(());
         ///Marker type for the `expo_go` field
         pub struct expo_go(());
+        ///Marker type for the `expo_client` field
+        pub struct expo_client(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ManifestExtraBuilder<S: BosStr, St: manifest_extra_state::State> {
+pub struct ManifestExtraBuilder<
+    St: manifest_extra_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<plugin::ExpoClient<S>>, Option<plugin::ExpoGo<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ManifestExtra<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ManifestExtraBuilder<S, manifest_extra_state::Empty> {
+impl ManifestExtra<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ManifestExtraBuilder<manifest_extra_state::Empty, DefaultStr> {
         ManifestExtraBuilder::new()
     }
 }
 
-impl<S: BosStr> ManifestExtraBuilder<S, manifest_extra_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ManifestExtra<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ManifestExtraBuilder<manifest_extra_state::Empty, S> {
+        ManifestExtraBuilder::builder()
+    }
+}
+
+impl ManifestExtraBuilder<manifest_extra_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ManifestExtraBuilder {
             _state: PhantomData,
@@ -1897,7 +1983,18 @@ impl<S: BosStr> ManifestExtraBuilder<S, manifest_extra_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ManifestExtraBuilder<S, St>
+impl<S: BosStr> ManifestExtraBuilder<manifest_extra_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ManifestExtraBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ManifestExtraBuilder<St, S>
 where
     St: manifest_extra_state::State,
     St::ExpoClient: manifest_extra_state::IsUnset,
@@ -1906,7 +2003,7 @@ where
     pub fn expo_client(
         mut self,
         value: impl Into<plugin::ExpoClient<S>>,
-    ) -> ManifestExtraBuilder<S, manifest_extra_state::SetExpoClient<St>> {
+    ) -> ManifestExtraBuilder<manifest_extra_state::SetExpoClient<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ManifestExtraBuilder {
             _state: PhantomData,
@@ -1916,7 +2013,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ManifestExtraBuilder<S, St>
+impl<St, S: BosStr> ManifestExtraBuilder<St, S>
 where
     St: manifest_extra_state::State,
     St::ExpoGo: manifest_extra_state::IsUnset,
@@ -1925,7 +2022,7 @@ where
     pub fn expo_go(
         mut self,
         value: impl Into<plugin::ExpoGo<S>>,
-    ) -> ManifestExtraBuilder<S, manifest_extra_state::SetExpoGo<St>> {
+    ) -> ManifestExtraBuilder<manifest_extra_state::SetExpoGo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ManifestExtraBuilder {
             _state: PhantomData,
@@ -1935,11 +2032,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ManifestExtraBuilder<S, St>
+impl<St, S: BosStr> ManifestExtraBuilder<St, S>
 where
     St: manifest_extra_state::State,
-    St::ExpoClient: manifest_extra_state::IsSet,
     St::ExpoGo: manifest_extra_state::IsSet,
+    St::ExpoClient: manifest_extra_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ManifestExtra<S> {
@@ -1950,7 +2047,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ManifestExtra<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ManifestExtra<S> {
         ManifestExtra {
             expo_client: self._fields.0.unwrap(),
             expo_go: self._fields.1.unwrap(),

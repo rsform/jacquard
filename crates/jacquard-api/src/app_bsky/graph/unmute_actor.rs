@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UnmuteActor<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -39,8 +36,9 @@ impl jacquard_common::xrpc::XrpcResp for UnmuteActorResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UnmuteActor<S> {
     const NSID: &'static str = "app.bsky.graph.unmuteActor";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UnmuteActorResponse;
 }
 
@@ -48,15 +46,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UnmuteActor<S> {
 pub struct UnmuteActorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UnmuteActorRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.unmuteActor";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UnmuteActor<S>;
     type Response = UnmuteActorResponse;
 }
 
 pub mod unmute_actor_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -87,21 +86,28 @@ pub mod unmute_actor_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UnmuteActorBuilder<S: BosStr, St: unmute_actor_state::State> {
+pub struct UnmuteActorBuilder<St: unmute_actor_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UnmuteActor<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UnmuteActorBuilder<S, unmute_actor_state::Empty> {
+impl UnmuteActor<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UnmuteActorBuilder<unmute_actor_state::Empty, DefaultStr> {
         UnmuteActorBuilder::new()
     }
 }
 
-impl<S: BosStr> UnmuteActorBuilder<S, unmute_actor_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UnmuteActor<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UnmuteActorBuilder<unmute_actor_state::Empty, S> {
+        UnmuteActorBuilder::builder()
+    }
+}
+
+impl UnmuteActorBuilder<unmute_actor_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UnmuteActorBuilder {
             _state: PhantomData,
@@ -111,7 +117,18 @@ impl<S: BosStr> UnmuteActorBuilder<S, unmute_actor_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> UnmuteActorBuilder<S, St>
+impl<S: BosStr> UnmuteActorBuilder<unmute_actor_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UnmuteActorBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> UnmuteActorBuilder<St, S>
 where
     St: unmute_actor_state::State,
     St::Actor: unmute_actor_state::IsUnset,
@@ -120,7 +137,7 @@ where
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> UnmuteActorBuilder<S, unmute_actor_state::SetActor<St>> {
+    ) -> UnmuteActorBuilder<unmute_actor_state::SetActor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         UnmuteActorBuilder {
             _state: PhantomData,
@@ -130,7 +147,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UnmuteActorBuilder<S, St>
+impl<St, S: BosStr> UnmuteActorBuilder<St, S>
 where
     St: unmute_actor_state::State,
     St::Actor: unmute_actor_state::IsSet,
@@ -143,7 +160,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UnmuteActor<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UnmuteActor<S> {
         UnmuteActor {
             actor: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

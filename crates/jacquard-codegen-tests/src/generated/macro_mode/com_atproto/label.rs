@@ -797,72 +797,75 @@ pub mod label_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Val;
-        type Cts;
         type Uri;
+        type Val;
         type Src;
+        type Cts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Val = Unset;
-        type Cts = Unset;
         type Uri = Unset;
+        type Val = Unset;
         type Src = Unset;
-    }
-    ///State transition - sets the `val` field to Set
-    pub struct SetVal<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVal<St> {}
-    impl<St: State> State for SetVal<St> {
-        type Val = Set<members::val>;
-        type Cts = St::Cts;
-        type Uri = St::Uri;
-        type Src = St::Src;
-    }
-    ///State transition - sets the `cts` field to Set
-    pub struct SetCts<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCts<St> {}
-    impl<St: State> State for SetCts<St> {
-        type Val = St::Val;
-        type Cts = Set<members::cts>;
-        type Uri = St::Uri;
-        type Src = St::Src;
+        type Cts = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Val = St::Val;
-        type Cts = St::Cts;
         type Uri = Set<members::uri>;
+        type Val = St::Val;
         type Src = St::Src;
+        type Cts = St::Cts;
+    }
+    ///State transition - sets the `val` field to Set
+    pub struct SetVal<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVal<St> {}
+    impl<St: State> State for SetVal<St> {
+        type Uri = St::Uri;
+        type Val = Set<members::val>;
+        type Src = St::Src;
+        type Cts = St::Cts;
     }
     ///State transition - sets the `src` field to Set
     pub struct SetSrc<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSrc<St> {}
     impl<St: State> State for SetSrc<St> {
-        type Val = St::Val;
-        type Cts = St::Cts;
         type Uri = St::Uri;
+        type Val = St::Val;
         type Src = Set<members::src>;
+        type Cts = St::Cts;
+    }
+    ///State transition - sets the `cts` field to Set
+    pub struct SetCts<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCts<St> {}
+    impl<St: State> State for SetCts<St> {
+        type Uri = St::Uri;
+        type Val = St::Val;
+        type Src = St::Src;
+        type Cts = Set<members::cts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `val` field
-        pub struct val(());
-        ///Marker type for the `cts` field
-        pub struct cts(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `val` field
+        pub struct val(());
         ///Marker type for the `src` field
         pub struct src(());
+        ///Marker type for the `cts` field
+        pub struct cts(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LabelBuilder<S: jacquard_common::BosStr, St: label_state::State> {
+pub struct LabelBuilder<
+    St: label_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
+> {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
         core::option::Option<jacquard_common::types::string::Cid<S>>,
@@ -878,15 +881,22 @@ pub struct LabelBuilder<S: jacquard_common::BosStr, St: label_state::State> {
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> Label<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LabelBuilder<S, label_state::Empty> {
+impl Label<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LabelBuilder<label_state::Empty, jacquard_common::DefaultStr> {
         LabelBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> LabelBuilder<S, label_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> Label<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LabelBuilder<label_state::Empty, S> {
+        LabelBuilder::builder()
+    }
+}
+
+impl LabelBuilder<label_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LabelBuilder {
             _state: ::core::marker::PhantomData,
@@ -896,7 +906,18 @@ impl<S: jacquard_common::BosStr> LabelBuilder<S, label_state::Empty> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St: label_state::State> LabelBuilder<S, St> {
+impl<S: jacquard_common::BosStr> LabelBuilder<label_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LabelBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St: label_state::State, S: jacquard_common::BosStr> LabelBuilder<St, S> {
     /// Set the `cid` field (optional)
     pub fn cid(
         mut self,
@@ -915,7 +936,7 @@ impl<S: jacquard_common::BosStr, St: label_state::State> LabelBuilder<S, St> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LabelBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> LabelBuilder<St, S>
 where
     St: label_state::State,
     St::Cts: label_state::IsUnset,
@@ -924,7 +945,7 @@ where
     pub fn cts(
         mut self,
         value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> LabelBuilder<S, label_state::SetCts<St>> {
+    ) -> LabelBuilder<label_state::SetCts<St>, S> {
         self._fields.1 = ::core::option::Option::Some(value.into());
         LabelBuilder {
             _state: ::core::marker::PhantomData,
@@ -934,7 +955,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St: label_state::State> LabelBuilder<S, St> {
+impl<St: label_state::State, S: jacquard_common::BosStr> LabelBuilder<St, S> {
     /// Set the `exp` field (optional)
     pub fn exp(
         mut self,
@@ -953,7 +974,7 @@ impl<S: jacquard_common::BosStr, St: label_state::State> LabelBuilder<S, St> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St: label_state::State> LabelBuilder<S, St> {
+impl<St: label_state::State, S: jacquard_common::BosStr> LabelBuilder<St, S> {
     /// Set the `neg` field (optional)
     pub fn neg(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -966,7 +987,7 @@ impl<S: jacquard_common::BosStr, St: label_state::State> LabelBuilder<S, St> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St: label_state::State> LabelBuilder<S, St> {
+impl<St: label_state::State, S: jacquard_common::BosStr> LabelBuilder<St, S> {
     /// Set the `sig` field (optional)
     pub fn sig(
         mut self,
@@ -985,7 +1006,7 @@ impl<S: jacquard_common::BosStr, St: label_state::State> LabelBuilder<S, St> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LabelBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> LabelBuilder<St, S>
 where
     St: label_state::State,
     St::Src: label_state::IsUnset,
@@ -994,7 +1015,7 @@ where
     pub fn src(
         mut self,
         value: impl Into<jacquard_common::types::string::Did<S>>,
-    ) -> LabelBuilder<S, label_state::SetSrc<St>> {
+    ) -> LabelBuilder<label_state::SetSrc<St>, S> {
         self._fields.5 = ::core::option::Option::Some(value.into());
         LabelBuilder {
             _state: ::core::marker::PhantomData,
@@ -1004,7 +1025,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LabelBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> LabelBuilder<St, S>
 where
     St: label_state::State,
     St::Uri: label_state::IsUnset,
@@ -1013,7 +1034,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<jacquard_common::types::string::UriValue<S>>,
-    ) -> LabelBuilder<S, label_state::SetUri<St>> {
+    ) -> LabelBuilder<label_state::SetUri<St>, S> {
         self._fields.6 = ::core::option::Option::Some(value.into());
         LabelBuilder {
             _state: ::core::marker::PhantomData,
@@ -1023,7 +1044,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LabelBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> LabelBuilder<St, S>
 where
     St: label_state::State,
     St::Val: label_state::IsUnset,
@@ -1032,7 +1053,7 @@ where
     pub fn val(
         mut self,
         value: impl Into<S>,
-    ) -> LabelBuilder<S, label_state::SetVal<St>> {
+    ) -> LabelBuilder<label_state::SetVal<St>, S> {
         self._fields.7 = ::core::option::Option::Some(value.into());
         LabelBuilder {
             _state: ::core::marker::PhantomData,
@@ -1042,7 +1063,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St: label_state::State> LabelBuilder<S, St> {
+impl<St: label_state::State, S: jacquard_common::BosStr> LabelBuilder<St, S> {
     /// Set the `ver` field (optional)
     pub fn ver(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.8 = value.into();
@@ -1055,13 +1076,13 @@ impl<S: jacquard_common::BosStr, St: label_state::State> LabelBuilder<S, St> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LabelBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> LabelBuilder<St, S>
 where
     St: label_state::State,
-    St::Val: label_state::IsSet,
-    St::Cts: label_state::IsSet,
     St::Uri: label_state::IsSet,
+    St::Val: label_state::IsSet,
     St::Src: label_state::IsSet,
+    St::Cts: label_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Label<S> {
@@ -1515,74 +1536,74 @@ pub mod label_value_definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Identifier;
-        type Blurs;
-        type Locales;
         type Severity;
+        type Locales;
+        type Blurs;
+        type Identifier;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Identifier = Unset;
-        type Blurs = Unset;
-        type Locales = Unset;
         type Severity = Unset;
-    }
-    ///State transition - sets the `identifier` field to Set
-    pub struct SetIdentifier<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIdentifier<St> {}
-    impl<St: State> State for SetIdentifier<St> {
-        type Identifier = Set<members::identifier>;
-        type Blurs = St::Blurs;
-        type Locales = St::Locales;
-        type Severity = St::Severity;
-    }
-    ///State transition - sets the `blurs` field to Set
-    pub struct SetBlurs<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBlurs<St> {}
-    impl<St: State> State for SetBlurs<St> {
-        type Identifier = St::Identifier;
-        type Blurs = Set<members::blurs>;
-        type Locales = St::Locales;
-        type Severity = St::Severity;
-    }
-    ///State transition - sets the `locales` field to Set
-    pub struct SetLocales<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLocales<St> {}
-    impl<St: State> State for SetLocales<St> {
-        type Identifier = St::Identifier;
-        type Blurs = St::Blurs;
-        type Locales = Set<members::locales>;
-        type Severity = St::Severity;
+        type Locales = Unset;
+        type Blurs = Unset;
+        type Identifier = Unset;
     }
     ///State transition - sets the `severity` field to Set
     pub struct SetSeverity<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSeverity<St> {}
     impl<St: State> State for SetSeverity<St> {
-        type Identifier = St::Identifier;
-        type Blurs = St::Blurs;
-        type Locales = St::Locales;
         type Severity = Set<members::severity>;
+        type Locales = St::Locales;
+        type Blurs = St::Blurs;
+        type Identifier = St::Identifier;
+    }
+    ///State transition - sets the `locales` field to Set
+    pub struct SetLocales<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLocales<St> {}
+    impl<St: State> State for SetLocales<St> {
+        type Severity = St::Severity;
+        type Locales = Set<members::locales>;
+        type Blurs = St::Blurs;
+        type Identifier = St::Identifier;
+    }
+    ///State transition - sets the `blurs` field to Set
+    pub struct SetBlurs<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlurs<St> {}
+    impl<St: State> State for SetBlurs<St> {
+        type Severity = St::Severity;
+        type Locales = St::Locales;
+        type Blurs = Set<members::blurs>;
+        type Identifier = St::Identifier;
+    }
+    ///State transition - sets the `identifier` field to Set
+    pub struct SetIdentifier<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIdentifier<St> {}
+    impl<St: State> State for SetIdentifier<St> {
+        type Severity = St::Severity;
+        type Locales = St::Locales;
+        type Blurs = St::Blurs;
+        type Identifier = Set<members::identifier>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `identifier` field
-        pub struct identifier(());
-        ///Marker type for the `blurs` field
-        pub struct blurs(());
-        ///Marker type for the `locales` field
-        pub struct locales(());
         ///Marker type for the `severity` field
         pub struct severity(());
+        ///Marker type for the `locales` field
+        pub struct locales(());
+        ///Marker type for the `blurs` field
+        pub struct blurs(());
+        ///Marker type for the `identifier` field
+        pub struct identifier(());
     }
 }
 
 /// Builder for constructing an instance of this type.
 pub struct LabelValueDefinitionBuilder<
-    S: jacquard_common::BosStr,
     St: label_value_definition_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
 > {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
@@ -1598,17 +1619,31 @@ pub struct LabelValueDefinitionBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> LabelValueDefinition<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LabelValueDefinitionBuilder<S, label_value_definition_state::Empty> {
+impl LabelValueDefinition<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LabelValueDefinitionBuilder<
+        label_value_definition_state::Empty,
+        jacquard_common::DefaultStr,
+    > {
         LabelValueDefinitionBuilder::new()
     }
 }
 
-impl<
-    S: jacquard_common::BosStr,
-> LabelValueDefinitionBuilder<S, label_value_definition_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> LabelValueDefinition<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LabelValueDefinitionBuilder<
+        label_value_definition_state::Empty,
+        S,
+    > {
+        LabelValueDefinitionBuilder::builder()
+    }
+}
+
+impl LabelValueDefinitionBuilder<
+    label_value_definition_state::Empty,
+    jacquard_common::DefaultStr,
+> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LabelValueDefinitionBuilder {
             _state: ::core::marker::PhantomData,
@@ -1620,8 +1655,21 @@ impl<
 
 impl<
     S: jacquard_common::BosStr,
+> LabelValueDefinitionBuilder<label_value_definition_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LabelValueDefinitionBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<
     St: label_value_definition_state::State,
-> LabelValueDefinitionBuilder<S, St> {
+    S: jacquard_common::BosStr,
+> LabelValueDefinitionBuilder<St, S> {
     /// Set the `adultOnly` field (optional)
     pub fn adult_only(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -1634,7 +1682,7 @@ impl<
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LabelValueDefinitionBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> LabelValueDefinitionBuilder<St, S>
 where
     St: label_value_definition_state::State,
     St::Blurs: label_value_definition_state::IsUnset,
@@ -1643,7 +1691,7 @@ where
     pub fn blurs(
         mut self,
         value: impl Into<LabelValueDefinitionBlurs<S>>,
-    ) -> LabelValueDefinitionBuilder<S, label_value_definition_state::SetBlurs<St>> {
+    ) -> LabelValueDefinitionBuilder<label_value_definition_state::SetBlurs<St>, S> {
         self._fields.1 = ::core::option::Option::Some(value.into());
         LabelValueDefinitionBuilder {
             _state: ::core::marker::PhantomData,
@@ -1654,9 +1702,9 @@ where
 }
 
 impl<
-    S: jacquard_common::BosStr,
     St: label_value_definition_state::State,
-> LabelValueDefinitionBuilder<S, St> {
+    S: jacquard_common::BosStr,
+> LabelValueDefinitionBuilder<St, S> {
     /// Set the `defaultSetting` field (optional)
     pub fn default_setting(
         mut self,
@@ -1675,7 +1723,7 @@ impl<
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LabelValueDefinitionBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> LabelValueDefinitionBuilder<St, S>
 where
     St: label_value_definition_state::State,
     St::Identifier: label_value_definition_state::IsUnset,
@@ -1685,8 +1733,8 @@ where
         mut self,
         value: impl Into<S>,
     ) -> LabelValueDefinitionBuilder<
-        S,
         label_value_definition_state::SetIdentifier<St>,
+        S,
     > {
         self._fields.3 = ::core::option::Option::Some(value.into());
         LabelValueDefinitionBuilder {
@@ -1697,7 +1745,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LabelValueDefinitionBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> LabelValueDefinitionBuilder<St, S>
 where
     St: label_value_definition_state::State,
     St::Locales: label_value_definition_state::IsUnset,
@@ -1708,7 +1756,7 @@ where
         value: impl Into<
             Vec<crate::macro_mode::com_atproto::label::LabelValueDefinitionStrings<S>>,
         >,
-    ) -> LabelValueDefinitionBuilder<S, label_value_definition_state::SetLocales<St>> {
+    ) -> LabelValueDefinitionBuilder<label_value_definition_state::SetLocales<St>, S> {
         self._fields.4 = ::core::option::Option::Some(value.into());
         LabelValueDefinitionBuilder {
             _state: ::core::marker::PhantomData,
@@ -1718,7 +1766,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LabelValueDefinitionBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> LabelValueDefinitionBuilder<St, S>
 where
     St: label_value_definition_state::State,
     St::Severity: label_value_definition_state::IsUnset,
@@ -1727,7 +1775,7 @@ where
     pub fn severity(
         mut self,
         value: impl Into<LabelValueDefinitionSeverity<S>>,
-    ) -> LabelValueDefinitionBuilder<S, label_value_definition_state::SetSeverity<St>> {
+    ) -> LabelValueDefinitionBuilder<label_value_definition_state::SetSeverity<St>, S> {
         self._fields.5 = ::core::option::Option::Some(value.into());
         LabelValueDefinitionBuilder {
             _state: ::core::marker::PhantomData,
@@ -1737,13 +1785,13 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LabelValueDefinitionBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> LabelValueDefinitionBuilder<St, S>
 where
     St: label_value_definition_state::State,
-    St::Identifier: label_value_definition_state::IsSet,
-    St::Blurs: label_value_definition_state::IsSet,
-    St::Locales: label_value_definition_state::IsSet,
     St::Severity: label_value_definition_state::IsSet,
+    St::Locales: label_value_definition_state::IsSet,
+    St::Blurs: label_value_definition_state::IsSet,
+    St::Identifier: label_value_definition_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LabelValueDefinition<S> {
@@ -1787,49 +1835,49 @@ pub mod label_value_definition_strings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Lang;
+        type Name;
         type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Lang = Unset;
+        type Name = Unset;
         type Description = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Lang = St::Lang;
-        type Description = St::Description;
     }
     ///State transition - sets the `lang` field to Set
     pub struct SetLang<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLang<St> {}
     impl<St: State> State for SetLang<St> {
-        type Name = St::Name;
         type Lang = Set<members::lang>;
+        type Name = St::Name;
+        type Description = St::Description;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Lang = St::Lang;
+        type Name = Set<members::name>;
         type Description = St::Description;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDescription<St> {}
     impl<St: State> State for SetDescription<St> {
-        type Name = St::Name;
         type Lang = St::Lang;
+        type Name = St::Name;
         type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `lang` field
         pub struct lang(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `description` field
         pub struct description(());
     }
@@ -1837,8 +1885,8 @@ pub mod label_value_definition_strings_state {
 
 /// Builder for constructing an instance of this type.
 pub struct LabelValueDefinitionStringsBuilder<
-    S: jacquard_common::BosStr,
     St: label_value_definition_strings_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
 > {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
@@ -1849,20 +1897,31 @@ pub struct LabelValueDefinitionStringsBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> LabelValueDefinitionStrings<S> {
-    /// Create a new builder for this type.
+impl LabelValueDefinitionStrings<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
     pub fn new() -> LabelValueDefinitionStringsBuilder<
-        S,
         label_value_definition_strings_state::Empty,
+        jacquard_common::DefaultStr,
     > {
         LabelValueDefinitionStringsBuilder::new()
     }
 }
 
-impl<
-    S: jacquard_common::BosStr,
-> LabelValueDefinitionStringsBuilder<S, label_value_definition_strings_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> LabelValueDefinitionStrings<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LabelValueDefinitionStringsBuilder<
+        label_value_definition_strings_state::Empty,
+        S,
+    > {
+        LabelValueDefinitionStringsBuilder::builder()
+    }
+}
+
+impl LabelValueDefinitionStringsBuilder<
+    label_value_definition_strings_state::Empty,
+    jacquard_common::DefaultStr,
+> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LabelValueDefinitionStringsBuilder {
             _state: ::core::marker::PhantomData,
@@ -1872,7 +1931,20 @@ impl<
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LabelValueDefinitionStringsBuilder<S, St>
+impl<
+    S: jacquard_common::BosStr,
+> LabelValueDefinitionStringsBuilder<label_value_definition_strings_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LabelValueDefinitionStringsBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None, None, None),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St, S: jacquard_common::BosStr> LabelValueDefinitionStringsBuilder<St, S>
 where
     St: label_value_definition_strings_state::State,
     St::Description: label_value_definition_strings_state::IsUnset,
@@ -1882,8 +1954,8 @@ where
         mut self,
         value: impl Into<S>,
     ) -> LabelValueDefinitionStringsBuilder<
-        S,
         label_value_definition_strings_state::SetDescription<St>,
+        S,
     > {
         self._fields.0 = ::core::option::Option::Some(value.into());
         LabelValueDefinitionStringsBuilder {
@@ -1894,7 +1966,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LabelValueDefinitionStringsBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> LabelValueDefinitionStringsBuilder<St, S>
 where
     St: label_value_definition_strings_state::State,
     St::Lang: label_value_definition_strings_state::IsUnset,
@@ -1904,8 +1976,8 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Language>,
     ) -> LabelValueDefinitionStringsBuilder<
-        S,
         label_value_definition_strings_state::SetLang<St>,
+        S,
     > {
         self._fields.1 = ::core::option::Option::Some(value.into());
         LabelValueDefinitionStringsBuilder {
@@ -1916,7 +1988,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LabelValueDefinitionStringsBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> LabelValueDefinitionStringsBuilder<St, S>
 where
     St: label_value_definition_strings_state::State,
     St::Name: label_value_definition_strings_state::IsUnset,
@@ -1926,8 +1998,8 @@ where
         mut self,
         value: impl Into<S>,
     ) -> LabelValueDefinitionStringsBuilder<
-        S,
         label_value_definition_strings_state::SetName<St>,
+        S,
     > {
         self._fields.2 = ::core::option::Option::Some(value.into());
         LabelValueDefinitionStringsBuilder {
@@ -1938,11 +2010,11 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> LabelValueDefinitionStringsBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> LabelValueDefinitionStringsBuilder<St, S>
 where
     St: label_value_definition_strings_state::State,
-    St::Name: label_value_definition_strings_state::IsSet,
     St::Lang: label_value_definition_strings_state::IsSet,
+    St::Name: label_value_definition_strings_state::IsSet,
     St::Description: label_value_definition_strings_state::IsSet,
 {
     /// Build the final struct.
@@ -2004,7 +2076,10 @@ pub mod self_labels_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SelfLabelsBuilder<S: jacquard_common::BosStr, St: self_labels_state::State> {
+pub struct SelfLabelsBuilder<
+    St: self_labels_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
+> {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
         core::option::Option<Vec<crate::macro_mode::com_atproto::label::SelfLabel<S>>>,
@@ -2012,15 +2087,25 @@ pub struct SelfLabelsBuilder<S: jacquard_common::BosStr, St: self_labels_state::
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> SelfLabels<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SelfLabelsBuilder<S, self_labels_state::Empty> {
+impl SelfLabels<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SelfLabelsBuilder<
+        self_labels_state::Empty,
+        jacquard_common::DefaultStr,
+    > {
         SelfLabelsBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> SelfLabelsBuilder<S, self_labels_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> SelfLabels<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SelfLabelsBuilder<self_labels_state::Empty, S> {
+        SelfLabelsBuilder::builder()
+    }
+}
+
+impl SelfLabelsBuilder<self_labels_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SelfLabelsBuilder {
             _state: ::core::marker::PhantomData,
@@ -2030,7 +2115,18 @@ impl<S: jacquard_common::BosStr> SelfLabelsBuilder<S, self_labels_state::Empty> 
     }
 }
 
-impl<S: jacquard_common::BosStr, St> SelfLabelsBuilder<S, St>
+impl<S: jacquard_common::BosStr> SelfLabelsBuilder<self_labels_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SelfLabelsBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None,),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St, S: jacquard_common::BosStr> SelfLabelsBuilder<St, S>
 where
     St: self_labels_state::State,
     St::Values: self_labels_state::IsUnset,
@@ -2039,7 +2135,7 @@ where
     pub fn values(
         mut self,
         value: impl Into<Vec<crate::macro_mode::com_atproto::label::SelfLabel<S>>>,
-    ) -> SelfLabelsBuilder<S, self_labels_state::SetValues<St>> {
+    ) -> SelfLabelsBuilder<self_labels_state::SetValues<St>, S> {
         self._fields.0 = ::core::option::Option::Some(value.into());
         SelfLabelsBuilder {
             _state: ::core::marker::PhantomData,
@@ -2049,7 +2145,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> SelfLabelsBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> SelfLabelsBuilder<St, S>
 where
     St: self_labels_state::State,
     St::Values: self_labels_state::IsSet,

@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeletePageParams<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
@@ -41,8 +38,9 @@ impl jacquard_common::xrpc::XrpcResp for DeletePageResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for DeletePage {
     const NSID: &'static str = "app.blebbit.authr.page.deletePage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeletePageResponse;
 }
 
@@ -50,15 +48,16 @@ impl jacquard_common::xrpc::XrpcRequest for DeletePage {
 pub struct DeletePageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeletePageRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.page.deletePage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeletePage;
     type Response = DeletePageResponse;
 }
 
 pub mod delete_page_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -76,21 +75,34 @@ pub mod delete_page_params_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeletePageParamsBuilder<S: BosStr, St: delete_page_params_state::State> {
+pub struct DeletePageParamsBuilder<
+    St: delete_page_params_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DeletePageParams<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DeletePageParamsBuilder<S, delete_page_params_state::Empty> {
+impl DeletePageParams<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DeletePageParamsBuilder<
+        delete_page_params_state::Empty,
+        DefaultStr,
+    > {
         DeletePageParamsBuilder::new()
     }
 }
 
-impl<S: BosStr> DeletePageParamsBuilder<S, delete_page_params_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DeletePageParams<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DeletePageParamsBuilder<delete_page_params_state::Empty, S> {
+        DeletePageParamsBuilder::builder()
+    }
+}
+
+impl DeletePageParamsBuilder<delete_page_params_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DeletePageParamsBuilder {
             _state: PhantomData,
@@ -100,7 +112,18 @@ impl<S: BosStr> DeletePageParamsBuilder<S, delete_page_params_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: delete_page_params_state::State> DeletePageParamsBuilder<S, St> {
+impl<S: BosStr> DeletePageParamsBuilder<delete_page_params_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DeletePageParamsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: delete_page_params_state::State, S: BosStr> DeletePageParamsBuilder<St, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -113,12 +136,14 @@ impl<S: BosStr, St: delete_page_params_state::State> DeletePageParamsBuilder<S, 
     }
 }
 
-impl<S: BosStr, St> DeletePageParamsBuilder<S, St>
+impl<St, S: BosStr> DeletePageParamsBuilder<St, S>
 where
     St: delete_page_params_state::State,
 {
     /// Build the final struct.
     pub fn build(self) -> DeletePageParams<S> {
-        DeletePageParams { id: self._fields.0 }
+        DeletePageParams {
+            id: self._fields.0,
+        }
     }
 }

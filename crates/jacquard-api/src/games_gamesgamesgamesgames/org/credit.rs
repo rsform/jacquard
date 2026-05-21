@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::games_gamesgamesgamesgames::CompanyRole;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::games_gamesgamesgamesgames::CompanyRole;
 /// A relationship between a game and an organization.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -123,7 +123,7 @@ impl<S: BosStr> LexiconSchema for Credit<S> {
 
 pub mod credit_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -131,56 +131,56 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Roles;
         type Game;
+        type Roles;
         type Org;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Roles = Unset;
         type Game = Unset;
+        type Roles = Unset;
         type Org = Unset;
-    }
-    ///State transition - sets the `roles` field to Set
-    pub struct SetRoles<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRoles<St> {}
-    impl<St: State> State for SetRoles<St> {
-        type Roles = Set<members::roles>;
-        type Game = St::Game;
-        type Org = St::Org;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGame<St> {}
     impl<St: State> State for SetGame<St> {
-        type Roles = St::Roles;
         type Game = Set<members::game>;
+        type Roles = St::Roles;
+        type Org = St::Org;
+    }
+    ///State transition - sets the `roles` field to Set
+    pub struct SetRoles<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoles<St> {}
+    impl<St: State> State for SetRoles<St> {
+        type Game = St::Game;
+        type Roles = Set<members::roles>;
         type Org = St::Org;
     }
     ///State transition - sets the `org` field to Set
     pub struct SetOrg<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOrg<St> {}
     impl<St: State> State for SetOrg<St> {
-        type Roles = St::Roles;
         type Game = St::Game;
+        type Roles = St::Roles;
         type Org = Set<members::org>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `roles` field
-        pub struct roles(());
         ///Marker type for the `game` field
         pub struct game(());
+        ///Marker type for the `roles` field
+        pub struct roles(());
         ///Marker type for the `org` field
         pub struct org(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreditBuilder<S: BosStr, St: credit_state::State> {
+pub struct CreditBuilder<St: credit_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -192,15 +192,22 @@ pub struct CreditBuilder<S: BosStr, St: credit_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Credit<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CreditBuilder<S, credit_state::Empty> {
+impl Credit<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CreditBuilder<credit_state::Empty, DefaultStr> {
         CreditBuilder::new()
     }
 }
 
-impl<S: BosStr> CreditBuilder<S, credit_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Credit<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CreditBuilder<credit_state::Empty, S> {
+        CreditBuilder::builder()
+    }
+}
+
+impl CreditBuilder<credit_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CreditBuilder {
             _state: PhantomData,
@@ -210,7 +217,18 @@ impl<S: BosStr> CreditBuilder<S, credit_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: credit_state::State> CreditBuilder<S, St> {
+impl<S: BosStr> CreditBuilder<credit_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CreditBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: credit_state::State, S: BosStr> CreditBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -223,7 +241,7 @@ impl<S: BosStr, St: credit_state::State> CreditBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: credit_state::State> CreditBuilder<S, St> {
+impl<St: credit_state::State, S: BosStr> CreditBuilder<St, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -236,7 +254,7 @@ impl<S: BosStr, St: credit_state::State> CreditBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CreditBuilder<S, St>
+impl<St, S: BosStr> CreditBuilder<St, S>
 where
     St: credit_state::State,
     St::Game: credit_state::IsUnset,
@@ -245,7 +263,7 @@ where
     pub fn game(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CreditBuilder<S, credit_state::SetGame<St>> {
+    ) -> CreditBuilder<credit_state::SetGame<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CreditBuilder {
             _state: PhantomData,
@@ -255,7 +273,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CreditBuilder<S, St>
+impl<St, S: BosStr> CreditBuilder<St, S>
 where
     St: credit_state::State,
     St::Org: credit_state::IsUnset,
@@ -264,7 +282,7 @@ where
     pub fn org(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CreditBuilder<S, credit_state::SetOrg<St>> {
+    ) -> CreditBuilder<credit_state::SetOrg<St>, S> {
         self._fields.3 = Option::Some(value.into());
         CreditBuilder {
             _state: PhantomData,
@@ -274,7 +292,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CreditBuilder<S, St>
+impl<St, S: BosStr> CreditBuilder<St, S>
 where
     St: credit_state::State,
     St::Roles: credit_state::IsUnset,
@@ -283,7 +301,7 @@ where
     pub fn roles(
         mut self,
         value: impl Into<Vec<CompanyRole<S>>>,
-    ) -> CreditBuilder<S, credit_state::SetRoles<St>> {
+    ) -> CreditBuilder<credit_state::SetRoles<St>, S> {
         self._fields.4 = Option::Some(value.into());
         CreditBuilder {
             _state: PhantomData,
@@ -293,11 +311,11 @@ where
     }
 }
 
-impl<S: BosStr, St> CreditBuilder<S, St>
+impl<St, S: BosStr> CreditBuilder<St, S>
 where
     St: credit_state::State,
-    St::Roles: credit_state::IsSet,
     St::Game: credit_state::IsSet,
+    St::Roles: credit_state::IsSet,
     St::Org: credit_state::IsSet,
 {
     /// Build the final struct.
@@ -325,10 +343,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_org_credit() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.org.credit"),

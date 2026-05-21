@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A warrant where one ATProto identity vouches for the trustworthiness of another identity
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -306,7 +306,7 @@ impl<S: BosStr> LexiconSchema for Warrant<S> {
 
 pub mod warrant_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -314,42 +314,42 @@ pub mod warrant_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = St::Subject;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
-        type CreatedAt = St::CreatedAt;
         type Subject = Set<members::subject>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WarrantBuilder<S: BosStr, St: warrant_state::State> {
+pub struct WarrantBuilder<St: warrant_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -362,15 +362,22 @@ pub struct WarrantBuilder<S: BosStr, St: warrant_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Warrant<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> WarrantBuilder<S, warrant_state::Empty> {
+impl Warrant<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> WarrantBuilder<warrant_state::Empty, DefaultStr> {
         WarrantBuilder::new()
     }
 }
 
-impl<S: BosStr> WarrantBuilder<S, warrant_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Warrant<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> WarrantBuilder<warrant_state::Empty, S> {
+        WarrantBuilder::builder()
+    }
+}
+
+impl WarrantBuilder<warrant_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         WarrantBuilder {
             _state: PhantomData,
@@ -380,7 +387,18 @@ impl<S: BosStr> WarrantBuilder<S, warrant_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> WarrantBuilder<S, St>
+impl<S: BosStr> WarrantBuilder<warrant_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        WarrantBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> WarrantBuilder<St, S>
 where
     St: warrant_state::State,
     St::CreatedAt: warrant_state::IsUnset,
@@ -389,7 +407,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WarrantBuilder<S, warrant_state::SetCreatedAt<St>> {
+    ) -> WarrantBuilder<warrant_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         WarrantBuilder {
             _state: PhantomData,
@@ -399,7 +417,7 @@ where
     }
 }
 
-impl<S: BosStr, St: warrant_state::State> WarrantBuilder<S, St> {
+impl<St: warrant_state::State, S: BosStr> WarrantBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -412,7 +430,7 @@ impl<S: BosStr, St: warrant_state::State> WarrantBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: warrant_state::State> WarrantBuilder<S, St> {
+impl<St: warrant_state::State, S: BosStr> WarrantBuilder<St, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -425,7 +443,7 @@ impl<S: BosStr, St: warrant_state::State> WarrantBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WarrantBuilder<S, St>
+impl<St, S: BosStr> WarrantBuilder<St, S>
 where
     St: warrant_state::State,
     St::Subject: warrant_state::IsUnset,
@@ -434,7 +452,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<S>,
-    ) -> WarrantBuilder<S, warrant_state::SetSubject<St>> {
+    ) -> WarrantBuilder<warrant_state::SetSubject<St>, S> {
         self._fields.3 = Option::Some(value.into());
         WarrantBuilder {
             _state: PhantomData,
@@ -444,9 +462,12 @@ where
     }
 }
 
-impl<S: BosStr, St: warrant_state::State> WarrantBuilder<S, St> {
+impl<St: warrant_state::State, S: BosStr> WarrantBuilder<St, S> {
     /// Set the `trustLevel` field (optional)
-    pub fn trust_level(mut self, value: impl Into<Option<WarrantTrustLevel<S>>>) -> Self {
+    pub fn trust_level(
+        mut self,
+        value: impl Into<Option<WarrantTrustLevel<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -457,9 +478,12 @@ impl<S: BosStr, St: warrant_state::State> WarrantBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: warrant_state::State> WarrantBuilder<S, St> {
+impl<St: warrant_state::State, S: BosStr> WarrantBuilder<St, S> {
     /// Set the `warrantType` field (optional)
-    pub fn warrant_type(mut self, value: impl Into<Option<WarrantWarrantType<S>>>) -> Self {
+    pub fn warrant_type(
+        mut self,
+        value: impl Into<Option<WarrantWarrantType<S>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -470,11 +494,11 @@ impl<S: BosStr, St: warrant_state::State> WarrantBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WarrantBuilder<S, St>
+impl<St, S: BosStr> WarrantBuilder<St, S>
 where
     St: warrant_state::State,
-    St::CreatedAt: warrant_state::IsSet,
     St::Subject: warrant_state::IsSet,
+    St::CreatedAt: warrant_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Warrant<S> {
@@ -503,10 +527,10 @@ where
 }
 
 fn lexicon_doc_beauty_cybernetic_trustcow_warrant() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("beauty.cybernetic.trustcow.warrant"),

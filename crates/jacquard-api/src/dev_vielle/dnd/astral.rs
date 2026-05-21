@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::dev_vielle::dnd::astral;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::dev_vielle::dnd::astral;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -55,6 +55,7 @@ pub struct AstralGetRecordOutput<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     pub value: Astral<S>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Power<S: BosStr = DefaultStr> {
@@ -84,7 +85,9 @@ impl<S: BosStr> Power<S> {
             Self::DevVielleDndPowerEldritchAdaptability => {
                 "dev.vielle.dnd.power#eldritchAdaptability"
             }
-            Self::DevVielleDndPowerEldritchAssault => "dev.vielle.dnd.power#eldritchAssault",
+            Self::DevVielleDndPowerEldritchAssault => {
+                "dev.vielle.dnd.power#eldritchAssault"
+            }
             Self::DevVielleDndPowerRuneSeeker => "dev.vielle.dnd.power#runeSeeker",
             Self::DevVielleDndPowerFateScriber => "dev.vielle.dnd.power#fateScriber",
             Self::DevVielleDndPowerFaceless => "dev.vielle.dnd.power#faceless",
@@ -92,7 +95,9 @@ impl<S: BosStr> Power<S> {
             Self::DevVielleDndPowerSpray => "dev.vielle.dnd.power#spray",
             Self::DevVielleDndPowerAcursed => "dev.vielle.dnd.power#acursed",
             Self::DevVielleDndPowerDarksight => "dev.vielle.dnd.power#darksight",
-            Self::DevVielleDndPowerEldritchVisage => "dev.vielle.dnd.power#eldritchVisage",
+            Self::DevVielleDndPowerEldritchVisage => {
+                "dev.vielle.dnd.power#eldritchVisage"
+            }
             Self::DevVielleDndPowerRegenerate => "dev.vielle.dnd.power#regenerate",
             Self::DevVielleDndPowerInstil => "dev.vielle.dnd.power#instil",
             Self::DevVielleDndPowerEldritchEnchantment => {
@@ -111,7 +116,9 @@ impl<S: BosStr> Power<S> {
             "dev.vielle.dnd.power#eldritchAdaptability" => {
                 Self::DevVielleDndPowerEldritchAdaptability
             }
-            "dev.vielle.dnd.power#eldritchAssault" => Self::DevVielleDndPowerEldritchAssault,
+            "dev.vielle.dnd.power#eldritchAssault" => {
+                Self::DevVielleDndPowerEldritchAssault
+            }
             "dev.vielle.dnd.power#runeSeeker" => Self::DevVielleDndPowerRuneSeeker,
             "dev.vielle.dnd.power#fateScriber" => Self::DevVielleDndPowerFateScriber,
             "dev.vielle.dnd.power#faceless" => Self::DevVielleDndPowerFaceless,
@@ -119,7 +126,9 @@ impl<S: BosStr> Power<S> {
             "dev.vielle.dnd.power#spray" => Self::DevVielleDndPowerSpray,
             "dev.vielle.dnd.power#acursed" => Self::DevVielleDndPowerAcursed,
             "dev.vielle.dnd.power#darksight" => Self::DevVielleDndPowerDarksight,
-            "dev.vielle.dnd.power#eldritchVisage" => Self::DevVielleDndPowerEldritchVisage,
+            "dev.vielle.dnd.power#eldritchVisage" => {
+                Self::DevVielleDndPowerEldritchVisage
+            }
             "dev.vielle.dnd.power#regenerate" => Self::DevVielleDndPowerRegenerate,
             "dev.vielle.dnd.power#instil" => Self::DevVielleDndPowerInstil,
             "dev.vielle.dnd.power#eldritchEnchantment" => {
@@ -176,7 +185,9 @@ where
             Power::DevVielleDndPowerEldritchAdaptability => {
                 Power::DevVielleDndPowerEldritchAdaptability
             }
-            Power::DevVielleDndPowerEldritchAssault => Power::DevVielleDndPowerEldritchAssault,
+            Power::DevVielleDndPowerEldritchAssault => {
+                Power::DevVielleDndPowerEldritchAssault
+            }
             Power::DevVielleDndPowerRuneSeeker => Power::DevVielleDndPowerRuneSeeker,
             Power::DevVielleDndPowerFateScriber => Power::DevVielleDndPowerFateScriber,
             Power::DevVielleDndPowerFaceless => Power::DevVielleDndPowerFaceless,
@@ -184,7 +195,9 @@ where
             Power::DevVielleDndPowerSpray => Power::DevVielleDndPowerSpray,
             Power::DevVielleDndPowerAcursed => Power::DevVielleDndPowerAcursed,
             Power::DevVielleDndPowerDarksight => Power::DevVielleDndPowerDarksight,
-            Power::DevVielleDndPowerEldritchVisage => Power::DevVielleDndPowerEldritchVisage,
+            Power::DevVielleDndPowerEldritchVisage => {
+                Power::DevVielleDndPowerEldritchVisage
+            }
             Power::DevVielleDndPowerRegenerate => Power::DevVielleDndPowerRegenerate,
             Power::DevVielleDndPowerInstil => Power::DevVielleDndPowerInstil,
             Power::DevVielleDndPowerEldritchEnchantment => {
@@ -253,7 +266,7 @@ fn _default_astral_points() -> i64 {
 
 pub mod astral_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -261,56 +274,63 @@ pub mod astral_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Powers;
         type Points;
+        type Powers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Powers = Unset;
         type Points = Unset;
-    }
-    ///State transition - sets the `powers` field to Set
-    pub struct SetPowers<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPowers<St> {}
-    impl<St: State> State for SetPowers<St> {
-        type Powers = Set<members::powers>;
-        type Points = St::Points;
+        type Powers = Unset;
     }
     ///State transition - sets the `points` field to Set
     pub struct SetPoints<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPoints<St> {}
     impl<St: State> State for SetPoints<St> {
-        type Powers = St::Powers;
         type Points = Set<members::points>;
+        type Powers = St::Powers;
+    }
+    ///State transition - sets the `powers` field to Set
+    pub struct SetPowers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPowers<St> {}
+    impl<St: State> State for SetPowers<St> {
+        type Points = St::Points;
+        type Powers = Set<members::powers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `powers` field
-        pub struct powers(());
         ///Marker type for the `points` field
         pub struct points(());
+        ///Marker type for the `powers` field
+        pub struct powers(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AstralBuilder<S: BosStr, St: astral_state::State> {
+pub struct AstralBuilder<St: astral_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Vec<astral::Power<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Astral<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AstralBuilder<S, astral_state::Empty> {
+impl Astral<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AstralBuilder<astral_state::Empty, DefaultStr> {
         AstralBuilder::new()
     }
 }
 
-impl<S: BosStr> AstralBuilder<S, astral_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Astral<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AstralBuilder<astral_state::Empty, S> {
+        AstralBuilder::builder()
+    }
+}
+
+impl AstralBuilder<astral_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AstralBuilder {
             _state: PhantomData,
@@ -320,7 +340,18 @@ impl<S: BosStr> AstralBuilder<S, astral_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AstralBuilder<S, St>
+impl<S: BosStr> AstralBuilder<astral_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AstralBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AstralBuilder<St, S>
 where
     St: astral_state::State,
     St::Points: astral_state::IsUnset,
@@ -329,7 +360,7 @@ where
     pub fn points(
         mut self,
         value: impl Into<i64>,
-    ) -> AstralBuilder<S, astral_state::SetPoints<St>> {
+    ) -> AstralBuilder<astral_state::SetPoints<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AstralBuilder {
             _state: PhantomData,
@@ -339,7 +370,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AstralBuilder<S, St>
+impl<St, S: BosStr> AstralBuilder<St, S>
 where
     St: astral_state::State,
     St::Powers: astral_state::IsUnset,
@@ -348,7 +379,7 @@ where
     pub fn powers(
         mut self,
         value: impl Into<Vec<astral::Power<S>>>,
-    ) -> AstralBuilder<S, astral_state::SetPowers<St>> {
+    ) -> AstralBuilder<astral_state::SetPowers<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AstralBuilder {
             _state: PhantomData,
@@ -358,11 +389,11 @@ where
     }
 }
 
-impl<S: BosStr, St> AstralBuilder<S, St>
+impl<St, S: BosStr> AstralBuilder<St, S>
 where
     St: astral_state::State,
-    St::Powers: astral_state::IsSet,
     St::Points: astral_state::IsSet,
+    St::Powers: astral_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Astral<S> {
@@ -383,10 +414,10 @@ where
 }
 
 fn lexicon_doc_dev_vielle_dnd_astral() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.vielle.dnd.astral"),
@@ -397,10 +428,11 @@ fn lexicon_doc_dev_vielle_dnd_astral() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("points"),
-                            SmolStr::new_static("powers"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("points"), SmolStr::new_static("powers")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -429,9 +461,7 @@ fn lexicon_doc_dev_vielle_dnd_astral() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("power"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map
         },

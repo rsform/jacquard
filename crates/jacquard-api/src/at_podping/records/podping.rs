@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Normalized podping fields, supporting podping v0 through v1.1. Record TID timestamp should represent when the event was received, useful for global ordering.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -118,7 +118,7 @@ impl<S: BosStr> LexiconSchema for Podping<S> {
 
 pub mod podping_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -126,90 +126,90 @@ pub mod podping_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Medium;
-        type Version;
         type Reason;
         type Iris;
         type Timestamp;
+        type Version;
+        type Medium;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Medium = Unset;
-        type Version = Unset;
         type Reason = Unset;
         type Iris = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `medium` field to Set
-    pub struct SetMedium<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMedium<St> {}
-    impl<St: State> State for SetMedium<St> {
-        type Medium = Set<members::medium>;
-        type Version = St::Version;
-        type Reason = St::Reason;
-        type Iris = St::Iris;
-        type Timestamp = St::Timestamp;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVersion<St> {}
-    impl<St: State> State for SetVersion<St> {
-        type Medium = St::Medium;
-        type Version = Set<members::version>;
-        type Reason = St::Reason;
-        type Iris = St::Iris;
-        type Timestamp = St::Timestamp;
+        type Version = Unset;
+        type Medium = Unset;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetReason<St> {}
     impl<St: State> State for SetReason<St> {
-        type Medium = St::Medium;
-        type Version = St::Version;
         type Reason = Set<members::reason>;
         type Iris = St::Iris;
         type Timestamp = St::Timestamp;
+        type Version = St::Version;
+        type Medium = St::Medium;
     }
     ///State transition - sets the `iris` field to Set
     pub struct SetIris<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIris<St> {}
     impl<St: State> State for SetIris<St> {
-        type Medium = St::Medium;
-        type Version = St::Version;
         type Reason = St::Reason;
         type Iris = Set<members::iris>;
         type Timestamp = St::Timestamp;
+        type Version = St::Version;
+        type Medium = St::Medium;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTimestamp<St> {}
     impl<St: State> State for SetTimestamp<St> {
-        type Medium = St::Medium;
-        type Version = St::Version;
         type Reason = St::Reason;
         type Iris = St::Iris;
         type Timestamp = Set<members::timestamp>;
+        type Version = St::Version;
+        type Medium = St::Medium;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVersion<St> {}
+    impl<St: State> State for SetVersion<St> {
+        type Reason = St::Reason;
+        type Iris = St::Iris;
+        type Timestamp = St::Timestamp;
+        type Version = Set<members::version>;
+        type Medium = St::Medium;
+    }
+    ///State transition - sets the `medium` field to Set
+    pub struct SetMedium<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMedium<St> {}
+    impl<St: State> State for SetMedium<St> {
+        type Reason = St::Reason;
+        type Iris = St::Iris;
+        type Timestamp = St::Timestamp;
+        type Version = St::Version;
+        type Medium = Set<members::medium>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `medium` field
-        pub struct medium(());
-        ///Marker type for the `version` field
-        pub struct version(());
         ///Marker type for the `reason` field
         pub struct reason(());
         ///Marker type for the `iris` field
         pub struct iris(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `version` field
+        pub struct version(());
+        ///Marker type for the `medium` field
+        pub struct medium(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PodpingBuilder<S: BosStr, St: podping_state::State> {
+pub struct PodpingBuilder<St: podping_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<UriValue<S>>>,
@@ -223,15 +223,22 @@ pub struct PodpingBuilder<S: BosStr, St: podping_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Podping<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PodpingBuilder<S, podping_state::Empty> {
+impl Podping<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PodpingBuilder<podping_state::Empty, DefaultStr> {
         PodpingBuilder::new()
     }
 }
 
-impl<S: BosStr> PodpingBuilder<S, podping_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Podping<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PodpingBuilder<podping_state::Empty, S> {
+        PodpingBuilder::builder()
+    }
+}
+
+impl PodpingBuilder<podping_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PodpingBuilder {
             _state: PhantomData,
@@ -241,7 +248,18 @@ impl<S: BosStr> PodpingBuilder<S, podping_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PodpingBuilder<S, St>
+impl<S: BosStr> PodpingBuilder<podping_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PodpingBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PodpingBuilder<St, S>
 where
     St: podping_state::State,
     St::Iris: podping_state::IsUnset,
@@ -250,7 +268,7 @@ where
     pub fn iris(
         mut self,
         value: impl Into<Vec<UriValue<S>>>,
-    ) -> PodpingBuilder<S, podping_state::SetIris<St>> {
+    ) -> PodpingBuilder<podping_state::SetIris<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PodpingBuilder {
             _state: PhantomData,
@@ -260,7 +278,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PodpingBuilder<S, St>
+impl<St, S: BosStr> PodpingBuilder<St, S>
 where
     St: podping_state::State,
     St::Medium: podping_state::IsUnset,
@@ -269,7 +287,7 @@ where
     pub fn medium(
         mut self,
         value: impl Into<S>,
-    ) -> PodpingBuilder<S, podping_state::SetMedium<St>> {
+    ) -> PodpingBuilder<podping_state::SetMedium<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PodpingBuilder {
             _state: PhantomData,
@@ -279,7 +297,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PodpingBuilder<S, St>
+impl<St, S: BosStr> PodpingBuilder<St, S>
 where
     St: podping_state::State,
     St::Reason: podping_state::IsUnset,
@@ -288,7 +306,7 @@ where
     pub fn reason(
         mut self,
         value: impl Into<S>,
-    ) -> PodpingBuilder<S, podping_state::SetReason<St>> {
+    ) -> PodpingBuilder<podping_state::SetReason<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PodpingBuilder {
             _state: PhantomData,
@@ -298,7 +316,7 @@ where
     }
 }
 
-impl<S: BosStr, St: podping_state::State> PodpingBuilder<S, St> {
+impl<St: podping_state::State, S: BosStr> PodpingBuilder<St, S> {
     /// Set the `sessionId` field (optional)
     pub fn session_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -311,7 +329,7 @@ impl<S: BosStr, St: podping_state::State> PodpingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: podping_state::State> PodpingBuilder<S, St> {
+impl<St: podping_state::State, S: BosStr> PodpingBuilder<St, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -324,7 +342,7 @@ impl<S: BosStr, St: podping_state::State> PodpingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PodpingBuilder<S, St>
+impl<St, S: BosStr> PodpingBuilder<St, S>
 where
     St: podping_state::State,
     St::Timestamp: podping_state::IsUnset,
@@ -333,7 +351,7 @@ where
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PodpingBuilder<S, podping_state::SetTimestamp<St>> {
+    ) -> PodpingBuilder<podping_state::SetTimestamp<St>, S> {
         self._fields.5 = Option::Some(value.into());
         PodpingBuilder {
             _state: PhantomData,
@@ -343,7 +361,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PodpingBuilder<S, St>
+impl<St, S: BosStr> PodpingBuilder<St, S>
 where
     St: podping_state::State,
     St::Version: podping_state::IsUnset,
@@ -352,7 +370,7 @@ where
     pub fn version(
         mut self,
         value: impl Into<S>,
-    ) -> PodpingBuilder<S, podping_state::SetVersion<St>> {
+    ) -> PodpingBuilder<podping_state::SetVersion<St>, S> {
         self._fields.6 = Option::Some(value.into());
         PodpingBuilder {
             _state: PhantomData,
@@ -362,14 +380,14 @@ where
     }
 }
 
-impl<S: BosStr, St> PodpingBuilder<S, St>
+impl<St, S: BosStr> PodpingBuilder<St, S>
 where
     St: podping_state::State,
-    St::Medium: podping_state::IsSet,
-    St::Version: podping_state::IsSet,
     St::Reason: podping_state::IsSet,
     St::Iris: podping_state::IsSet,
     St::Timestamp: podping_state::IsSet,
+    St::Version: podping_state::IsSet,
+    St::Medium: podping_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Podping<S> {
@@ -400,10 +418,10 @@ where
 }
 
 fn lexicon_doc_at_podping_records_podping() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.podping.records.podping"),

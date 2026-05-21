@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateAccountHandle<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub handle: Handle<S>,
@@ -40,8 +37,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateAccountHandleResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateAccountHandle<S> {
     const NSID: &'static str = "com.atproto.admin.updateAccountHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateAccountHandleResponse;
 }
 
@@ -49,15 +47,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateAccountHandle<S> {
 pub struct UpdateAccountHandleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountHandleRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateAccountHandle<S>;
     type Response = UpdateAccountHandleResponse;
 }
 
 pub mod update_account_handle_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -65,56 +64,72 @@ pub mod update_account_handle_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Handle = St::Handle;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHandle<St> {}
     impl<St: State> State for SetHandle<St> {
-        type Did = St::Did;
         type Handle = Set<members::handle>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Handle = St::Handle;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateAccountHandleBuilder<S: BosStr, St: update_account_handle_state::State> {
+pub struct UpdateAccountHandleBuilder<
+    St: update_account_handle_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Handle<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UpdateAccountHandle<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UpdateAccountHandleBuilder<S, update_account_handle_state::Empty> {
+impl UpdateAccountHandle<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UpdateAccountHandleBuilder<
+        update_account_handle_state::Empty,
+        DefaultStr,
+    > {
         UpdateAccountHandleBuilder::new()
     }
 }
 
-impl<S: BosStr> UpdateAccountHandleBuilder<S, update_account_handle_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UpdateAccountHandle<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UpdateAccountHandleBuilder<
+        update_account_handle_state::Empty,
+        S,
+    > {
+        UpdateAccountHandleBuilder::builder()
+    }
+}
+
+impl UpdateAccountHandleBuilder<update_account_handle_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UpdateAccountHandleBuilder {
             _state: PhantomData,
@@ -124,7 +139,18 @@ impl<S: BosStr> UpdateAccountHandleBuilder<S, update_account_handle_state::Empty
     }
 }
 
-impl<S: BosStr, St> UpdateAccountHandleBuilder<S, St>
+impl<S: BosStr> UpdateAccountHandleBuilder<update_account_handle_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UpdateAccountHandleBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> UpdateAccountHandleBuilder<St, S>
 where
     St: update_account_handle_state::State,
     St::Did: update_account_handle_state::IsUnset,
@@ -133,7 +159,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> UpdateAccountHandleBuilder<S, update_account_handle_state::SetDid<St>> {
+    ) -> UpdateAccountHandleBuilder<update_account_handle_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         UpdateAccountHandleBuilder {
             _state: PhantomData,
@@ -143,7 +169,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UpdateAccountHandleBuilder<S, St>
+impl<St, S: BosStr> UpdateAccountHandleBuilder<St, S>
 where
     St: update_account_handle_state::State,
     St::Handle: update_account_handle_state::IsUnset,
@@ -152,7 +178,7 @@ where
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> UpdateAccountHandleBuilder<S, update_account_handle_state::SetHandle<St>> {
+    ) -> UpdateAccountHandleBuilder<update_account_handle_state::SetHandle<St>, S> {
         self._fields.1 = Option::Some(value.into());
         UpdateAccountHandleBuilder {
             _state: PhantomData,
@@ -162,11 +188,11 @@ where
     }
 }
 
-impl<S: BosStr, St> UpdateAccountHandleBuilder<S, St>
+impl<St, S: BosStr> UpdateAccountHandleBuilder<St, S>
 where
     St: update_account_handle_state::State,
-    St::Did: update_account_handle_state::IsSet,
     St::Handle: update_account_handle_state::IsSet,
+    St::Did: update_account_handle_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> UpdateAccountHandle<S> {
@@ -177,7 +203,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateAccountHandle<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateAccountHandle<S> {
         UpdateAccountHandle {
             did: self._fields.0.unwrap(),
             handle: self._fields.1.unwrap(),

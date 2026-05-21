@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A fitness goal to track progress against
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -48,6 +48,7 @@ pub struct Goal<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GoalMetric<S: BosStr = DefaultStr> {
@@ -133,6 +134,7 @@ where
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GoalPeriod<S: BosStr = DefaultStr> {
@@ -308,7 +310,7 @@ impl<S: BosStr> LexiconSchema for Goal<S> {
 
 pub mod goal_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -316,90 +318,90 @@ pub mod goal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TargetValue;
-        type CreatedAt;
         type StartDate;
-        type Metric;
         type Period;
+        type Metric;
+        type CreatedAt;
+        type TargetValue;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TargetValue = Unset;
-        type CreatedAt = Unset;
         type StartDate = Unset;
-        type Metric = Unset;
         type Period = Unset;
-    }
-    ///State transition - sets the `target_value` field to Set
-    pub struct SetTargetValue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTargetValue<St> {}
-    impl<St: State> State for SetTargetValue<St> {
-        type TargetValue = Set<members::target_value>;
-        type CreatedAt = St::CreatedAt;
-        type StartDate = St::StartDate;
-        type Metric = St::Metric;
-        type Period = St::Period;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type TargetValue = St::TargetValue;
-        type CreatedAt = Set<members::created_at>;
-        type StartDate = St::StartDate;
-        type Metric = St::Metric;
-        type Period = St::Period;
+        type Metric = Unset;
+        type CreatedAt = Unset;
+        type TargetValue = Unset;
     }
     ///State transition - sets the `start_date` field to Set
     pub struct SetStartDate<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStartDate<St> {}
     impl<St: State> State for SetStartDate<St> {
-        type TargetValue = St::TargetValue;
-        type CreatedAt = St::CreatedAt;
         type StartDate = Set<members::start_date>;
+        type Period = St::Period;
         type Metric = St::Metric;
-        type Period = St::Period;
-    }
-    ///State transition - sets the `metric` field to Set
-    pub struct SetMetric<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMetric<St> {}
-    impl<St: State> State for SetMetric<St> {
-        type TargetValue = St::TargetValue;
         type CreatedAt = St::CreatedAt;
-        type StartDate = St::StartDate;
-        type Metric = Set<members::metric>;
-        type Period = St::Period;
+        type TargetValue = St::TargetValue;
     }
     ///State transition - sets the `period` field to Set
     pub struct SetPeriod<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPeriod<St> {}
     impl<St: State> State for SetPeriod<St> {
-        type TargetValue = St::TargetValue;
-        type CreatedAt = St::CreatedAt;
         type StartDate = St::StartDate;
-        type Metric = St::Metric;
         type Period = Set<members::period>;
+        type Metric = St::Metric;
+        type CreatedAt = St::CreatedAt;
+        type TargetValue = St::TargetValue;
+    }
+    ///State transition - sets the `metric` field to Set
+    pub struct SetMetric<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMetric<St> {}
+    impl<St: State> State for SetMetric<St> {
+        type StartDate = St::StartDate;
+        type Period = St::Period;
+        type Metric = Set<members::metric>;
+        type CreatedAt = St::CreatedAt;
+        type TargetValue = St::TargetValue;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type StartDate = St::StartDate;
+        type Period = St::Period;
+        type Metric = St::Metric;
+        type CreatedAt = Set<members::created_at>;
+        type TargetValue = St::TargetValue;
+    }
+    ///State transition - sets the `target_value` field to Set
+    pub struct SetTargetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTargetValue<St> {}
+    impl<St: State> State for SetTargetValue<St> {
+        type StartDate = St::StartDate;
+        type Period = St::Period;
+        type Metric = St::Metric;
+        type CreatedAt = St::CreatedAt;
+        type TargetValue = Set<members::target_value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `target_value` field
-        pub struct target_value(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `start_date` field
         pub struct start_date(());
-        ///Marker type for the `metric` field
-        pub struct metric(());
         ///Marker type for the `period` field
         pub struct period(());
+        ///Marker type for the `metric` field
+        pub struct metric(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `target_value` field
+        pub struct target_value(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GoalBuilder<S: BosStr, St: goal_state::State> {
+pub struct GoalBuilder<St: goal_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -412,15 +414,22 @@ pub struct GoalBuilder<S: BosStr, St: goal_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Goal<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GoalBuilder<S, goal_state::Empty> {
+impl Goal<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GoalBuilder<goal_state::Empty, DefaultStr> {
         GoalBuilder::new()
     }
 }
 
-impl<S: BosStr> GoalBuilder<S, goal_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Goal<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GoalBuilder<goal_state::Empty, S> {
+        GoalBuilder::builder()
+    }
+}
+
+impl GoalBuilder<goal_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GoalBuilder {
             _state: PhantomData,
@@ -430,7 +439,18 @@ impl<S: BosStr> GoalBuilder<S, goal_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GoalBuilder<S, St>
+impl<S: BosStr> GoalBuilder<goal_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GoalBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GoalBuilder<St, S>
 where
     St: goal_state::State,
     St::CreatedAt: goal_state::IsUnset,
@@ -439,7 +459,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GoalBuilder<S, goal_state::SetCreatedAt<St>> {
+    ) -> GoalBuilder<goal_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
@@ -449,7 +469,7 @@ where
     }
 }
 
-impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
+impl<St: goal_state::State, S: BosStr> GoalBuilder<St, S> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -462,7 +482,7 @@ impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GoalBuilder<S, St>
+impl<St, S: BosStr> GoalBuilder<St, S>
 where
     St: goal_state::State,
     St::Metric: goal_state::IsUnset,
@@ -471,7 +491,7 @@ where
     pub fn metric(
         mut self,
         value: impl Into<GoalMetric<S>>,
-    ) -> GoalBuilder<S, goal_state::SetMetric<St>> {
+    ) -> GoalBuilder<goal_state::SetMetric<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
@@ -481,7 +501,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GoalBuilder<S, St>
+impl<St, S: BosStr> GoalBuilder<St, S>
 where
     St: goal_state::State,
     St::Period: goal_state::IsUnset,
@@ -490,7 +510,7 @@ where
     pub fn period(
         mut self,
         value: impl Into<GoalPeriod<S>>,
-    ) -> GoalBuilder<S, goal_state::SetPeriod<St>> {
+    ) -> GoalBuilder<goal_state::SetPeriod<St>, S> {
         self._fields.3 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
@@ -500,7 +520,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GoalBuilder<S, St>
+impl<St, S: BosStr> GoalBuilder<St, S>
 where
     St: goal_state::State,
     St::StartDate: goal_state::IsUnset,
@@ -509,7 +529,7 @@ where
     pub fn start_date(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GoalBuilder<S, goal_state::SetStartDate<St>> {
+    ) -> GoalBuilder<goal_state::SetStartDate<St>, S> {
         self._fields.4 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
@@ -519,7 +539,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GoalBuilder<S, St>
+impl<St, S: BosStr> GoalBuilder<St, S>
 where
     St: goal_state::State,
     St::TargetValue: goal_state::IsUnset,
@@ -528,7 +548,7 @@ where
     pub fn target_value(
         mut self,
         value: impl Into<i64>,
-    ) -> GoalBuilder<S, goal_state::SetTargetValue<St>> {
+    ) -> GoalBuilder<goal_state::SetTargetValue<St>, S> {
         self._fields.5 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
@@ -538,14 +558,14 @@ where
     }
 }
 
-impl<S: BosStr, St> GoalBuilder<S, St>
+impl<St, S: BosStr> GoalBuilder<St, S>
 where
     St: goal_state::State,
-    St::TargetValue: goal_state::IsSet,
-    St::CreatedAt: goal_state::IsSet,
     St::StartDate: goal_state::IsSet,
-    St::Metric: goal_state::IsSet,
     St::Period: goal_state::IsSet,
+    St::Metric: goal_state::IsSet,
+    St::CreatedAt: goal_state::IsSet,
+    St::TargetValue: goal_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Goal<S> {
@@ -574,10 +594,10 @@ where
 }
 
 fn lexicon_doc_app_fitsky_goal() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.fitsky.goal"),
@@ -586,18 +606,20 @@ fn lexicon_doc_app_fitsky_goal() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A fitness goal to track progress against",
-                    )),
+                    description: Some(
+                        CowStr::new_static("A fitness goal to track progress against"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("metric"),
-                            SmolStr::new_static("targetValue"),
-                            SmolStr::new_static("period"),
-                            SmolStr::new_static("startDate"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("metric"),
+                                SmolStr::new_static("targetValue"),
+                                SmolStr::new_static("period"),
+                                SmolStr::new_static("startDate"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

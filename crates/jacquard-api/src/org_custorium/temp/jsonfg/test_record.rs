@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A test record type for geometries
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -42,6 +42,7 @@ pub struct TestRecord<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -119,7 +120,7 @@ impl<S: BosStr> LexiconSchema for TestRecord<S> {
 
 pub mod test_record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -127,56 +128,63 @@ pub mod test_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
         type Geometry;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
         type Geometry = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetText<St> {}
-    impl<St: State> State for SetText<St> {
-        type Text = Set<members::text>;
-        type Geometry = St::Geometry;
+        type Text = Unset;
     }
     ///State transition - sets the `geometry` field to Set
     pub struct SetGeometry<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGeometry<St> {}
     impl<St: State> State for SetGeometry<St> {
-        type Text = St::Text;
         type Geometry = Set<members::geometry>;
+        type Text = St::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Geometry = St::Geometry;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `geometry` field
         pub struct geometry(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TestRecordBuilder<S: BosStr, St: test_record_state::State> {
+pub struct TestRecordBuilder<St: test_record_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<TestRecordGeometry<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> TestRecord<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TestRecordBuilder<S, test_record_state::Empty> {
+impl TestRecord<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TestRecordBuilder<test_record_state::Empty, DefaultStr> {
         TestRecordBuilder::new()
     }
 }
 
-impl<S: BosStr> TestRecordBuilder<S, test_record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> TestRecord<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TestRecordBuilder<test_record_state::Empty, S> {
+        TestRecordBuilder::builder()
+    }
+}
+
+impl TestRecordBuilder<test_record_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TestRecordBuilder {
             _state: PhantomData,
@@ -186,7 +194,18 @@ impl<S: BosStr> TestRecordBuilder<S, test_record_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> TestRecordBuilder<S, St>
+impl<S: BosStr> TestRecordBuilder<test_record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TestRecordBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> TestRecordBuilder<St, S>
 where
     St: test_record_state::State,
     St::Geometry: test_record_state::IsUnset,
@@ -195,7 +214,7 @@ where
     pub fn geometry(
         mut self,
         value: impl Into<TestRecordGeometry<S>>,
-    ) -> TestRecordBuilder<S, test_record_state::SetGeometry<St>> {
+    ) -> TestRecordBuilder<test_record_state::SetGeometry<St>, S> {
         self._fields.0 = Option::Some(value.into());
         TestRecordBuilder {
             _state: PhantomData,
@@ -205,7 +224,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TestRecordBuilder<S, St>
+impl<St, S: BosStr> TestRecordBuilder<St, S>
 where
     St: test_record_state::State,
     St::Text: test_record_state::IsUnset,
@@ -214,7 +233,7 @@ where
     pub fn text(
         mut self,
         value: impl Into<S>,
-    ) -> TestRecordBuilder<S, test_record_state::SetText<St>> {
+    ) -> TestRecordBuilder<test_record_state::SetText<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TestRecordBuilder {
             _state: PhantomData,
@@ -224,11 +243,11 @@ where
     }
 }
 
-impl<S: BosStr, St> TestRecordBuilder<S, St>
+impl<St, S: BosStr> TestRecordBuilder<St, S>
 where
     St: test_record_state::State,
-    St::Text: test_record_state::IsSet,
     St::Geometry: test_record_state::IsSet,
+    St::Text: test_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> TestRecord<S> {
@@ -239,7 +258,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TestRecord<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TestRecord<S> {
         TestRecord {
             geometry: self._fields.0.unwrap(),
             text: self._fields.1.unwrap(),
@@ -249,10 +271,10 @@ where
 }
 
 fn lexicon_doc_org_custorium_temp_jsonfg_testRecord() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.custorium.temp.jsonfg.testRecord"),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,18 +20,15 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::at_inlay::Element;
 use crate::at_inlay::Response;
 use crate::org_atsui::tabs;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Tabs<S: BosStr = DefaultStr> {
     ///Tabs to display.
     pub items: Vec<tabs::Tab<S>>,
@@ -39,11 +36,9 @@ pub struct Tabs<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TabsOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -51,11 +46,9 @@ pub struct TabsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Tab<S: BosStr = DefaultStr> {
     ///Element to render as tab content.
     pub content: Element<S>,
@@ -78,8 +71,9 @@ impl jacquard_common::xrpc::XrpcResp for TabsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Tabs<S> {
     const NSID: &'static str = "org.atsui.Tabs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = TabsResponse;
 }
 
@@ -87,8 +81,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Tabs<S> {
 pub struct TabsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for TabsRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Tabs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Tabs<S>;
     type Response = TabsResponse;
 }
@@ -132,7 +127,7 @@ impl<S: BosStr> LexiconSchema for Tab<S> {
 
 pub mod tabs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -163,21 +158,28 @@ pub mod tabs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TabsBuilder<S: BosStr, St: tabs_state::State> {
+pub struct TabsBuilder<St: tabs_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<tabs::Tab<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Tabs<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TabsBuilder<S, tabs_state::Empty> {
+impl Tabs<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TabsBuilder<tabs_state::Empty, DefaultStr> {
         TabsBuilder::new()
     }
 }
 
-impl<S: BosStr> TabsBuilder<S, tabs_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Tabs<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TabsBuilder<tabs_state::Empty, S> {
+        TabsBuilder::builder()
+    }
+}
+
+impl TabsBuilder<tabs_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TabsBuilder {
             _state: PhantomData,
@@ -187,7 +189,18 @@ impl<S: BosStr> TabsBuilder<S, tabs_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> TabsBuilder<S, St>
+impl<S: BosStr> TabsBuilder<tabs_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TabsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> TabsBuilder<St, S>
 where
     St: tabs_state::State,
     St::Items: tabs_state::IsUnset,
@@ -196,7 +209,7 @@ where
     pub fn items(
         mut self,
         value: impl Into<Vec<tabs::Tab<S>>>,
-    ) -> TabsBuilder<S, tabs_state::SetItems<St>> {
+    ) -> TabsBuilder<tabs_state::SetItems<St>, S> {
         self._fields.0 = Option::Some(value.into());
         TabsBuilder {
             _state: PhantomData,
@@ -206,7 +219,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TabsBuilder<S, St>
+impl<St, S: BosStr> TabsBuilder<St, S>
 where
     St: tabs_state::State,
     St::Items: tabs_state::IsSet,
@@ -229,7 +242,7 @@ where
 
 pub mod tab_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -237,70 +250,77 @@ pub mod tab_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
-        type Content;
         type Label;
+        type Content;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
-        type Content = Unset;
         type Label = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKey<St> {}
-    impl<St: State> State for SetKey<St> {
-        type Key = Set<members::key>;
-        type Content = St::Content;
-        type Label = St::Label;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type Key = St::Key;
-        type Content = Set<members::content>;
-        type Label = St::Label;
+        type Content = Unset;
+        type Key = Unset;
     }
     ///State transition - sets the `label` field to Set
     pub struct SetLabel<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLabel<St> {}
     impl<St: State> State for SetLabel<St> {
-        type Key = St::Key;
-        type Content = St::Content;
         type Label = Set<members::label>;
+        type Content = St::Content;
+        type Key = St::Key;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Label = St::Label;
+        type Content = Set<members::content>;
+        type Key = St::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type Label = St::Label;
+        type Content = St::Content;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `label` field
         pub struct label(());
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TabBuilder<S: BosStr, St: tab_state::State> {
+pub struct TabBuilder<St: tab_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Element<S>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Tab<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TabBuilder<S, tab_state::Empty> {
+impl Tab<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TabBuilder<tab_state::Empty, DefaultStr> {
         TabBuilder::new()
     }
 }
 
-impl<S: BosStr> TabBuilder<S, tab_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Tab<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TabBuilder<tab_state::Empty, S> {
+        TabBuilder::builder()
+    }
+}
+
+impl TabBuilder<tab_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TabBuilder {
             _state: PhantomData,
@@ -310,7 +330,18 @@ impl<S: BosStr> TabBuilder<S, tab_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> TabBuilder<S, St>
+impl<S: BosStr> TabBuilder<tab_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TabBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> TabBuilder<St, S>
 where
     St: tab_state::State,
     St::Content: tab_state::IsUnset,
@@ -319,7 +350,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<Element<S>>,
-    ) -> TabBuilder<S, tab_state::SetContent<St>> {
+    ) -> TabBuilder<tab_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         TabBuilder {
             _state: PhantomData,
@@ -329,13 +360,13 @@ where
     }
 }
 
-impl<S: BosStr, St> TabBuilder<S, St>
+impl<St, S: BosStr> TabBuilder<St, S>
 where
     St: tab_state::State,
     St::Key: tab_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(mut self, value: impl Into<S>) -> TabBuilder<S, tab_state::SetKey<St>> {
+    pub fn key(mut self, value: impl Into<S>) -> TabBuilder<tab_state::SetKey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TabBuilder {
             _state: PhantomData,
@@ -345,13 +376,16 @@ where
     }
 }
 
-impl<S: BosStr, St> TabBuilder<S, St>
+impl<St, S: BosStr> TabBuilder<St, S>
 where
     St: tab_state::State,
     St::Label: tab_state::IsUnset,
 {
     /// Set the `label` field (required)
-    pub fn label(mut self, value: impl Into<S>) -> TabBuilder<S, tab_state::SetLabel<St>> {
+    pub fn label(
+        mut self,
+        value: impl Into<S>,
+    ) -> TabBuilder<tab_state::SetLabel<St>, S> {
         self._fields.2 = Option::Some(value.into());
         TabBuilder {
             _state: PhantomData,
@@ -361,12 +395,12 @@ where
     }
 }
 
-impl<S: BosStr, St> TabBuilder<S, St>
+impl<St, S: BosStr> TabBuilder<St, S>
 where
     St: tab_state::State,
-    St::Key: tab_state::IsSet,
-    St::Content: tab_state::IsSet,
     St::Label: tab_state::IsSet,
+    St::Content: tab_state::IsSet,
+    St::Key: tab_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Tab<S> {
@@ -389,10 +423,10 @@ where
 }
 
 fn lexicon_doc_org_atsui_Tabs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.atsui.Tabs"),
@@ -403,26 +437,28 @@ fn lexicon_doc_org_atsui_Tabs() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![SmolStr::new_static("items")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("items"),
-                                    LexObjectProperty::Array(LexArray {
-                                        description: Some(CowStr::new_static("Tabs to display.")),
-                                        items: LexArrayItem::Ref(LexRef {
-                                            r#ref: CowStr::new_static("#tab"),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(vec![SmolStr::new_static("items")]),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("items"),
+                                        LexObjectProperty::Array(LexArray {
+                                            description: Some(CowStr::new_static("Tabs to display.")),
+                                            items: LexArrayItem::Ref(LexRef {
+                                                r#ref: CowStr::new_static("#tab"),
+                                                ..Default::default()
+                                            }),
                                             ..Default::default()
                                         }),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -431,11 +467,12 @@ fn lexicon_doc_org_atsui_Tabs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("tab"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("key"),
-                        SmolStr::new_static("label"),
-                        SmolStr::new_static("content"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("key"), SmolStr::new_static("label"),
+                            SmolStr::new_static("content")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -449,9 +486,11 @@ fn lexicon_doc_org_atsui_Tabs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("key"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Stable key that identifies the tab among its siblings.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Stable key that identifies the tab among its siblings.",
+                                    ),
+                                ),
                                 max_length: Some(64usize),
                                 ..Default::default()
                             }),
@@ -459,7 +498,9 @@ fn lexicon_doc_org_atsui_Tabs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("label"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Display label for the tab.")),
+                                description: Some(
+                                    CowStr::new_static("Display label for the tab."),
+                                ),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),

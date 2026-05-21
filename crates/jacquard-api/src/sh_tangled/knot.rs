@@ -8,16 +8,18 @@
 pub mod list_keys;
 pub mod member;
 
+
 #[cfg(feature = "streaming")]
 pub mod subscribe_repos;
 pub mod version;
+
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,7 +35,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -109,7 +111,7 @@ impl<S: BosStr> LexiconSchema for Knot<S> {
 
 pub mod knot_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -140,21 +142,28 @@ pub mod knot_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct KnotBuilder<S: BosStr, St: knot_state::State> {
+pub struct KnotBuilder<St: knot_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Knot<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> KnotBuilder<S, knot_state::Empty> {
+impl Knot<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> KnotBuilder<knot_state::Empty, DefaultStr> {
         KnotBuilder::new()
     }
 }
 
-impl<S: BosStr> KnotBuilder<S, knot_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Knot<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> KnotBuilder<knot_state::Empty, S> {
+        KnotBuilder::builder()
+    }
+}
+
+impl KnotBuilder<knot_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         KnotBuilder {
             _state: PhantomData,
@@ -164,7 +173,18 @@ impl<S: BosStr> KnotBuilder<S, knot_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> KnotBuilder<S, St>
+impl<S: BosStr> KnotBuilder<knot_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        KnotBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> KnotBuilder<St, S>
 where
     St: knot_state::State,
     St::CreatedAt: knot_state::IsUnset,
@@ -173,7 +193,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> KnotBuilder<S, knot_state::SetCreatedAt<St>> {
+    ) -> KnotBuilder<knot_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         KnotBuilder {
             _state: PhantomData,
@@ -183,7 +203,7 @@ where
     }
 }
 
-impl<S: BosStr, St> KnotBuilder<S, St>
+impl<St, S: BosStr> KnotBuilder<St, S>
 where
     St: knot_state::State,
     St::CreatedAt: knot_state::IsSet,
@@ -205,10 +225,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_knot() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.knot"),

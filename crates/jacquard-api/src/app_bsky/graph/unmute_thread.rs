@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UnmuteThread<S: BosStr = DefaultStr> {
     pub root: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -39,8 +36,9 @@ impl jacquard_common::xrpc::XrpcResp for UnmuteThreadResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UnmuteThread<S> {
     const NSID: &'static str = "app.bsky.graph.unmuteThread";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UnmuteThreadResponse;
 }
 
@@ -48,15 +46,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UnmuteThread<S> {
 pub struct UnmuteThreadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UnmuteThreadRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.unmuteThread";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UnmuteThread<S>;
     type Response = UnmuteThreadResponse;
 }
 
 pub mod unmute_thread_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -87,21 +86,28 @@ pub mod unmute_thread_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UnmuteThreadBuilder<S: BosStr, St: unmute_thread_state::State> {
+pub struct UnmuteThreadBuilder<St: unmute_thread_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UnmuteThread<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UnmuteThreadBuilder<S, unmute_thread_state::Empty> {
+impl UnmuteThread<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UnmuteThreadBuilder<unmute_thread_state::Empty, DefaultStr> {
         UnmuteThreadBuilder::new()
     }
 }
 
-impl<S: BosStr> UnmuteThreadBuilder<S, unmute_thread_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UnmuteThread<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UnmuteThreadBuilder<unmute_thread_state::Empty, S> {
+        UnmuteThreadBuilder::builder()
+    }
+}
+
+impl UnmuteThreadBuilder<unmute_thread_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UnmuteThreadBuilder {
             _state: PhantomData,
@@ -111,7 +117,18 @@ impl<S: BosStr> UnmuteThreadBuilder<S, unmute_thread_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> UnmuteThreadBuilder<S, St>
+impl<S: BosStr> UnmuteThreadBuilder<unmute_thread_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UnmuteThreadBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> UnmuteThreadBuilder<St, S>
 where
     St: unmute_thread_state::State,
     St::Root: unmute_thread_state::IsUnset,
@@ -120,7 +137,7 @@ where
     pub fn root(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> UnmuteThreadBuilder<S, unmute_thread_state::SetRoot<St>> {
+    ) -> UnmuteThreadBuilder<unmute_thread_state::SetRoot<St>, S> {
         self._fields.0 = Option::Some(value.into());
         UnmuteThreadBuilder {
             _state: PhantomData,
@@ -130,7 +147,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UnmuteThreadBuilder<S, St>
+impl<St, S: BosStr> UnmuteThreadBuilder<St, S>
 where
     St: unmute_thread_state::State,
     St::Root: unmute_thread_state::IsSet,
@@ -143,7 +160,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UnmuteThread<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UnmuteThread<S> {
         UnmuteThread {
             root: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

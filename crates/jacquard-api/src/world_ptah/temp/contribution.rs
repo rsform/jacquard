@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A deed of addition. Imhotep — the most famous architect in history, deified as the Son of Ptah. Every contributor to a world is an Imhotep. They build within the tradition of the master. Their work is attributed. The lineage is unbroken.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -78,18 +78,30 @@ pub enum ContributionCanonicalStatus<S: BosStr = DefaultStr> {
 impl<S: BosStr> ContributionCanonicalStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::CanonicalStatusOfficial => "world.ptah.temp.defs#canonicalStatusOfficial",
-            Self::CanonicalStatusCommunity => "world.ptah.temp.defs#canonicalStatusCommunity",
-            Self::CanonicalStatusApocryphal => "world.ptah.temp.defs#canonicalStatusApocryphal",
+            Self::CanonicalStatusOfficial => {
+                "world.ptah.temp.defs#canonicalStatusOfficial"
+            }
+            Self::CanonicalStatusCommunity => {
+                "world.ptah.temp.defs#canonicalStatusCommunity"
+            }
+            Self::CanonicalStatusApocryphal => {
+                "world.ptah.temp.defs#canonicalStatusApocryphal"
+            }
             Self::Other(s) => s.as_ref(),
         }
     }
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "world.ptah.temp.defs#canonicalStatusOfficial" => Self::CanonicalStatusOfficial,
-            "world.ptah.temp.defs#canonicalStatusCommunity" => Self::CanonicalStatusCommunity,
-            "world.ptah.temp.defs#canonicalStatusApocryphal" => Self::CanonicalStatusApocryphal,
+            "world.ptah.temp.defs#canonicalStatusOfficial" => {
+                Self::CanonicalStatusOfficial
+            }
+            "world.ptah.temp.defs#canonicalStatusCommunity" => {
+                Self::CanonicalStatusCommunity
+            }
+            "world.ptah.temp.defs#canonicalStatusApocryphal" => {
+                Self::CanonicalStatusApocryphal
+            }
             _ => Self::Other(s),
         }
     }
@@ -116,7 +128,8 @@ impl<S: BosStr> Serialize for ContributionCanonicalStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ContributionCanonicalStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ContributionCanonicalStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -216,7 +229,8 @@ impl<S: BosStr> Serialize for ContributionContributionType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ContributionContributionType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ContributionContributionType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -240,12 +254,16 @@ where
     type Output = ContributionContributionType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            ContributionContributionType::Character => ContributionContributionType::Character,
+            ContributionContributionType::Character => {
+                ContributionContributionType::Character
+            }
             ContributionContributionType::Role => ContributionContributionType::Role,
             ContributionContributionType::Action => ContributionContributionType::Action,
             ContributionContributionType::Event => ContributionContributionType::Event,
             ContributionContributionType::Lore => ContributionContributionType::Lore,
-            ContributionContributionType::Location => ContributionContributionType::Location,
+            ContributionContributionType::Location => {
+                ContributionContributionType::Location
+            }
             ContributionContributionType::Other(v) => {
                 ContributionContributionType::Other(v.into_static())
             }
@@ -304,7 +322,8 @@ impl<S: BosStr> Serialize for ContributionOriginatorApproval<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ContributionOriginatorApproval<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ContributionOriginatorApproval<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -328,7 +347,9 @@ where
     type Output = ContributionOriginatorApproval<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            ContributionOriginatorApproval::Approved => ContributionOriginatorApproval::Approved,
+            ContributionOriginatorApproval::Approved => {
+                ContributionOriginatorApproval::Approved
+            }
             ContributionOriginatorApproval::PreApproved => {
                 ContributionOriginatorApproval::PreApproved
             }
@@ -425,7 +446,7 @@ impl<S: BosStr> LexiconSchema for Contribution<S> {
 
 pub mod contribution_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -482,7 +503,7 @@ pub mod contribution_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ContributionBuilder<S: BosStr, St: contribution_state::State> {
+pub struct ContributionBuilder<St: contribution_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<AtUri<S>>>,
@@ -498,15 +519,22 @@ pub struct ContributionBuilder<S: BosStr, St: contribution_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Contribution<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ContributionBuilder<S, contribution_state::Empty> {
+impl Contribution<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ContributionBuilder<contribution_state::Empty, DefaultStr> {
         ContributionBuilder::new()
     }
 }
 
-impl<S: BosStr> ContributionBuilder<S, contribution_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Contribution<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ContributionBuilder<contribution_state::Empty, S> {
+        ContributionBuilder::builder()
+    }
+}
+
+impl ContributionBuilder<contribution_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ContributionBuilder {
             _state: PhantomData,
@@ -516,7 +544,18 @@ impl<S: BosStr> ContributionBuilder<S, contribution_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
+impl<S: BosStr> ContributionBuilder<contribution_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ContributionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: contribution_state::State, S: BosStr> ContributionBuilder<St, S> {
     /// Set the `attributionChain` field (optional)
     pub fn attribution_chain(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -529,7 +568,7 @@ impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
+impl<St: contribution_state::State, S: BosStr> ContributionBuilder<St, S> {
     /// Set the `canonicalStatus` field (optional)
     pub fn canonical_status(
         mut self,
@@ -539,13 +578,16 @@ impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
         self
     }
     /// Set the `canonicalStatus` field to an Option value (optional)
-    pub fn maybe_canonical_status(mut self, value: Option<ContributionCanonicalStatus<S>>) -> Self {
+    pub fn maybe_canonical_status(
+        mut self,
+        value: Option<ContributionCanonicalStatus<S>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
+impl<St: contribution_state::State, S: BosStr> ContributionBuilder<St, S> {
     /// Set the `contributionType` field (optional)
     pub fn contribution_type(
         mut self,
@@ -564,7 +606,7 @@ impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ContributionBuilder<S, St>
+impl<St, S: BosStr> ContributionBuilder<St, S>
 where
     St: contribution_state::State,
     St::ContributorDid: contribution_state::IsUnset,
@@ -573,7 +615,7 @@ where
     pub fn contributor_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ContributionBuilder<S, contribution_state::SetContributorDid<St>> {
+    ) -> ContributionBuilder<contribution_state::SetContributorDid<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ContributionBuilder {
             _state: PhantomData,
@@ -583,7 +625,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ContributionBuilder<S, St>
+impl<St, S: BosStr> ContributionBuilder<St, S>
 where
     St: contribution_state::State,
     St::CreatedAt: contribution_state::IsUnset,
@@ -592,7 +634,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ContributionBuilder<S, contribution_state::SetCreatedAt<St>> {
+    ) -> ContributionBuilder<contribution_state::SetCreatedAt<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ContributionBuilder {
             _state: PhantomData,
@@ -602,7 +644,7 @@ where
     }
 }
 
-impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
+impl<St: contribution_state::State, S: BosStr> ContributionBuilder<St, S> {
     /// Set the `originatorApproval` field (optional)
     pub fn originator_approval(
         mut self,
@@ -621,7 +663,7 @@ impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
+impl<St: contribution_state::State, S: BosStr> ContributionBuilder<St, S> {
     /// Set the `publicDomainCompliance` field (optional)
     pub fn public_domain_compliance(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.6 = value.into();
@@ -634,7 +676,7 @@ impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
+impl<St: contribution_state::State, S: BosStr> ContributionBuilder<St, S> {
     /// Set the `recordReference` field (optional)
     pub fn record_reference(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -647,7 +689,7 @@ impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ContributionBuilder<S, St>
+impl<St, S: BosStr> ContributionBuilder<St, S>
 where
     St: contribution_state::State,
     St::WorldReference: contribution_state::IsUnset,
@@ -656,7 +698,7 @@ where
     pub fn world_reference(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ContributionBuilder<S, contribution_state::SetWorldReference<St>> {
+    ) -> ContributionBuilder<contribution_state::SetWorldReference<St>, S> {
         self._fields.8 = Option::Some(value.into());
         ContributionBuilder {
             _state: PhantomData,
@@ -666,7 +708,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ContributionBuilder<S, St>
+impl<St, S: BosStr> ContributionBuilder<St, S>
 where
     St: contribution_state::State,
     St::CreatedAt: contribution_state::IsSet,
@@ -689,7 +731,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Contribution<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Contribution<S> {
         Contribution {
             attribution_chain: self._fields.0,
             canonical_status: self._fields.1,
@@ -706,10 +751,10 @@ where
 }
 
 fn lexicon_doc_world_ptah_temp_contribution() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("world.ptah.temp.contribution"),

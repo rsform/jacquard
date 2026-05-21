@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_asadaame5121::at_circle::RingRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_asadaame5121::at_circle::RingRef;
 /// A request to join a webring
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -161,7 +161,7 @@ impl<S: BosStr> LexiconSchema for Request<S> {
 
 pub mod request_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -169,72 +169,72 @@ pub mod request_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ring;
         type SiteTitle;
-        type SiteUrl;
         type CreatedAt;
+        type Ring;
+        type SiteUrl;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ring = Unset;
         type SiteTitle = Unset;
-        type SiteUrl = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `ring` field to Set
-    pub struct SetRing<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRing<St> {}
-    impl<St: State> State for SetRing<St> {
-        type Ring = Set<members::ring>;
-        type SiteTitle = St::SiteTitle;
-        type SiteUrl = St::SiteUrl;
-        type CreatedAt = St::CreatedAt;
+        type Ring = Unset;
+        type SiteUrl = Unset;
     }
     ///State transition - sets the `site_title` field to Set
     pub struct SetSiteTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSiteTitle<St> {}
     impl<St: State> State for SetSiteTitle<St> {
-        type Ring = St::Ring;
         type SiteTitle = Set<members::site_title>;
-        type SiteUrl = St::SiteUrl;
         type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `site_url` field to Set
-    pub struct SetSiteUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSiteUrl<St> {}
-    impl<St: State> State for SetSiteUrl<St> {
         type Ring = St::Ring;
-        type SiteTitle = St::SiteTitle;
-        type SiteUrl = Set<members::site_url>;
-        type CreatedAt = St::CreatedAt;
+        type SiteUrl = St::SiteUrl;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Ring = St::Ring;
         type SiteTitle = St::SiteTitle;
-        type SiteUrl = St::SiteUrl;
         type CreatedAt = Set<members::created_at>;
+        type Ring = St::Ring;
+        type SiteUrl = St::SiteUrl;
+    }
+    ///State transition - sets the `ring` field to Set
+    pub struct SetRing<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRing<St> {}
+    impl<St: State> State for SetRing<St> {
+        type SiteTitle = St::SiteTitle;
+        type CreatedAt = St::CreatedAt;
+        type Ring = Set<members::ring>;
+        type SiteUrl = St::SiteUrl;
+    }
+    ///State transition - sets the `site_url` field to Set
+    pub struct SetSiteUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSiteUrl<St> {}
+    impl<St: State> State for SetSiteUrl<St> {
+        type SiteTitle = St::SiteTitle;
+        type CreatedAt = St::CreatedAt;
+        type Ring = St::Ring;
+        type SiteUrl = Set<members::site_url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ring` field
-        pub struct ring(());
         ///Marker type for the `site_title` field
         pub struct site_title(());
-        ///Marker type for the `site_url` field
-        pub struct site_url(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `ring` field
+        pub struct ring(());
+        ///Marker type for the `site_url` field
+        pub struct site_url(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RequestBuilder<S: BosStr, St: request_state::State> {
+pub struct RequestBuilder<St: request_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -247,15 +247,22 @@ pub struct RequestBuilder<S: BosStr, St: request_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Request<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RequestBuilder<S, request_state::Empty> {
+impl Request<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RequestBuilder<request_state::Empty, DefaultStr> {
         RequestBuilder::new()
     }
 }
 
-impl<S: BosStr> RequestBuilder<S, request_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Request<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RequestBuilder<request_state::Empty, S> {
+        RequestBuilder::builder()
+    }
+}
+
+impl RequestBuilder<request_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RequestBuilder {
             _state: PhantomData,
@@ -265,7 +272,18 @@ impl<S: BosStr> RequestBuilder<S, request_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RequestBuilder<S, St>
+impl<S: BosStr> RequestBuilder<request_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RequestBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RequestBuilder<St, S>
 where
     St: request_state::State,
     St::CreatedAt: request_state::IsUnset,
@@ -274,7 +292,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RequestBuilder<S, request_state::SetCreatedAt<St>> {
+    ) -> RequestBuilder<request_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
@@ -284,7 +302,7 @@ where
     }
 }
 
-impl<S: BosStr, St: request_state::State> RequestBuilder<S, St> {
+impl<St: request_state::State, S: BosStr> RequestBuilder<St, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -297,7 +315,7 @@ impl<S: BosStr, St: request_state::State> RequestBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RequestBuilder<S, St>
+impl<St, S: BosStr> RequestBuilder<St, S>
 where
     St: request_state::State,
     St::Ring: request_state::IsUnset,
@@ -306,7 +324,7 @@ where
     pub fn ring(
         mut self,
         value: impl Into<RingRef<S>>,
-    ) -> RequestBuilder<S, request_state::SetRing<St>> {
+    ) -> RequestBuilder<request_state::SetRing<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
@@ -316,7 +334,7 @@ where
     }
 }
 
-impl<S: BosStr, St: request_state::State> RequestBuilder<S, St> {
+impl<St: request_state::State, S: BosStr> RequestBuilder<St, S> {
     /// Set the `rssUrl` field (optional)
     pub fn rss_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -329,7 +347,7 @@ impl<S: BosStr, St: request_state::State> RequestBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RequestBuilder<S, St>
+impl<St, S: BosStr> RequestBuilder<St, S>
 where
     St: request_state::State,
     St::SiteTitle: request_state::IsUnset,
@@ -338,7 +356,7 @@ where
     pub fn site_title(
         mut self,
         value: impl Into<S>,
-    ) -> RequestBuilder<S, request_state::SetSiteTitle<St>> {
+    ) -> RequestBuilder<request_state::SetSiteTitle<St>, S> {
         self._fields.4 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
@@ -348,7 +366,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RequestBuilder<S, St>
+impl<St, S: BosStr> RequestBuilder<St, S>
 where
     St: request_state::State,
     St::SiteUrl: request_state::IsUnset,
@@ -357,7 +375,7 @@ where
     pub fn site_url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> RequestBuilder<S, request_state::SetSiteUrl<St>> {
+    ) -> RequestBuilder<request_state::SetSiteUrl<St>, S> {
         self._fields.5 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
@@ -367,13 +385,13 @@ where
     }
 }
 
-impl<S: BosStr, St> RequestBuilder<S, St>
+impl<St, S: BosStr> RequestBuilder<St, S>
 where
     St: request_state::State,
-    St::Ring: request_state::IsSet,
     St::SiteTitle: request_state::IsSet,
-    St::SiteUrl: request_state::IsSet,
     St::CreatedAt: request_state::IsSet,
+    St::Ring: request_state::IsSet,
+    St::SiteUrl: request_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Request<S> {
@@ -402,10 +420,10 @@ where
 }
 
 fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.asadaame5121.at-circle.request"),
@@ -417,12 +435,13 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A request to join a webring")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("ring"),
-                            SmolStr::new_static("siteUrl"),
-                            SmolStr::new_static("siteTitle"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("ring"), SmolStr::new_static("siteUrl"),
+                                SmolStr::new_static("siteTitle"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -436,7 +455,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("message"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Introduction message")),
+                                    description: Some(
+                                        CowStr::new_static("Introduction message"),
+                                    ),
                                     max_length: Some(1000usize),
                                     max_graphemes: Some(100usize),
                                     ..Default::default()
@@ -454,9 +475,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("rssUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "RSS feed URL of the site",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("RSS feed URL of the site"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -473,9 +494,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("siteUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "URL of the site to register",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("URL of the site to register"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),

@@ -8,32 +8,27 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::moderation::RecordViewDetail;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::RecordViewDetail;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecord<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: RecordViewDetail<S>,
@@ -41,19 +36,25 @@ pub struct GetRecordOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetRecordError {
     #[serde(rename = "RecordNotFound")]
     RecordNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetRecordError {
@@ -103,7 +104,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetRecordRequest {
 
 pub mod get_record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -134,21 +135,28 @@ pub mod get_record_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetRecordBuilder<S: BosStr, St: get_record_state::State> {
+pub struct GetRecordBuilder<St: get_record_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetRecord<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetRecordBuilder<S, get_record_state::Empty> {
+impl GetRecord<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetRecordBuilder<get_record_state::Empty, DefaultStr> {
         GetRecordBuilder::new()
     }
 }
 
-impl<S: BosStr> GetRecordBuilder<S, get_record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetRecord<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetRecordBuilder<get_record_state::Empty, S> {
+        GetRecordBuilder::builder()
+    }
+}
+
+impl GetRecordBuilder<get_record_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetRecordBuilder {
             _state: PhantomData,
@@ -158,7 +166,18 @@ impl<S: BosStr> GetRecordBuilder<S, get_record_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_record_state::State> GetRecordBuilder<S, St> {
+impl<S: BosStr> GetRecordBuilder<get_record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetRecordBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_record_state::State, S: BosStr> GetRecordBuilder<St, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -171,7 +190,7 @@ impl<S: BosStr, St: get_record_state::State> GetRecordBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetRecordBuilder<S, St>
+impl<St, S: BosStr> GetRecordBuilder<St, S>
 where
     St: get_record_state::State,
     St::Uri: get_record_state::IsUnset,
@@ -180,7 +199,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetRecordBuilder<S, get_record_state::SetUri<St>> {
+    ) -> GetRecordBuilder<get_record_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetRecordBuilder {
             _state: PhantomData,
@@ -190,7 +209,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetRecordBuilder<S, St>
+impl<St, S: BosStr> GetRecordBuilder<St, S>
 where
     St: get_record_state::State,
     St::Uri: get_record_state::IsSet,

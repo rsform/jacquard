@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,18 +24,15 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::games_gamesgamesgamesgames::actor::game;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::games_gamesgamesgamesgames::actor::game;
 /// Reference to a game, either by AT URI or external platform ID.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GameRef<S: BosStr = DefaultStr> {
     ///External platform's ID for the game.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -175,6 +172,7 @@ where
     }
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -258,10 +256,10 @@ impl<S: BosStr> LexiconSchema for Game<S> {
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_actor_game() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.actor.game"),
@@ -270,34 +268,38 @@ fn lexicon_doc_games_gamesgamesgamesgames_actor_game() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("gameRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Reference to a game, either by AT URI or external platform ID.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Reference to a game, either by AT URI or external platform ID.",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("externalId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "External platform's ID for the game.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("External platform's ID for the game."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("platform"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "External platform for ID lookup.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("External platform for ID lookup."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("AT URI of the game record.")),
+                                description: Some(
+                                    CowStr::new_static("AT URI of the game record."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -385,7 +387,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_actor_game() -> LexiconDoc<'static> {
 
 pub mod game_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -393,56 +395,56 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Platform;
         type Game;
+        type Platform;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Platform = Unset;
         type Game = Unset;
+        type Platform = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlatform<St> {}
-    impl<St: State> State for SetPlatform<St> {
-        type Platform = Set<members::platform>;
-        type Game = St::Game;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGame<St> {}
     impl<St: State> State for SetGame<St> {
-        type Platform = St::Platform;
         type Game = Set<members::game>;
+        type Platform = St::Platform;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlatform<St> {}
+    impl<St: State> State for SetPlatform<St> {
+        type Game = St::Game;
+        type Platform = Set<members::platform>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Platform = St::Platform;
         type Game = St::Game;
+        type Platform = St::Platform;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `platform` field
-        pub struct platform(());
         ///Marker type for the `game` field
         pub struct game(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GameBuilder<S: BosStr, St: game_state::State> {
+pub struct GameBuilder<St: game_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -453,15 +455,22 @@ pub struct GameBuilder<S: BosStr, St: game_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Game<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GameBuilder<S, game_state::Empty> {
+impl Game<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GameBuilder<game_state::Empty, DefaultStr> {
         GameBuilder::new()
     }
 }
 
-impl<S: BosStr> GameBuilder<S, game_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Game<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GameBuilder<game_state::Empty, S> {
+        GameBuilder::builder()
+    }
+}
+
+impl GameBuilder<game_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GameBuilder {
             _state: PhantomData,
@@ -471,7 +480,18 @@ impl<S: BosStr> GameBuilder<S, game_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GameBuilder<S, St>
+impl<S: BosStr> GameBuilder<game_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GameBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GameBuilder<St, S>
 where
     St: game_state::State,
     St::CreatedAt: game_state::IsUnset,
@@ -480,7 +500,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GameBuilder<S, game_state::SetCreatedAt<St>> {
+    ) -> GameBuilder<game_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
@@ -490,7 +510,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GameBuilder<S, St>
+impl<St, S: BosStr> GameBuilder<St, S>
 where
     St: game_state::State,
     St::Game: game_state::IsUnset,
@@ -499,7 +519,7 @@ where
     pub fn game(
         mut self,
         value: impl Into<game::GameRef<S>>,
-    ) -> GameBuilder<S, game_state::SetGame<St>> {
+    ) -> GameBuilder<game_state::SetGame<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
@@ -509,7 +529,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GameBuilder<S, St>
+impl<St, S: BosStr> GameBuilder<St, S>
 where
     St: game_state::State,
     St::Platform: game_state::IsUnset,
@@ -518,7 +538,7 @@ where
     pub fn platform(
         mut self,
         value: impl Into<GamePlatform<S>>,
-    ) -> GameBuilder<S, game_state::SetPlatform<St>> {
+    ) -> GameBuilder<game_state::SetPlatform<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
@@ -528,24 +548,30 @@ where
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `signatures` field (optional)
-    pub fn signatures(mut self, value: impl Into<Option<Vec<GameSignaturesItem<S>>>>) -> Self {
+    pub fn signatures(
+        mut self,
+        value: impl Into<Option<Vec<GameSignaturesItem<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `signatures` field to an Option value (optional)
-    pub fn maybe_signatures(mut self, value: Option<Vec<GameSignaturesItem<S>>>) -> Self {
+    pub fn maybe_signatures(
+        mut self,
+        value: Option<Vec<GameSignaturesItem<S>>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
 }
 
-impl<S: BosStr, St> GameBuilder<S, St>
+impl<St, S: BosStr> GameBuilder<St, S>
 where
     St: game_state::State,
-    St::Platform: game_state::IsSet,
     St::Game: game_state::IsSet,
+    St::Platform: game_state::IsSet,
     St::CreatedAt: game_state::IsSet,
 {
     /// Build the final struct.

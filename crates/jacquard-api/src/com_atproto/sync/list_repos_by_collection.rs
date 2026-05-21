@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::sync::list_repos_by_collection;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::sync::list_repos_by_collection;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListReposByCollection<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -41,11 +38,9 @@ pub struct ListReposByCollection<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListReposByCollectionOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -54,11 +49,9 @@ pub struct ListReposByCollectionOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Repo<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -110,7 +103,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_repos_by_collection_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -141,21 +134,37 @@ pub mod list_repos_by_collection_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListReposByCollectionBuilder<S: BosStr, St: list_repos_by_collection_state::State> {
+pub struct ListReposByCollectionBuilder<
+    St: list_repos_by_collection_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Nsid<S>>, Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListReposByCollection<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListReposByCollectionBuilder<S, list_repos_by_collection_state::Empty> {
+impl ListReposByCollection<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListReposByCollectionBuilder<
+        list_repos_by_collection_state::Empty,
+        DefaultStr,
+    > {
         ListReposByCollectionBuilder::new()
     }
 }
 
-impl<S: BosStr> ListReposByCollectionBuilder<S, list_repos_by_collection_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListReposByCollection<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListReposByCollectionBuilder<
+        list_repos_by_collection_state::Empty,
+        S,
+    > {
+        ListReposByCollectionBuilder::builder()
+    }
+}
+
+impl ListReposByCollectionBuilder<list_repos_by_collection_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListReposByCollectionBuilder {
             _state: PhantomData,
@@ -165,7 +174,18 @@ impl<S: BosStr> ListReposByCollectionBuilder<S, list_repos_by_collection_state::
     }
 }
 
-impl<S: BosStr, St> ListReposByCollectionBuilder<S, St>
+impl<S: BosStr> ListReposByCollectionBuilder<list_repos_by_collection_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListReposByCollectionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ListReposByCollectionBuilder<St, S>
 where
     St: list_repos_by_collection_state::State,
     St::Collection: list_repos_by_collection_state::IsUnset,
@@ -174,7 +194,10 @@ where
     pub fn collection(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> ListReposByCollectionBuilder<S, list_repos_by_collection_state::SetCollection<St>> {
+    ) -> ListReposByCollectionBuilder<
+        list_repos_by_collection_state::SetCollection<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         ListReposByCollectionBuilder {
             _state: PhantomData,
@@ -184,7 +207,10 @@ where
     }
 }
 
-impl<S: BosStr, St: list_repos_by_collection_state::State> ListReposByCollectionBuilder<S, St> {
+impl<
+    St: list_repos_by_collection_state::State,
+    S: BosStr,
+> ListReposByCollectionBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -197,7 +223,10 @@ impl<S: BosStr, St: list_repos_by_collection_state::State> ListReposByCollection
     }
 }
 
-impl<S: BosStr, St: list_repos_by_collection_state::State> ListReposByCollectionBuilder<S, St> {
+impl<
+    St: list_repos_by_collection_state::State,
+    S: BosStr,
+> ListReposByCollectionBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -210,7 +239,7 @@ impl<S: BosStr, St: list_repos_by_collection_state::State> ListReposByCollection
     }
 }
 
-impl<S: BosStr, St> ListReposByCollectionBuilder<S, St>
+impl<St, S: BosStr> ListReposByCollectionBuilder<St, S>
 where
     St: list_repos_by_collection_state::State,
     St::Collection: list_repos_by_collection_state::IsSet,
@@ -227,7 +256,7 @@ where
 
 pub mod repo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -258,21 +287,28 @@ pub mod repo_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RepoBuilder<S: BosStr, St: repo_state::State> {
+pub struct RepoBuilder<St: repo_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Repo<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RepoBuilder<S, repo_state::Empty> {
+impl Repo<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RepoBuilder<repo_state::Empty, DefaultStr> {
         RepoBuilder::new()
     }
 }
 
-impl<S: BosStr> RepoBuilder<S, repo_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Repo<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RepoBuilder<repo_state::Empty, S> {
+        RepoBuilder::builder()
+    }
+}
+
+impl RepoBuilder<repo_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RepoBuilder {
             _state: PhantomData,
@@ -282,13 +318,27 @@ impl<S: BosStr> RepoBuilder<S, repo_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RepoBuilder<S, St>
+impl<S: BosStr> RepoBuilder<repo_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RepoBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RepoBuilder<St, S>
 where
     St: repo_state::State,
     St::Did: repo_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> RepoBuilder<S, repo_state::SetDid<St>> {
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> RepoBuilder<repo_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RepoBuilder {
             _state: PhantomData,
@@ -298,7 +348,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RepoBuilder<S, St>
+impl<St, S: BosStr> RepoBuilder<St, S>
 where
     St: repo_state::State,
     St::Did: repo_state::IsSet,
@@ -320,10 +370,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_sync_listReposByCollection() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.sync.listReposByCollection"),
@@ -332,34 +382,36 @@ fn lexicon_doc_com_atproto_sync_listReposByCollection() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("collection")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("collection"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    format: Some(LexStringFormat::Nsid),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("collection")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("collection"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        format: Some(LexStringFormat::Nsid),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );

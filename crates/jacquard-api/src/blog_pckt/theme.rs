@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,17 +20,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blog_pckt::theme;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blog_pckt::theme;
 /// Theme configuration for a blog publication
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Theme<S: BosStr = DefaultStr> {
     ///Dark mode color palette
     pub dark: theme::Palette<S>,
@@ -49,10 +46,7 @@ pub struct Theme<S: BosStr = DefaultStr> {
 /// Color palette with CSS hex values
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Palette<S: BosStr = DefaultStr> {
     ///Accent color (hex value)
     pub accent: S,
@@ -183,7 +177,7 @@ impl<S: BosStr> LexiconSchema for Palette<S> {
 
 pub mod theme_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -191,42 +185,42 @@ pub mod theme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Light;
         type Dark;
+        type Light;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Light = Unset;
         type Dark = Unset;
-    }
-    ///State transition - sets the `light` field to Set
-    pub struct SetLight<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLight<St> {}
-    impl<St: State> State for SetLight<St> {
-        type Light = Set<members::light>;
-        type Dark = St::Dark;
+        type Light = Unset;
     }
     ///State transition - sets the `dark` field to Set
     pub struct SetDark<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDark<St> {}
     impl<St: State> State for SetDark<St> {
-        type Light = St::Light;
         type Dark = Set<members::dark>;
+        type Light = St::Light;
+    }
+    ///State transition - sets the `light` field to Set
+    pub struct SetLight<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLight<St> {}
+    impl<St: State> State for SetLight<St> {
+        type Dark = St::Dark;
+        type Light = Set<members::light>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `light` field
-        pub struct light(());
         ///Marker type for the `dark` field
         pub struct dark(());
+        ///Marker type for the `light` field
+        pub struct light(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ThemeBuilder<S: BosStr, St: theme_state::State> {
+pub struct ThemeBuilder<St: theme_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<theme::Palette<S>>,
@@ -237,15 +231,22 @@ pub struct ThemeBuilder<S: BosStr, St: theme_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Theme<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ThemeBuilder<S, theme_state::Empty> {
+impl Theme<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ThemeBuilder<theme_state::Empty, DefaultStr> {
         ThemeBuilder::new()
     }
 }
 
-impl<S: BosStr> ThemeBuilder<S, theme_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Theme<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ThemeBuilder<theme_state::Empty, S> {
+        ThemeBuilder::builder()
+    }
+}
+
+impl ThemeBuilder<theme_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ThemeBuilder {
             _state: PhantomData,
@@ -255,7 +256,18 @@ impl<S: BosStr> ThemeBuilder<S, theme_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ThemeBuilder<S, St>
+impl<S: BosStr> ThemeBuilder<theme_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ThemeBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ThemeBuilder<St, S>
 where
     St: theme_state::State,
     St::Dark: theme_state::IsUnset,
@@ -264,7 +276,7 @@ where
     pub fn dark(
         mut self,
         value: impl Into<theme::Palette<S>>,
-    ) -> ThemeBuilder<S, theme_state::SetDark<St>> {
+    ) -> ThemeBuilder<theme_state::SetDark<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ThemeBuilder {
             _state: PhantomData,
@@ -274,7 +286,7 @@ where
     }
 }
 
-impl<S: BosStr, St: theme_state::State> ThemeBuilder<S, St> {
+impl<St: theme_state::State, S: BosStr> ThemeBuilder<St, S> {
     /// Set the `font` field (optional)
     pub fn font(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -287,7 +299,7 @@ impl<S: BosStr, St: theme_state::State> ThemeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ThemeBuilder<S, St>
+impl<St, S: BosStr> ThemeBuilder<St, S>
 where
     St: theme_state::State,
     St::Light: theme_state::IsUnset,
@@ -296,7 +308,7 @@ where
     pub fn light(
         mut self,
         value: impl Into<theme::Palette<S>>,
-    ) -> ThemeBuilder<S, theme_state::SetLight<St>> {
+    ) -> ThemeBuilder<theme_state::SetLight<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ThemeBuilder {
             _state: PhantomData,
@@ -306,7 +318,7 @@ where
     }
 }
 
-impl<S: BosStr, St: theme_state::State> ThemeBuilder<S, St> {
+impl<St: theme_state::State, S: BosStr> ThemeBuilder<St, S> {
     /// Set the `transparency` field (optional)
     pub fn transparency(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -319,11 +331,11 @@ impl<S: BosStr, St: theme_state::State> ThemeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ThemeBuilder<S, St>
+impl<St, S: BosStr> ThemeBuilder<St, S>
 where
     St: theme_state::State,
-    St::Light: theme_state::IsSet,
     St::Dark: theme_state::IsSet,
+    St::Light: theme_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Theme<S> {
@@ -348,10 +360,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.theme"),
@@ -360,13 +372,12 @@ fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Theme configuration for a blog publication",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("light"),
-                        SmolStr::new_static("dark"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Theme configuration for a blog publication"),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("light"), SmolStr::new_static("dark")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -380,9 +391,9 @@ fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("font"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Font family name (optional)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Font family name (optional)"),
+                                ),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -410,21 +421,26 @@ fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("palette"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Color palette with CSS hex values")),
-                    required: Some(vec![
-                        SmolStr::new_static("link"),
-                        SmolStr::new_static("text"),
-                        SmolStr::new_static("accent"),
-                        SmolStr::new_static("background"),
-                        SmolStr::new_static("surfaceHover"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Color palette with CSS hex values"),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("link"), SmolStr::new_static("text"),
+                            SmolStr::new_static("accent"),
+                            SmolStr::new_static("background"),
+                            SmolStr::new_static("surfaceHover")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("accent"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Accent color (hex value)")),
+                                description: Some(
+                                    CowStr::new_static("Accent color (hex value)"),
+                                ),
                                 max_length: Some(7usize),
                                 ..Default::default()
                             }),
@@ -432,9 +448,9 @@ fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("background"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Background color (hex value)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Background color (hex value)"),
+                                ),
                                 max_length: Some(7usize),
                                 ..Default::default()
                             }),
@@ -442,7 +458,9 @@ fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("link"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Link color (hex value)")),
+                                description: Some(
+                                    CowStr::new_static("Link color (hex value)"),
+                                ),
                                 max_length: Some(7usize),
                                 ..Default::default()
                             }),
@@ -450,9 +468,9 @@ fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("surfaceHover"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Surface hover color (hex value)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Surface hover color (hex value)"),
+                                ),
                                 max_length: Some(7usize),
                                 ..Default::default()
                             }),
@@ -460,9 +478,9 @@ fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Primary text color (hex value)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Primary text color (hex value)"),
+                                ),
                                 max_length: Some(7usize),
                                 ..Default::default()
                             }),

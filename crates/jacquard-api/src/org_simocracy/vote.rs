@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A quadratic vote allocation targeting a sim.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -109,7 +109,7 @@ impl<S: BosStr> LexiconSchema for Vote<S> {
 
 pub mod vote_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -117,70 +117,77 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Votes;
         type Sim;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Votes = Unset;
         type Sim = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Votes = St::Votes;
-        type Sim = St::Sim;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `votes` field to Set
     pub struct SetVotes<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetVotes<St> {}
     impl<St: State> State for SetVotes<St> {
-        type CreatedAt = St::CreatedAt;
         type Votes = Set<members::votes>;
         type Sim = St::Sim;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `sim` field to Set
     pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSim<St> {}
     impl<St: State> State for SetSim<St> {
-        type CreatedAt = St::CreatedAt;
         type Votes = St::Votes;
         type Sim = Set<members::sim>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Votes = St::Votes;
+        type Sim = St::Sim;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `votes` field
         pub struct votes(());
         ///Marker type for the `sim` field
         pub struct sim(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct VoteBuilder<S: BosStr, St: vote_state::State> {
+pub struct VoteBuilder<St: vote_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<StrongRef<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Vote<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> VoteBuilder<S, vote_state::Empty> {
+impl Vote<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> VoteBuilder<vote_state::Empty, DefaultStr> {
         VoteBuilder::new()
     }
 }
 
-impl<S: BosStr> VoteBuilder<S, vote_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Vote<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> VoteBuilder<vote_state::Empty, S> {
+        VoteBuilder::builder()
+    }
+}
+
+impl VoteBuilder<vote_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         VoteBuilder {
             _state: PhantomData,
@@ -190,7 +197,18 @@ impl<S: BosStr> VoteBuilder<S, vote_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> VoteBuilder<S, St>
+impl<S: BosStr> VoteBuilder<vote_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        VoteBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> VoteBuilder<St, S>
 where
     St: vote_state::State,
     St::CreatedAt: vote_state::IsUnset,
@@ -199,7 +217,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> VoteBuilder<S, vote_state::SetCreatedAt<St>> {
+    ) -> VoteBuilder<vote_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         VoteBuilder {
             _state: PhantomData,
@@ -209,13 +227,16 @@ where
     }
 }
 
-impl<S: BosStr, St> VoteBuilder<S, St>
+impl<St, S: BosStr> VoteBuilder<St, S>
 where
     St: vote_state::State,
     St::Sim: vote_state::IsUnset,
 {
     /// Set the `sim` field (required)
-    pub fn sim(mut self, value: impl Into<StrongRef<S>>) -> VoteBuilder<S, vote_state::SetSim<St>> {
+    pub fn sim(
+        mut self,
+        value: impl Into<StrongRef<S>>,
+    ) -> VoteBuilder<vote_state::SetSim<St>, S> {
         self._fields.1 = Option::Some(value.into());
         VoteBuilder {
             _state: PhantomData,
@@ -225,13 +246,16 @@ where
     }
 }
 
-impl<S: BosStr, St> VoteBuilder<S, St>
+impl<St, S: BosStr> VoteBuilder<St, S>
 where
     St: vote_state::State,
     St::Votes: vote_state::IsUnset,
 {
     /// Set the `votes` field (required)
-    pub fn votes(mut self, value: impl Into<i64>) -> VoteBuilder<S, vote_state::SetVotes<St>> {
+    pub fn votes(
+        mut self,
+        value: impl Into<i64>,
+    ) -> VoteBuilder<vote_state::SetVotes<St>, S> {
         self._fields.2 = Option::Some(value.into());
         VoteBuilder {
             _state: PhantomData,
@@ -241,12 +265,12 @@ where
     }
 }
 
-impl<S: BosStr, St> VoteBuilder<S, St>
+impl<St, S: BosStr> VoteBuilder<St, S>
 where
     St: vote_state::State,
-    St::CreatedAt: vote_state::IsSet,
     St::Votes: vote_state::IsSet,
     St::Sim: vote_state::IsSet,
+    St::CreatedAt: vote_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Vote<S> {
@@ -269,10 +293,10 @@ where
 }
 
 fn lexicon_doc_org_simocracy_vote() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.simocracy.vote"),
@@ -281,25 +305,28 @@ fn lexicon_doc_org_simocracy_vote() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A quadratic vote allocation targeting a sim.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A quadratic vote allocation targeting a sim.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("sim"),
-                            SmolStr::new_static("votes"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("sim"), SmolStr::new_static("votes"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the vote was cast",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp when the vote was cast"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

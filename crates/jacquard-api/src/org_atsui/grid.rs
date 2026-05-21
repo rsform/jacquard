@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Grid<S: BosStr = DefaultStr> {
     pub children: Data<S>,
     ///Number of equal columns.  Defaults to `3`.
@@ -122,11 +119,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GridOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -145,8 +140,9 @@ impl jacquard_common::xrpc::XrpcResp for GridResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Grid<S> {
     const NSID: &'static str = "org.atsui.Grid";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = GridResponse;
 }
 
@@ -154,8 +150,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Grid<S> {
 pub struct GridRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GridRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Grid";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Grid<S>;
     type Response = GridResponse;
 }
@@ -166,7 +163,7 @@ fn _default_grid_columns() -> Option<i64> {
 
 pub mod grid_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -197,21 +194,28 @@ pub mod grid_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GridBuilder<S: BosStr, St: grid_state::State> {
+pub struct GridBuilder<St: grid_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>, Option<i64>, Option<GridGap<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Grid<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GridBuilder<S, grid_state::Empty> {
+impl Grid<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GridBuilder<grid_state::Empty, DefaultStr> {
         GridBuilder::new()
     }
 }
 
-impl<S: BosStr> GridBuilder<S, grid_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Grid<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GridBuilder<grid_state::Empty, S> {
+        GridBuilder::builder()
+    }
+}
+
+impl GridBuilder<grid_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GridBuilder {
             _state: PhantomData,
@@ -221,7 +225,18 @@ impl<S: BosStr> GridBuilder<S, grid_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GridBuilder<S, St>
+impl<S: BosStr> GridBuilder<grid_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GridBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GridBuilder<St, S>
 where
     St: grid_state::State,
     St::Children: grid_state::IsUnset,
@@ -230,7 +245,7 @@ where
     pub fn children(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> GridBuilder<S, grid_state::SetChildren<St>> {
+    ) -> GridBuilder<grid_state::SetChildren<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GridBuilder {
             _state: PhantomData,
@@ -240,7 +255,7 @@ where
     }
 }
 
-impl<S: BosStr, St: grid_state::State> GridBuilder<S, St> {
+impl<St: grid_state::State, S: BosStr> GridBuilder<St, S> {
     /// Set the `columns` field (optional)
     pub fn columns(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -253,7 +268,7 @@ impl<S: BosStr, St: grid_state::State> GridBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: grid_state::State> GridBuilder<S, St> {
+impl<St: grid_state::State, S: BosStr> GridBuilder<St, S> {
     /// Set the `gap` field (optional)
     pub fn gap(mut self, value: impl Into<Option<GridGap<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -266,7 +281,7 @@ impl<S: BosStr, St: grid_state::State> GridBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GridBuilder<S, St>
+impl<St, S: BosStr> GridBuilder<St, S>
 where
     St: grid_state::State,
     St::Children: grid_state::IsSet,

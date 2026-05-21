@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,16 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::org_user_intents::demo::declaration;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_user_intents::demo::declaration;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Intent<S: BosStr = DefaultStr> {
     ///indicates user intent for reuse. Note that this field is optional, and thus tri-state (true, false, undefined)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -149,7 +146,7 @@ impl<S: BosStr> LexiconSchema for Declaration<S> {
 
 pub mod intent_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -180,21 +177,28 @@ pub mod intent_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IntentBuilder<S: BosStr, St: intent_state::State> {
+pub struct IntentBuilder<St: intent_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Intent<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> IntentBuilder<S, intent_state::Empty> {
+impl Intent<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> IntentBuilder<intent_state::Empty, DefaultStr> {
         IntentBuilder::new()
     }
 }
 
-impl<S: BosStr> IntentBuilder<S, intent_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Intent<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> IntentBuilder<intent_state::Empty, S> {
+        IntentBuilder::builder()
+    }
+}
+
+impl IntentBuilder<intent_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         IntentBuilder {
             _state: PhantomData,
@@ -204,7 +208,18 @@ impl<S: BosStr> IntentBuilder<S, intent_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: intent_state::State> IntentBuilder<S, St> {
+impl<S: BosStr> IntentBuilder<intent_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        IntentBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: intent_state::State, S: BosStr> IntentBuilder<St, S> {
     /// Set the `allow` field (optional)
     pub fn allow(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -217,7 +232,7 @@ impl<S: BosStr, St: intent_state::State> IntentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> IntentBuilder<S, St>
+impl<St, S: BosStr> IntentBuilder<St, S>
 where
     St: intent_state::State,
     St::UpdatedAt: intent_state::IsUnset,
@@ -226,7 +241,7 @@ where
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> IntentBuilder<S, intent_state::SetUpdatedAt<St>> {
+    ) -> IntentBuilder<intent_state::SetUpdatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         IntentBuilder {
             _state: PhantomData,
@@ -236,7 +251,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IntentBuilder<S, St>
+impl<St, S: BosStr> IntentBuilder<St, S>
 where
     St: intent_state::State,
     St::UpdatedAt: intent_state::IsSet,
@@ -260,10 +275,10 @@ where
 }
 
 fn lexicon_doc_org_user_intents_demo_declaration() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.user-intents.demo.declaration"),
@@ -355,7 +370,7 @@ fn lexicon_doc_org_user_intents_demo_declaration() -> LexiconDoc<'static> {
 
 pub mod declaration_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -373,7 +388,7 @@ pub mod declaration_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeclarationBuilder<S: BosStr, St: declaration_state::State> {
+pub struct DeclarationBuilder<St: declaration_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<declaration::Intent<S>>,
@@ -385,15 +400,22 @@ pub struct DeclarationBuilder<S: BosStr, St: declaration_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Declaration<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DeclarationBuilder<S, declaration_state::Empty> {
+impl Declaration<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DeclarationBuilder<declaration_state::Empty, DefaultStr> {
         DeclarationBuilder::new()
     }
 }
 
-impl<S: BosStr> DeclarationBuilder<S, declaration_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Declaration<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DeclarationBuilder<declaration_state::Empty, S> {
+        DeclarationBuilder::builder()
+    }
+}
+
+impl DeclarationBuilder<declaration_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DeclarationBuilder {
             _state: PhantomData,
@@ -403,9 +425,23 @@ impl<S: BosStr> DeclarationBuilder<S, declaration_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
+impl<S: BosStr> DeclarationBuilder<declaration_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DeclarationBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: declaration_state::State, S: BosStr> DeclarationBuilder<St, S> {
     /// Set the `bulkDataset` field (optional)
-    pub fn bulk_dataset(mut self, value: impl Into<Option<declaration::Intent<S>>>) -> Self {
+    pub fn bulk_dataset(
+        mut self,
+        value: impl Into<Option<declaration::Intent<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -416,20 +452,26 @@ impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
+impl<St: declaration_state::State, S: BosStr> DeclarationBuilder<St, S> {
     /// Set the `protocolBridging` field (optional)
-    pub fn protocol_bridging(mut self, value: impl Into<Option<declaration::Intent<S>>>) -> Self {
+    pub fn protocol_bridging(
+        mut self,
+        value: impl Into<Option<declaration::Intent<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `protocolBridging` field to an Option value (optional)
-    pub fn maybe_protocol_bridging(mut self, value: Option<declaration::Intent<S>>) -> Self {
+    pub fn maybe_protocol_bridging(
+        mut self,
+        value: Option<declaration::Intent<S>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
+impl<St: declaration_state::State, S: BosStr> DeclarationBuilder<St, S> {
     /// Set the `publicAccessArchive` field (optional)
     pub fn public_access_archive(
         mut self,
@@ -439,13 +481,16 @@ impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
         self
     }
     /// Set the `publicAccessArchive` field to an Option value (optional)
-    pub fn maybe_public_access_archive(mut self, value: Option<declaration::Intent<S>>) -> Self {
+    pub fn maybe_public_access_archive(
+        mut self,
+        value: Option<declaration::Intent<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
 }
 
-impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
+impl<St: declaration_state::State, S: BosStr> DeclarationBuilder<St, S> {
     /// Set the `syntheticContentGeneration` field (optional)
     pub fn synthetic_content_generation(
         mut self,
@@ -464,7 +509,7 @@ impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
+impl<St: declaration_state::State, S: BosStr> DeclarationBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -477,7 +522,7 @@ impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DeclarationBuilder<S, St>
+impl<St, S: BosStr> DeclarationBuilder<St, S>
 where
     St: declaration_state::State,
 {
@@ -493,7 +538,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Declaration<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Declaration<S> {
         Declaration {
             bulk_dataset: self._fields.0,
             protocol_bridging: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::network_slices::slice::stats;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::slice::stats;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CollectionStats<S: BosStr = DefaultStr> {
     ///Collection NSID
     pub collection: Nsid<S>,
@@ -42,20 +39,16 @@ pub struct CollectionStats<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Stats<S: BosStr = DefaultStr> {
     pub slice: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StatsOutput<S: BosStr = DefaultStr> {
     ///Per-collection statistics
     pub collection_stats: Vec<stats::CollectionStats<S>>,
@@ -112,7 +105,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for StatsRequest {
 
 pub mod collection_stats_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -121,69 +114,79 @@ pub mod collection_stats_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Collection;
-        type UniqueActors;
         type RecordCount;
+        type UniqueActors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Collection = Unset;
-        type UniqueActors = Unset;
         type RecordCount = Unset;
+        type UniqueActors = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
         type Collection = Set<members::collection>;
+        type RecordCount = St::RecordCount;
         type UniqueActors = St::UniqueActors;
-        type RecordCount = St::RecordCount;
-    }
-    ///State transition - sets the `unique_actors` field to Set
-    pub struct SetUniqueActors<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUniqueActors<St> {}
-    impl<St: State> State for SetUniqueActors<St> {
-        type Collection = St::Collection;
-        type UniqueActors = Set<members::unique_actors>;
-        type RecordCount = St::RecordCount;
     }
     ///State transition - sets the `record_count` field to Set
     pub struct SetRecordCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecordCount<St> {}
     impl<St: State> State for SetRecordCount<St> {
         type Collection = St::Collection;
-        type UniqueActors = St::UniqueActors;
         type RecordCount = Set<members::record_count>;
+        type UniqueActors = St::UniqueActors;
+    }
+    ///State transition - sets the `unique_actors` field to Set
+    pub struct SetUniqueActors<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUniqueActors<St> {}
+    impl<St: State> State for SetUniqueActors<St> {
+        type Collection = St::Collection;
+        type RecordCount = St::RecordCount;
+        type UniqueActors = Set<members::unique_actors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `collection` field
         pub struct collection(());
-        ///Marker type for the `unique_actors` field
-        pub struct unique_actors(());
         ///Marker type for the `record_count` field
         pub struct record_count(());
+        ///Marker type for the `unique_actors` field
+        pub struct unique_actors(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionStatsBuilder<S: BosStr, St: collection_stats_state::State> {
+pub struct CollectionStatsBuilder<
+    St: collection_stats_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Nsid<S>>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CollectionStats<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CollectionStatsBuilder<S, collection_stats_state::Empty> {
+impl CollectionStats<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CollectionStatsBuilder<collection_stats_state::Empty, DefaultStr> {
         CollectionStatsBuilder::new()
     }
 }
 
-impl<S: BosStr> CollectionStatsBuilder<S, collection_stats_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CollectionStats<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CollectionStatsBuilder<collection_stats_state::Empty, S> {
+        CollectionStatsBuilder::builder()
+    }
+}
+
+impl CollectionStatsBuilder<collection_stats_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CollectionStatsBuilder {
             _state: PhantomData,
@@ -193,7 +196,18 @@ impl<S: BosStr> CollectionStatsBuilder<S, collection_stats_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CollectionStatsBuilder<S, St>
+impl<S: BosStr> CollectionStatsBuilder<collection_stats_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CollectionStatsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CollectionStatsBuilder<St, S>
 where
     St: collection_stats_state::State,
     St::Collection: collection_stats_state::IsUnset,
@@ -202,7 +216,7 @@ where
     pub fn collection(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> CollectionStatsBuilder<S, collection_stats_state::SetCollection<St>> {
+    ) -> CollectionStatsBuilder<collection_stats_state::SetCollection<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CollectionStatsBuilder {
             _state: PhantomData,
@@ -212,7 +226,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CollectionStatsBuilder<S, St>
+impl<St, S: BosStr> CollectionStatsBuilder<St, S>
 where
     St: collection_stats_state::State,
     St::RecordCount: collection_stats_state::IsUnset,
@@ -221,7 +235,7 @@ where
     pub fn record_count(
         mut self,
         value: impl Into<i64>,
-    ) -> CollectionStatsBuilder<S, collection_stats_state::SetRecordCount<St>> {
+    ) -> CollectionStatsBuilder<collection_stats_state::SetRecordCount<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CollectionStatsBuilder {
             _state: PhantomData,
@@ -231,7 +245,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CollectionStatsBuilder<S, St>
+impl<St, S: BosStr> CollectionStatsBuilder<St, S>
 where
     St: collection_stats_state::State,
     St::UniqueActors: collection_stats_state::IsUnset,
@@ -240,7 +254,7 @@ where
     pub fn unique_actors(
         mut self,
         value: impl Into<i64>,
-    ) -> CollectionStatsBuilder<S, collection_stats_state::SetUniqueActors<St>> {
+    ) -> CollectionStatsBuilder<collection_stats_state::SetUniqueActors<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CollectionStatsBuilder {
             _state: PhantomData,
@@ -250,12 +264,12 @@ where
     }
 }
 
-impl<S: BosStr, St> CollectionStatsBuilder<S, St>
+impl<St, S: BosStr> CollectionStatsBuilder<St, S>
 where
     St: collection_stats_state::State,
     St::Collection: collection_stats_state::IsSet,
-    St::UniqueActors: collection_stats_state::IsSet,
     St::RecordCount: collection_stats_state::IsSet,
+    St::UniqueActors: collection_stats_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CollectionStats<S> {
@@ -267,7 +281,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CollectionStats<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CollectionStats<S> {
         CollectionStats {
             collection: self._fields.0.unwrap(),
             record_count: self._fields.1.unwrap(),
@@ -278,10 +295,10 @@ where
 }
 
 fn lexicon_doc_network_slices_slice_stats() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.slice.stats"),
@@ -290,11 +307,13 @@ fn lexicon_doc_network_slices_slice_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("collectionStats"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("collection"),
-                        SmolStr::new_static("recordCount"),
-                        SmolStr::new_static("uniqueActors"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("collection"),
+                            SmolStr::new_static("recordCount"),
+                            SmolStr::new_static("uniqueActors")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -326,24 +345,28 @@ fn lexicon_doc_network_slices_slice_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("slice")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("slice"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "AT-URI of the slice to get statistics for",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("slice")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("slice"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "AT-URI of the slice to get statistics for",
+                                            ),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -355,7 +378,7 @@ fn lexicon_doc_network_slices_slice_stats() -> LexiconDoc<'static> {
 
 pub mod stats_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -386,21 +409,28 @@ pub mod stats_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StatsBuilder<S: BosStr, St: stats_state::State> {
+pub struct StatsBuilder<St: stats_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Stats<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StatsBuilder<S, stats_state::Empty> {
+impl Stats<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StatsBuilder<stats_state::Empty, DefaultStr> {
         StatsBuilder::new()
     }
 }
 
-impl<S: BosStr> StatsBuilder<S, stats_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Stats<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StatsBuilder<stats_state::Empty, S> {
+        StatsBuilder::builder()
+    }
+}
+
+impl StatsBuilder<stats_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StatsBuilder {
             _state: PhantomData,
@@ -410,13 +440,27 @@ impl<S: BosStr> StatsBuilder<S, stats_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StatsBuilder<S, St>
+impl<S: BosStr> StatsBuilder<stats_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StatsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StatsBuilder<St, S>
 where
     St: stats_state::State,
     St::Slice: stats_state::IsUnset,
 {
     /// Set the `slice` field (required)
-    pub fn slice(mut self, value: impl Into<S>) -> StatsBuilder<S, stats_state::SetSlice<St>> {
+    pub fn slice(
+        mut self,
+        value: impl Into<S>,
+    ) -> StatsBuilder<stats_state::SetSlice<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
@@ -426,7 +470,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatsBuilder<S, St>
+impl<St, S: BosStr> StatsBuilder<St, S>
 where
     St: stats_state::State,
     St::Slice: stats_state::IsSet,

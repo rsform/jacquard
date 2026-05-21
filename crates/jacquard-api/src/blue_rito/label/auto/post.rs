@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Setting Post based auto labeling.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -114,7 +114,7 @@ impl<S: BosStr> LexiconSchema for Post<S> {
 
 pub mod post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -122,111 +122,111 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DurationInHours;
-        type CreatedAt;
-        type AppliedTo;
-        type Condition;
         type Label;
+        type Condition;
+        type CreatedAt;
+        type DurationInHours;
+        type AppliedTo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DurationInHours = Unset;
-        type CreatedAt = Unset;
-        type AppliedTo = Unset;
-        type Condition = Unset;
         type Label = Unset;
-    }
-    ///State transition - sets the `duration_in_hours` field to Set
-    pub struct SetDurationInHours<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDurationInHours<St> {}
-    impl<St: State> State for SetDurationInHours<St> {
-        type DurationInHours = Set<members::duration_in_hours>;
-        type CreatedAt = St::CreatedAt;
-        type AppliedTo = St::AppliedTo;
-        type Condition = St::Condition;
-        type Label = St::Label;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type DurationInHours = St::DurationInHours;
-        type CreatedAt = Set<members::created_at>;
-        type AppliedTo = St::AppliedTo;
-        type Condition = St::Condition;
-        type Label = St::Label;
-    }
-    ///State transition - sets the `applied_to` field to Set
-    pub struct SetAppliedTo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAppliedTo<St> {}
-    impl<St: State> State for SetAppliedTo<St> {
-        type DurationInHours = St::DurationInHours;
-        type CreatedAt = St::CreatedAt;
-        type AppliedTo = Set<members::applied_to>;
-        type Condition = St::Condition;
-        type Label = St::Label;
-    }
-    ///State transition - sets the `condition` field to Set
-    pub struct SetCondition<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCondition<St> {}
-    impl<St: State> State for SetCondition<St> {
-        type DurationInHours = St::DurationInHours;
-        type CreatedAt = St::CreatedAt;
-        type AppliedTo = St::AppliedTo;
-        type Condition = Set<members::condition>;
-        type Label = St::Label;
+        type Condition = Unset;
+        type CreatedAt = Unset;
+        type DurationInHours = Unset;
+        type AppliedTo = Unset;
     }
     ///State transition - sets the `label` field to Set
     pub struct SetLabel<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLabel<St> {}
     impl<St: State> State for SetLabel<St> {
-        type DurationInHours = St::DurationInHours;
-        type CreatedAt = St::CreatedAt;
-        type AppliedTo = St::AppliedTo;
-        type Condition = St::Condition;
         type Label = Set<members::label>;
+        type Condition = St::Condition;
+        type CreatedAt = St::CreatedAt;
+        type DurationInHours = St::DurationInHours;
+        type AppliedTo = St::AppliedTo;
+    }
+    ///State transition - sets the `condition` field to Set
+    pub struct SetCondition<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCondition<St> {}
+    impl<St: State> State for SetCondition<St> {
+        type Label = St::Label;
+        type Condition = Set<members::condition>;
+        type CreatedAt = St::CreatedAt;
+        type DurationInHours = St::DurationInHours;
+        type AppliedTo = St::AppliedTo;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Label = St::Label;
+        type Condition = St::Condition;
+        type CreatedAt = Set<members::created_at>;
+        type DurationInHours = St::DurationInHours;
+        type AppliedTo = St::AppliedTo;
+    }
+    ///State transition - sets the `duration_in_hours` field to Set
+    pub struct SetDurationInHours<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDurationInHours<St> {}
+    impl<St: State> State for SetDurationInHours<St> {
+        type Label = St::Label;
+        type Condition = St::Condition;
+        type CreatedAt = St::CreatedAt;
+        type DurationInHours = Set<members::duration_in_hours>;
+        type AppliedTo = St::AppliedTo;
+    }
+    ///State transition - sets the `applied_to` field to Set
+    pub struct SetAppliedTo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAppliedTo<St> {}
+    impl<St: State> State for SetAppliedTo<St> {
+        type Label = St::Label;
+        type Condition = St::Condition;
+        type CreatedAt = St::CreatedAt;
+        type DurationInHours = St::DurationInHours;
+        type AppliedTo = Set<members::applied_to>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `duration_in_hours` field
-        pub struct duration_in_hours(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `applied_to` field
-        pub struct applied_to(());
-        ///Marker type for the `condition` field
-        pub struct condition(());
         ///Marker type for the `label` field
         pub struct label(());
+        ///Marker type for the `condition` field
+        pub struct condition(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `duration_in_hours` field
+        pub struct duration_in_hours(());
+        ///Marker type for the `applied_to` field
+        pub struct applied_to(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PostBuilder<S: BosStr, St: post_state::State> {
+pub struct PostBuilder<St: post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<S>,
-        Option<S>,
-        Option<Datetime>,
-        Option<i64>,
-        Option<S>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<S>, Option<Datetime>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Post<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PostBuilder<S, post_state::Empty> {
+impl Post<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PostBuilder<post_state::Empty, DefaultStr> {
         PostBuilder::new()
     }
 }
 
-impl<S: BosStr> PostBuilder<S, post_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Post<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PostBuilder<post_state::Empty, S> {
+        PostBuilder::builder()
+    }
+}
+
+impl PostBuilder<post_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PostBuilder {
             _state: PhantomData,
@@ -236,7 +236,18 @@ impl<S: BosStr> PostBuilder<S, post_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<S: BosStr> PostBuilder<post_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PostBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `action` field (optional)
     pub fn action(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -249,7 +260,7 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::AppliedTo: post_state::IsUnset,
@@ -258,7 +269,7 @@ where
     pub fn applied_to(
         mut self,
         value: impl Into<S>,
-    ) -> PostBuilder<S, post_state::SetAppliedTo<St>> {
+    ) -> PostBuilder<post_state::SetAppliedTo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -268,7 +279,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::Condition: post_state::IsUnset,
@@ -277,7 +288,7 @@ where
     pub fn condition(
         mut self,
         value: impl Into<S>,
-    ) -> PostBuilder<S, post_state::SetCondition<St>> {
+    ) -> PostBuilder<post_state::SetCondition<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -287,7 +298,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::CreatedAt: post_state::IsUnset,
@@ -296,7 +307,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PostBuilder<S, post_state::SetCreatedAt<St>> {
+    ) -> PostBuilder<post_state::SetCreatedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -306,7 +317,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::DurationInHours: post_state::IsUnset,
@@ -315,7 +326,7 @@ where
     pub fn duration_in_hours(
         mut self,
         value: impl Into<i64>,
-    ) -> PostBuilder<S, post_state::SetDurationInHours<St>> {
+    ) -> PostBuilder<post_state::SetDurationInHours<St>, S> {
         self._fields.4 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -325,13 +336,16 @@ where
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::Label: post_state::IsUnset,
 {
     /// Set the `label` field (required)
-    pub fn label(mut self, value: impl Into<S>) -> PostBuilder<S, post_state::SetLabel<St>> {
+    pub fn label(
+        mut self,
+        value: impl Into<S>,
+    ) -> PostBuilder<post_state::SetLabel<St>, S> {
         self._fields.5 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -341,14 +355,14 @@ where
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
-    St::DurationInHours: post_state::IsSet,
-    St::CreatedAt: post_state::IsSet,
-    St::AppliedTo: post_state::IsSet,
-    St::Condition: post_state::IsSet,
     St::Label: post_state::IsSet,
+    St::Condition: post_state::IsSet,
+    St::CreatedAt: post_state::IsSet,
+    St::DurationInHours: post_state::IsSet,
+    St::AppliedTo: post_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Post<S> {
@@ -377,10 +391,10 @@ where
 }
 
 fn lexicon_doc_blue_rito_label_auto_post() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.rito.label.auto.post"),

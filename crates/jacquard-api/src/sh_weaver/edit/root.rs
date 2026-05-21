@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_weaver::edit::DocRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::edit::DocRef;
 /// The starting point for edit history on a notebook.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -118,16 +118,19 @@ impl<S: BosStr> LexiconSchema for Root<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("snapshot"),
@@ -143,7 +146,7 @@ impl<S: BosStr> LexiconSchema for Root<S> {
 
 pub mod root_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -151,56 +154,63 @@ pub mod root_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Doc;
         type Snapshot;
+        type Doc;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Doc = Unset;
         type Snapshot = Unset;
-    }
-    ///State transition - sets the `doc` field to Set
-    pub struct SetDoc<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDoc<St> {}
-    impl<St: State> State for SetDoc<St> {
-        type Doc = Set<members::doc>;
-        type Snapshot = St::Snapshot;
+        type Doc = Unset;
     }
     ///State transition - sets the `snapshot` field to Set
     pub struct SetSnapshot<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSnapshot<St> {}
     impl<St: State> State for SetSnapshot<St> {
-        type Doc = St::Doc;
         type Snapshot = Set<members::snapshot>;
+        type Doc = St::Doc;
+    }
+    ///State transition - sets the `doc` field to Set
+    pub struct SetDoc<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDoc<St> {}
+    impl<St: State> State for SetDoc<St> {
+        type Snapshot = St::Snapshot;
+        type Doc = Set<members::doc>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `doc` field
-        pub struct doc(());
         ///Marker type for the `snapshot` field
         pub struct snapshot(());
+        ///Marker type for the `doc` field
+        pub struct doc(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RootBuilder<S: BosStr, St: root_state::State> {
+pub struct RootBuilder<St: root_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<DocRef<S>>, Option<BlobRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Root<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RootBuilder<S, root_state::Empty> {
+impl Root<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RootBuilder<root_state::Empty, DefaultStr> {
         RootBuilder::new()
     }
 }
 
-impl<S: BosStr> RootBuilder<S, root_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Root<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RootBuilder<root_state::Empty, S> {
+        RootBuilder::builder()
+    }
+}
+
+impl RootBuilder<root_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RootBuilder {
             _state: PhantomData,
@@ -210,13 +220,27 @@ impl<S: BosStr> RootBuilder<S, root_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RootBuilder<S, St>
+impl<S: BosStr> RootBuilder<root_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RootBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RootBuilder<St, S>
 where
     St: root_state::State,
     St::Doc: root_state::IsUnset,
 {
     /// Set the `doc` field (required)
-    pub fn doc(mut self, value: impl Into<DocRef<S>>) -> RootBuilder<S, root_state::SetDoc<St>> {
+    pub fn doc(
+        mut self,
+        value: impl Into<DocRef<S>>,
+    ) -> RootBuilder<root_state::SetDoc<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RootBuilder {
             _state: PhantomData,
@@ -226,7 +250,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RootBuilder<S, St>
+impl<St, S: BosStr> RootBuilder<St, S>
 where
     St: root_state::State,
     St::Snapshot: root_state::IsUnset,
@@ -235,7 +259,7 @@ where
     pub fn snapshot(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> RootBuilder<S, root_state::SetSnapshot<St>> {
+    ) -> RootBuilder<root_state::SetSnapshot<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RootBuilder {
             _state: PhantomData,
@@ -245,11 +269,11 @@ where
     }
 }
 
-impl<S: BosStr, St> RootBuilder<S, St>
+impl<St, S: BosStr> RootBuilder<St, S>
 where
     St: root_state::State,
-    St::Doc: root_state::IsSet,
     St::Snapshot: root_state::IsSet,
+    St::Doc: root_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Root<S> {
@@ -270,10 +294,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_edit_root() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.edit.root"),
@@ -282,15 +306,18 @@ fn lexicon_doc_sh_weaver_edit_root() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "The starting point for edit history on a notebook.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "The starting point for edit history on a notebook.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("doc"),
-                            SmolStr::new_static("snapshot"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("doc"), SmolStr::new_static("snapshot")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -303,9 +330,7 @@ fn lexicon_doc_sh_weaver_edit_root() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("snapshot"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map
                         },

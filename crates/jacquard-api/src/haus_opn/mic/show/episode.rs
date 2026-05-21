@@ -7,12 +7,13 @@
 
 pub mod favorite;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,7 +30,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A specific episode or VOD of a show.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -214,16 +215,19 @@ impl<S: BosStr> LexiconSchema for Episode<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("cover_art"),
@@ -260,7 +264,7 @@ impl<S: BosStr> LexiconSchema for Episode<S> {
 
 pub mod episode_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -268,56 +272,56 @@ pub mod episode_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Title;
         type CreatedAt;
         type ShowUri;
-        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Title = Unset;
         type CreatedAt = Unset;
         type ShowUri = Unset;
-        type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type ShowUri = St::ShowUri;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `show_uri` field to Set
-    pub struct SetShowUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetShowUri<St> {}
-    impl<St: State> State for SetShowUri<St> {
-        type CreatedAt = St::CreatedAt;
-        type ShowUri = Set<members::show_uri>;
-        type Title = St::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
+        type Title = Set<members::title>;
         type CreatedAt = St::CreatedAt;
         type ShowUri = St::ShowUri;
-        type Title = Set<members::title>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Title = St::Title;
+        type CreatedAt = Set<members::created_at>;
+        type ShowUri = St::ShowUri;
+    }
+    ///State transition - sets the `show_uri` field to Set
+    pub struct SetShowUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShowUri<St> {}
+    impl<St: State> State for SetShowUri<St> {
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type ShowUri = Set<members::show_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `show_uri` field
         pub struct show_uri(());
-        ///Marker type for the `title` field
-        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EpisodeBuilder<S: BosStr, St: episode_state::State> {
+pub struct EpisodeBuilder<St: episode_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -332,15 +336,22 @@ pub struct EpisodeBuilder<S: BosStr, St: episode_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Episode<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EpisodeBuilder<S, episode_state::Empty> {
+impl Episode<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EpisodeBuilder<episode_state::Empty, DefaultStr> {
         EpisodeBuilder::new()
     }
 }
 
-impl<S: BosStr> EpisodeBuilder<S, episode_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Episode<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EpisodeBuilder<episode_state::Empty, S> {
+        EpisodeBuilder::builder()
+    }
+}
+
+impl EpisodeBuilder<episode_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EpisodeBuilder {
             _state: PhantomData,
@@ -350,7 +361,18 @@ impl<S: BosStr> EpisodeBuilder<S, episode_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<S: BosStr> EpisodeBuilder<episode_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EpisodeBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `airingDate` field (optional)
     pub fn airing_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -363,7 +385,7 @@ impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `coverArt` field (optional)
     pub fn cover_art(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -376,7 +398,7 @@ impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EpisodeBuilder<S, St>
+impl<St, S: BosStr> EpisodeBuilder<St, S>
 where
     St: episode_state::State,
     St::CreatedAt: episode_state::IsUnset,
@@ -385,7 +407,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EpisodeBuilder<S, episode_state::SetCreatedAt<St>> {
+    ) -> EpisodeBuilder<episode_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
@@ -395,7 +417,7 @@ where
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -408,7 +430,7 @@ impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EpisodeBuilder<S, St>
+impl<St, S: BosStr> EpisodeBuilder<St, S>
 where
     St: episode_state::State,
     St::ShowUri: episode_state::IsUnset,
@@ -417,7 +439,7 @@ where
     pub fn show_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> EpisodeBuilder<S, episode_state::SetShowUri<St>> {
+    ) -> EpisodeBuilder<episode_state::SetShowUri<St>, S> {
         self._fields.4 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
@@ -427,7 +449,7 @@ where
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<EpisodeStatus<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -440,13 +462,16 @@ impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EpisodeBuilder<S, St>
+impl<St, S: BosStr> EpisodeBuilder<St, S>
 where
     St: episode_state::State,
     St::Title: episode_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> EpisodeBuilder<S, episode_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> EpisodeBuilder<episode_state::SetTitle<St>, S> {
         self._fields.6 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
@@ -456,7 +481,7 @@ where
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `vodUrl` field (optional)
     pub fn vod_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -469,12 +494,12 @@ impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EpisodeBuilder<S, St>
+impl<St, S: BosStr> EpisodeBuilder<St, S>
 where
     St: episode_state::State,
+    St::Title: episode_state::IsSet,
     St::CreatedAt: episode_state::IsSet,
     St::ShowUri: episode_state::IsSet,
-    St::Title: episode_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Episode<S> {
@@ -507,10 +532,10 @@ where
 }
 
 fn lexicon_doc_haus_opn_mic_show_episode() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("haus.opn.mic.show.episode"),
@@ -519,32 +544,36 @@ fn lexicon_doc_haus_opn_mic_show_episode() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A specific episode or VOD of a show.")),
+                    description: Some(
+                        CowStr::new_static("A specific episode or VOD of a show."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("showUri"),
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("showUri"),
+                                SmolStr::new_static("title"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("airingDate"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Scheduled or actual date/time when this episode airs.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Scheduled or actual date/time when this episode airs.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("coverArt"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),
@@ -563,9 +592,11 @@ fn lexicon_doc_haus_opn_mic_show_episode() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("showUri"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Reference to the haus.opn.mic.show record.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Reference to the haus.opn.mic.show record.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -573,9 +604,9 @@ fn lexicon_doc_haus_opn_mic_show_episode() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("status"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Current episode lifecycle status.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Current episode lifecycle status."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

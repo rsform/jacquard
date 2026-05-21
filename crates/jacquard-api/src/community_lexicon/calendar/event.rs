@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,14 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::community_lexicon::calendar::event;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::community_lexicon::location::address::Address;
 use crate::community_lexicon::location::fsq::Fsq;
 use crate::community_lexicon::location::geo::Geo;
 use crate::community_lexicon::location::hthree::Hthree;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use crate::community_lexicon::calendar::event;
 /// The event has been cancelled.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
@@ -101,6 +101,7 @@ pub struct Event<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -141,7 +142,9 @@ pub enum Mode<S: BosStr = DefaultStr> {
 impl<S: BosStr> Mode<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::CommunityLexiconCalendarEventHybrid => "community.lexicon.calendar.event#hybrid",
+            Self::CommunityLexiconCalendarEventHybrid => {
+                "community.lexicon.calendar.event#hybrid"
+            }
             Self::CommunityLexiconCalendarEventInperson => {
                 "community.lexicon.calendar.event#inperson"
             }
@@ -154,7 +157,9 @@ impl<S: BosStr> Mode<S> {
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "community.lexicon.calendar.event#hybrid" => Self::CommunityLexiconCalendarEventHybrid,
+            "community.lexicon.calendar.event#hybrid" => {
+                Self::CommunityLexiconCalendarEventHybrid
+            }
             "community.lexicon.calendar.event#inperson" => {
                 Self::CommunityLexiconCalendarEventInperson
             }
@@ -205,7 +210,9 @@ where
     type Output = Mode<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            Mode::CommunityLexiconCalendarEventHybrid => Mode::CommunityLexiconCalendarEventHybrid,
+            Mode::CommunityLexiconCalendarEventHybrid => {
+                Mode::CommunityLexiconCalendarEventHybrid
+            }
             Mode::CommunityLexiconCalendarEventInperson => {
                 Mode::CommunityLexiconCalendarEventInperson
             }
@@ -375,10 +382,7 @@ where
 /// A URI associated with the event.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Uri<S: BosStr = DefaultStr> {
     ///The display name of the URI.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -463,7 +467,7 @@ impl<S: BosStr> LexiconSchema for Uri<S> {
 
 pub mod event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -471,42 +475,42 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = St::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EventBuilder<S: BosStr, St: event_state::State> {
+pub struct EventBuilder<St: event_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -522,15 +526,22 @@ pub struct EventBuilder<S: BosStr, St: event_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Event<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EventBuilder<S, event_state::Empty> {
+impl Event<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EventBuilder<event_state::Empty, DefaultStr> {
         EventBuilder::new()
     }
 }
 
-impl<S: BosStr> EventBuilder<S, event_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Event<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EventBuilder<event_state::Empty, S> {
+        EventBuilder::builder()
+    }
+}
+
+impl EventBuilder<event_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventBuilder {
             _state: PhantomData,
@@ -540,7 +551,18 @@ impl<S: BosStr> EventBuilder<S, event_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<S: BosStr> EventBuilder<event_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EventBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::CreatedAt: event_state::IsUnset,
@@ -549,7 +571,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventBuilder<S, event_state::SetCreatedAt<St>> {
+    ) -> EventBuilder<event_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -559,7 +581,7 @@ where
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -572,7 +594,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `endsAt` field (optional)
     pub fn ends_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -585,9 +607,12 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `locations` field (optional)
-    pub fn locations(mut self, value: impl Into<Option<Vec<EventLocationsItem<S>>>>) -> Self {
+    pub fn locations(
+        mut self,
+        value: impl Into<Option<Vec<EventLocationsItem<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -598,7 +623,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `mode` field (optional)
     pub fn mode(mut self, value: impl Into<Option<event::Mode<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -611,13 +636,16 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::Name: event_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> EventBuilder<S, event_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> EventBuilder<event_state::SetName<St>, S> {
         self._fields.5 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -627,7 +655,7 @@ where
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `startsAt` field (optional)
     pub fn starts_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -640,7 +668,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<event::Status<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -653,7 +681,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `uris` field (optional)
     pub fn uris(mut self, value: impl Into<Option<Vec<event::Uri<S>>>>) -> Self {
         self._fields.8 = value.into();
@@ -666,11 +694,11 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
-    St::CreatedAt: event_state::IsSet,
     St::Name: event_state::IsSet,
+    St::CreatedAt: event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Event<S> {
@@ -705,10 +733,10 @@ where
 }
 
 fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("community.lexicon.calendar.event"),
@@ -716,21 +744,15 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
             let mut map = BTreeMap::new();
             map.insert(
                 SmolStr::new_static("cancelled"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("hybrid"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("inperson"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("main"),
@@ -738,19 +760,23 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A calendar event.")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("name"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("name")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Client-declared timestamp when the event was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Client-declared timestamp when the event was created.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -758,18 +784,20 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The description of the event.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The description of the event."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("endsAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Client-declared timestamp when the event ends.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Client-declared timestamp when the event ends.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -777,20 +805,18 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("locations"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "The locations where the event takes place.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The locations where the event takes place.",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Union(LexRefUnion {
                                         refs: vec![
-                                            CowStr::new_static(
-                                                "community.lexicon.calendar.event#uri",
-                                            ),
-                                            CowStr::new_static(
-                                                "community.lexicon.location.address",
-                                            ),
+                                            CowStr::new_static("community.lexicon.calendar.event#uri"),
+                                            CowStr::new_static("community.lexicon.location.address"),
                                             CowStr::new_static("community.lexicon.location.fsq"),
                                             CowStr::new_static("community.lexicon.location.geo"),
-                                            CowStr::new_static("community.lexicon.location.hthree"),
+                                            CowStr::new_static("community.lexicon.location.hthree")
                                         ],
                                         ..Default::default()
                                     }),
@@ -809,16 +835,20 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("The name of the event.")),
+                                    description: Some(
+                                        CowStr::new_static("The name of the event."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("startsAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Client-declared timestamp when the event starts.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Client-declared timestamp when the event starts.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -835,9 +865,9 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("uris"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "URIs associated with the event.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("URIs associated with the event."),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static(
                                             "community.lexicon.calendar.event#uri",
@@ -863,27 +893,19 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("planned"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("postponed"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("rescheduled"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("scheduled"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("status"),
@@ -895,7 +917,9 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("uri"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A URI associated with the event.")),
+                    description: Some(
+                        CowStr::new_static("A URI associated with the event."),
+                    ),
                     required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -903,9 +927,9 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The display name of the URI.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The display name of the URI."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -923,9 +947,7 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("virtual"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map
         },
@@ -935,7 +957,7 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
 
 pub mod uri_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -966,21 +988,28 @@ pub mod uri_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UriBuilder<S: BosStr, St: uri_state::State> {
+pub struct UriBuilder<St: uri_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Uri<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UriBuilder<S, uri_state::Empty> {
+impl Uri<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UriBuilder<uri_state::Empty, DefaultStr> {
         UriBuilder::new()
     }
 }
 
-impl<S: BosStr> UriBuilder<S, uri_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Uri<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UriBuilder<uri_state::Empty, S> {
+        UriBuilder::builder()
+    }
+}
+
+impl UriBuilder<uri_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UriBuilder {
             _state: PhantomData,
@@ -990,7 +1019,18 @@ impl<S: BosStr> UriBuilder<S, uri_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: uri_state::State> UriBuilder<S, St> {
+impl<S: BosStr> UriBuilder<uri_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UriBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: uri_state::State, S: BosStr> UriBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -1003,13 +1043,16 @@ impl<S: BosStr, St: uri_state::State> UriBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> UriBuilder<S, St>
+impl<St, S: BosStr> UriBuilder<St, S>
 where
     St: uri_state::State,
     St::Uri: uri_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(mut self, value: impl Into<UriValue<S>>) -> UriBuilder<S, uri_state::SetUri<St>> {
+    pub fn uri(
+        mut self,
+        value: impl Into<UriValue<S>>,
+    ) -> UriBuilder<uri_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         UriBuilder {
             _state: PhantomData,
@@ -1019,7 +1062,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UriBuilder<S, St>
+impl<St, S: BosStr> UriBuilder<St, S>
 where
     St: uri_state::State,
     St::Uri: uri_state::IsSet,

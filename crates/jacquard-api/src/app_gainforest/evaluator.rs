@@ -9,12 +9,13 @@ pub mod evaluation;
 pub mod service;
 pub mod subscription;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,17 +26,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_gainforest::evaluator;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_gainforest::evaluator;
 /// A candidate taxon identification with confidence score and rank.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CandidateTaxon<S: BosStr = DefaultStr> {
     ///Confidence score (0-1000, where 1000 = 100.0%).
     pub confidence: i64,
@@ -62,10 +60,7 @@ pub struct CandidateTaxon<S: BosStr = DefaultStr> {
 /// Generic categorical classification result (e.g., conservation priority, habitat type).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ClassificationResult<S: BosStr = DefaultStr> {
     ///The classification category (e.g., 'conservation-priority', 'habitat-type').
     pub category: S,
@@ -81,10 +76,7 @@ pub struct ClassificationResult<S: BosStr = DefaultStr> {
 /// Data quality assessment result with per-field quality flags.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DataQualityResult<S: BosStr = DefaultStr> {
     ///Overall completeness score (0-1000, where 1000 = 100.0%).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -101,10 +93,7 @@ pub struct DataQualityResult<S: BosStr = DefaultStr> {
 /// A single measurement derived by an evaluator from source data.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DerivedMeasurement<S: BosStr = DefaultStr> {
     ///Description of the method used to obtain the measurement.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -123,10 +112,7 @@ pub struct DerivedMeasurement<S: BosStr = DefaultStr> {
 /// Derived measurements produced by an evaluator from source data (e.g., remote sensing metrics).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MeasurementResult<S: BosStr = DefaultStr> {
     ///List of derived measurements.
     pub measurements: Vec<evaluator::DerivedMeasurement<S>>,
@@ -140,10 +126,7 @@ pub struct MeasurementResult<S: BosStr = DefaultStr> {
 /// Provenance metadata describing the method used to produce an evaluation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MethodInfo<S: BosStr = DefaultStr> {
     ///Identifier for the specific model checkpoint used (e.g., date or hash).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -163,10 +146,7 @@ pub struct MethodInfo<S: BosStr = DefaultStr> {
 /// A single data quality flag indicating an issue with a specific field.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QualityFlag<S: BosStr = DefaultStr> {
     ///The field name that has the quality issue.
     pub field: S,
@@ -265,10 +245,7 @@ where
 /// AI or human species recognition result with ranked candidate identifications.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SpeciesIdResult<S: BosStr = DefaultStr> {
     ///Ranked list of candidate species identifications.
     pub candidates: Vec<evaluator::CandidateTaxon<S>>,
@@ -285,10 +262,7 @@ pub struct SpeciesIdResult<S: BosStr = DefaultStr> {
 /// Reference to a target record that is being evaluated.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubjectRef<S: BosStr = DefaultStr> {
     ///CID pinning the exact version of the target record.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -302,10 +276,7 @@ pub struct SubjectRef<S: BosStr = DefaultStr> {
 /// Expert verification result for a previous identification or evaluation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VerificationResult<S: BosStr = DefaultStr> {
     ///Notes about the verification decision.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -376,7 +347,8 @@ impl<S: BosStr> Serialize for VerificationResultStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VerificationResultStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for VerificationResultStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -403,7 +375,9 @@ where
             VerificationResultStatus::Confirmed => VerificationResultStatus::Confirmed,
             VerificationResultStatus::Rejected => VerificationResultStatus::Rejected,
             VerificationResultStatus::Uncertain => VerificationResultStatus::Uncertain,
-            VerificationResultStatus::Other(v) => VerificationResultStatus::Other(v.into_static()),
+            VerificationResultStatus::Other(v) => {
+                VerificationResultStatus::Other(v.into_static())
+            }
         }
     }
 }
@@ -984,7 +958,7 @@ impl<S: BosStr> LexiconSchema for VerificationResult<S> {
 
 pub mod candidate_taxon_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1041,7 +1015,10 @@ pub mod candidate_taxon_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CandidateTaxonBuilder<S: BosStr, St: candidate_taxon_state::State> {
+pub struct CandidateTaxonBuilder<
+    St: candidate_taxon_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
@@ -1055,15 +1032,22 @@ pub struct CandidateTaxonBuilder<S: BosStr, St: candidate_taxon_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CandidateTaxon<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CandidateTaxonBuilder<S, candidate_taxon_state::Empty> {
+impl CandidateTaxon<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CandidateTaxonBuilder<candidate_taxon_state::Empty, DefaultStr> {
         CandidateTaxonBuilder::new()
     }
 }
 
-impl<S: BosStr> CandidateTaxonBuilder<S, candidate_taxon_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CandidateTaxon<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CandidateTaxonBuilder<candidate_taxon_state::Empty, S> {
+        CandidateTaxonBuilder::builder()
+    }
+}
+
+impl CandidateTaxonBuilder<candidate_taxon_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CandidateTaxonBuilder {
             _state: PhantomData,
@@ -1073,7 +1057,18 @@ impl<S: BosStr> CandidateTaxonBuilder<S, candidate_taxon_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CandidateTaxonBuilder<S, St>
+impl<S: BosStr> CandidateTaxonBuilder<candidate_taxon_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CandidateTaxonBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CandidateTaxonBuilder<St, S>
 where
     St: candidate_taxon_state::State,
     St::Confidence: candidate_taxon_state::IsUnset,
@@ -1082,7 +1077,7 @@ where
     pub fn confidence(
         mut self,
         value: impl Into<i64>,
-    ) -> CandidateTaxonBuilder<S, candidate_taxon_state::SetConfidence<St>> {
+    ) -> CandidateTaxonBuilder<candidate_taxon_state::SetConfidence<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CandidateTaxonBuilder {
             _state: PhantomData,
@@ -1092,7 +1087,7 @@ where
     }
 }
 
-impl<S: BosStr, St: candidate_taxon_state::State> CandidateTaxonBuilder<S, St> {
+impl<St: candidate_taxon_state::State, S: BosStr> CandidateTaxonBuilder<St, S> {
     /// Set the `family` field (optional)
     pub fn family(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -1105,7 +1100,7 @@ impl<S: BosStr, St: candidate_taxon_state::State> CandidateTaxonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: candidate_taxon_state::State> CandidateTaxonBuilder<S, St> {
+impl<St: candidate_taxon_state::State, S: BosStr> CandidateTaxonBuilder<St, S> {
     /// Set the `gbifTaxonKey` field (optional)
     pub fn gbif_taxon_key(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1118,7 +1113,7 @@ impl<S: BosStr, St: candidate_taxon_state::State> CandidateTaxonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: candidate_taxon_state::State> CandidateTaxonBuilder<S, St> {
+impl<St: candidate_taxon_state::State, S: BosStr> CandidateTaxonBuilder<St, S> {
     /// Set the `genus` field (optional)
     pub fn genus(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -1131,7 +1126,7 @@ impl<S: BosStr, St: candidate_taxon_state::State> CandidateTaxonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: candidate_taxon_state::State> CandidateTaxonBuilder<S, St> {
+impl<St: candidate_taxon_state::State, S: BosStr> CandidateTaxonBuilder<St, S> {
     /// Set the `kingdom` field (optional)
     pub fn kingdom(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -1144,7 +1139,7 @@ impl<S: BosStr, St: candidate_taxon_state::State> CandidateTaxonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CandidateTaxonBuilder<S, St>
+impl<St, S: BosStr> CandidateTaxonBuilder<St, S>
 where
     St: candidate_taxon_state::State,
     St::Rank: candidate_taxon_state::IsUnset,
@@ -1153,7 +1148,7 @@ where
     pub fn rank(
         mut self,
         value: impl Into<i64>,
-    ) -> CandidateTaxonBuilder<S, candidate_taxon_state::SetRank<St>> {
+    ) -> CandidateTaxonBuilder<candidate_taxon_state::SetRank<St>, S> {
         self._fields.5 = Option::Some(value.into());
         CandidateTaxonBuilder {
             _state: PhantomData,
@@ -1163,7 +1158,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CandidateTaxonBuilder<S, St>
+impl<St, S: BosStr> CandidateTaxonBuilder<St, S>
 where
     St: candidate_taxon_state::State,
     St::ScientificName: candidate_taxon_state::IsUnset,
@@ -1172,7 +1167,7 @@ where
     pub fn scientific_name(
         mut self,
         value: impl Into<S>,
-    ) -> CandidateTaxonBuilder<S, candidate_taxon_state::SetScientificName<St>> {
+    ) -> CandidateTaxonBuilder<candidate_taxon_state::SetScientificName<St>, S> {
         self._fields.6 = Option::Some(value.into());
         CandidateTaxonBuilder {
             _state: PhantomData,
@@ -1182,7 +1177,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CandidateTaxonBuilder<S, St>
+impl<St, S: BosStr> CandidateTaxonBuilder<St, S>
 where
     St: candidate_taxon_state::State,
     St::ScientificName: candidate_taxon_state::IsSet,
@@ -1203,7 +1198,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CandidateTaxon<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CandidateTaxon<S> {
         CandidateTaxon {
             confidence: self._fields.0.unwrap(),
             family: self._fields.1,
@@ -1218,10 +1216,10 @@ where
 }
 
 fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.gainforest.evaluator.defs"),
@@ -1230,14 +1228,18 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("candidateTaxon"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A candidate taxon identification with confidence score and rank.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("scientificName"),
-                        SmolStr::new_static("confidence"),
-                        SmolStr::new_static("rank"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A candidate taxon identification with confidence score and rank.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("scientificName"),
+                            SmolStr::new_static("confidence"),
+                            SmolStr::new_static("rank")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1252,9 +1254,9 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("family"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Family of the candidate taxon.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Family of the candidate taxon."),
+                                ),
                                 max_graphemes: Some(128usize),
                                 ..Default::default()
                             }),
@@ -1262,9 +1264,11 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("gbifTaxonKey"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "GBIF backbone taxonomy key for the candidate.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "GBIF backbone taxonomy key for the candidate.",
+                                    ),
+                                ),
                                 max_graphemes: Some(64usize),
                                 ..Default::default()
                             }),
@@ -1272,9 +1276,9 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("genus"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Genus of the candidate taxon.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Genus of the candidate taxon."),
+                                ),
                                 max_graphemes: Some(128usize),
                                 ..Default::default()
                             }),
@@ -1282,9 +1286,9 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("kingdom"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Kingdom of the candidate taxon.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Kingdom of the candidate taxon."),
+                                ),
                                 max_graphemes: Some(128usize),
                                 ..Default::default()
                             }),
@@ -1299,9 +1303,11 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("scientificName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Full scientific name of the candidate taxon.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Full scientific name of the candidate taxon.",
+                                    ),
+                                ),
                                 max_graphemes: Some(512usize),
                                 ..Default::default()
                             }),
@@ -1371,9 +1377,11 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dataQualityResult"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Data quality assessment result with per-field quality flags.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Data quality assessment result with per-field quality flags.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("flags")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1389,9 +1397,11 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("flags"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "List of quality issues found in the record.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "List of quality issues found in the record.",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#qualityFlag"),
                                     ..Default::default()
@@ -1403,9 +1413,11 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("remarks"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Additional notes about the quality assessment.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Additional notes about the quality assessment.",
+                                    ),
+                                ),
                                 max_graphemes: Some(2048usize),
                                 ..Default::default()
                             }),
@@ -1598,22 +1610,25 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("qualityFlag"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A single data quality flag indicating an issue with a specific field.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("field"),
-                        SmolStr::new_static("issue"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A single data quality flag indicating an issue with a specific field.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("field"), SmolStr::new_static("issue")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("field"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The field name that has the quality issue.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The field name that has the quality issue.",
+                                    ),
+                                ),
                                 max_graphemes: Some(64usize),
                                 ..Default::default()
                             }),
@@ -1621,9 +1636,9 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("issue"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Description of the quality issue.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Description of the quality issue."),
+                                ),
                                 max_graphemes: Some(256usize),
                                 ..Default::default()
                             }),
@@ -1631,9 +1646,9 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("severity"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Severity level of the quality issue.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Severity level of the quality issue."),
+                                ),
                                 max_graphemes: Some(64usize),
                                 ..Default::default()
                             }),
@@ -1703,9 +1718,11 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("subjectRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Reference to a target record that is being evaluated.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Reference to a target record that is being evaluated.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1713,9 +1730,11 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "CID pinning the exact version of the target record.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "CID pinning the exact version of the target record.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -1723,9 +1742,9 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT-URI of the target record.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("AT-URI of the target record."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1818,7 +1837,7 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
 
 pub mod data_quality_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1849,25 +1868,34 @@ pub mod data_quality_result_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DataQualityResultBuilder<S: BosStr, St: data_quality_result_state::State> {
+pub struct DataQualityResultBuilder<
+    St: data_quality_result_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<i64>,
-        Option<Vec<evaluator::QualityFlag<S>>>,
-        Option<S>,
-    ),
+    _fields: (Option<i64>, Option<Vec<evaluator::QualityFlag<S>>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DataQualityResult<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DataQualityResultBuilder<S, data_quality_result_state::Empty> {
+impl DataQualityResult<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DataQualityResultBuilder<
+        data_quality_result_state::Empty,
+        DefaultStr,
+    > {
         DataQualityResultBuilder::new()
     }
 }
 
-impl<S: BosStr> DataQualityResultBuilder<S, data_quality_result_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DataQualityResult<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DataQualityResultBuilder<data_quality_result_state::Empty, S> {
+        DataQualityResultBuilder::builder()
+    }
+}
+
+impl DataQualityResultBuilder<data_quality_result_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DataQualityResultBuilder {
             _state: PhantomData,
@@ -1877,7 +1905,18 @@ impl<S: BosStr> DataQualityResultBuilder<S, data_quality_result_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: data_quality_result_state::State> DataQualityResultBuilder<S, St> {
+impl<S: BosStr> DataQualityResultBuilder<data_quality_result_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DataQualityResultBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: data_quality_result_state::State, S: BosStr> DataQualityResultBuilder<St, S> {
     /// Set the `completenessScore` field (optional)
     pub fn completeness_score(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -1890,7 +1929,7 @@ impl<S: BosStr, St: data_quality_result_state::State> DataQualityResultBuilder<S
     }
 }
 
-impl<S: BosStr, St> DataQualityResultBuilder<S, St>
+impl<St, S: BosStr> DataQualityResultBuilder<St, S>
 where
     St: data_quality_result_state::State,
     St::Flags: data_quality_result_state::IsUnset,
@@ -1899,7 +1938,7 @@ where
     pub fn flags(
         mut self,
         value: impl Into<Vec<evaluator::QualityFlag<S>>>,
-    ) -> DataQualityResultBuilder<S, data_quality_result_state::SetFlags<St>> {
+    ) -> DataQualityResultBuilder<data_quality_result_state::SetFlags<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DataQualityResultBuilder {
             _state: PhantomData,
@@ -1909,7 +1948,7 @@ where
     }
 }
 
-impl<S: BosStr, St: data_quality_result_state::State> DataQualityResultBuilder<S, St> {
+impl<St: data_quality_result_state::State, S: BosStr> DataQualityResultBuilder<St, S> {
     /// Set the `remarks` field (optional)
     pub fn remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1922,7 +1961,7 @@ impl<S: BosStr, St: data_quality_result_state::State> DataQualityResultBuilder<S
     }
 }
 
-impl<S: BosStr, St> DataQualityResultBuilder<S, St>
+impl<St, S: BosStr> DataQualityResultBuilder<St, S>
 where
     St: data_quality_result_state::State,
     St::Flags: data_quality_result_state::IsSet,
@@ -1937,7 +1976,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DataQualityResult<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DataQualityResult<S> {
         DataQualityResult {
             completeness_score: self._fields.0,
             flags: self._fields.1.unwrap(),
@@ -1949,7 +1991,7 @@ where
 
 pub mod measurement_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1980,21 +2022,34 @@ pub mod measurement_result_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MeasurementResultBuilder<S: BosStr, St: measurement_result_state::State> {
+pub struct MeasurementResultBuilder<
+    St: measurement_result_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<evaluator::DerivedMeasurement<S>>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> MeasurementResult<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MeasurementResultBuilder<S, measurement_result_state::Empty> {
+impl MeasurementResult<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MeasurementResultBuilder<
+        measurement_result_state::Empty,
+        DefaultStr,
+    > {
         MeasurementResultBuilder::new()
     }
 }
 
-impl<S: BosStr> MeasurementResultBuilder<S, measurement_result_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> MeasurementResult<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MeasurementResultBuilder<measurement_result_state::Empty, S> {
+        MeasurementResultBuilder::builder()
+    }
+}
+
+impl MeasurementResultBuilder<measurement_result_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MeasurementResultBuilder {
             _state: PhantomData,
@@ -2004,7 +2059,18 @@ impl<S: BosStr> MeasurementResultBuilder<S, measurement_result_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MeasurementResultBuilder<S, St>
+impl<S: BosStr> MeasurementResultBuilder<measurement_result_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MeasurementResultBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MeasurementResultBuilder<St, S>
 where
     St: measurement_result_state::State,
     St::Measurements: measurement_result_state::IsUnset,
@@ -2013,7 +2079,7 @@ where
     pub fn measurements(
         mut self,
         value: impl Into<Vec<evaluator::DerivedMeasurement<S>>>,
-    ) -> MeasurementResultBuilder<S, measurement_result_state::SetMeasurements<St>> {
+    ) -> MeasurementResultBuilder<measurement_result_state::SetMeasurements<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MeasurementResultBuilder {
             _state: PhantomData,
@@ -2023,7 +2089,7 @@ where
     }
 }
 
-impl<S: BosStr, St: measurement_result_state::State> MeasurementResultBuilder<S, St> {
+impl<St: measurement_result_state::State, S: BosStr> MeasurementResultBuilder<St, S> {
     /// Set the `remarks` field (optional)
     pub fn remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -2036,7 +2102,7 @@ impl<S: BosStr, St: measurement_result_state::State> MeasurementResultBuilder<S,
     }
 }
 
-impl<S: BosStr, St> MeasurementResultBuilder<S, St>
+impl<St, S: BosStr> MeasurementResultBuilder<St, S>
 where
     St: measurement_result_state::State,
     St::Measurements: measurement_result_state::IsSet,
@@ -2050,7 +2116,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MeasurementResult<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MeasurementResult<S> {
         MeasurementResult {
             measurements: self._fields.0.unwrap(),
             remarks: self._fields.1,
@@ -2061,7 +2130,7 @@ where
 
 pub mod species_id_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2092,25 +2161,31 @@ pub mod species_id_result_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SpeciesIdResultBuilder<S: BosStr, St: species_id_result_state::State> {
+pub struct SpeciesIdResultBuilder<
+    St: species_id_result_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Vec<evaluator::CandidateTaxon<S>>>,
-        Option<S>,
-        Option<S>,
-    ),
+    _fields: (Option<Vec<evaluator::CandidateTaxon<S>>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SpeciesIdResult<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SpeciesIdResultBuilder<S, species_id_result_state::Empty> {
+impl SpeciesIdResult<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SpeciesIdResultBuilder<species_id_result_state::Empty, DefaultStr> {
         SpeciesIdResultBuilder::new()
     }
 }
 
-impl<S: BosStr> SpeciesIdResultBuilder<S, species_id_result_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SpeciesIdResult<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SpeciesIdResultBuilder<species_id_result_state::Empty, S> {
+        SpeciesIdResultBuilder::builder()
+    }
+}
+
+impl SpeciesIdResultBuilder<species_id_result_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SpeciesIdResultBuilder {
             _state: PhantomData,
@@ -2120,7 +2195,18 @@ impl<S: BosStr> SpeciesIdResultBuilder<S, species_id_result_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SpeciesIdResultBuilder<S, St>
+impl<S: BosStr> SpeciesIdResultBuilder<species_id_result_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SpeciesIdResultBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SpeciesIdResultBuilder<St, S>
 where
     St: species_id_result_state::State,
     St::Candidates: species_id_result_state::IsUnset,
@@ -2129,7 +2215,7 @@ where
     pub fn candidates(
         mut self,
         value: impl Into<Vec<evaluator::CandidateTaxon<S>>>,
-    ) -> SpeciesIdResultBuilder<S, species_id_result_state::SetCandidates<St>> {
+    ) -> SpeciesIdResultBuilder<species_id_result_state::SetCandidates<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SpeciesIdResultBuilder {
             _state: PhantomData,
@@ -2139,7 +2225,7 @@ where
     }
 }
 
-impl<S: BosStr, St: species_id_result_state::State> SpeciesIdResultBuilder<S, St> {
+impl<St: species_id_result_state::State, S: BosStr> SpeciesIdResultBuilder<St, S> {
     /// Set the `inputFeature` field (optional)
     pub fn input_feature(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -2152,7 +2238,7 @@ impl<S: BosStr, St: species_id_result_state::State> SpeciesIdResultBuilder<S, St
     }
 }
 
-impl<S: BosStr, St: species_id_result_state::State> SpeciesIdResultBuilder<S, St> {
+impl<St: species_id_result_state::State, S: BosStr> SpeciesIdResultBuilder<St, S> {
     /// Set the `remarks` field (optional)
     pub fn remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -2165,7 +2251,7 @@ impl<S: BosStr, St: species_id_result_state::State> SpeciesIdResultBuilder<S, St
     }
 }
 
-impl<S: BosStr, St> SpeciesIdResultBuilder<S, St>
+impl<St, S: BosStr> SpeciesIdResultBuilder<St, S>
 where
     St: species_id_result_state::State,
     St::Candidates: species_id_result_state::IsSet,
@@ -2180,7 +2266,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SpeciesIdResult<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SpeciesIdResult<S> {
         SpeciesIdResult {
             candidates: self._fields.0.unwrap(),
             input_feature: self._fields.1,
@@ -2192,7 +2281,7 @@ where
 
 pub mod subject_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2223,21 +2312,28 @@ pub mod subject_ref_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SubjectRefBuilder<S: BosStr, St: subject_ref_state::State> {
+pub struct SubjectRefBuilder<St: subject_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SubjectRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SubjectRefBuilder<S, subject_ref_state::Empty> {
+impl SubjectRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SubjectRefBuilder<subject_ref_state::Empty, DefaultStr> {
         SubjectRefBuilder::new()
     }
 }
 
-impl<S: BosStr> SubjectRefBuilder<S, subject_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SubjectRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SubjectRefBuilder<subject_ref_state::Empty, S> {
+        SubjectRefBuilder::builder()
+    }
+}
+
+impl SubjectRefBuilder<subject_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SubjectRefBuilder {
             _state: PhantomData,
@@ -2247,7 +2343,18 @@ impl<S: BosStr> SubjectRefBuilder<S, subject_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: subject_ref_state::State> SubjectRefBuilder<S, St> {
+impl<S: BosStr> SubjectRefBuilder<subject_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SubjectRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: subject_ref_state::State, S: BosStr> SubjectRefBuilder<St, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -2260,7 +2367,7 @@ impl<S: BosStr, St: subject_ref_state::State> SubjectRefBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SubjectRefBuilder<S, St>
+impl<St, S: BosStr> SubjectRefBuilder<St, S>
 where
     St: subject_ref_state::State,
     St::Uri: subject_ref_state::IsUnset,
@@ -2269,7 +2376,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SubjectRefBuilder<S, subject_ref_state::SetUri<St>> {
+    ) -> SubjectRefBuilder<subject_ref_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SubjectRefBuilder {
             _state: PhantomData,
@@ -2279,7 +2386,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SubjectRefBuilder<S, St>
+impl<St, S: BosStr> SubjectRefBuilder<St, S>
 where
     St: subject_ref_state::State,
     St::Uri: subject_ref_state::IsSet,
@@ -2293,7 +2400,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SubjectRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SubjectRef<S> {
         SubjectRef {
             cid: self._fields.0,
             uri: self._fields.1.unwrap(),

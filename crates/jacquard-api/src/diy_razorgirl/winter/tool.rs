@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -156,7 +156,7 @@ impl<S: BosStr> LexiconSchema for Tool<S> {
 
 pub mod tool_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -164,90 +164,90 @@ pub mod tool_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type InputSchema;
-        type Description;
-        type Name;
         type Code;
+        type Name;
         type CreatedAt;
+        type Description;
+        type InputSchema;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type InputSchema = Unset;
-        type Description = Unset;
-        type Name = Unset;
         type Code = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `input_schema` field to Set
-    pub struct SetInputSchema<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetInputSchema<St> {}
-    impl<St: State> State for SetInputSchema<St> {
-        type InputSchema = Set<members::input_schema>;
-        type Description = St::Description;
-        type Name = St::Name;
-        type Code = St::Code;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDescription<St> {}
-    impl<St: State> State for SetDescription<St> {
-        type InputSchema = St::InputSchema;
-        type Description = Set<members::description>;
-        type Name = St::Name;
-        type Code = St::Code;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type InputSchema = St::InputSchema;
-        type Description = St::Description;
-        type Name = Set<members::name>;
-        type Code = St::Code;
-        type CreatedAt = St::CreatedAt;
+        type Description = Unset;
+        type InputSchema = Unset;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCode<St> {}
     impl<St: State> State for SetCode<St> {
-        type InputSchema = St::InputSchema;
-        type Description = St::Description;
-        type Name = St::Name;
         type Code = Set<members::code>;
+        type Name = St::Name;
         type CreatedAt = St::CreatedAt;
+        type Description = St::Description;
+        type InputSchema = St::InputSchema;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Code = St::Code;
+        type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+        type Description = St::Description;
+        type InputSchema = St::InputSchema;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type InputSchema = St::InputSchema;
-        type Description = St::Description;
-        type Name = St::Name;
         type Code = St::Code;
+        type Name = St::Name;
         type CreatedAt = Set<members::created_at>;
+        type Description = St::Description;
+        type InputSchema = St::InputSchema;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Code = St::Code;
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type Description = Set<members::description>;
+        type InputSchema = St::InputSchema;
+    }
+    ///State transition - sets the `input_schema` field to Set
+    pub struct SetInputSchema<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetInputSchema<St> {}
+    impl<St: State> State for SetInputSchema<St> {
+        type Code = St::Code;
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type Description = St::Description;
+        type InputSchema = Set<members::input_schema>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `input_schema` field
-        pub struct input_schema(());
-        ///Marker type for the `description` field
-        pub struct description(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `code` field
         pub struct code(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `input_schema` field
+        pub struct input_schema(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ToolBuilder<S: BosStr, St: tool_state::State> {
+pub struct ToolBuilder<St: tool_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -266,33 +266,78 @@ pub struct ToolBuilder<S: BosStr, St: tool_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Tool<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ToolBuilder<S, tool_state::Empty> {
+impl Tool<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ToolBuilder<tool_state::Empty, DefaultStr> {
         ToolBuilder::new()
     }
 }
 
-impl<S: BosStr> ToolBuilder<S, tool_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Tool<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ToolBuilder<tool_state::Empty, S> {
+        ToolBuilder::builder()
+    }
+}
+
+impl ToolBuilder<tool_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ToolBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St> ToolBuilder<S, St>
+impl<S: BosStr> ToolBuilder<tool_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ToolBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ToolBuilder<St, S>
 where
     St: tool_state::State,
     St::Code: tool_state::IsUnset,
 {
     /// Set the `code` field (required)
-    pub fn code(mut self, value: impl Into<S>) -> ToolBuilder<S, tool_state::SetCode<St>> {
+    pub fn code(
+        mut self,
+        value: impl Into<S>,
+    ) -> ToolBuilder<tool_state::SetCode<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ToolBuilder {
             _state: PhantomData,
@@ -302,7 +347,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ToolBuilder<S, St>
+impl<St, S: BosStr> ToolBuilder<St, S>
 where
     St: tool_state::State,
     St::CreatedAt: tool_state::IsUnset,
@@ -311,7 +356,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ToolBuilder<S, tool_state::SetCreatedAt<St>> {
+    ) -> ToolBuilder<tool_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ToolBuilder {
             _state: PhantomData,
@@ -321,7 +366,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ToolBuilder<S, St>
+impl<St, S: BosStr> ToolBuilder<St, S>
 where
     St: tool_state::State,
     St::Description: tool_state::IsUnset,
@@ -330,7 +375,7 @@ where
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> ToolBuilder<S, tool_state::SetDescription<St>> {
+    ) -> ToolBuilder<tool_state::SetDescription<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ToolBuilder {
             _state: PhantomData,
@@ -340,7 +385,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ToolBuilder<S, St>
+impl<St, S: BosStr> ToolBuilder<St, S>
 where
     St: tool_state::State,
     St::InputSchema: tool_state::IsUnset,
@@ -349,7 +394,7 @@ where
     pub fn input_schema(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> ToolBuilder<S, tool_state::SetInputSchema<St>> {
+    ) -> ToolBuilder<tool_state::SetInputSchema<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ToolBuilder {
             _state: PhantomData,
@@ -359,7 +404,7 @@ where
     }
 }
 
-impl<S: BosStr, St: tool_state::State> ToolBuilder<S, St> {
+impl<St: tool_state::State, S: BosStr> ToolBuilder<St, S> {
     /// Set the `lastUpdated` field (optional)
     pub fn last_updated(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -372,13 +417,16 @@ impl<S: BosStr, St: tool_state::State> ToolBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ToolBuilder<S, St>
+impl<St, S: BosStr> ToolBuilder<St, S>
 where
     St: tool_state::State,
     St::Name: tool_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> ToolBuilder<S, tool_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> ToolBuilder<tool_state::SetName<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ToolBuilder {
             _state: PhantomData,
@@ -388,7 +436,7 @@ where
     }
 }
 
-impl<S: BosStr, St: tool_state::State> ToolBuilder<S, St> {
+impl<St: tool_state::State, S: BosStr> ToolBuilder<St, S> {
     /// Set the `requiredCommands` field (optional)
     pub fn required_commands(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -401,7 +449,7 @@ impl<S: BosStr, St: tool_state::State> ToolBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: tool_state::State> ToolBuilder<S, St> {
+impl<St: tool_state::State, S: BosStr> ToolBuilder<St, S> {
     /// Set the `requiredSecrets` field (optional)
     pub fn required_secrets(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -414,7 +462,7 @@ impl<S: BosStr, St: tool_state::State> ToolBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: tool_state::State> ToolBuilder<S, St> {
+impl<St: tool_state::State, S: BosStr> ToolBuilder<St, S> {
     /// Set the `requiredTools` field (optional)
     pub fn required_tools(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -427,7 +475,7 @@ impl<S: BosStr, St: tool_state::State> ToolBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: tool_state::State> ToolBuilder<S, St> {
+impl<St: tool_state::State, S: BosStr> ToolBuilder<St, S> {
     /// Set the `requiresNetwork` field (optional)
     pub fn requires_network(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.9 = value.into();
@@ -440,7 +488,7 @@ impl<S: BosStr, St: tool_state::State> ToolBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: tool_state::State> ToolBuilder<S, St> {
+impl<St: tool_state::State, S: BosStr> ToolBuilder<St, S> {
     /// Set the `requiresWorkspace` field (optional)
     pub fn requires_workspace(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.10 = value.into();
@@ -453,7 +501,7 @@ impl<S: BosStr, St: tool_state::State> ToolBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: tool_state::State> ToolBuilder<S, St> {
+impl<St: tool_state::State, S: BosStr> ToolBuilder<St, S> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.11 = value.into();
@@ -466,14 +514,14 @@ impl<S: BosStr, St: tool_state::State> ToolBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ToolBuilder<S, St>
+impl<St, S: BosStr> ToolBuilder<St, S>
 where
     St: tool_state::State,
-    St::InputSchema: tool_state::IsSet,
-    St::Description: tool_state::IsSet,
-    St::Name: tool_state::IsSet,
     St::Code: tool_state::IsSet,
+    St::Name: tool_state::IsSet,
     St::CreatedAt: tool_state::IsSet,
+    St::Description: tool_state::IsSet,
+    St::InputSchema: tool_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Tool<S> {
@@ -514,10 +562,10 @@ where
 }
 
 fn lexicon_doc_diy_razorgirl_winter_tool() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("diy.razorgirl.winter.tool"),
@@ -528,22 +576,26 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("description"),
-                            SmolStr::new_static("code"),
-                            SmolStr::new_static("inputSchema"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("description"),
+                                SmolStr::new_static("code"),
+                                SmolStr::new_static("inputSchema"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("code"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "TS/JS source, must export default async function",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "TS/JS source, must export default async function",
+                                        ),
+                                    ),
                                     max_length: Some(100000usize),
                                     ..Default::default()
                                 }),
@@ -603,9 +655,11 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("requiredTools"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Tools this tool chains to (AT URIs or built-in names)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Tools this tool chains to (AT URIs or built-in names)",
+                                        ),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         ..Default::default()
                                     }),

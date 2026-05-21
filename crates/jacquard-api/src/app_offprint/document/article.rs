@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -104,7 +104,7 @@ impl<S: BosStr> LexiconSchema for Article<S> {
 
 pub mod article_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -135,21 +135,28 @@ pub mod article_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ArticleBuilder<S: BosStr, St: article_state::State> {
+pub struct ArticleBuilder<St: article_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Article<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ArticleBuilder<S, article_state::Empty> {
+impl Article<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ArticleBuilder<article_state::Empty, DefaultStr> {
         ArticleBuilder::new()
     }
 }
 
-impl<S: BosStr> ArticleBuilder<S, article_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Article<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ArticleBuilder<article_state::Empty, S> {
+        ArticleBuilder::builder()
+    }
+}
+
+impl ArticleBuilder<article_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ArticleBuilder {
             _state: PhantomData,
@@ -159,7 +166,18 @@ impl<S: BosStr> ArticleBuilder<S, article_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ArticleBuilder<S, St>
+impl<S: BosStr> ArticleBuilder<article_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ArticleBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ArticleBuilder<St, S>
 where
     St: article_state::State,
     St::Document: article_state::IsUnset,
@@ -168,7 +186,7 @@ where
     pub fn document(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ArticleBuilder<S, article_state::SetDocument<St>> {
+    ) -> ArticleBuilder<article_state::SetDocument<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ArticleBuilder {
             _state: PhantomData,
@@ -178,7 +196,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ArticleBuilder<S, St>
+impl<St, S: BosStr> ArticleBuilder<St, S>
 where
     St: article_state::State,
     St::Document: article_state::IsSet,
@@ -200,10 +218,10 @@ where
 }
 
 fn lexicon_doc_app_offprint_document_article() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.offprint.document.article"),

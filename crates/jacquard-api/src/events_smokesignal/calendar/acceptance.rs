@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A cryptographic proof record that contains RSVP acceptance data.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -104,7 +104,7 @@ impl<S: BosStr> LexiconSchema for Acceptance<S> {
 
 pub mod acceptance_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -135,21 +135,28 @@ pub mod acceptance_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AcceptanceBuilder<S: BosStr, St: acceptance_state::State> {
+pub struct AcceptanceBuilder<St: acceptance_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Acceptance<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AcceptanceBuilder<S, acceptance_state::Empty> {
+impl Acceptance<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AcceptanceBuilder<acceptance_state::Empty, DefaultStr> {
         AcceptanceBuilder::new()
     }
 }
 
-impl<S: BosStr> AcceptanceBuilder<S, acceptance_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Acceptance<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AcceptanceBuilder<acceptance_state::Empty, S> {
+        AcceptanceBuilder::builder()
+    }
+}
+
+impl AcceptanceBuilder<acceptance_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AcceptanceBuilder {
             _state: PhantomData,
@@ -159,7 +166,18 @@ impl<S: BosStr> AcceptanceBuilder<S, acceptance_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AcceptanceBuilder<S, St>
+impl<S: BosStr> AcceptanceBuilder<acceptance_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AcceptanceBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AcceptanceBuilder<St, S>
 where
     St: acceptance_state::State,
     St::Cid: acceptance_state::IsUnset,
@@ -168,7 +186,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> AcceptanceBuilder<S, acceptance_state::SetCid<St>> {
+    ) -> AcceptanceBuilder<acceptance_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AcceptanceBuilder {
             _state: PhantomData,
@@ -178,7 +196,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AcceptanceBuilder<S, St>
+impl<St, S: BosStr> AcceptanceBuilder<St, S>
 where
     St: acceptance_state::State,
     St::Cid: acceptance_state::IsSet,
@@ -191,7 +209,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Acceptance<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Acceptance<S> {
         Acceptance {
             cid: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -200,10 +221,10 @@ where
 }
 
 fn lexicon_doc_events_smokesignal_calendar_acceptance() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("events.smokesignal.calendar.acceptance"),

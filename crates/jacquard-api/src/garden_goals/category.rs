@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A category for organizing goals.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -130,7 +130,7 @@ impl<S: BosStr> LexiconSchema for Category<S> {
 
 pub mod category_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -187,21 +187,28 @@ pub mod category_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CategoryBuilder<S: BosStr, St: category_state::State> {
+pub struct CategoryBuilder<St: category_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Category<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CategoryBuilder<S, category_state::Empty> {
+impl Category<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CategoryBuilder<category_state::Empty, DefaultStr> {
         CategoryBuilder::new()
     }
 }
 
-impl<S: BosStr> CategoryBuilder<S, category_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Category<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CategoryBuilder<category_state::Empty, S> {
+        CategoryBuilder::builder()
+    }
+}
+
+impl CategoryBuilder<category_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CategoryBuilder {
             _state: PhantomData,
@@ -211,7 +218,18 @@ impl<S: BosStr> CategoryBuilder<S, category_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CategoryBuilder<S, St>
+impl<S: BosStr> CategoryBuilder<category_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CategoryBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CategoryBuilder<St, S>
 where
     St: category_state::State,
     St::CategoryId: category_state::IsUnset,
@@ -220,7 +238,7 @@ where
     pub fn category_id(
         mut self,
         value: impl Into<S>,
-    ) -> CategoryBuilder<S, category_state::SetCategoryId<St>> {
+    ) -> CategoryBuilder<category_state::SetCategoryId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CategoryBuilder {
             _state: PhantomData,
@@ -230,7 +248,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CategoryBuilder<S, St>
+impl<St, S: BosStr> CategoryBuilder<St, S>
 where
     St: category_state::State,
     St::CreatedAt: category_state::IsUnset,
@@ -239,7 +257,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CategoryBuilder<S, category_state::SetCreatedAt<St>> {
+    ) -> CategoryBuilder<category_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CategoryBuilder {
             _state: PhantomData,
@@ -249,13 +267,16 @@ where
     }
 }
 
-impl<S: BosStr, St> CategoryBuilder<S, St>
+impl<St, S: BosStr> CategoryBuilder<St, S>
 where
     St: category_state::State,
     St::Name: category_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> CategoryBuilder<S, category_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> CategoryBuilder<category_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CategoryBuilder {
             _state: PhantomData,
@@ -265,7 +286,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CategoryBuilder<S, St>
+impl<St, S: BosStr> CategoryBuilder<St, S>
 where
     St: category_state::State,
     St::CategoryId: category_state::IsSet,
@@ -293,10 +314,10 @@ where
 }
 
 fn lexicon_doc_garden_goals_category() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.goals.category"),
@@ -305,23 +326,29 @@ fn lexicon_doc_garden_goals_category() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A category for organizing goals.")),
+                    description: Some(
+                        CowStr::new_static("A category for organizing goals."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("categoryId"),
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("categoryId"),
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("categoryId"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Unique identifier for the category (UUID)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Unique identifier for the category (UUID)",
+                                        ),
+                                    ),
                                     max_length: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -329,9 +356,11 @@ fn lexicon_doc_garden_goals_category() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the category was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp when the category was created",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -339,9 +368,9 @@ fn lexicon_doc_garden_goals_category() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Display name of the category",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Display name of the category"),
+                                    ),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),

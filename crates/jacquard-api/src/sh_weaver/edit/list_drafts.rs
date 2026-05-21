@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,18 +22,15 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::sh_weaver::edit::list_drafts;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::sh_weaver::edit::list_drafts;
 /// Hydrated view of a draft with edit state.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub created_at: Datetime,
@@ -50,11 +47,9 @@ pub struct DraftView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListDrafts<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -65,11 +60,9 @@ pub struct ListDrafts<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListDraftsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -119,7 +112,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListDraftsRequest {
 
 pub mod draft_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -127,56 +120,56 @@ pub mod draft_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
         type CreatedAt;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Cid = St::Cid;
-        type CreatedAt = St::CreatedAt;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
         type Cid = Set<members::cid>;
         type CreatedAt = St::CreatedAt;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Uri = St::Uri;
         type Cid = St::Cid;
         type CreatedAt = Set<members::created_at>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type CreatedAt = St::CreatedAt;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DraftViewBuilder<S: BosStr, St: draft_view_state::State> {
+pub struct DraftViewBuilder<St: draft_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
@@ -189,15 +182,22 @@ pub struct DraftViewBuilder<S: BosStr, St: draft_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DraftView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DraftViewBuilder<S, draft_view_state::Empty> {
+impl DraftView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DraftViewBuilder<draft_view_state::Empty, DefaultStr> {
         DraftViewBuilder::new()
     }
 }
 
-impl<S: BosStr> DraftViewBuilder<S, draft_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DraftView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DraftViewBuilder<draft_view_state::Empty, S> {
+        DraftViewBuilder::builder()
+    }
+}
+
+impl DraftViewBuilder<draft_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DraftViewBuilder {
             _state: PhantomData,
@@ -207,7 +207,18 @@ impl<S: BosStr> DraftViewBuilder<S, draft_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DraftViewBuilder<S, St>
+impl<S: BosStr> DraftViewBuilder<draft_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DraftViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DraftViewBuilder<St, S>
 where
     St: draft_view_state::State,
     St::Cid: draft_view_state::IsUnset,
@@ -216,7 +227,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> DraftViewBuilder<S, draft_view_state::SetCid<St>> {
+    ) -> DraftViewBuilder<draft_view_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DraftViewBuilder {
             _state: PhantomData,
@@ -226,7 +237,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DraftViewBuilder<S, St>
+impl<St, S: BosStr> DraftViewBuilder<St, S>
 where
     St: draft_view_state::State,
     St::CreatedAt: draft_view_state::IsUnset,
@@ -235,7 +246,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DraftViewBuilder<S, draft_view_state::SetCreatedAt<St>> {
+    ) -> DraftViewBuilder<draft_view_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DraftViewBuilder {
             _state: PhantomData,
@@ -245,7 +256,7 @@ where
     }
 }
 
-impl<S: BosStr, St: draft_view_state::State> DraftViewBuilder<S, St> {
+impl<St: draft_view_state::State, S: BosStr> DraftViewBuilder<St, S> {
     /// Set the `editRoot` field (optional)
     pub fn edit_root(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -258,7 +269,7 @@ impl<S: BosStr, St: draft_view_state::State> DraftViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: draft_view_state::State> DraftViewBuilder<S, St> {
+impl<St: draft_view_state::State, S: BosStr> DraftViewBuilder<St, S> {
     /// Set the `lastEditAt` field (optional)
     pub fn last_edit_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -271,7 +282,7 @@ impl<S: BosStr, St: draft_view_state::State> DraftViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: draft_view_state::State> DraftViewBuilder<S, St> {
+impl<St: draft_view_state::State, S: BosStr> DraftViewBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -284,7 +295,7 @@ impl<S: BosStr, St: draft_view_state::State> DraftViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DraftViewBuilder<S, St>
+impl<St, S: BosStr> DraftViewBuilder<St, S>
 where
     St: draft_view_state::State,
     St::Uri: draft_view_state::IsUnset,
@@ -293,7 +304,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> DraftViewBuilder<S, draft_view_state::SetUri<St>> {
+    ) -> DraftViewBuilder<draft_view_state::SetUri<St>, S> {
         self._fields.5 = Option::Some(value.into());
         DraftViewBuilder {
             _state: PhantomData,
@@ -303,12 +314,12 @@ where
     }
 }
 
-impl<S: BosStr, St> DraftViewBuilder<S, St>
+impl<St, S: BosStr> DraftViewBuilder<St, S>
 where
     St: draft_view_state::State,
-    St::Uri: draft_view_state::IsSet,
     St::Cid: draft_view_state::IsSet,
     St::CreatedAt: draft_view_state::IsSet,
+    St::Uri: draft_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DraftView<S> {
@@ -323,7 +334,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DraftView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DraftView<S> {
         DraftView {
             cid: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -337,10 +351,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_edit_listDrafts() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.edit.listDrafts"),
@@ -349,14 +363,15 @@ fn lexicon_doc_sh_weaver_edit_listDrafts() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("draftView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Hydrated view of a draft with edit state.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Hydrated view of a draft with edit state."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -391,9 +406,11 @@ fn lexicon_doc_sh_weaver_edit_listDrafts() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Extracted title if available from edit state",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Extracted title if available from edit state",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -412,37 +429,39 @@ fn lexicon_doc_sh_weaver_edit_listDrafts() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("actor")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("actor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "DID or handle of the actor",
-                                    )),
-                                    format: Some(LexStringFormat::AtIdentifier),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("actor")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("actor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("DID or handle of the actor"),
+                                        ),
+                                        format: Some(LexStringFormat::AtIdentifier),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -458,7 +477,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_drafts_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -489,21 +508,28 @@ pub mod list_drafts_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListDraftsBuilder<S: BosStr, St: list_drafts_state::State> {
+pub struct ListDraftsBuilder<St: list_drafts_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListDrafts<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListDraftsBuilder<S, list_drafts_state::Empty> {
+impl ListDrafts<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListDraftsBuilder<list_drafts_state::Empty, DefaultStr> {
         ListDraftsBuilder::new()
     }
 }
 
-impl<S: BosStr> ListDraftsBuilder<S, list_drafts_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListDrafts<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListDraftsBuilder<list_drafts_state::Empty, S> {
+        ListDraftsBuilder::builder()
+    }
+}
+
+impl ListDraftsBuilder<list_drafts_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListDraftsBuilder {
             _state: PhantomData,
@@ -513,7 +539,18 @@ impl<S: BosStr> ListDraftsBuilder<S, list_drafts_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ListDraftsBuilder<S, St>
+impl<S: BosStr> ListDraftsBuilder<list_drafts_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListDraftsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ListDraftsBuilder<St, S>
 where
     St: list_drafts_state::State,
     St::Actor: list_drafts_state::IsUnset,
@@ -522,7 +559,7 @@ where
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> ListDraftsBuilder<S, list_drafts_state::SetActor<St>> {
+    ) -> ListDraftsBuilder<list_drafts_state::SetActor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ListDraftsBuilder {
             _state: PhantomData,
@@ -532,7 +569,7 @@ where
     }
 }
 
-impl<S: BosStr, St: list_drafts_state::State> ListDraftsBuilder<S, St> {
+impl<St: list_drafts_state::State, S: BosStr> ListDraftsBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -545,7 +582,7 @@ impl<S: BosStr, St: list_drafts_state::State> ListDraftsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: list_drafts_state::State> ListDraftsBuilder<S, St> {
+impl<St: list_drafts_state::State, S: BosStr> ListDraftsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -558,7 +595,7 @@ impl<S: BosStr, St: list_drafts_state::State> ListDraftsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListDraftsBuilder<S, St>
+impl<St, S: BosStr> ListDraftsBuilder<St, S>
 where
     St: list_drafts_state::State,
     St::Actor: list_drafts_state::IsSet,

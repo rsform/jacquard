@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -23,14 +23,11 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A cryptographic signature attesting to a claim
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Signature<S: BosStr = DefaultStr> {
     ///The cryptographic signature (base64-encoded).
     pub attestation: S,
@@ -81,7 +78,7 @@ impl<S: BosStr> LexiconSchema for Signature<S> {
 
 pub mod signature_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -89,90 +86,90 @@ pub mod signature_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type SignedAt;
+        type Attestation;
+        type Src;
         type Kid;
         type SignedFields;
-        type Src;
-        type Attestation;
-        type SignedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type SignedAt = Unset;
+        type Attestation = Unset;
+        type Src = Unset;
         type Kid = Unset;
         type SignedFields = Unset;
-        type Src = Unset;
-        type Attestation = Unset;
-        type SignedAt = Unset;
-    }
-    ///State transition - sets the `kid` field to Set
-    pub struct SetKid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKid<St> {}
-    impl<St: State> State for SetKid<St> {
-        type Kid = Set<members::kid>;
-        type SignedFields = St::SignedFields;
-        type Src = St::Src;
-        type Attestation = St::Attestation;
-        type SignedAt = St::SignedAt;
-    }
-    ///State transition - sets the `signed_fields` field to Set
-    pub struct SetSignedFields<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSignedFields<St> {}
-    impl<St: State> State for SetSignedFields<St> {
-        type Kid = St::Kid;
-        type SignedFields = Set<members::signed_fields>;
-        type Src = St::Src;
-        type Attestation = St::Attestation;
-        type SignedAt = St::SignedAt;
-    }
-    ///State transition - sets the `src` field to Set
-    pub struct SetSrc<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSrc<St> {}
-    impl<St: State> State for SetSrc<St> {
-        type Kid = St::Kid;
-        type SignedFields = St::SignedFields;
-        type Src = Set<members::src>;
-        type Attestation = St::Attestation;
-        type SignedAt = St::SignedAt;
-    }
-    ///State transition - sets the `attestation` field to Set
-    pub struct SetAttestation<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAttestation<St> {}
-    impl<St: State> State for SetAttestation<St> {
-        type Kid = St::Kid;
-        type SignedFields = St::SignedFields;
-        type Src = St::Src;
-        type Attestation = Set<members::attestation>;
-        type SignedAt = St::SignedAt;
     }
     ///State transition - sets the `signed_at` field to Set
     pub struct SetSignedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSignedAt<St> {}
     impl<St: State> State for SetSignedAt<St> {
+        type SignedAt = Set<members::signed_at>;
+        type Attestation = St::Attestation;
+        type Src = St::Src;
         type Kid = St::Kid;
         type SignedFields = St::SignedFields;
+    }
+    ///State transition - sets the `attestation` field to Set
+    pub struct SetAttestation<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAttestation<St> {}
+    impl<St: State> State for SetAttestation<St> {
+        type SignedAt = St::SignedAt;
+        type Attestation = Set<members::attestation>;
         type Src = St::Src;
+        type Kid = St::Kid;
+        type SignedFields = St::SignedFields;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSrc<St> {}
+    impl<St: State> State for SetSrc<St> {
+        type SignedAt = St::SignedAt;
         type Attestation = St::Attestation;
-        type SignedAt = Set<members::signed_at>;
+        type Src = Set<members::src>;
+        type Kid = St::Kid;
+        type SignedFields = St::SignedFields;
+    }
+    ///State transition - sets the `kid` field to Set
+    pub struct SetKid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKid<St> {}
+    impl<St: State> State for SetKid<St> {
+        type SignedAt = St::SignedAt;
+        type Attestation = St::Attestation;
+        type Src = St::Src;
+        type Kid = Set<members::kid>;
+        type SignedFields = St::SignedFields;
+    }
+    ///State transition - sets the `signed_fields` field to Set
+    pub struct SetSignedFields<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSignedFields<St> {}
+    impl<St: State> State for SetSignedFields<St> {
+        type SignedAt = St::SignedAt;
+        type Attestation = St::Attestation;
+        type Src = St::Src;
+        type Kid = St::Kid;
+        type SignedFields = Set<members::signed_fields>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `signed_at` field
+        pub struct signed_at(());
+        ///Marker type for the `attestation` field
+        pub struct attestation(());
+        ///Marker type for the `src` field
+        pub struct src(());
         ///Marker type for the `kid` field
         pub struct kid(());
         ///Marker type for the `signed_fields` field
         pub struct signed_fields(());
-        ///Marker type for the `src` field
-        pub struct src(());
-        ///Marker type for the `attestation` field
-        pub struct attestation(());
-        ///Marker type for the `signed_at` field
-        pub struct signed_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SignatureBuilder<S: BosStr, St: signature_state::State> {
+pub struct SignatureBuilder<St: signature_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -186,15 +183,22 @@ pub struct SignatureBuilder<S: BosStr, St: signature_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Signature<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SignatureBuilder<S, signature_state::Empty> {
+impl Signature<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SignatureBuilder<signature_state::Empty, DefaultStr> {
         SignatureBuilder::new()
     }
 }
 
-impl<S: BosStr> SignatureBuilder<S, signature_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Signature<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SignatureBuilder<signature_state::Empty, S> {
+        SignatureBuilder::builder()
+    }
+}
+
+impl SignatureBuilder<signature_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SignatureBuilder {
             _state: PhantomData,
@@ -204,7 +208,18 @@ impl<S: BosStr> SignatureBuilder<S, signature_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SignatureBuilder<S, St>
+impl<S: BosStr> SignatureBuilder<signature_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SignatureBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
     St::Attestation: signature_state::IsUnset,
@@ -213,7 +228,7 @@ where
     pub fn attestation(
         mut self,
         value: impl Into<S>,
-    ) -> SignatureBuilder<S, signature_state::SetAttestation<St>> {
+    ) -> SignatureBuilder<signature_state::SetAttestation<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -223,7 +238,7 @@ where
     }
 }
 
-impl<S: BosStr, St: signature_state::State> SignatureBuilder<S, St> {
+impl<St: signature_state::State, S: BosStr> SignatureBuilder<St, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -236,13 +251,16 @@ impl<S: BosStr, St: signature_state::State> SignatureBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SignatureBuilder<S, St>
+impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
     St::Kid: signature_state::IsUnset,
 {
     /// Set the `kid` field (required)
-    pub fn kid(mut self, value: impl Into<S>) -> SignatureBuilder<S, signature_state::SetKid<St>> {
+    pub fn kid(
+        mut self,
+        value: impl Into<S>,
+    ) -> SignatureBuilder<signature_state::SetKid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -252,7 +270,7 @@ where
     }
 }
 
-impl<S: BosStr, St: signature_state::State> SignatureBuilder<S, St> {
+impl<St: signature_state::State, S: BosStr> SignatureBuilder<St, S> {
     /// Set the `retractedAt` field (optional)
     pub fn retracted_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -265,7 +283,7 @@ impl<S: BosStr, St: signature_state::State> SignatureBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SignatureBuilder<S, St>
+impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
     St::SignedAt: signature_state::IsUnset,
@@ -274,7 +292,7 @@ where
     pub fn signed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SignatureBuilder<S, signature_state::SetSignedAt<St>> {
+    ) -> SignatureBuilder<signature_state::SetSignedAt<St>, S> {
         self._fields.4 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -284,7 +302,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SignatureBuilder<S, St>
+impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
     St::SignedFields: signature_state::IsUnset,
@@ -293,7 +311,7 @@ where
     pub fn signed_fields(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> SignatureBuilder<S, signature_state::SetSignedFields<St>> {
+    ) -> SignatureBuilder<signature_state::SetSignedFields<St>, S> {
         self._fields.5 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -303,7 +321,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SignatureBuilder<S, St>
+impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
     St::Src: signature_state::IsUnset,
@@ -312,7 +330,7 @@ where
     pub fn src(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SignatureBuilder<S, signature_state::SetSrc<St>> {
+    ) -> SignatureBuilder<signature_state::SetSrc<St>, S> {
         self._fields.6 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -322,14 +340,14 @@ where
     }
 }
 
-impl<S: BosStr, St> SignatureBuilder<S, St>
+impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
+    St::SignedAt: signature_state::IsSet,
+    St::Attestation: signature_state::IsSet,
+    St::Src: signature_state::IsSet,
     St::Kid: signature_state::IsSet,
     St::SignedFields: signature_state::IsSet,
-    St::Src: signature_state::IsSet,
-    St::Attestation: signature_state::IsSet,
-    St::SignedAt: signature_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Signature<S> {
@@ -345,7 +363,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Signature<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Signature<S> {
         Signature {
             attestation: self._fields.0.unwrap(),
             comment: self._fields.1,
@@ -360,10 +381,10 @@ where
 }
 
 fn lexicon_doc_dev_keytrace_signature() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.keytrace.signature"),

@@ -22,12 +22,13 @@ pub mod stats;
 pub mod sync_user_collections;
 pub mod update_o_auth_client;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -41,11 +42,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::network_slices::actor::ProfileViewBasic;
-use crate::network_slices::slice;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::actor::ProfileViewBasic;
+use crate::network_slices::slice;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -76,11 +77,9 @@ pub struct SliceGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Slice<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SliceView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub created_at: Datetime,
@@ -113,11 +112,9 @@ pub struct SliceView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SparklinePoint<S: BosStr = DefaultStr> {
     pub count: i64,
     pub timestamp: Datetime,
@@ -237,7 +234,7 @@ impl<S: BosStr> LexiconSchema for SparklinePoint<S> {
 
 pub mod slice_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -246,69 +243,76 @@ pub mod slice_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Domain;
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Domain = Unset;
-        type CreatedAt = Unset;
         type Name = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `domain` field to Set
     pub struct SetDomain<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDomain<St> {}
     impl<St: State> State for SetDomain<St> {
         type Domain = Set<members::domain>;
+        type Name = St::Name;
         type CreatedAt = St::CreatedAt;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Domain = St::Domain;
-        type CreatedAt = Set<members::created_at>;
-        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
         type Domain = St::Domain;
-        type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Domain = St::Domain;
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `domain` field
         pub struct domain(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SliceBuilder<S: BosStr, St: slice_state::State> {
+pub struct SliceBuilder<St: slice_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Slice<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SliceBuilder<S, slice_state::Empty> {
+impl Slice<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SliceBuilder<slice_state::Empty, DefaultStr> {
         SliceBuilder::new()
     }
 }
 
-impl<S: BosStr> SliceBuilder<S, slice_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Slice<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SliceBuilder<slice_state::Empty, S> {
+        SliceBuilder::builder()
+    }
+}
+
+impl SliceBuilder<slice_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SliceBuilder {
             _state: PhantomData,
@@ -318,7 +322,18 @@ impl<S: BosStr> SliceBuilder<S, slice_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SliceBuilder<S, St>
+impl<S: BosStr> SliceBuilder<slice_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SliceBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SliceBuilder<St, S>
 where
     St: slice_state::State,
     St::CreatedAt: slice_state::IsUnset,
@@ -327,7 +342,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SliceBuilder<S, slice_state::SetCreatedAt<St>> {
+    ) -> SliceBuilder<slice_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SliceBuilder {
             _state: PhantomData,
@@ -337,13 +352,16 @@ where
     }
 }
 
-impl<S: BosStr, St> SliceBuilder<S, St>
+impl<St, S: BosStr> SliceBuilder<St, S>
 where
     St: slice_state::State,
     St::Domain: slice_state::IsUnset,
 {
     /// Set the `domain` field (required)
-    pub fn domain(mut self, value: impl Into<S>) -> SliceBuilder<S, slice_state::SetDomain<St>> {
+    pub fn domain(
+        mut self,
+        value: impl Into<S>,
+    ) -> SliceBuilder<slice_state::SetDomain<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SliceBuilder {
             _state: PhantomData,
@@ -353,13 +371,16 @@ where
     }
 }
 
-impl<S: BosStr, St> SliceBuilder<S, St>
+impl<St, S: BosStr> SliceBuilder<St, S>
 where
     St: slice_state::State,
     St::Name: slice_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> SliceBuilder<S, slice_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> SliceBuilder<slice_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SliceBuilder {
             _state: PhantomData,
@@ -369,12 +390,12 @@ where
     }
 }
 
-impl<S: BosStr, St> SliceBuilder<S, St>
+impl<St, S: BosStr> SliceBuilder<St, S>
 where
     St: slice_state::State,
     St::Domain: slice_state::IsSet,
-    St::CreatedAt: slice_state::IsSet,
     St::Name: slice_state::IsSet,
+    St::CreatedAt: slice_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Slice<S> {
@@ -397,10 +418,10 @@ where
 }
 
 fn lexicon_doc_network_slices_slice() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.slice"),
@@ -465,7 +486,7 @@ fn lexicon_doc_network_slices_slice() -> LexiconDoc<'static> {
 
 pub mod slice_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -473,110 +494,110 @@ pub mod slice_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Domain;
+        type Creator;
+        type Cid;
         type Name;
         type Uri;
-        type Domain;
-        type Cid;
-        type Creator;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Domain = Unset;
+        type Creator = Unset;
+        type Cid = Unset;
         type Name = Unset;
         type Uri = Unset;
-        type Domain = Unset;
-        type Cid = Unset;
-        type Creator = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Uri = St::Uri;
-        type Domain = St::Domain;
-        type Cid = St::Cid;
-        type Creator = St::Creator;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Name = St::Name;
-        type Uri = Set<members::uri>;
-        type Domain = St::Domain;
-        type Cid = St::Cid;
-        type Creator = St::Creator;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `domain` field to Set
     pub struct SetDomain<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDomain<St> {}
     impl<St: State> State for SetDomain<St> {
-        type Name = St::Name;
-        type Uri = St::Uri;
         type Domain = Set<members::domain>;
-        type Cid = St::Cid;
         type Creator = St::Creator;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
+        type Cid = St::Cid;
         type Name = St::Name;
         type Uri = St::Uri;
-        type Domain = St::Domain;
-        type Cid = Set<members::cid>;
-        type Creator = St::Creator;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreator<St> {}
     impl<St: State> State for SetCreator<St> {
+        type Domain = St::Domain;
+        type Creator = Set<members::creator>;
+        type Cid = St::Cid;
         type Name = St::Name;
         type Uri = St::Uri;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
         type Domain = St::Domain;
+        type Creator = St::Creator;
+        type Cid = Set<members::cid>;
+        type Name = St::Name;
+        type Uri = St::Uri;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Domain = St::Domain;
+        type Creator = St::Creator;
         type Cid = St::Cid;
-        type Creator = Set<members::creator>;
+        type Name = Set<members::name>;
+        type Uri = St::Uri;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Domain = St::Domain;
+        type Creator = St::Creator;
+        type Cid = St::Cid;
+        type Name = St::Name;
+        type Uri = Set<members::uri>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type Domain = St::Domain;
+        type Creator = St::Creator;
+        type Cid = St::Cid;
         type Name = St::Name;
         type Uri = St::Uri;
-        type Domain = St::Domain;
-        type Cid = St::Cid;
-        type Creator = St::Creator;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `domain` field
+        pub struct domain(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `domain` field
-        pub struct domain(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `creator` field
-        pub struct creator(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SliceViewBuilder<S: BosStr, St: slice_view_state::State> {
+pub struct SliceViewBuilder<St: slice_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
@@ -595,27 +616,69 @@ pub struct SliceViewBuilder<S: BosStr, St: slice_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SliceView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SliceViewBuilder<S, slice_view_state::Empty> {
+impl SliceView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SliceViewBuilder<slice_view_state::Empty, DefaultStr> {
         SliceViewBuilder::new()
     }
 }
 
-impl<S: BosStr> SliceViewBuilder<S, slice_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SliceView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SliceViewBuilder<slice_view_state::Empty, S> {
+        SliceViewBuilder::builder()
+    }
+}
+
+impl SliceViewBuilder<slice_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SliceViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St> SliceViewBuilder<S, St>
+impl<S: BosStr> SliceViewBuilder<slice_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SliceViewBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SliceViewBuilder<St, S>
 where
     St: slice_view_state::State,
     St::Cid: slice_view_state::IsUnset,
@@ -624,7 +687,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> SliceViewBuilder<S, slice_view_state::SetCid<St>> {
+    ) -> SliceViewBuilder<slice_view_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SliceViewBuilder {
             _state: PhantomData,
@@ -634,7 +697,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SliceViewBuilder<S, St>
+impl<St, S: BosStr> SliceViewBuilder<St, S>
 where
     St: slice_view_state::State,
     St::CreatedAt: slice_view_state::IsUnset,
@@ -643,7 +706,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SliceViewBuilder<S, slice_view_state::SetCreatedAt<St>> {
+    ) -> SliceViewBuilder<slice_view_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SliceViewBuilder {
             _state: PhantomData,
@@ -653,7 +716,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SliceViewBuilder<S, St>
+impl<St, S: BosStr> SliceViewBuilder<St, S>
 where
     St: slice_view_state::State,
     St::Creator: slice_view_state::IsUnset,
@@ -662,7 +725,7 @@ where
     pub fn creator(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> SliceViewBuilder<S, slice_view_state::SetCreator<St>> {
+    ) -> SliceViewBuilder<slice_view_state::SetCreator<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SliceViewBuilder {
             _state: PhantomData,
@@ -672,7 +735,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SliceViewBuilder<S, St>
+impl<St, S: BosStr> SliceViewBuilder<St, S>
 where
     St: slice_view_state::State,
     St::Domain: slice_view_state::IsUnset,
@@ -681,7 +744,7 @@ where
     pub fn domain(
         mut self,
         value: impl Into<S>,
-    ) -> SliceViewBuilder<S, slice_view_state::SetDomain<St>> {
+    ) -> SliceViewBuilder<slice_view_state::SetDomain<St>, S> {
         self._fields.3 = Option::Some(value.into());
         SliceViewBuilder {
             _state: PhantomData,
@@ -691,7 +754,7 @@ where
     }
 }
 
-impl<S: BosStr, St: slice_view_state::State> SliceViewBuilder<S, St> {
+impl<St: slice_view_state::State, S: BosStr> SliceViewBuilder<St, S> {
     /// Set the `indexedActorCount` field (optional)
     pub fn indexed_actor_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -704,7 +767,7 @@ impl<S: BosStr, St: slice_view_state::State> SliceViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: slice_view_state::State> SliceViewBuilder<S, St> {
+impl<St: slice_view_state::State, S: BosStr> SliceViewBuilder<St, S> {
     /// Set the `indexedCollectionCount` field (optional)
     pub fn indexed_collection_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -717,7 +780,7 @@ impl<S: BosStr, St: slice_view_state::State> SliceViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: slice_view_state::State> SliceViewBuilder<S, St> {
+impl<St: slice_view_state::State, S: BosStr> SliceViewBuilder<St, S> {
     /// Set the `indexedRecordCount` field (optional)
     pub fn indexed_record_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -730,7 +793,7 @@ impl<S: BosStr, St: slice_view_state::State> SliceViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SliceViewBuilder<S, St>
+impl<St, S: BosStr> SliceViewBuilder<St, S>
 where
     St: slice_view_state::State,
     St::Name: slice_view_state::IsUnset,
@@ -739,7 +802,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> SliceViewBuilder<S, slice_view_state::SetName<St>> {
+    ) -> SliceViewBuilder<slice_view_state::SetName<St>, S> {
         self._fields.7 = Option::Some(value.into());
         SliceViewBuilder {
             _state: PhantomData,
@@ -749,20 +812,26 @@ where
     }
 }
 
-impl<S: BosStr, St: slice_view_state::State> SliceViewBuilder<S, St> {
+impl<St: slice_view_state::State, S: BosStr> SliceViewBuilder<St, S> {
     /// Set the `sparkline` field (optional)
-    pub fn sparkline(mut self, value: impl Into<Option<Vec<slice::SparklinePoint<S>>>>) -> Self {
+    pub fn sparkline(
+        mut self,
+        value: impl Into<Option<Vec<slice::SparklinePoint<S>>>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `sparkline` field to an Option value (optional)
-    pub fn maybe_sparkline(mut self, value: Option<Vec<slice::SparklinePoint<S>>>) -> Self {
+    pub fn maybe_sparkline(
+        mut self,
+        value: Option<Vec<slice::SparklinePoint<S>>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
 }
 
-impl<S: BosStr, St> SliceViewBuilder<S, St>
+impl<St, S: BosStr> SliceViewBuilder<St, S>
 where
     St: slice_view_state::State,
     St::Uri: slice_view_state::IsUnset,
@@ -771,7 +840,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SliceViewBuilder<S, slice_view_state::SetUri<St>> {
+    ) -> SliceViewBuilder<slice_view_state::SetUri<St>, S> {
         self._fields.9 = Option::Some(value.into());
         SliceViewBuilder {
             _state: PhantomData,
@@ -781,7 +850,7 @@ where
     }
 }
 
-impl<S: BosStr, St: slice_view_state::State> SliceViewBuilder<S, St> {
+impl<St: slice_view_state::State, S: BosStr> SliceViewBuilder<St, S> {
     /// Set the `waitlistInviteCount` field (optional)
     pub fn waitlist_invite_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.10 = value.into();
@@ -794,7 +863,7 @@ impl<S: BosStr, St: slice_view_state::State> SliceViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: slice_view_state::State> SliceViewBuilder<S, St> {
+impl<St: slice_view_state::State, S: BosStr> SliceViewBuilder<St, S> {
     /// Set the `waitlistRequestCount` field (optional)
     pub fn waitlist_request_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.11 = value.into();
@@ -807,14 +876,14 @@ impl<S: BosStr, St: slice_view_state::State> SliceViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SliceViewBuilder<S, St>
+impl<St, S: BosStr> SliceViewBuilder<St, S>
 where
     St: slice_view_state::State,
+    St::Domain: slice_view_state::IsSet,
+    St::Creator: slice_view_state::IsSet,
+    St::Cid: slice_view_state::IsSet,
     St::Name: slice_view_state::IsSet,
     St::Uri: slice_view_state::IsSet,
-    St::Domain: slice_view_state::IsSet,
-    St::Cid: slice_view_state::IsSet,
-    St::Creator: slice_view_state::IsSet,
     St::CreatedAt: slice_view_state::IsSet,
 {
     /// Build the final struct.
@@ -836,7 +905,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SliceView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SliceView<S> {
         SliceView {
             cid: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -856,10 +928,10 @@ where
 }
 
 fn lexicon_doc_network_slices_slice_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.slice.defs"),
@@ -868,14 +940,14 @@ fn lexicon_doc_network_slices_slice_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("sliceView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("domain"),
-                        SmolStr::new_static("creator"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("name"), SmolStr::new_static("domain"),
+                            SmolStr::new_static("creator"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -905,9 +977,11 @@ fn lexicon_doc_network_slices_slice_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("domain"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Primary domain namespace for this slice (e.g. social.grain)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Primary domain namespace for this slice (e.g. social.grain)",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -932,16 +1006,20 @@ fn lexicon_doc_network_slices_slice_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Display name of the slice")),
+                                description: Some(
+                                    CowStr::new_static("Display name of the slice"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sparkline"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Recent activity sparkline data points for the last 24 hours",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Recent activity sparkline data points for the last 24 hours",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#sparklinePoint"),
                                     ..Default::default()
@@ -976,10 +1054,12 @@ fn lexicon_doc_network_slices_slice_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("sparklinePoint"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("timestamp"),
-                        SmolStr::new_static("count"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("timestamp"),
+                            SmolStr::new_static("count")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1010,7 +1090,7 @@ fn lexicon_doc_network_slices_slice_defs() -> LexiconDoc<'static> {
 
 pub mod sparkline_point_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1053,21 +1133,31 @@ pub mod sparkline_point_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SparklinePointBuilder<S: BosStr, St: sparkline_point_state::State> {
+pub struct SparklinePointBuilder<
+    St: sparkline_point_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SparklinePoint<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SparklinePointBuilder<S, sparkline_point_state::Empty> {
+impl SparklinePoint<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SparklinePointBuilder<sparkline_point_state::Empty, DefaultStr> {
         SparklinePointBuilder::new()
     }
 }
 
-impl<S: BosStr> SparklinePointBuilder<S, sparkline_point_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SparklinePoint<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SparklinePointBuilder<sparkline_point_state::Empty, S> {
+        SparklinePointBuilder::builder()
+    }
+}
+
+impl SparklinePointBuilder<sparkline_point_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SparklinePointBuilder {
             _state: PhantomData,
@@ -1077,7 +1167,18 @@ impl<S: BosStr> SparklinePointBuilder<S, sparkline_point_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SparklinePointBuilder<S, St>
+impl<S: BosStr> SparklinePointBuilder<sparkline_point_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SparklinePointBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SparklinePointBuilder<St, S>
 where
     St: sparkline_point_state::State,
     St::Count: sparkline_point_state::IsUnset,
@@ -1086,7 +1187,7 @@ where
     pub fn count(
         mut self,
         value: impl Into<i64>,
-    ) -> SparklinePointBuilder<S, sparkline_point_state::SetCount<St>> {
+    ) -> SparklinePointBuilder<sparkline_point_state::SetCount<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SparklinePointBuilder {
             _state: PhantomData,
@@ -1096,7 +1197,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SparklinePointBuilder<S, St>
+impl<St, S: BosStr> SparklinePointBuilder<St, S>
 where
     St: sparkline_point_state::State,
     St::Timestamp: sparkline_point_state::IsUnset,
@@ -1105,7 +1206,7 @@ where
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SparklinePointBuilder<S, sparkline_point_state::SetTimestamp<St>> {
+    ) -> SparklinePointBuilder<sparkline_point_state::SetTimestamp<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SparklinePointBuilder {
             _state: PhantomData,
@@ -1115,7 +1216,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SparklinePointBuilder<S, St>
+impl<St, S: BosStr> SparklinePointBuilder<St, S>
 where
     St: sparkline_point_state::State,
     St::Timestamp: sparkline_point_state::IsSet,
@@ -1130,7 +1231,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SparklinePoint<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SparklinePoint<S> {
         SparklinePoint {
             count: self._fields.0.unwrap(),
             timestamp: self._fields.1.unwrap(),

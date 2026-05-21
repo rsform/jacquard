@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,13 +22,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Heading<S: BosStr = DefaultStr> {
     ///Facets for text formatting
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -81,7 +78,7 @@ impl<S: BosStr> LexiconSchema for Heading<S> {
 
 pub mod heading_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -124,21 +121,28 @@ pub mod heading_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HeadingBuilder<S: BosStr, St: heading_state::State> {
+pub struct HeadingBuilder<St: heading_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Data<S>>>, Option<i64>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Heading<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> HeadingBuilder<S, heading_state::Empty> {
+impl Heading<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> HeadingBuilder<heading_state::Empty, DefaultStr> {
         HeadingBuilder::new()
     }
 }
 
-impl<S: BosStr> HeadingBuilder<S, heading_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Heading<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> HeadingBuilder<heading_state::Empty, S> {
+        HeadingBuilder::builder()
+    }
+}
+
+impl HeadingBuilder<heading_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         HeadingBuilder {
             _state: PhantomData,
@@ -148,7 +152,18 @@ impl<S: BosStr> HeadingBuilder<S, heading_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: heading_state::State> HeadingBuilder<S, St> {
+impl<S: BosStr> HeadingBuilder<heading_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        HeadingBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: heading_state::State, S: BosStr> HeadingBuilder<St, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -161,7 +176,7 @@ impl<S: BosStr, St: heading_state::State> HeadingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> HeadingBuilder<S, St>
+impl<St, S: BosStr> HeadingBuilder<St, S>
 where
     St: heading_state::State,
     St::Level: heading_state::IsUnset,
@@ -170,7 +185,7 @@ where
     pub fn level(
         mut self,
         value: impl Into<i64>,
-    ) -> HeadingBuilder<S, heading_state::SetLevel<St>> {
+    ) -> HeadingBuilder<heading_state::SetLevel<St>, S> {
         self._fields.1 = Option::Some(value.into());
         HeadingBuilder {
             _state: PhantomData,
@@ -180,7 +195,7 @@ where
     }
 }
 
-impl<S: BosStr, St> HeadingBuilder<S, St>
+impl<St, S: BosStr> HeadingBuilder<St, S>
 where
     St: heading_state::State,
     St::Plaintext: heading_state::IsUnset,
@@ -189,7 +204,7 @@ where
     pub fn plaintext(
         mut self,
         value: impl Into<S>,
-    ) -> HeadingBuilder<S, heading_state::SetPlaintext<St>> {
+    ) -> HeadingBuilder<heading_state::SetPlaintext<St>, S> {
         self._fields.2 = Option::Some(value.into());
         HeadingBuilder {
             _state: PhantomData,
@@ -199,7 +214,7 @@ where
     }
 }
 
-impl<S: BosStr, St: heading_state::State> HeadingBuilder<S, St> {
+impl<St: heading_state::State, S: BosStr> HeadingBuilder<St, S> {
     /// Set the `textAlign` field (optional)
     pub fn text_align(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -212,7 +227,7 @@ impl<S: BosStr, St: heading_state::State> HeadingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> HeadingBuilder<S, St>
+impl<St, S: BosStr> HeadingBuilder<St, S>
 where
     St: heading_state::State,
     St::Level: heading_state::IsSet,
@@ -241,10 +256,10 @@ where
 }
 
 fn lexicon_doc_app_offprint_block_heading() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.offprint.block.heading"),
@@ -253,17 +268,21 @@ fn lexicon_doc_app_offprint_block_heading() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("plaintext"),
-                        SmolStr::new_static("level"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("plaintext"),
+                            SmolStr::new_static("level")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static("Facets for text formatting")),
+                                description: Some(
+                                    CowStr::new_static("Facets for text formatting"),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("app.offprint.richtext.facet"),
                                     ..Default::default()
@@ -282,7 +301,9 @@ fn lexicon_doc_app_offprint_block_heading() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("plaintext"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The heading text content")),
+                                description: Some(
+                                    CowStr::new_static("The heading text content"),
+                                ),
                                 ..Default::default()
                             }),
                         );

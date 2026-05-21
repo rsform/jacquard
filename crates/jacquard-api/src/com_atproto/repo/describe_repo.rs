@@ -10,28 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{Did, Handle, Nsid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DescribeRepo<S: BosStr = DefaultStr> {
     pub repo: AtIdentifier<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DescribeRepoOutput<S: BosStr = DefaultStr> {
     ///List of all the collections (NSIDs) for which this repo contains at least one record.
     pub collections: Vec<Nsid<S>>,
@@ -71,7 +66,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DescribeRepoRequest {
 
 pub mod describe_repo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -102,21 +97,28 @@ pub mod describe_repo_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DescribeRepoBuilder<S: BosStr, St: describe_repo_state::State> {
+pub struct DescribeRepoBuilder<St: describe_repo_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DescribeRepo<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DescribeRepoBuilder<S, describe_repo_state::Empty> {
+impl DescribeRepo<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DescribeRepoBuilder<describe_repo_state::Empty, DefaultStr> {
         DescribeRepoBuilder::new()
     }
 }
 
-impl<S: BosStr> DescribeRepoBuilder<S, describe_repo_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DescribeRepo<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DescribeRepoBuilder<describe_repo_state::Empty, S> {
+        DescribeRepoBuilder::builder()
+    }
+}
+
+impl DescribeRepoBuilder<describe_repo_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DescribeRepoBuilder {
             _state: PhantomData,
@@ -126,7 +128,18 @@ impl<S: BosStr> DescribeRepoBuilder<S, describe_repo_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DescribeRepoBuilder<S, St>
+impl<S: BosStr> DescribeRepoBuilder<describe_repo_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DescribeRepoBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DescribeRepoBuilder<St, S>
 where
     St: describe_repo_state::State,
     St::Repo: describe_repo_state::IsUnset,
@@ -135,7 +148,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> DescribeRepoBuilder<S, describe_repo_state::SetRepo<St>> {
+    ) -> DescribeRepoBuilder<describe_repo_state::SetRepo<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DescribeRepoBuilder {
             _state: PhantomData,
@@ -145,7 +158,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DescribeRepoBuilder<S, St>
+impl<St, S: BosStr> DescribeRepoBuilder<St, S>
 where
     St: describe_repo_state::State,
     St::Repo: describe_repo_state::IsSet,

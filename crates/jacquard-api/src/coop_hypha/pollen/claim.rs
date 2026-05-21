@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,11 +25,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::coop_hypha::pollen::embed::text::Text;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::coop_hypha::pollen::embed::text::Text;
 /// A provenance claim linking a perceptual fingerprint (PFP) to a blob.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -115,7 +115,7 @@ impl<S: BosStr> LexiconSchema for Claim<S> {
 
 pub mod claim_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -123,72 +123,72 @@ pub mod claim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Pfp;
-        type Content;
         type Cid;
+        type Content;
+        type Pfp;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Pfp = Unset;
-        type Content = Unset;
         type Cid = Unset;
+        type Content = Unset;
+        type Pfp = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `pfp` field to Set
-    pub struct SetPfp<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPfp<St> {}
-    impl<St: State> State for SetPfp<St> {
-        type Pfp = Set<members::pfp>;
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Cid = Set<members::cid>;
         type Content = St::Content;
-        type Cid = St::Cid;
+        type Pfp = St::Pfp;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
-        type Pfp = St::Pfp;
-        type Content = Set<members::content>;
         type Cid = St::Cid;
+        type Content = Set<members::content>;
+        type Pfp = St::Pfp;
         type CreatedAt = St::CreatedAt;
     }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Pfp = St::Pfp;
+    ///State transition - sets the `pfp` field to Set
+    pub struct SetPfp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPfp<St> {}
+    impl<St: State> State for SetPfp<St> {
+        type Cid = St::Cid;
         type Content = St::Content;
-        type Cid = Set<members::cid>;
+        type Pfp = Set<members::pfp>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Pfp = St::Pfp;
-        type Content = St::Content;
         type Cid = St::Cid;
+        type Content = St::Content;
+        type Pfp = St::Pfp;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `pfp` field
-        pub struct pfp(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `pfp` field
+        pub struct pfp(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ClaimBuilder<S: BosStr, St: claim_state::State> {
+pub struct ClaimBuilder<St: claim_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<CidLink<S>>,
@@ -200,15 +200,22 @@ pub struct ClaimBuilder<S: BosStr, St: claim_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Claim<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ClaimBuilder<S, claim_state::Empty> {
+impl Claim<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ClaimBuilder<claim_state::Empty, DefaultStr> {
         ClaimBuilder::new()
     }
 }
 
-impl<S: BosStr> ClaimBuilder<S, claim_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Claim<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ClaimBuilder<claim_state::Empty, S> {
+        ClaimBuilder::builder()
+    }
+}
+
+impl ClaimBuilder<claim_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ClaimBuilder {
             _state: PhantomData,
@@ -218,13 +225,27 @@ impl<S: BosStr> ClaimBuilder<S, claim_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ClaimBuilder<S, St>
+impl<S: BosStr> ClaimBuilder<claim_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ClaimBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ClaimBuilder<St, S>
 where
     St: claim_state::State,
     St::Cid: claim_state::IsUnset,
 {
     /// Set the `cid` field (required)
-    pub fn cid(mut self, value: impl Into<CidLink<S>>) -> ClaimBuilder<S, claim_state::SetCid<St>> {
+    pub fn cid(
+        mut self,
+        value: impl Into<CidLink<S>>,
+    ) -> ClaimBuilder<claim_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ClaimBuilder {
             _state: PhantomData,
@@ -234,7 +255,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ClaimBuilder<S, St>
+impl<St, S: BosStr> ClaimBuilder<St, S>
 where
     St: claim_state::State,
     St::Content: claim_state::IsUnset,
@@ -243,7 +264,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<Text<S>>,
-    ) -> ClaimBuilder<S, claim_state::SetContent<St>> {
+    ) -> ClaimBuilder<claim_state::SetContent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ClaimBuilder {
             _state: PhantomData,
@@ -253,7 +274,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ClaimBuilder<S, St>
+impl<St, S: BosStr> ClaimBuilder<St, S>
 where
     St: claim_state::State,
     St::CreatedAt: claim_state::IsUnset,
@@ -262,7 +283,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ClaimBuilder<S, claim_state::SetCreatedAt<St>> {
+    ) -> ClaimBuilder<claim_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ClaimBuilder {
             _state: PhantomData,
@@ -272,13 +293,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ClaimBuilder<S, St>
+impl<St, S: BosStr> ClaimBuilder<St, S>
 where
     St: claim_state::State,
     St::Pfp: claim_state::IsUnset,
 {
     /// Set the `pfp` field (required)
-    pub fn pfp(mut self, value: impl Into<Data<S>>) -> ClaimBuilder<S, claim_state::SetPfp<St>> {
+    pub fn pfp(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> ClaimBuilder<claim_state::SetPfp<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ClaimBuilder {
             _state: PhantomData,
@@ -288,7 +312,7 @@ where
     }
 }
 
-impl<S: BosStr, St: claim_state::State> ClaimBuilder<S, St> {
+impl<St: claim_state::State, S: BosStr> ClaimBuilder<St, S> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -301,12 +325,12 @@ impl<S: BosStr, St: claim_state::State> ClaimBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ClaimBuilder<S, St>
+impl<St, S: BosStr> ClaimBuilder<St, S>
 where
     St: claim_state::State,
-    St::Pfp: claim_state::IsSet,
-    St::Content: claim_state::IsSet,
     St::Cid: claim_state::IsSet,
+    St::Content: claim_state::IsSet,
+    St::Pfp: claim_state::IsSet,
     St::CreatedAt: claim_state::IsSet,
 {
     /// Build the final struct.
@@ -334,10 +358,10 @@ where
 }
 
 fn lexicon_doc_coop_hypha_pollen_claim() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("coop.hypha.pollen.claim"),
@@ -346,17 +370,20 @@ fn lexicon_doc_coop_hypha_pollen_claim() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A provenance claim linking a perceptual fingerprint (PFP) to a blob.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A provenance claim linking a perceptual fingerprint (PFP) to a blob.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("pfp"),
-                            SmolStr::new_static("cid"),
-                            SmolStr::new_static("content"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("pfp"), SmolStr::new_static("cid"),
+                                SmolStr::new_static("content"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -369,19 +396,21 @@ fn lexicon_doc_coop_hypha_pollen_claim() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("content"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(CowStr::new_static(
-                                        "Content of the claim, such as text.",
-                                    )),
-                                    refs: vec![CowStr::new_static("coop.hypha.pollen.embed.text")],
+                                    description: Some(
+                                        CowStr::new_static("Content of the claim, such as text."),
+                                    ),
+                                    refs: vec![
+                                        CowStr::new_static("coop.hypha.pollen.embed.text")
+                                    ],
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when this claim was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp when this claim was created."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,13 +25,13 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::pub_leaflet::publication;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::pub_leaflet::theme::background_image::BackgroundImage;
 use crate::pub_leaflet::theme::color::Rgb;
 use crate::pub_leaflet::theme::color::Rgba;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use crate::pub_leaflet::publication;
 /// Record declaring a publication
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -68,11 +68,9 @@ pub struct PublicationGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Publication<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Preferences<S: BosStr = DefaultStr> {
     /// Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -98,11 +96,9 @@ pub struct Preferences<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Theme<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accent_background: Option<ThemeAccentBackground<S>>,
@@ -130,6 +126,7 @@ pub struct Theme<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -139,6 +136,7 @@ pub enum ThemeAccentBackground<S: BosStr = DefaultStr> {
     #[serde(rename = "pub.leaflet.theme.color#rgb")]
     ColorRgb(Box<Rgb<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -150,6 +148,7 @@ pub enum ThemeAccentText<S: BosStr = DefaultStr> {
     ColorRgb(Box<Rgb<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -160,6 +159,7 @@ pub enum ThemeBackgroundColor<S: BosStr = DefaultStr> {
     ColorRgb(Box<Rgb<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -169,6 +169,7 @@ pub enum ThemePageBackground<S: BosStr = DefaultStr> {
     #[serde(rename = "pub.leaflet.theme.color#rgb")]
     ColorRgb(Box<Rgb<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -250,16 +251,19 @@ impl<S: BosStr> LexiconSchema for Publication<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("icon"),
@@ -354,7 +358,7 @@ impl<S: BosStr> LexiconSchema for Theme<S> {
 
 pub mod publication_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -385,7 +389,7 @@ pub mod publication_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PublicationBuilder<S: BosStr, St: publication_state::State> {
+pub struct PublicationBuilder<St: publication_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -398,15 +402,22 @@ pub struct PublicationBuilder<S: BosStr, St: publication_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Publication<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PublicationBuilder<S, publication_state::Empty> {
+impl Publication<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PublicationBuilder<publication_state::Empty, DefaultStr> {
         PublicationBuilder::new()
     }
 }
 
-impl<S: BosStr> PublicationBuilder<S, publication_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Publication<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PublicationBuilder<publication_state::Empty, S> {
+        PublicationBuilder::builder()
+    }
+}
+
+impl PublicationBuilder<publication_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PublicationBuilder {
             _state: PhantomData,
@@ -416,7 +427,18 @@ impl<S: BosStr> PublicationBuilder<S, publication_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: publication_state::State> PublicationBuilder<S, St> {
+impl<S: BosStr> PublicationBuilder<publication_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PublicationBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: publication_state::State, S: BosStr> PublicationBuilder<St, S> {
     /// Set the `base_path` field (optional)
     pub fn base_path(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -429,7 +451,7 @@ impl<S: BosStr, St: publication_state::State> PublicationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: publication_state::State> PublicationBuilder<S, St> {
+impl<St: publication_state::State, S: BosStr> PublicationBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -442,7 +464,7 @@ impl<S: BosStr, St: publication_state::State> PublicationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: publication_state::State> PublicationBuilder<S, St> {
+impl<St: publication_state::State, S: BosStr> PublicationBuilder<St, S> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -455,7 +477,7 @@ impl<S: BosStr, St: publication_state::State> PublicationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PublicationBuilder<S, St>
+impl<St, S: BosStr> PublicationBuilder<St, S>
 where
     St: publication_state::State,
     St::Name: publication_state::IsUnset,
@@ -464,7 +486,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> PublicationBuilder<S, publication_state::SetName<St>> {
+    ) -> PublicationBuilder<publication_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
@@ -474,20 +496,26 @@ where
     }
 }
 
-impl<S: BosStr, St: publication_state::State> PublicationBuilder<S, St> {
+impl<St: publication_state::State, S: BosStr> PublicationBuilder<St, S> {
     /// Set the `preferences` field (optional)
-    pub fn preferences(mut self, value: impl Into<Option<publication::Preferences<S>>>) -> Self {
+    pub fn preferences(
+        mut self,
+        value: impl Into<Option<publication::Preferences<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `preferences` field to an Option value (optional)
-    pub fn maybe_preferences(mut self, value: Option<publication::Preferences<S>>) -> Self {
+    pub fn maybe_preferences(
+        mut self,
+        value: Option<publication::Preferences<S>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
 }
 
-impl<S: BosStr, St: publication_state::State> PublicationBuilder<S, St> {
+impl<St: publication_state::State, S: BosStr> PublicationBuilder<St, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<publication::Theme<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -500,7 +528,7 @@ impl<S: BosStr, St: publication_state::State> PublicationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PublicationBuilder<S, St>
+impl<St, S: BosStr> PublicationBuilder<St, S>
 where
     St: publication_state::State,
     St::Name: publication_state::IsSet,
@@ -518,7 +546,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Publication<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Publication<S> {
         Publication {
             base_path: self._fields.0,
             description: self._fields.1,
@@ -532,10 +563,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.publication"),
@@ -544,7 +575,9 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("Record declaring a publication")),
+                    description: Some(
+                        CowStr::new_static("Record declaring a publication"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("name")]),
@@ -566,9 +599,7 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("icon"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("name"),
@@ -650,7 +681,7 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    CowStr::new_static("pub.leaflet.theme.color#rgb"),
+                                    CowStr::new_static("pub.leaflet.theme.color#rgb")
                                 ],
                                 ..Default::default()
                             }),
@@ -660,7 +691,7 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    CowStr::new_static("pub.leaflet.theme.color#rgb"),
+                                    CowStr::new_static("pub.leaflet.theme.color#rgb")
                                 ],
                                 ..Default::default()
                             }),
@@ -670,7 +701,7 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    CowStr::new_static("pub.leaflet.theme.color#rgb"),
+                                    CowStr::new_static("pub.leaflet.theme.color#rgb")
                                 ],
                                 ..Default::default()
                             }),
@@ -678,7 +709,9 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("backgroundImage"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("pub.leaflet.theme.backgroundImage"),
+                                r#ref: CowStr::new_static(
+                                    "pub.leaflet.theme.backgroundImage",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -701,7 +734,7 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    CowStr::new_static("pub.leaflet.theme.color#rgb"),
+                                    CowStr::new_static("pub.leaflet.theme.color#rgb")
                                 ],
                                 ..Default::default()
                             }),
@@ -719,7 +752,7 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    CowStr::new_static("pub.leaflet.theme.color#rgb"),
+                                    CowStr::new_static("pub.leaflet.theme.color#rgb")
                                 ],
                                 ..Default::default()
                             }),

@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::place_stream::server::RewriteRule;
-use crate::place_stream::server::Webhook;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::server::RewriteRule;
+use crate::place_stream::server::Webhook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateWebhook<S: BosStr = DefaultStr> {
     ///Whether this webhook should be active upon creation.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,20 +52,27 @@ pub struct CreateWebhook<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateWebhookOutput<S: BosStr = DefaultStr> {
     pub webhook: Webhook<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum CreateWebhookError {
     /// The provided webhook URL is invalid or unreachable.
@@ -82,10 +86,7 @@ pub enum CreateWebhookError {
     TooManyWebhooks(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for CreateWebhookError {
@@ -134,8 +135,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateWebhookResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateWebhook<S> {
     const NSID: &'static str = "place.stream.server.createWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateWebhookResponse;
 }
 
@@ -143,8 +145,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateWebhook<S> {
 pub struct CreateWebhookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateWebhookRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.createWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateWebhook<S>;
     type Response = CreateWebhookResponse;
 }
@@ -155,7 +158,7 @@ fn _default_create_webhook_active() -> Option<bool> {
 
 pub mod create_webhook_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -163,42 +166,45 @@ pub mod create_webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Events;
         type Url;
+        type Events;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Events = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `events` field to Set
-    pub struct SetEvents<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEvents<St> {}
-    impl<St: State> State for SetEvents<St> {
-        type Events = Set<members::events>;
-        type Url = St::Url;
+        type Events = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUrl<St> {}
     impl<St: State> State for SetUrl<St> {
-        type Events = St::Events;
         type Url = Set<members::url>;
+        type Events = St::Events;
+    }
+    ///State transition - sets the `events` field to Set
+    pub struct SetEvents<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEvents<St> {}
+    impl<St: State> State for SetEvents<St> {
+        type Url = St::Url;
+        type Events = Set<members::events>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `events` field
-        pub struct events(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `events` field
+        pub struct events(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateWebhookBuilder<S: BosStr, St: create_webhook_state::State> {
+pub struct CreateWebhookBuilder<
+    St: create_webhook_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -214,15 +220,22 @@ pub struct CreateWebhookBuilder<S: BosStr, St: create_webhook_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CreateWebhook<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CreateWebhookBuilder<S, create_webhook_state::Empty> {
+impl CreateWebhook<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CreateWebhookBuilder<create_webhook_state::Empty, DefaultStr> {
         CreateWebhookBuilder::new()
     }
 }
 
-impl<S: BosStr> CreateWebhookBuilder<S, create_webhook_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CreateWebhook<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CreateWebhookBuilder<create_webhook_state::Empty, S> {
+        CreateWebhookBuilder::builder()
+    }
+}
+
+impl CreateWebhookBuilder<create_webhook_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CreateWebhookBuilder {
             _state: PhantomData,
@@ -232,7 +245,18 @@ impl<S: BosStr> CreateWebhookBuilder<S, create_webhook_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: create_webhook_state::State> CreateWebhookBuilder<S, St> {
+impl<S: BosStr> CreateWebhookBuilder<create_webhook_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CreateWebhookBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: create_webhook_state::State, S: BosStr> CreateWebhookBuilder<St, S> {
     /// Set the `active` field (optional)
     pub fn active(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -245,7 +269,7 @@ impl<S: BosStr, St: create_webhook_state::State> CreateWebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: create_webhook_state::State> CreateWebhookBuilder<S, St> {
+impl<St: create_webhook_state::State, S: BosStr> CreateWebhookBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -258,7 +282,7 @@ impl<S: BosStr, St: create_webhook_state::State> CreateWebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CreateWebhookBuilder<S, St>
+impl<St, S: BosStr> CreateWebhookBuilder<St, S>
 where
     St: create_webhook_state::State,
     St::Events: create_webhook_state::IsUnset,
@@ -267,7 +291,7 @@ where
     pub fn events(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> CreateWebhookBuilder<S, create_webhook_state::SetEvents<St>> {
+    ) -> CreateWebhookBuilder<create_webhook_state::SetEvents<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CreateWebhookBuilder {
             _state: PhantomData,
@@ -277,7 +301,7 @@ where
     }
 }
 
-impl<S: BosStr, St: create_webhook_state::State> CreateWebhookBuilder<S, St> {
+impl<St: create_webhook_state::State, S: BosStr> CreateWebhookBuilder<St, S> {
     /// Set the `muteWords` field (optional)
     pub fn mute_words(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -290,7 +314,7 @@ impl<S: BosStr, St: create_webhook_state::State> CreateWebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: create_webhook_state::State> CreateWebhookBuilder<S, St> {
+impl<St: create_webhook_state::State, S: BosStr> CreateWebhookBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -303,7 +327,7 @@ impl<S: BosStr, St: create_webhook_state::State> CreateWebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: create_webhook_state::State> CreateWebhookBuilder<S, St> {
+impl<St: create_webhook_state::State, S: BosStr> CreateWebhookBuilder<St, S> {
     /// Set the `prefix` field (optional)
     pub fn prefix(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -316,7 +340,7 @@ impl<S: BosStr, St: create_webhook_state::State> CreateWebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: create_webhook_state::State> CreateWebhookBuilder<S, St> {
+impl<St: create_webhook_state::State, S: BosStr> CreateWebhookBuilder<St, S> {
     /// Set the `rewrite` field (optional)
     pub fn rewrite(mut self, value: impl Into<Option<Vec<RewriteRule<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -329,7 +353,7 @@ impl<S: BosStr, St: create_webhook_state::State> CreateWebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: create_webhook_state::State> CreateWebhookBuilder<S, St> {
+impl<St: create_webhook_state::State, S: BosStr> CreateWebhookBuilder<St, S> {
     /// Set the `suffix` field (optional)
     pub fn suffix(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -342,7 +366,7 @@ impl<S: BosStr, St: create_webhook_state::State> CreateWebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CreateWebhookBuilder<S, St>
+impl<St, S: BosStr> CreateWebhookBuilder<St, S>
 where
     St: create_webhook_state::State,
     St::Url: create_webhook_state::IsUnset,
@@ -351,7 +375,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> CreateWebhookBuilder<S, create_webhook_state::SetUrl<St>> {
+    ) -> CreateWebhookBuilder<create_webhook_state::SetUrl<St>, S> {
         self._fields.8 = Option::Some(value.into());
         CreateWebhookBuilder {
             _state: PhantomData,
@@ -361,11 +385,11 @@ where
     }
 }
 
-impl<S: BosStr, St> CreateWebhookBuilder<S, St>
+impl<St, S: BosStr> CreateWebhookBuilder<St, S>
 where
     St: create_webhook_state::State,
-    St::Events: create_webhook_state::IsSet,
     St::Url: create_webhook_state::IsSet,
+    St::Events: create_webhook_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CreateWebhook<S> {
@@ -383,7 +407,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateWebhook<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateWebhook<S> {
         CreateWebhook {
             active: self._fields.0.or_else(|| Some(false)),
             description: self._fields.1,

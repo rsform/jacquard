@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteTemplate<S: BosStr = DefaultStr> {
     pub id: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -38,8 +35,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteTemplateResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteTemplate<S> {
     const NSID: &'static str = "tools.ozone.communication.deleteTemplate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteTemplateResponse;
 }
 
@@ -47,8 +45,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteTemplate<S> {
 pub struct DeleteTemplateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteTemplateRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.communication.deleteTemplate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeleteTemplate<S>;
     type Response = DeleteTemplateResponse;
 }

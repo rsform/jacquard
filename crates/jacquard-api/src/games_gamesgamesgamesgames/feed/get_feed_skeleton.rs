@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::games_gamesgamesgamesgames::SkeletonGameFeedItem;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::SkeletonGameFeedItem;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFeedSkeleton<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -33,11 +30,9 @@ pub struct GetFeedSkeleton<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFeedSkeletonOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -46,19 +41,25 @@ pub struct GetFeedSkeletonOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetFeedSkeletonError {
     #[serde(rename = "UnknownFeed")]
     UnknownFeed(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetFeedSkeletonError {
@@ -112,7 +113,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_feed_skeleton_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -143,21 +144,31 @@ pub mod get_feed_skeleton_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetFeedSkeletonBuilder<S: BosStr, St: get_feed_skeleton_state::State> {
+pub struct GetFeedSkeletonBuilder<
+    St: get_feed_skeleton_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetFeedSkeleton<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetFeedSkeletonBuilder<S, get_feed_skeleton_state::Empty> {
+impl GetFeedSkeleton<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetFeedSkeletonBuilder<get_feed_skeleton_state::Empty, DefaultStr> {
         GetFeedSkeletonBuilder::new()
     }
 }
 
-impl<S: BosStr> GetFeedSkeletonBuilder<S, get_feed_skeleton_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetFeedSkeleton<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetFeedSkeletonBuilder<get_feed_skeleton_state::Empty, S> {
+        GetFeedSkeletonBuilder::builder()
+    }
+}
+
+impl GetFeedSkeletonBuilder<get_feed_skeleton_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetFeedSkeletonBuilder {
             _state: PhantomData,
@@ -167,7 +178,18 @@ impl<S: BosStr> GetFeedSkeletonBuilder<S, get_feed_skeleton_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_feed_skeleton_state::State> GetFeedSkeletonBuilder<S, St> {
+impl<S: BosStr> GetFeedSkeletonBuilder<get_feed_skeleton_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetFeedSkeletonBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_feed_skeleton_state::State, S: BosStr> GetFeedSkeletonBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -180,7 +202,7 @@ impl<S: BosStr, St: get_feed_skeleton_state::State> GetFeedSkeletonBuilder<S, St
     }
 }
 
-impl<S: BosStr, St> GetFeedSkeletonBuilder<S, St>
+impl<St, S: BosStr> GetFeedSkeletonBuilder<St, S>
 where
     St: get_feed_skeleton_state::State,
     St::Feed: get_feed_skeleton_state::IsUnset,
@@ -189,7 +211,7 @@ where
     pub fn feed(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetFeedSkeletonBuilder<S, get_feed_skeleton_state::SetFeed<St>> {
+    ) -> GetFeedSkeletonBuilder<get_feed_skeleton_state::SetFeed<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetFeedSkeletonBuilder {
             _state: PhantomData,
@@ -199,7 +221,7 @@ where
     }
 }
 
-impl<S: BosStr, St: get_feed_skeleton_state::State> GetFeedSkeletonBuilder<S, St> {
+impl<St: get_feed_skeleton_state::State, S: BosStr> GetFeedSkeletonBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -212,7 +234,7 @@ impl<S: BosStr, St: get_feed_skeleton_state::State> GetFeedSkeletonBuilder<S, St
     }
 }
 
-impl<S: BosStr, St> GetFeedSkeletonBuilder<S, St>
+impl<St, S: BosStr> GetFeedSkeletonBuilder<St, S>
 where
     St: get_feed_skeleton_state::State,
     St::Feed: get_feed_skeleton_state::IsSet,

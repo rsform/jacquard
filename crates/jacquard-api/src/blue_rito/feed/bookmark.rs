@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,16 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blue_rito::feed::bookmark;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blue_rito::feed::bookmark;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Locale<S: BosStr = DefaultStr> {
     ///URI's comment. It can use GitHub Flavored Markdown.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -229,10 +226,10 @@ impl<S: BosStr> LexiconSchema for Bookmark<S> {
 }
 
 fn lexicon_doc_blue_rito_feed_bookmark() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.rito.feed.bookmark"),
@@ -241,19 +238,20 @@ fn lexicon_doc_blue_rito_feed_bookmark() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("locale"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("lang"),
-                        SmolStr::new_static("title"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("lang"), SmolStr::new_static("title")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("comment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URI's comment. It can use GitHub Flavored Markdown.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "URI's comment. It can use GitHub Flavored Markdown.",
+                                    ),
+                                ),
                                 max_length: Some(100000usize),
                                 max_graphemes: Some(10000usize),
                                 ..Default::default()
@@ -383,7 +381,7 @@ fn lexicon_doc_blue_rito_feed_bookmark() -> LexiconDoc<'static> {
 
 pub mod bookmark_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -391,56 +389,56 @@ pub mod bookmark_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Comments;
         type Subject;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Comments = Unset;
         type Subject = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `comments` field to Set
-    pub struct SetComments<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetComments<St> {}
-    impl<St: State> State for SetComments<St> {
-        type Comments = Set<members::comments>;
-        type Subject = St::Subject;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Comments = St::Comments;
-        type Subject = Set<members::subject>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type Comments = St::Comments;
         type Subject = St::Subject;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `comments` field to Set
+    pub struct SetComments<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetComments<St> {}
+    impl<St: State> State for SetComments<St> {
+        type CreatedAt = St::CreatedAt;
+        type Comments = Set<members::comments>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Comments = St::Comments;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `comments` field
         pub struct comments(());
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BookmarkBuilder<S: BosStr, St: bookmark_state::State> {
+pub struct BookmarkBuilder<St: bookmark_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<bookmark::Locale<S>>>,
@@ -454,15 +452,22 @@ pub struct BookmarkBuilder<S: BosStr, St: bookmark_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Bookmark<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BookmarkBuilder<S, bookmark_state::Empty> {
+impl Bookmark<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BookmarkBuilder<bookmark_state::Empty, DefaultStr> {
         BookmarkBuilder::new()
     }
 }
 
-impl<S: BosStr> BookmarkBuilder<S, bookmark_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Bookmark<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BookmarkBuilder<bookmark_state::Empty, S> {
+        BookmarkBuilder::builder()
+    }
+}
+
+impl BookmarkBuilder<bookmark_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BookmarkBuilder {
             _state: PhantomData,
@@ -472,7 +477,18 @@ impl<S: BosStr> BookmarkBuilder<S, bookmark_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BookmarkBuilder<S, St>
+impl<S: BosStr> BookmarkBuilder<bookmark_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BookmarkBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BookmarkBuilder<St, S>
 where
     St: bookmark_state::State,
     St::Comments: bookmark_state::IsUnset,
@@ -481,7 +497,7 @@ where
     pub fn comments(
         mut self,
         value: impl Into<Vec<bookmark::Locale<S>>>,
-    ) -> BookmarkBuilder<S, bookmark_state::SetComments<St>> {
+    ) -> BookmarkBuilder<bookmark_state::SetComments<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BookmarkBuilder {
             _state: PhantomData,
@@ -491,7 +507,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BookmarkBuilder<S, St>
+impl<St, S: BosStr> BookmarkBuilder<St, S>
 where
     St: bookmark_state::State,
     St::CreatedAt: bookmark_state::IsUnset,
@@ -500,7 +516,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BookmarkBuilder<S, bookmark_state::SetCreatedAt<St>> {
+    ) -> BookmarkBuilder<bookmark_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BookmarkBuilder {
             _state: PhantomData,
@@ -510,7 +526,7 @@ where
     }
 }
 
-impl<S: BosStr, St: bookmark_state::State> BookmarkBuilder<S, St> {
+impl<St: bookmark_state::State, S: BosStr> BookmarkBuilder<St, S> {
     /// Set the `ogpDescription` field (optional)
     pub fn ogp_description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -523,7 +539,7 @@ impl<S: BosStr, St: bookmark_state::State> BookmarkBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: bookmark_state::State> BookmarkBuilder<S, St> {
+impl<St: bookmark_state::State, S: BosStr> BookmarkBuilder<St, S> {
     /// Set the `ogpImage` field (optional)
     pub fn ogp_image(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -536,7 +552,7 @@ impl<S: BosStr, St: bookmark_state::State> BookmarkBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: bookmark_state::State> BookmarkBuilder<S, St> {
+impl<St: bookmark_state::State, S: BosStr> BookmarkBuilder<St, S> {
     /// Set the `ogpTitle` field (optional)
     pub fn ogp_title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -549,7 +565,7 @@ impl<S: BosStr, St: bookmark_state::State> BookmarkBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BookmarkBuilder<S, St>
+impl<St, S: BosStr> BookmarkBuilder<St, S>
 where
     St: bookmark_state::State,
     St::Subject: bookmark_state::IsUnset,
@@ -558,7 +574,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> BookmarkBuilder<S, bookmark_state::SetSubject<St>> {
+    ) -> BookmarkBuilder<bookmark_state::SetSubject<St>, S> {
         self._fields.5 = Option::Some(value.into());
         BookmarkBuilder {
             _state: PhantomData,
@@ -568,7 +584,7 @@ where
     }
 }
 
-impl<S: BosStr, St: bookmark_state::State> BookmarkBuilder<S, St> {
+impl<St: bookmark_state::State, S: BosStr> BookmarkBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -581,12 +597,12 @@ impl<S: BosStr, St: bookmark_state::State> BookmarkBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BookmarkBuilder<S, St>
+impl<St, S: BosStr> BookmarkBuilder<St, S>
 where
     St: bookmark_state::State,
+    St::CreatedAt: bookmark_state::IsSet,
     St::Comments: bookmark_state::IsSet,
     St::Subject: bookmark_state::IsSet,
-    St::CreatedAt: bookmark_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Bookmark<S> {

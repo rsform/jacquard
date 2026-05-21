@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Per-contributor presentation defaults, reusable across boards.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -122,7 +122,7 @@ impl<S: BosStr> LexiconSchema for Contributor<S> {
 
 pub mod contributor_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -165,7 +165,7 @@ pub mod contributor_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ContributorBuilder<S: BosStr, St: contributor_state::State> {
+pub struct ContributorBuilder<St: contributor_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -179,15 +179,22 @@ pub struct ContributorBuilder<S: BosStr, St: contributor_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Contributor<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ContributorBuilder<S, contributor_state::Empty> {
+impl Contributor<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ContributorBuilder<contributor_state::Empty, DefaultStr> {
         ContributorBuilder::new()
     }
 }
 
-impl<S: BosStr> ContributorBuilder<S, contributor_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Contributor<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ContributorBuilder<contributor_state::Empty, S> {
+        ContributorBuilder::builder()
+    }
+}
+
+impl ContributorBuilder<contributor_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ContributorBuilder {
             _state: PhantomData,
@@ -197,7 +204,18 @@ impl<S: BosStr> ContributorBuilder<S, contributor_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
+impl<S: BosStr> ContributorBuilder<contributor_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ContributorBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: contributor_state::State, S: BosStr> ContributorBuilder<St, S> {
     /// Set the `circularImage` field (optional)
     pub fn circular_image(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -210,7 +228,7 @@ impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ContributorBuilder<S, St>
+impl<St, S: BosStr> ContributorBuilder<St, S>
 where
     St: contributor_state::State,
     St::ContributorRef: contributor_state::IsUnset,
@@ -219,7 +237,7 @@ where
     pub fn contributor_ref(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ContributorBuilder<S, contributor_state::SetContributorRef<St>> {
+    ) -> ContributorBuilder<contributor_state::SetContributorRef<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ContributorBuilder {
             _state: PhantomData,
@@ -229,7 +247,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ContributorBuilder<S, St>
+impl<St, S: BosStr> ContributorBuilder<St, S>
 where
     St: contributor_state::State,
     St::CreatedAt: contributor_state::IsUnset,
@@ -238,7 +256,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ContributorBuilder<S, contributor_state::SetCreatedAt<St>> {
+    ) -> ContributorBuilder<contributor_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ContributorBuilder {
             _state: PhantomData,
@@ -248,7 +266,7 @@ where
     }
 }
 
-impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
+impl<St: contributor_state::State, S: BosStr> ContributorBuilder<St, S> {
     /// Set the `hoverIframeUrl` field (optional)
     pub fn hover_iframe_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -261,7 +279,7 @@ impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
+impl<St: contributor_state::State, S: BosStr> ContributorBuilder<St, S> {
     /// Set the `hoverImageUrl` field (optional)
     pub fn hover_image_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -274,7 +292,7 @@ impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
+impl<St: contributor_state::State, S: BosStr> ContributorBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -287,7 +305,7 @@ impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
+impl<St: contributor_state::State, S: BosStr> ContributorBuilder<St, S> {
     /// Set the `videoUrl` field (optional)
     pub fn video_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -300,7 +318,7 @@ impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ContributorBuilder<S, St>
+impl<St, S: BosStr> ContributorBuilder<St, S>
 where
     St: contributor_state::State,
     St::ContributorRef: contributor_state::IsSet,
@@ -320,7 +338,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Contributor<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Contributor<S> {
         Contributor {
             circular_image: self._fields.0,
             contributor_ref: self._fields.1.unwrap(),
@@ -335,10 +356,10 @@ where
 }
 
 fn lexicon_doc_org_hyperboards_contributor() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hyperboards.contributor"),
@@ -347,15 +368,19 @@ fn lexicon_doc_org_hyperboards_contributor() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Per-contributor presentation defaults, reusable across boards.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Per-contributor presentation defaults, reusable across boards.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("contributorRef"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("contributorRef"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -375,9 +400,11 @@ fn lexicon_doc_org_hyperboards_contributor() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the contributor record was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp when the contributor record was created",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -385,7 +412,9 @@ fn lexicon_doc_org_hyperboards_contributor() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("hoverIframeUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Iframe shown on hover")),
+                                    description: Some(
+                                        CowStr::new_static("Iframe shown on hover"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -393,9 +422,9 @@ fn lexicon_doc_org_hyperboards_contributor() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("hoverImageUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Image overlay shown on hover",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Image overlay shown on hover"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -403,9 +432,9 @@ fn lexicon_doc_org_hyperboards_contributor() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("url"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Link URL for this contributor",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Link URL for this contributor"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -413,9 +442,9 @@ fn lexicon_doc_org_hyperboards_contributor() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("videoUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Direct video or Instagram URL",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Direct video or Instagram URL"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),

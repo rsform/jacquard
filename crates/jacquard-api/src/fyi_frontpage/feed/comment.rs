@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::fyi_frontpage::richtext::block::Block;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::fyi_frontpage::richtext::block::Block;
 /// Record containing a Frontpage comment.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -122,7 +122,7 @@ impl<S: BosStr> LexiconSchema for Comment<S> {
 
 pub mod comment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -130,56 +130,56 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blocks;
         type CreatedAt;
         type Post;
+        type Blocks;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blocks = Unset;
         type CreatedAt = Unset;
         type Post = Unset;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBlocks<St> {}
-    impl<St: State> State for SetBlocks<St> {
-        type Blocks = Set<members::blocks>;
-        type CreatedAt = St::CreatedAt;
-        type Post = St::Post;
+        type Blocks = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Blocks = St::Blocks;
         type CreatedAt = Set<members::created_at>;
         type Post = St::Post;
+        type Blocks = St::Blocks;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPost<St> {}
     impl<St: State> State for SetPost<St> {
-        type Blocks = St::Blocks;
         type CreatedAt = St::CreatedAt;
         type Post = Set<members::post>;
+        type Blocks = St::Blocks;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlocks<St> {}
+    impl<St: State> State for SetBlocks<St> {
+        type CreatedAt = St::CreatedAt;
+        type Post = St::Post;
+        type Blocks = Set<members::blocks>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `post` field
         pub struct post(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CommentBuilder<S: BosStr, St: comment_state::State> {
+pub struct CommentBuilder<St: comment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<Block<S>>>,
@@ -190,15 +190,22 @@ pub struct CommentBuilder<S: BosStr, St: comment_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Comment<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CommentBuilder<S, comment_state::Empty> {
+impl Comment<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CommentBuilder<comment_state::Empty, DefaultStr> {
         CommentBuilder::new()
     }
 }
 
-impl<S: BosStr> CommentBuilder<S, comment_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Comment<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CommentBuilder<comment_state::Empty, S> {
+        CommentBuilder::builder()
+    }
+}
+
+impl CommentBuilder<comment_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CommentBuilder {
             _state: PhantomData,
@@ -208,7 +215,18 @@ impl<S: BosStr> CommentBuilder<S, comment_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<S: BosStr> CommentBuilder<comment_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CommentBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::Blocks: comment_state::IsUnset,
@@ -217,7 +235,7 @@ where
     pub fn blocks(
         mut self,
         value: impl Into<Vec<Block<S>>>,
-    ) -> CommentBuilder<S, comment_state::SetBlocks<St>> {
+    ) -> CommentBuilder<comment_state::SetBlocks<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
@@ -227,7 +245,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::CreatedAt: comment_state::IsUnset,
@@ -236,7 +254,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CommentBuilder<S, comment_state::SetCreatedAt<St>> {
+    ) -> CommentBuilder<comment_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
@@ -246,7 +264,7 @@ where
     }
 }
 
-impl<S: BosStr, St: comment_state::State> CommentBuilder<S, St> {
+impl<St: comment_state::State, S: BosStr> CommentBuilder<St, S> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -259,7 +277,7 @@ impl<S: BosStr, St: comment_state::State> CommentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::Post: comment_state::IsUnset,
@@ -268,7 +286,7 @@ where
     pub fn post(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CommentBuilder<S, comment_state::SetPost<St>> {
+    ) -> CommentBuilder<comment_state::SetPost<St>, S> {
         self._fields.3 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
@@ -278,12 +296,12 @@ where
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
-    St::Blocks: comment_state::IsSet,
     St::CreatedAt: comment_state::IsSet,
     St::Post: comment_state::IsSet,
+    St::Blocks: comment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Comment<S> {
@@ -308,10 +326,10 @@ where
 }
 
 fn lexicon_doc_fyi_frontpage_feed_comment() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fyi.frontpage.feed.comment"),

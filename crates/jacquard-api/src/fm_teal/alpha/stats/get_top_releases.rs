@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::fm_teal::alpha::stats::ReleaseView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::fm_teal::alpha::stats::ReleaseView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTopReleases<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -35,11 +32,9 @@ pub struct GetTopReleases<S: BosStr = DefaultStr> {
     pub period: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTopReleasesOutput<S: BosStr = DefaultStr> {
     ///Next page cursor
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -83,7 +78,7 @@ fn _default_period<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_top_releases_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -101,21 +96,31 @@ pub mod get_top_releases_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetTopReleasesBuilder<S: BosStr, St: get_top_releases_state::State> {
+pub struct GetTopReleasesBuilder<
+    St: get_top_releases_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetTopReleases<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetTopReleasesBuilder<S, get_top_releases_state::Empty> {
+impl GetTopReleases<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetTopReleasesBuilder<get_top_releases_state::Empty, DefaultStr> {
         GetTopReleasesBuilder::new()
     }
 }
 
-impl<S: BosStr> GetTopReleasesBuilder<S, get_top_releases_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetTopReleases<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetTopReleasesBuilder<get_top_releases_state::Empty, S> {
+        GetTopReleasesBuilder::builder()
+    }
+}
+
+impl GetTopReleasesBuilder<get_top_releases_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetTopReleasesBuilder {
             _state: PhantomData,
@@ -125,7 +130,18 @@ impl<S: BosStr> GetTopReleasesBuilder<S, get_top_releases_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_top_releases_state::State> GetTopReleasesBuilder<S, St> {
+impl<S: BosStr> GetTopReleasesBuilder<get_top_releases_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetTopReleasesBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_top_releases_state::State, S: BosStr> GetTopReleasesBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -138,7 +154,7 @@ impl<S: BosStr, St: get_top_releases_state::State> GetTopReleasesBuilder<S, St> 
     }
 }
 
-impl<S: BosStr, St: get_top_releases_state::State> GetTopReleasesBuilder<S, St> {
+impl<St: get_top_releases_state::State, S: BosStr> GetTopReleasesBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -151,7 +167,7 @@ impl<S: BosStr, St: get_top_releases_state::State> GetTopReleasesBuilder<S, St> 
     }
 }
 
-impl<S: BosStr, St: get_top_releases_state::State> GetTopReleasesBuilder<S, St> {
+impl<St: get_top_releases_state::State, S: BosStr> GetTopReleasesBuilder<St, S> {
     /// Set the `period` field (optional)
     pub fn period(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -164,7 +180,7 @@ impl<S: BosStr, St: get_top_releases_state::State> GetTopReleasesBuilder<S, St> 
     }
 }
 
-impl<S: BosStr, St> GetTopReleasesBuilder<S, St>
+impl<St, S: BosStr> GetTopReleasesBuilder<St, S>
 where
     St: get_top_releases_state::State,
 {

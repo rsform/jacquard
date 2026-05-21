@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// The phenomenon being observed (e.g. air temperature, PM2.5 concentration).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -129,7 +129,7 @@ impl<S: BosStr> LexiconSchema for ObservedProperty<S> {
 
 pub mod observed_property_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -137,70 +137,80 @@ pub mod observed_property_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Name;
         type Definition;
+        type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Name = Unset;
         type Definition = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = St::Name;
-        type Definition = St::Definition;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type CreatedAt = St::CreatedAt;
-        type Name = Set<members::name>;
-        type Definition = St::Definition;
+        type Name = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `definition` field to Set
     pub struct SetDefinition<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDefinition<St> {}
     impl<St: State> State for SetDefinition<St> {
-        type CreatedAt = St::CreatedAt;
-        type Name = St::Name;
         type Definition = Set<members::definition>;
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Definition = St::Definition;
+        type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Definition = St::Definition;
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `definition` field
         pub struct definition(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ObservedPropertyBuilder<S: BosStr, St: observed_property_state::State> {
+pub struct ObservedPropertyBuilder<
+    St: observed_property_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<UriValue<S>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ObservedProperty<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ObservedPropertyBuilder<S, observed_property_state::Empty> {
+impl ObservedProperty<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ObservedPropertyBuilder<observed_property_state::Empty, DefaultStr> {
         ObservedPropertyBuilder::new()
     }
 }
 
-impl<S: BosStr> ObservedPropertyBuilder<S, observed_property_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ObservedProperty<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ObservedPropertyBuilder<observed_property_state::Empty, S> {
+        ObservedPropertyBuilder::builder()
+    }
+}
+
+impl ObservedPropertyBuilder<observed_property_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ObservedPropertyBuilder {
             _state: PhantomData,
@@ -210,7 +220,18 @@ impl<S: BosStr> ObservedPropertyBuilder<S, observed_property_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ObservedPropertyBuilder<S, St>
+impl<S: BosStr> ObservedPropertyBuilder<observed_property_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ObservedPropertyBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ObservedPropertyBuilder<St, S>
 where
     St: observed_property_state::State,
     St::CreatedAt: observed_property_state::IsUnset,
@@ -219,7 +240,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ObservedPropertyBuilder<S, observed_property_state::SetCreatedAt<St>> {
+    ) -> ObservedPropertyBuilder<observed_property_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ObservedPropertyBuilder {
             _state: PhantomData,
@@ -229,7 +250,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ObservedPropertyBuilder<S, St>
+impl<St, S: BosStr> ObservedPropertyBuilder<St, S>
 where
     St: observed_property_state::State,
     St::Definition: observed_property_state::IsUnset,
@@ -238,7 +259,7 @@ where
     pub fn definition(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ObservedPropertyBuilder<S, observed_property_state::SetDefinition<St>> {
+    ) -> ObservedPropertyBuilder<observed_property_state::SetDefinition<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ObservedPropertyBuilder {
             _state: PhantomData,
@@ -248,7 +269,7 @@ where
     }
 }
 
-impl<S: BosStr, St: observed_property_state::State> ObservedPropertyBuilder<S, St> {
+impl<St: observed_property_state::State, S: BosStr> ObservedPropertyBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -261,7 +282,7 @@ impl<S: BosStr, St: observed_property_state::State> ObservedPropertyBuilder<S, S
     }
 }
 
-impl<S: BosStr, St> ObservedPropertyBuilder<S, St>
+impl<St, S: BosStr> ObservedPropertyBuilder<St, S>
 where
     St: observed_property_state::State,
     St::Name: observed_property_state::IsUnset,
@@ -270,7 +291,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ObservedPropertyBuilder<S, observed_property_state::SetName<St>> {
+    ) -> ObservedPropertyBuilder<observed_property_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ObservedPropertyBuilder {
             _state: PhantomData,
@@ -280,12 +301,12 @@ where
     }
 }
 
-impl<S: BosStr, St> ObservedPropertyBuilder<S, St>
+impl<St, S: BosStr> ObservedPropertyBuilder<St, S>
 where
     St: observed_property_state::State,
-    St::CreatedAt: observed_property_state::IsSet,
-    St::Name: observed_property_state::IsSet,
     St::Definition: observed_property_state::IsSet,
+    St::Name: observed_property_state::IsSet,
+    St::CreatedAt: observed_property_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ObservedProperty<S> {
@@ -298,7 +319,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ObservedProperty<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ObservedProperty<S> {
         ObservedProperty {
             created_at: self._fields.0.unwrap(),
             definition: self._fields.1.unwrap(),
@@ -310,10 +334,10 @@ where
 }
 
 fn lexicon_doc_dev_sensorthings_observedProperty() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.sensorthings.observedProperty"),

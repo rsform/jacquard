@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::fm_teal::alpha::actor::MiniProfileView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::fm_teal::alpha::actor::MiniProfileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchActors<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -31,11 +28,9 @@ pub struct SearchActors<S: BosStr = DefaultStr> {
     pub q: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchActorsOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<MiniProfileView<S>>,
     ///Cursor for pagination
@@ -71,7 +66,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsRequest {
 
 pub mod search_actors_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -102,21 +97,28 @@ pub mod search_actors_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchActorsBuilder<S: BosStr, St: search_actors_state::State> {
+pub struct SearchActorsBuilder<St: search_actors_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SearchActors<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SearchActorsBuilder<S, search_actors_state::Empty> {
+impl SearchActors<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SearchActorsBuilder<search_actors_state::Empty, DefaultStr> {
         SearchActorsBuilder::new()
     }
 }
 
-impl<S: BosStr> SearchActorsBuilder<S, search_actors_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SearchActors<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SearchActorsBuilder<search_actors_state::Empty, S> {
+        SearchActorsBuilder::builder()
+    }
+}
+
+impl SearchActorsBuilder<search_actors_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SearchActorsBuilder {
             _state: PhantomData,
@@ -126,7 +128,18 @@ impl<S: BosStr> SearchActorsBuilder<S, search_actors_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: search_actors_state::State> SearchActorsBuilder<S, St> {
+impl<S: BosStr> SearchActorsBuilder<search_actors_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SearchActorsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: search_actors_state::State, S: BosStr> SearchActorsBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -139,7 +152,7 @@ impl<S: BosStr, St: search_actors_state::State> SearchActorsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_actors_state::State> SearchActorsBuilder<S, St> {
+impl<St: search_actors_state::State, S: BosStr> SearchActorsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -152,7 +165,7 @@ impl<S: BosStr, St: search_actors_state::State> SearchActorsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SearchActorsBuilder<S, St>
+impl<St, S: BosStr> SearchActorsBuilder<St, S>
 where
     St: search_actors_state::State,
     St::Q: search_actors_state::IsUnset,
@@ -161,7 +174,7 @@ where
     pub fn q(
         mut self,
         value: impl Into<S>,
-    ) -> SearchActorsBuilder<S, search_actors_state::SetQ<St>> {
+    ) -> SearchActorsBuilder<search_actors_state::SetQ<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SearchActorsBuilder {
             _state: PhantomData,
@@ -171,7 +184,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SearchActorsBuilder<S, St>
+impl<St, S: BosStr> SearchActorsBuilder<St, S>
 where
     St: search_actors_state::State,
     St::Q: search_actors_state::IsSet,

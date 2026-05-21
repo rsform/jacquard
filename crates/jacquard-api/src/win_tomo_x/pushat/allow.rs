@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// allow service to push. key must be did
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -105,7 +105,7 @@ impl<S: BosStr> LexiconSchema for Allow<S> {
 
 pub mod allow_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -136,21 +136,28 @@ pub mod allow_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AllowBuilder<S: BosStr, St: allow_state::State> {
+pub struct AllowBuilder<St: allow_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Allow<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AllowBuilder<S, allow_state::Empty> {
+impl Allow<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AllowBuilder<allow_state::Empty, DefaultStr> {
         AllowBuilder::new()
     }
 }
 
-impl<S: BosStr> AllowBuilder<S, allow_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Allow<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AllowBuilder<allow_state::Empty, S> {
+        AllowBuilder::builder()
+    }
+}
+
+impl AllowBuilder<allow_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AllowBuilder {
             _state: PhantomData,
@@ -160,7 +167,18 @@ impl<S: BosStr> AllowBuilder<S, allow_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: allow_state::State> AllowBuilder<S, St> {
+impl<S: BosStr> AllowBuilder<allow_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AllowBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: allow_state::State, S: BosStr> AllowBuilder<St, S> {
     /// Set the `config` field (optional)
     pub fn config(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -173,7 +191,7 @@ impl<S: BosStr, St: allow_state::State> AllowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AllowBuilder<S, St>
+impl<St, S: BosStr> AllowBuilder<St, S>
 where
     St: allow_state::State,
     St::CreatedAt: allow_state::IsUnset,
@@ -182,7 +200,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AllowBuilder<S, allow_state::SetCreatedAt<St>> {
+    ) -> AllowBuilder<allow_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AllowBuilder {
             _state: PhantomData,
@@ -192,7 +210,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AllowBuilder<S, St>
+impl<St, S: BosStr> AllowBuilder<St, S>
 where
     St: allow_state::State,
     St::CreatedAt: allow_state::IsSet,
@@ -216,10 +234,10 @@ where
 }
 
 fn lexicon_doc_win_tomo_x_pushat_allow() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("win.tomo-x.pushat.allow"),
@@ -228,7 +246,9 @@ fn lexicon_doc_win_tomo_x_pushat_allow() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("allow service to push. key must be did")),
+                    description: Some(
+                        CowStr::new_static("allow service to push. key must be did"),
+                    ),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("createdAt")]),

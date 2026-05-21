@@ -8,29 +8,24 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::org_passingreads::book::StatefulBook;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_passingreads::book::StatefulBook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBooks<S: BosStr = DefaultStr> {
     pub ids: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBooksOutput<S: BosStr = DefaultStr> {
     ///List of books found. Missing books are omitted.
     pub books: Vec<StatefulBook<S>>,
@@ -64,7 +59,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetBooksRequest {
 
 pub mod get_books_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,21 +90,28 @@ pub mod get_books_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetBooksBuilder<S: BosStr, St: get_books_state::State> {
+pub struct GetBooksBuilder<St: get_books_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetBooks<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetBooksBuilder<S, get_books_state::Empty> {
+impl GetBooks<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetBooksBuilder<get_books_state::Empty, DefaultStr> {
         GetBooksBuilder::new()
     }
 }
 
-impl<S: BosStr> GetBooksBuilder<S, get_books_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetBooks<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetBooksBuilder<get_books_state::Empty, S> {
+        GetBooksBuilder::builder()
+    }
+}
+
+impl GetBooksBuilder<get_books_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetBooksBuilder {
             _state: PhantomData,
@@ -119,13 +121,27 @@ impl<S: BosStr> GetBooksBuilder<S, get_books_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetBooksBuilder<S, St>
+impl<S: BosStr> GetBooksBuilder<get_books_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetBooksBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetBooksBuilder<St, S>
 where
     St: get_books_state::State,
     St::Ids: get_books_state::IsUnset,
 {
     /// Set the `ids` field (required)
-    pub fn ids(mut self, value: impl Into<S>) -> GetBooksBuilder<S, get_books_state::SetIds<St>> {
+    pub fn ids(
+        mut self,
+        value: impl Into<S>,
+    ) -> GetBooksBuilder<get_books_state::SetIds<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetBooksBuilder {
             _state: PhantomData,
@@ -135,7 +151,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetBooksBuilder<S, St>
+impl<St, S: BosStr> GetBooksBuilder<St, S>
 where
     St: get_books_state::State,
     St::Ids: get_books_state::IsSet,

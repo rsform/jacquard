@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,18 +24,15 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::social_flockfeeds::lexical::r#type::event;
-use crate::social_flockfeeds::lexical::r#type::image_object;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_flockfeeds::lexical::r#type::event;
+use crate::social_flockfeeds::lexical::r#type::image_object;
 /// A brand is a name used by an organization or business person for labeling a product, product group, or similar.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_type: Option<EmbeddedAdditionalType<S>>,
@@ -72,6 +69,7 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -111,6 +109,7 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -118,6 +117,7 @@ pub enum EmbeddedLogo<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -156,6 +156,7 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -206,6 +207,7 @@ pub struct Brand<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -244,6 +246,7 @@ pub enum BrandImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -251,6 +254,7 @@ pub enum BrandLogo<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -289,6 +293,7 @@ pub enum BrandSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -369,10 +374,10 @@ impl<S: BosStr> LexiconSchema for Brand<S> {
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_Brand() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.Brand"),
@@ -754,7 +759,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Brand() -> LexiconDoc<'static> {
 
 pub mod brand_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -772,7 +777,7 @@ pub mod brand_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BrandBuilder<S: BosStr, St: brand_state::State> {
+pub struct BrandBuilder<St: brand_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BrandAdditionalType<S>>,
@@ -795,56 +800,120 @@ pub struct BrandBuilder<S: BosStr, St: brand_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Brand<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BrandBuilder<S, brand_state::Empty> {
+impl Brand<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BrandBuilder<brand_state::Empty, DefaultStr> {
         BrandBuilder::new()
     }
 }
 
-impl<S: BosStr> BrandBuilder<S, brand_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Brand<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BrandBuilder<brand_state::Empty, S> {
+        BrandBuilder::builder()
+    }
+}
+
+impl BrandBuilder<brand_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BrandBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<S: BosStr> BrandBuilder<brand_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BrandBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `additionalType` field (optional)
-    pub fn additional_type(mut self, value: impl Into<Option<BrandAdditionalType<S>>>) -> Self {
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<BrandAdditionalType<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(mut self, value: Option<BrandAdditionalType<S>>) -> Self {
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<BrandAdditionalType<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `aggregateRating` field (optional)
-    pub fn aggregate_rating(mut self, value: impl Into<Option<BrandAggregateRating<S>>>) -> Self {
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<BrandAggregateRating<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(mut self, value: Option<BrandAggregateRating<S>>) -> Self {
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<BrandAggregateRating<S>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(mut self, value: impl Into<Option<BrandAlternateName<S>>>) -> Self {
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<BrandAlternateName<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -855,7 +924,7 @@ impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<BrandDescription<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -868,7 +937,7 @@ impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
@@ -887,7 +956,7 @@ impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<BrandIdentifier<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -900,7 +969,7 @@ impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<BrandImage<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -913,7 +982,7 @@ impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `logo` field (optional)
     pub fn logo(mut self, value: impl Into<Option<BrandLogo<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -926,7 +995,7 @@ impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
@@ -936,13 +1005,16 @@ impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
-    pub fn maybe_main_entity_of_page(mut self, value: Option<BrandMainEntityOfPage<S>>) -> Self {
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<BrandMainEntityOfPage<S>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<BrandName<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -955,20 +1027,26 @@ impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `potentialAction` field (optional)
-    pub fn potential_action(mut self, value: impl Into<Option<BrandPotentialAction<S>>>) -> Self {
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<BrandPotentialAction<S>>>,
+    ) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(mut self, value: Option<BrandPotentialAction<S>>) -> Self {
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<BrandPotentialAction<S>>,
+    ) -> Self {
         self._fields.10 = value;
         self
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<BrandReview<S>>>) -> Self {
         self._fields.11 = value.into();
@@ -981,7 +1059,7 @@ impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<BrandSameAs<S>>>) -> Self {
         self._fields.12 = value.into();
@@ -994,7 +1072,7 @@ impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `slogan` field (optional)
     pub fn slogan(mut self, value: impl Into<Option<BrandSlogan<S>>>) -> Self {
         self._fields.13 = value.into();
@@ -1007,7 +1085,7 @@ impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<BrandSubjectOf<S>>>) -> Self {
         self._fields.14 = value.into();
@@ -1020,7 +1098,7 @@ impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
+impl<St: brand_state::State, S: BosStr> BrandBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<BrandUrl<S>>>) -> Self {
         self._fields.15 = value.into();
@@ -1033,7 +1111,7 @@ impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BrandBuilder<S, St>
+impl<St, S: BosStr> BrandBuilder<St, S>
 where
     St: brand_state::State,
 {

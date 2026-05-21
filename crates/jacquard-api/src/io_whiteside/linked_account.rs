@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A linked account record containing external account information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -111,7 +111,7 @@ impl<S: BosStr> LexiconSchema for LinkedAccount<S> {
 
 pub mod linked_account_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -120,69 +120,79 @@ pub mod linked_account_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Link;
-        type Icon;
         type Name;
+        type Icon;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Link = Unset;
-        type Icon = Unset;
         type Name = Unset;
+        type Icon = Unset;
     }
     ///State transition - sets the `link` field to Set
     pub struct SetLink<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLink<St> {}
     impl<St: State> State for SetLink<St> {
         type Link = Set<members::link>;
+        type Name = St::Name;
         type Icon = St::Icon;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `icon` field to Set
-    pub struct SetIcon<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIcon<St> {}
-    impl<St: State> State for SetIcon<St> {
-        type Link = St::Link;
-        type Icon = Set<members::icon>;
-        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
         type Link = St::Link;
-        type Icon = St::Icon;
         type Name = Set<members::name>;
+        type Icon = St::Icon;
+    }
+    ///State transition - sets the `icon` field to Set
+    pub struct SetIcon<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIcon<St> {}
+    impl<St: State> State for SetIcon<St> {
+        type Link = St::Link;
+        type Name = St::Name;
+        type Icon = Set<members::icon>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `link` field
         pub struct link(());
-        ///Marker type for the `icon` field
-        pub struct icon(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `icon` field
+        pub struct icon(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LinkedAccountBuilder<S: BosStr, St: linked_account_state::State> {
+pub struct LinkedAccountBuilder<
+    St: linked_account_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<UriValue<S>>, Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LinkedAccount<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LinkedAccountBuilder<S, linked_account_state::Empty> {
+impl LinkedAccount<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LinkedAccountBuilder<linked_account_state::Empty, DefaultStr> {
         LinkedAccountBuilder::new()
     }
 }
 
-impl<S: BosStr> LinkedAccountBuilder<S, linked_account_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LinkedAccount<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LinkedAccountBuilder<linked_account_state::Empty, S> {
+        LinkedAccountBuilder::builder()
+    }
+}
+
+impl LinkedAccountBuilder<linked_account_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LinkedAccountBuilder {
             _state: PhantomData,
@@ -192,7 +202,18 @@ impl<S: BosStr> LinkedAccountBuilder<S, linked_account_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LinkedAccountBuilder<S, St>
+impl<S: BosStr> LinkedAccountBuilder<linked_account_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LinkedAccountBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LinkedAccountBuilder<St, S>
 where
     St: linked_account_state::State,
     St::Icon: linked_account_state::IsUnset,
@@ -201,7 +222,7 @@ where
     pub fn icon(
         mut self,
         value: impl Into<S>,
-    ) -> LinkedAccountBuilder<S, linked_account_state::SetIcon<St>> {
+    ) -> LinkedAccountBuilder<linked_account_state::SetIcon<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LinkedAccountBuilder {
             _state: PhantomData,
@@ -211,7 +232,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LinkedAccountBuilder<S, St>
+impl<St, S: BosStr> LinkedAccountBuilder<St, S>
 where
     St: linked_account_state::State,
     St::Link: linked_account_state::IsUnset,
@@ -220,7 +241,7 @@ where
     pub fn link(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> LinkedAccountBuilder<S, linked_account_state::SetLink<St>> {
+    ) -> LinkedAccountBuilder<linked_account_state::SetLink<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LinkedAccountBuilder {
             _state: PhantomData,
@@ -230,7 +251,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LinkedAccountBuilder<S, St>
+impl<St, S: BosStr> LinkedAccountBuilder<St, S>
 where
     St: linked_account_state::State,
     St::Name: linked_account_state::IsUnset,
@@ -239,7 +260,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> LinkedAccountBuilder<S, linked_account_state::SetName<St>> {
+    ) -> LinkedAccountBuilder<linked_account_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LinkedAccountBuilder {
             _state: PhantomData,
@@ -249,7 +270,7 @@ where
     }
 }
 
-impl<S: BosStr, St: linked_account_state::State> LinkedAccountBuilder<S, St> {
+impl<St: linked_account_state::State, S: BosStr> LinkedAccountBuilder<St, S> {
     /// Set the `order` field (optional)
     pub fn order(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -262,12 +283,12 @@ impl<S: BosStr, St: linked_account_state::State> LinkedAccountBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LinkedAccountBuilder<S, St>
+impl<St, S: BosStr> LinkedAccountBuilder<St, S>
 where
     St: linked_account_state::State,
     St::Link: linked_account_state::IsSet,
-    St::Icon: linked_account_state::IsSet,
     St::Name: linked_account_state::IsSet,
+    St::Icon: linked_account_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LinkedAccount<S> {
@@ -280,7 +301,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LinkedAccount<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LinkedAccount<S> {
         LinkedAccount {
             icon: self._fields.0.unwrap(),
             link: self._fields.1.unwrap(),
@@ -292,10 +316,10 @@ where
 }
 
 fn lexicon_doc_io_whiteside_linkedAccount() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.whiteside.linkedAccount"),
@@ -304,33 +328,38 @@ fn lexicon_doc_io_whiteside_linkedAccount() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A linked account record containing external account information",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A linked account record containing external account information",
+                        ),
+                    ),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("icon"),
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("link"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("icon"), SmolStr::new_static("name"),
+                                SmolStr::new_static("link")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("icon"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Icon identifier or URL for the linked account",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Icon identifier or URL for the linked account",
+                                        ),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("link"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "URL to the linked account",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("URL to the linked account"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -338,9 +367,9 @@ fn lexicon_doc_io_whiteside_linkedAccount() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Display name of the linked account",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Display name of the linked account"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

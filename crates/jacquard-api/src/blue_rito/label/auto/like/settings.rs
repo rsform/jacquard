@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blue_rito::label::auto::like::settings;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blue_rito::label::auto::like::settings;
 /// Setting Like based auto labeling.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -59,11 +59,9 @@ pub struct SettingsGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Settings<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PostRef<S: BosStr = DefaultStr> {
     ///CID of the post
     pub cid: S,
@@ -138,7 +136,7 @@ impl<S: BosStr> LexiconSchema for PostRef<S> {
 
 pub mod settings_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -146,42 +144,42 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Apply;
         type CreatedAt;
+        type Apply;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Apply = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `apply` field to Set
-    pub struct SetApply<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetApply<St> {}
-    impl<St: State> State for SetApply<St> {
-        type Apply = Set<members::apply>;
-        type CreatedAt = St::CreatedAt;
+        type Apply = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Apply = St::Apply;
         type CreatedAt = Set<members::created_at>;
+        type Apply = St::Apply;
+    }
+    ///State transition - sets the `apply` field to Set
+    pub struct SetApply<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetApply<St> {}
+    impl<St: State> State for SetApply<St> {
+        type CreatedAt = St::CreatedAt;
+        type Apply = Set<members::apply>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `apply` field
-        pub struct apply(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `apply` field
+        pub struct apply(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SettingsBuilder<S: BosStr, St: settings_state::State> {
+pub struct SettingsBuilder<St: settings_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<settings::PostRef<S>>,
@@ -191,15 +189,22 @@ pub struct SettingsBuilder<S: BosStr, St: settings_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Settings<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SettingsBuilder<S, settings_state::Empty> {
+impl Settings<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SettingsBuilder<settings_state::Empty, DefaultStr> {
         SettingsBuilder::new()
     }
 }
 
-impl<S: BosStr> SettingsBuilder<S, settings_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Settings<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SettingsBuilder<settings_state::Empty, S> {
+        SettingsBuilder::builder()
+    }
+}
+
+impl SettingsBuilder<settings_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SettingsBuilder {
             _state: PhantomData,
@@ -209,7 +214,18 @@ impl<S: BosStr> SettingsBuilder<S, settings_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<S: BosStr> SettingsBuilder<settings_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SettingsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
     St::Apply: settings_state::IsUnset,
@@ -218,7 +234,7 @@ where
     pub fn apply(
         mut self,
         value: impl Into<settings::PostRef<S>>,
-    ) -> SettingsBuilder<S, settings_state::SetApply<St>> {
+    ) -> SettingsBuilder<settings_state::SetApply<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
@@ -228,7 +244,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
     St::CreatedAt: settings_state::IsUnset,
@@ -237,7 +253,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SettingsBuilder<S, settings_state::SetCreatedAt<St>> {
+    ) -> SettingsBuilder<settings_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
@@ -247,7 +263,7 @@ where
     }
 }
 
-impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `delete` field (optional)
     pub fn delete(mut self, value: impl Into<Option<settings::PostRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -260,11 +276,11 @@ impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
-    St::Apply: settings_state::IsSet,
     St::CreatedAt: settings_state::IsSet,
+    St::Apply: settings_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Settings<S> {
@@ -287,10 +303,10 @@ where
 }
 
 fn lexicon_doc_blue_rito_label_auto_like_settings() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.rito.label.auto.like.settings"),
@@ -299,25 +315,29 @@ fn lexicon_doc_blue_rito_label_auto_like_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("Setting Like based auto labeling.")),
+                    description: Some(
+                        CowStr::new_static("Setting Like based auto labeling."),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("apply"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("apply"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("apply"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(CowStr::new_static(
-                                        "The post to apply the label to",
-                                    )),
-                                    refs: vec![CowStr::new_static(
-                                        "blue.rito.label.auto.like.settings#postRef",
-                                    )],
+                                    description: Some(
+                                        CowStr::new_static("The post to apply the label to"),
+                                    ),
+                                    refs: vec![
+                                        CowStr::new_static("blue.rito.label.auto.like.settings#postRef")
+                                    ],
                                     ..Default::default()
                                 }),
                             );
@@ -331,12 +351,12 @@ fn lexicon_doc_blue_rito_label_auto_like_settings() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("delete"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(CowStr::new_static(
-                                        "The post to remove the label from",
-                                    )),
-                                    refs: vec![CowStr::new_static(
-                                        "blue.rito.label.auto.like.settings#postRef",
-                                    )],
+                                    description: Some(
+                                        CowStr::new_static("The post to remove the label from"),
+                                    ),
+                                    refs: vec![
+                                        CowStr::new_static("blue.rito.label.auto.like.settings#postRef")
+                                    ],
                                     ..Default::default()
                                 }),
                             );
@@ -350,7 +370,9 @@ fn lexicon_doc_blue_rito_label_auto_like_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("postRef"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -382,7 +404,7 @@ fn lexicon_doc_blue_rito_label_auto_like_settings() -> LexiconDoc<'static> {
 
 pub mod post_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -390,56 +412,63 @@ pub mod post_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Cid = St::Cid;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
         type Cid = Set<members::cid>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PostRefBuilder<S: BosStr, St: post_ref_state::State> {
+pub struct PostRefBuilder<St: post_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PostRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PostRefBuilder<S, post_ref_state::Empty> {
+impl PostRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PostRefBuilder<post_ref_state::Empty, DefaultStr> {
         PostRefBuilder::new()
     }
 }
 
-impl<S: BosStr> PostRefBuilder<S, post_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PostRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PostRefBuilder<post_ref_state::Empty, S> {
+        PostRefBuilder::builder()
+    }
+}
+
+impl PostRefBuilder<post_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PostRefBuilder {
             _state: PhantomData,
@@ -449,13 +478,27 @@ impl<S: BosStr> PostRefBuilder<S, post_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PostRefBuilder<S, St>
+impl<S: BosStr> PostRefBuilder<post_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PostRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PostRefBuilder<St, S>
 where
     St: post_ref_state::State,
     St::Cid: post_ref_state::IsUnset,
 {
     /// Set the `cid` field (required)
-    pub fn cid(mut self, value: impl Into<S>) -> PostRefBuilder<S, post_ref_state::SetCid<St>> {
+    pub fn cid(
+        mut self,
+        value: impl Into<S>,
+    ) -> PostRefBuilder<post_ref_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PostRefBuilder {
             _state: PhantomData,
@@ -465,7 +508,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PostRefBuilder<S, St>
+impl<St, S: BosStr> PostRefBuilder<St, S>
 where
     St: post_ref_state::State,
     St::Uri: post_ref_state::IsUnset,
@@ -474,7 +517,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> PostRefBuilder<S, post_ref_state::SetUri<St>> {
+    ) -> PostRefBuilder<post_ref_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PostRefBuilder {
             _state: PhantomData,
@@ -484,11 +527,11 @@ where
     }
 }
 
-impl<S: BosStr, St> PostRefBuilder<S, St>
+impl<St, S: BosStr> PostRefBuilder<St, S>
 where
     St: post_ref_state::State,
-    St::Uri: post_ref_state::IsSet,
     St::Cid: post_ref_state::IsSet,
+    St::Uri: post_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PostRef<S> {

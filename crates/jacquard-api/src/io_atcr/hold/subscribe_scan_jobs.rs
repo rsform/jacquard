@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,10 +22,10 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::io_atcr::hold::subscribe_scan_jobs;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::io_atcr::hold::subscribe_scan_jobs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -33,6 +33,7 @@ pub struct SubscribeScanJobs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<i64>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -52,26 +53,43 @@ impl<S: BosStr> SubscribeScanJobsMessage<S> {
     where
         S: serde::Deserialize<'de>,
     {
-        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
+            bytes,
+        )?;
         match header.t.as_str() {
             "#scanJob" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::ScanJob(Box::new(variant)))
             }
             "#scanResult" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::ScanResult(Box::new(variant)))
             }
-            unknown => Err(jacquard_common::error::DecodeError::UnknownEventType(
-                unknown.into(),
-            )),
+            unknown => {
+                Err(
+                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
+                )
+            }
         }
     }
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum SubscribeScanJobsError {
     /// Scanner shared secret is invalid
@@ -79,10 +97,7 @@ pub enum SubscribeScanJobsError {
     InvalidSecret(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for SubscribeScanJobsError {
@@ -109,10 +124,7 @@ impl core::fmt::Display for SubscribeScanJobsError {
 /// A scan job dispatched from hold to scanner. Sent as a JSON WebSocket message.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ScanJob<S: BosStr = DefaultStr> {
     ///Manifest digest (e.g., sha256:abc123...)
     pub digest: S,
@@ -141,10 +153,7 @@ pub struct ScanJob<S: BosStr = DefaultStr> {
 /// A scan result sent from scanner back to hold. Sent as a JSON WebSocket message.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ScanResult<S: BosStr = DefaultStr> {
     ///Manifest digest that was scanned
     pub digest: S,
@@ -170,11 +179,9 @@ pub struct ScanResult<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VulnSummary<S: BosStr = DefaultStr> {
     ///Count of critical severity vulnerabilities
     pub critical: i64,
@@ -195,24 +202,21 @@ pub struct VulnSummary<S: BosStr = DefaultStr> {
 pub struct SubscribeScanJobsStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeScanJobsStream {
     const NSID: &'static str = "io.atcr.hold.subscribeScanJobs";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Message<S: BosStr> = SubscribeScanJobsMessage<S>;
     type Error = SubscribeScanJobsError;
 }
 
 impl jacquard_common::xrpc::XrpcSubscription for SubscribeScanJobs {
     const NSID: &'static str = "io.atcr.hold.subscribeScanJobs";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Stream = SubscribeScanJobsStream;
 }
 
 pub struct SubscribeScanJobsEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeScanJobsEndpoint {
     const PATH: &'static str = "/xrpc/io.atcr.hold.subscribeScanJobs";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Params<S: BosStr> = SubscribeScanJobs;
     type Stream = SubscribeScanJobsStream;
 }
@@ -399,7 +403,7 @@ impl<S: BosStr> LexiconSchema for VulnSummary<S> {
 
 pub mod subscribe_scan_jobs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -430,8 +434,18 @@ impl SubscribeScanJobs {
 }
 
 impl SubscribeScanJobsBuilder<subscribe_scan_jobs_state::Empty> {
-    /// Create a new builder with all fields unset.
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
+        SubscribeScanJobsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+        }
+    }
+}
+
+impl SubscribeScanJobsBuilder<subscribe_scan_jobs_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
         SubscribeScanJobsBuilder {
             _state: PhantomData,
             _fields: (None,),
@@ -466,7 +480,7 @@ where
 
 pub mod scan_job_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -474,117 +488,113 @@ pub mod scan_job_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Seq;
-        type HoldDid;
         type HoldEndpoint;
         type Digest;
         type Type;
         type Repository;
         type UserDid;
+        type Seq;
+        type HoldDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Seq = Unset;
-        type HoldDid = Unset;
         type HoldEndpoint = Unset;
         type Digest = Unset;
         type Type = Unset;
         type Repository = Unset;
         type UserDid = Unset;
-    }
-    ///State transition - sets the `seq` field to Set
-    pub struct SetSeq<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSeq<St> {}
-    impl<St: State> State for SetSeq<St> {
-        type Seq = Set<members::seq>;
-        type HoldDid = St::HoldDid;
-        type HoldEndpoint = St::HoldEndpoint;
-        type Digest = St::Digest;
-        type Type = St::Type;
-        type Repository = St::Repository;
-        type UserDid = St::UserDid;
-    }
-    ///State transition - sets the `hold_did` field to Set
-    pub struct SetHoldDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHoldDid<St> {}
-    impl<St: State> State for SetHoldDid<St> {
-        type Seq = St::Seq;
-        type HoldDid = Set<members::hold_did>;
-        type HoldEndpoint = St::HoldEndpoint;
-        type Digest = St::Digest;
-        type Type = St::Type;
-        type Repository = St::Repository;
-        type UserDid = St::UserDid;
+        type Seq = Unset;
+        type HoldDid = Unset;
     }
     ///State transition - sets the `hold_endpoint` field to Set
     pub struct SetHoldEndpoint<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHoldEndpoint<St> {}
     impl<St: State> State for SetHoldEndpoint<St> {
-        type Seq = St::Seq;
-        type HoldDid = St::HoldDid;
         type HoldEndpoint = Set<members::hold_endpoint>;
         type Digest = St::Digest;
         type Type = St::Type;
         type Repository = St::Repository;
         type UserDid = St::UserDid;
+        type Seq = St::Seq;
+        type HoldDid = St::HoldDid;
     }
     ///State transition - sets the `digest` field to Set
     pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDigest<St> {}
     impl<St: State> State for SetDigest<St> {
-        type Seq = St::Seq;
-        type HoldDid = St::HoldDid;
         type HoldEndpoint = St::HoldEndpoint;
         type Digest = Set<members::digest>;
         type Type = St::Type;
         type Repository = St::Repository;
         type UserDid = St::UserDid;
+        type Seq = St::Seq;
+        type HoldDid = St::HoldDid;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type Seq = St::Seq;
-        type HoldDid = St::HoldDid;
         type HoldEndpoint = St::HoldEndpoint;
         type Digest = St::Digest;
         type Type = Set<members::r#type>;
         type Repository = St::Repository;
         type UserDid = St::UserDid;
+        type Seq = St::Seq;
+        type HoldDid = St::HoldDid;
     }
     ///State transition - sets the `repository` field to Set
     pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepository<St> {}
     impl<St: State> State for SetRepository<St> {
-        type Seq = St::Seq;
-        type HoldDid = St::HoldDid;
         type HoldEndpoint = St::HoldEndpoint;
         type Digest = St::Digest;
         type Type = St::Type;
         type Repository = Set<members::repository>;
         type UserDid = St::UserDid;
+        type Seq = St::Seq;
+        type HoldDid = St::HoldDid;
     }
     ///State transition - sets the `user_did` field to Set
     pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUserDid<St> {}
     impl<St: State> State for SetUserDid<St> {
-        type Seq = St::Seq;
-        type HoldDid = St::HoldDid;
         type HoldEndpoint = St::HoldEndpoint;
         type Digest = St::Digest;
         type Type = St::Type;
         type Repository = St::Repository;
         type UserDid = Set<members::user_did>;
+        type Seq = St::Seq;
+        type HoldDid = St::HoldDid;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSeq<St> {}
+    impl<St: State> State for SetSeq<St> {
+        type HoldEndpoint = St::HoldEndpoint;
+        type Digest = St::Digest;
+        type Type = St::Type;
+        type Repository = St::Repository;
+        type UserDid = St::UserDid;
+        type Seq = Set<members::seq>;
+        type HoldDid = St::HoldDid;
+    }
+    ///State transition - sets the `hold_did` field to Set
+    pub struct SetHoldDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHoldDid<St> {}
+    impl<St: State> State for SetHoldDid<St> {
+        type HoldEndpoint = St::HoldEndpoint;
+        type Digest = St::Digest;
+        type Type = St::Type;
+        type Repository = St::Repository;
+        type UserDid = St::UserDid;
+        type Seq = St::Seq;
+        type HoldDid = Set<members::hold_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `seq` field
-        pub struct seq(());
-        ///Marker type for the `hold_did` field
-        pub struct hold_did(());
         ///Marker type for the `hold_endpoint` field
         pub struct hold_endpoint(());
         ///Marker type for the `digest` field
@@ -595,11 +605,15 @@ pub mod scan_job_state {
         pub struct repository(());
         ///Marker type for the `user_did` field
         pub struct user_did(());
+        ///Marker type for the `seq` field
+        pub struct seq(());
+        ///Marker type for the `hold_did` field
+        pub struct hold_did(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ScanJobBuilder<S: BosStr, St: scan_job_state::State> {
+pub struct ScanJobBuilder<St: scan_job_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -615,15 +629,22 @@ pub struct ScanJobBuilder<S: BosStr, St: scan_job_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ScanJob<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ScanJobBuilder<S, scan_job_state::Empty> {
+impl ScanJob<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ScanJobBuilder<scan_job_state::Empty, DefaultStr> {
         ScanJobBuilder::new()
     }
 }
 
-impl<S: BosStr> ScanJobBuilder<S, scan_job_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ScanJob<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ScanJobBuilder<scan_job_state::Empty, S> {
+        ScanJobBuilder::builder()
+    }
+}
+
+impl ScanJobBuilder<scan_job_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ScanJobBuilder {
             _state: PhantomData,
@@ -633,7 +654,18 @@ impl<S: BosStr> ScanJobBuilder<S, scan_job_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ScanJobBuilder<S, St>
+impl<S: BosStr> ScanJobBuilder<scan_job_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ScanJobBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ScanJobBuilder<St, S>
 where
     St: scan_job_state::State,
     St::Digest: scan_job_state::IsUnset,
@@ -642,7 +674,7 @@ where
     pub fn digest(
         mut self,
         value: impl Into<S>,
-    ) -> ScanJobBuilder<S, scan_job_state::SetDigest<St>> {
+    ) -> ScanJobBuilder<scan_job_state::SetDigest<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ScanJobBuilder {
             _state: PhantomData,
@@ -652,7 +684,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ScanJobBuilder<S, St>
+impl<St, S: BosStr> ScanJobBuilder<St, S>
 where
     St: scan_job_state::State,
     St::HoldDid: scan_job_state::IsUnset,
@@ -661,7 +693,7 @@ where
     pub fn hold_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ScanJobBuilder<S, scan_job_state::SetHoldDid<St>> {
+    ) -> ScanJobBuilder<scan_job_state::SetHoldDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ScanJobBuilder {
             _state: PhantomData,
@@ -671,7 +703,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ScanJobBuilder<S, St>
+impl<St, S: BosStr> ScanJobBuilder<St, S>
 where
     St: scan_job_state::State,
     St::HoldEndpoint: scan_job_state::IsUnset,
@@ -680,7 +712,7 @@ where
     pub fn hold_endpoint(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ScanJobBuilder<S, scan_job_state::SetHoldEndpoint<St>> {
+    ) -> ScanJobBuilder<scan_job_state::SetHoldEndpoint<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ScanJobBuilder {
             _state: PhantomData,
@@ -690,7 +722,7 @@ where
     }
 }
 
-impl<S: BosStr, St: scan_job_state::State> ScanJobBuilder<S, St> {
+impl<St: scan_job_state::State, S: BosStr> ScanJobBuilder<St, S> {
     /// Set the `priority` field (optional)
     pub fn priority(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -703,7 +735,7 @@ impl<S: BosStr, St: scan_job_state::State> ScanJobBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ScanJobBuilder<S, St>
+impl<St, S: BosStr> ScanJobBuilder<St, S>
 where
     St: scan_job_state::State,
     St::Repository: scan_job_state::IsUnset,
@@ -712,7 +744,7 @@ where
     pub fn repository(
         mut self,
         value: impl Into<S>,
-    ) -> ScanJobBuilder<S, scan_job_state::SetRepository<St>> {
+    ) -> ScanJobBuilder<scan_job_state::SetRepository<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ScanJobBuilder {
             _state: PhantomData,
@@ -722,13 +754,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ScanJobBuilder<S, St>
+impl<St, S: BosStr> ScanJobBuilder<St, S>
 where
     St: scan_job_state::State,
     St::Seq: scan_job_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(mut self, value: impl Into<i64>) -> ScanJobBuilder<S, scan_job_state::SetSeq<St>> {
+    pub fn seq(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ScanJobBuilder<scan_job_state::SetSeq<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ScanJobBuilder {
             _state: PhantomData,
@@ -738,7 +773,7 @@ where
     }
 }
 
-impl<S: BosStr, St: scan_job_state::State> ScanJobBuilder<S, St> {
+impl<St: scan_job_state::State, S: BosStr> ScanJobBuilder<St, S> {
     /// Set the `tag` field (optional)
     pub fn tag(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -751,13 +786,16 @@ impl<S: BosStr, St: scan_job_state::State> ScanJobBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ScanJobBuilder<S, St>
+impl<St, S: BosStr> ScanJobBuilder<St, S>
 where
     St: scan_job_state::State,
     St::Type: scan_job_state::IsUnset,
 {
     /// Set the `type` field (required)
-    pub fn r#type(mut self, value: impl Into<S>) -> ScanJobBuilder<S, scan_job_state::SetType<St>> {
+    pub fn r#type(
+        mut self,
+        value: impl Into<S>,
+    ) -> ScanJobBuilder<scan_job_state::SetType<St>, S> {
         self._fields.7 = Option::Some(value.into());
         ScanJobBuilder {
             _state: PhantomData,
@@ -767,7 +805,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ScanJobBuilder<S, St>
+impl<St, S: BosStr> ScanJobBuilder<St, S>
 where
     St: scan_job_state::State,
     St::UserDid: scan_job_state::IsUnset,
@@ -776,7 +814,7 @@ where
     pub fn user_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ScanJobBuilder<S, scan_job_state::SetUserDid<St>> {
+    ) -> ScanJobBuilder<scan_job_state::SetUserDid<St>, S> {
         self._fields.8 = Option::Some(value.into());
         ScanJobBuilder {
             _state: PhantomData,
@@ -786,16 +824,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ScanJobBuilder<S, St>
+impl<St, S: BosStr> ScanJobBuilder<St, S>
 where
     St: scan_job_state::State,
-    St::Seq: scan_job_state::IsSet,
-    St::HoldDid: scan_job_state::IsSet,
     St::HoldEndpoint: scan_job_state::IsSet,
     St::Digest: scan_job_state::IsSet,
     St::Type: scan_job_state::IsSet,
     St::Repository: scan_job_state::IsSet,
     St::UserDid: scan_job_state::IsSet,
+    St::Seq: scan_job_state::IsSet,
+    St::HoldDid: scan_job_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ScanJob<S> {
@@ -830,10 +868,10 @@ where
 }
 
 fn lexicon_doc_io_atcr_hold_subscribeScanJobs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.hold.subscribeScanJobs"),
@@ -842,20 +880,22 @@ fn lexicon_doc_io_atcr_hold_subscribeScanJobs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcSubscription(LexXrpcSubscription {
-                    parameters: Some(LexXrpcSubscriptionParameter::Params(LexXrpcParameters {
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcSubscriptionParameter::Params(LexXrpcParameters {
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -1059,13 +1099,13 @@ fn lexicon_doc_io_atcr_hold_subscribeScanJobs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("vulnSummary"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("critical"),
-                        SmolStr::new_static("high"),
-                        SmolStr::new_static("medium"),
-                        SmolStr::new_static("low"),
-                        SmolStr::new_static("total"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("critical"), SmolStr::new_static("high"),
+                            SmolStr::new_static("medium"), SmolStr::new_static("low"),
+                            SmolStr::new_static("total")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1117,7 +1157,7 @@ fn lexicon_doc_io_atcr_hold_subscribeScanJobs() -> LexiconDoc<'static> {
 
 pub mod scan_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1125,56 +1165,56 @@ pub mod scan_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Summary;
         type Type;
         type Digest;
-        type Summary;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Summary = Unset;
         type Type = Unset;
         type Digest = Unset;
-        type Summary = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Type = Set<members::r#type>;
-        type Digest = St::Digest;
-        type Summary = St::Summary;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDigest<St> {}
-    impl<St: State> State for SetDigest<St> {
-        type Type = St::Type;
-        type Digest = Set<members::digest>;
-        type Summary = St::Summary;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSummary<St> {}
     impl<St: State> State for SetSummary<St> {
+        type Summary = Set<members::summary>;
         type Type = St::Type;
         type Digest = St::Digest;
-        type Summary = Set<members::summary>;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Summary = St::Summary;
+        type Type = Set<members::r#type>;
+        type Digest = St::Digest;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDigest<St> {}
+    impl<St: State> State for SetDigest<St> {
+        type Summary = St::Summary;
+        type Type = St::Type;
+        type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `summary` field
+        pub struct summary(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `digest` field
         pub struct digest(());
-        ///Marker type for the `summary` field
-        pub struct summary(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ScanResultBuilder<S: BosStr, St: scan_result_state::State> {
+pub struct ScanResultBuilder<St: scan_result_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -1188,15 +1228,22 @@ pub struct ScanResultBuilder<S: BosStr, St: scan_result_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ScanResult<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ScanResultBuilder<S, scan_result_state::Empty> {
+impl ScanResult<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ScanResultBuilder<scan_result_state::Empty, DefaultStr> {
         ScanResultBuilder::new()
     }
 }
 
-impl<S: BosStr> ScanResultBuilder<S, scan_result_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ScanResult<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ScanResultBuilder<scan_result_state::Empty, S> {
+        ScanResultBuilder::builder()
+    }
+}
+
+impl ScanResultBuilder<scan_result_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ScanResultBuilder {
             _state: PhantomData,
@@ -1206,7 +1253,18 @@ impl<S: BosStr> ScanResultBuilder<S, scan_result_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ScanResultBuilder<S, St>
+impl<S: BosStr> ScanResultBuilder<scan_result_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ScanResultBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ScanResultBuilder<St, S>
 where
     St: scan_result_state::State,
     St::Digest: scan_result_state::IsUnset,
@@ -1215,7 +1273,7 @@ where
     pub fn digest(
         mut self,
         value: impl Into<S>,
-    ) -> ScanResultBuilder<S, scan_result_state::SetDigest<St>> {
+    ) -> ScanResultBuilder<scan_result_state::SetDigest<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ScanResultBuilder {
             _state: PhantomData,
@@ -1225,7 +1283,7 @@ where
     }
 }
 
-impl<S: BosStr, St: scan_result_state::State> ScanResultBuilder<S, St> {
+impl<St: scan_result_state::State, S: BosStr> ScanResultBuilder<St, S> {
     /// Set the `error` field (optional)
     pub fn error(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -1238,7 +1296,7 @@ impl<S: BosStr, St: scan_result_state::State> ScanResultBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scan_result_state::State> ScanResultBuilder<S, St> {
+impl<St: scan_result_state::State, S: BosStr> ScanResultBuilder<St, S> {
     /// Set the `sbom` field (optional)
     pub fn sbom(mut self, value: impl Into<Option<Bytes>>) -> Self {
         self._fields.2 = value.into();
@@ -1251,7 +1309,7 @@ impl<S: BosStr, St: scan_result_state::State> ScanResultBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: scan_result_state::State> ScanResultBuilder<S, St> {
+impl<St: scan_result_state::State, S: BosStr> ScanResultBuilder<St, S> {
     /// Set the `scannerVersion` field (optional)
     pub fn scanner_version(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -1264,7 +1322,7 @@ impl<S: BosStr, St: scan_result_state::State> ScanResultBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ScanResultBuilder<S, St>
+impl<St, S: BosStr> ScanResultBuilder<St, S>
 where
     St: scan_result_state::State,
     St::Summary: scan_result_state::IsUnset,
@@ -1273,7 +1331,7 @@ where
     pub fn summary(
         mut self,
         value: impl Into<subscribe_scan_jobs::VulnSummary<S>>,
-    ) -> ScanResultBuilder<S, scan_result_state::SetSummary<St>> {
+    ) -> ScanResultBuilder<scan_result_state::SetSummary<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ScanResultBuilder {
             _state: PhantomData,
@@ -1283,7 +1341,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ScanResultBuilder<S, St>
+impl<St, S: BosStr> ScanResultBuilder<St, S>
 where
     St: scan_result_state::State,
     St::Type: scan_result_state::IsUnset,
@@ -1292,7 +1350,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> ScanResultBuilder<S, scan_result_state::SetType<St>> {
+    ) -> ScanResultBuilder<scan_result_state::SetType<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ScanResultBuilder {
             _state: PhantomData,
@@ -1302,7 +1360,7 @@ where
     }
 }
 
-impl<S: BosStr, St: scan_result_state::State> ScanResultBuilder<S, St> {
+impl<St: scan_result_state::State, S: BosStr> ScanResultBuilder<St, S> {
     /// Set the `vulnReport` field (optional)
     pub fn vuln_report(mut self, value: impl Into<Option<Bytes>>) -> Self {
         self._fields.6 = value.into();
@@ -1315,12 +1373,12 @@ impl<S: BosStr, St: scan_result_state::State> ScanResultBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ScanResultBuilder<S, St>
+impl<St, S: BosStr> ScanResultBuilder<St, S>
 where
     St: scan_result_state::State,
+    St::Summary: scan_result_state::IsSet,
     St::Type: scan_result_state::IsSet,
     St::Digest: scan_result_state::IsSet,
-    St::Summary: scan_result_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ScanResult<S> {
@@ -1336,7 +1394,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ScanResult<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ScanResult<S> {
         ScanResult {
             digest: self._fields.0.unwrap(),
             error: self._fields.1,
@@ -1352,7 +1413,7 @@ where
 
 pub mod vuln_summary_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1360,110 +1421,111 @@ pub mod vuln_summary_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Medium;
         type Total;
         type Critical;
         type High;
+        type Medium;
         type Low;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Medium = Unset;
         type Total = Unset;
         type Critical = Unset;
         type High = Unset;
+        type Medium = Unset;
         type Low = Unset;
-    }
-    ///State transition - sets the `medium` field to Set
-    pub struct SetMedium<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMedium<St> {}
-    impl<St: State> State for SetMedium<St> {
-        type Medium = Set<members::medium>;
-        type Total = St::Total;
-        type Critical = St::Critical;
-        type High = St::High;
-        type Low = St::Low;
     }
     ///State transition - sets the `total` field to Set
     pub struct SetTotal<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTotal<St> {}
     impl<St: State> State for SetTotal<St> {
-        type Medium = St::Medium;
         type Total = Set<members::total>;
         type Critical = St::Critical;
         type High = St::High;
+        type Medium = St::Medium;
         type Low = St::Low;
     }
     ///State transition - sets the `critical` field to Set
     pub struct SetCritical<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCritical<St> {}
     impl<St: State> State for SetCritical<St> {
-        type Medium = St::Medium;
         type Total = St::Total;
         type Critical = Set<members::critical>;
         type High = St::High;
+        type Medium = St::Medium;
         type Low = St::Low;
     }
     ///State transition - sets the `high` field to Set
     pub struct SetHigh<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHigh<St> {}
     impl<St: State> State for SetHigh<St> {
-        type Medium = St::Medium;
         type Total = St::Total;
         type Critical = St::Critical;
         type High = Set<members::high>;
+        type Medium = St::Medium;
+        type Low = St::Low;
+    }
+    ///State transition - sets the `medium` field to Set
+    pub struct SetMedium<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMedium<St> {}
+    impl<St: State> State for SetMedium<St> {
+        type Total = St::Total;
+        type Critical = St::Critical;
+        type High = St::High;
+        type Medium = Set<members::medium>;
         type Low = St::Low;
     }
     ///State transition - sets the `low` field to Set
     pub struct SetLow<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLow<St> {}
     impl<St: State> State for SetLow<St> {
-        type Medium = St::Medium;
         type Total = St::Total;
         type Critical = St::Critical;
         type High = St::High;
+        type Medium = St::Medium;
         type Low = Set<members::low>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `medium` field
-        pub struct medium(());
         ///Marker type for the `total` field
         pub struct total(());
         ///Marker type for the `critical` field
         pub struct critical(());
         ///Marker type for the `high` field
         pub struct high(());
+        ///Marker type for the `medium` field
+        pub struct medium(());
         ///Marker type for the `low` field
         pub struct low(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct VulnSummaryBuilder<S: BosStr, St: vuln_summary_state::State> {
+pub struct VulnSummaryBuilder<St: vuln_summary_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<i64>,
-        Option<i64>,
-        Option<i64>,
-        Option<i64>,
-        Option<i64>,
-    ),
+    _fields: (Option<i64>, Option<i64>, Option<i64>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> VulnSummary<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> VulnSummaryBuilder<S, vuln_summary_state::Empty> {
+impl VulnSummary<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> VulnSummaryBuilder<vuln_summary_state::Empty, DefaultStr> {
         VulnSummaryBuilder::new()
     }
 }
 
-impl<S: BosStr> VulnSummaryBuilder<S, vuln_summary_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> VulnSummary<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> VulnSummaryBuilder<vuln_summary_state::Empty, S> {
+        VulnSummaryBuilder::builder()
+    }
+}
+
+impl VulnSummaryBuilder<vuln_summary_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         VulnSummaryBuilder {
             _state: PhantomData,
@@ -1473,7 +1535,18 @@ impl<S: BosStr> VulnSummaryBuilder<S, vuln_summary_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> VulnSummaryBuilder<S, St>
+impl<S: BosStr> VulnSummaryBuilder<vuln_summary_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        VulnSummaryBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> VulnSummaryBuilder<St, S>
 where
     St: vuln_summary_state::State,
     St::Critical: vuln_summary_state::IsUnset,
@@ -1482,7 +1555,7 @@ where
     pub fn critical(
         mut self,
         value: impl Into<i64>,
-    ) -> VulnSummaryBuilder<S, vuln_summary_state::SetCritical<St>> {
+    ) -> VulnSummaryBuilder<vuln_summary_state::SetCritical<St>, S> {
         self._fields.0 = Option::Some(value.into());
         VulnSummaryBuilder {
             _state: PhantomData,
@@ -1492,7 +1565,7 @@ where
     }
 }
 
-impl<S: BosStr, St> VulnSummaryBuilder<S, St>
+impl<St, S: BosStr> VulnSummaryBuilder<St, S>
 where
     St: vuln_summary_state::State,
     St::High: vuln_summary_state::IsUnset,
@@ -1501,7 +1574,7 @@ where
     pub fn high(
         mut self,
         value: impl Into<i64>,
-    ) -> VulnSummaryBuilder<S, vuln_summary_state::SetHigh<St>> {
+    ) -> VulnSummaryBuilder<vuln_summary_state::SetHigh<St>, S> {
         self._fields.1 = Option::Some(value.into());
         VulnSummaryBuilder {
             _state: PhantomData,
@@ -1511,7 +1584,7 @@ where
     }
 }
 
-impl<S: BosStr, St> VulnSummaryBuilder<S, St>
+impl<St, S: BosStr> VulnSummaryBuilder<St, S>
 where
     St: vuln_summary_state::State,
     St::Low: vuln_summary_state::IsUnset,
@@ -1520,7 +1593,7 @@ where
     pub fn low(
         mut self,
         value: impl Into<i64>,
-    ) -> VulnSummaryBuilder<S, vuln_summary_state::SetLow<St>> {
+    ) -> VulnSummaryBuilder<vuln_summary_state::SetLow<St>, S> {
         self._fields.2 = Option::Some(value.into());
         VulnSummaryBuilder {
             _state: PhantomData,
@@ -1530,7 +1603,7 @@ where
     }
 }
 
-impl<S: BosStr, St> VulnSummaryBuilder<S, St>
+impl<St, S: BosStr> VulnSummaryBuilder<St, S>
 where
     St: vuln_summary_state::State,
     St::Medium: vuln_summary_state::IsUnset,
@@ -1539,7 +1612,7 @@ where
     pub fn medium(
         mut self,
         value: impl Into<i64>,
-    ) -> VulnSummaryBuilder<S, vuln_summary_state::SetMedium<St>> {
+    ) -> VulnSummaryBuilder<vuln_summary_state::SetMedium<St>, S> {
         self._fields.3 = Option::Some(value.into());
         VulnSummaryBuilder {
             _state: PhantomData,
@@ -1549,7 +1622,7 @@ where
     }
 }
 
-impl<S: BosStr, St> VulnSummaryBuilder<S, St>
+impl<St, S: BosStr> VulnSummaryBuilder<St, S>
 where
     St: vuln_summary_state::State,
     St::Total: vuln_summary_state::IsUnset,
@@ -1558,7 +1631,7 @@ where
     pub fn total(
         mut self,
         value: impl Into<i64>,
-    ) -> VulnSummaryBuilder<S, vuln_summary_state::SetTotal<St>> {
+    ) -> VulnSummaryBuilder<vuln_summary_state::SetTotal<St>, S> {
         self._fields.4 = Option::Some(value.into());
         VulnSummaryBuilder {
             _state: PhantomData,
@@ -1568,13 +1641,13 @@ where
     }
 }
 
-impl<S: BosStr, St> VulnSummaryBuilder<S, St>
+impl<St, S: BosStr> VulnSummaryBuilder<St, S>
 where
     St: vuln_summary_state::State,
-    St::Medium: vuln_summary_state::IsSet,
     St::Total: vuln_summary_state::IsSet,
     St::Critical: vuln_summary_state::IsSet,
     St::High: vuln_summary_state::IsSet,
+    St::Medium: vuln_summary_state::IsSet,
     St::Low: vuln_summary_state::IsSet,
 {
     /// Build the final struct.
@@ -1589,7 +1662,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> VulnSummary<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> VulnSummary<S> {
         VulnSummary {
             critical: self._fields.0.unwrap(),
             high: self._fields.1.unwrap(),

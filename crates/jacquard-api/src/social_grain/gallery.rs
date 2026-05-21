@@ -7,12 +7,13 @@
 
 pub mod item;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,13 +27,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::label::Label;
 use crate::com_atproto::label::SelfLabels;
 use crate::social_grain::actor::ProfileView;
 use crate::social_grain::photo::PhotoView;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -64,11 +65,9 @@ pub struct GalleryGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Gallery<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GalleryView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub creator: ProfileView<S>,
@@ -169,7 +168,7 @@ impl<S: BosStr> LexiconSchema for GalleryView<S> {
 
 pub mod gallery_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -177,61 +176,63 @@ pub mod gallery_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type CreatedAt = St::CreatedAt;
+        type Title = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Title = St::Title;
         type CreatedAt = Set<members::created_at>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GalleryBuilder<S: BosStr, St: gallery_state::State> {
+pub struct GalleryBuilder<St: gallery_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<S>,
-        Option<SelfLabels<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<SelfLabels<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Gallery<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GalleryBuilder<S, gallery_state::Empty> {
+impl Gallery<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GalleryBuilder<gallery_state::Empty, DefaultStr> {
         GalleryBuilder::new()
     }
 }
 
-impl<S: BosStr> GalleryBuilder<S, gallery_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Gallery<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GalleryBuilder<gallery_state::Empty, S> {
+        GalleryBuilder::builder()
+    }
+}
+
+impl GalleryBuilder<gallery_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GalleryBuilder {
             _state: PhantomData,
@@ -241,7 +242,18 @@ impl<S: BosStr> GalleryBuilder<S, gallery_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GalleryBuilder<S, St>
+impl<S: BosStr> GalleryBuilder<gallery_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GalleryBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GalleryBuilder<St, S>
 where
     St: gallery_state::State,
     St::CreatedAt: gallery_state::IsUnset,
@@ -250,7 +262,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GalleryBuilder<S, gallery_state::SetCreatedAt<St>> {
+    ) -> GalleryBuilder<gallery_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GalleryBuilder {
             _state: PhantomData,
@@ -260,7 +272,7 @@ where
     }
 }
 
-impl<S: BosStr, St: gallery_state::State> GalleryBuilder<S, St> {
+impl<St: gallery_state::State, S: BosStr> GalleryBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -273,7 +285,7 @@ impl<S: BosStr, St: gallery_state::State> GalleryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: gallery_state::State> GalleryBuilder<S, St> {
+impl<St: gallery_state::State, S: BosStr> GalleryBuilder<St, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -286,13 +298,16 @@ impl<S: BosStr, St: gallery_state::State> GalleryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GalleryBuilder<S, St>
+impl<St, S: BosStr> GalleryBuilder<St, S>
 where
     St: gallery_state::State,
     St::Title: gallery_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> GalleryBuilder<S, gallery_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> GalleryBuilder<gallery_state::SetTitle<St>, S> {
         self._fields.3 = Option::Some(value.into());
         GalleryBuilder {
             _state: PhantomData,
@@ -302,11 +317,11 @@ where
     }
 }
 
-impl<S: BosStr, St> GalleryBuilder<S, St>
+impl<St, S: BosStr> GalleryBuilder<St, S>
 where
     St: gallery_state::State,
-    St::Title: gallery_state::IsSet,
     St::CreatedAt: gallery_state::IsSet,
+    St::Title: gallery_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Gallery<S> {
@@ -331,10 +346,10 @@ where
 }
 
 fn lexicon_doc_social_grain_gallery() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.grain.gallery"),
@@ -404,7 +419,7 @@ fn lexicon_doc_social_grain_gallery() -> LexiconDoc<'static> {
 
 pub mod gallery_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -412,90 +427,90 @@ pub mod gallery_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Creator;
-        type IndexedAt;
         type Uri;
         type Cid;
+        type IndexedAt;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Creator = Unset;
-        type IndexedAt = Unset;
         type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
-        type Record = Set<members::record>;
-        type Creator = St::Creator;
-        type IndexedAt = St::IndexedAt;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
+        type IndexedAt = Unset;
+        type Record = Unset;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreator<St> {}
     impl<St: State> State for SetCreator<St> {
-        type Record = St::Record;
         type Creator = Set<members::creator>;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
         type IndexedAt = St::IndexedAt;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
         type Record = St::Record;
-        type Creator = St::Creator;
-        type IndexedAt = Set<members::indexed_at>;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Record = St::Record;
         type Creator = St::Creator;
-        type IndexedAt = St::IndexedAt;
         type Uri = Set<members::uri>;
         type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
+        type Record = St::Record;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Record = St::Record;
         type Creator = St::Creator;
-        type IndexedAt = St::IndexedAt;
         type Uri = St::Uri;
         type Cid = Set<members::cid>;
+        type IndexedAt = St::IndexedAt;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Creator = St::Creator;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type IndexedAt = Set<members::indexed_at>;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Creator = St::Creator;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `creator` field
         pub struct creator(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GalleryViewBuilder<S: BosStr, St: gallery_view_state::State> {
+pub struct GalleryViewBuilder<St: gallery_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
@@ -509,15 +524,22 @@ pub struct GalleryViewBuilder<S: BosStr, St: gallery_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GalleryView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GalleryViewBuilder<S, gallery_view_state::Empty> {
+impl GalleryView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GalleryViewBuilder<gallery_view_state::Empty, DefaultStr> {
         GalleryViewBuilder::new()
     }
 }
 
-impl<S: BosStr> GalleryViewBuilder<S, gallery_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GalleryView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GalleryViewBuilder<gallery_view_state::Empty, S> {
+        GalleryViewBuilder::builder()
+    }
+}
+
+impl GalleryViewBuilder<gallery_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GalleryViewBuilder {
             _state: PhantomData,
@@ -527,7 +549,18 @@ impl<S: BosStr> GalleryViewBuilder<S, gallery_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GalleryViewBuilder<S, St>
+impl<S: BosStr> GalleryViewBuilder<gallery_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GalleryViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GalleryViewBuilder<St, S>
 where
     St: gallery_view_state::State,
     St::Cid: gallery_view_state::IsUnset,
@@ -536,7 +569,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> GalleryViewBuilder<S, gallery_view_state::SetCid<St>> {
+    ) -> GalleryViewBuilder<gallery_view_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GalleryViewBuilder {
             _state: PhantomData,
@@ -546,7 +579,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GalleryViewBuilder<S, St>
+impl<St, S: BosStr> GalleryViewBuilder<St, S>
 where
     St: gallery_view_state::State,
     St::Creator: gallery_view_state::IsUnset,
@@ -555,7 +588,7 @@ where
     pub fn creator(
         mut self,
         value: impl Into<ProfileView<S>>,
-    ) -> GalleryViewBuilder<S, gallery_view_state::SetCreator<St>> {
+    ) -> GalleryViewBuilder<gallery_view_state::SetCreator<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GalleryViewBuilder {
             _state: PhantomData,
@@ -565,7 +598,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GalleryViewBuilder<S, St>
+impl<St, S: BosStr> GalleryViewBuilder<St, S>
 where
     St: gallery_view_state::State,
     St::IndexedAt: gallery_view_state::IsUnset,
@@ -574,7 +607,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GalleryViewBuilder<S, gallery_view_state::SetIndexedAt<St>> {
+    ) -> GalleryViewBuilder<gallery_view_state::SetIndexedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GalleryViewBuilder {
             _state: PhantomData,
@@ -584,7 +617,7 @@ where
     }
 }
 
-impl<S: BosStr, St: gallery_view_state::State> GalleryViewBuilder<S, St> {
+impl<St: gallery_view_state::State, S: BosStr> GalleryViewBuilder<St, S> {
     /// Set the `items` field (optional)
     pub fn items(mut self, value: impl Into<Option<Vec<PhotoView<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -597,7 +630,7 @@ impl<S: BosStr, St: gallery_view_state::State> GalleryViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: gallery_view_state::State> GalleryViewBuilder<S, St> {
+impl<St: gallery_view_state::State, S: BosStr> GalleryViewBuilder<St, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -610,7 +643,7 @@ impl<S: BosStr, St: gallery_view_state::State> GalleryViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GalleryViewBuilder<S, St>
+impl<St, S: BosStr> GalleryViewBuilder<St, S>
 where
     St: gallery_view_state::State,
     St::Record: gallery_view_state::IsUnset,
@@ -619,7 +652,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> GalleryViewBuilder<S, gallery_view_state::SetRecord<St>> {
+    ) -> GalleryViewBuilder<gallery_view_state::SetRecord<St>, S> {
         self._fields.5 = Option::Some(value.into());
         GalleryViewBuilder {
             _state: PhantomData,
@@ -629,7 +662,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GalleryViewBuilder<S, St>
+impl<St, S: BosStr> GalleryViewBuilder<St, S>
 where
     St: gallery_view_state::State,
     St::Uri: gallery_view_state::IsUnset,
@@ -638,7 +671,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GalleryViewBuilder<S, gallery_view_state::SetUri<St>> {
+    ) -> GalleryViewBuilder<gallery_view_state::SetUri<St>, S> {
         self._fields.6 = Option::Some(value.into());
         GalleryViewBuilder {
             _state: PhantomData,
@@ -648,14 +681,14 @@ where
     }
 }
 
-impl<S: BosStr, St> GalleryViewBuilder<S, St>
+impl<St, S: BosStr> GalleryViewBuilder<St, S>
 where
     St: gallery_view_state::State,
-    St::Record: gallery_view_state::IsSet,
     St::Creator: gallery_view_state::IsSet,
-    St::IndexedAt: gallery_view_state::IsSet,
     St::Uri: gallery_view_state::IsSet,
     St::Cid: gallery_view_state::IsSet,
+    St::IndexedAt: gallery_view_state::IsSet,
+    St::Record: gallery_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GalleryView<S> {
@@ -671,7 +704,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GalleryView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GalleryView<S> {
         GalleryView {
             cid: self._fields.0.unwrap(),
             creator: self._fields.1.unwrap(),
@@ -686,10 +722,10 @@ where
 }
 
 fn lexicon_doc_social_grain_gallery_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.grain.gallery.defs"),
@@ -698,13 +734,14 @@ fn lexicon_doc_social_grain_gallery_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("galleryView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("creator"),
-                        SmolStr::new_static("record"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("creator"),
+                            SmolStr::new_static("record"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -718,7 +755,9 @@ fn lexicon_doc_social_grain_gallery_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("creator"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("social.grain.actor.defs#profileView"),
+                                r#ref: CowStr::new_static(
+                                    "social.grain.actor.defs#profileView",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -733,9 +772,9 @@ fn lexicon_doc_social_grain_gallery_defs() -> LexiconDoc<'static> {
                             SmolStr::new_static("items"),
                             LexObjectProperty::Array(LexArray {
                                 items: LexArrayItem::Union(LexRefUnion {
-                                    refs: vec![CowStr::new_static(
-                                        "social.grain.photo.defs#photoView",
-                                    )],
+                                    refs: vec![
+                                        CowStr::new_static("social.grain.photo.defs#photoView")
+                                    ],
                                     ..Default::default()
                                 }),
                                 ..Default::default()

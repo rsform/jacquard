@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,13 +24,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct WebEmbed<S: BosStr = DefaultStr> {
     ///Horizontal alignment
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -122,16 +119,19 @@ impl<S: BosStr> LexiconSchema for WebEmbed<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("preview"),
@@ -171,7 +171,7 @@ impl<S: BosStr> LexiconSchema for WebEmbed<S> {
 
 pub mod web_embed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -202,7 +202,7 @@ pub mod web_embed_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WebEmbedBuilder<S: BosStr, St: web_embed_state::State> {
+pub struct WebEmbedBuilder<St: web_embed_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -219,15 +219,22 @@ pub struct WebEmbedBuilder<S: BosStr, St: web_embed_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> WebEmbed<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> WebEmbedBuilder<S, web_embed_state::Empty> {
+impl WebEmbed<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> WebEmbedBuilder<web_embed_state::Empty, DefaultStr> {
         WebEmbedBuilder::new()
     }
 }
 
-impl<S: BosStr> WebEmbedBuilder<S, web_embed_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> WebEmbed<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> WebEmbedBuilder<web_embed_state::Empty, S> {
+        WebEmbedBuilder::builder()
+    }
+}
+
+impl WebEmbedBuilder<web_embed_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         WebEmbedBuilder {
             _state: PhantomData,
@@ -237,7 +244,18 @@ impl<S: BosStr> WebEmbedBuilder<S, web_embed_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
+impl<S: BosStr> WebEmbedBuilder<web_embed_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        WebEmbedBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: web_embed_state::State, S: BosStr> WebEmbedBuilder<St, S> {
     /// Set the `alignment` field (optional)
     pub fn alignment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -250,7 +268,7 @@ impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
+impl<St: web_embed_state::State, S: BosStr> WebEmbedBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -263,7 +281,7 @@ impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
+impl<St: web_embed_state::State, S: BosStr> WebEmbedBuilder<St, S> {
     /// Set the `embedHeight` field (optional)
     pub fn embed_height(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -276,7 +294,7 @@ impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
+impl<St: web_embed_state::State, S: BosStr> WebEmbedBuilder<St, S> {
     /// Set the `embedUrl` field (optional)
     pub fn embed_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -289,7 +307,7 @@ impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
+impl<St: web_embed_state::State, S: BosStr> WebEmbedBuilder<St, S> {
     /// Set the `embedWidth` field (optional)
     pub fn embed_width(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -302,7 +320,7 @@ impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WebEmbedBuilder<S, St>
+impl<St, S: BosStr> WebEmbedBuilder<St, S>
 where
     St: web_embed_state::State,
     St::Href: web_embed_state::IsUnset,
@@ -311,7 +329,7 @@ where
     pub fn href(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> WebEmbedBuilder<S, web_embed_state::SetHref<St>> {
+    ) -> WebEmbedBuilder<web_embed_state::SetHref<St>, S> {
         self._fields.5 = Option::Some(value.into());
         WebEmbedBuilder {
             _state: PhantomData,
@@ -321,7 +339,7 @@ where
     }
 }
 
-impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
+impl<St: web_embed_state::State, S: BosStr> WebEmbedBuilder<St, S> {
     /// Set the `preview` field (optional)
     pub fn preview(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -334,7 +352,7 @@ impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
+impl<St: web_embed_state::State, S: BosStr> WebEmbedBuilder<St, S> {
     /// Set the `siteName` field (optional)
     pub fn site_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -347,7 +365,7 @@ impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
+impl<St: web_embed_state::State, S: BosStr> WebEmbedBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -360,7 +378,7 @@ impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
+impl<St: web_embed_state::State, S: BosStr> WebEmbedBuilder<St, S> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -373,7 +391,7 @@ impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WebEmbedBuilder<S, St>
+impl<St, S: BosStr> WebEmbedBuilder<St, S>
 where
     St: web_embed_state::State,
     St::Href: web_embed_state::IsSet,
@@ -413,10 +431,10 @@ where
 }
 
 fn lexicon_doc_app_offprint_block_webEmbed() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.offprint.block.webEmbed"),
@@ -432,14 +450,18 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alignment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Horizontal alignment")),
+                                description: Some(
+                                    CowStr::new_static("Horizontal alignment"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Page description/excerpt")),
+                                description: Some(
+                                    CowStr::new_static("Page description/excerpt"),
+                                ),
                                 max_graphemes: Some(1000usize),
                                 ..Default::default()
                             }),
@@ -454,9 +476,9 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("embedUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "oEmbed URL for iframe embedding",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("oEmbed URL for iframe embedding"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -471,23 +493,23 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("href"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URL of the embedded page",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The URL of the embedded page"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("preview"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("siteName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Name of the website")),
+                                description: Some(
+                                    CowStr::new_static("Name of the website"),
+                                ),
                                 max_graphemes: Some(100usize),
                                 ..Default::default()
                             }),
@@ -503,9 +525,11 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("width"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "CSS width value (e.g., \"100%\", \"75%\". \"50%\" minimum)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "CSS width value (e.g., \"100%\", \"75%\". \"50%\" minimum)",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );

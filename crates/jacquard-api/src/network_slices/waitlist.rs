@@ -8,6 +8,7 @@
 pub mod invite;
 pub mod request;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -18,23 +19,20 @@ use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::actor::ProfileViewBasic;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor::ProfileViewBasic;
 /// An invite granting a DID access with profile information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct InviteView<S: BosStr = DefaultStr> {
     ///When this invitation was created
     pub created_at: Datetime,
@@ -58,10 +56,7 @@ pub struct InviteView<S: BosStr = DefaultStr> {
 /// A request to join the waitlist with profile information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RequestView<S: BosStr = DefaultStr> {
     ///When the user joined the waitlist
     pub created_at: Datetime,
@@ -106,7 +101,7 @@ impl<S: BosStr> LexiconSchema for RequestView<S> {
 
 pub mod invite_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -163,7 +158,7 @@ pub mod invite_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct InviteViewBuilder<S: BosStr, St: invite_view_state::State> {
+pub struct InviteViewBuilder<St: invite_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -176,15 +171,22 @@ pub struct InviteViewBuilder<S: BosStr, St: invite_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> InviteView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> InviteViewBuilder<S, invite_view_state::Empty> {
+impl InviteView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> InviteViewBuilder<invite_view_state::Empty, DefaultStr> {
         InviteViewBuilder::new()
     }
 }
 
-impl<S: BosStr> InviteViewBuilder<S, invite_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> InviteView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> InviteViewBuilder<invite_view_state::Empty, S> {
+        InviteViewBuilder::builder()
+    }
+}
+
+impl InviteViewBuilder<invite_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         InviteViewBuilder {
             _state: PhantomData,
@@ -194,7 +196,18 @@ impl<S: BosStr> InviteViewBuilder<S, invite_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> InviteViewBuilder<S, St>
+impl<S: BosStr> InviteViewBuilder<invite_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        InviteViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> InviteViewBuilder<St, S>
 where
     St: invite_view_state::State,
     St::CreatedAt: invite_view_state::IsUnset,
@@ -203,7 +216,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> InviteViewBuilder<S, invite_view_state::SetCreatedAt<St>> {
+    ) -> InviteViewBuilder<invite_view_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         InviteViewBuilder {
             _state: PhantomData,
@@ -213,7 +226,7 @@ where
     }
 }
 
-impl<S: BosStr, St> InviteViewBuilder<S, St>
+impl<St, S: BosStr> InviteViewBuilder<St, S>
 where
     St: invite_view_state::State,
     St::Did: invite_view_state::IsUnset,
@@ -222,7 +235,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> InviteViewBuilder<S, invite_view_state::SetDid<St>> {
+    ) -> InviteViewBuilder<invite_view_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         InviteViewBuilder {
             _state: PhantomData,
@@ -232,7 +245,7 @@ where
     }
 }
 
-impl<S: BosStr, St: invite_view_state::State> InviteViewBuilder<S, St> {
+impl<St: invite_view_state::State, S: BosStr> InviteViewBuilder<St, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -245,7 +258,7 @@ impl<S: BosStr, St: invite_view_state::State> InviteViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: invite_view_state::State> InviteViewBuilder<S, St> {
+impl<St: invite_view_state::State, S: BosStr> InviteViewBuilder<St, S> {
     /// Set the `profile` field (optional)
     pub fn profile(mut self, value: impl Into<Option<ProfileViewBasic<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -258,7 +271,7 @@ impl<S: BosStr, St: invite_view_state::State> InviteViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> InviteViewBuilder<S, St>
+impl<St, S: BosStr> InviteViewBuilder<St, S>
 where
     St: invite_view_state::State,
     St::Slice: invite_view_state::IsUnset,
@@ -267,7 +280,7 @@ where
     pub fn slice(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> InviteViewBuilder<S, invite_view_state::SetSlice<St>> {
+    ) -> InviteViewBuilder<invite_view_state::SetSlice<St>, S> {
         self._fields.4 = Option::Some(value.into());
         InviteViewBuilder {
             _state: PhantomData,
@@ -277,7 +290,7 @@ where
     }
 }
 
-impl<S: BosStr, St: invite_view_state::State> InviteViewBuilder<S, St> {
+impl<St: invite_view_state::State, S: BosStr> InviteViewBuilder<St, S> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -290,7 +303,7 @@ impl<S: BosStr, St: invite_view_state::State> InviteViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> InviteViewBuilder<S, St>
+impl<St, S: BosStr> InviteViewBuilder<St, S>
 where
     St: invite_view_state::State,
     St::Slice: invite_view_state::IsSet,
@@ -310,7 +323,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> InviteView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> InviteView<S> {
         InviteView {
             created_at: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -324,10 +340,10 @@ where
 }
 
 fn lexicon_doc_network_slices_waitlist_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.waitlist.defs"),
@@ -336,23 +352,26 @@ fn lexicon_doc_network_slices_waitlist_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("inviteView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "An invite granting a DID access with profile information",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("slice"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "An invite granting a DID access with profile information",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("did"), SmolStr::new_static("slice"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When this invitation was created",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When this invitation was created"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -360,7 +379,9 @@ fn lexicon_doc_network_slices_waitlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The DID being invited")),
+                                description: Some(
+                                    CowStr::new_static("The DID being invited"),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -368,9 +389,11 @@ fn lexicon_doc_network_slices_waitlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("expiresAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Optional expiration date for this invitation",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Optional expiration date for this invitation",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -378,16 +401,20 @@ fn lexicon_doc_network_slices_waitlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("profile"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("slice"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The AT URI of the slice this invite is for",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The AT URI of the slice this invite is for",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -395,9 +422,9 @@ fn lexicon_doc_network_slices_waitlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The AT URI of this invite record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The AT URI of this invite record"),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -410,22 +437,26 @@ fn lexicon_doc_network_slices_waitlist_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("requestView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A request to join the waitlist with profile information",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("slice"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A request to join the waitlist with profile information",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("slice"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the user joined the waitlist",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When the user joined the waitlist"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -433,16 +464,20 @@ fn lexicon_doc_network_slices_waitlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("profile"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("slice"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The AT URI of the slice being requested access to",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The AT URI of the slice being requested access to",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -460,7 +495,7 @@ fn lexicon_doc_network_slices_waitlist_defs() -> LexiconDoc<'static> {
 
 pub mod request_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -503,25 +538,28 @@ pub mod request_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RequestViewBuilder<S: BosStr, St: request_view_state::State> {
+pub struct RequestViewBuilder<St: request_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<ProfileViewBasic<S>>,
-        Option<AtUri<S>>,
-    ),
+    _fields: (Option<Datetime>, Option<ProfileViewBasic<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RequestView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RequestViewBuilder<S, request_view_state::Empty> {
+impl RequestView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RequestViewBuilder<request_view_state::Empty, DefaultStr> {
         RequestViewBuilder::new()
     }
 }
 
-impl<S: BosStr> RequestViewBuilder<S, request_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RequestView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RequestViewBuilder<request_view_state::Empty, S> {
+        RequestViewBuilder::builder()
+    }
+}
+
+impl RequestViewBuilder<request_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RequestViewBuilder {
             _state: PhantomData,
@@ -531,7 +569,18 @@ impl<S: BosStr> RequestViewBuilder<S, request_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RequestViewBuilder<S, St>
+impl<S: BosStr> RequestViewBuilder<request_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RequestViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RequestViewBuilder<St, S>
 where
     St: request_view_state::State,
     St::CreatedAt: request_view_state::IsUnset,
@@ -540,7 +589,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RequestViewBuilder<S, request_view_state::SetCreatedAt<St>> {
+    ) -> RequestViewBuilder<request_view_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RequestViewBuilder {
             _state: PhantomData,
@@ -550,7 +599,7 @@ where
     }
 }
 
-impl<S: BosStr, St: request_view_state::State> RequestViewBuilder<S, St> {
+impl<St: request_view_state::State, S: BosStr> RequestViewBuilder<St, S> {
     /// Set the `profile` field (optional)
     pub fn profile(mut self, value: impl Into<Option<ProfileViewBasic<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -563,7 +612,7 @@ impl<S: BosStr, St: request_view_state::State> RequestViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RequestViewBuilder<S, St>
+impl<St, S: BosStr> RequestViewBuilder<St, S>
 where
     St: request_view_state::State,
     St::Slice: request_view_state::IsUnset,
@@ -572,7 +621,7 @@ where
     pub fn slice(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RequestViewBuilder<S, request_view_state::SetSlice<St>> {
+    ) -> RequestViewBuilder<request_view_state::SetSlice<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RequestViewBuilder {
             _state: PhantomData,
@@ -582,7 +631,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RequestViewBuilder<S, St>
+impl<St, S: BosStr> RequestViewBuilder<St, S>
 where
     St: request_view_state::State,
     St::CreatedAt: request_view_state::IsSet,
@@ -598,7 +647,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RequestView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RequestView<S> {
         RequestView {
             created_at: self._fields.0.unwrap(),
             profile: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_chronosky::plan::get_assignment;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_chronosky::plan::get_assignment;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAssignmentOutput<S: BosStr = DefaultStr> {
     ///Active plan assignment (null if no active plan)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -45,10 +42,7 @@ pub struct GetAssignmentOutput<S: BosStr = DefaultStr> {
 /// Plan assignment details.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlanAssignment<S: BosStr = DefaultStr> {
     ///Plan activation timestamp
     pub activated_at: Datetime,
@@ -71,10 +65,7 @@ pub struct PlanAssignment<S: BosStr = DefaultStr> {
 /// Plan information.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlanInfo<S: BosStr = DefaultStr> {
     ///Plan description
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -108,10 +99,7 @@ pub struct PlanInfo<S: BosStr = DefaultStr> {
 /// Ticket information.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TicketInfo<S: BosStr = DefaultStr> {
     ///Ticket code
     pub code: S,
@@ -283,7 +271,7 @@ impl<S: BosStr> LexiconSchema for TicketInfo<S> {
 
 pub mod plan_assignment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -291,110 +279,113 @@ pub mod plan_assignment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ActivatedAt;
-        type Id;
-        type Status;
-        type Plan;
-        type ExpiresAt;
         type PlanId;
+        type Plan;
+        type Status;
+        type ActivatedAt;
+        type ExpiresAt;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ActivatedAt = Unset;
-        type Id = Unset;
-        type Status = Unset;
-        type Plan = Unset;
-        type ExpiresAt = Unset;
         type PlanId = Unset;
-    }
-    ///State transition - sets the `activated_at` field to Set
-    pub struct SetActivatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetActivatedAt<St> {}
-    impl<St: State> State for SetActivatedAt<St> {
-        type ActivatedAt = Set<members::activated_at>;
-        type Id = St::Id;
-        type Status = St::Status;
-        type Plan = St::Plan;
-        type ExpiresAt = St::ExpiresAt;
-        type PlanId = St::PlanId;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type ActivatedAt = St::ActivatedAt;
-        type Id = Set<members::id>;
-        type Status = St::Status;
-        type Plan = St::Plan;
-        type ExpiresAt = St::ExpiresAt;
-        type PlanId = St::PlanId;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type ActivatedAt = St::ActivatedAt;
-        type Id = St::Id;
-        type Status = Set<members::status>;
-        type Plan = St::Plan;
-        type ExpiresAt = St::ExpiresAt;
-        type PlanId = St::PlanId;
-    }
-    ///State transition - sets the `plan` field to Set
-    pub struct SetPlan<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlan<St> {}
-    impl<St: State> State for SetPlan<St> {
-        type ActivatedAt = St::ActivatedAt;
-        type Id = St::Id;
-        type Status = St::Status;
-        type Plan = Set<members::plan>;
-        type ExpiresAt = St::ExpiresAt;
-        type PlanId = St::PlanId;
-    }
-    ///State transition - sets the `expires_at` field to Set
-    pub struct SetExpiresAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetExpiresAt<St> {}
-    impl<St: State> State for SetExpiresAt<St> {
-        type ActivatedAt = St::ActivatedAt;
-        type Id = St::Id;
-        type Status = St::Status;
-        type Plan = St::Plan;
-        type ExpiresAt = Set<members::expires_at>;
-        type PlanId = St::PlanId;
+        type Plan = Unset;
+        type Status = Unset;
+        type ActivatedAt = Unset;
+        type ExpiresAt = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `plan_id` field to Set
     pub struct SetPlanId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPlanId<St> {}
     impl<St: State> State for SetPlanId<St> {
-        type ActivatedAt = St::ActivatedAt;
-        type Id = St::Id;
-        type Status = St::Status;
-        type Plan = St::Plan;
-        type ExpiresAt = St::ExpiresAt;
         type PlanId = Set<members::plan_id>;
+        type Plan = St::Plan;
+        type Status = St::Status;
+        type ActivatedAt = St::ActivatedAt;
+        type ExpiresAt = St::ExpiresAt;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `plan` field to Set
+    pub struct SetPlan<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlan<St> {}
+    impl<St: State> State for SetPlan<St> {
+        type PlanId = St::PlanId;
+        type Plan = Set<members::plan>;
+        type Status = St::Status;
+        type ActivatedAt = St::ActivatedAt;
+        type ExpiresAt = St::ExpiresAt;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type PlanId = St::PlanId;
+        type Plan = St::Plan;
+        type Status = Set<members::status>;
+        type ActivatedAt = St::ActivatedAt;
+        type ExpiresAt = St::ExpiresAt;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `activated_at` field to Set
+    pub struct SetActivatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActivatedAt<St> {}
+    impl<St: State> State for SetActivatedAt<St> {
+        type PlanId = St::PlanId;
+        type Plan = St::Plan;
+        type Status = St::Status;
+        type ActivatedAt = Set<members::activated_at>;
+        type ExpiresAt = St::ExpiresAt;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `expires_at` field to Set
+    pub struct SetExpiresAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetExpiresAt<St> {}
+    impl<St: State> State for SetExpiresAt<St> {
+        type PlanId = St::PlanId;
+        type Plan = St::Plan;
+        type Status = St::Status;
+        type ActivatedAt = St::ActivatedAt;
+        type ExpiresAt = Set<members::expires_at>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type PlanId = St::PlanId;
+        type Plan = St::Plan;
+        type Status = St::Status;
+        type ActivatedAt = St::ActivatedAt;
+        type ExpiresAt = St::ExpiresAt;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `activated_at` field
-        pub struct activated_at(());
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `plan` field
-        pub struct plan(());
-        ///Marker type for the `expires_at` field
-        pub struct expires_at(());
         ///Marker type for the `plan_id` field
         pub struct plan_id(());
+        ///Marker type for the `plan` field
+        pub struct plan(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `activated_at` field
+        pub struct activated_at(());
+        ///Marker type for the `expires_at` field
+        pub struct expires_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PlanAssignmentBuilder<S: BosStr, St: plan_assignment_state::State> {
+pub struct PlanAssignmentBuilder<
+    St: plan_assignment_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -408,15 +399,22 @@ pub struct PlanAssignmentBuilder<S: BosStr, St: plan_assignment_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PlanAssignment<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PlanAssignmentBuilder<S, plan_assignment_state::Empty> {
+impl PlanAssignment<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PlanAssignmentBuilder<plan_assignment_state::Empty, DefaultStr> {
         PlanAssignmentBuilder::new()
     }
 }
 
-impl<S: BosStr> PlanAssignmentBuilder<S, plan_assignment_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PlanAssignment<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PlanAssignmentBuilder<plan_assignment_state::Empty, S> {
+        PlanAssignmentBuilder::builder()
+    }
+}
+
+impl PlanAssignmentBuilder<plan_assignment_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PlanAssignmentBuilder {
             _state: PhantomData,
@@ -426,7 +424,18 @@ impl<S: BosStr> PlanAssignmentBuilder<S, plan_assignment_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PlanAssignmentBuilder<S, St>
+impl<S: BosStr> PlanAssignmentBuilder<plan_assignment_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PlanAssignmentBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PlanAssignmentBuilder<St, S>
 where
     St: plan_assignment_state::State,
     St::ActivatedAt: plan_assignment_state::IsUnset,
@@ -435,7 +444,7 @@ where
     pub fn activated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PlanAssignmentBuilder<S, plan_assignment_state::SetActivatedAt<St>> {
+    ) -> PlanAssignmentBuilder<plan_assignment_state::SetActivatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PlanAssignmentBuilder {
             _state: PhantomData,
@@ -445,7 +454,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PlanAssignmentBuilder<S, St>
+impl<St, S: BosStr> PlanAssignmentBuilder<St, S>
 where
     St: plan_assignment_state::State,
     St::ExpiresAt: plan_assignment_state::IsUnset,
@@ -454,7 +463,7 @@ where
     pub fn expires_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PlanAssignmentBuilder<S, plan_assignment_state::SetExpiresAt<St>> {
+    ) -> PlanAssignmentBuilder<plan_assignment_state::SetExpiresAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PlanAssignmentBuilder {
             _state: PhantomData,
@@ -464,7 +473,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PlanAssignmentBuilder<S, St>
+impl<St, S: BosStr> PlanAssignmentBuilder<St, S>
 where
     St: plan_assignment_state::State,
     St::Id: plan_assignment_state::IsUnset,
@@ -473,7 +482,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> PlanAssignmentBuilder<S, plan_assignment_state::SetId<St>> {
+    ) -> PlanAssignmentBuilder<plan_assignment_state::SetId<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PlanAssignmentBuilder {
             _state: PhantomData,
@@ -483,7 +492,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PlanAssignmentBuilder<S, St>
+impl<St, S: BosStr> PlanAssignmentBuilder<St, S>
 where
     St: plan_assignment_state::State,
     St::Plan: plan_assignment_state::IsUnset,
@@ -492,7 +501,7 @@ where
     pub fn plan(
         mut self,
         value: impl Into<get_assignment::PlanInfo<S>>,
-    ) -> PlanAssignmentBuilder<S, plan_assignment_state::SetPlan<St>> {
+    ) -> PlanAssignmentBuilder<plan_assignment_state::SetPlan<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PlanAssignmentBuilder {
             _state: PhantomData,
@@ -502,7 +511,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PlanAssignmentBuilder<S, St>
+impl<St, S: BosStr> PlanAssignmentBuilder<St, S>
 where
     St: plan_assignment_state::State,
     St::PlanId: plan_assignment_state::IsUnset,
@@ -511,7 +520,7 @@ where
     pub fn plan_id(
         mut self,
         value: impl Into<S>,
-    ) -> PlanAssignmentBuilder<S, plan_assignment_state::SetPlanId<St>> {
+    ) -> PlanAssignmentBuilder<plan_assignment_state::SetPlanId<St>, S> {
         self._fields.4 = Option::Some(value.into());
         PlanAssignmentBuilder {
             _state: PhantomData,
@@ -521,7 +530,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PlanAssignmentBuilder<S, St>
+impl<St, S: BosStr> PlanAssignmentBuilder<St, S>
 where
     St: plan_assignment_state::State,
     St::Status: plan_assignment_state::IsUnset,
@@ -530,7 +539,7 @@ where
     pub fn status(
         mut self,
         value: impl Into<S>,
-    ) -> PlanAssignmentBuilder<S, plan_assignment_state::SetStatus<St>> {
+    ) -> PlanAssignmentBuilder<plan_assignment_state::SetStatus<St>, S> {
         self._fields.5 = Option::Some(value.into());
         PlanAssignmentBuilder {
             _state: PhantomData,
@@ -540,9 +549,12 @@ where
     }
 }
 
-impl<S: BosStr, St: plan_assignment_state::State> PlanAssignmentBuilder<S, St> {
+impl<St: plan_assignment_state::State, S: BosStr> PlanAssignmentBuilder<St, S> {
     /// Set the `ticket` field (optional)
-    pub fn ticket(mut self, value: impl Into<Option<get_assignment::TicketInfo<S>>>) -> Self {
+    pub fn ticket(
+        mut self,
+        value: impl Into<Option<get_assignment::TicketInfo<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
@@ -553,15 +565,15 @@ impl<S: BosStr, St: plan_assignment_state::State> PlanAssignmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PlanAssignmentBuilder<S, St>
+impl<St, S: BosStr> PlanAssignmentBuilder<St, S>
 where
     St: plan_assignment_state::State,
-    St::ActivatedAt: plan_assignment_state::IsSet,
-    St::Id: plan_assignment_state::IsSet,
-    St::Status: plan_assignment_state::IsSet,
-    St::Plan: plan_assignment_state::IsSet,
-    St::ExpiresAt: plan_assignment_state::IsSet,
     St::PlanId: plan_assignment_state::IsSet,
+    St::Plan: plan_assignment_state::IsSet,
+    St::Status: plan_assignment_state::IsSet,
+    St::ActivatedAt: plan_assignment_state::IsSet,
+    St::ExpiresAt: plan_assignment_state::IsSet,
+    St::Id: plan_assignment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PlanAssignment<S> {
@@ -577,7 +589,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PlanAssignment<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PlanAssignment<S> {
         PlanAssignment {
             activated_at: self._fields.0.unwrap(),
             expires_at: self._fields.1.unwrap(),
@@ -592,10 +607,10 @@ where
 }
 
 fn lexicon_doc_app_chronosky_plan_getAssignment() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chronosky.plan.getAssignment"),
@@ -612,21 +627,24 @@ fn lexicon_doc_app_chronosky_plan_getAssignment() -> LexiconDoc<'static> {
                 SmolStr::new_static("planAssignment"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Plan assignment details.")),
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("planId"),
-                        SmolStr::new_static("plan"),
-                        SmolStr::new_static("activatedAt"),
-                        SmolStr::new_static("expiresAt"),
-                        SmolStr::new_static("status"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("planId"),
+                            SmolStr::new_static("plan"),
+                            SmolStr::new_static("activatedAt"),
+                            SmolStr::new_static("expiresAt"),
+                            SmolStr::new_static("status")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("activatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Plan activation timestamp")),
+                                description: Some(
+                                    CowStr::new_static("Plan activation timestamp"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -635,7 +653,9 @@ fn lexicon_doc_app_chronosky_plan_getAssignment() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("expiresAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Plan expiration timestamp")),
+                                description: Some(
+                                    CowStr::new_static("Plan expiration timestamp"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -667,7 +687,9 @@ fn lexicon_doc_app_chronosky_plan_getAssignment() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("status"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Plan assignment status")),
+                                description: Some(
+                                    CowStr::new_static("Plan assignment status"),
+                                ),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -688,7 +710,9 @@ fn lexicon_doc_app_chronosky_plan_getAssignment() -> LexiconDoc<'static> {
                 SmolStr::new_static("planInfo"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Plan information.")),
-                    required: Some(vec![SmolStr::new_static("id"), SmolStr::new_static("name")]),
+                    required: Some(
+                        vec![SmolStr::new_static("id"), SmolStr::new_static("name")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -761,7 +785,9 @@ fn lexicon_doc_app_chronosky_plan_getAssignment() -> LexiconDoc<'static> {
                 SmolStr::new_static("ticketInfo"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Ticket information.")),
-                    required: Some(vec![SmolStr::new_static("id"), SmolStr::new_static("code")]),
+                    required: Some(
+                        vec![SmolStr::new_static("id"), SmolStr::new_static("code")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateAccountSigningKey<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     ///Did-key formatted public key
@@ -41,8 +38,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateAccountSigningKeyResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateAccountSigningKey<S> {
     const NSID: &'static str = "com.atproto.admin.updateAccountSigningKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateAccountSigningKeyResponse;
 }
 
@@ -50,15 +48,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateAccountSigningKey<S
 pub struct UpdateAccountSigningKeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountSigningKeyRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountSigningKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateAccountSigningKey<S>;
     type Response = UpdateAccountSigningKeyResponse;
 }
 
 pub mod update_account_signing_key_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -66,56 +65,75 @@ pub mod update_account_signing_key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SigningKey;
         type Did;
+        type SigningKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SigningKey = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `signing_key` field to Set
-    pub struct SetSigningKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSigningKey<St> {}
-    impl<St: State> State for SetSigningKey<St> {
-        type SigningKey = Set<members::signing_key>;
-        type Did = St::Did;
+        type SigningKey = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type SigningKey = St::SigningKey;
         type Did = Set<members::did>;
+        type SigningKey = St::SigningKey;
+    }
+    ///State transition - sets the `signing_key` field to Set
+    pub struct SetSigningKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSigningKey<St> {}
+    impl<St: State> State for SetSigningKey<St> {
+        type Did = St::Did;
+        type SigningKey = Set<members::signing_key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signing_key` field
-        pub struct signing_key(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `signing_key` field
+        pub struct signing_key(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateAccountSigningKeyBuilder<S: BosStr, St: update_account_signing_key_state::State> {
+pub struct UpdateAccountSigningKeyBuilder<
+    St: update_account_signing_key_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UpdateAccountSigningKey<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UpdateAccountSigningKeyBuilder<S, update_account_signing_key_state::Empty> {
+impl UpdateAccountSigningKey<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UpdateAccountSigningKeyBuilder<
+        update_account_signing_key_state::Empty,
+        DefaultStr,
+    > {
         UpdateAccountSigningKeyBuilder::new()
     }
 }
 
-impl<S: BosStr> UpdateAccountSigningKeyBuilder<S, update_account_signing_key_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UpdateAccountSigningKey<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UpdateAccountSigningKeyBuilder<
+        update_account_signing_key_state::Empty,
+        S,
+    > {
+        UpdateAccountSigningKeyBuilder::builder()
+    }
+}
+
+impl UpdateAccountSigningKeyBuilder<
+    update_account_signing_key_state::Empty,
+    DefaultStr,
+> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UpdateAccountSigningKeyBuilder {
             _state: PhantomData,
@@ -125,7 +143,20 @@ impl<S: BosStr> UpdateAccountSigningKeyBuilder<S, update_account_signing_key_sta
     }
 }
 
-impl<S: BosStr, St> UpdateAccountSigningKeyBuilder<S, St>
+impl<
+    S: BosStr,
+> UpdateAccountSigningKeyBuilder<update_account_signing_key_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UpdateAccountSigningKeyBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> UpdateAccountSigningKeyBuilder<St, S>
 where
     St: update_account_signing_key_state::State,
     St::Did: update_account_signing_key_state::IsUnset,
@@ -134,7 +165,10 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> UpdateAccountSigningKeyBuilder<S, update_account_signing_key_state::SetDid<St>> {
+    ) -> UpdateAccountSigningKeyBuilder<
+        update_account_signing_key_state::SetDid<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         UpdateAccountSigningKeyBuilder {
             _state: PhantomData,
@@ -144,7 +178,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UpdateAccountSigningKeyBuilder<S, St>
+impl<St, S: BosStr> UpdateAccountSigningKeyBuilder<St, S>
 where
     St: update_account_signing_key_state::State,
     St::SigningKey: update_account_signing_key_state::IsUnset,
@@ -153,8 +187,10 @@ where
     pub fn signing_key(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> UpdateAccountSigningKeyBuilder<S, update_account_signing_key_state::SetSigningKey<St>>
-    {
+    ) -> UpdateAccountSigningKeyBuilder<
+        update_account_signing_key_state::SetSigningKey<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         UpdateAccountSigningKeyBuilder {
             _state: PhantomData,
@@ -164,11 +200,11 @@ where
     }
 }
 
-impl<S: BosStr, St> UpdateAccountSigningKeyBuilder<S, St>
+impl<St, S: BosStr> UpdateAccountSigningKeyBuilder<St, S>
 where
     St: update_account_signing_key_state::State,
-    St::SigningKey: update_account_signing_key_state::IsSet,
     St::Did: update_account_signing_key_state::IsSet,
+    St::SigningKey: update_account_signing_key_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> UpdateAccountSigningKey<S> {

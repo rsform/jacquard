@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -118,7 +118,7 @@ impl<S: BosStr> LexiconSchema for Test<S> {
 
 pub mod test_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -175,7 +175,7 @@ pub mod test_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TestBuilder<S: BosStr, St: test_state::State> {
+pub struct TestBuilder<St: test_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -189,15 +189,22 @@ pub struct TestBuilder<S: BosStr, St: test_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Test<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TestBuilder<S, test_state::Empty> {
+impl Test<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TestBuilder<test_state::Empty, DefaultStr> {
         TestBuilder::new()
     }
 }
 
-impl<S: BosStr> TestBuilder<S, test_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Test<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TestBuilder<test_state::Empty, S> {
+        TestBuilder::builder()
+    }
+}
+
+impl TestBuilder<test_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TestBuilder {
             _state: PhantomData,
@@ -207,7 +214,18 @@ impl<S: BosStr> TestBuilder<S, test_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: test_state::State> TestBuilder<S, St> {
+impl<S: BosStr> TestBuilder<test_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TestBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: test_state::State, S: BosStr> TestBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -220,7 +238,7 @@ impl<S: BosStr, St: test_state::State> TestBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: test_state::State> TestBuilder<S, St> {
+impl<St: test_state::State, S: BosStr> TestBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -233,13 +251,16 @@ impl<S: BosStr, St: test_state::State> TestBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TestBuilder<S, St>
+impl<St, S: BosStr> TestBuilder<St, S>
 where
     St: test_state::State,
     St::End: test_state::IsUnset,
 {
     /// Set the `end` field (required)
-    pub fn end(mut self, value: impl Into<Datetime>) -> TestBuilder<S, test_state::SetEnd<St>> {
+    pub fn end(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> TestBuilder<test_state::SetEnd<St>, S> {
         self._fields.2 = Option::Some(value.into());
         TestBuilder {
             _state: PhantomData,
@@ -249,7 +270,7 @@ where
     }
 }
 
-impl<S: BosStr, St: test_state::State> TestBuilder<S, St> {
+impl<St: test_state::State, S: BosStr> TestBuilder<St, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -262,13 +283,16 @@ impl<S: BosStr, St: test_state::State> TestBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TestBuilder<S, St>
+impl<St, S: BosStr> TestBuilder<St, S>
 where
     St: test_state::State,
     St::Start: test_state::IsUnset,
 {
     /// Set the `start` field (required)
-    pub fn start(mut self, value: impl Into<Datetime>) -> TestBuilder<S, test_state::SetStart<St>> {
+    pub fn start(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> TestBuilder<test_state::SetStart<St>, S> {
         self._fields.4 = Option::Some(value.into());
         TestBuilder {
             _state: PhantomData,
@@ -278,13 +302,16 @@ where
     }
 }
 
-impl<S: BosStr, St> TestBuilder<S, St>
+impl<St, S: BosStr> TestBuilder<St, S>
 where
     St: test_state::State,
     St::Title: test_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> TestBuilder<S, test_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> TestBuilder<test_state::SetTitle<St>, S> {
         self._fields.5 = Option::Some(value.into());
         TestBuilder {
             _state: PhantomData,
@@ -294,7 +321,7 @@ where
     }
 }
 
-impl<S: BosStr, St: test_state::State> TestBuilder<S, St> {
+impl<St: test_state::State, S: BosStr> TestBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -307,7 +334,7 @@ impl<S: BosStr, St: test_state::State> TestBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TestBuilder<S, St>
+impl<St, S: BosStr> TestBuilder<St, S>
 where
     St: test_state::State,
     St::Start: test_state::IsSet,
@@ -343,10 +370,10 @@ where
 }
 
 fn lexicon_doc_org_devcon_event_test() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.devcon.event.test"),
@@ -357,11 +384,12 @@ fn lexicon_doc_org_devcon_event_test() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("start"),
-                            SmolStr::new_static("end"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"), SmolStr::new_static("start"),
+                                SmolStr::new_static("end")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -375,16 +403,18 @@ fn lexicon_doc_org_devcon_event_test() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Description of the event",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Description of the event"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("end"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("End time of the event")),
+                                    description: Some(
+                                        CowStr::new_static("End time of the event"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -392,16 +422,18 @@ fn lexicon_doc_org_devcon_event_test() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("location"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Location of the event")),
+                                    description: Some(
+                                        CowStr::new_static("Location of the event"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("start"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Start time of the event",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Start time of the event"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

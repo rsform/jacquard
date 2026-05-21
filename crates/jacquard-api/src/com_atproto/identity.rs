@@ -15,6 +15,7 @@ pub mod sign_plc_operation;
 pub mod submit_plc_operation;
 pub mod update_handle;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -33,13 +34,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct IdentityInfo<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     ///The complete DID document for the identity.
@@ -67,7 +65,7 @@ impl<S: BosStr> LexiconSchema for IdentityInfo<S> {
 
 pub mod identity_info_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -75,70 +73,77 @@ pub mod identity_info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Did;
+        type Handle;
         type DidDoc;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Did = Unset;
+        type Handle = Unset;
         type DidDoc = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHandle<St> {}
-    impl<St: State> State for SetHandle<St> {
-        type Handle = Set<members::handle>;
-        type Did = St::Did;
-        type DidDoc = St::DidDoc;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Handle = St::Handle;
         type Did = Set<members::did>;
+        type Handle = St::Handle;
+        type DidDoc = St::DidDoc;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Did = St::Did;
+        type Handle = Set<members::handle>;
         type DidDoc = St::DidDoc;
     }
     ///State transition - sets the `did_doc` field to Set
     pub struct SetDidDoc<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDidDoc<St> {}
     impl<St: State> State for SetDidDoc<St> {
-        type Handle = St::Handle;
         type Did = St::Did;
+        type Handle = St::Handle;
         type DidDoc = Set<members::did_doc>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
         ///Marker type for the `did_doc` field
         pub struct did_doc(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IdentityInfoBuilder<S: BosStr, St: identity_info_state::State> {
+pub struct IdentityInfoBuilder<St: identity_info_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Data<S>>, Option<Handle<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> IdentityInfo<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> IdentityInfoBuilder<S, identity_info_state::Empty> {
+impl IdentityInfo<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> IdentityInfoBuilder<identity_info_state::Empty, DefaultStr> {
         IdentityInfoBuilder::new()
     }
 }
 
-impl<S: BosStr> IdentityInfoBuilder<S, identity_info_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> IdentityInfo<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> IdentityInfoBuilder<identity_info_state::Empty, S> {
+        IdentityInfoBuilder::builder()
+    }
+}
+
+impl IdentityInfoBuilder<identity_info_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         IdentityInfoBuilder {
             _state: PhantomData,
@@ -148,7 +153,18 @@ impl<S: BosStr> IdentityInfoBuilder<S, identity_info_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> IdentityInfoBuilder<S, St>
+impl<S: BosStr> IdentityInfoBuilder<identity_info_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        IdentityInfoBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> IdentityInfoBuilder<St, S>
 where
     St: identity_info_state::State,
     St::Did: identity_info_state::IsUnset,
@@ -157,7 +173,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> IdentityInfoBuilder<S, identity_info_state::SetDid<St>> {
+    ) -> IdentityInfoBuilder<identity_info_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         IdentityInfoBuilder {
             _state: PhantomData,
@@ -167,7 +183,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IdentityInfoBuilder<S, St>
+impl<St, S: BosStr> IdentityInfoBuilder<St, S>
 where
     St: identity_info_state::State,
     St::DidDoc: identity_info_state::IsUnset,
@@ -176,7 +192,7 @@ where
     pub fn did_doc(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> IdentityInfoBuilder<S, identity_info_state::SetDidDoc<St>> {
+    ) -> IdentityInfoBuilder<identity_info_state::SetDidDoc<St>, S> {
         self._fields.1 = Option::Some(value.into());
         IdentityInfoBuilder {
             _state: PhantomData,
@@ -186,7 +202,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IdentityInfoBuilder<S, St>
+impl<St, S: BosStr> IdentityInfoBuilder<St, S>
 where
     St: identity_info_state::State,
     St::Handle: identity_info_state::IsUnset,
@@ -195,7 +211,7 @@ where
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> IdentityInfoBuilder<S, identity_info_state::SetHandle<St>> {
+    ) -> IdentityInfoBuilder<identity_info_state::SetHandle<St>, S> {
         self._fields.2 = Option::Some(value.into());
         IdentityInfoBuilder {
             _state: PhantomData,
@@ -205,11 +221,11 @@ where
     }
 }
 
-impl<S: BosStr, St> IdentityInfoBuilder<S, St>
+impl<St, S: BosStr> IdentityInfoBuilder<St, S>
 where
     St: identity_info_state::State,
-    St::Handle: identity_info_state::IsSet,
     St::Did: identity_info_state::IsSet,
+    St::Handle: identity_info_state::IsSet,
     St::DidDoc: identity_info_state::IsSet,
 {
     /// Build the final struct.
@@ -222,7 +238,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> IdentityInfo<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> IdentityInfo<S> {
         IdentityInfo {
             did: self._fields.0.unwrap(),
             did_doc: self._fields.1.unwrap(),
@@ -233,10 +252,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_identity_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.identity.defs"),

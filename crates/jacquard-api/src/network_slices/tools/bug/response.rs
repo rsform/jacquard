@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::richtext::facet::Facet;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -50,6 +50,7 @@ pub struct Response<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ResponseStatus<S: BosStr = DefaultStr> {
@@ -223,7 +224,7 @@ impl<S: BosStr> LexiconSchema for Response<S> {
 
 pub mod response_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -231,56 +232,56 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
-        type Bug;
         type CreatedAt;
+        type Bug;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
-        type Bug = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type Status = Set<members::status>;
-        type Bug = St::Bug;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `bug` field to Set
-    pub struct SetBug<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBug<St> {}
-    impl<St: State> State for SetBug<St> {
-        type Status = St::Status;
-        type Bug = Set<members::bug>;
-        type CreatedAt = St::CreatedAt;
+        type Bug = Unset;
+        type Status = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Status = St::Status;
-        type Bug = St::Bug;
         type CreatedAt = Set<members::created_at>;
+        type Bug = St::Bug;
+        type Status = St::Status;
+    }
+    ///State transition - sets the `bug` field to Set
+    pub struct SetBug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBug<St> {}
+    impl<St: State> State for SetBug<St> {
+        type CreatedAt = St::CreatedAt;
+        type Bug = Set<members::bug>;
+        type Status = St::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type CreatedAt = St::CreatedAt;
+        type Bug = St::Bug;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `bug` field
-        pub struct bug(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `bug` field
+        pub struct bug(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ResponseBuilder<S: BosStr, St: response_state::State> {
+pub struct ResponseBuilder<St: response_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
@@ -292,15 +293,22 @@ pub struct ResponseBuilder<S: BosStr, St: response_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Response<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ResponseBuilder<S, response_state::Empty> {
+impl Response<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ResponseBuilder<response_state::Empty, DefaultStr> {
         ResponseBuilder::new()
     }
 }
 
-impl<S: BosStr> ResponseBuilder<S, response_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Response<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ResponseBuilder<response_state::Empty, S> {
+        ResponseBuilder::builder()
+    }
+}
+
+impl ResponseBuilder<response_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ResponseBuilder {
             _state: PhantomData,
@@ -310,7 +318,18 @@ impl<S: BosStr> ResponseBuilder<S, response_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ResponseBuilder<S, St>
+impl<S: BosStr> ResponseBuilder<response_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ResponseBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ResponseBuilder<St, S>
 where
     St: response_state::State,
     St::Bug: response_state::IsUnset,
@@ -319,7 +338,7 @@ where
     pub fn bug(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ResponseBuilder<S, response_state::SetBug<St>> {
+    ) -> ResponseBuilder<response_state::SetBug<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ResponseBuilder {
             _state: PhantomData,
@@ -329,7 +348,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ResponseBuilder<S, St>
+impl<St, S: BosStr> ResponseBuilder<St, S>
 where
     St: response_state::State,
     St::CreatedAt: response_state::IsUnset,
@@ -338,7 +357,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ResponseBuilder<S, response_state::SetCreatedAt<St>> {
+    ) -> ResponseBuilder<response_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ResponseBuilder {
             _state: PhantomData,
@@ -348,7 +367,7 @@ where
     }
 }
 
-impl<S: BosStr, St: response_state::State> ResponseBuilder<S, St> {
+impl<St: response_state::State, S: BosStr> ResponseBuilder<St, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -361,7 +380,7 @@ impl<S: BosStr, St: response_state::State> ResponseBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: response_state::State> ResponseBuilder<S, St> {
+impl<St: response_state::State, S: BosStr> ResponseBuilder<St, S> {
     /// Set the `messageFacets` field (optional)
     pub fn message_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -374,7 +393,7 @@ impl<S: BosStr, St: response_state::State> ResponseBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ResponseBuilder<S, St>
+impl<St, S: BosStr> ResponseBuilder<St, S>
 where
     St: response_state::State,
     St::Status: response_state::IsUnset,
@@ -383,7 +402,7 @@ where
     pub fn status(
         mut self,
         value: impl Into<ResponseStatus<S>>,
-    ) -> ResponseBuilder<S, response_state::SetStatus<St>> {
+    ) -> ResponseBuilder<response_state::SetStatus<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ResponseBuilder {
             _state: PhantomData,
@@ -393,12 +412,12 @@ where
     }
 }
 
-impl<S: BosStr, St> ResponseBuilder<S, St>
+impl<St, S: BosStr> ResponseBuilder<St, S>
 where
     St: response_state::State,
-    St::Status: response_state::IsSet,
-    St::Bug: response_state::IsSet,
     St::CreatedAt: response_state::IsSet,
+    St::Bug: response_state::IsSet,
+    St::Status: response_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Response<S> {
@@ -425,10 +444,10 @@ where
 }
 
 fn lexicon_doc_network_slices_tools_bug_response() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.tools.bug.response"),
@@ -439,20 +458,21 @@ fn lexicon_doc_network_slices_tools_bug_response() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("bug"),
-                            SmolStr::new_static("status"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("bug"), SmolStr::new_static("status"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("bug"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Reference to the bug report",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Reference to the bug report"),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -467,9 +487,9 @@ fn lexicon_doc_network_slices_tools_bug_response() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("message"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Optional explanation or link to fix",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Optional explanation or link to fix"),
+                                    ),
                                     max_length: Some(3000usize),
                                     max_graphemes: Some(1000usize),
                                     ..Default::default()
@@ -478,9 +498,11 @@ fn lexicon_doc_network_slices_tools_bug_response() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("messageFacets"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Annotations of message (mentions and links)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Annotations of message (mentions and links)",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("app.bsky.richtext.facet"),
                                         ..Default::default()

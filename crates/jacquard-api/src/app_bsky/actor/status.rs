@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::embed::external::ExternalRecord;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::embed::external::ExternalRecord;
 /// Advertises an account as currently offering live content.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
@@ -206,7 +206,7 @@ impl<S: BosStr> LexiconSchema for Status<S> {
 
 pub mod status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -249,7 +249,7 @@ pub mod status_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StatusBuilder<S: BosStr, St: status_state::State> {
+pub struct StatusBuilder<St: status_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -260,15 +260,22 @@ pub struct StatusBuilder<S: BosStr, St: status_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Status<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StatusBuilder<S, status_state::Empty> {
+impl Status<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StatusBuilder<status_state::Empty, DefaultStr> {
         StatusBuilder::new()
     }
 }
 
-impl<S: BosStr> StatusBuilder<S, status_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Status<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StatusBuilder<status_state::Empty, S> {
+        StatusBuilder::builder()
+    }
+}
+
+impl StatusBuilder<status_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StatusBuilder {
             _state: PhantomData,
@@ -278,7 +285,18 @@ impl<S: BosStr> StatusBuilder<S, status_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StatusBuilder<S, St>
+impl<S: BosStr> StatusBuilder<status_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StatusBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StatusBuilder<St, S>
 where
     St: status_state::State,
     St::CreatedAt: status_state::IsUnset,
@@ -287,7 +305,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StatusBuilder<S, status_state::SetCreatedAt<St>> {
+    ) -> StatusBuilder<status_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
@@ -297,7 +315,7 @@ where
     }
 }
 
-impl<S: BosStr, St: status_state::State> StatusBuilder<S, St> {
+impl<St: status_state::State, S: BosStr> StatusBuilder<St, S> {
     /// Set the `durationMinutes` field (optional)
     pub fn duration_minutes(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -310,7 +328,7 @@ impl<S: BosStr, St: status_state::State> StatusBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: status_state::State> StatusBuilder<S, St> {
+impl<St: status_state::State, S: BosStr> StatusBuilder<St, S> {
     /// Set the `embed` field (optional)
     pub fn embed(mut self, value: impl Into<Option<ExternalRecord<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -323,7 +341,7 @@ impl<S: BosStr, St: status_state::State> StatusBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StatusBuilder<S, St>
+impl<St, S: BosStr> StatusBuilder<St, S>
 where
     St: status_state::State,
     St::Status: status_state::IsUnset,
@@ -332,7 +350,7 @@ where
     pub fn status(
         mut self,
         value: impl Into<StatusStatus<S>>,
-    ) -> StatusBuilder<S, status_state::SetStatus<St>> {
+    ) -> StatusBuilder<status_state::SetStatus<St>, S> {
         self._fields.3 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
@@ -342,7 +360,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatusBuilder<S, St>
+impl<St, S: BosStr> StatusBuilder<St, S>
 where
     St: status_state::State,
     St::CreatedAt: status_state::IsSet,
@@ -371,10 +389,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_actor_status() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.actor.status"),
@@ -382,22 +400,22 @@ fn lexicon_doc_app_bsky_actor_status() -> LexiconDoc<'static> {
             let mut map = BTreeMap::new();
             map.insert(
                 SmolStr::new_static("live"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A declaration of a Bluesky account status.",
-                    )),
+                    description: Some(
+                        CowStr::new_static("A declaration of a Bluesky account status."),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("status"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("status"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -418,9 +436,11 @@ fn lexicon_doc_app_bsky_actor_status() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("embed"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(CowStr::new_static(
-                                        "An optional embed associated with the status.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "An optional embed associated with the status.",
+                                        ),
+                                    ),
                                     refs: vec![CowStr::new_static("app.bsky.embed.external")],
                                     ..Default::default()
                                 }),
@@ -428,9 +448,9 @@ fn lexicon_doc_app_bsky_actor_status() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("status"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The status for the account.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The status for the account."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

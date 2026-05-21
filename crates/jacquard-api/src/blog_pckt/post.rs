@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -117,16 +117,19 @@ impl<S: BosStr> LexiconSchema for Post<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("cover"),
@@ -142,7 +145,7 @@ impl<S: BosStr> LexiconSchema for Post<S> {
 
 pub mod post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -215,7 +218,7 @@ pub mod post_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PostBuilder<S: BosStr, St: post_state::State> {
+pub struct PostBuilder<St: post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Data<S>>,
@@ -232,15 +235,22 @@ pub struct PostBuilder<S: BosStr, St: post_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Post<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PostBuilder<S, post_state::Empty> {
+impl Post<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PostBuilder<post_state::Empty, DefaultStr> {
         PostBuilder::new()
     }
 }
 
-impl<S: BosStr> PostBuilder<S, post_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Post<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PostBuilder<post_state::Empty, S> {
+        PostBuilder::builder()
+    }
+}
+
+impl PostBuilder<post_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PostBuilder {
             _state: PhantomData,
@@ -250,7 +260,18 @@ impl<S: BosStr> PostBuilder<S, post_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<S: BosStr> PostBuilder<post_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PostBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::Blocks: post_state::IsUnset,
@@ -259,7 +280,7 @@ where
     pub fn blocks(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> PostBuilder<S, post_state::SetBlocks<St>> {
+    ) -> PostBuilder<post_state::SetBlocks<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -269,7 +290,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::Blog: post_state::IsUnset,
@@ -278,7 +299,7 @@ where
     pub fn blog(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> PostBuilder<S, post_state::SetBlog<St>> {
+    ) -> PostBuilder<post_state::SetBlog<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -288,7 +309,7 @@ where
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `bodyPlain` field (optional)
     pub fn body_plain(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -301,7 +322,7 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `cover` field (optional)
     pub fn cover(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -314,7 +335,7 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `images` field (optional)
     pub fn images(mut self, value: impl Into<Option<Vec<BlobRef<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -327,7 +348,7 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `publishedAt` field (optional)
     pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -340,7 +361,7 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -353,13 +374,16 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::Title: post_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> PostBuilder<S, post_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> PostBuilder<post_state::SetTitle<St>, S> {
         self._fields.7 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -369,7 +393,7 @@ where
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.8 = value.into();
@@ -382,13 +406,16 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::Url: post_state::IsUnset,
 {
     /// Set the `url` field (required)
-    pub fn url(mut self, value: impl Into<UriValue<S>>) -> PostBuilder<S, post_state::SetUrl<St>> {
+    pub fn url(
+        mut self,
+        value: impl Into<UriValue<S>>,
+    ) -> PostBuilder<post_state::SetUrl<St>, S> {
         self._fields.9 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -398,7 +425,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::Blog: post_state::IsSet,
@@ -441,10 +468,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_post() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.post"),
@@ -455,12 +482,12 @@ fn lexicon_doc_blog_pckt_post() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("blocks"),
-                            SmolStr::new_static("url"),
-                            SmolStr::new_static("blog"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"), SmolStr::new_static("blocks"),
+                                SmolStr::new_static("url"), SmolStr::new_static("blog")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -487,16 +514,12 @@ fn lexicon_doc_blog_pckt_post() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("cover"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("images"),
                                 LexObjectProperty::Array(LexArray {
-                                    items: LexArrayItem::Blob(LexBlob {
-                                        ..Default::default()
-                                    }),
+                                    items: LexArrayItem::Blob(LexBlob { ..Default::default() }),
                                     ..Default::default()
                                 }),
                             );

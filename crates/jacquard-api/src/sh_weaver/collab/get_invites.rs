@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::collab::InviteView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::collab::InviteView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetInvites<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -41,11 +38,9 @@ pub struct GetInvites<S: BosStr = DefaultStr> {
     pub status: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetInvitesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -92,7 +87,7 @@ fn _default_status<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_invites_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -123,27 +118,28 @@ pub mod get_invites_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetInvitesBuilder<S: BosStr, St: get_invites_state::State> {
+pub struct GetInvitesBuilder<St: get_invites_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<AtIdentifier<S>>,
-        Option<S>,
-        Option<S>,
-        Option<i64>,
-        Option<S>,
-    ),
+    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<S>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetInvites<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetInvitesBuilder<S, get_invites_state::Empty> {
+impl GetInvites<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetInvitesBuilder<get_invites_state::Empty, DefaultStr> {
         GetInvitesBuilder::new()
     }
 }
 
-impl<S: BosStr> GetInvitesBuilder<S, get_invites_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetInvites<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetInvitesBuilder<get_invites_state::Empty, S> {
+        GetInvitesBuilder::builder()
+    }
+}
+
+impl GetInvitesBuilder<get_invites_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetInvitesBuilder {
             _state: PhantomData,
@@ -153,7 +149,18 @@ impl<S: BosStr> GetInvitesBuilder<S, get_invites_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetInvitesBuilder<S, St>
+impl<S: BosStr> GetInvitesBuilder<get_invites_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetInvitesBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetInvitesBuilder<St, S>
 where
     St: get_invites_state::State,
     St::Actor: get_invites_state::IsUnset,
@@ -162,7 +169,7 @@ where
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetInvitesBuilder<S, get_invites_state::SetActor<St>> {
+    ) -> GetInvitesBuilder<get_invites_state::SetActor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetInvitesBuilder {
             _state: PhantomData,
@@ -172,7 +179,7 @@ where
     }
 }
 
-impl<S: BosStr, St: get_invites_state::State> GetInvitesBuilder<S, St> {
+impl<St: get_invites_state::State, S: BosStr> GetInvitesBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -185,7 +192,7 @@ impl<S: BosStr, St: get_invites_state::State> GetInvitesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_invites_state::State> GetInvitesBuilder<S, St> {
+impl<St: get_invites_state::State, S: BosStr> GetInvitesBuilder<St, S> {
     /// Set the `direction` field (optional)
     pub fn direction(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -198,7 +205,7 @@ impl<S: BosStr, St: get_invites_state::State> GetInvitesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_invites_state::State> GetInvitesBuilder<S, St> {
+impl<St: get_invites_state::State, S: BosStr> GetInvitesBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -211,7 +218,7 @@ impl<S: BosStr, St: get_invites_state::State> GetInvitesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_invites_state::State> GetInvitesBuilder<S, St> {
+impl<St: get_invites_state::State, S: BosStr> GetInvitesBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -224,7 +231,7 @@ impl<S: BosStr, St: get_invites_state::State> GetInvitesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetInvitesBuilder<S, St>
+impl<St, S: BosStr> GetInvitesBuilder<St, S>
 where
     St: get_invites_state::State,
     St::Actor: get_invites_state::IsSet,

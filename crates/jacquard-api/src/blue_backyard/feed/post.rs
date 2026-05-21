@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,18 +25,15 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blue_backyard::feed::post;
-use crate::blue_backyard::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blue_backyard::richtext::facet::Facet;
+use crate::blue_backyard::feed::post;
 /// Width and height of the media, used for layout before the blob is loaded.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -47,10 +44,7 @@ pub struct AspectRatio<S: BosStr = DefaultStr> {
 /// An inline URL embed (link preview).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EmbedBlock<S: BosStr = DefaultStr> {
     ///The URL to embed as a link preview.
     pub url: UriValue<S>,
@@ -61,10 +55,7 @@ pub struct EmbedBlock<S: BosStr = DefaultStr> {
 /// An inline image or video.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ImageBlock<S: BosStr = DefaultStr> {
     ///Alt text description for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -101,6 +92,7 @@ pub struct Post<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -127,10 +119,7 @@ pub struct PostGetRecordOutput<S: BosStr = DefaultStr> {
 /// A block of rich text content.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TextBlock<S: BosStr = DefaultStr> {
     ///Annotations of text (mentions, URLs, hashtags, formatting).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -256,27 +245,27 @@ impl<S: BosStr> LexiconSchema for ImageBlock<S> {
                     "video/mp4",
                     "video/webm",
                 ];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/gif".to_string(),
-                            "image/webp".to_string(),
-                            "image/avif".to_string(),
-                            "video/mp4".to_string(),
-                            "video/webm".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/gif".to_string(), "image/webp".to_string(),
+                            "image/avif".to_string(), "video/mp4".to_string(),
+                            "video/webm".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -423,7 +412,7 @@ impl<S: BosStr> LexiconSchema for TextBlock<S> {
 
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -466,21 +455,28 @@ pub mod aspect_ratio_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AspectRatioBuilder<S: BosStr, St: aspect_ratio_state::State> {
+pub struct AspectRatioBuilder<St: aspect_ratio_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> AspectRatio<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
+impl AspectRatio<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AspectRatioBuilder<aspect_ratio_state::Empty, DefaultStr> {
         AspectRatioBuilder::new()
     }
 }
 
-impl<S: BosStr> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> AspectRatio<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AspectRatioBuilder<aspect_ratio_state::Empty, S> {
+        AspectRatioBuilder::builder()
+    }
+}
+
+impl AspectRatioBuilder<aspect_ratio_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AspectRatioBuilder {
             _state: PhantomData,
@@ -490,7 +486,18 @@ impl<S: BosStr> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AspectRatioBuilder<S, St>
+impl<S: BosStr> AspectRatioBuilder<aspect_ratio_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AspectRatioBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
 where
     St: aspect_ratio_state::State,
     St::Height: aspect_ratio_state::IsUnset,
@@ -499,7 +506,7 @@ where
     pub fn height(
         mut self,
         value: impl Into<i64>,
-    ) -> AspectRatioBuilder<S, aspect_ratio_state::SetHeight<St>> {
+    ) -> AspectRatioBuilder<aspect_ratio_state::SetHeight<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AspectRatioBuilder {
             _state: PhantomData,
@@ -509,7 +516,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AspectRatioBuilder<S, St>
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
 where
     St: aspect_ratio_state::State,
     St::Width: aspect_ratio_state::IsUnset,
@@ -518,7 +525,7 @@ where
     pub fn width(
         mut self,
         value: impl Into<i64>,
-    ) -> AspectRatioBuilder<S, aspect_ratio_state::SetWidth<St>> {
+    ) -> AspectRatioBuilder<aspect_ratio_state::SetWidth<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AspectRatioBuilder {
             _state: PhantomData,
@@ -528,7 +535,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AspectRatioBuilder<S, St>
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
 where
     St: aspect_ratio_state::State,
     St::Height: aspect_ratio_state::IsSet,
@@ -543,7 +550,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AspectRatio<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -553,10 +563,10 @@ where
 }
 
 fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.backyard.feed.post"),
@@ -565,13 +575,14 @@ fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("aspectRatio"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Width and height of the media, used for layout before the blob is loaded.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("width"),
-                        SmolStr::new_static("height"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Width and height of the media, used for layout before the blob is loaded.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -597,7 +608,9 @@ fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("embedBlock"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("An inline URL embed (link preview).")),
+                    description: Some(
+                        CowStr::new_static("An inline URL embed (link preview)."),
+                    ),
                     required: Some(vec![SmolStr::new_static("url")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -605,9 +618,9 @@ fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URL to embed as a link preview.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The URL to embed as a link preview."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -756,7 +769,9 @@ fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("textBlock"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A block of rich text content.")),
+                    description: Some(
+                        CowStr::new_static("A block of rich text content."),
+                    ),
                     required: Some(vec![SmolStr::new_static("text")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -764,9 +779,11 @@ fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Annotations of text (mentions, URLs, hashtags, formatting).",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Annotations of text (mentions, URLs, hashtags, formatting).",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("blue.backyard.richtext.facet"),
                                     ..Default::default()
@@ -777,9 +794,9 @@ fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The text content of this block.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The text content of this block."),
+                                ),
                                 max_length: Some(30000usize),
                                 max_graphemes: Some(3000usize),
                                 ..Default::default()
@@ -798,7 +815,7 @@ fn lexicon_doc_blue_backyard_feed_post() -> LexiconDoc<'static> {
 
 pub mod embed_block_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -829,21 +846,28 @@ pub mod embed_block_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EmbedBlockBuilder<S: BosStr, St: embed_block_state::State> {
+pub struct EmbedBlockBuilder<St: embed_block_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> EmbedBlock<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EmbedBlockBuilder<S, embed_block_state::Empty> {
+impl EmbedBlock<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EmbedBlockBuilder<embed_block_state::Empty, DefaultStr> {
         EmbedBlockBuilder::new()
     }
 }
 
-impl<S: BosStr> EmbedBlockBuilder<S, embed_block_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> EmbedBlock<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EmbedBlockBuilder<embed_block_state::Empty, S> {
+        EmbedBlockBuilder::builder()
+    }
+}
+
+impl EmbedBlockBuilder<embed_block_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EmbedBlockBuilder {
             _state: PhantomData,
@@ -853,7 +877,18 @@ impl<S: BosStr> EmbedBlockBuilder<S, embed_block_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EmbedBlockBuilder<S, St>
+impl<S: BosStr> EmbedBlockBuilder<embed_block_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EmbedBlockBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EmbedBlockBuilder<St, S>
 where
     St: embed_block_state::State,
     St::Url: embed_block_state::IsUnset,
@@ -862,7 +897,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> EmbedBlockBuilder<S, embed_block_state::SetUrl<St>> {
+    ) -> EmbedBlockBuilder<embed_block_state::SetUrl<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EmbedBlockBuilder {
             _state: PhantomData,
@@ -872,7 +907,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EmbedBlockBuilder<S, St>
+impl<St, S: BosStr> EmbedBlockBuilder<St, S>
 where
     St: embed_block_state::State,
     St::Url: embed_block_state::IsSet,
@@ -885,7 +920,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EmbedBlock<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EmbedBlock<S> {
         EmbedBlock {
             url: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -895,7 +933,7 @@ where
 
 pub mod image_block_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -938,26 +976,28 @@ pub mod image_block_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ImageBlockBuilder<S: BosStr, St: image_block_state::State> {
+pub struct ImageBlockBuilder<St: image_block_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<post::AspectRatio<S>>,
-        Option<BlobRef<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<S>, Option<post::AspectRatio<S>>, Option<BlobRef<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ImageBlock<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ImageBlockBuilder<S, image_block_state::Empty> {
+impl ImageBlock<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ImageBlockBuilder<image_block_state::Empty, DefaultStr> {
         ImageBlockBuilder::new()
     }
 }
 
-impl<S: BosStr> ImageBlockBuilder<S, image_block_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ImageBlock<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ImageBlockBuilder<image_block_state::Empty, S> {
+        ImageBlockBuilder::builder()
+    }
+}
+
+impl ImageBlockBuilder<image_block_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ImageBlockBuilder {
             _state: PhantomData,
@@ -967,7 +1007,18 @@ impl<S: BosStr> ImageBlockBuilder<S, image_block_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: image_block_state::State> ImageBlockBuilder<S, St> {
+impl<S: BosStr> ImageBlockBuilder<image_block_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ImageBlockBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: image_block_state::State, S: BosStr> ImageBlockBuilder<St, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -980,9 +1031,12 @@ impl<S: BosStr, St: image_block_state::State> ImageBlockBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: image_block_state::State> ImageBlockBuilder<S, St> {
+impl<St: image_block_state::State, S: BosStr> ImageBlockBuilder<St, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(mut self, value: impl Into<Option<post::AspectRatio<S>>>) -> Self {
+    pub fn aspect_ratio(
+        mut self,
+        value: impl Into<Option<post::AspectRatio<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -993,7 +1047,7 @@ impl<S: BosStr, St: image_block_state::State> ImageBlockBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ImageBlockBuilder<S, St>
+impl<St, S: BosStr> ImageBlockBuilder<St, S>
 where
     St: image_block_state::State,
     St::Blob: image_block_state::IsUnset,
@@ -1002,7 +1056,7 @@ where
     pub fn blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ImageBlockBuilder<S, image_block_state::SetBlob<St>> {
+    ) -> ImageBlockBuilder<image_block_state::SetBlob<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ImageBlockBuilder {
             _state: PhantomData,
@@ -1012,7 +1066,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ImageBlockBuilder<S, St>
+impl<St, S: BosStr> ImageBlockBuilder<St, S>
 where
     St: image_block_state::State,
     St::MimeType: image_block_state::IsUnset,
@@ -1021,7 +1075,7 @@ where
     pub fn mime_type(
         mut self,
         value: impl Into<S>,
-    ) -> ImageBlockBuilder<S, image_block_state::SetMimeType<St>> {
+    ) -> ImageBlockBuilder<image_block_state::SetMimeType<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ImageBlockBuilder {
             _state: PhantomData,
@@ -1031,7 +1085,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ImageBlockBuilder<S, St>
+impl<St, S: BosStr> ImageBlockBuilder<St, S>
 where
     St: image_block_state::State,
     St::Blob: image_block_state::IsSet,
@@ -1048,7 +1102,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ImageBlock<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ImageBlock<S> {
         ImageBlock {
             alt: self._fields.0,
             aspect_ratio: self._fields.1,
@@ -1061,7 +1118,7 @@ where
 
 pub mod post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1069,42 +1126,42 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Content;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = St::Content;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
-        type CreatedAt = St::CreatedAt;
         type Content = Set<members::content>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Content = St::Content;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PostBuilder<S: BosStr, St: post_state::State> {
+pub struct PostBuilder<St: post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<PostContentItem<S>>>,
@@ -1115,15 +1172,22 @@ pub struct PostBuilder<S: BosStr, St: post_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Post<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PostBuilder<S, post_state::Empty> {
+impl Post<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PostBuilder<post_state::Empty, DefaultStr> {
         PostBuilder::new()
     }
 }
 
-impl<S: BosStr> PostBuilder<S, post_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Post<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PostBuilder<post_state::Empty, S> {
+        PostBuilder::builder()
+    }
+}
+
+impl PostBuilder<post_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PostBuilder {
             _state: PhantomData,
@@ -1133,7 +1197,18 @@ impl<S: BosStr> PostBuilder<S, post_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<S: BosStr> PostBuilder<post_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PostBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::Content: post_state::IsUnset,
@@ -1142,7 +1217,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<Vec<PostContentItem<S>>>,
-    ) -> PostBuilder<S, post_state::SetContent<St>> {
+    ) -> PostBuilder<post_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -1152,7 +1227,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::CreatedAt: post_state::IsUnset,
@@ -1161,7 +1236,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PostBuilder<S, post_state::SetCreatedAt<St>> {
+    ) -> PostBuilder<post_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -1171,7 +1246,7 @@ where
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `langs` field (optional)
     pub fn langs(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
         self._fields.2 = value.into();
@@ -1184,7 +1259,7 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
+impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -1197,11 +1272,11 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PostBuilder<S, St>
+impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
-    St::CreatedAt: post_state::IsSet,
     St::Content: post_state::IsSet,
+    St::CreatedAt: post_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Post<S> {

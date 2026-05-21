@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::contact::MatchAndContactIndex;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::contact::MatchAndContactIndex;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ImportContacts<S: BosStr = DefaultStr> {
     ///List of phone numbers in global E.164 format (e.g., '+12125550123'). Phone numbers that cannot be normalized into a valid phone number will be discarded. Should not repeat the 'phone' input used in `app.bsky.contact.verifyPhone`.
     pub contacts: Vec<S>,
@@ -31,11 +28,9 @@ pub struct ImportContacts<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ImportContactsOutput<S: BosStr = DefaultStr> {
     ///The users that matched during import and their indexes on the input contacts, so the client can correlate with its local list.
     pub matches_and_contact_indexes: Vec<MatchAndContactIndex<S>>,
@@ -43,9 +38,18 @@ pub struct ImportContactsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ImportContactsError {
     #[serde(rename = "InvalidDid")]
@@ -60,10 +64,7 @@ pub enum ImportContactsError {
     InternalError(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ImportContactsError {
@@ -126,8 +127,9 @@ impl jacquard_common::xrpc::XrpcResp for ImportContactsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ImportContacts<S> {
     const NSID: &'static str = "app.bsky.contact.importContacts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ImportContactsResponse;
 }
 
@@ -135,15 +137,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ImportContacts<S> {
 pub struct ImportContactsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ImportContactsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.importContacts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ImportContacts<S>;
     type Response = ImportContactsResponse;
 }
 
 pub mod import_contacts_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -186,21 +189,31 @@ pub mod import_contacts_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ImportContactsBuilder<S: BosStr, St: import_contacts_state::State> {
+pub struct ImportContactsBuilder<
+    St: import_contacts_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ImportContacts<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ImportContactsBuilder<S, import_contacts_state::Empty> {
+impl ImportContacts<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ImportContactsBuilder<import_contacts_state::Empty, DefaultStr> {
         ImportContactsBuilder::new()
     }
 }
 
-impl<S: BosStr> ImportContactsBuilder<S, import_contacts_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ImportContacts<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ImportContactsBuilder<import_contacts_state::Empty, S> {
+        ImportContactsBuilder::builder()
+    }
+}
+
+impl ImportContactsBuilder<import_contacts_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ImportContactsBuilder {
             _state: PhantomData,
@@ -210,7 +223,18 @@ impl<S: BosStr> ImportContactsBuilder<S, import_contacts_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ImportContactsBuilder<S, St>
+impl<S: BosStr> ImportContactsBuilder<import_contacts_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ImportContactsBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ImportContactsBuilder<St, S>
 where
     St: import_contacts_state::State,
     St::Contacts: import_contacts_state::IsUnset,
@@ -219,7 +243,7 @@ where
     pub fn contacts(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> ImportContactsBuilder<S, import_contacts_state::SetContacts<St>> {
+    ) -> ImportContactsBuilder<import_contacts_state::SetContacts<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ImportContactsBuilder {
             _state: PhantomData,
@@ -229,7 +253,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ImportContactsBuilder<S, St>
+impl<St, S: BosStr> ImportContactsBuilder<St, S>
 where
     St: import_contacts_state::State,
     St::Token: import_contacts_state::IsUnset,
@@ -238,7 +262,7 @@ where
     pub fn token(
         mut self,
         value: impl Into<S>,
-    ) -> ImportContactsBuilder<S, import_contacts_state::SetToken<St>> {
+    ) -> ImportContactsBuilder<import_contacts_state::SetToken<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ImportContactsBuilder {
             _state: PhantomData,
@@ -248,7 +272,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ImportContactsBuilder<S, St>
+impl<St, S: BosStr> ImportContactsBuilder<St, S>
 where
     St: import_contacts_state::State,
     St::Token: import_contacts_state::IsSet,
@@ -263,7 +287,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ImportContacts<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ImportContacts<S> {
         ImportContacts {
             contacts: self._fields.0.unwrap(),
             token: self._fields.1.unwrap(),

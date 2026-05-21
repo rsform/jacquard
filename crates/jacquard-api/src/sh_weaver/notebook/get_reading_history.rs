@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,19 +20,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::NotebookView;
 use crate::sh_weaver::notebook::ReadingProgress;
 use crate::sh_weaver::notebook::get_reading_history;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetReadingHistory<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -46,11 +43,9 @@ pub struct GetReadingHistory<S: BosStr = DefaultStr> {
     pub status: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetReadingHistoryOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -59,11 +54,9 @@ pub struct GetReadingHistoryOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReadingHistoryItem<S: BosStr = DefaultStr> {
     ///The entry the user was last reading.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -123,7 +116,7 @@ fn _default_status<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_reading_history_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -141,21 +134,34 @@ pub mod get_reading_history_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetReadingHistoryBuilder<S: BosStr, St: get_reading_history_state::State> {
+pub struct GetReadingHistoryBuilder<
+    St: get_reading_history_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetReadingHistory<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetReadingHistoryBuilder<S, get_reading_history_state::Empty> {
+impl GetReadingHistory<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetReadingHistoryBuilder<
+        get_reading_history_state::Empty,
+        DefaultStr,
+    > {
         GetReadingHistoryBuilder::new()
     }
 }
 
-impl<S: BosStr> GetReadingHistoryBuilder<S, get_reading_history_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetReadingHistory<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetReadingHistoryBuilder<get_reading_history_state::Empty, S> {
+        GetReadingHistoryBuilder::builder()
+    }
+}
+
+impl GetReadingHistoryBuilder<get_reading_history_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetReadingHistoryBuilder {
             _state: PhantomData,
@@ -165,7 +171,18 @@ impl<S: BosStr> GetReadingHistoryBuilder<S, get_reading_history_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_reading_history_state::State> GetReadingHistoryBuilder<S, St> {
+impl<S: BosStr> GetReadingHistoryBuilder<get_reading_history_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetReadingHistoryBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_reading_history_state::State, S: BosStr> GetReadingHistoryBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -178,7 +195,7 @@ impl<S: BosStr, St: get_reading_history_state::State> GetReadingHistoryBuilder<S
     }
 }
 
-impl<S: BosStr, St: get_reading_history_state::State> GetReadingHistoryBuilder<S, St> {
+impl<St: get_reading_history_state::State, S: BosStr> GetReadingHistoryBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -191,7 +208,7 @@ impl<S: BosStr, St: get_reading_history_state::State> GetReadingHistoryBuilder<S
     }
 }
 
-impl<S: BosStr, St: get_reading_history_state::State> GetReadingHistoryBuilder<S, St> {
+impl<St: get_reading_history_state::State, S: BosStr> GetReadingHistoryBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -204,7 +221,7 @@ impl<S: BosStr, St: get_reading_history_state::State> GetReadingHistoryBuilder<S
     }
 }
 
-impl<S: BosStr, St> GetReadingHistoryBuilder<S, St>
+impl<St, S: BosStr> GetReadingHistoryBuilder<St, S>
 where
     St: get_reading_history_state::State,
 {
@@ -220,7 +237,7 @@ where
 
 pub mod reading_history_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -228,60 +245,69 @@ pub mod reading_history_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Notebook;
         type Progress;
+        type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Notebook = Unset;
         type Progress = Unset;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNotebook<St> {}
-    impl<St: State> State for SetNotebook<St> {
-        type Notebook = Set<members::notebook>;
-        type Progress = St::Progress;
+        type Notebook = Unset;
     }
     ///State transition - sets the `progress` field to Set
     pub struct SetProgress<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetProgress<St> {}
     impl<St: State> State for SetProgress<St> {
-        type Notebook = St::Notebook;
         type Progress = Set<members::progress>;
+        type Notebook = St::Notebook;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
+        type Progress = St::Progress;
+        type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
         ///Marker type for the `progress` field
         pub struct progress(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReadingHistoryItemBuilder<S: BosStr, St: reading_history_item_state::State> {
+pub struct ReadingHistoryItemBuilder<
+    St: reading_history_item_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<EntryView<S>>,
-        Option<NotebookView<S>>,
-        Option<ReadingProgress<S>>,
-    ),
+    _fields: (Option<EntryView<S>>, Option<NotebookView<S>>, Option<ReadingProgress<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ReadingHistoryItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ReadingHistoryItemBuilder<S, reading_history_item_state::Empty> {
+impl ReadingHistoryItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReadingHistoryItemBuilder<
+        reading_history_item_state::Empty,
+        DefaultStr,
+    > {
         ReadingHistoryItemBuilder::new()
     }
 }
 
-impl<S: BosStr> ReadingHistoryItemBuilder<S, reading_history_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ReadingHistoryItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReadingHistoryItemBuilder<reading_history_item_state::Empty, S> {
+        ReadingHistoryItemBuilder::builder()
+    }
+}
+
+impl ReadingHistoryItemBuilder<reading_history_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ReadingHistoryItemBuilder {
             _state: PhantomData,
@@ -291,7 +317,18 @@ impl<S: BosStr> ReadingHistoryItemBuilder<S, reading_history_item_state::Empty> 
     }
 }
 
-impl<S: BosStr, St: reading_history_item_state::State> ReadingHistoryItemBuilder<S, St> {
+impl<S: BosStr> ReadingHistoryItemBuilder<reading_history_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReadingHistoryItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: reading_history_item_state::State, S: BosStr> ReadingHistoryItemBuilder<St, S> {
     /// Set the `currentEntry` field (optional)
     pub fn current_entry(mut self, value: impl Into<Option<EntryView<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -304,7 +341,7 @@ impl<S: BosStr, St: reading_history_item_state::State> ReadingHistoryItemBuilder
     }
 }
 
-impl<S: BosStr, St> ReadingHistoryItemBuilder<S, St>
+impl<St, S: BosStr> ReadingHistoryItemBuilder<St, S>
 where
     St: reading_history_item_state::State,
     St::Notebook: reading_history_item_state::IsUnset,
@@ -313,7 +350,7 @@ where
     pub fn notebook(
         mut self,
         value: impl Into<NotebookView<S>>,
-    ) -> ReadingHistoryItemBuilder<S, reading_history_item_state::SetNotebook<St>> {
+    ) -> ReadingHistoryItemBuilder<reading_history_item_state::SetNotebook<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ReadingHistoryItemBuilder {
             _state: PhantomData,
@@ -323,7 +360,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReadingHistoryItemBuilder<S, St>
+impl<St, S: BosStr> ReadingHistoryItemBuilder<St, S>
 where
     St: reading_history_item_state::State,
     St::Progress: reading_history_item_state::IsUnset,
@@ -332,7 +369,7 @@ where
     pub fn progress(
         mut self,
         value: impl Into<ReadingProgress<S>>,
-    ) -> ReadingHistoryItemBuilder<S, reading_history_item_state::SetProgress<St>> {
+    ) -> ReadingHistoryItemBuilder<reading_history_item_state::SetProgress<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ReadingHistoryItemBuilder {
             _state: PhantomData,
@@ -342,11 +379,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ReadingHistoryItemBuilder<S, St>
+impl<St, S: BosStr> ReadingHistoryItemBuilder<St, S>
 where
     St: reading_history_item_state::State,
-    St::Notebook: reading_history_item_state::IsSet,
     St::Progress: reading_history_item_state::IsSet,
+    St::Notebook: reading_history_item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ReadingHistoryItem<S> {
@@ -358,7 +395,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReadingHistoryItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReadingHistoryItem<S> {
         ReadingHistoryItem {
             current_entry: self._fields.0,
             notebook: self._fields.1.unwrap(),
@@ -369,10 +409,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.notebook.getReadingHistory"),
@@ -381,59 +421,67 @@ fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("status"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Filter by reading status.",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("status"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("Filter by reading status."),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("readingHistoryItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("notebook"),
-                        SmolStr::new_static("progress"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("notebook"),
+                            SmolStr::new_static("progress")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("currentEntry"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("sh.weaver.notebook.defs#entryView"),
+                                r#ref: CowStr::new_static(
+                                    "sh.weaver.notebook.defs#entryView",
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("notebook"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("sh.weaver.notebook.defs#notebookView"),
+                                r#ref: CowStr::new_static(
+                                    "sh.weaver.notebook.defs#notebookView",
+                                ),
                                 ..Default::default()
                             }),
                         );

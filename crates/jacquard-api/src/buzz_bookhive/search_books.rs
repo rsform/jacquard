@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::buzz_bookhive::hive_book::HiveBook;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::buzz_bookhive::hive_book::HiveBook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchBooks<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub genre: Option<S>,
@@ -37,11 +34,9 @@ pub struct SearchBooks<S: BosStr = DefaultStr> {
     pub q: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchBooksOutput<S: BosStr = DefaultStr> {
     pub books: Vec<HiveBook<S>>,
     ///The next offset to use for pagination (result of limit + offset)
@@ -81,7 +76,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_books_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -99,21 +94,28 @@ pub mod search_books_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchBooksBuilder<S: BosStr, St: search_books_state::State> {
+pub struct SearchBooksBuilder<St: search_books_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<i64>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SearchBooks<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SearchBooksBuilder<S, search_books_state::Empty> {
+impl SearchBooks<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SearchBooksBuilder<search_books_state::Empty, DefaultStr> {
         SearchBooksBuilder::new()
     }
 }
 
-impl<S: BosStr> SearchBooksBuilder<S, search_books_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SearchBooks<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SearchBooksBuilder<search_books_state::Empty, S> {
+        SearchBooksBuilder::builder()
+    }
+}
+
+impl SearchBooksBuilder<search_books_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SearchBooksBuilder {
             _state: PhantomData,
@@ -123,7 +125,18 @@ impl<S: BosStr> SearchBooksBuilder<S, search_books_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: search_books_state::State> SearchBooksBuilder<S, St> {
+impl<S: BosStr> SearchBooksBuilder<search_books_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SearchBooksBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: search_books_state::State, S: BosStr> SearchBooksBuilder<St, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -136,7 +149,7 @@ impl<S: BosStr, St: search_books_state::State> SearchBooksBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_books_state::State> SearchBooksBuilder<S, St> {
+impl<St: search_books_state::State, S: BosStr> SearchBooksBuilder<St, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -149,7 +162,7 @@ impl<S: BosStr, St: search_books_state::State> SearchBooksBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_books_state::State> SearchBooksBuilder<S, St> {
+impl<St: search_books_state::State, S: BosStr> SearchBooksBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -162,7 +175,7 @@ impl<S: BosStr, St: search_books_state::State> SearchBooksBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_books_state::State> SearchBooksBuilder<S, St> {
+impl<St: search_books_state::State, S: BosStr> SearchBooksBuilder<St, S> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -175,7 +188,7 @@ impl<S: BosStr, St: search_books_state::State> SearchBooksBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_books_state::State> SearchBooksBuilder<S, St> {
+impl<St: search_books_state::State, S: BosStr> SearchBooksBuilder<St, S> {
     /// Set the `q` field (optional)
     pub fn q(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -188,7 +201,7 @@ impl<S: BosStr, St: search_books_state::State> SearchBooksBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SearchBooksBuilder<S, St>
+impl<St, S: BosStr> SearchBooksBuilder<St, S>
 where
     St: search_books_state::State,
 {

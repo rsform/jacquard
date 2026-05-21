@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A request for someone to draw something
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -167,7 +167,7 @@ fn _default_request_is_open() -> Option<bool> {
 
 pub mod request_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -175,42 +175,42 @@ pub mod request_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
         type CreatedAt;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetText<St> {}
-    impl<St: State> State for SetText<St> {
-        type Text = Set<members::text>;
-        type CreatedAt = St::CreatedAt;
+        type Text = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Text = St::Text;
         type CreatedAt = Set<members::created_at>;
+        type Text = St::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type CreatedAt = St::CreatedAt;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RequestBuilder<S: BosStr, St: request_state::State> {
+pub struct RequestBuilder<St: request_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -223,15 +223,22 @@ pub struct RequestBuilder<S: BosStr, St: request_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Request<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RequestBuilder<S, request_state::Empty> {
+impl Request<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RequestBuilder<request_state::Empty, DefaultStr> {
         RequestBuilder::new()
     }
 }
 
-impl<S: BosStr> RequestBuilder<S, request_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Request<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RequestBuilder<request_state::Empty, S> {
+        RequestBuilder::builder()
+    }
+}
+
+impl RequestBuilder<request_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RequestBuilder {
             _state: PhantomData,
@@ -241,7 +248,18 @@ impl<S: BosStr> RequestBuilder<S, request_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RequestBuilder<S, St>
+impl<S: BosStr> RequestBuilder<request_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RequestBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RequestBuilder<St, S>
 where
     St: request_state::State,
     St::CreatedAt: request_state::IsUnset,
@@ -250,7 +268,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RequestBuilder<S, request_state::SetCreatedAt<St>> {
+    ) -> RequestBuilder<request_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
@@ -260,7 +278,7 @@ where
     }
 }
 
-impl<S: BosStr, St: request_state::State> RequestBuilder<S, St> {
+impl<St: request_state::State, S: BosStr> RequestBuilder<St, S> {
     /// Set the `isOpen` field (optional)
     pub fn is_open(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -273,9 +291,12 @@ impl<S: BosStr, St: request_state::State> RequestBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: request_state::State> RequestBuilder<S, St> {
+impl<St: request_state::State, S: BosStr> RequestBuilder<St, S> {
     /// Set the `referenceImages` field (optional)
-    pub fn reference_images(mut self, value: impl Into<Option<Vec<BlobRef<S>>>>) -> Self {
+    pub fn reference_images(
+        mut self,
+        value: impl Into<Option<Vec<BlobRef<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -286,7 +307,7 @@ impl<S: BosStr, St: request_state::State> RequestBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: request_state::State> RequestBuilder<S, St> {
+impl<St: request_state::State, S: BosStr> RequestBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -299,7 +320,7 @@ impl<S: BosStr, St: request_state::State> RequestBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: request_state::State> RequestBuilder<S, St> {
+impl<St: request_state::State, S: BosStr> RequestBuilder<St, S> {
     /// Set the `targetActor` field (optional)
     pub fn target_actor(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -312,13 +333,16 @@ impl<S: BosStr, St: request_state::State> RequestBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RequestBuilder<S, St>
+impl<St, S: BosStr> RequestBuilder<St, S>
 where
     St: request_state::State,
     St::Text: request_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(mut self, value: impl Into<S>) -> RequestBuilder<S, request_state::SetText<St>> {
+    pub fn text(
+        mut self,
+        value: impl Into<S>,
+    ) -> RequestBuilder<request_state::SetText<St>, S> {
         self._fields.5 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
@@ -328,11 +352,11 @@ where
     }
 }
 
-impl<S: BosStr, St> RequestBuilder<S, St>
+impl<St, S: BosStr> RequestBuilder<St, S>
 where
     St: request_state::State,
-    St::Text: request_state::IsSet,
     St::CreatedAt: request_state::IsSet,
+    St::Text: request_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Request<S> {
@@ -361,10 +385,10 @@ where
 }
 
 fn lexicon_doc_tech_tokimeki_kaku_request() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tech.tokimeki.kaku.request"),
@@ -373,15 +397,17 @@ fn lexicon_doc_tech_tokimeki_kaku_request() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A request for someone to draw something",
-                    )),
+                    description: Some(
+                        CowStr::new_static("A request for someone to draw something"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("text"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("text"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -401,12 +427,10 @@ fn lexicon_doc_tech_tokimeki_kaku_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("referenceImages"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Reference images for the request",
-                                    )),
-                                    items: LexArrayItem::Blob(LexBlob {
-                                        ..Default::default()
-                                    }),
+                                    description: Some(
+                                        CowStr::new_static("Reference images for the request"),
+                                    ),
+                                    items: LexArrayItem::Blob(LexBlob { ..Default::default() }),
                                     max_length: Some(4usize),
                                     ..Default::default()
                                 }),
@@ -414,9 +438,9 @@ fn lexicon_doc_tech_tokimeki_kaku_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tags"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Tags for categorization",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Tags for categorization"),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(64usize),
                                         ..Default::default()
@@ -428,9 +452,9 @@ fn lexicon_doc_tech_tokimeki_kaku_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("targetActor"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Optional: specific artist to request",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Optional: specific artist to request"),
+                                    ),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
@@ -438,9 +462,9 @@ fn lexicon_doc_tech_tokimeki_kaku_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("text"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Description of what to draw",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Description of what to draw"),
+                                    ),
                                     max_length: Some(1000usize),
                                     max_graphemes: Some(300usize),
                                     ..Default::default()

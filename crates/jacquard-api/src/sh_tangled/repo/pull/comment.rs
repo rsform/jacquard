@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -108,7 +108,7 @@ impl<S: BosStr> LexiconSchema for Comment<S> {
 
 pub mod comment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -117,55 +117,55 @@ pub mod comment_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Pull;
         type Body;
+        type Pull;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Pull = Unset;
         type Body = Unset;
+        type Pull = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Body = St::Body;
         type Pull = St::Pull;
-        type Body = St::Body;
-    }
-    ///State transition - sets the `pull` field to Set
-    pub struct SetPull<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPull<St> {}
-    impl<St: State> State for SetPull<St> {
-        type CreatedAt = St::CreatedAt;
-        type Pull = Set<members::pull>;
-        type Body = St::Body;
     }
     ///State transition - sets the `body` field to Set
     pub struct SetBody<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBody<St> {}
     impl<St: State> State for SetBody<St> {
         type CreatedAt = St::CreatedAt;
-        type Pull = St::Pull;
         type Body = Set<members::body>;
+        type Pull = St::Pull;
+    }
+    ///State transition - sets the `pull` field to Set
+    pub struct SetPull<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPull<St> {}
+    impl<St: State> State for SetPull<St> {
+        type CreatedAt = St::CreatedAt;
+        type Body = St::Body;
+        type Pull = Set<members::pull>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `pull` field
-        pub struct pull(());
         ///Marker type for the `body` field
         pub struct body(());
+        ///Marker type for the `pull` field
+        pub struct pull(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CommentBuilder<S: BosStr, St: comment_state::State> {
+pub struct CommentBuilder<St: comment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -177,15 +177,22 @@ pub struct CommentBuilder<S: BosStr, St: comment_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Comment<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CommentBuilder<S, comment_state::Empty> {
+impl Comment<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CommentBuilder<comment_state::Empty, DefaultStr> {
         CommentBuilder::new()
     }
 }
 
-impl<S: BosStr> CommentBuilder<S, comment_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Comment<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CommentBuilder<comment_state::Empty, S> {
+        CommentBuilder::builder()
+    }
+}
+
+impl CommentBuilder<comment_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CommentBuilder {
             _state: PhantomData,
@@ -195,13 +202,27 @@ impl<S: BosStr> CommentBuilder<S, comment_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<S: BosStr> CommentBuilder<comment_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CommentBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::Body: comment_state::IsUnset,
 {
     /// Set the `body` field (required)
-    pub fn body(mut self, value: impl Into<S>) -> CommentBuilder<S, comment_state::SetBody<St>> {
+    pub fn body(
+        mut self,
+        value: impl Into<S>,
+    ) -> CommentBuilder<comment_state::SetBody<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
@@ -211,7 +232,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::CreatedAt: comment_state::IsUnset,
@@ -220,7 +241,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CommentBuilder<S, comment_state::SetCreatedAt<St>> {
+    ) -> CommentBuilder<comment_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
@@ -230,7 +251,7 @@ where
     }
 }
 
-impl<S: BosStr, St: comment_state::State> CommentBuilder<S, St> {
+impl<St: comment_state::State, S: BosStr> CommentBuilder<St, S> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
         self._fields.2 = value.into();
@@ -243,7 +264,7 @@ impl<S: BosStr, St: comment_state::State> CommentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::Pull: comment_state::IsUnset,
@@ -252,7 +273,7 @@ where
     pub fn pull(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> CommentBuilder<S, comment_state::SetPull<St>> {
+    ) -> CommentBuilder<comment_state::SetPull<St>, S> {
         self._fields.3 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
@@ -262,7 +283,7 @@ where
     }
 }
 
-impl<S: BosStr, St: comment_state::State> CommentBuilder<S, St> {
+impl<St: comment_state::State, S: BosStr> CommentBuilder<St, S> {
     /// Set the `references` field (optional)
     pub fn references(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -275,12 +296,12 @@ impl<S: BosStr, St: comment_state::State> CommentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::CreatedAt: comment_state::IsSet,
-    St::Pull: comment_state::IsSet,
     St::Body: comment_state::IsSet,
+    St::Pull: comment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Comment<S> {
@@ -307,10 +328,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_pull_comment() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.pull.comment"),
@@ -321,11 +342,12 @@ fn lexicon_doc_sh_tangled_repo_pull_comment() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("pull"),
-                            SmolStr::new_static("body"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("pull"), SmolStr::new_static("body"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

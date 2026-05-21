@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::place_stream::segment::SegmentView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did};
-use jacquard_common::types::value::Data;
 use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::segment::SegmentView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSegments<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub before: Option<Datetime>,
@@ -33,11 +30,9 @@ pub struct GetSegments<S: BosStr = DefaultStr> {
     pub user_did: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSegmentsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub segments: Option<Vec<SegmentView<S>>>,
@@ -75,7 +70,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_segments_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -106,21 +101,28 @@ pub mod get_segments_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetSegmentsBuilder<S: BosStr, St: get_segments_state::State> {
+pub struct GetSegmentsBuilder<St: get_segments_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<i64>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetSegments<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetSegmentsBuilder<S, get_segments_state::Empty> {
+impl GetSegments<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetSegmentsBuilder<get_segments_state::Empty, DefaultStr> {
         GetSegmentsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetSegmentsBuilder<S, get_segments_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetSegments<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetSegmentsBuilder<get_segments_state::Empty, S> {
+        GetSegmentsBuilder::builder()
+    }
+}
+
+impl GetSegmentsBuilder<get_segments_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetSegmentsBuilder {
             _state: PhantomData,
@@ -130,7 +132,18 @@ impl<S: BosStr> GetSegmentsBuilder<S, get_segments_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_segments_state::State> GetSegmentsBuilder<S, St> {
+impl<S: BosStr> GetSegmentsBuilder<get_segments_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetSegmentsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_segments_state::State, S: BosStr> GetSegmentsBuilder<St, S> {
     /// Set the `before` field (optional)
     pub fn before(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -143,7 +156,7 @@ impl<S: BosStr, St: get_segments_state::State> GetSegmentsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_segments_state::State> GetSegmentsBuilder<S, St> {
+impl<St: get_segments_state::State, S: BosStr> GetSegmentsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -156,7 +169,7 @@ impl<S: BosStr, St: get_segments_state::State> GetSegmentsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetSegmentsBuilder<S, St>
+impl<St, S: BosStr> GetSegmentsBuilder<St, S>
 where
     St: get_segments_state::State,
     St::UserDid: get_segments_state::IsUnset,
@@ -165,7 +178,7 @@ where
     pub fn user_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetSegmentsBuilder<S, get_segments_state::SetUserDid<St>> {
+    ) -> GetSegmentsBuilder<get_segments_state::SetUserDid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GetSegmentsBuilder {
             _state: PhantomData,
@@ -175,7 +188,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetSegmentsBuilder<S, St>
+impl<St, S: BosStr> GetSegmentsBuilder<St, S>
 where
     St: get_segments_state::State,
     St::UserDid: get_segments_state::IsSet,

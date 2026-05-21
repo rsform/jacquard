@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,18 +25,15 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::org_atpodcasting::PodcastRef;
-use crate::org_atpodcasting::episode;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_atpodcasting::PodcastRef;
+use crate::org_atpodcasting::episode;
 /// Reference to an externally hosted chapters file.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ChaptersRef<S: BosStr = DefaultStr> {
     ///MIME type of the chapters file (e.g. application/json+chapters).
     pub mime_type: S,
@@ -201,10 +198,7 @@ pub struct EpisodeGetRecordOutput<S: BosStr = DefaultStr> {
 /// Reference to an externally hosted media file.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MediaRef<S: BosStr = DefaultStr> {
     ///MIME type of the media file (e.g. audio/mpeg, video/mp4).
     pub mime_type: S,
@@ -217,10 +211,7 @@ pub struct MediaRef<S: BosStr = DefaultStr> {
 /// Reference to an externally hosted transcript file.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TranscriptRef<S: BosStr = DefaultStr> {
     ///Language of the transcript (ISO 639-1 two-letter code, e.g. 'en', 'es', 'pt').
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -318,20 +309,25 @@ impl<S: BosStr> LexiconSchema for Episode<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("artwork"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -443,7 +439,7 @@ impl<S: BosStr> LexiconSchema for TranscriptRef<S> {
 
 pub mod chapters_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -451,56 +447,63 @@ pub mod chapters_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type MimeType;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type MimeType = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type Url = Set<members::url>;
-        type MimeType = St::MimeType;
+        type Url = Unset;
     }
     ///State transition - sets the `mime_type` field to Set
     pub struct SetMimeType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMimeType<St> {}
     impl<St: State> State for SetMimeType<St> {
-        type Url = St::Url;
         type MimeType = Set<members::mime_type>;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type MimeType = St::MimeType;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `mime_type` field
         pub struct mime_type(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ChaptersRefBuilder<S: BosStr, St: chapters_ref_state::State> {
+pub struct ChaptersRefBuilder<St: chapters_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ChaptersRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ChaptersRefBuilder<S, chapters_ref_state::Empty> {
+impl ChaptersRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ChaptersRefBuilder<chapters_ref_state::Empty, DefaultStr> {
         ChaptersRefBuilder::new()
     }
 }
 
-impl<S: BosStr> ChaptersRefBuilder<S, chapters_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ChaptersRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ChaptersRefBuilder<chapters_ref_state::Empty, S> {
+        ChaptersRefBuilder::builder()
+    }
+}
+
+impl ChaptersRefBuilder<chapters_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ChaptersRefBuilder {
             _state: PhantomData,
@@ -510,7 +513,18 @@ impl<S: BosStr> ChaptersRefBuilder<S, chapters_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ChaptersRefBuilder<S, St>
+impl<S: BosStr> ChaptersRefBuilder<chapters_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ChaptersRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ChaptersRefBuilder<St, S>
 where
     St: chapters_ref_state::State,
     St::MimeType: chapters_ref_state::IsUnset,
@@ -519,7 +533,7 @@ where
     pub fn mime_type(
         mut self,
         value: impl Into<S>,
-    ) -> ChaptersRefBuilder<S, chapters_ref_state::SetMimeType<St>> {
+    ) -> ChaptersRefBuilder<chapters_ref_state::SetMimeType<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ChaptersRefBuilder {
             _state: PhantomData,
@@ -529,7 +543,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ChaptersRefBuilder<S, St>
+impl<St, S: BosStr> ChaptersRefBuilder<St, S>
 where
     St: chapters_ref_state::State,
     St::Url: chapters_ref_state::IsUnset,
@@ -538,7 +552,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ChaptersRefBuilder<S, chapters_ref_state::SetUrl<St>> {
+    ) -> ChaptersRefBuilder<chapters_ref_state::SetUrl<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ChaptersRefBuilder {
             _state: PhantomData,
@@ -548,11 +562,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ChaptersRefBuilder<S, St>
+impl<St, S: BosStr> ChaptersRefBuilder<St, S>
 where
     St: chapters_ref_state::State,
-    St::Url: chapters_ref_state::IsSet,
     St::MimeType: chapters_ref_state::IsSet,
+    St::Url: chapters_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ChaptersRef<S> {
@@ -563,7 +577,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChaptersRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ChaptersRef<S> {
         ChaptersRef {
             mime_type: self._fields.0.unwrap(),
             url: self._fields.1.unwrap(),
@@ -573,10 +590,10 @@ where
 }
 
 fn lexicon_doc_org_atpodcasting_episode() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.atpodcasting.episode"),
@@ -816,29 +833,34 @@ fn lexicon_doc_org_atpodcasting_episode() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("mediaRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Reference to an externally hosted media file.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("url"),
-                        SmolStr::new_static("mimeType"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Reference to an externally hosted media file.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("url"), SmolStr::new_static("mimeType")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("mimeType"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "MIME type of the media file (e.g. audio/mpeg, video/mp4).",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "MIME type of the media file (e.g. audio/mpeg, video/mp4).",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("URL of the media file.")),
+                                description: Some(
+                                    CowStr::new_static("URL of the media file."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -908,7 +930,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> LexiconDoc<'static> {
 
 pub mod episode_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -916,132 +938,132 @@ pub mod episode_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Media;
         type Podcast;
-        type Title;
         type PublishedAt;
-        type FeedItemGuid;
-        type Duration;
         type CreatedAt;
+        type Title;
+        type Duration;
+        type FeedItemGuid;
+        type Media;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Media = Unset;
         type Podcast = Unset;
-        type Title = Unset;
         type PublishedAt = Unset;
-        type FeedItemGuid = Unset;
-        type Duration = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `media` field to Set
-    pub struct SetMedia<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMedia<St> {}
-    impl<St: State> State for SetMedia<St> {
-        type Media = Set<members::media>;
-        type Podcast = St::Podcast;
-        type Title = St::Title;
-        type PublishedAt = St::PublishedAt;
-        type FeedItemGuid = St::FeedItemGuid;
-        type Duration = St::Duration;
-        type CreatedAt = St::CreatedAt;
+        type Title = Unset;
+        type Duration = Unset;
+        type FeedItemGuid = Unset;
+        type Media = Unset;
     }
     ///State transition - sets the `podcast` field to Set
     pub struct SetPodcast<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPodcast<St> {}
     impl<St: State> State for SetPodcast<St> {
-        type Media = St::Media;
         type Podcast = Set<members::podcast>;
+        type PublishedAt = St::PublishedAt;
+        type CreatedAt = St::CreatedAt;
         type Title = St::Title;
-        type PublishedAt = St::PublishedAt;
-        type FeedItemGuid = St::FeedItemGuid;
         type Duration = St::Duration;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
+        type FeedItemGuid = St::FeedItemGuid;
         type Media = St::Media;
-        type Podcast = St::Podcast;
-        type Title = Set<members::title>;
-        type PublishedAt = St::PublishedAt;
-        type FeedItemGuid = St::FeedItemGuid;
-        type Duration = St::Duration;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `published_at` field to Set
     pub struct SetPublishedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPublishedAt<St> {}
     impl<St: State> State for SetPublishedAt<St> {
-        type Media = St::Media;
         type Podcast = St::Podcast;
-        type Title = St::Title;
         type PublishedAt = Set<members::published_at>;
-        type FeedItemGuid = St::FeedItemGuid;
-        type Duration = St::Duration;
         type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `feed_item_guid` field to Set
-    pub struct SetFeedItemGuid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFeedItemGuid<St> {}
-    impl<St: State> State for SetFeedItemGuid<St> {
-        type Media = St::Media;
-        type Podcast = St::Podcast;
         type Title = St::Title;
-        type PublishedAt = St::PublishedAt;
-        type FeedItemGuid = Set<members::feed_item_guid>;
         type Duration = St::Duration;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDuration<St> {}
-    impl<St: State> State for SetDuration<St> {
-        type Media = St::Media;
-        type Podcast = St::Podcast;
-        type Title = St::Title;
-        type PublishedAt = St::PublishedAt;
         type FeedItemGuid = St::FeedItemGuid;
-        type Duration = Set<members::duration>;
-        type CreatedAt = St::CreatedAt;
+        type Media = St::Media;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Media = St::Media;
         type Podcast = St::Podcast;
-        type Title = St::Title;
         type PublishedAt = St::PublishedAt;
-        type FeedItemGuid = St::FeedItemGuid;
-        type Duration = St::Duration;
         type CreatedAt = Set<members::created_at>;
+        type Title = St::Title;
+        type Duration = St::Duration;
+        type FeedItemGuid = St::FeedItemGuid;
+        type Media = St::Media;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Podcast = St::Podcast;
+        type PublishedAt = St::PublishedAt;
+        type CreatedAt = St::CreatedAt;
+        type Title = Set<members::title>;
+        type Duration = St::Duration;
+        type FeedItemGuid = St::FeedItemGuid;
+        type Media = St::Media;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDuration<St> {}
+    impl<St: State> State for SetDuration<St> {
+        type Podcast = St::Podcast;
+        type PublishedAt = St::PublishedAt;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type Duration = Set<members::duration>;
+        type FeedItemGuid = St::FeedItemGuid;
+        type Media = St::Media;
+    }
+    ///State transition - sets the `feed_item_guid` field to Set
+    pub struct SetFeedItemGuid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFeedItemGuid<St> {}
+    impl<St: State> State for SetFeedItemGuid<St> {
+        type Podcast = St::Podcast;
+        type PublishedAt = St::PublishedAt;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type Duration = St::Duration;
+        type FeedItemGuid = Set<members::feed_item_guid>;
+        type Media = St::Media;
+    }
+    ///State transition - sets the `media` field to Set
+    pub struct SetMedia<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMedia<St> {}
+    impl<St: State> State for SetMedia<St> {
+        type Podcast = St::Podcast;
+        type PublishedAt = St::PublishedAt;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type Duration = St::Duration;
+        type FeedItemGuid = St::FeedItemGuid;
+        type Media = Set<members::media>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `media` field
-        pub struct media(());
         ///Marker type for the `podcast` field
         pub struct podcast(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `published_at` field
         pub struct published_at(());
-        ///Marker type for the `feed_item_guid` field
-        pub struct feed_item_guid(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
+        ///Marker type for the `feed_item_guid` field
+        pub struct feed_item_guid(());
+        ///Marker type for the `media` field
+        pub struct media(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EpisodeBuilder<S: BosStr, St: episode_state::State> {
+pub struct EpisodeBuilder<St: episode_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<episode::MediaRef<S>>>,
@@ -1065,41 +1087,98 @@ pub struct EpisodeBuilder<S: BosStr, St: episode_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Episode<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EpisodeBuilder<S, episode_state::Empty> {
+impl Episode<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EpisodeBuilder<episode_state::Empty, DefaultStr> {
         EpisodeBuilder::new()
     }
 }
 
-impl<S: BosStr> EpisodeBuilder<S, episode_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Episode<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EpisodeBuilder<episode_state::Empty, S> {
+        EpisodeBuilder::builder()
+    }
+}
+
+impl EpisodeBuilder<episode_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EpisodeBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<S: BosStr> EpisodeBuilder<episode_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EpisodeBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `alternateMedia` field (optional)
-    pub fn alternate_media(mut self, value: impl Into<Option<Vec<episode::MediaRef<S>>>>) -> Self {
+    pub fn alternate_media(
+        mut self,
+        value: impl Into<Option<Vec<episode::MediaRef<S>>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alternateMedia` field to an Option value (optional)
-    pub fn maybe_alternate_media(mut self, value: Option<Vec<episode::MediaRef<S>>>) -> Self {
+    pub fn maybe_alternate_media(
+        mut self,
+        value: Option<Vec<episode::MediaRef<S>>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `artwork` field (optional)
     pub fn artwork(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -1112,9 +1191,12 @@ impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `chapters` field (optional)
-    pub fn chapters(mut self, value: impl Into<Option<episode::ChaptersRef<S>>>) -> Self {
+    pub fn chapters(
+        mut self,
+        value: impl Into<Option<episode::ChaptersRef<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -1125,7 +1207,7 @@ impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EpisodeBuilder<S, St>
+impl<St, S: BosStr> EpisodeBuilder<St, S>
 where
     St: episode_state::State,
     St::CreatedAt: episode_state::IsUnset,
@@ -1134,7 +1216,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EpisodeBuilder<S, episode_state::SetCreatedAt<St>> {
+    ) -> EpisodeBuilder<episode_state::SetCreatedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
@@ -1144,7 +1226,7 @@ where
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -1157,7 +1239,7 @@ impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EpisodeBuilder<S, St>
+impl<St, S: BosStr> EpisodeBuilder<St, S>
 where
     St: episode_state::State,
     St::Duration: episode_state::IsUnset,
@@ -1166,7 +1248,7 @@ where
     pub fn duration(
         mut self,
         value: impl Into<i64>,
-    ) -> EpisodeBuilder<S, episode_state::SetDuration<St>> {
+    ) -> EpisodeBuilder<episode_state::SetDuration<St>, S> {
         self._fields.5 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
@@ -1176,7 +1258,7 @@ where
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `episodeNumber` field (optional)
     pub fn episode_number(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -1189,9 +1271,12 @@ impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `episodeType` field (optional)
-    pub fn episode_type(mut self, value: impl Into<Option<EpisodeEpisodeType<S>>>) -> Self {
+    pub fn episode_type(
+        mut self,
+        value: impl Into<Option<EpisodeEpisodeType<S>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
@@ -1202,7 +1287,7 @@ impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `explicit` field (optional)
     pub fn explicit(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.8 = value.into();
@@ -1215,7 +1300,7 @@ impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EpisodeBuilder<S, St>
+impl<St, S: BosStr> EpisodeBuilder<St, S>
 where
     St: episode_state::State,
     St::FeedItemGuid: episode_state::IsUnset,
@@ -1224,7 +1309,7 @@ where
     pub fn feed_item_guid(
         mut self,
         value: impl Into<S>,
-    ) -> EpisodeBuilder<S, episode_state::SetFeedItemGuid<St>> {
+    ) -> EpisodeBuilder<episode_state::SetFeedItemGuid<St>, S> {
         self._fields.9 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
@@ -1234,7 +1319,7 @@ where
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `link` field (optional)
     pub fn link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -1247,7 +1332,7 @@ impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EpisodeBuilder<S, St>
+impl<St, S: BosStr> EpisodeBuilder<St, S>
 where
     St: episode_state::State,
     St::Media: episode_state::IsUnset,
@@ -1256,7 +1341,7 @@ where
     pub fn media(
         mut self,
         value: impl Into<episode::MediaRef<S>>,
-    ) -> EpisodeBuilder<S, episode_state::SetMedia<St>> {
+    ) -> EpisodeBuilder<episode_state::SetMedia<St>, S> {
         self._fields.11 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
@@ -1266,7 +1351,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EpisodeBuilder<S, St>
+impl<St, S: BosStr> EpisodeBuilder<St, S>
 where
     St: episode_state::State,
     St::Podcast: episode_state::IsUnset,
@@ -1275,7 +1360,7 @@ where
     pub fn podcast(
         mut self,
         value: impl Into<PodcastRef<S>>,
-    ) -> EpisodeBuilder<S, episode_state::SetPodcast<St>> {
+    ) -> EpisodeBuilder<episode_state::SetPodcast<St>, S> {
         self._fields.12 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
@@ -1285,7 +1370,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EpisodeBuilder<S, St>
+impl<St, S: BosStr> EpisodeBuilder<St, S>
 where
     St: episode_state::State,
     St::PublishedAt: episode_state::IsUnset,
@@ -1294,7 +1379,7 @@ where
     pub fn published_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EpisodeBuilder<S, episode_state::SetPublishedAt<St>> {
+    ) -> EpisodeBuilder<episode_state::SetPublishedAt<St>, S> {
         self._fields.13 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
@@ -1304,7 +1389,7 @@ where
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `seasonNumber` field (optional)
     pub fn season_number(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.14 = value.into();
@@ -1317,13 +1402,16 @@ impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EpisodeBuilder<S, St>
+impl<St, S: BosStr> EpisodeBuilder<St, S>
 where
     St: episode_state::State,
     St::Title: episode_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> EpisodeBuilder<S, episode_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> EpisodeBuilder<episode_state::SetTitle<St>, S> {
         self._fields.15 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
@@ -1333,29 +1421,35 @@ where
     }
 }
 
-impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
+impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `transcript` field (optional)
-    pub fn transcript(mut self, value: impl Into<Option<Vec<episode::TranscriptRef<S>>>>) -> Self {
+    pub fn transcript(
+        mut self,
+        value: impl Into<Option<Vec<episode::TranscriptRef<S>>>>,
+    ) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `transcript` field to an Option value (optional)
-    pub fn maybe_transcript(mut self, value: Option<Vec<episode::TranscriptRef<S>>>) -> Self {
+    pub fn maybe_transcript(
+        mut self,
+        value: Option<Vec<episode::TranscriptRef<S>>>,
+    ) -> Self {
         self._fields.16 = value;
         self
     }
 }
 
-impl<S: BosStr, St> EpisodeBuilder<S, St>
+impl<St, S: BosStr> EpisodeBuilder<St, S>
 where
     St: episode_state::State,
-    St::Media: episode_state::IsSet,
     St::Podcast: episode_state::IsSet,
-    St::Title: episode_state::IsSet,
     St::PublishedAt: episode_state::IsSet,
-    St::FeedItemGuid: episode_state::IsSet,
-    St::Duration: episode_state::IsSet,
     St::CreatedAt: episode_state::IsSet,
+    St::Title: episode_state::IsSet,
+    St::Duration: episode_state::IsSet,
+    St::FeedItemGuid: episode_state::IsSet,
+    St::Media: episode_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Episode<S> {
@@ -1407,7 +1501,7 @@ where
 
 pub mod media_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1415,56 +1509,63 @@ pub mod media_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type MimeType;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type MimeType = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type Url = Set<members::url>;
-        type MimeType = St::MimeType;
+        type Url = Unset;
     }
     ///State transition - sets the `mime_type` field to Set
     pub struct SetMimeType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMimeType<St> {}
     impl<St: State> State for SetMimeType<St> {
-        type Url = St::Url;
         type MimeType = Set<members::mime_type>;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type MimeType = St::MimeType;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `mime_type` field
         pub struct mime_type(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MediaRefBuilder<S: BosStr, St: media_ref_state::State> {
+pub struct MediaRefBuilder<St: media_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> MediaRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MediaRefBuilder<S, media_ref_state::Empty> {
+impl MediaRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MediaRefBuilder<media_ref_state::Empty, DefaultStr> {
         MediaRefBuilder::new()
     }
 }
 
-impl<S: BosStr> MediaRefBuilder<S, media_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> MediaRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MediaRefBuilder<media_ref_state::Empty, S> {
+        MediaRefBuilder::builder()
+    }
+}
+
+impl MediaRefBuilder<media_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MediaRefBuilder {
             _state: PhantomData,
@@ -1474,7 +1575,18 @@ impl<S: BosStr> MediaRefBuilder<S, media_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MediaRefBuilder<S, St>
+impl<S: BosStr> MediaRefBuilder<media_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MediaRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MediaRefBuilder<St, S>
 where
     St: media_ref_state::State,
     St::MimeType: media_ref_state::IsUnset,
@@ -1483,7 +1595,7 @@ where
     pub fn mime_type(
         mut self,
         value: impl Into<S>,
-    ) -> MediaRefBuilder<S, media_ref_state::SetMimeType<St>> {
+    ) -> MediaRefBuilder<media_ref_state::SetMimeType<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MediaRefBuilder {
             _state: PhantomData,
@@ -1493,7 +1605,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MediaRefBuilder<S, St>
+impl<St, S: BosStr> MediaRefBuilder<St, S>
 where
     St: media_ref_state::State,
     St::Url: media_ref_state::IsUnset,
@@ -1502,7 +1614,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> MediaRefBuilder<S, media_ref_state::SetUrl<St>> {
+    ) -> MediaRefBuilder<media_ref_state::SetUrl<St>, S> {
         self._fields.1 = Option::Some(value.into());
         MediaRefBuilder {
             _state: PhantomData,
@@ -1512,11 +1624,11 @@ where
     }
 }
 
-impl<S: BosStr, St> MediaRefBuilder<S, St>
+impl<St, S: BosStr> MediaRefBuilder<St, S>
 where
     St: media_ref_state::State,
-    St::Url: media_ref_state::IsSet,
     St::MimeType: media_ref_state::IsSet,
+    St::Url: media_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MediaRef<S> {
@@ -1538,7 +1650,7 @@ where
 
 pub mod transcript_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1546,56 +1658,66 @@ pub mod transcript_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MimeType;
         type Url;
+        type MimeType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MimeType = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `mime_type` field to Set
-    pub struct SetMimeType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMimeType<St> {}
-    impl<St: State> State for SetMimeType<St> {
-        type MimeType = Set<members::mime_type>;
-        type Url = St::Url;
+        type MimeType = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUrl<St> {}
     impl<St: State> State for SetUrl<St> {
-        type MimeType = St::MimeType;
         type Url = Set<members::url>;
+        type MimeType = St::MimeType;
+    }
+    ///State transition - sets the `mime_type` field to Set
+    pub struct SetMimeType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMimeType<St> {}
+    impl<St: State> State for SetMimeType<St> {
+        type Url = St::Url;
+        type MimeType = Set<members::mime_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mime_type` field
-        pub struct mime_type(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `mime_type` field
+        pub struct mime_type(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TranscriptRefBuilder<S: BosStr, St: transcript_ref_state::State> {
+pub struct TranscriptRefBuilder<
+    St: transcript_ref_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Language>, Option<S>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> TranscriptRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TranscriptRefBuilder<S, transcript_ref_state::Empty> {
+impl TranscriptRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TranscriptRefBuilder<transcript_ref_state::Empty, DefaultStr> {
         TranscriptRefBuilder::new()
     }
 }
 
-impl<S: BosStr> TranscriptRefBuilder<S, transcript_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> TranscriptRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TranscriptRefBuilder<transcript_ref_state::Empty, S> {
+        TranscriptRefBuilder::builder()
+    }
+}
+
+impl TranscriptRefBuilder<transcript_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TranscriptRefBuilder {
             _state: PhantomData,
@@ -1605,7 +1727,18 @@ impl<S: BosStr> TranscriptRefBuilder<S, transcript_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: transcript_ref_state::State> TranscriptRefBuilder<S, St> {
+impl<S: BosStr> TranscriptRefBuilder<transcript_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TranscriptRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: transcript_ref_state::State, S: BosStr> TranscriptRefBuilder<St, S> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<Language>>) -> Self {
         self._fields.0 = value.into();
@@ -1618,7 +1751,7 @@ impl<S: BosStr, St: transcript_ref_state::State> TranscriptRefBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TranscriptRefBuilder<S, St>
+impl<St, S: BosStr> TranscriptRefBuilder<St, S>
 where
     St: transcript_ref_state::State,
     St::MimeType: transcript_ref_state::IsUnset,
@@ -1627,7 +1760,7 @@ where
     pub fn mime_type(
         mut self,
         value: impl Into<S>,
-    ) -> TranscriptRefBuilder<S, transcript_ref_state::SetMimeType<St>> {
+    ) -> TranscriptRefBuilder<transcript_ref_state::SetMimeType<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TranscriptRefBuilder {
             _state: PhantomData,
@@ -1637,7 +1770,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TranscriptRefBuilder<S, St>
+impl<St, S: BosStr> TranscriptRefBuilder<St, S>
 where
     St: transcript_ref_state::State,
     St::Url: transcript_ref_state::IsUnset,
@@ -1646,7 +1779,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> TranscriptRefBuilder<S, transcript_ref_state::SetUrl<St>> {
+    ) -> TranscriptRefBuilder<transcript_ref_state::SetUrl<St>, S> {
         self._fields.2 = Option::Some(value.into());
         TranscriptRefBuilder {
             _state: PhantomData,
@@ -1656,11 +1789,11 @@ where
     }
 }
 
-impl<S: BosStr, St> TranscriptRefBuilder<S, St>
+impl<St, S: BosStr> TranscriptRefBuilder<St, S>
 where
     St: transcript_ref_state::State,
-    St::MimeType: transcript_ref_state::IsSet,
     St::Url: transcript_ref_state::IsSet,
+    St::MimeType: transcript_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> TranscriptRef<S> {
@@ -1672,7 +1805,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TranscriptRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TranscriptRef<S> {
         TranscriptRef {
             language: self._fields.0,
             mime_type: self._fields.1.unwrap(),

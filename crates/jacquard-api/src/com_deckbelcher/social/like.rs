@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,19 +24,16 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::com_deckbelcher::CardRef;
 use crate::com_deckbelcher::social::like;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// Subject for liking a card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CardSubject<S: BosStr = DefaultStr> {
     ///Reference to the card.
     pub r#ref: CardRef<S>,
@@ -62,6 +59,7 @@ pub struct Like<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -86,10 +84,7 @@ pub struct LikeGetRecordOutput<S: BosStr = DefaultStr> {
 /// Subject for liking an ATProto record (deck, reply, etc).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordSubject<S: BosStr = DefaultStr> {
     ///Reference to the record.
     pub r#ref: StrongRef<S>,
@@ -177,7 +172,7 @@ impl<S: BosStr> LexiconSchema for RecordSubject<S> {
 
 pub mod card_subject_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -208,21 +203,28 @@ pub mod card_subject_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CardSubjectBuilder<S: BosStr, St: card_subject_state::State> {
+pub struct CardSubjectBuilder<St: card_subject_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<CardRef<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CardSubject<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CardSubjectBuilder<S, card_subject_state::Empty> {
+impl CardSubject<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CardSubjectBuilder<card_subject_state::Empty, DefaultStr> {
         CardSubjectBuilder::new()
     }
 }
 
-impl<S: BosStr> CardSubjectBuilder<S, card_subject_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CardSubject<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CardSubjectBuilder<card_subject_state::Empty, S> {
+        CardSubjectBuilder::builder()
+    }
+}
+
+impl CardSubjectBuilder<card_subject_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CardSubjectBuilder {
             _state: PhantomData,
@@ -232,7 +234,18 @@ impl<S: BosStr> CardSubjectBuilder<S, card_subject_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CardSubjectBuilder<S, St>
+impl<S: BosStr> CardSubjectBuilder<card_subject_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CardSubjectBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CardSubjectBuilder<St, S>
 where
     St: card_subject_state::State,
     St::Ref: card_subject_state::IsUnset,
@@ -241,7 +254,7 @@ where
     pub fn r#ref(
         mut self,
         value: impl Into<CardRef<S>>,
-    ) -> CardSubjectBuilder<S, card_subject_state::SetRef<St>> {
+    ) -> CardSubjectBuilder<card_subject_state::SetRef<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CardSubjectBuilder {
             _state: PhantomData,
@@ -251,7 +264,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CardSubjectBuilder<S, St>
+impl<St, S: BosStr> CardSubjectBuilder<St, S>
 where
     St: card_subject_state::State,
     St::Ref: card_subject_state::IsSet,
@@ -264,7 +277,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CardSubject<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CardSubject<S> {
         CardSubject {
             r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -273,10 +289,10 @@ where
 }
 
 fn lexicon_doc_com_deckbelcher_social_like() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.deckbelcher.social.like"),
@@ -305,24 +321,28 @@ fn lexicon_doc_com_deckbelcher_social_like() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Record declaring a 'like' of a piece of content (card, deck, reply, etc).",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Record declaring a 'like' of a piece of content (card, deck, reply, etc).",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("subject"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the like was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp when the like was created."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -330,12 +350,12 @@ fn lexicon_doc_com_deckbelcher_social_like() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("subject"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(CowStr::new_static(
-                                        "Reference to the content being liked.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Reference to the content being liked."),
+                                    ),
                                     refs: vec![
                                         CowStr::new_static("#cardSubject"),
-                                        CowStr::new_static("#recordSubject"),
+                                        CowStr::new_static("#recordSubject")
                                     ],
                                     ..Default::default()
                                 }),
@@ -350,9 +370,11 @@ fn lexicon_doc_com_deckbelcher_social_like() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("recordSubject"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Subject for liking an ATProto record (deck, reply, etc).",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Subject for liking an ATProto record (deck, reply, etc).",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("ref")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -377,7 +399,7 @@ fn lexicon_doc_com_deckbelcher_social_like() -> LexiconDoc<'static> {
 
 pub mod like_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -385,56 +407,63 @@ pub mod like_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = St::Subject;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
-        type CreatedAt = St::CreatedAt;
         type Subject = Set<members::subject>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LikeBuilder<S: BosStr, St: like_state::State> {
+pub struct LikeBuilder<St: like_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<LikeSubject<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Like<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LikeBuilder<S, like_state::Empty> {
+impl Like<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LikeBuilder<like_state::Empty, DefaultStr> {
         LikeBuilder::new()
     }
 }
 
-impl<S: BosStr> LikeBuilder<S, like_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Like<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LikeBuilder<like_state::Empty, S> {
+        LikeBuilder::builder()
+    }
+}
+
+impl LikeBuilder<like_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LikeBuilder {
             _state: PhantomData,
@@ -444,7 +473,18 @@ impl<S: BosStr> LikeBuilder<S, like_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LikeBuilder<S, St>
+impl<S: BosStr> LikeBuilder<like_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LikeBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LikeBuilder<St, S>
 where
     St: like_state::State,
     St::CreatedAt: like_state::IsUnset,
@@ -453,7 +493,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LikeBuilder<S, like_state::SetCreatedAt<St>> {
+    ) -> LikeBuilder<like_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LikeBuilder {
             _state: PhantomData,
@@ -463,7 +503,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LikeBuilder<S, St>
+impl<St, S: BosStr> LikeBuilder<St, S>
 where
     St: like_state::State,
     St::Subject: like_state::IsUnset,
@@ -472,7 +512,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<LikeSubject<S>>,
-    ) -> LikeBuilder<S, like_state::SetSubject<St>> {
+    ) -> LikeBuilder<like_state::SetSubject<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LikeBuilder {
             _state: PhantomData,
@@ -482,11 +522,11 @@ where
     }
 }
 
-impl<S: BosStr, St> LikeBuilder<S, St>
+impl<St, S: BosStr> LikeBuilder<St, S>
 where
     St: like_state::State,
-    St::CreatedAt: like_state::IsSet,
     St::Subject: like_state::IsSet,
+    St::CreatedAt: like_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Like<S> {
@@ -508,7 +548,7 @@ where
 
 pub mod record_subject_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -539,21 +579,31 @@ pub mod record_subject_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RecordSubjectBuilder<S: BosStr, St: record_subject_state::State> {
+pub struct RecordSubjectBuilder<
+    St: record_subject_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RecordSubject<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RecordSubjectBuilder<S, record_subject_state::Empty> {
+impl RecordSubject<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RecordSubjectBuilder<record_subject_state::Empty, DefaultStr> {
         RecordSubjectBuilder::new()
     }
 }
 
-impl<S: BosStr> RecordSubjectBuilder<S, record_subject_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RecordSubject<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RecordSubjectBuilder<record_subject_state::Empty, S> {
+        RecordSubjectBuilder::builder()
+    }
+}
+
+impl RecordSubjectBuilder<record_subject_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RecordSubjectBuilder {
             _state: PhantomData,
@@ -563,7 +613,18 @@ impl<S: BosStr> RecordSubjectBuilder<S, record_subject_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RecordSubjectBuilder<S, St>
+impl<S: BosStr> RecordSubjectBuilder<record_subject_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RecordSubjectBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RecordSubjectBuilder<St, S>
 where
     St: record_subject_state::State,
     St::Ref: record_subject_state::IsUnset,
@@ -572,7 +633,7 @@ where
     pub fn r#ref(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> RecordSubjectBuilder<S, record_subject_state::SetRef<St>> {
+    ) -> RecordSubjectBuilder<record_subject_state::SetRef<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RecordSubjectBuilder {
             _state: PhantomData,
@@ -582,7 +643,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RecordSubjectBuilder<S, St>
+impl<St, S: BosStr> RecordSubjectBuilder<St, S>
 where
     St: record_subject_state::State,
     St::Ref: record_subject_state::IsSet,
@@ -595,7 +656,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordSubject<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RecordSubject<S> {
         RecordSubject {
             r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

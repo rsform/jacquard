@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,18 +24,15 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::ch_indiemusi::alpha::actor::publishing_owner::PublishingOwner;
-use crate::ch_indiemusi::alpha::song;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::ch_indiemusi::alpha::actor::publishing_owner::PublishingOwner;
+use crate::ch_indiemusi::alpha::song;
 /// An interested party associated with the song (author, composer, publisher)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct InterestedParty<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collecting_society: Option<S>,
@@ -227,10 +224,10 @@ impl<S: BosStr> LexiconSchema for Song<S> {
 }
 
 fn lexicon_doc_ch_indiemusi_alpha_song() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ch.indiemusi.alpha.song"),
@@ -382,7 +379,7 @@ fn lexicon_doc_ch_indiemusi_alpha_song() -> LexiconDoc<'static> {
 
 pub mod song_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -390,56 +387,63 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type InterestedParties;
         type Title;
+        type InterestedParties;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type InterestedParties = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `interested_parties` field to Set
-    pub struct SetInterestedParties<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetInterestedParties<St> {}
-    impl<St: State> State for SetInterestedParties<St> {
-        type InterestedParties = Set<members::interested_parties>;
-        type Title = St::Title;
+        type InterestedParties = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type InterestedParties = St::InterestedParties;
         type Title = Set<members::title>;
+        type InterestedParties = St::InterestedParties;
+    }
+    ///State transition - sets the `interested_parties` field to Set
+    pub struct SetInterestedParties<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetInterestedParties<St> {}
+    impl<St: State> State for SetInterestedParties<St> {
+        type Title = St::Title;
+        type InterestedParties = Set<members::interested_parties>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `interested_parties` field
-        pub struct interested_parties(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `interested_parties` field
+        pub struct interested_parties(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SongBuilder<S: BosStr, St: song_state::State> {
+pub struct SongBuilder<St: song_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<song::InterestedParty<S>>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Song<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SongBuilder<S, song_state::Empty> {
+impl Song<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SongBuilder<song_state::Empty, DefaultStr> {
         SongBuilder::new()
     }
 }
 
-impl<S: BosStr> SongBuilder<S, song_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Song<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SongBuilder<song_state::Empty, S> {
+        SongBuilder::builder()
+    }
+}
+
+impl SongBuilder<song_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SongBuilder {
             _state: PhantomData,
@@ -449,7 +453,18 @@ impl<S: BosStr> SongBuilder<S, song_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SongBuilder<S, St>
+impl<S: BosStr> SongBuilder<song_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SongBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SongBuilder<St, S>
 where
     St: song_state::State,
     St::InterestedParties: song_state::IsUnset,
@@ -458,7 +473,7 @@ where
     pub fn interested_parties(
         mut self,
         value: impl Into<Vec<song::InterestedParty<S>>>,
-    ) -> SongBuilder<S, song_state::SetInterestedParties<St>> {
+    ) -> SongBuilder<song_state::SetInterestedParties<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
@@ -468,7 +483,7 @@ where
     }
 }
 
-impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
+impl<St: song_state::State, S: BosStr> SongBuilder<St, S> {
     /// Set the `iswc` field (optional)
     pub fn iswc(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -481,13 +496,16 @@ impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SongBuilder<S, St>
+impl<St, S: BosStr> SongBuilder<St, S>
 where
     St: song_state::State,
     St::Title: song_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> SongBuilder<S, song_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> SongBuilder<song_state::SetTitle<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
@@ -497,11 +515,11 @@ where
     }
 }
 
-impl<S: BosStr, St> SongBuilder<S, St>
+impl<St, S: BosStr> SongBuilder<St, S>
 where
     St: song_state::State,
-    St::InterestedParties: song_state::IsSet,
     St::Title: song_state::IsSet,
+    St::InterestedParties: song_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Song<S> {

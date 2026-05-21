@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::org_simocracy::SpriteSettings;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_simocracy::SpriteSettings;
 /// An avatar/sim record. One user can have multiple sims.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -111,23 +111,25 @@ impl<S: BosStr> LexiconSchema for Sim<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/webp".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -151,7 +153,7 @@ impl<S: BosStr> LexiconSchema for Sim<S> {
 
 pub mod sim_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -208,7 +210,7 @@ pub mod sim_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SimBuilder<S: BosStr, St: sim_state::State> {
+pub struct SimBuilder<St: sim_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -219,15 +221,22 @@ pub struct SimBuilder<S: BosStr, St: sim_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Sim<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SimBuilder<S, sim_state::Empty> {
+impl Sim<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SimBuilder<sim_state::Empty, DefaultStr> {
         SimBuilder::new()
     }
 }
 
-impl<S: BosStr> SimBuilder<S, sim_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Sim<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SimBuilder<sim_state::Empty, S> {
+        SimBuilder::builder()
+    }
+}
+
+impl SimBuilder<sim_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SimBuilder {
             _state: PhantomData,
@@ -237,7 +246,18 @@ impl<S: BosStr> SimBuilder<S, sim_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SimBuilder<S, St>
+impl<S: BosStr> SimBuilder<sim_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SimBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SimBuilder<St, S>
 where
     St: sim_state::State,
     St::CreatedAt: sim_state::IsUnset,
@@ -246,7 +266,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SimBuilder<S, sim_state::SetCreatedAt<St>> {
+    ) -> SimBuilder<sim_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SimBuilder {
             _state: PhantomData,
@@ -256,7 +276,7 @@ where
     }
 }
 
-impl<S: BosStr, St: sim_state::State> SimBuilder<S, St> {
+impl<St: sim_state::State, S: BosStr> SimBuilder<St, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -269,13 +289,13 @@ impl<S: BosStr, St: sim_state::State> SimBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SimBuilder<S, St>
+impl<St, S: BosStr> SimBuilder<St, S>
 where
     St: sim_state::State,
     St::Name: sim_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> SimBuilder<S, sim_state::SetName<St>> {
+    pub fn name(mut self, value: impl Into<S>) -> SimBuilder<sim_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SimBuilder {
             _state: PhantomData,
@@ -285,7 +305,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SimBuilder<S, St>
+impl<St, S: BosStr> SimBuilder<St, S>
 where
     St: sim_state::State,
     St::Settings: sim_state::IsUnset,
@@ -294,7 +314,7 @@ where
     pub fn settings(
         mut self,
         value: impl Into<SpriteSettings<S>>,
-    ) -> SimBuilder<S, sim_state::SetSettings<St>> {
+    ) -> SimBuilder<sim_state::SetSettings<St>, S> {
         self._fields.3 = Option::Some(value.into());
         SimBuilder {
             _state: PhantomData,
@@ -304,7 +324,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SimBuilder<S, St>
+impl<St, S: BosStr> SimBuilder<St, S>
 where
     St: sim_state::State,
     St::Settings: sim_state::IsSet,
@@ -334,10 +354,10 @@ where
 }
 
 fn lexicon_doc_org_simocracy_sim() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.simocracy.sim"),
@@ -346,41 +366,43 @@ fn lexicon_doc_org_simocracy_sim() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "An avatar/sim record. One user can have multiple sims.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "An avatar/sim record. One user can have multiple sims.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("settings"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("settings"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the sim was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp when the sim was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("image"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Display name of the sim",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Display name of the sim"),
+                                    ),
                                     max_length: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -388,7 +410,9 @@ fn lexicon_doc_org_simocracy_sim() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("settings"),
                                 LexObjectProperty::Ref(LexRef {
-                                    r#ref: CowStr::new_static("org.simocracy.defs#spriteSettings"),
+                                    r#ref: CowStr::new_static(
+                                        "org.simocracy.defs#spriteSettings",
+                                    ),
                                     ..Default::default()
                                 }),
                             );

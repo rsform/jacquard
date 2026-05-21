@@ -8,31 +8,26 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_ocho::plugin::Manifest;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_ocho::plugin::Manifest;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetManifest<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub platform: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetManifestOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Manifest<S>,
@@ -66,7 +61,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetManifestRequest {
 
 pub mod get_manifest_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -74,56 +69,63 @@ pub mod get_manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Platform;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Platform = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Platform = St::Platform;
+        type Did = Unset;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPlatform<St> {}
     impl<St: State> State for SetPlatform<St> {
-        type Did = St::Did;
         type Platform = Set<members::platform>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Platform = St::Platform;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `platform` field
         pub struct platform(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetManifestBuilder<S: BosStr, St: get_manifest_state::State> {
+pub struct GetManifestBuilder<St: get_manifest_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetManifest<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetManifestBuilder<S, get_manifest_state::Empty> {
+impl GetManifest<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetManifestBuilder<get_manifest_state::Empty, DefaultStr> {
         GetManifestBuilder::new()
     }
 }
 
-impl<S: BosStr> GetManifestBuilder<S, get_manifest_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetManifest<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetManifestBuilder<get_manifest_state::Empty, S> {
+        GetManifestBuilder::builder()
+    }
+}
+
+impl GetManifestBuilder<get_manifest_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetManifestBuilder {
             _state: PhantomData,
@@ -133,7 +135,18 @@ impl<S: BosStr> GetManifestBuilder<S, get_manifest_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetManifestBuilder<S, St>
+impl<S: BosStr> GetManifestBuilder<get_manifest_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetManifestBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetManifestBuilder<St, S>
 where
     St: get_manifest_state::State,
     St::Did: get_manifest_state::IsUnset,
@@ -142,7 +155,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetManifestBuilder<S, get_manifest_state::SetDid<St>> {
+    ) -> GetManifestBuilder<get_manifest_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetManifestBuilder {
             _state: PhantomData,
@@ -152,7 +165,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetManifestBuilder<S, St>
+impl<St, S: BosStr> GetManifestBuilder<St, S>
 where
     St: get_manifest_state::State,
     St::Platform: get_manifest_state::IsUnset,
@@ -161,7 +174,7 @@ where
     pub fn platform(
         mut self,
         value: impl Into<S>,
-    ) -> GetManifestBuilder<S, get_manifest_state::SetPlatform<St>> {
+    ) -> GetManifestBuilder<get_manifest_state::SetPlatform<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetManifestBuilder {
             _state: PhantomData,
@@ -171,11 +184,11 @@ where
     }
 }
 
-impl<S: BosStr, St> GetManifestBuilder<S, St>
+impl<St, S: BosStr> GetManifestBuilder<St, S>
 where
     St: get_manifest_state::State,
-    St::Did: get_manifest_state::IsSet,
     St::Platform: get_manifest_state::IsSet,
+    St::Did: get_manifest_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GetManifest<S> {

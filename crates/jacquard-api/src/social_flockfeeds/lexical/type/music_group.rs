@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,6 +24,9 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::article;
 use crate::social_flockfeeds::lexical::r#type::brand;
 use crate::social_flockfeeds::lexical::r#type::event;
@@ -32,16 +35,10 @@ use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A musical group, such as a band, an orchestra, or a choir. Can also be a solo musician.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accepted_payment_method: Option<EmbeddedAcceptedPaymentMethod<S>>,
@@ -237,6 +234,7 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -290,6 +288,7 @@ pub enum EmbeddedAlumni<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -314,6 +313,7 @@ pub enum EmbeddedBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -343,6 +343,7 @@ pub enum EmbeddedDepartment<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -371,6 +372,7 @@ pub enum EmbeddedDiversityStaffingReport<S: BosStr = DefaultStr> {
     ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -389,6 +391,7 @@ pub enum EmbeddedEmployee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -396,6 +399,7 @@ pub enum EmbeddedEmployees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -410,6 +414,7 @@ pub enum EmbeddedEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -417,6 +422,7 @@ pub enum EmbeddedEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -433,6 +439,7 @@ pub enum EmbeddedFounder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -440,6 +447,7 @@ pub enum EmbeddedFounders<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -460,6 +468,7 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -534,6 +543,7 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -582,6 +592,7 @@ pub enum EmbeddedLegalRepresentative<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -600,6 +611,7 @@ pub enum EmbeddedLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -613,6 +625,7 @@ pub enum EmbeddedMakesOffer<S: BosStr = DefaultStr> {
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -623,6 +636,7 @@ pub enum EmbeddedMember<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -630,6 +644,7 @@ pub enum EmbeddedMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -641,6 +656,7 @@ pub enum EmbeddedMembers<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -648,6 +664,7 @@ pub enum EmbeddedMusicGroupMember<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -682,6 +699,7 @@ pub enum EmbeddedOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -689,6 +707,7 @@ pub enum EmbeddedParentOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -745,6 +764,7 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -753,6 +773,7 @@ pub enum EmbeddedSubOrganization<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -760,6 +781,7 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -998,6 +1020,7 @@ pub struct MusicGroup<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1051,6 +1074,7 @@ pub enum MusicGroupAlumni<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1075,6 +1099,7 @@ pub enum MusicGroupBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1104,6 +1129,7 @@ pub enum MusicGroupDepartment<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1132,6 +1158,7 @@ pub enum MusicGroupDiversityStaffingReport<S: BosStr = DefaultStr> {
     ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1150,6 +1177,7 @@ pub enum MusicGroupEmployee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1157,6 +1185,7 @@ pub enum MusicGroupEmployees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1171,6 +1200,7 @@ pub enum MusicGroupEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1178,6 +1208,7 @@ pub enum MusicGroupEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1194,6 +1225,7 @@ pub enum MusicGroupFounder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1201,6 +1233,7 @@ pub enum MusicGroupFounders<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1221,6 +1254,7 @@ pub enum MusicGroupFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1295,6 +1329,7 @@ pub enum MusicGroupImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1343,6 +1378,7 @@ pub enum MusicGroupLegalRepresentative<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1361,6 +1397,7 @@ pub enum MusicGroupLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1374,6 +1411,7 @@ pub enum MusicGroupMakesOffer<S: BosStr = DefaultStr> {
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1384,6 +1422,7 @@ pub enum MusicGroupMember<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1391,6 +1430,7 @@ pub enum MusicGroupMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1402,6 +1442,7 @@ pub enum MusicGroupMembers<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1409,6 +1450,7 @@ pub enum MusicGroupMusicGroupMember<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1443,6 +1485,7 @@ pub enum MusicGroupOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1450,6 +1493,7 @@ pub enum MusicGroupParentOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1506,6 +1550,7 @@ pub enum MusicGroupSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1514,6 +1559,7 @@ pub enum MusicGroupSubOrganization<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1521,6 +1567,7 @@ pub enum MusicGroupSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1631,10 +1678,10 @@ impl<S: BosStr> LexiconSchema for MusicGroup<S> {
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_MusicGroup() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.MusicGroup"),
@@ -3666,7 +3713,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicGroup() -> LexiconDoc<'static
 
 pub mod music_group_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3684,7 +3731,7 @@ pub mod music_group_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MusicGroupBuilder<S: BosStr, St: music_group_state::State> {
+pub struct MusicGroupBuilder<St: music_group_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<MusicGroupAcceptedPaymentMethod<S>>,
@@ -3786,33 +3833,235 @@ pub struct MusicGroupBuilder<S: BosStr, St: music_group_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> MusicGroup<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MusicGroupBuilder<S, music_group_state::Empty> {
+impl MusicGroup<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MusicGroupBuilder<music_group_state::Empty, DefaultStr> {
         MusicGroupBuilder::new()
     }
 }
 
-impl<S: BosStr> MusicGroupBuilder<S, music_group_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> MusicGroup<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MusicGroupBuilder<music_group_state::Empty, S> {
+        MusicGroupBuilder::builder()
+    }
+}
+
+impl MusicGroupBuilder<music_group_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MusicGroupBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<S: BosStr> MusicGroupBuilder<music_group_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MusicGroupBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `acceptedPaymentMethod` field (optional)
     pub fn accepted_payment_method(
         mut self,
@@ -3831,7 +4080,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `actionableFeedbackPolicy` field (optional)
     pub fn actionable_feedback_policy(
         mut self,
@@ -3850,7 +4099,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `additionalType` field (optional)
     pub fn additional_type(
         mut self,
@@ -3860,13 +4109,16 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(mut self, value: Option<MusicGroupAdditionalType<S>>) -> Self {
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<MusicGroupAdditionalType<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `address` field (optional)
     pub fn address(mut self, value: impl Into<Option<MusicGroupAddress<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -3879,7 +4131,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `agentInteractionStatistic` field (optional)
     pub fn agent_interaction_statistic(
         mut self,
@@ -3898,7 +4150,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `aggregateRating` field (optional)
     pub fn aggregate_rating(
         mut self,
@@ -3908,13 +4160,16 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(mut self, value: Option<MusicGroupAggregateRating<S>>) -> Self {
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<MusicGroupAggregateRating<S>>,
+    ) -> Self {
         self._fields.5 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `album` field (optional)
     pub fn album(mut self, value: impl Into<Option<MusicGroupAlbum<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -3927,7 +4182,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `albums` field (optional)
     pub fn albums(mut self, value: impl Into<Option<MusicGroupAlbums<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -3940,20 +4195,26 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(mut self, value: impl Into<Option<MusicGroupAlternateName<S>>>) -> Self {
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<MusicGroupAlternateName<S>>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(mut self, value: Option<MusicGroupAlternateName<S>>) -> Self {
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<MusicGroupAlternateName<S>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `alumni` field (optional)
     pub fn alumni(mut self, value: impl Into<Option<MusicGroupAlumni<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -3966,9 +4227,12 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `areaServed` field (optional)
-    pub fn area_served(mut self, value: impl Into<Option<MusicGroupAreaServed<S>>>) -> Self {
+    pub fn area_served(
+        mut self,
+        value: impl Into<Option<MusicGroupAreaServed<S>>>,
+    ) -> Self {
         self._fields.10 = value.into();
         self
     }
@@ -3979,7 +4243,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<MusicGroupAward<S>>>) -> Self {
         self._fields.11 = value.into();
@@ -3992,7 +4256,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<MusicGroupAwards<S>>>) -> Self {
         self._fields.12 = value.into();
@@ -4005,7 +4269,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `brand` field (optional)
     pub fn brand(mut self, value: impl Into<Option<MusicGroupBrand<S>>>) -> Self {
         self._fields.13 = value.into();
@@ -4018,7 +4282,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `companyRegistration` field (optional)
     pub fn company_registration(
         mut self,
@@ -4037,33 +4301,45 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `contactPoint` field (optional)
-    pub fn contact_point(mut self, value: impl Into<Option<MusicGroupContactPoint<S>>>) -> Self {
+    pub fn contact_point(
+        mut self,
+        value: impl Into<Option<MusicGroupContactPoint<S>>>,
+    ) -> Self {
         self._fields.15 = value.into();
         self
     }
     /// Set the `contactPoint` field to an Option value (optional)
-    pub fn maybe_contact_point(mut self, value: Option<MusicGroupContactPoint<S>>) -> Self {
+    pub fn maybe_contact_point(
+        mut self,
+        value: Option<MusicGroupContactPoint<S>>,
+    ) -> Self {
         self._fields.15 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `contactPoints` field (optional)
-    pub fn contact_points(mut self, value: impl Into<Option<MusicGroupContactPoints<S>>>) -> Self {
+    pub fn contact_points(
+        mut self,
+        value: impl Into<Option<MusicGroupContactPoints<S>>>,
+    ) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `contactPoints` field to an Option value (optional)
-    pub fn maybe_contact_points(mut self, value: Option<MusicGroupContactPoints<S>>) -> Self {
+    pub fn maybe_contact_points(
+        mut self,
+        value: Option<MusicGroupContactPoints<S>>,
+    ) -> Self {
         self._fields.16 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `correctionsPolicy` field (optional)
     pub fn corrections_policy(
         mut self,
@@ -4082,9 +4358,12 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `department` field (optional)
-    pub fn department(mut self, value: impl Into<Option<MusicGroupDepartment<S>>>) -> Self {
+    pub fn department(
+        mut self,
+        value: impl Into<Option<MusicGroupDepartment<S>>>,
+    ) -> Self {
         self._fields.18 = value.into();
         self
     }
@@ -4095,9 +4374,12 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<MusicGroupDescription<S>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<MusicGroupDescription<S>>>,
+    ) -> Self {
         self._fields.19 = value.into();
         self
     }
@@ -4108,7 +4390,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
@@ -4127,7 +4409,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `dissolutionDate` field (optional)
     pub fn dissolution_date(
         mut self,
@@ -4137,13 +4419,16 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
         self
     }
     /// Set the `dissolutionDate` field to an Option value (optional)
-    pub fn maybe_dissolution_date(mut self, value: Option<MusicGroupDissolutionDate<S>>) -> Self {
+    pub fn maybe_dissolution_date(
+        mut self,
+        value: Option<MusicGroupDissolutionDate<S>>,
+    ) -> Self {
         self._fields.21 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `diversityPolicy` field (optional)
     pub fn diversity_policy(
         mut self,
@@ -4153,13 +4438,16 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
         self
     }
     /// Set the `diversityPolicy` field to an Option value (optional)
-    pub fn maybe_diversity_policy(mut self, value: Option<MusicGroupDiversityPolicy<S>>) -> Self {
+    pub fn maybe_diversity_policy(
+        mut self,
+        value: Option<MusicGroupDiversityPolicy<S>>,
+    ) -> Self {
         self._fields.22 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `diversityStaffingReport` field (optional)
     pub fn diversity_staffing_report(
         mut self,
@@ -4178,7 +4466,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `duns` field (optional)
     pub fn duns(mut self, value: impl Into<Option<MusicGroupDuns<S>>>) -> Self {
         self._fields.24 = value.into();
@@ -4191,7 +4479,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<MusicGroupEmail<S>>>) -> Self {
         self._fields.25 = value.into();
@@ -4204,7 +4492,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `employee` field (optional)
     pub fn employee(mut self, value: impl Into<Option<MusicGroupEmployee<S>>>) -> Self {
         self._fields.26 = value.into();
@@ -4217,9 +4505,12 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `employees` field (optional)
-    pub fn employees(mut self, value: impl Into<Option<MusicGroupEmployees<S>>>) -> Self {
+    pub fn employees(
+        mut self,
+        value: impl Into<Option<MusicGroupEmployees<S>>>,
+    ) -> Self {
         self._fields.27 = value.into();
         self
     }
@@ -4230,20 +4521,26 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `ethicsPolicy` field (optional)
-    pub fn ethics_policy(mut self, value: impl Into<Option<MusicGroupEthicsPolicy<S>>>) -> Self {
+    pub fn ethics_policy(
+        mut self,
+        value: impl Into<Option<MusicGroupEthicsPolicy<S>>>,
+    ) -> Self {
         self._fields.28 = value.into();
         self
     }
     /// Set the `ethicsPolicy` field to an Option value (optional)
-    pub fn maybe_ethics_policy(mut self, value: Option<MusicGroupEthicsPolicy<S>>) -> Self {
+    pub fn maybe_ethics_policy(
+        mut self,
+        value: Option<MusicGroupEthicsPolicy<S>>,
+    ) -> Self {
         self._fields.28 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `event` field (optional)
     pub fn event(mut self, value: impl Into<Option<MusicGroupEvent<S>>>) -> Self {
         self._fields.29 = value.into();
@@ -4256,7 +4553,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `events` field (optional)
     pub fn events(mut self, value: impl Into<Option<MusicGroupEvents<S>>>) -> Self {
         self._fields.30 = value.into();
@@ -4269,9 +4566,12 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `faxNumber` field (optional)
-    pub fn fax_number(mut self, value: impl Into<Option<MusicGroupFaxNumber<S>>>) -> Self {
+    pub fn fax_number(
+        mut self,
+        value: impl Into<Option<MusicGroupFaxNumber<S>>>,
+    ) -> Self {
         self._fields.31 = value.into();
         self
     }
@@ -4282,7 +4582,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `founder` field (optional)
     pub fn founder(mut self, value: impl Into<Option<MusicGroupFounder<S>>>) -> Self {
         self._fields.32 = value.into();
@@ -4295,7 +4595,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `founders` field (optional)
     pub fn founders(mut self, value: impl Into<Option<MusicGroupFounders<S>>>) -> Self {
         self._fields.33 = value.into();
@@ -4308,20 +4608,26 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `foundingDate` field (optional)
-    pub fn founding_date(mut self, value: impl Into<Option<MusicGroupFoundingDate<S>>>) -> Self {
+    pub fn founding_date(
+        mut self,
+        value: impl Into<Option<MusicGroupFoundingDate<S>>>,
+    ) -> Self {
         self._fields.34 = value.into();
         self
     }
     /// Set the `foundingDate` field to an Option value (optional)
-    pub fn maybe_founding_date(mut self, value: Option<MusicGroupFoundingDate<S>>) -> Self {
+    pub fn maybe_founding_date(
+        mut self,
+        value: Option<MusicGroupFoundingDate<S>>,
+    ) -> Self {
         self._fields.34 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `foundingLocation` field (optional)
     pub fn founding_location(
         mut self,
@@ -4331,13 +4637,16 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
         self
     }
     /// Set the `foundingLocation` field to an Option value (optional)
-    pub fn maybe_founding_location(mut self, value: Option<MusicGroupFoundingLocation<S>>) -> Self {
+    pub fn maybe_founding_location(
+        mut self,
+        value: Option<MusicGroupFoundingLocation<S>>,
+    ) -> Self {
         self._fields.35 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<MusicGroupFunder<S>>>) -> Self {
         self._fields.36 = value.into();
@@ -4350,7 +4659,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<MusicGroupFunding<S>>>) -> Self {
         self._fields.37 = value.into();
@@ -4363,7 +4672,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<MusicGroupGenre<S>>>) -> Self {
         self._fields.38 = value.into();
@@ -4376,7 +4685,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `globalLocationNumber` field (optional)
     pub fn global_location_number(
         mut self,
@@ -4395,7 +4704,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `hasCertification` field (optional)
     pub fn has_certification(
         mut self,
@@ -4405,26 +4714,35 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
         self
     }
     /// Set the `hasCertification` field to an Option value (optional)
-    pub fn maybe_has_certification(mut self, value: Option<MusicGroupHasCertification<S>>) -> Self {
+    pub fn maybe_has_certification(
+        mut self,
+        value: Option<MusicGroupHasCertification<S>>,
+    ) -> Self {
         self._fields.40 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `hasCredential` field (optional)
-    pub fn has_credential(mut self, value: impl Into<Option<MusicGroupHasCredential<S>>>) -> Self {
+    pub fn has_credential(
+        mut self,
+        value: impl Into<Option<MusicGroupHasCredential<S>>>,
+    ) -> Self {
         self._fields.41 = value.into();
         self
     }
     /// Set the `hasCredential` field to an Option value (optional)
-    pub fn maybe_has_credential(mut self, value: Option<MusicGroupHasCredential<S>>) -> Self {
+    pub fn maybe_has_credential(
+        mut self,
+        value: Option<MusicGroupHasCredential<S>>,
+    ) -> Self {
         self._fields.41 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `hasGS1DigitalLink` field (optional)
     pub fn has_gs1_digital_link(
         mut self,
@@ -4443,7 +4761,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `hasMemberProgram` field (optional)
     pub fn has_member_program(
         mut self,
@@ -4462,7 +4780,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `hasMerchantReturnPolicy` field (optional)
     pub fn has_merchant_return_policy(
         mut self,
@@ -4481,7 +4799,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `hasOfferCatalog` field (optional)
     pub fn has_offer_catalog(
         mut self,
@@ -4491,13 +4809,16 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
         self
     }
     /// Set the `hasOfferCatalog` field to an Option value (optional)
-    pub fn maybe_has_offer_catalog(mut self, value: Option<MusicGroupHasOfferCatalog<S>>) -> Self {
+    pub fn maybe_has_offer_catalog(
+        mut self,
+        value: Option<MusicGroupHasOfferCatalog<S>>,
+    ) -> Self {
         self._fields.45 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `hasPOS` field (optional)
     pub fn has_pos(mut self, value: impl Into<Option<MusicGroupHasPos<S>>>) -> Self {
         self._fields.46 = value.into();
@@ -4510,7 +4831,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `hasProductReturnPolicy` field (optional)
     pub fn has_product_return_policy(
         mut self,
@@ -4529,7 +4850,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `hasShippingService` field (optional)
     pub fn has_shipping_service(
         mut self,
@@ -4548,9 +4869,12 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(mut self, value: impl Into<Option<MusicGroupIdentifier<S>>>) -> Self {
+    pub fn identifier(
+        mut self,
+        value: impl Into<Option<MusicGroupIdentifier<S>>>,
+    ) -> Self {
         self._fields.49 = value.into();
         self
     }
@@ -4561,7 +4885,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<MusicGroupImage<S>>>) -> Self {
         self._fields.50 = value.into();
@@ -4574,7 +4898,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `interactionStatistic` field (optional)
     pub fn interaction_statistic(
         mut self,
@@ -4593,7 +4917,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `isicV4` field (optional)
     pub fn isic_v4(mut self, value: impl Into<Option<MusicGroupIsicV4<S>>>) -> Self {
         self._fields.52 = value.into();
@@ -4606,20 +4930,26 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `iso6523Code` field (optional)
-    pub fn iso6523_code(mut self, value: impl Into<Option<MusicGroupIso6523Code<S>>>) -> Self {
+    pub fn iso6523_code(
+        mut self,
+        value: impl Into<Option<MusicGroupIso6523Code<S>>>,
+    ) -> Self {
         self._fields.53 = value.into();
         self
     }
     /// Set the `iso6523Code` field to an Option value (optional)
-    pub fn maybe_iso6523_code(mut self, value: Option<MusicGroupIso6523Code<S>>) -> Self {
+    pub fn maybe_iso6523_code(
+        mut self,
+        value: Option<MusicGroupIso6523Code<S>>,
+    ) -> Self {
         self._fields.53 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<MusicGroupKeywords<S>>>) -> Self {
         self._fields.54 = value.into();
@@ -4632,9 +4962,12 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `knowsAbout` field (optional)
-    pub fn knows_about(mut self, value: impl Into<Option<MusicGroupKnowsAbout<S>>>) -> Self {
+    pub fn knows_about(
+        mut self,
+        value: impl Into<Option<MusicGroupKnowsAbout<S>>>,
+    ) -> Self {
         self._fields.55 = value.into();
         self
     }
@@ -4645,35 +4978,50 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `knowsLanguage` field (optional)
-    pub fn knows_language(mut self, value: impl Into<Option<MusicGroupKnowsLanguage<S>>>) -> Self {
+    pub fn knows_language(
+        mut self,
+        value: impl Into<Option<MusicGroupKnowsLanguage<S>>>,
+    ) -> Self {
         self._fields.56 = value.into();
         self
     }
     /// Set the `knowsLanguage` field to an Option value (optional)
-    pub fn maybe_knows_language(mut self, value: Option<MusicGroupKnowsLanguage<S>>) -> Self {
+    pub fn maybe_knows_language(
+        mut self,
+        value: Option<MusicGroupKnowsLanguage<S>>,
+    ) -> Self {
         self._fields.56 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `legalAddress` field (optional)
-    pub fn legal_address(mut self, value: impl Into<Option<MusicGroupLegalAddress<S>>>) -> Self {
+    pub fn legal_address(
+        mut self,
+        value: impl Into<Option<MusicGroupLegalAddress<S>>>,
+    ) -> Self {
         self._fields.57 = value.into();
         self
     }
     /// Set the `legalAddress` field to an Option value (optional)
-    pub fn maybe_legal_address(mut self, value: Option<MusicGroupLegalAddress<S>>) -> Self {
+    pub fn maybe_legal_address(
+        mut self,
+        value: Option<MusicGroupLegalAddress<S>>,
+    ) -> Self {
         self._fields.57 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `legalName` field (optional)
-    pub fn legal_name(mut self, value: impl Into<Option<MusicGroupLegalName<S>>>) -> Self {
+    pub fn legal_name(
+        mut self,
+        value: impl Into<Option<MusicGroupLegalName<S>>>,
+    ) -> Self {
         self._fields.58 = value.into();
         self
     }
@@ -4684,7 +5032,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `legalRepresentative` field (optional)
     pub fn legal_representative(
         mut self,
@@ -4703,7 +5051,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `leiCode` field (optional)
     pub fn lei_code(mut self, value: impl Into<Option<MusicGroupLeiCode<S>>>) -> Self {
         self._fields.60 = value.into();
@@ -4716,7 +5064,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<MusicGroupLocation<S>>>) -> Self {
         self._fields.61 = value.into();
@@ -4729,7 +5077,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `logo` field (optional)
     pub fn logo(mut self, value: impl Into<Option<MusicGroupLogo<S>>>) -> Self {
         self._fields.62 = value.into();
@@ -4742,7 +5090,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
@@ -4761,9 +5109,12 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `makesOffer` field (optional)
-    pub fn makes_offer(mut self, value: impl Into<Option<MusicGroupMakesOffer<S>>>) -> Self {
+    pub fn makes_offer(
+        mut self,
+        value: impl Into<Option<MusicGroupMakesOffer<S>>>,
+    ) -> Self {
         self._fields.64 = value.into();
         self
     }
@@ -4774,7 +5125,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `member` field (optional)
     pub fn member(mut self, value: impl Into<Option<MusicGroupMember<S>>>) -> Self {
         self._fields.65 = value.into();
@@ -4787,7 +5138,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `memberOf` field (optional)
     pub fn member_of(mut self, value: impl Into<Option<MusicGroupMemberOf<S>>>) -> Self {
         self._fields.66 = value.into();
@@ -4800,7 +5151,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `members` field (optional)
     pub fn members(mut self, value: impl Into<Option<MusicGroupMembers<S>>>) -> Self {
         self._fields.67 = value.into();
@@ -4813,7 +5164,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `musicGroupMember` field (optional)
     pub fn music_group_member(
         mut self,
@@ -4832,7 +5183,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `naics` field (optional)
     pub fn naics(mut self, value: impl Into<Option<MusicGroupNaics<S>>>) -> Self {
         self._fields.69 = value.into();
@@ -4845,7 +5196,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<MusicGroupName<S>>>) -> Self {
         self._fields.70 = value.into();
@@ -4858,7 +5209,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `nonprofitStatus` field (optional)
     pub fn nonprofit_status(
         mut self,
@@ -4868,13 +5219,16 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
         self
     }
     /// Set the `nonprofitStatus` field to an Option value (optional)
-    pub fn maybe_nonprofit_status(mut self, value: Option<MusicGroupNonprofitStatus<S>>) -> Self {
+    pub fn maybe_nonprofit_status(
+        mut self,
+        value: Option<MusicGroupNonprofitStatus<S>>,
+    ) -> Self {
         self._fields.71 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `numberOfEmployees` field (optional)
     pub fn number_of_employees(
         mut self,
@@ -4893,7 +5247,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `ownershipFundingInfo` field (optional)
     pub fn ownership_funding_info(
         mut self,
@@ -4912,7 +5266,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `owns` field (optional)
     pub fn owns(mut self, value: impl Into<Option<MusicGroupOwns<S>>>) -> Self {
         self._fields.74 = value.into();
@@ -4925,7 +5279,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `parentOrganization` field (optional)
     pub fn parent_organization(
         mut self,
@@ -4944,7 +5298,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `potentialAction` field (optional)
     pub fn potential_action(
         mut self,
@@ -4954,13 +5308,16 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(mut self, value: Option<MusicGroupPotentialAction<S>>) -> Self {
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<MusicGroupPotentialAction<S>>,
+    ) -> Self {
         self._fields.76 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `publishingPrinciples` field (optional)
     pub fn publishing_principles(
         mut self,
@@ -4979,7 +5336,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<MusicGroupReview<S>>>) -> Self {
         self._fields.78 = value.into();
@@ -4992,7 +5349,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<MusicGroupReviews<S>>>) -> Self {
         self._fields.79 = value.into();
@@ -5005,7 +5362,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<MusicGroupSameAs<S>>>) -> Self {
         self._fields.80 = value.into();
@@ -5018,7 +5375,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `seeks` field (optional)
     pub fn seeks(mut self, value: impl Into<Option<MusicGroupSeeks<S>>>) -> Self {
         self._fields.81 = value.into();
@@ -5031,20 +5388,26 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `serviceArea` field (optional)
-    pub fn service_area(mut self, value: impl Into<Option<MusicGroupServiceArea<S>>>) -> Self {
+    pub fn service_area(
+        mut self,
+        value: impl Into<Option<MusicGroupServiceArea<S>>>,
+    ) -> Self {
         self._fields.82 = value.into();
         self
     }
     /// Set the `serviceArea` field to an Option value (optional)
-    pub fn maybe_service_area(mut self, value: Option<MusicGroupServiceArea<S>>) -> Self {
+    pub fn maybe_service_area(
+        mut self,
+        value: Option<MusicGroupServiceArea<S>>,
+    ) -> Self {
         self._fields.82 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `skills` field (optional)
     pub fn skills(mut self, value: impl Into<Option<MusicGroupSkills<S>>>) -> Self {
         self._fields.83 = value.into();
@@ -5057,7 +5420,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `slogan` field (optional)
     pub fn slogan(mut self, value: impl Into<Option<MusicGroupSlogan<S>>>) -> Self {
         self._fields.84 = value.into();
@@ -5070,7 +5433,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<MusicGroupSponsor<S>>>) -> Self {
         self._fields.85 = value.into();
@@ -5083,7 +5446,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `subOrganization` field (optional)
     pub fn sub_organization(
         mut self,
@@ -5093,15 +5456,21 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
         self
     }
     /// Set the `subOrganization` field to an Option value (optional)
-    pub fn maybe_sub_organization(mut self, value: Option<MusicGroupSubOrganization<S>>) -> Self {
+    pub fn maybe_sub_organization(
+        mut self,
+        value: Option<MusicGroupSubOrganization<S>>,
+    ) -> Self {
         self._fields.86 = value;
         self
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `subjectOf` field (optional)
-    pub fn subject_of(mut self, value: impl Into<Option<MusicGroupSubjectOf<S>>>) -> Self {
+    pub fn subject_of(
+        mut self,
+        value: impl Into<Option<MusicGroupSubjectOf<S>>>,
+    ) -> Self {
         self._fields.87 = value.into();
         self
     }
@@ -5112,7 +5481,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `taxID` field (optional)
     pub fn tax_id(mut self, value: impl Into<Option<MusicGroupTaxId<S>>>) -> Self {
         self._fields.88 = value.into();
@@ -5125,9 +5494,12 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `telephone` field (optional)
-    pub fn telephone(mut self, value: impl Into<Option<MusicGroupTelephone<S>>>) -> Self {
+    pub fn telephone(
+        mut self,
+        value: impl Into<Option<MusicGroupTelephone<S>>>,
+    ) -> Self {
         self._fields.89 = value.into();
         self
     }
@@ -5138,7 +5510,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `track` field (optional)
     pub fn track(mut self, value: impl Into<Option<MusicGroupTrack<S>>>) -> Self {
         self._fields.90 = value.into();
@@ -5151,7 +5523,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `tracks` field (optional)
     pub fn tracks(mut self, value: impl Into<Option<MusicGroupTracks<S>>>) -> Self {
         self._fields.91 = value.into();
@@ -5164,7 +5536,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `unnamedSourcesPolicy` field (optional)
     pub fn unnamed_sources_policy(
         mut self,
@@ -5183,7 +5555,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<MusicGroupUrl<S>>>) -> Self {
         self._fields.93 = value.into();
@@ -5196,7 +5568,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
+impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `vatID` field (optional)
     pub fn vat_id(mut self, value: impl Into<Option<MusicGroupVatId<S>>>) -> Self {
         self._fields.94 = value.into();
@@ -5209,7 +5581,7 @@ impl<S: BosStr, St: music_group_state::State> MusicGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MusicGroupBuilder<S, St>
+impl<St, S: BosStr> MusicGroupBuilder<St, S>
 where
     St: music_group_state::State,
 {
@@ -5315,7 +5687,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MusicGroup<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MusicGroup<S> {
         MusicGroup {
             accepted_payment_method: self._fields.0,
             actionable_feedback_policy: self._fields.1,

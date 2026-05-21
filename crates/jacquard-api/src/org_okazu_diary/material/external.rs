@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,13 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::label::SelfLabels;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::org_okazu_diary::material::Tag;
 use crate::org_okazu_diary::material::external;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A descriptor of a pornographic material.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -83,11 +83,9 @@ pub struct ExternalGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: External<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Thumb<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -171,7 +169,7 @@ impl<S: BosStr> LexiconSchema for Thumb<S> {
 
 pub mod external_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -189,7 +187,7 @@ pub mod external_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ExternalBuilder<S: BosStr, St: external_state::State> {
+pub struct ExternalBuilder<St: external_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -205,15 +203,22 @@ pub struct ExternalBuilder<S: BosStr, St: external_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> External<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ExternalBuilder<S, external_state::Empty> {
+impl External<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ExternalBuilder<external_state::Empty, DefaultStr> {
         ExternalBuilder::new()
     }
 }
 
-impl<S: BosStr> ExternalBuilder<S, external_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> External<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ExternalBuilder<external_state::Empty, S> {
+        ExternalBuilder::builder()
+    }
+}
+
+impl ExternalBuilder<external_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ExternalBuilder {
             _state: PhantomData,
@@ -223,7 +228,18 @@ impl<S: BosStr> ExternalBuilder<S, external_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
+impl<S: BosStr> ExternalBuilder<external_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ExternalBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: external_state::State, S: BosStr> ExternalBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -236,7 +252,7 @@ impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
+impl<St: external_state::State, S: BosStr> ExternalBuilder<St, S> {
     /// Set the `genericLabels` field (optional)
     pub fn generic_labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -249,7 +265,7 @@ impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
+impl<St: external_state::State, S: BosStr> ExternalBuilder<St, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -262,7 +278,7 @@ impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
+impl<St: external_state::State, S: BosStr> ExternalBuilder<St, S> {
     /// Set the `record` field (optional)
     pub fn record(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -275,7 +291,7 @@ impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
+impl<St: external_state::State, S: BosStr> ExternalBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<Tag<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -288,7 +304,7 @@ impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
+impl<St: external_state::State, S: BosStr> ExternalBuilder<St, S> {
     /// Set the `thumb` field (optional)
     pub fn thumb(mut self, value: impl Into<Option<external::Thumb<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -301,7 +317,7 @@ impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
+impl<St: external_state::State, S: BosStr> ExternalBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -314,7 +330,7 @@ impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
+impl<St: external_state::State, S: BosStr> ExternalBuilder<St, S> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -327,7 +343,7 @@ impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
+impl<St: external_state::State, S: BosStr> ExternalBuilder<St, S> {
     /// Set the `via` field (optional)
     pub fn via(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -340,7 +356,7 @@ impl<S: BosStr, St: external_state::State> ExternalBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ExternalBuilder<S, St>
+impl<St, S: BosStr> ExternalBuilder<St, S>
 where
     St: external_state::State,
 {
@@ -377,10 +393,10 @@ where
 }
 
 fn lexicon_doc_org_okazu_diary_material_external() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.okazu-diary.material.external"),
@@ -537,7 +553,7 @@ fn lexicon_doc_org_okazu_diary_material_external() -> LexiconDoc<'static> {
 
 pub mod thumb_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -568,21 +584,28 @@ pub mod thumb_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ThumbBuilder<S: BosStr, St: thumb_state::State> {
+pub struct ThumbBuilder<St: thumb_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Thumb<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ThumbBuilder<S, thumb_state::Empty> {
+impl Thumb<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ThumbBuilder<thumb_state::Empty, DefaultStr> {
         ThumbBuilder::new()
     }
 }
 
-impl<S: BosStr> ThumbBuilder<S, thumb_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Thumb<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ThumbBuilder<thumb_state::Empty, S> {
+        ThumbBuilder::builder()
+    }
+}
+
+impl ThumbBuilder<thumb_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ThumbBuilder {
             _state: PhantomData,
@@ -592,7 +615,18 @@ impl<S: BosStr> ThumbBuilder<S, thumb_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: thumb_state::State> ThumbBuilder<S, St> {
+impl<S: BosStr> ThumbBuilder<thumb_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ThumbBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: thumb_state::State, S: BosStr> ThumbBuilder<St, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -605,7 +639,7 @@ impl<S: BosStr, St: thumb_state::State> ThumbBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ThumbBuilder<S, St>
+impl<St, S: BosStr> ThumbBuilder<St, S>
 where
     St: thumb_state::State,
     St::Url: thumb_state::IsUnset,
@@ -614,7 +648,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ThumbBuilder<S, thumb_state::SetUrl<St>> {
+    ) -> ThumbBuilder<thumb_state::SetUrl<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ThumbBuilder {
             _state: PhantomData,
@@ -624,7 +658,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ThumbBuilder<S, St>
+impl<St, S: BosStr> ThumbBuilder<St, S>
 where
     St: thumb_state::State,
     St::Url: thumb_state::IsSet,

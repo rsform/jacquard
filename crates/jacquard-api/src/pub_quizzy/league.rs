@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A quiz league with quiz masters and teams
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -166,7 +166,7 @@ impl<S: BosStr> LexiconSchema for League<S> {
 
 pub mod league_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -174,70 +174,77 @@ pub mod league_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type QuizMasters;
+        type Name;
         type Teams;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type QuizMasters = Unset;
+        type Name = Unset;
         type Teams = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type QuizMasters = St::QuizMasters;
-        type Teams = St::Teams;
     }
     ///State transition - sets the `quiz_masters` field to Set
     pub struct SetQuizMasters<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetQuizMasters<St> {}
     impl<St: State> State for SetQuizMasters<St> {
-        type Name = St::Name;
         type QuizMasters = Set<members::quiz_masters>;
+        type Name = St::Name;
+        type Teams = St::Teams;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type QuizMasters = St::QuizMasters;
+        type Name = Set<members::name>;
         type Teams = St::Teams;
     }
     ///State transition - sets the `teams` field to Set
     pub struct SetTeams<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTeams<St> {}
     impl<St: State> State for SetTeams<St> {
-        type Name = St::Name;
         type QuizMasters = St::QuizMasters;
+        type Name = St::Name;
         type Teams = Set<members::teams>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `quiz_masters` field
         pub struct quiz_masters(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `teams` field
         pub struct teams(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LeagueBuilder<S: BosStr, St: league_state::State> {
+pub struct LeagueBuilder<St: league_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<Did<S>>>, Option<Vec<StrongRef<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> League<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LeagueBuilder<S, league_state::Empty> {
+impl League<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LeagueBuilder<league_state::Empty, DefaultStr> {
         LeagueBuilder::new()
     }
 }
 
-impl<S: BosStr> LeagueBuilder<S, league_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> League<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LeagueBuilder<league_state::Empty, S> {
+        LeagueBuilder::builder()
+    }
+}
+
+impl LeagueBuilder<league_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LeagueBuilder {
             _state: PhantomData,
@@ -247,13 +254,27 @@ impl<S: BosStr> LeagueBuilder<S, league_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LeagueBuilder<S, St>
+impl<S: BosStr> LeagueBuilder<league_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LeagueBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LeagueBuilder<St, S>
 where
     St: league_state::State,
     St::Name: league_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> LeagueBuilder<S, league_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> LeagueBuilder<league_state::SetName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LeagueBuilder {
             _state: PhantomData,
@@ -263,7 +284,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LeagueBuilder<S, St>
+impl<St, S: BosStr> LeagueBuilder<St, S>
 where
     St: league_state::State,
     St::QuizMasters: league_state::IsUnset,
@@ -272,7 +293,7 @@ where
     pub fn quiz_masters(
         mut self,
         value: impl Into<Vec<Did<S>>>,
-    ) -> LeagueBuilder<S, league_state::SetQuizMasters<St>> {
+    ) -> LeagueBuilder<league_state::SetQuizMasters<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LeagueBuilder {
             _state: PhantomData,
@@ -282,7 +303,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LeagueBuilder<S, St>
+impl<St, S: BosStr> LeagueBuilder<St, S>
 where
     St: league_state::State,
     St::Teams: league_state::IsUnset,
@@ -291,7 +312,7 @@ where
     pub fn teams(
         mut self,
         value: impl Into<Vec<StrongRef<S>>>,
-    ) -> LeagueBuilder<S, league_state::SetTeams<St>> {
+    ) -> LeagueBuilder<league_state::SetTeams<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LeagueBuilder {
             _state: PhantomData,
@@ -301,11 +322,11 @@ where
     }
 }
 
-impl<S: BosStr, St> LeagueBuilder<S, St>
+impl<St, S: BosStr> LeagueBuilder<St, S>
 where
     St: league_state::State,
-    St::Name: league_state::IsSet,
     St::QuizMasters: league_state::IsSet,
+    St::Name: league_state::IsSet,
     St::Teams: league_state::IsSet,
 {
     /// Build the final struct.
@@ -329,10 +350,10 @@ where
 }
 
 fn lexicon_doc_pub_quizzy_league() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.quizzy.league"),
@@ -341,16 +362,18 @@ fn lexicon_doc_pub_quizzy_league() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A quiz league with quiz masters and teams",
-                    )),
+                    description: Some(
+                        CowStr::new_static("A quiz league with quiz masters and teams"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("quizMasters"),
-                            SmolStr::new_static("teams"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("quizMasters"),
+                                SmolStr::new_static("teams")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -366,9 +389,11 @@ fn lexicon_doc_pub_quizzy_league() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("quizMasters"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "DIDs of quiz masters who can run quizzes for this league",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "DIDs of quiz masters who can run quizzes for this league",
+                                        ),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         format: Some(LexStringFormat::Did),
                                         ..Default::default()
@@ -381,9 +406,9 @@ fn lexicon_doc_pub_quizzy_league() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("teams"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Teams participating in this league",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Teams participating in this league"),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
                                         ..Default::default()

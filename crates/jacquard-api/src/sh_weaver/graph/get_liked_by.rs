@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetLikedBy<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -32,11 +29,9 @@ pub struct GetLikedBy<S: BosStr = DefaultStr> {
     pub subject: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetLikedByOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -78,7 +73,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_liked_by_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -109,21 +104,28 @@ pub mod get_liked_by_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetLikedByBuilder<S: BosStr, St: get_liked_by_state::State> {
+pub struct GetLikedByBuilder<St: get_liked_by_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetLikedBy<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetLikedByBuilder<S, get_liked_by_state::Empty> {
+impl GetLikedBy<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetLikedByBuilder<get_liked_by_state::Empty, DefaultStr> {
         GetLikedByBuilder::new()
     }
 }
 
-impl<S: BosStr> GetLikedByBuilder<S, get_liked_by_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetLikedBy<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetLikedByBuilder<get_liked_by_state::Empty, S> {
+        GetLikedByBuilder::builder()
+    }
+}
+
+impl GetLikedByBuilder<get_liked_by_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetLikedByBuilder {
             _state: PhantomData,
@@ -133,7 +135,18 @@ impl<S: BosStr> GetLikedByBuilder<S, get_liked_by_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_liked_by_state::State> GetLikedByBuilder<S, St> {
+impl<S: BosStr> GetLikedByBuilder<get_liked_by_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetLikedByBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_liked_by_state::State, S: BosStr> GetLikedByBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -146,7 +159,7 @@ impl<S: BosStr, St: get_liked_by_state::State> GetLikedByBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_liked_by_state::State> GetLikedByBuilder<S, St> {
+impl<St: get_liked_by_state::State, S: BosStr> GetLikedByBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -159,7 +172,7 @@ impl<S: BosStr, St: get_liked_by_state::State> GetLikedByBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetLikedByBuilder<S, St>
+impl<St, S: BosStr> GetLikedByBuilder<St, S>
 where
     St: get_liked_by_state::State,
     St::Subject: get_liked_by_state::IsUnset,
@@ -168,7 +181,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetLikedByBuilder<S, get_liked_by_state::SetSubject<St>> {
+    ) -> GetLikedByBuilder<get_liked_by_state::SetSubject<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GetLikedByBuilder {
             _state: PhantomData,
@@ -178,7 +191,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetLikedByBuilder<S, St>
+impl<St, S: BosStr> GetLikedByBuilder<St, S>
 where
     St: get_liked_by_state::State,
     St::Subject: get_liked_by_state::IsSet,

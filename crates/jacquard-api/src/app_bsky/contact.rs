@@ -14,6 +14,7 @@ pub mod send_notification;
 pub mod start_phone_verification;
 pub mod verify_phone;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -24,23 +25,20 @@ use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did};
+use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::actor::ProfileView;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor::ProfileView;
 /// Associates a profile with the positional index of the contact import input in the call to `app.bsky.contact.importContacts`, so clients can know which phone caused a particular match.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MatchAndContactIndex<S: BosStr = DefaultStr> {
     ///The index of this match in the import contact input.
     pub contact_index: i64,
@@ -53,10 +51,7 @@ pub struct MatchAndContactIndex<S: BosStr = DefaultStr> {
 /// A stash object to be sent via bsync representing a notification to be created.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Notification<S: BosStr = DefaultStr> {
     ///The DID of who this notification comes from.
     pub from: Did<S>,
@@ -66,11 +61,9 @@ pub struct Notification<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SyncStatus<S: BosStr = DefaultStr> {
     ///Number of existing contact matches resulting of the user imports and of their imported contacts having imported the user. Matches stop being counted when the user either follows the matched contact or dismisses the match.
     pub matches_count: i64,
@@ -157,7 +150,7 @@ impl<S: BosStr> LexiconSchema for SyncStatus<S> {
 
 pub mod match_and_contact_index_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -200,21 +193,37 @@ pub mod match_and_contact_index_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MatchAndContactIndexBuilder<S: BosStr, St: match_and_contact_index_state::State> {
+pub struct MatchAndContactIndexBuilder<
+    St: match_and_contact_index_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<ProfileView<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> MatchAndContactIndex<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MatchAndContactIndexBuilder<S, match_and_contact_index_state::Empty> {
+impl MatchAndContactIndex<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MatchAndContactIndexBuilder<
+        match_and_contact_index_state::Empty,
+        DefaultStr,
+    > {
         MatchAndContactIndexBuilder::new()
     }
 }
 
-impl<S: BosStr> MatchAndContactIndexBuilder<S, match_and_contact_index_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> MatchAndContactIndex<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MatchAndContactIndexBuilder<
+        match_and_contact_index_state::Empty,
+        S,
+    > {
+        MatchAndContactIndexBuilder::builder()
+    }
+}
+
+impl MatchAndContactIndexBuilder<match_and_contact_index_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MatchAndContactIndexBuilder {
             _state: PhantomData,
@@ -224,7 +233,18 @@ impl<S: BosStr> MatchAndContactIndexBuilder<S, match_and_contact_index_state::Em
     }
 }
 
-impl<S: BosStr, St> MatchAndContactIndexBuilder<S, St>
+impl<S: BosStr> MatchAndContactIndexBuilder<match_and_contact_index_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MatchAndContactIndexBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MatchAndContactIndexBuilder<St, S>
 where
     St: match_and_contact_index_state::State,
     St::ContactIndex: match_and_contact_index_state::IsUnset,
@@ -233,7 +253,10 @@ where
     pub fn contact_index(
         mut self,
         value: impl Into<i64>,
-    ) -> MatchAndContactIndexBuilder<S, match_and_contact_index_state::SetContactIndex<St>> {
+    ) -> MatchAndContactIndexBuilder<
+        match_and_contact_index_state::SetContactIndex<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         MatchAndContactIndexBuilder {
             _state: PhantomData,
@@ -243,7 +266,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MatchAndContactIndexBuilder<S, St>
+impl<St, S: BosStr> MatchAndContactIndexBuilder<St, S>
 where
     St: match_and_contact_index_state::State,
     St::Match: match_and_contact_index_state::IsUnset,
@@ -252,7 +275,7 @@ where
     pub fn r#match(
         mut self,
         value: impl Into<ProfileView<S>>,
-    ) -> MatchAndContactIndexBuilder<S, match_and_contact_index_state::SetMatch<St>> {
+    ) -> MatchAndContactIndexBuilder<match_and_contact_index_state::SetMatch<St>, S> {
         self._fields.1 = Option::Some(value.into());
         MatchAndContactIndexBuilder {
             _state: PhantomData,
@@ -262,7 +285,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MatchAndContactIndexBuilder<S, St>
+impl<St, S: BosStr> MatchAndContactIndexBuilder<St, S>
 where
     St: match_and_contact_index_state::State,
     St::ContactIndex: match_and_contact_index_state::IsSet,
@@ -290,10 +313,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_contact_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.contact.defs"),
@@ -384,10 +407,12 @@ fn lexicon_doc_app_bsky_contact_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("syncStatus"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("syncedAt"),
-                        SmolStr::new_static("matchesCount"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("syncedAt"),
+                            SmolStr::new_static("matchesCount")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -401,9 +426,11 @@ fn lexicon_doc_app_bsky_contact_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("syncedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Last date when contacts where imported.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Last date when contacts where imported.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -421,7 +448,7 @@ fn lexicon_doc_app_bsky_contact_defs() -> LexiconDoc<'static> {
 
 pub mod notification_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -464,21 +491,28 @@ pub mod notification_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NotificationBuilder<S: BosStr, St: notification_state::State> {
+pub struct NotificationBuilder<St: notification_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Notification<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> NotificationBuilder<S, notification_state::Empty> {
+impl Notification<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> NotificationBuilder<notification_state::Empty, DefaultStr> {
         NotificationBuilder::new()
     }
 }
 
-impl<S: BosStr> NotificationBuilder<S, notification_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Notification<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> NotificationBuilder<notification_state::Empty, S> {
+        NotificationBuilder::builder()
+    }
+}
+
+impl NotificationBuilder<notification_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         NotificationBuilder {
             _state: PhantomData,
@@ -488,7 +522,18 @@ impl<S: BosStr> NotificationBuilder<S, notification_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> NotificationBuilder<S, St>
+impl<S: BosStr> NotificationBuilder<notification_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        NotificationBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> NotificationBuilder<St, S>
 where
     St: notification_state::State,
     St::From: notification_state::IsUnset,
@@ -497,7 +542,7 @@ where
     pub fn from(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> NotificationBuilder<S, notification_state::SetFrom<St>> {
+    ) -> NotificationBuilder<notification_state::SetFrom<St>, S> {
         self._fields.0 = Option::Some(value.into());
         NotificationBuilder {
             _state: PhantomData,
@@ -507,7 +552,7 @@ where
     }
 }
 
-impl<S: BosStr, St> NotificationBuilder<S, St>
+impl<St, S: BosStr> NotificationBuilder<St, S>
 where
     St: notification_state::State,
     St::To: notification_state::IsUnset,
@@ -516,7 +561,7 @@ where
     pub fn to(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> NotificationBuilder<S, notification_state::SetTo<St>> {
+    ) -> NotificationBuilder<notification_state::SetTo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         NotificationBuilder {
             _state: PhantomData,
@@ -526,7 +571,7 @@ where
     }
 }
 
-impl<S: BosStr, St> NotificationBuilder<S, St>
+impl<St, S: BosStr> NotificationBuilder<St, S>
 where
     St: notification_state::State,
     St::From: notification_state::IsSet,
@@ -541,7 +586,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Notification<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Notification<S> {
         Notification {
             from: self._fields.0.unwrap(),
             to: self._fields.1.unwrap(),
@@ -552,7 +600,7 @@ where
 
 pub mod sync_status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -560,56 +608,63 @@ pub mod sync_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MatchesCount;
         type SyncedAt;
+        type MatchesCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MatchesCount = Unset;
         type SyncedAt = Unset;
-    }
-    ///State transition - sets the `matches_count` field to Set
-    pub struct SetMatchesCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMatchesCount<St> {}
-    impl<St: State> State for SetMatchesCount<St> {
-        type MatchesCount = Set<members::matches_count>;
-        type SyncedAt = St::SyncedAt;
+        type MatchesCount = Unset;
     }
     ///State transition - sets the `synced_at` field to Set
     pub struct SetSyncedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSyncedAt<St> {}
     impl<St: State> State for SetSyncedAt<St> {
-        type MatchesCount = St::MatchesCount;
         type SyncedAt = Set<members::synced_at>;
+        type MatchesCount = St::MatchesCount;
+    }
+    ///State transition - sets the `matches_count` field to Set
+    pub struct SetMatchesCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMatchesCount<St> {}
+    impl<St: State> State for SetMatchesCount<St> {
+        type SyncedAt = St::SyncedAt;
+        type MatchesCount = Set<members::matches_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `matches_count` field
-        pub struct matches_count(());
         ///Marker type for the `synced_at` field
         pub struct synced_at(());
+        ///Marker type for the `matches_count` field
+        pub struct matches_count(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SyncStatusBuilder<S: BosStr, St: sync_status_state::State> {
+pub struct SyncStatusBuilder<St: sync_status_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SyncStatus<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SyncStatusBuilder<S, sync_status_state::Empty> {
+impl SyncStatus<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SyncStatusBuilder<sync_status_state::Empty, DefaultStr> {
         SyncStatusBuilder::new()
     }
 }
 
-impl<S: BosStr> SyncStatusBuilder<S, sync_status_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SyncStatus<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SyncStatusBuilder<sync_status_state::Empty, S> {
+        SyncStatusBuilder::builder()
+    }
+}
+
+impl SyncStatusBuilder<sync_status_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SyncStatusBuilder {
             _state: PhantomData,
@@ -619,7 +674,18 @@ impl<S: BosStr> SyncStatusBuilder<S, sync_status_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SyncStatusBuilder<S, St>
+impl<S: BosStr> SyncStatusBuilder<sync_status_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SyncStatusBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SyncStatusBuilder<St, S>
 where
     St: sync_status_state::State,
     St::MatchesCount: sync_status_state::IsUnset,
@@ -628,7 +694,7 @@ where
     pub fn matches_count(
         mut self,
         value: impl Into<i64>,
-    ) -> SyncStatusBuilder<S, sync_status_state::SetMatchesCount<St>> {
+    ) -> SyncStatusBuilder<sync_status_state::SetMatchesCount<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SyncStatusBuilder {
             _state: PhantomData,
@@ -638,7 +704,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SyncStatusBuilder<S, St>
+impl<St, S: BosStr> SyncStatusBuilder<St, S>
 where
     St: sync_status_state::State,
     St::SyncedAt: sync_status_state::IsUnset,
@@ -647,7 +713,7 @@ where
     pub fn synced_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SyncStatusBuilder<S, sync_status_state::SetSyncedAt<St>> {
+    ) -> SyncStatusBuilder<sync_status_state::SetSyncedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SyncStatusBuilder {
             _state: PhantomData,
@@ -657,11 +723,11 @@ where
     }
 }
 
-impl<S: BosStr, St> SyncStatusBuilder<S, St>
+impl<St, S: BosStr> SyncStatusBuilder<St, S>
 where
     St: sync_status_state::State,
-    St::MatchesCount: sync_status_state::IsSet,
     St::SyncedAt: sync_status_state::IsSet,
+    St::MatchesCount: sync_status_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SyncStatus<S> {
@@ -672,7 +738,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SyncStatus<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SyncStatus<S> {
         SyncStatus {
             matches_count: self._fields.0.unwrap(),
             synced_at: self._fields.1.unwrap(),

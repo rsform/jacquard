@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::chat_bsky::convo::MessageInput;
-use crate::chat_bsky::convo::MessageView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::MessageInput;
+use crate::chat_bsky::convo::MessageView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SendMessage<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: MessageInput<S>,
@@ -30,11 +27,9 @@ pub struct SendMessage<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SendMessageOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: MessageView<S>,
@@ -53,8 +48,9 @@ impl jacquard_common::xrpc::XrpcResp for SendMessageResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SendMessage<S> {
     const NSID: &'static str = "chat.bsky.convo.sendMessage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = SendMessageResponse;
 }
 
@@ -62,15 +58,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SendMessage<S> {
 pub struct SendMessageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendMessageRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.sendMessage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = SendMessage<S>;
     type Response = SendMessageResponse;
 }
 
 pub mod send_message_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -78,56 +75,63 @@ pub mod send_message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
         type ConvoId;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
         type ConvoId = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMessage<St> {}
-    impl<St: State> State for SetMessage<St> {
-        type Message = Set<members::message>;
-        type ConvoId = St::ConvoId;
+        type Message = Unset;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetConvoId<St> {}
     impl<St: State> State for SetConvoId<St> {
-        type Message = St::Message;
         type ConvoId = Set<members::convo_id>;
+        type Message = St::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
+        type ConvoId = St::ConvoId;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SendMessageBuilder<S: BosStr, St: send_message_state::State> {
+pub struct SendMessageBuilder<St: send_message_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<MessageInput<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SendMessage<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SendMessageBuilder<S, send_message_state::Empty> {
+impl SendMessage<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SendMessageBuilder<send_message_state::Empty, DefaultStr> {
         SendMessageBuilder::new()
     }
 }
 
-impl<S: BosStr> SendMessageBuilder<S, send_message_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SendMessage<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SendMessageBuilder<send_message_state::Empty, S> {
+        SendMessageBuilder::builder()
+    }
+}
+
+impl SendMessageBuilder<send_message_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SendMessageBuilder {
             _state: PhantomData,
@@ -137,7 +141,18 @@ impl<S: BosStr> SendMessageBuilder<S, send_message_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SendMessageBuilder<S, St>
+impl<S: BosStr> SendMessageBuilder<send_message_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SendMessageBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SendMessageBuilder<St, S>
 where
     St: send_message_state::State,
     St::ConvoId: send_message_state::IsUnset,
@@ -146,7 +161,7 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> SendMessageBuilder<S, send_message_state::SetConvoId<St>> {
+    ) -> SendMessageBuilder<send_message_state::SetConvoId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SendMessageBuilder {
             _state: PhantomData,
@@ -156,7 +171,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SendMessageBuilder<S, St>
+impl<St, S: BosStr> SendMessageBuilder<St, S>
 where
     St: send_message_state::State,
     St::Message: send_message_state::IsUnset,
@@ -165,7 +180,7 @@ where
     pub fn message(
         mut self,
         value: impl Into<MessageInput<S>>,
-    ) -> SendMessageBuilder<S, send_message_state::SetMessage<St>> {
+    ) -> SendMessageBuilder<send_message_state::SetMessage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SendMessageBuilder {
             _state: PhantomData,
@@ -175,11 +190,11 @@ where
     }
 }
 
-impl<S: BosStr, St> SendMessageBuilder<S, St>
+impl<St, S: BosStr> SendMessageBuilder<St, S>
 where
     St: send_message_state::State,
-    St::Message: send_message_state::IsSet,
     St::ConvoId: send_message_state::IsSet,
+    St::Message: send_message_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SendMessage<S> {
@@ -190,7 +205,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SendMessage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SendMessage<S> {
         SendMessage {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),

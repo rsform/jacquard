@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::my_skylights::Item;
-use crate::my_skylights::rel;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::my_skylights::Item;
+use crate::my_skylights::rel;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -60,11 +60,9 @@ pub struct RelGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Rel<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Note<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub updated_at: Datetime,
@@ -73,11 +71,9 @@ pub struct Note<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Rating<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub value: i64,
@@ -185,7 +181,7 @@ impl<S: BosStr> LexiconSchema for Rating<S> {
 
 pub mod rel_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -216,7 +212,7 @@ pub mod rel_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RelBuilder<S: BosStr, St: rel_state::State> {
+pub struct RelBuilder<St: rel_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<Datetime>>,
@@ -227,15 +223,22 @@ pub struct RelBuilder<S: BosStr, St: rel_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Rel<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RelBuilder<S, rel_state::Empty> {
+impl Rel<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RelBuilder<rel_state::Empty, DefaultStr> {
         RelBuilder::new()
     }
 }
 
-impl<S: BosStr> RelBuilder<S, rel_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Rel<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RelBuilder<rel_state::Empty, S> {
+        RelBuilder::builder()
+    }
+}
+
+impl RelBuilder<rel_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RelBuilder {
             _state: PhantomData,
@@ -245,7 +248,18 @@ impl<S: BosStr> RelBuilder<S, rel_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: rel_state::State> RelBuilder<S, St> {
+impl<S: BosStr> RelBuilder<rel_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RelBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: rel_state::State, S: BosStr> RelBuilder<St, S> {
     /// Set the `finishedAt` field (optional)
     pub fn finished_at(mut self, value: impl Into<Option<Vec<Datetime>>>) -> Self {
         self._fields.0 = value.into();
@@ -258,13 +272,16 @@ impl<S: BosStr, St: rel_state::State> RelBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RelBuilder<S, St>
+impl<St, S: BosStr> RelBuilder<St, S>
 where
     St: rel_state::State,
     St::Item: rel_state::IsUnset,
 {
     /// Set the `item` field (required)
-    pub fn item(mut self, value: impl Into<Item<S>>) -> RelBuilder<S, rel_state::SetItem<St>> {
+    pub fn item(
+        mut self,
+        value: impl Into<Item<S>>,
+    ) -> RelBuilder<rel_state::SetItem<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RelBuilder {
             _state: PhantomData,
@@ -274,7 +291,7 @@ where
     }
 }
 
-impl<S: BosStr, St: rel_state::State> RelBuilder<S, St> {
+impl<St: rel_state::State, S: BosStr> RelBuilder<St, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<rel::Note<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -287,7 +304,7 @@ impl<S: BosStr, St: rel_state::State> RelBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: rel_state::State> RelBuilder<S, St> {
+impl<St: rel_state::State, S: BosStr> RelBuilder<St, S> {
     /// Set the `rating` field (optional)
     pub fn rating(mut self, value: impl Into<Option<rel::Rating<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -300,7 +317,7 @@ impl<S: BosStr, St: rel_state::State> RelBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RelBuilder<S, St>
+impl<St, S: BosStr> RelBuilder<St, S>
 where
     St: rel_state::State,
     St::Item: rel_state::IsSet,
@@ -328,10 +345,10 @@ where
 }
 
 fn lexicon_doc_my_skylights_rel() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("my.skylights.rel"),
@@ -387,11 +404,13 @@ fn lexicon_doc_my_skylights_rel() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("note"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("value"),
-                        SmolStr::new_static("createdAt"),
-                        SmolStr::new_static("updatedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("value"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("updatedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -411,9 +430,7 @@ fn lexicon_doc_my_skylights_rel() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("value"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -423,10 +440,12 @@ fn lexicon_doc_my_skylights_rel() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("rating"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("value"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("value"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -458,7 +477,7 @@ fn lexicon_doc_my_skylights_rel() -> LexiconDoc<'static> {
 
 pub mod note_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -466,70 +485,77 @@ pub mod note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type CreatedAt;
+        type Value;
         type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type CreatedAt = Unset;
+        type Value = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValue<St> {}
-    impl<St: State> State for SetValue<St> {
-        type Value = Set<members::value>;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Value = St::Value;
         type CreatedAt = Set<members::created_at>;
+        type Value = St::Value;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type CreatedAt = St::CreatedAt;
+        type Value = Set<members::value>;
         type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
     impl<St: State> State for SetUpdatedAt<St> {
-        type Value = St::Value;
         type CreatedAt = St::CreatedAt;
+        type Value = St::Value;
         type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `value` field
+        pub struct value(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NoteBuilder<S: BosStr, St: note_state::State> {
+pub struct NoteBuilder<St: note_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Datetime>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Note<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> NoteBuilder<S, note_state::Empty> {
+impl Note<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> NoteBuilder<note_state::Empty, DefaultStr> {
         NoteBuilder::new()
     }
 }
 
-impl<S: BosStr> NoteBuilder<S, note_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Note<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> NoteBuilder<note_state::Empty, S> {
+        NoteBuilder::builder()
+    }
+}
+
+impl NoteBuilder<note_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         NoteBuilder {
             _state: PhantomData,
@@ -539,7 +565,18 @@ impl<S: BosStr> NoteBuilder<S, note_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> NoteBuilder<S, St>
+impl<S: BosStr> NoteBuilder<note_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        NoteBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> NoteBuilder<St, S>
 where
     St: note_state::State,
     St::CreatedAt: note_state::IsUnset,
@@ -548,7 +585,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> NoteBuilder<S, note_state::SetCreatedAt<St>> {
+    ) -> NoteBuilder<note_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
@@ -558,7 +595,7 @@ where
     }
 }
 
-impl<S: BosStr, St> NoteBuilder<S, St>
+impl<St, S: BosStr> NoteBuilder<St, S>
 where
     St: note_state::State,
     St::UpdatedAt: note_state::IsUnset,
@@ -567,7 +604,7 @@ where
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> NoteBuilder<S, note_state::SetUpdatedAt<St>> {
+    ) -> NoteBuilder<note_state::SetUpdatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
@@ -577,13 +614,16 @@ where
     }
 }
 
-impl<S: BosStr, St> NoteBuilder<S, St>
+impl<St, S: BosStr> NoteBuilder<St, S>
 where
     St: note_state::State,
     St::Value: note_state::IsUnset,
 {
     /// Set the `value` field (required)
-    pub fn value(mut self, value: impl Into<S>) -> NoteBuilder<S, note_state::SetValue<St>> {
+    pub fn value(
+        mut self,
+        value: impl Into<S>,
+    ) -> NoteBuilder<note_state::SetValue<St>, S> {
         self._fields.2 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
@@ -593,11 +633,11 @@ where
     }
 }
 
-impl<S: BosStr, St> NoteBuilder<S, St>
+impl<St, S: BosStr> NoteBuilder<St, S>
 where
     St: note_state::State,
-    St::Value: note_state::IsSet,
     St::CreatedAt: note_state::IsSet,
+    St::Value: note_state::IsSet,
     St::UpdatedAt: note_state::IsSet,
 {
     /// Build the final struct.
@@ -622,7 +662,7 @@ where
 
 pub mod rating_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -630,56 +670,63 @@ pub mod rating_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type CreatedAt;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValue<St> {}
-    impl<St: State> State for SetValue<St> {
-        type Value = Set<members::value>;
-        type CreatedAt = St::CreatedAt;
+        type Value = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Value = St::Value;
         type CreatedAt = Set<members::created_at>;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type CreatedAt = St::CreatedAt;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RatingBuilder<S: BosStr, St: rating_state::State> {
+pub struct RatingBuilder<St: rating_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Rating<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RatingBuilder<S, rating_state::Empty> {
+impl Rating<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RatingBuilder<rating_state::Empty, DefaultStr> {
         RatingBuilder::new()
     }
 }
 
-impl<S: BosStr> RatingBuilder<S, rating_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Rating<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RatingBuilder<rating_state::Empty, S> {
+        RatingBuilder::builder()
+    }
+}
+
+impl RatingBuilder<rating_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RatingBuilder {
             _state: PhantomData,
@@ -689,7 +736,18 @@ impl<S: BosStr> RatingBuilder<S, rating_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RatingBuilder<S, St>
+impl<S: BosStr> RatingBuilder<rating_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RatingBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RatingBuilder<St, S>
 where
     St: rating_state::State,
     St::CreatedAt: rating_state::IsUnset,
@@ -698,7 +756,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RatingBuilder<S, rating_state::SetCreatedAt<St>> {
+    ) -> RatingBuilder<rating_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RatingBuilder {
             _state: PhantomData,
@@ -708,13 +766,16 @@ where
     }
 }
 
-impl<S: BosStr, St> RatingBuilder<S, St>
+impl<St, S: BosStr> RatingBuilder<St, S>
 where
     St: rating_state::State,
     St::Value: rating_state::IsUnset,
 {
     /// Set the `value` field (required)
-    pub fn value(mut self, value: impl Into<i64>) -> RatingBuilder<S, rating_state::SetValue<St>> {
+    pub fn value(
+        mut self,
+        value: impl Into<i64>,
+    ) -> RatingBuilder<rating_state::SetValue<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RatingBuilder {
             _state: PhantomData,
@@ -724,11 +785,11 @@ where
     }
 }
 
-impl<S: BosStr, St> RatingBuilder<S, St>
+impl<St, S: BosStr> RatingBuilder<St, S>
 where
     St: rating_state::State,
-    St::Value: rating_state::IsSet,
     St::CreatedAt: rating_state::IsSet,
+    St::Value: rating_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Rating<S> {

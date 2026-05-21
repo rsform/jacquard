@@ -232,7 +232,7 @@ where
 /// The kind of MIME pattern, without carrying string data.
 /// Used by validate_mime_pattern() to return the discriminant.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum MimePatternKind {
+pub enum MimePatternKind {
     All,
     TypeWildcard,
     Exact,
@@ -292,7 +292,7 @@ impl<S: BosStr> MimePattern<S> {
     /// and `kind` matches the pattern. `MimePattern`'s API assumes
     /// the invariant holds. Violating it will produce incorrect
     /// results from downstream operations.
-    pub(crate) unsafe fn unchecked(s: S, kind: MimePatternKind) -> Self {
+    pub unsafe fn unchecked(s: S, kind: MimePatternKind) -> Self {
         match kind {
             MimePatternKind::All => MimePattern::All,
             MimePatternKind::TypeWildcard => MimePattern::TypeWildcard(s),

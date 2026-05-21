@@ -9,12 +9,13 @@ pub mod get_job_status;
 pub mod get_upload_limits;
 pub mod upload_video;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,13 +29,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct JobStatus<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blob: Option<BlobRef<S>>,
@@ -167,7 +165,7 @@ impl<S: BosStr> LexiconSchema for JobStatus<S> {
 
 pub mod job_status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -176,55 +174,55 @@ pub mod job_status_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
-        type State;
         type JobId;
+        type State;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
-        type State = Unset;
         type JobId = Unset;
+        type State = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
+        type JobId = St::JobId;
         type State = St::State;
-        type JobId = St::JobId;
-    }
-    ///State transition - sets the `state` field to Set
-    pub struct SetState<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetState<St> {}
-    impl<St: State> State for SetState<St> {
-        type Did = St::Did;
-        type State = Set<members::state>;
-        type JobId = St::JobId;
     }
     ///State transition - sets the `job_id` field to Set
     pub struct SetJobId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetJobId<St> {}
     impl<St: State> State for SetJobId<St> {
         type Did = St::Did;
-        type State = St::State;
         type JobId = Set<members::job_id>;
+        type State = St::State;
+    }
+    ///State transition - sets the `state` field to Set
+    pub struct SetState<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetState<St> {}
+    impl<St: State> State for SetState<St> {
+        type Did = St::Did;
+        type JobId = St::JobId;
+        type State = Set<members::state>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `state` field
-        pub struct state(());
         ///Marker type for the `job_id` field
         pub struct job_id(());
+        ///Marker type for the `state` field
+        pub struct state(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct JobStatusBuilder<S: BosStr, St: job_status_state::State> {
+pub struct JobStatusBuilder<St: job_status_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
@@ -238,15 +236,22 @@ pub struct JobStatusBuilder<S: BosStr, St: job_status_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> JobStatus<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> JobStatusBuilder<S, job_status_state::Empty> {
+impl JobStatus<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> JobStatusBuilder<job_status_state::Empty, DefaultStr> {
         JobStatusBuilder::new()
     }
 }
 
-impl<S: BosStr> JobStatusBuilder<S, job_status_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> JobStatus<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> JobStatusBuilder<job_status_state::Empty, S> {
+        JobStatusBuilder::builder()
+    }
+}
+
+impl JobStatusBuilder<job_status_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         JobStatusBuilder {
             _state: PhantomData,
@@ -256,7 +261,18 @@ impl<S: BosStr> JobStatusBuilder<S, job_status_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: job_status_state::State> JobStatusBuilder<S, St> {
+impl<S: BosStr> JobStatusBuilder<job_status_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        JobStatusBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: job_status_state::State, S: BosStr> JobStatusBuilder<St, S> {
     /// Set the `blob` field (optional)
     pub fn blob(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -269,7 +285,7 @@ impl<S: BosStr, St: job_status_state::State> JobStatusBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> JobStatusBuilder<S, St>
+impl<St, S: BosStr> JobStatusBuilder<St, S>
 where
     St: job_status_state::State,
     St::Did: job_status_state::IsUnset,
@@ -278,7 +294,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> JobStatusBuilder<S, job_status_state::SetDid<St>> {
+    ) -> JobStatusBuilder<job_status_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         JobStatusBuilder {
             _state: PhantomData,
@@ -288,7 +304,7 @@ where
     }
 }
 
-impl<S: BosStr, St: job_status_state::State> JobStatusBuilder<S, St> {
+impl<St: job_status_state::State, S: BosStr> JobStatusBuilder<St, S> {
     /// Set the `error` field (optional)
     pub fn error(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -301,7 +317,7 @@ impl<S: BosStr, St: job_status_state::State> JobStatusBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> JobStatusBuilder<S, St>
+impl<St, S: BosStr> JobStatusBuilder<St, S>
 where
     St: job_status_state::State,
     St::JobId: job_status_state::IsUnset,
@@ -310,7 +326,7 @@ where
     pub fn job_id(
         mut self,
         value: impl Into<S>,
-    ) -> JobStatusBuilder<S, job_status_state::SetJobId<St>> {
+    ) -> JobStatusBuilder<job_status_state::SetJobId<St>, S> {
         self._fields.3 = Option::Some(value.into());
         JobStatusBuilder {
             _state: PhantomData,
@@ -320,7 +336,7 @@ where
     }
 }
 
-impl<S: BosStr, St: job_status_state::State> JobStatusBuilder<S, St> {
+impl<St: job_status_state::State, S: BosStr> JobStatusBuilder<St, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -333,7 +349,7 @@ impl<S: BosStr, St: job_status_state::State> JobStatusBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: job_status_state::State> JobStatusBuilder<S, St> {
+impl<St: job_status_state::State, S: BosStr> JobStatusBuilder<St, S> {
     /// Set the `progress` field (optional)
     pub fn progress(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -346,7 +362,7 @@ impl<S: BosStr, St: job_status_state::State> JobStatusBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> JobStatusBuilder<S, St>
+impl<St, S: BosStr> JobStatusBuilder<St, S>
 where
     St: job_status_state::State,
     St::State: job_status_state::IsUnset,
@@ -355,7 +371,7 @@ where
     pub fn state(
         mut self,
         value: impl Into<JobStatusState<S>>,
-    ) -> JobStatusBuilder<S, job_status_state::SetState<St>> {
+    ) -> JobStatusBuilder<job_status_state::SetState<St>, S> {
         self._fields.6 = Option::Some(value.into());
         JobStatusBuilder {
             _state: PhantomData,
@@ -365,12 +381,12 @@ where
     }
 }
 
-impl<S: BosStr, St> JobStatusBuilder<S, St>
+impl<St, S: BosStr> JobStatusBuilder<St, S>
 where
     St: job_status_state::State,
     St::Did: job_status_state::IsSet,
-    St::State: job_status_state::IsSet,
     St::JobId: job_status_state::IsSet,
+    St::State: job_status_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> JobStatus<S> {
@@ -386,7 +402,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> JobStatus<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> JobStatus<S> {
         JobStatus {
             blob: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -401,10 +420,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_video_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.video.defs"),

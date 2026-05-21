@@ -23,36 +23,34 @@ pub mod unmute_convo;
 pub mod update_all_read;
 pub mod update_read;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did};
+use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::embed::record::Record;
 use crate::app_bsky::embed::record::View;
 use crate::app_bsky::richtext::facet::Facet;
 use crate::chat_bsky::actor::ProfileViewBasic;
 use crate::chat_bsky::convo;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ConvoView<S: BosStr = DefaultStr> {
     pub id: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,6 +67,7 @@ pub struct ConvoView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -78,6 +77,7 @@ pub enum ConvoViewLastMessage<S: BosStr = DefaultStr> {
     #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConvoViewStatus<S: BosStr = DefaultStr> {
@@ -156,11 +156,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeletedMessageView<S: BosStr = DefaultStr> {
     pub id: S,
     pub rev: S,
@@ -170,11 +168,9 @@ pub struct DeletedMessageView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogAcceptConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -182,11 +178,9 @@ pub struct LogAcceptConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogAddReaction<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogAddReactionMessage<S>,
@@ -195,6 +189,7 @@ pub struct LogAddReaction<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -206,11 +201,9 @@ pub enum LogAddReactionMessage<S: BosStr = DefaultStr> {
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogBeginConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -218,11 +211,9 @@ pub struct LogBeginConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogCreateMessage<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogCreateMessageMessage<S>,
@@ -230,6 +221,7 @@ pub struct LogCreateMessage<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -241,11 +233,9 @@ pub enum LogCreateMessageMessage<S: BosStr = DefaultStr> {
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogDeleteMessage<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogDeleteMessageMessage<S>,
@@ -253,6 +243,7 @@ pub struct LogDeleteMessage<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -264,11 +255,9 @@ pub enum LogDeleteMessageMessage<S: BosStr = DefaultStr> {
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogLeaveConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -276,11 +265,9 @@ pub struct LogLeaveConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogMuteConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -288,11 +275,9 @@ pub struct LogMuteConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogReadMessage<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogReadMessageMessage<S>,
@@ -300,6 +285,7 @@ pub struct LogReadMessage<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -311,11 +297,9 @@ pub enum LogReadMessageMessage<S: BosStr = DefaultStr> {
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogRemoveReaction<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogRemoveReactionMessage<S>,
@@ -324,6 +308,7 @@ pub struct LogRemoveReaction<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -335,11 +320,9 @@ pub enum LogRemoveReactionMessage<S: BosStr = DefaultStr> {
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogUnmuteConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -347,11 +330,9 @@ pub struct LogUnmuteConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageAndReactionView<S: BosStr = DefaultStr> {
     pub message: convo::MessageView<S>,
     pub reaction: convo::ReactionView<S>,
@@ -359,11 +340,9 @@ pub struct MessageAndReactionView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageInput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<Record<S>>,
@@ -375,11 +354,9 @@ pub struct MessageInput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageRef<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub did: Did<S>,
@@ -388,11 +365,9 @@ pub struct MessageRef<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<View<S>>,
@@ -411,22 +386,18 @@ pub struct MessageView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageViewSender<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReactionView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub sender: convo::ReactionViewSender<S>,
@@ -435,11 +406,9 @@ pub struct ReactionView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReactionViewSender<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -781,7 +750,7 @@ impl<S: BosStr> LexiconSchema for ReactionViewSender<S> {
 
 pub mod convo_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -789,90 +758,90 @@ pub mod convo_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Members;
-        type Id;
         type Rev;
+        type Id;
         type Muted;
         type UnreadCount;
+        type Members;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Members = Unset;
-        type Id = Unset;
         type Rev = Unset;
+        type Id = Unset;
         type Muted = Unset;
         type UnreadCount = Unset;
-    }
-    ///State transition - sets the `members` field to Set
-    pub struct SetMembers<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMembers<St> {}
-    impl<St: State> State for SetMembers<St> {
-        type Members = Set<members::members>;
-        type Id = St::Id;
-        type Rev = St::Rev;
-        type Muted = St::Muted;
-        type UnreadCount = St::UnreadCount;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Members = St::Members;
-        type Id = Set<members::id>;
-        type Rev = St::Rev;
-        type Muted = St::Muted;
-        type UnreadCount = St::UnreadCount;
+        type Members = Unset;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRev<St> {}
     impl<St: State> State for SetRev<St> {
-        type Members = St::Members;
-        type Id = St::Id;
         type Rev = Set<members::rev>;
+        type Id = St::Id;
         type Muted = St::Muted;
         type UnreadCount = St::UnreadCount;
+        type Members = St::Members;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Rev = St::Rev;
+        type Id = Set<members::id>;
+        type Muted = St::Muted;
+        type UnreadCount = St::UnreadCount;
+        type Members = St::Members;
     }
     ///State transition - sets the `muted` field to Set
     pub struct SetMuted<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMuted<St> {}
     impl<St: State> State for SetMuted<St> {
-        type Members = St::Members;
-        type Id = St::Id;
         type Rev = St::Rev;
+        type Id = St::Id;
         type Muted = Set<members::muted>;
         type UnreadCount = St::UnreadCount;
+        type Members = St::Members;
     }
     ///State transition - sets the `unread_count` field to Set
     pub struct SetUnreadCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUnreadCount<St> {}
     impl<St: State> State for SetUnreadCount<St> {
-        type Members = St::Members;
-        type Id = St::Id;
         type Rev = St::Rev;
+        type Id = St::Id;
         type Muted = St::Muted;
         type UnreadCount = Set<members::unread_count>;
+        type Members = St::Members;
+    }
+    ///State transition - sets the `members` field to Set
+    pub struct SetMembers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMembers<St> {}
+    impl<St: State> State for SetMembers<St> {
+        type Rev = St::Rev;
+        type Id = St::Id;
+        type Muted = St::Muted;
+        type UnreadCount = St::UnreadCount;
+        type Members = Set<members::members>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `members` field
-        pub struct members(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `rev` field
         pub struct rev(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `muted` field
         pub struct muted(());
         ///Marker type for the `unread_count` field
         pub struct unread_count(());
+        ///Marker type for the `members` field
+        pub struct members(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ConvoViewBuilder<S: BosStr, St: convo_view_state::State> {
+pub struct ConvoViewBuilder<St: convo_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -887,15 +856,22 @@ pub struct ConvoViewBuilder<S: BosStr, St: convo_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ConvoView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ConvoViewBuilder<S, convo_view_state::Empty> {
+impl ConvoView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ConvoViewBuilder<convo_view_state::Empty, DefaultStr> {
         ConvoViewBuilder::new()
     }
 }
 
-impl<S: BosStr> ConvoViewBuilder<S, convo_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ConvoView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ConvoViewBuilder<convo_view_state::Empty, S> {
+        ConvoViewBuilder::builder()
+    }
+}
+
+impl ConvoViewBuilder<convo_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ConvoViewBuilder {
             _state: PhantomData,
@@ -905,13 +881,27 @@ impl<S: BosStr> ConvoViewBuilder<S, convo_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ConvoViewBuilder<S, St>
+impl<S: BosStr> ConvoViewBuilder<convo_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ConvoViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ConvoViewBuilder<St, S>
 where
     St: convo_view_state::State,
     St::Id: convo_view_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<S>) -> ConvoViewBuilder<S, convo_view_state::SetId<St>> {
+    pub fn id(
+        mut self,
+        value: impl Into<S>,
+    ) -> ConvoViewBuilder<convo_view_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ConvoViewBuilder {
             _state: PhantomData,
@@ -921,9 +911,12 @@ where
     }
 }
 
-impl<S: BosStr, St: convo_view_state::State> ConvoViewBuilder<S, St> {
+impl<St: convo_view_state::State, S: BosStr> ConvoViewBuilder<St, S> {
     /// Set the `lastMessage` field (optional)
-    pub fn last_message(mut self, value: impl Into<Option<ConvoViewLastMessage<S>>>) -> Self {
+    pub fn last_message(
+        mut self,
+        value: impl Into<Option<ConvoViewLastMessage<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -934,7 +927,7 @@ impl<S: BosStr, St: convo_view_state::State> ConvoViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: convo_view_state::State> ConvoViewBuilder<S, St> {
+impl<St: convo_view_state::State, S: BosStr> ConvoViewBuilder<St, S> {
     /// Set the `lastReaction` field (optional)
     pub fn last_reaction(
         mut self,
@@ -944,13 +937,16 @@ impl<S: BosStr, St: convo_view_state::State> ConvoViewBuilder<S, St> {
         self
     }
     /// Set the `lastReaction` field to an Option value (optional)
-    pub fn maybe_last_reaction(mut self, value: Option<convo::MessageAndReactionView<S>>) -> Self {
+    pub fn maybe_last_reaction(
+        mut self,
+        value: Option<convo::MessageAndReactionView<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
 }
 
-impl<S: BosStr, St> ConvoViewBuilder<S, St>
+impl<St, S: BosStr> ConvoViewBuilder<St, S>
 where
     St: convo_view_state::State,
     St::Members: convo_view_state::IsUnset,
@@ -959,7 +955,7 @@ where
     pub fn members(
         mut self,
         value: impl Into<Vec<ProfileViewBasic<S>>>,
-    ) -> ConvoViewBuilder<S, convo_view_state::SetMembers<St>> {
+    ) -> ConvoViewBuilder<convo_view_state::SetMembers<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ConvoViewBuilder {
             _state: PhantomData,
@@ -969,7 +965,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ConvoViewBuilder<S, St>
+impl<St, S: BosStr> ConvoViewBuilder<St, S>
 where
     St: convo_view_state::State,
     St::Muted: convo_view_state::IsUnset,
@@ -978,7 +974,7 @@ where
     pub fn muted(
         mut self,
         value: impl Into<bool>,
-    ) -> ConvoViewBuilder<S, convo_view_state::SetMuted<St>> {
+    ) -> ConvoViewBuilder<convo_view_state::SetMuted<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ConvoViewBuilder {
             _state: PhantomData,
@@ -988,13 +984,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ConvoViewBuilder<S, St>
+impl<St, S: BosStr> ConvoViewBuilder<St, S>
 where
     St: convo_view_state::State,
     St::Rev: convo_view_state::IsUnset,
 {
     /// Set the `rev` field (required)
-    pub fn rev(mut self, value: impl Into<S>) -> ConvoViewBuilder<S, convo_view_state::SetRev<St>> {
+    pub fn rev(
+        mut self,
+        value: impl Into<S>,
+    ) -> ConvoViewBuilder<convo_view_state::SetRev<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ConvoViewBuilder {
             _state: PhantomData,
@@ -1004,7 +1003,7 @@ where
     }
 }
 
-impl<S: BosStr, St: convo_view_state::State> ConvoViewBuilder<S, St> {
+impl<St: convo_view_state::State, S: BosStr> ConvoViewBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<ConvoViewStatus<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -1017,7 +1016,7 @@ impl<S: BosStr, St: convo_view_state::State> ConvoViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ConvoViewBuilder<S, St>
+impl<St, S: BosStr> ConvoViewBuilder<St, S>
 where
     St: convo_view_state::State,
     St::UnreadCount: convo_view_state::IsUnset,
@@ -1026,7 +1025,7 @@ where
     pub fn unread_count(
         mut self,
         value: impl Into<i64>,
-    ) -> ConvoViewBuilder<S, convo_view_state::SetUnreadCount<St>> {
+    ) -> ConvoViewBuilder<convo_view_state::SetUnreadCount<St>, S> {
         self._fields.7 = Option::Some(value.into());
         ConvoViewBuilder {
             _state: PhantomData,
@@ -1036,14 +1035,14 @@ where
     }
 }
 
-impl<S: BosStr, St> ConvoViewBuilder<S, St>
+impl<St, S: BosStr> ConvoViewBuilder<St, S>
 where
     St: convo_view_state::State,
-    St::Members: convo_view_state::IsSet,
-    St::Id: convo_view_state::IsSet,
     St::Rev: convo_view_state::IsSet,
+    St::Id: convo_view_state::IsSet,
     St::Muted: convo_view_state::IsSet,
     St::UnreadCount: convo_view_state::IsSet,
+    St::Members: convo_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ConvoView<S> {
@@ -1060,7 +1059,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ConvoView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ConvoView<S> {
         ConvoView {
             id: self._fields.0.unwrap(),
             last_message: self._fields.1,
@@ -1076,10 +1078,10 @@ where
 }
 
 fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.convo.defs"),
@@ -1088,28 +1090,26 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("convoView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("members"),
-                        SmolStr::new_static("muted"),
-                        SmolStr::new_static("unreadCount"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("rev"),
+                            SmolStr::new_static("members"), SmolStr::new_static("muted"),
+                            SmolStr::new_static("unreadCount")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("lastMessage"),
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#messageView"),
-                                    CowStr::new_static("#deletedMessageView"),
+                                    CowStr::new_static("#deletedMessageView")
                                 ],
                                 ..Default::default()
                             }),
@@ -1141,15 +1141,11 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("unreadCount"),
@@ -1165,26 +1161,22 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("deletedMessageView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("sender"),
-                        SmolStr::new_static("sentAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("rev"),
+                            SmolStr::new_static("sender"), SmolStr::new_static("sentAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("sender"),
@@ -1208,24 +1200,19 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logAcceptConvo"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("convoId"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("rev"), SmolStr::new_static("convoId")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1235,27 +1222,26 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logAddReaction"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("convoId"),
-                        SmolStr::new_static("message"),
-                        SmolStr::new_static("reaction"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
+                            SmolStr::new_static("message"),
+                            SmolStr::new_static("reaction")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#messageView"),
-                                    CowStr::new_static("#deletedMessageView"),
+                                    CowStr::new_static("#deletedMessageView")
                                 ],
                                 ..Default::default()
                             }),
@@ -1269,9 +1255,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1281,24 +1265,19 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logBeginConvo"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("convoId"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("rev"), SmolStr::new_static("convoId")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1308,35 +1287,32 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logCreateMessage"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("convoId"),
-                        SmolStr::new_static("message"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
+                            SmolStr::new_static("message")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#messageView"),
-                                    CowStr::new_static("#deletedMessageView"),
+                                    CowStr::new_static("#deletedMessageView")
                                 ],
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1346,35 +1322,32 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logDeleteMessage"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("convoId"),
-                        SmolStr::new_static("message"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
+                            SmolStr::new_static("message")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#messageView"),
-                                    CowStr::new_static("#deletedMessageView"),
+                                    CowStr::new_static("#deletedMessageView")
                                 ],
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1384,24 +1357,19 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logLeaveConvo"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("convoId"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("rev"), SmolStr::new_static("convoId")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1411,24 +1379,19 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logMuteConvo"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("convoId"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("rev"), SmolStr::new_static("convoId")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1438,35 +1401,32 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logReadMessage"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("convoId"),
-                        SmolStr::new_static("message"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
+                            SmolStr::new_static("message")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#messageView"),
-                                    CowStr::new_static("#deletedMessageView"),
+                                    CowStr::new_static("#deletedMessageView")
                                 ],
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1476,27 +1436,26 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logRemoveReaction"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("convoId"),
-                        SmolStr::new_static("message"),
-                        SmolStr::new_static("reaction"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
+                            SmolStr::new_static("message"),
+                            SmolStr::new_static("reaction")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#messageView"),
-                                    CowStr::new_static("#deletedMessageView"),
+                                    CowStr::new_static("#deletedMessageView")
                                 ],
                                 ..Default::default()
                             }),
@@ -1510,9 +1469,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1522,24 +1479,19 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logUnmuteConvo"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("convoId"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("rev"), SmolStr::new_static("convoId")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1549,10 +1501,12 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("messageAndReactionView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("message"),
-                        SmolStr::new_static("reaction"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("message"),
+                            SmolStr::new_static("reaction")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1592,9 +1546,11 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Annotations of text (mentions, URLs, hashtags, etc)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Annotations of text (mentions, URLs, hashtags, etc)",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("app.bsky.richtext.facet"),
                                     ..Default::default()
@@ -1618,19 +1574,18 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("messageRef"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("messageId"),
-                        SmolStr::new_static("convoId"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("did"), SmolStr::new_static("messageId"),
+                            SmolStr::new_static("convoId")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("did"),
@@ -1641,9 +1596,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("messageId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1759,11 +1712,12 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reactionView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("value"),
-                        SmolStr::new_static("sender"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("value"), SmolStr::new_static("sender"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1783,9 +1737,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("value"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1819,7 +1771,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
 
 pub mod deleted_message_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1827,72 +1779,75 @@ pub mod deleted_message_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Rev;
         type Sender;
+        type Rev;
         type SentAt;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Rev = Unset;
         type Sender = Unset;
+        type Rev = Unset;
         type SentAt = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type Rev = St::Rev;
-        type Sender = St::Sender;
-        type SentAt = St::SentAt;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev<St> {}
-    impl<St: State> State for SetRev<St> {
-        type Id = St::Id;
-        type Rev = Set<members::rev>;
-        type Sender = St::Sender;
-        type SentAt = St::SentAt;
+        type Id = Unset;
     }
     ///State transition - sets the `sender` field to Set
     pub struct SetSender<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSender<St> {}
     impl<St: State> State for SetSender<St> {
-        type Id = St::Id;
-        type Rev = St::Rev;
         type Sender = Set<members::sender>;
+        type Rev = St::Rev;
         type SentAt = St::SentAt;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev<St> {}
+    impl<St: State> State for SetRev<St> {
+        type Sender = St::Sender;
+        type Rev = Set<members::rev>;
+        type SentAt = St::SentAt;
+        type Id = St::Id;
     }
     ///State transition - sets the `sent_at` field to Set
     pub struct SetSentAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSentAt<St> {}
     impl<St: State> State for SetSentAt<St> {
-        type Id = St::Id;
-        type Rev = St::Rev;
         type Sender = St::Sender;
+        type Rev = St::Rev;
         type SentAt = Set<members::sent_at>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Sender = St::Sender;
+        type Rev = St::Rev;
+        type SentAt = St::SentAt;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `sender` field
         pub struct sender(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
         ///Marker type for the `sent_at` field
         pub struct sent_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeletedMessageViewBuilder<S: BosStr, St: deleted_message_view_state::State> {
+pub struct DeletedMessageViewBuilder<
+    St: deleted_message_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -1903,15 +1858,25 @@ pub struct DeletedMessageViewBuilder<S: BosStr, St: deleted_message_view_state::
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DeletedMessageView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DeletedMessageViewBuilder<S, deleted_message_view_state::Empty> {
+impl DeletedMessageView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DeletedMessageViewBuilder<
+        deleted_message_view_state::Empty,
+        DefaultStr,
+    > {
         DeletedMessageViewBuilder::new()
     }
 }
 
-impl<S: BosStr> DeletedMessageViewBuilder<S, deleted_message_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DeletedMessageView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DeletedMessageViewBuilder<deleted_message_view_state::Empty, S> {
+        DeletedMessageViewBuilder::builder()
+    }
+}
+
+impl DeletedMessageViewBuilder<deleted_message_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DeletedMessageViewBuilder {
             _state: PhantomData,
@@ -1921,7 +1886,18 @@ impl<S: BosStr> DeletedMessageViewBuilder<S, deleted_message_view_state::Empty> 
     }
 }
 
-impl<S: BosStr, St> DeletedMessageViewBuilder<S, St>
+impl<S: BosStr> DeletedMessageViewBuilder<deleted_message_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DeletedMessageViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DeletedMessageViewBuilder<St, S>
 where
     St: deleted_message_view_state::State,
     St::Id: deleted_message_view_state::IsUnset,
@@ -1930,7 +1906,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> DeletedMessageViewBuilder<S, deleted_message_view_state::SetId<St>> {
+    ) -> DeletedMessageViewBuilder<deleted_message_view_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DeletedMessageViewBuilder {
             _state: PhantomData,
@@ -1940,7 +1916,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeletedMessageViewBuilder<S, St>
+impl<St, S: BosStr> DeletedMessageViewBuilder<St, S>
 where
     St: deleted_message_view_state::State,
     St::Rev: deleted_message_view_state::IsUnset,
@@ -1949,7 +1925,7 @@ where
     pub fn rev(
         mut self,
         value: impl Into<S>,
-    ) -> DeletedMessageViewBuilder<S, deleted_message_view_state::SetRev<St>> {
+    ) -> DeletedMessageViewBuilder<deleted_message_view_state::SetRev<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DeletedMessageViewBuilder {
             _state: PhantomData,
@@ -1959,7 +1935,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeletedMessageViewBuilder<S, St>
+impl<St, S: BosStr> DeletedMessageViewBuilder<St, S>
 where
     St: deleted_message_view_state::State,
     St::Sender: deleted_message_view_state::IsUnset,
@@ -1968,7 +1944,7 @@ where
     pub fn sender(
         mut self,
         value: impl Into<convo::MessageViewSender<S>>,
-    ) -> DeletedMessageViewBuilder<S, deleted_message_view_state::SetSender<St>> {
+    ) -> DeletedMessageViewBuilder<deleted_message_view_state::SetSender<St>, S> {
         self._fields.2 = Option::Some(value.into());
         DeletedMessageViewBuilder {
             _state: PhantomData,
@@ -1978,7 +1954,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeletedMessageViewBuilder<S, St>
+impl<St, S: BosStr> DeletedMessageViewBuilder<St, S>
 where
     St: deleted_message_view_state::State,
     St::SentAt: deleted_message_view_state::IsUnset,
@@ -1987,7 +1963,7 @@ where
     pub fn sent_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DeletedMessageViewBuilder<S, deleted_message_view_state::SetSentAt<St>> {
+    ) -> DeletedMessageViewBuilder<deleted_message_view_state::SetSentAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         DeletedMessageViewBuilder {
             _state: PhantomData,
@@ -1997,13 +1973,13 @@ where
     }
 }
 
-impl<S: BosStr, St> DeletedMessageViewBuilder<S, St>
+impl<St, S: BosStr> DeletedMessageViewBuilder<St, S>
 where
     St: deleted_message_view_state::State,
-    St::Id: deleted_message_view_state::IsSet,
-    St::Rev: deleted_message_view_state::IsSet,
     St::Sender: deleted_message_view_state::IsSet,
+    St::Rev: deleted_message_view_state::IsSet,
     St::SentAt: deleted_message_view_state::IsSet,
+    St::Id: deleted_message_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DeletedMessageView<S> {
@@ -2016,7 +1992,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeletedMessageView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeletedMessageView<S> {
         DeletedMessageView {
             id: self._fields.0.unwrap(),
             rev: self._fields.1.unwrap(),
@@ -2029,7 +2008,7 @@ where
 
 pub mod log_add_reaction_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2037,72 +2016,75 @@ pub mod log_add_reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
         type Reaction;
-        type Rev;
         type ConvoId;
+        type Message;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
         type Reaction = Unset;
-        type Rev = Unset;
         type ConvoId = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMessage<St> {}
-    impl<St: State> State for SetMessage<St> {
-        type Message = Set<members::message>;
-        type Reaction = St::Reaction;
-        type Rev = St::Rev;
-        type ConvoId = St::ConvoId;
+        type Message = Unset;
+        type Rev = Unset;
     }
     ///State transition - sets the `reaction` field to Set
     pub struct SetReaction<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetReaction<St> {}
     impl<St: State> State for SetReaction<St> {
-        type Message = St::Message;
         type Reaction = Set<members::reaction>;
-        type Rev = St::Rev;
         type ConvoId = St::ConvoId;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev<St> {}
-    impl<St: State> State for SetRev<St> {
         type Message = St::Message;
-        type Reaction = St::Reaction;
-        type Rev = Set<members::rev>;
-        type ConvoId = St::ConvoId;
+        type Rev = St::Rev;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetConvoId<St> {}
     impl<St: State> State for SetConvoId<St> {
-        type Message = St::Message;
         type Reaction = St::Reaction;
-        type Rev = St::Rev;
         type ConvoId = Set<members::convo_id>;
+        type Message = St::Message;
+        type Rev = St::Rev;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
+        type Reaction = St::Reaction;
+        type ConvoId = St::ConvoId;
+        type Message = Set<members::message>;
+        type Rev = St::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev<St> {}
+    impl<St: State> State for SetRev<St> {
+        type Reaction = St::Reaction;
+        type ConvoId = St::ConvoId;
+        type Message = St::Message;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `reaction` field
         pub struct reaction(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
+        ///Marker type for the `message` field
+        pub struct message(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogAddReactionBuilder<S: BosStr, St: log_add_reaction_state::State> {
+pub struct LogAddReactionBuilder<
+    St: log_add_reaction_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -2113,15 +2095,22 @@ pub struct LogAddReactionBuilder<S: BosStr, St: log_add_reaction_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LogAddReaction<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LogAddReactionBuilder<S, log_add_reaction_state::Empty> {
+impl LogAddReaction<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LogAddReactionBuilder<log_add_reaction_state::Empty, DefaultStr> {
         LogAddReactionBuilder::new()
     }
 }
 
-impl<S: BosStr> LogAddReactionBuilder<S, log_add_reaction_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LogAddReaction<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LogAddReactionBuilder<log_add_reaction_state::Empty, S> {
+        LogAddReactionBuilder::builder()
+    }
+}
+
+impl LogAddReactionBuilder<log_add_reaction_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LogAddReactionBuilder {
             _state: PhantomData,
@@ -2131,7 +2120,18 @@ impl<S: BosStr> LogAddReactionBuilder<S, log_add_reaction_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LogAddReactionBuilder<S, St>
+impl<S: BosStr> LogAddReactionBuilder<log_add_reaction_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LogAddReactionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LogAddReactionBuilder<St, S>
 where
     St: log_add_reaction_state::State,
     St::ConvoId: log_add_reaction_state::IsUnset,
@@ -2140,7 +2140,7 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> LogAddReactionBuilder<S, log_add_reaction_state::SetConvoId<St>> {
+    ) -> LogAddReactionBuilder<log_add_reaction_state::SetConvoId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LogAddReactionBuilder {
             _state: PhantomData,
@@ -2150,7 +2150,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogAddReactionBuilder<S, St>
+impl<St, S: BosStr> LogAddReactionBuilder<St, S>
 where
     St: log_add_reaction_state::State,
     St::Message: log_add_reaction_state::IsUnset,
@@ -2159,7 +2159,7 @@ where
     pub fn message(
         mut self,
         value: impl Into<LogAddReactionMessage<S>>,
-    ) -> LogAddReactionBuilder<S, log_add_reaction_state::SetMessage<St>> {
+    ) -> LogAddReactionBuilder<log_add_reaction_state::SetMessage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LogAddReactionBuilder {
             _state: PhantomData,
@@ -2169,7 +2169,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogAddReactionBuilder<S, St>
+impl<St, S: BosStr> LogAddReactionBuilder<St, S>
 where
     St: log_add_reaction_state::State,
     St::Reaction: log_add_reaction_state::IsUnset,
@@ -2178,7 +2178,7 @@ where
     pub fn reaction(
         mut self,
         value: impl Into<convo::ReactionView<S>>,
-    ) -> LogAddReactionBuilder<S, log_add_reaction_state::SetReaction<St>> {
+    ) -> LogAddReactionBuilder<log_add_reaction_state::SetReaction<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LogAddReactionBuilder {
             _state: PhantomData,
@@ -2188,7 +2188,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogAddReactionBuilder<S, St>
+impl<St, S: BosStr> LogAddReactionBuilder<St, S>
 where
     St: log_add_reaction_state::State,
     St::Rev: log_add_reaction_state::IsUnset,
@@ -2197,7 +2197,7 @@ where
     pub fn rev(
         mut self,
         value: impl Into<S>,
-    ) -> LogAddReactionBuilder<S, log_add_reaction_state::SetRev<St>> {
+    ) -> LogAddReactionBuilder<log_add_reaction_state::SetRev<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LogAddReactionBuilder {
             _state: PhantomData,
@@ -2207,13 +2207,13 @@ where
     }
 }
 
-impl<S: BosStr, St> LogAddReactionBuilder<S, St>
+impl<St, S: BosStr> LogAddReactionBuilder<St, S>
 where
     St: log_add_reaction_state::State,
-    St::Message: log_add_reaction_state::IsSet,
     St::Reaction: log_add_reaction_state::IsSet,
-    St::Rev: log_add_reaction_state::IsSet,
     St::ConvoId: log_add_reaction_state::IsSet,
+    St::Message: log_add_reaction_state::IsSet,
+    St::Rev: log_add_reaction_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LogAddReaction<S> {
@@ -2226,7 +2226,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogAddReaction<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogAddReaction<S> {
         LogAddReaction {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -2239,7 +2242,7 @@ where
 
 pub mod log_create_message_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2247,70 +2250,83 @@ pub mod log_create_message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
         type ConvoId;
         type Rev;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
         type ConvoId = Unset;
         type Rev = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMessage<St> {}
-    impl<St: State> State for SetMessage<St> {
-        type Message = Set<members::message>;
-        type ConvoId = St::ConvoId;
-        type Rev = St::Rev;
+        type Message = Unset;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetConvoId<St> {}
     impl<St: State> State for SetConvoId<St> {
-        type Message = St::Message;
         type ConvoId = Set<members::convo_id>;
         type Rev = St::Rev;
+        type Message = St::Message;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRev<St> {}
     impl<St: State> State for SetRev<St> {
-        type Message = St::Message;
         type ConvoId = St::ConvoId;
         type Rev = Set<members::rev>;
+        type Message = St::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
+        type ConvoId = St::ConvoId;
+        type Rev = St::Rev;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
         ///Marker type for the `rev` field
         pub struct rev(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogCreateMessageBuilder<S: BosStr, St: log_create_message_state::State> {
+pub struct LogCreateMessageBuilder<
+    St: log_create_message_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<LogCreateMessageMessage<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LogCreateMessage<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LogCreateMessageBuilder<S, log_create_message_state::Empty> {
+impl LogCreateMessage<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LogCreateMessageBuilder<
+        log_create_message_state::Empty,
+        DefaultStr,
+    > {
         LogCreateMessageBuilder::new()
     }
 }
 
-impl<S: BosStr> LogCreateMessageBuilder<S, log_create_message_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LogCreateMessage<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LogCreateMessageBuilder<log_create_message_state::Empty, S> {
+        LogCreateMessageBuilder::builder()
+    }
+}
+
+impl LogCreateMessageBuilder<log_create_message_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LogCreateMessageBuilder {
             _state: PhantomData,
@@ -2320,7 +2336,18 @@ impl<S: BosStr> LogCreateMessageBuilder<S, log_create_message_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LogCreateMessageBuilder<S, St>
+impl<S: BosStr> LogCreateMessageBuilder<log_create_message_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LogCreateMessageBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LogCreateMessageBuilder<St, S>
 where
     St: log_create_message_state::State,
     St::ConvoId: log_create_message_state::IsUnset,
@@ -2329,7 +2356,7 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> LogCreateMessageBuilder<S, log_create_message_state::SetConvoId<St>> {
+    ) -> LogCreateMessageBuilder<log_create_message_state::SetConvoId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LogCreateMessageBuilder {
             _state: PhantomData,
@@ -2339,7 +2366,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogCreateMessageBuilder<S, St>
+impl<St, S: BosStr> LogCreateMessageBuilder<St, S>
 where
     St: log_create_message_state::State,
     St::Message: log_create_message_state::IsUnset,
@@ -2348,7 +2375,7 @@ where
     pub fn message(
         mut self,
         value: impl Into<LogCreateMessageMessage<S>>,
-    ) -> LogCreateMessageBuilder<S, log_create_message_state::SetMessage<St>> {
+    ) -> LogCreateMessageBuilder<log_create_message_state::SetMessage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LogCreateMessageBuilder {
             _state: PhantomData,
@@ -2358,7 +2385,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogCreateMessageBuilder<S, St>
+impl<St, S: BosStr> LogCreateMessageBuilder<St, S>
 where
     St: log_create_message_state::State,
     St::Rev: log_create_message_state::IsUnset,
@@ -2367,7 +2394,7 @@ where
     pub fn rev(
         mut self,
         value: impl Into<S>,
-    ) -> LogCreateMessageBuilder<S, log_create_message_state::SetRev<St>> {
+    ) -> LogCreateMessageBuilder<log_create_message_state::SetRev<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LogCreateMessageBuilder {
             _state: PhantomData,
@@ -2377,12 +2404,12 @@ where
     }
 }
 
-impl<S: BosStr, St> LogCreateMessageBuilder<S, St>
+impl<St, S: BosStr> LogCreateMessageBuilder<St, S>
 where
     St: log_create_message_state::State,
-    St::Message: log_create_message_state::IsSet,
     St::ConvoId: log_create_message_state::IsSet,
     St::Rev: log_create_message_state::IsSet,
+    St::Message: log_create_message_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LogCreateMessage<S> {
@@ -2394,7 +2421,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogCreateMessage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogCreateMessage<S> {
         LogCreateMessage {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -2406,7 +2436,7 @@ where
 
 pub mod log_delete_message_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2463,21 +2493,34 @@ pub mod log_delete_message_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogDeleteMessageBuilder<S: BosStr, St: log_delete_message_state::State> {
+pub struct LogDeleteMessageBuilder<
+    St: log_delete_message_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<LogDeleteMessageMessage<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LogDeleteMessage<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LogDeleteMessageBuilder<S, log_delete_message_state::Empty> {
+impl LogDeleteMessage<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LogDeleteMessageBuilder<
+        log_delete_message_state::Empty,
+        DefaultStr,
+    > {
         LogDeleteMessageBuilder::new()
     }
 }
 
-impl<S: BosStr> LogDeleteMessageBuilder<S, log_delete_message_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LogDeleteMessage<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LogDeleteMessageBuilder<log_delete_message_state::Empty, S> {
+        LogDeleteMessageBuilder::builder()
+    }
+}
+
+impl LogDeleteMessageBuilder<log_delete_message_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LogDeleteMessageBuilder {
             _state: PhantomData,
@@ -2487,7 +2530,18 @@ impl<S: BosStr> LogDeleteMessageBuilder<S, log_delete_message_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LogDeleteMessageBuilder<S, St>
+impl<S: BosStr> LogDeleteMessageBuilder<log_delete_message_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LogDeleteMessageBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LogDeleteMessageBuilder<St, S>
 where
     St: log_delete_message_state::State,
     St::ConvoId: log_delete_message_state::IsUnset,
@@ -2496,7 +2550,7 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> LogDeleteMessageBuilder<S, log_delete_message_state::SetConvoId<St>> {
+    ) -> LogDeleteMessageBuilder<log_delete_message_state::SetConvoId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LogDeleteMessageBuilder {
             _state: PhantomData,
@@ -2506,7 +2560,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogDeleteMessageBuilder<S, St>
+impl<St, S: BosStr> LogDeleteMessageBuilder<St, S>
 where
     St: log_delete_message_state::State,
     St::Message: log_delete_message_state::IsUnset,
@@ -2515,7 +2569,7 @@ where
     pub fn message(
         mut self,
         value: impl Into<LogDeleteMessageMessage<S>>,
-    ) -> LogDeleteMessageBuilder<S, log_delete_message_state::SetMessage<St>> {
+    ) -> LogDeleteMessageBuilder<log_delete_message_state::SetMessage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LogDeleteMessageBuilder {
             _state: PhantomData,
@@ -2525,7 +2579,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogDeleteMessageBuilder<S, St>
+impl<St, S: BosStr> LogDeleteMessageBuilder<St, S>
 where
     St: log_delete_message_state::State,
     St::Rev: log_delete_message_state::IsUnset,
@@ -2534,7 +2588,7 @@ where
     pub fn rev(
         mut self,
         value: impl Into<S>,
-    ) -> LogDeleteMessageBuilder<S, log_delete_message_state::SetRev<St>> {
+    ) -> LogDeleteMessageBuilder<log_delete_message_state::SetRev<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LogDeleteMessageBuilder {
             _state: PhantomData,
@@ -2544,7 +2598,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogDeleteMessageBuilder<S, St>
+impl<St, S: BosStr> LogDeleteMessageBuilder<St, S>
 where
     St: log_delete_message_state::State,
     St::ConvoId: log_delete_message_state::IsSet,
@@ -2561,7 +2615,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogDeleteMessage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogDeleteMessage<S> {
         LogDeleteMessage {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -2573,7 +2630,7 @@ where
 
 pub mod log_read_message_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2581,70 +2638,80 @@ pub mod log_read_message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rev;
-        type ConvoId;
         type Message;
+        type ConvoId;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rev = Unset;
-        type ConvoId = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev<St> {}
-    impl<St: State> State for SetRev<St> {
-        type Rev = Set<members::rev>;
-        type ConvoId = St::ConvoId;
-        type Message = St::Message;
-    }
-    ///State transition - sets the `convo_id` field to Set
-    pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetConvoId<St> {}
-    impl<St: State> State for SetConvoId<St> {
-        type Rev = St::Rev;
-        type ConvoId = Set<members::convo_id>;
-        type Message = St::Message;
+        type ConvoId = Unset;
+        type Rev = Unset;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessage<St> {}
     impl<St: State> State for SetMessage<St> {
-        type Rev = St::Rev;
-        type ConvoId = St::ConvoId;
         type Message = Set<members::message>;
+        type ConvoId = St::ConvoId;
+        type Rev = St::Rev;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetConvoId<St> {}
+    impl<St: State> State for SetConvoId<St> {
+        type Message = St::Message;
+        type ConvoId = Set<members::convo_id>;
+        type Rev = St::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev<St> {}
+    impl<St: State> State for SetRev<St> {
+        type Message = St::Message;
+        type ConvoId = St::ConvoId;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rev` field
-        pub struct rev(());
-        ///Marker type for the `convo_id` field
-        pub struct convo_id(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogReadMessageBuilder<S: BosStr, St: log_read_message_state::State> {
+pub struct LogReadMessageBuilder<
+    St: log_read_message_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<LogReadMessageMessage<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LogReadMessage<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LogReadMessageBuilder<S, log_read_message_state::Empty> {
+impl LogReadMessage<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LogReadMessageBuilder<log_read_message_state::Empty, DefaultStr> {
         LogReadMessageBuilder::new()
     }
 }
 
-impl<S: BosStr> LogReadMessageBuilder<S, log_read_message_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LogReadMessage<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LogReadMessageBuilder<log_read_message_state::Empty, S> {
+        LogReadMessageBuilder::builder()
+    }
+}
+
+impl LogReadMessageBuilder<log_read_message_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LogReadMessageBuilder {
             _state: PhantomData,
@@ -2654,7 +2721,18 @@ impl<S: BosStr> LogReadMessageBuilder<S, log_read_message_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LogReadMessageBuilder<S, St>
+impl<S: BosStr> LogReadMessageBuilder<log_read_message_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LogReadMessageBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LogReadMessageBuilder<St, S>
 where
     St: log_read_message_state::State,
     St::ConvoId: log_read_message_state::IsUnset,
@@ -2663,7 +2741,7 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> LogReadMessageBuilder<S, log_read_message_state::SetConvoId<St>> {
+    ) -> LogReadMessageBuilder<log_read_message_state::SetConvoId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LogReadMessageBuilder {
             _state: PhantomData,
@@ -2673,7 +2751,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogReadMessageBuilder<S, St>
+impl<St, S: BosStr> LogReadMessageBuilder<St, S>
 where
     St: log_read_message_state::State,
     St::Message: log_read_message_state::IsUnset,
@@ -2682,7 +2760,7 @@ where
     pub fn message(
         mut self,
         value: impl Into<LogReadMessageMessage<S>>,
-    ) -> LogReadMessageBuilder<S, log_read_message_state::SetMessage<St>> {
+    ) -> LogReadMessageBuilder<log_read_message_state::SetMessage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LogReadMessageBuilder {
             _state: PhantomData,
@@ -2692,7 +2770,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogReadMessageBuilder<S, St>
+impl<St, S: BosStr> LogReadMessageBuilder<St, S>
 where
     St: log_read_message_state::State,
     St::Rev: log_read_message_state::IsUnset,
@@ -2701,7 +2779,7 @@ where
     pub fn rev(
         mut self,
         value: impl Into<S>,
-    ) -> LogReadMessageBuilder<S, log_read_message_state::SetRev<St>> {
+    ) -> LogReadMessageBuilder<log_read_message_state::SetRev<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LogReadMessageBuilder {
             _state: PhantomData,
@@ -2711,12 +2789,12 @@ where
     }
 }
 
-impl<S: BosStr, St> LogReadMessageBuilder<S, St>
+impl<St, S: BosStr> LogReadMessageBuilder<St, S>
 where
     St: log_read_message_state::State,
-    St::Rev: log_read_message_state::IsSet,
-    St::ConvoId: log_read_message_state::IsSet,
     St::Message: log_read_message_state::IsSet,
+    St::ConvoId: log_read_message_state::IsSet,
+    St::Rev: log_read_message_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LogReadMessage<S> {
@@ -2728,7 +2806,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogReadMessage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogReadMessage<S> {
         LogReadMessage {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -2740,7 +2821,7 @@ where
 
 pub mod log_remove_reaction_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2748,72 +2829,75 @@ pub mod log_remove_reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rev;
-        type Message;
-        type ConvoId;
         type Reaction;
+        type ConvoId;
+        type Message;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rev = Unset;
-        type Message = Unset;
-        type ConvoId = Unset;
         type Reaction = Unset;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev<St> {}
-    impl<St: State> State for SetRev<St> {
-        type Rev = Set<members::rev>;
-        type Message = St::Message;
-        type ConvoId = St::ConvoId;
-        type Reaction = St::Reaction;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMessage<St> {}
-    impl<St: State> State for SetMessage<St> {
-        type Rev = St::Rev;
-        type Message = Set<members::message>;
-        type ConvoId = St::ConvoId;
-        type Reaction = St::Reaction;
-    }
-    ///State transition - sets the `convo_id` field to Set
-    pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetConvoId<St> {}
-    impl<St: State> State for SetConvoId<St> {
-        type Rev = St::Rev;
-        type Message = St::Message;
-        type ConvoId = Set<members::convo_id>;
-        type Reaction = St::Reaction;
+        type ConvoId = Unset;
+        type Message = Unset;
+        type Rev = Unset;
     }
     ///State transition - sets the `reaction` field to Set
     pub struct SetReaction<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetReaction<St> {}
     impl<St: State> State for SetReaction<St> {
-        type Rev = St::Rev;
-        type Message = St::Message;
-        type ConvoId = St::ConvoId;
         type Reaction = Set<members::reaction>;
+        type ConvoId = St::ConvoId;
+        type Message = St::Message;
+        type Rev = St::Rev;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetConvoId<St> {}
+    impl<St: State> State for SetConvoId<St> {
+        type Reaction = St::Reaction;
+        type ConvoId = Set<members::convo_id>;
+        type Message = St::Message;
+        type Rev = St::Rev;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
+        type Reaction = St::Reaction;
+        type ConvoId = St::ConvoId;
+        type Message = Set<members::message>;
+        type Rev = St::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev<St> {}
+    impl<St: State> State for SetRev<St> {
+        type Reaction = St::Reaction;
+        type ConvoId = St::ConvoId;
+        type Message = St::Message;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rev` field
-        pub struct rev(());
-        ///Marker type for the `message` field
-        pub struct message(());
-        ///Marker type for the `convo_id` field
-        pub struct convo_id(());
         ///Marker type for the `reaction` field
         pub struct reaction(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
+        ///Marker type for the `message` field
+        pub struct message(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogRemoveReactionBuilder<S: BosStr, St: log_remove_reaction_state::State> {
+pub struct LogRemoveReactionBuilder<
+    St: log_remove_reaction_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -2824,15 +2908,25 @@ pub struct LogRemoveReactionBuilder<S: BosStr, St: log_remove_reaction_state::St
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LogRemoveReaction<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LogRemoveReactionBuilder<S, log_remove_reaction_state::Empty> {
+impl LogRemoveReaction<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LogRemoveReactionBuilder<
+        log_remove_reaction_state::Empty,
+        DefaultStr,
+    > {
         LogRemoveReactionBuilder::new()
     }
 }
 
-impl<S: BosStr> LogRemoveReactionBuilder<S, log_remove_reaction_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LogRemoveReaction<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LogRemoveReactionBuilder<log_remove_reaction_state::Empty, S> {
+        LogRemoveReactionBuilder::builder()
+    }
+}
+
+impl LogRemoveReactionBuilder<log_remove_reaction_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LogRemoveReactionBuilder {
             _state: PhantomData,
@@ -2842,7 +2936,18 @@ impl<S: BosStr> LogRemoveReactionBuilder<S, log_remove_reaction_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LogRemoveReactionBuilder<S, St>
+impl<S: BosStr> LogRemoveReactionBuilder<log_remove_reaction_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LogRemoveReactionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LogRemoveReactionBuilder<St, S>
 where
     St: log_remove_reaction_state::State,
     St::ConvoId: log_remove_reaction_state::IsUnset,
@@ -2851,7 +2956,7 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> LogRemoveReactionBuilder<S, log_remove_reaction_state::SetConvoId<St>> {
+    ) -> LogRemoveReactionBuilder<log_remove_reaction_state::SetConvoId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LogRemoveReactionBuilder {
             _state: PhantomData,
@@ -2861,7 +2966,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogRemoveReactionBuilder<S, St>
+impl<St, S: BosStr> LogRemoveReactionBuilder<St, S>
 where
     St: log_remove_reaction_state::State,
     St::Message: log_remove_reaction_state::IsUnset,
@@ -2870,7 +2975,7 @@ where
     pub fn message(
         mut self,
         value: impl Into<LogRemoveReactionMessage<S>>,
-    ) -> LogRemoveReactionBuilder<S, log_remove_reaction_state::SetMessage<St>> {
+    ) -> LogRemoveReactionBuilder<log_remove_reaction_state::SetMessage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LogRemoveReactionBuilder {
             _state: PhantomData,
@@ -2880,7 +2985,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogRemoveReactionBuilder<S, St>
+impl<St, S: BosStr> LogRemoveReactionBuilder<St, S>
 where
     St: log_remove_reaction_state::State,
     St::Reaction: log_remove_reaction_state::IsUnset,
@@ -2889,7 +2994,7 @@ where
     pub fn reaction(
         mut self,
         value: impl Into<convo::ReactionView<S>>,
-    ) -> LogRemoveReactionBuilder<S, log_remove_reaction_state::SetReaction<St>> {
+    ) -> LogRemoveReactionBuilder<log_remove_reaction_state::SetReaction<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LogRemoveReactionBuilder {
             _state: PhantomData,
@@ -2899,7 +3004,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogRemoveReactionBuilder<S, St>
+impl<St, S: BosStr> LogRemoveReactionBuilder<St, S>
 where
     St: log_remove_reaction_state::State,
     St::Rev: log_remove_reaction_state::IsUnset,
@@ -2908,7 +3013,7 @@ where
     pub fn rev(
         mut self,
         value: impl Into<S>,
-    ) -> LogRemoveReactionBuilder<S, log_remove_reaction_state::SetRev<St>> {
+    ) -> LogRemoveReactionBuilder<log_remove_reaction_state::SetRev<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LogRemoveReactionBuilder {
             _state: PhantomData,
@@ -2918,13 +3023,13 @@ where
     }
 }
 
-impl<S: BosStr, St> LogRemoveReactionBuilder<S, St>
+impl<St, S: BosStr> LogRemoveReactionBuilder<St, S>
 where
     St: log_remove_reaction_state::State,
-    St::Rev: log_remove_reaction_state::IsSet,
-    St::Message: log_remove_reaction_state::IsSet,
-    St::ConvoId: log_remove_reaction_state::IsSet,
     St::Reaction: log_remove_reaction_state::IsSet,
+    St::ConvoId: log_remove_reaction_state::IsSet,
+    St::Message: log_remove_reaction_state::IsSet,
+    St::Rev: log_remove_reaction_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LogRemoveReaction<S> {
@@ -2937,7 +3042,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogRemoveReaction<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogRemoveReaction<S> {
         LogRemoveReaction {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -2950,7 +3058,7 @@ where
 
 pub mod message_and_reaction_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2993,24 +3101,37 @@ pub mod message_and_reaction_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MessageAndReactionViewBuilder<S: BosStr, St: message_and_reaction_view_state::State> {
+pub struct MessageAndReactionViewBuilder<
+    St: message_and_reaction_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<convo::MessageView<S>>,
-        Option<convo::ReactionView<S>>,
-    ),
+    _fields: (Option<convo::MessageView<S>>, Option<convo::ReactionView<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> MessageAndReactionView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MessageAndReactionViewBuilder<S, message_and_reaction_view_state::Empty> {
+impl MessageAndReactionView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MessageAndReactionViewBuilder<
+        message_and_reaction_view_state::Empty,
+        DefaultStr,
+    > {
         MessageAndReactionViewBuilder::new()
     }
 }
 
-impl<S: BosStr> MessageAndReactionViewBuilder<S, message_and_reaction_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> MessageAndReactionView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MessageAndReactionViewBuilder<
+        message_and_reaction_view_state::Empty,
+        S,
+    > {
+        MessageAndReactionViewBuilder::builder()
+    }
+}
+
+impl MessageAndReactionViewBuilder<message_and_reaction_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MessageAndReactionViewBuilder {
             _state: PhantomData,
@@ -3020,7 +3141,20 @@ impl<S: BosStr> MessageAndReactionViewBuilder<S, message_and_reaction_view_state
     }
 }
 
-impl<S: BosStr, St> MessageAndReactionViewBuilder<S, St>
+impl<
+    S: BosStr,
+> MessageAndReactionViewBuilder<message_and_reaction_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MessageAndReactionViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MessageAndReactionViewBuilder<St, S>
 where
     St: message_and_reaction_view_state::State,
     St::Message: message_and_reaction_view_state::IsUnset,
@@ -3029,7 +3163,10 @@ where
     pub fn message(
         mut self,
         value: impl Into<convo::MessageView<S>>,
-    ) -> MessageAndReactionViewBuilder<S, message_and_reaction_view_state::SetMessage<St>> {
+    ) -> MessageAndReactionViewBuilder<
+        message_and_reaction_view_state::SetMessage<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         MessageAndReactionViewBuilder {
             _state: PhantomData,
@@ -3039,7 +3176,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageAndReactionViewBuilder<S, St>
+impl<St, S: BosStr> MessageAndReactionViewBuilder<St, S>
 where
     St: message_and_reaction_view_state::State,
     St::Reaction: message_and_reaction_view_state::IsUnset,
@@ -3048,7 +3185,10 @@ where
     pub fn reaction(
         mut self,
         value: impl Into<convo::ReactionView<S>>,
-    ) -> MessageAndReactionViewBuilder<S, message_and_reaction_view_state::SetReaction<St>> {
+    ) -> MessageAndReactionViewBuilder<
+        message_and_reaction_view_state::SetReaction<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         MessageAndReactionViewBuilder {
             _state: PhantomData,
@@ -3058,7 +3198,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageAndReactionViewBuilder<S, St>
+impl<St, S: BosStr> MessageAndReactionViewBuilder<St, S>
 where
     St: message_and_reaction_view_state::State,
     St::Message: message_and_reaction_view_state::IsSet,
@@ -3087,7 +3227,7 @@ where
 
 pub mod message_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3144,21 +3284,28 @@ pub mod message_ref_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MessageRefBuilder<S: BosStr, St: message_ref_state::State> {
+pub struct MessageRefBuilder<St: message_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> MessageRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MessageRefBuilder<S, message_ref_state::Empty> {
+impl MessageRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MessageRefBuilder<message_ref_state::Empty, DefaultStr> {
         MessageRefBuilder::new()
     }
 }
 
-impl<S: BosStr> MessageRefBuilder<S, message_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> MessageRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MessageRefBuilder<message_ref_state::Empty, S> {
+        MessageRefBuilder::builder()
+    }
+}
+
+impl MessageRefBuilder<message_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MessageRefBuilder {
             _state: PhantomData,
@@ -3168,7 +3315,18 @@ impl<S: BosStr> MessageRefBuilder<S, message_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MessageRefBuilder<S, St>
+impl<S: BosStr> MessageRefBuilder<message_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MessageRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MessageRefBuilder<St, S>
 where
     St: message_ref_state::State,
     St::ConvoId: message_ref_state::IsUnset,
@@ -3177,7 +3335,7 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> MessageRefBuilder<S, message_ref_state::SetConvoId<St>> {
+    ) -> MessageRefBuilder<message_ref_state::SetConvoId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MessageRefBuilder {
             _state: PhantomData,
@@ -3187,7 +3345,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageRefBuilder<S, St>
+impl<St, S: BosStr> MessageRefBuilder<St, S>
 where
     St: message_ref_state::State,
     St::Did: message_ref_state::IsUnset,
@@ -3196,7 +3354,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> MessageRefBuilder<S, message_ref_state::SetDid<St>> {
+    ) -> MessageRefBuilder<message_ref_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         MessageRefBuilder {
             _state: PhantomData,
@@ -3206,7 +3364,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageRefBuilder<S, St>
+impl<St, S: BosStr> MessageRefBuilder<St, S>
 where
     St: message_ref_state::State,
     St::MessageId: message_ref_state::IsUnset,
@@ -3215,7 +3373,7 @@ where
     pub fn message_id(
         mut self,
         value: impl Into<S>,
-    ) -> MessageRefBuilder<S, message_ref_state::SetMessageId<St>> {
+    ) -> MessageRefBuilder<message_ref_state::SetMessageId<St>, S> {
         self._fields.2 = Option::Some(value.into());
         MessageRefBuilder {
             _state: PhantomData,
@@ -3225,7 +3383,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageRefBuilder<S, St>
+impl<St, S: BosStr> MessageRefBuilder<St, S>
 where
     St: message_ref_state::State,
     St::MessageId: message_ref_state::IsSet,
@@ -3242,7 +3400,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MessageRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MessageRef<S> {
         MessageRef {
             convo_id: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -3254,7 +3415,7 @@ where
 
 pub mod message_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3262,90 +3423,90 @@ pub mod message_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rev;
-        type Text;
-        type SentAt;
         type Sender;
+        type Text;
         type Id;
+        type SentAt;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rev = Unset;
-        type Text = Unset;
-        type SentAt = Unset;
         type Sender = Unset;
+        type Text = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev<St> {}
-    impl<St: State> State for SetRev<St> {
-        type Rev = Set<members::rev>;
-        type Text = St::Text;
-        type SentAt = St::SentAt;
-        type Sender = St::Sender;
-        type Id = St::Id;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetText<St> {}
-    impl<St: State> State for SetText<St> {
-        type Rev = St::Rev;
-        type Text = Set<members::text>;
-        type SentAt = St::SentAt;
-        type Sender = St::Sender;
-        type Id = St::Id;
-    }
-    ///State transition - sets the `sent_at` field to Set
-    pub struct SetSentAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSentAt<St> {}
-    impl<St: State> State for SetSentAt<St> {
-        type Rev = St::Rev;
-        type Text = St::Text;
-        type SentAt = Set<members::sent_at>;
-        type Sender = St::Sender;
-        type Id = St::Id;
+        type SentAt = Unset;
+        type Rev = Unset;
     }
     ///State transition - sets the `sender` field to Set
     pub struct SetSender<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSender<St> {}
     impl<St: State> State for SetSender<St> {
-        type Rev = St::Rev;
-        type Text = St::Text;
-        type SentAt = St::SentAt;
         type Sender = Set<members::sender>;
+        type Text = St::Text;
         type Id = St::Id;
+        type SentAt = St::SentAt;
+        type Rev = St::Rev;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Sender = St::Sender;
+        type Text = Set<members::text>;
+        type Id = St::Id;
+        type SentAt = St::SentAt;
+        type Rev = St::Rev;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type Rev = St::Rev;
-        type Text = St::Text;
-        type SentAt = St::SentAt;
         type Sender = St::Sender;
+        type Text = St::Text;
         type Id = Set<members::id>;
+        type SentAt = St::SentAt;
+        type Rev = St::Rev;
+    }
+    ///State transition - sets the `sent_at` field to Set
+    pub struct SetSentAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSentAt<St> {}
+    impl<St: State> State for SetSentAt<St> {
+        type Sender = St::Sender;
+        type Text = St::Text;
+        type Id = St::Id;
+        type SentAt = Set<members::sent_at>;
+        type Rev = St::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev<St> {}
+    impl<St: State> State for SetRev<St> {
+        type Sender = St::Sender;
+        type Text = St::Text;
+        type Id = St::Id;
+        type SentAt = St::SentAt;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rev` field
-        pub struct rev(());
-        ///Marker type for the `text` field
-        pub struct text(());
-        ///Marker type for the `sent_at` field
-        pub struct sent_at(());
         ///Marker type for the `sender` field
         pub struct sender(());
+        ///Marker type for the `text` field
+        pub struct text(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `sent_at` field
+        pub struct sent_at(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MessageViewBuilder<S: BosStr, St: message_view_state::State> {
+pub struct MessageViewBuilder<St: message_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<View<S>>,
@@ -3360,15 +3521,22 @@ pub struct MessageViewBuilder<S: BosStr, St: message_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> MessageView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MessageViewBuilder<S, message_view_state::Empty> {
+impl MessageView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MessageViewBuilder<message_view_state::Empty, DefaultStr> {
         MessageViewBuilder::new()
     }
 }
 
-impl<S: BosStr> MessageViewBuilder<S, message_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> MessageView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MessageViewBuilder<message_view_state::Empty, S> {
+        MessageViewBuilder::builder()
+    }
+}
+
+impl MessageViewBuilder<message_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MessageViewBuilder {
             _state: PhantomData,
@@ -3378,7 +3546,18 @@ impl<S: BosStr> MessageViewBuilder<S, message_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
+impl<S: BosStr> MessageViewBuilder<message_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MessageViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: message_view_state::State, S: BosStr> MessageViewBuilder<St, S> {
     /// Set the `embed` field (optional)
     pub fn embed(mut self, value: impl Into<Option<View<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -3391,7 +3570,7 @@ impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
+impl<St: message_view_state::State, S: BosStr> MessageViewBuilder<St, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -3404,7 +3583,7 @@ impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MessageViewBuilder<S, St>
+impl<St, S: BosStr> MessageViewBuilder<St, S>
 where
     St: message_view_state::State,
     St::Id: message_view_state::IsUnset,
@@ -3413,7 +3592,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> MessageViewBuilder<S, message_view_state::SetId<St>> {
+    ) -> MessageViewBuilder<message_view_state::SetId<St>, S> {
         self._fields.2 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
@@ -3423,20 +3602,26 @@ where
     }
 }
 
-impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
+impl<St: message_view_state::State, S: BosStr> MessageViewBuilder<St, S> {
     /// Set the `reactions` field (optional)
-    pub fn reactions(mut self, value: impl Into<Option<Vec<convo::ReactionView<S>>>>) -> Self {
+    pub fn reactions(
+        mut self,
+        value: impl Into<Option<Vec<convo::ReactionView<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `reactions` field to an Option value (optional)
-    pub fn maybe_reactions(mut self, value: Option<Vec<convo::ReactionView<S>>>) -> Self {
+    pub fn maybe_reactions(
+        mut self,
+        value: Option<Vec<convo::ReactionView<S>>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
 }
 
-impl<S: BosStr, St> MessageViewBuilder<S, St>
+impl<St, S: BosStr> MessageViewBuilder<St, S>
 where
     St: message_view_state::State,
     St::Rev: message_view_state::IsUnset,
@@ -3445,7 +3630,7 @@ where
     pub fn rev(
         mut self,
         value: impl Into<S>,
-    ) -> MessageViewBuilder<S, message_view_state::SetRev<St>> {
+    ) -> MessageViewBuilder<message_view_state::SetRev<St>, S> {
         self._fields.4 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
@@ -3455,7 +3640,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageViewBuilder<S, St>
+impl<St, S: BosStr> MessageViewBuilder<St, S>
 where
     St: message_view_state::State,
     St::Sender: message_view_state::IsUnset,
@@ -3464,7 +3649,7 @@ where
     pub fn sender(
         mut self,
         value: impl Into<convo::MessageViewSender<S>>,
-    ) -> MessageViewBuilder<S, message_view_state::SetSender<St>> {
+    ) -> MessageViewBuilder<message_view_state::SetSender<St>, S> {
         self._fields.5 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
@@ -3474,7 +3659,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageViewBuilder<S, St>
+impl<St, S: BosStr> MessageViewBuilder<St, S>
 where
     St: message_view_state::State,
     St::SentAt: message_view_state::IsUnset,
@@ -3483,7 +3668,7 @@ where
     pub fn sent_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MessageViewBuilder<S, message_view_state::SetSentAt<St>> {
+    ) -> MessageViewBuilder<message_view_state::SetSentAt<St>, S> {
         self._fields.6 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
@@ -3493,7 +3678,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageViewBuilder<S, St>
+impl<St, S: BosStr> MessageViewBuilder<St, S>
 where
     St: message_view_state::State,
     St::Text: message_view_state::IsUnset,
@@ -3502,7 +3687,7 @@ where
     pub fn text(
         mut self,
         value: impl Into<S>,
-    ) -> MessageViewBuilder<S, message_view_state::SetText<St>> {
+    ) -> MessageViewBuilder<message_view_state::SetText<St>, S> {
         self._fields.7 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
@@ -3512,14 +3697,14 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageViewBuilder<S, St>
+impl<St, S: BosStr> MessageViewBuilder<St, S>
 where
     St: message_view_state::State,
-    St::Rev: message_view_state::IsSet,
-    St::Text: message_view_state::IsSet,
-    St::SentAt: message_view_state::IsSet,
     St::Sender: message_view_state::IsSet,
+    St::Text: message_view_state::IsSet,
     St::Id: message_view_state::IsSet,
+    St::SentAt: message_view_state::IsSet,
+    St::Rev: message_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MessageView<S> {
@@ -3536,7 +3721,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MessageView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MessageView<S> {
         MessageView {
             embed: self._fields.0,
             facets: self._fields.1,
@@ -3553,7 +3741,7 @@ where
 
 pub mod message_view_sender_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3584,21 +3772,34 @@ pub mod message_view_sender_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MessageViewSenderBuilder<S: BosStr, St: message_view_sender_state::State> {
+pub struct MessageViewSenderBuilder<
+    St: message_view_sender_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> MessageViewSender<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MessageViewSenderBuilder<S, message_view_sender_state::Empty> {
+impl MessageViewSender<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MessageViewSenderBuilder<
+        message_view_sender_state::Empty,
+        DefaultStr,
+    > {
         MessageViewSenderBuilder::new()
     }
 }
 
-impl<S: BosStr> MessageViewSenderBuilder<S, message_view_sender_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> MessageViewSender<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MessageViewSenderBuilder<message_view_sender_state::Empty, S> {
+        MessageViewSenderBuilder::builder()
+    }
+}
+
+impl MessageViewSenderBuilder<message_view_sender_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MessageViewSenderBuilder {
             _state: PhantomData,
@@ -3608,7 +3809,18 @@ impl<S: BosStr> MessageViewSenderBuilder<S, message_view_sender_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MessageViewSenderBuilder<S, St>
+impl<S: BosStr> MessageViewSenderBuilder<message_view_sender_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MessageViewSenderBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MessageViewSenderBuilder<St, S>
 where
     St: message_view_sender_state::State,
     St::Did: message_view_sender_state::IsUnset,
@@ -3617,7 +3829,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> MessageViewSenderBuilder<S, message_view_sender_state::SetDid<St>> {
+    ) -> MessageViewSenderBuilder<message_view_sender_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MessageViewSenderBuilder {
             _state: PhantomData,
@@ -3627,7 +3839,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageViewSenderBuilder<S, St>
+impl<St, S: BosStr> MessageViewSenderBuilder<St, S>
 where
     St: message_view_sender_state::State,
     St::Did: message_view_sender_state::IsSet,
@@ -3640,7 +3852,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MessageViewSender<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MessageViewSender<S> {
         MessageViewSender {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -3650,7 +3865,7 @@ where
 
 pub mod reaction_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3707,25 +3922,28 @@ pub mod reaction_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReactionViewBuilder<S: BosStr, St: reaction_view_state::State> {
+pub struct ReactionViewBuilder<St: reaction_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<convo::ReactionViewSender<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<Datetime>, Option<convo::ReactionViewSender<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ReactionView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ReactionViewBuilder<S, reaction_view_state::Empty> {
+impl ReactionView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReactionViewBuilder<reaction_view_state::Empty, DefaultStr> {
         ReactionViewBuilder::new()
     }
 }
 
-impl<S: BosStr> ReactionViewBuilder<S, reaction_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ReactionView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReactionViewBuilder<reaction_view_state::Empty, S> {
+        ReactionViewBuilder::builder()
+    }
+}
+
+impl ReactionViewBuilder<reaction_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ReactionViewBuilder {
             _state: PhantomData,
@@ -3735,7 +3953,18 @@ impl<S: BosStr> ReactionViewBuilder<S, reaction_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ReactionViewBuilder<S, St>
+impl<S: BosStr> ReactionViewBuilder<reaction_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReactionViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReactionViewBuilder<St, S>
 where
     St: reaction_view_state::State,
     St::CreatedAt: reaction_view_state::IsUnset,
@@ -3744,7 +3973,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReactionViewBuilder<S, reaction_view_state::SetCreatedAt<St>> {
+    ) -> ReactionViewBuilder<reaction_view_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ReactionViewBuilder {
             _state: PhantomData,
@@ -3754,7 +3983,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReactionViewBuilder<S, St>
+impl<St, S: BosStr> ReactionViewBuilder<St, S>
 where
     St: reaction_view_state::State,
     St::Sender: reaction_view_state::IsUnset,
@@ -3763,7 +3992,7 @@ where
     pub fn sender(
         mut self,
         value: impl Into<convo::ReactionViewSender<S>>,
-    ) -> ReactionViewBuilder<S, reaction_view_state::SetSender<St>> {
+    ) -> ReactionViewBuilder<reaction_view_state::SetSender<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ReactionViewBuilder {
             _state: PhantomData,
@@ -3773,7 +4002,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReactionViewBuilder<S, St>
+impl<St, S: BosStr> ReactionViewBuilder<St, S>
 where
     St: reaction_view_state::State,
     St::Value: reaction_view_state::IsUnset,
@@ -3782,7 +4011,7 @@ where
     pub fn value(
         mut self,
         value: impl Into<S>,
-    ) -> ReactionViewBuilder<S, reaction_view_state::SetValue<St>> {
+    ) -> ReactionViewBuilder<reaction_view_state::SetValue<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ReactionViewBuilder {
             _state: PhantomData,
@@ -3792,7 +4021,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReactionViewBuilder<S, St>
+impl<St, S: BosStr> ReactionViewBuilder<St, S>
 where
     St: reaction_view_state::State,
     St::Value: reaction_view_state::IsSet,
@@ -3809,7 +4038,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReactionView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReactionView<S> {
         ReactionView {
             created_at: self._fields.0.unwrap(),
             sender: self._fields.1.unwrap(),
@@ -3821,7 +4053,7 @@ where
 
 pub mod reaction_view_sender_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3852,21 +4084,34 @@ pub mod reaction_view_sender_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReactionViewSenderBuilder<S: BosStr, St: reaction_view_sender_state::State> {
+pub struct ReactionViewSenderBuilder<
+    St: reaction_view_sender_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ReactionViewSender<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ReactionViewSenderBuilder<S, reaction_view_sender_state::Empty> {
+impl ReactionViewSender<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReactionViewSenderBuilder<
+        reaction_view_sender_state::Empty,
+        DefaultStr,
+    > {
         ReactionViewSenderBuilder::new()
     }
 }
 
-impl<S: BosStr> ReactionViewSenderBuilder<S, reaction_view_sender_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ReactionViewSender<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReactionViewSenderBuilder<reaction_view_sender_state::Empty, S> {
+        ReactionViewSenderBuilder::builder()
+    }
+}
+
+impl ReactionViewSenderBuilder<reaction_view_sender_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ReactionViewSenderBuilder {
             _state: PhantomData,
@@ -3876,7 +4121,18 @@ impl<S: BosStr> ReactionViewSenderBuilder<S, reaction_view_sender_state::Empty> 
     }
 }
 
-impl<S: BosStr, St> ReactionViewSenderBuilder<S, St>
+impl<S: BosStr> ReactionViewSenderBuilder<reaction_view_sender_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReactionViewSenderBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReactionViewSenderBuilder<St, S>
 where
     St: reaction_view_sender_state::State,
     St::Did: reaction_view_sender_state::IsUnset,
@@ -3885,7 +4141,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ReactionViewSenderBuilder<S, reaction_view_sender_state::SetDid<St>> {
+    ) -> ReactionViewSenderBuilder<reaction_view_sender_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ReactionViewSenderBuilder {
             _state: PhantomData,
@@ -3895,7 +4151,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReactionViewSenderBuilder<S, St>
+impl<St, S: BosStr> ReactionViewSenderBuilder<St, S>
 where
     St: reaction_view_sender_state::State,
     St::Did: reaction_view_sender_state::IsSet,
@@ -3908,7 +4164,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReactionViewSender<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReactionViewSender<S> {
         ReactionViewSender {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

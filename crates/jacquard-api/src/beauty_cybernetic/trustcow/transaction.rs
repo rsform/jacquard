@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A verified transaction between two ATProto identities that must be stored in both parties' PDS
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -150,7 +150,7 @@ impl<S: BosStr> LexiconSchema for Transaction<S> {
 
 pub mod transaction_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -223,7 +223,7 @@ pub mod transaction_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TransactionBuilder<S: BosStr, St: transaction_state::State> {
+pub struct TransactionBuilder<St: transaction_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -237,15 +237,22 @@ pub struct TransactionBuilder<S: BosStr, St: transaction_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Transaction<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TransactionBuilder<S, transaction_state::Empty> {
+impl Transaction<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TransactionBuilder<transaction_state::Empty, DefaultStr> {
         TransactionBuilder::new()
     }
 }
 
-impl<S: BosStr> TransactionBuilder<S, transaction_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Transaction<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TransactionBuilder<transaction_state::Empty, S> {
+        TransactionBuilder::builder()
+    }
+}
+
+impl TransactionBuilder<transaction_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TransactionBuilder {
             _state: PhantomData,
@@ -255,7 +262,18 @@ impl<S: BosStr> TransactionBuilder<S, transaction_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: transaction_state::State> TransactionBuilder<S, St> {
+impl<S: BosStr> TransactionBuilder<transaction_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TransactionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: transaction_state::State, S: BosStr> TransactionBuilder<St, S> {
     /// Set the `amount` field (optional)
     pub fn amount(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -268,7 +286,7 @@ impl<S: BosStr, St: transaction_state::State> TransactionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TransactionBuilder<S, St>
+impl<St, S: BosStr> TransactionBuilder<St, S>
 where
     St: transaction_state::State,
     St::CreatedAt: transaction_state::IsUnset,
@@ -277,7 +295,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TransactionBuilder<S, transaction_state::SetCreatedAt<St>> {
+    ) -> TransactionBuilder<transaction_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TransactionBuilder {
             _state: PhantomData,
@@ -287,7 +305,7 @@ where
     }
 }
 
-impl<S: BosStr, St: transaction_state::State> TransactionBuilder<S, St> {
+impl<St: transaction_state::State, S: BosStr> TransactionBuilder<St, S> {
     /// Set the `currency` field (optional)
     pub fn currency(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -300,7 +318,7 @@ impl<S: BosStr, St: transaction_state::State> TransactionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: transaction_state::State> TransactionBuilder<S, St> {
+impl<St: transaction_state::State, S: BosStr> TransactionBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -313,7 +331,7 @@ impl<S: BosStr, St: transaction_state::State> TransactionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TransactionBuilder<S, St>
+impl<St, S: BosStr> TransactionBuilder<St, S>
 where
     St: transaction_state::State,
     St::ServiceConsumer: transaction_state::IsUnset,
@@ -322,7 +340,7 @@ where
     pub fn service_consumer(
         mut self,
         value: impl Into<S>,
-    ) -> TransactionBuilder<S, transaction_state::SetServiceConsumer<St>> {
+    ) -> TransactionBuilder<transaction_state::SetServiceConsumer<St>, S> {
         self._fields.4 = Option::Some(value.into());
         TransactionBuilder {
             _state: PhantomData,
@@ -332,7 +350,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TransactionBuilder<S, St>
+impl<St, S: BosStr> TransactionBuilder<St, S>
 where
     St: transaction_state::State,
     St::ServiceProvider: transaction_state::IsUnset,
@@ -341,7 +359,7 @@ where
     pub fn service_provider(
         mut self,
         value: impl Into<S>,
-    ) -> TransactionBuilder<S, transaction_state::SetServiceProvider<St>> {
+    ) -> TransactionBuilder<transaction_state::SetServiceProvider<St>, S> {
         self._fields.5 = Option::Some(value.into());
         TransactionBuilder {
             _state: PhantomData,
@@ -351,7 +369,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TransactionBuilder<S, St>
+impl<St, S: BosStr> TransactionBuilder<St, S>
 where
     St: transaction_state::State,
     St::TransactionId: transaction_state::IsUnset,
@@ -360,7 +378,7 @@ where
     pub fn transaction_id(
         mut self,
         value: impl Into<S>,
-    ) -> TransactionBuilder<S, transaction_state::SetTransactionId<St>> {
+    ) -> TransactionBuilder<transaction_state::SetTransactionId<St>, S> {
         self._fields.6 = Option::Some(value.into());
         TransactionBuilder {
             _state: PhantomData,
@@ -370,7 +388,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TransactionBuilder<S, St>
+impl<St, S: BosStr> TransactionBuilder<St, S>
 where
     St: transaction_state::State,
     St::CreatedAt: transaction_state::IsSet,
@@ -392,7 +410,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Transaction<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Transaction<S> {
         Transaction {
             amount: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -407,10 +428,10 @@ where
 }
 
 fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("beauty.cybernetic.trustcow.transaction"),

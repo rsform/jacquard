@@ -17,36 +17,34 @@ pub mod list_book_ids;
 pub mod list_dropped_books;
 pub mod registration;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Datetime, Did, UriValue};
+use jacquard_common::types::string::{Did, AtUri, Datetime, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::community_lexicon::location::hthree::Hthree;
 use crate::org_passingreads::Actor;
 use crate::org_passingreads::AspectRatio;
 use crate::org_passingreads::book;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A confirmed book event for display purposes. Omits cryptographic fields (bookPub, bookSig) and book reference since it's shown in context of a book.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ConfirmedEvent<S: BosStr = DefaultStr> {
     ///The person who performed this event
     pub actor: Actor<S>,
@@ -154,10 +152,7 @@ where
 /// A view of a book registration for API responses. Omits cryptographic fields (bookPub, bookSig) and the cover blob.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RegistrationView<S: BosStr = DefaultStr> {
     ///Authors of this book, in order of credit
     pub authors: Vec<S>,
@@ -179,10 +174,7 @@ pub struct RegistrationView<S: BosStr = DefaultStr> {
 /// A book with its current state, combining registration data with computed state information.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StatefulBook<S: BosStr = DefaultStr> {
     ///Aspect ratio of the cover image
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -352,7 +344,7 @@ impl<S: BosStr> LexiconSchema for StatefulBook<S> {
 
 pub mod confirmed_event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -360,90 +352,93 @@ pub mod confirmed_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Uri;
         type Event;
+        type Actor;
         type Location;
         type OccurredAt;
-        type Uri;
-        type Actor;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Uri = Unset;
         type Event = Unset;
+        type Actor = Unset;
         type Location = Unset;
         type OccurredAt = Unset;
-        type Uri = Unset;
-        type Actor = Unset;
-    }
-    ///State transition - sets the `event` field to Set
-    pub struct SetEvent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEvent<St> {}
-    impl<St: State> State for SetEvent<St> {
-        type Event = Set<members::event>;
-        type Location = St::Location;
-        type OccurredAt = St::OccurredAt;
-        type Uri = St::Uri;
-        type Actor = St::Actor;
-    }
-    ///State transition - sets the `location` field to Set
-    pub struct SetLocation<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLocation<St> {}
-    impl<St: State> State for SetLocation<St> {
-        type Event = St::Event;
-        type Location = Set<members::location>;
-        type OccurredAt = St::OccurredAt;
-        type Uri = St::Uri;
-        type Actor = St::Actor;
-    }
-    ///State transition - sets the `occurred_at` field to Set
-    pub struct SetOccurredAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOccurredAt<St> {}
-    impl<St: State> State for SetOccurredAt<St> {
-        type Event = St::Event;
-        type Location = St::Location;
-        type OccurredAt = Set<members::occurred_at>;
-        type Uri = St::Uri;
-        type Actor = St::Actor;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
+        type Uri = Set<members::uri>;
         type Event = St::Event;
+        type Actor = St::Actor;
         type Location = St::Location;
         type OccurredAt = St::OccurredAt;
-        type Uri = Set<members::uri>;
+    }
+    ///State transition - sets the `event` field to Set
+    pub struct SetEvent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEvent<St> {}
+    impl<St: State> State for SetEvent<St> {
+        type Uri = St::Uri;
+        type Event = Set<members::event>;
         type Actor = St::Actor;
+        type Location = St::Location;
+        type OccurredAt = St::OccurredAt;
     }
     ///State transition - sets the `actor` field to Set
     pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetActor<St> {}
     impl<St: State> State for SetActor<St> {
+        type Uri = St::Uri;
         type Event = St::Event;
+        type Actor = Set<members::actor>;
         type Location = St::Location;
         type OccurredAt = St::OccurredAt;
+    }
+    ///State transition - sets the `location` field to Set
+    pub struct SetLocation<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLocation<St> {}
+    impl<St: State> State for SetLocation<St> {
         type Uri = St::Uri;
-        type Actor = Set<members::actor>;
+        type Event = St::Event;
+        type Actor = St::Actor;
+        type Location = Set<members::location>;
+        type OccurredAt = St::OccurredAt;
+    }
+    ///State transition - sets the `occurred_at` field to Set
+    pub struct SetOccurredAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOccurredAt<St> {}
+    impl<St: State> State for SetOccurredAt<St> {
+        type Uri = St::Uri;
+        type Event = St::Event;
+        type Actor = St::Actor;
+        type Location = St::Location;
+        type OccurredAt = Set<members::occurred_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `event` field
         pub struct event(());
+        ///Marker type for the `actor` field
+        pub struct actor(());
         ///Marker type for the `location` field
         pub struct location(());
         ///Marker type for the `occurred_at` field
         pub struct occurred_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `actor` field
-        pub struct actor(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ConfirmedEventBuilder<S: BosStr, St: confirmed_event_state::State> {
+pub struct ConfirmedEventBuilder<
+    St: confirmed_event_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Actor<S>>,
@@ -455,15 +450,22 @@ pub struct ConfirmedEventBuilder<S: BosStr, St: confirmed_event_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ConfirmedEvent<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ConfirmedEventBuilder<S, confirmed_event_state::Empty> {
+impl ConfirmedEvent<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ConfirmedEventBuilder<confirmed_event_state::Empty, DefaultStr> {
         ConfirmedEventBuilder::new()
     }
 }
 
-impl<S: BosStr> ConfirmedEventBuilder<S, confirmed_event_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ConfirmedEvent<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ConfirmedEventBuilder<confirmed_event_state::Empty, S> {
+        ConfirmedEventBuilder::builder()
+    }
+}
+
+impl ConfirmedEventBuilder<confirmed_event_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ConfirmedEventBuilder {
             _state: PhantomData,
@@ -473,7 +475,18 @@ impl<S: BosStr> ConfirmedEventBuilder<S, confirmed_event_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ConfirmedEventBuilder<S, St>
+impl<S: BosStr> ConfirmedEventBuilder<confirmed_event_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ConfirmedEventBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ConfirmedEventBuilder<St, S>
 where
     St: confirmed_event_state::State,
     St::Actor: confirmed_event_state::IsUnset,
@@ -482,7 +495,7 @@ where
     pub fn actor(
         mut self,
         value: impl Into<Actor<S>>,
-    ) -> ConfirmedEventBuilder<S, confirmed_event_state::SetActor<St>> {
+    ) -> ConfirmedEventBuilder<confirmed_event_state::SetActor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ConfirmedEventBuilder {
             _state: PhantomData,
@@ -492,7 +505,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ConfirmedEventBuilder<S, St>
+impl<St, S: BosStr> ConfirmedEventBuilder<St, S>
 where
     St: confirmed_event_state::State,
     St::Event: confirmed_event_state::IsUnset,
@@ -501,7 +514,7 @@ where
     pub fn event(
         mut self,
         value: impl Into<ConfirmedEventEvent<S>>,
-    ) -> ConfirmedEventBuilder<S, confirmed_event_state::SetEvent<St>> {
+    ) -> ConfirmedEventBuilder<confirmed_event_state::SetEvent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ConfirmedEventBuilder {
             _state: PhantomData,
@@ -511,7 +524,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ConfirmedEventBuilder<S, St>
+impl<St, S: BosStr> ConfirmedEventBuilder<St, S>
 where
     St: confirmed_event_state::State,
     St::Location: confirmed_event_state::IsUnset,
@@ -520,7 +533,7 @@ where
     pub fn location(
         mut self,
         value: impl Into<Hthree<S>>,
-    ) -> ConfirmedEventBuilder<S, confirmed_event_state::SetLocation<St>> {
+    ) -> ConfirmedEventBuilder<confirmed_event_state::SetLocation<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ConfirmedEventBuilder {
             _state: PhantomData,
@@ -530,7 +543,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ConfirmedEventBuilder<S, St>
+impl<St, S: BosStr> ConfirmedEventBuilder<St, S>
 where
     St: confirmed_event_state::State,
     St::OccurredAt: confirmed_event_state::IsUnset,
@@ -539,7 +552,7 @@ where
     pub fn occurred_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ConfirmedEventBuilder<S, confirmed_event_state::SetOccurredAt<St>> {
+    ) -> ConfirmedEventBuilder<confirmed_event_state::SetOccurredAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ConfirmedEventBuilder {
             _state: PhantomData,
@@ -549,7 +562,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ConfirmedEventBuilder<S, St>
+impl<St, S: BosStr> ConfirmedEventBuilder<St, S>
 where
     St: confirmed_event_state::State,
     St::Uri: confirmed_event_state::IsUnset,
@@ -558,7 +571,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ConfirmedEventBuilder<S, confirmed_event_state::SetUri<St>> {
+    ) -> ConfirmedEventBuilder<confirmed_event_state::SetUri<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ConfirmedEventBuilder {
             _state: PhantomData,
@@ -568,14 +581,14 @@ where
     }
 }
 
-impl<S: BosStr, St> ConfirmedEventBuilder<S, St>
+impl<St, S: BosStr> ConfirmedEventBuilder<St, S>
 where
     St: confirmed_event_state::State,
+    St::Uri: confirmed_event_state::IsSet,
     St::Event: confirmed_event_state::IsSet,
+    St::Actor: confirmed_event_state::IsSet,
     St::Location: confirmed_event_state::IsSet,
     St::OccurredAt: confirmed_event_state::IsSet,
-    St::Uri: confirmed_event_state::IsSet,
-    St::Actor: confirmed_event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ConfirmedEvent<S> {
@@ -589,7 +602,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ConfirmedEvent<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ConfirmedEvent<S> {
         ConfirmedEvent {
             actor: self._fields.0.unwrap(),
             event: self._fields.1.unwrap(),
@@ -602,10 +618,10 @@ where
 }
 
 fn lexicon_doc_org_passingreads_book_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.passingreads.book.defs"),
@@ -894,7 +910,7 @@ fn lexicon_doc_org_passingreads_book_defs() -> LexiconDoc<'static> {
 
 pub mod registration_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -902,90 +918,93 @@ pub mod registration_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BookId;
-        type Authors;
-        type OccurredAt;
         type Title;
+        type OccurredAt;
+        type BookId;
         type RegisteredBy;
+        type Authors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BookId = Unset;
-        type Authors = Unset;
-        type OccurredAt = Unset;
         type Title = Unset;
+        type OccurredAt = Unset;
+        type BookId = Unset;
         type RegisteredBy = Unset;
-    }
-    ///State transition - sets the `book_id` field to Set
-    pub struct SetBookId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBookId<St> {}
-    impl<St: State> State for SetBookId<St> {
-        type BookId = Set<members::book_id>;
-        type Authors = St::Authors;
-        type OccurredAt = St::OccurredAt;
-        type Title = St::Title;
-        type RegisteredBy = St::RegisteredBy;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAuthors<St> {}
-    impl<St: State> State for SetAuthors<St> {
-        type BookId = St::BookId;
-        type Authors = Set<members::authors>;
-        type OccurredAt = St::OccurredAt;
-        type Title = St::Title;
-        type RegisteredBy = St::RegisteredBy;
-    }
-    ///State transition - sets the `occurred_at` field to Set
-    pub struct SetOccurredAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOccurredAt<St> {}
-    impl<St: State> State for SetOccurredAt<St> {
-        type BookId = St::BookId;
-        type Authors = St::Authors;
-        type OccurredAt = Set<members::occurred_at>;
-        type Title = St::Title;
-        type RegisteredBy = St::RegisteredBy;
+        type Authors = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type BookId = St::BookId;
-        type Authors = St::Authors;
-        type OccurredAt = St::OccurredAt;
         type Title = Set<members::title>;
+        type OccurredAt = St::OccurredAt;
+        type BookId = St::BookId;
         type RegisteredBy = St::RegisteredBy;
+        type Authors = St::Authors;
+    }
+    ///State transition - sets the `occurred_at` field to Set
+    pub struct SetOccurredAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOccurredAt<St> {}
+    impl<St: State> State for SetOccurredAt<St> {
+        type Title = St::Title;
+        type OccurredAt = Set<members::occurred_at>;
+        type BookId = St::BookId;
+        type RegisteredBy = St::RegisteredBy;
+        type Authors = St::Authors;
+    }
+    ///State transition - sets the `book_id` field to Set
+    pub struct SetBookId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBookId<St> {}
+    impl<St: State> State for SetBookId<St> {
+        type Title = St::Title;
+        type OccurredAt = St::OccurredAt;
+        type BookId = Set<members::book_id>;
+        type RegisteredBy = St::RegisteredBy;
+        type Authors = St::Authors;
     }
     ///State transition - sets the `registered_by` field to Set
     pub struct SetRegisteredBy<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRegisteredBy<St> {}
     impl<St: State> State for SetRegisteredBy<St> {
-        type BookId = St::BookId;
-        type Authors = St::Authors;
-        type OccurredAt = St::OccurredAt;
         type Title = St::Title;
+        type OccurredAt = St::OccurredAt;
+        type BookId = St::BookId;
         type RegisteredBy = Set<members::registered_by>;
+        type Authors = St::Authors;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthors<St> {}
+    impl<St: State> State for SetAuthors<St> {
+        type Title = St::Title;
+        type OccurredAt = St::OccurredAt;
+        type BookId = St::BookId;
+        type RegisteredBy = St::RegisteredBy;
+        type Authors = Set<members::authors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book_id` field
-        pub struct book_id(());
-        ///Marker type for the `authors` field
-        pub struct authors(());
-        ///Marker type for the `occurred_at` field
-        pub struct occurred_at(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `occurred_at` field
+        pub struct occurred_at(());
+        ///Marker type for the `book_id` field
+        pub struct book_id(());
         ///Marker type for the `registered_by` field
         pub struct registered_by(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RegistrationViewBuilder<S: BosStr, St: registration_view_state::State> {
+pub struct RegistrationViewBuilder<
+    St: registration_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
@@ -998,15 +1017,22 @@ pub struct RegistrationViewBuilder<S: BosStr, St: registration_view_state::State
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RegistrationView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RegistrationViewBuilder<S, registration_view_state::Empty> {
+impl RegistrationView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RegistrationViewBuilder<registration_view_state::Empty, DefaultStr> {
         RegistrationViewBuilder::new()
     }
 }
 
-impl<S: BosStr> RegistrationViewBuilder<S, registration_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RegistrationView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RegistrationViewBuilder<registration_view_state::Empty, S> {
+        RegistrationViewBuilder::builder()
+    }
+}
+
+impl RegistrationViewBuilder<registration_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RegistrationViewBuilder {
             _state: PhantomData,
@@ -1016,7 +1042,18 @@ impl<S: BosStr> RegistrationViewBuilder<S, registration_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RegistrationViewBuilder<S, St>
+impl<S: BosStr> RegistrationViewBuilder<registration_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RegistrationViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RegistrationViewBuilder<St, S>
 where
     St: registration_view_state::State,
     St::Authors: registration_view_state::IsUnset,
@@ -1025,7 +1062,7 @@ where
     pub fn authors(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> RegistrationViewBuilder<S, registration_view_state::SetAuthors<St>> {
+    ) -> RegistrationViewBuilder<registration_view_state::SetAuthors<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RegistrationViewBuilder {
             _state: PhantomData,
@@ -1035,7 +1072,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RegistrationViewBuilder<S, St>
+impl<St, S: BosStr> RegistrationViewBuilder<St, S>
 where
     St: registration_view_state::State,
     St::BookId: registration_view_state::IsUnset,
@@ -1044,7 +1081,7 @@ where
     pub fn book_id(
         mut self,
         value: impl Into<S>,
-    ) -> RegistrationViewBuilder<S, registration_view_state::SetBookId<St>> {
+    ) -> RegistrationViewBuilder<registration_view_state::SetBookId<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RegistrationViewBuilder {
             _state: PhantomData,
@@ -1054,7 +1091,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RegistrationViewBuilder<S, St>
+impl<St, S: BosStr> RegistrationViewBuilder<St, S>
 where
     St: registration_view_state::State,
     St::OccurredAt: registration_view_state::IsUnset,
@@ -1063,7 +1100,7 @@ where
     pub fn occurred_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RegistrationViewBuilder<S, registration_view_state::SetOccurredAt<St>> {
+    ) -> RegistrationViewBuilder<registration_view_state::SetOccurredAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RegistrationViewBuilder {
             _state: PhantomData,
@@ -1073,7 +1110,7 @@ where
     }
 }
 
-impl<S: BosStr, St: registration_view_state::State> RegistrationViewBuilder<S, St> {
+impl<St: registration_view_state::State, S: BosStr> RegistrationViewBuilder<St, S> {
     /// Set the `publicationId` field (optional)
     pub fn publication_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -1086,7 +1123,7 @@ impl<S: BosStr, St: registration_view_state::State> RegistrationViewBuilder<S, S
     }
 }
 
-impl<S: BosStr, St> RegistrationViewBuilder<S, St>
+impl<St, S: BosStr> RegistrationViewBuilder<St, S>
 where
     St: registration_view_state::State,
     St::RegisteredBy: registration_view_state::IsUnset,
@@ -1095,7 +1132,7 @@ where
     pub fn registered_by(
         mut self,
         value: impl Into<Actor<S>>,
-    ) -> RegistrationViewBuilder<S, registration_view_state::SetRegisteredBy<St>> {
+    ) -> RegistrationViewBuilder<registration_view_state::SetRegisteredBy<St>, S> {
         self._fields.4 = Option::Some(value.into());
         RegistrationViewBuilder {
             _state: PhantomData,
@@ -1105,7 +1142,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RegistrationViewBuilder<S, St>
+impl<St, S: BosStr> RegistrationViewBuilder<St, S>
 where
     St: registration_view_state::State,
     St::Title: registration_view_state::IsUnset,
@@ -1114,7 +1151,7 @@ where
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> RegistrationViewBuilder<S, registration_view_state::SetTitle<St>> {
+    ) -> RegistrationViewBuilder<registration_view_state::SetTitle<St>, S> {
         self._fields.5 = Option::Some(value.into());
         RegistrationViewBuilder {
             _state: PhantomData,
@@ -1124,14 +1161,14 @@ where
     }
 }
 
-impl<S: BosStr, St> RegistrationViewBuilder<S, St>
+impl<St, S: BosStr> RegistrationViewBuilder<St, S>
 where
     St: registration_view_state::State,
-    St::BookId: registration_view_state::IsSet,
-    St::Authors: registration_view_state::IsSet,
-    St::OccurredAt: registration_view_state::IsSet,
     St::Title: registration_view_state::IsSet,
+    St::OccurredAt: registration_view_state::IsSet,
+    St::BookId: registration_view_state::IsSet,
     St::RegisteredBy: registration_view_state::IsSet,
+    St::Authors: registration_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RegistrationView<S> {
@@ -1146,7 +1183,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RegistrationView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RegistrationView<S> {
         RegistrationView {
             authors: self._fields.0.unwrap(),
             book_id: self._fields.1.unwrap(),
@@ -1161,7 +1201,7 @@ where
 
 pub mod stateful_book_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1169,90 +1209,90 @@ pub mod stateful_book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Registration;
-        type Uri;
         type State;
+        type Uri;
+        type Cid;
         type CurrentHolder;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Registration = Unset;
-        type Uri = Unset;
         type State = Unset;
+        type Uri = Unset;
+        type Cid = Unset;
         type CurrentHolder = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Cid = Set<members::cid>;
-        type Registration = St::Registration;
-        type Uri = St::Uri;
-        type State = St::State;
-        type CurrentHolder = St::CurrentHolder;
     }
     ///State transition - sets the `registration` field to Set
     pub struct SetRegistration<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRegistration<St> {}
     impl<St: State> State for SetRegistration<St> {
-        type Cid = St::Cid;
         type Registration = Set<members::registration>;
+        type State = St::State;
         type Uri = St::Uri;
-        type State = St::State;
-        type CurrentHolder = St::CurrentHolder;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
         type Cid = St::Cid;
-        type Registration = St::Registration;
-        type Uri = Set<members::uri>;
-        type State = St::State;
         type CurrentHolder = St::CurrentHolder;
     }
     ///State transition - sets the `state` field to Set
     pub struct SetState<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetState<St> {}
     impl<St: State> State for SetState<St> {
-        type Cid = St::Cid;
         type Registration = St::Registration;
-        type Uri = St::Uri;
         type State = Set<members::state>;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type CurrentHolder = St::CurrentHolder;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Registration = St::Registration;
+        type State = St::State;
+        type Uri = Set<members::uri>;
+        type Cid = St::Cid;
+        type CurrentHolder = St::CurrentHolder;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Registration = St::Registration;
+        type State = St::State;
+        type Uri = St::Uri;
+        type Cid = Set<members::cid>;
         type CurrentHolder = St::CurrentHolder;
     }
     ///State transition - sets the `current_holder` field to Set
     pub struct SetCurrentHolder<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCurrentHolder<St> {}
     impl<St: State> State for SetCurrentHolder<St> {
-        type Cid = St::Cid;
         type Registration = St::Registration;
-        type Uri = St::Uri;
         type State = St::State;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
         type CurrentHolder = Set<members::current_holder>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `registration` field
         pub struct registration(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `state` field
         pub struct state(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `current_holder` field
         pub struct current_holder(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StatefulBookBuilder<S: BosStr, St: stateful_book_state::State> {
+pub struct StatefulBookBuilder<St: stateful_book_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AspectRatio<S>>,
@@ -1268,15 +1308,22 @@ pub struct StatefulBookBuilder<S: BosStr, St: stateful_book_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> StatefulBook<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StatefulBookBuilder<S, stateful_book_state::Empty> {
+impl StatefulBook<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StatefulBookBuilder<stateful_book_state::Empty, DefaultStr> {
         StatefulBookBuilder::new()
     }
 }
 
-impl<S: BosStr> StatefulBookBuilder<S, stateful_book_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> StatefulBook<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StatefulBookBuilder<stateful_book_state::Empty, S> {
+        StatefulBookBuilder::builder()
+    }
+}
+
+impl StatefulBookBuilder<stateful_book_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StatefulBookBuilder {
             _state: PhantomData,
@@ -1286,7 +1333,18 @@ impl<S: BosStr> StatefulBookBuilder<S, stateful_book_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: stateful_book_state::State> StatefulBookBuilder<S, St> {
+impl<S: BosStr> StatefulBookBuilder<stateful_book_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StatefulBookBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: stateful_book_state::State, S: BosStr> StatefulBookBuilder<St, S> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1299,7 +1357,7 @@ impl<S: BosStr, St: stateful_book_state::State> StatefulBookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StatefulBookBuilder<S, St>
+impl<St, S: BosStr> StatefulBookBuilder<St, S>
 where
     St: stateful_book_state::State,
     St::Cid: stateful_book_state::IsUnset,
@@ -1308,7 +1366,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<S>,
-    ) -> StatefulBookBuilder<S, stateful_book_state::SetCid<St>> {
+    ) -> StatefulBookBuilder<stateful_book_state::SetCid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StatefulBookBuilder {
             _state: PhantomData,
@@ -1318,7 +1376,7 @@ where
     }
 }
 
-impl<S: BosStr, St: stateful_book_state::State> StatefulBookBuilder<S, St> {
+impl<St: stateful_book_state::State, S: BosStr> StatefulBookBuilder<St, S> {
     /// Set the `coverUrl` field (optional)
     pub fn cover_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -1331,7 +1389,7 @@ impl<S: BosStr, St: stateful_book_state::State> StatefulBookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StatefulBookBuilder<S, St>
+impl<St, S: BosStr> StatefulBookBuilder<St, S>
 where
     St: stateful_book_state::State,
     St::CurrentHolder: stateful_book_state::IsUnset,
@@ -1340,7 +1398,7 @@ where
     pub fn current_holder(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> StatefulBookBuilder<S, stateful_book_state::SetCurrentHolder<St>> {
+    ) -> StatefulBookBuilder<stateful_book_state::SetCurrentHolder<St>, S> {
         self._fields.3 = Option::Some(value.into());
         StatefulBookBuilder {
             _state: PhantomData,
@@ -1350,7 +1408,7 @@ where
     }
 }
 
-impl<S: BosStr, St: stateful_book_state::State> StatefulBookBuilder<S, St> {
+impl<St: stateful_book_state::State, S: BosStr> StatefulBookBuilder<St, S> {
     /// Set the `currentLocation` field (optional)
     pub fn current_location(mut self, value: impl Into<Option<Hthree<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -1363,9 +1421,12 @@ impl<S: BosStr, St: stateful_book_state::State> StatefulBookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: stateful_book_state::State> StatefulBookBuilder<S, St> {
+impl<St: stateful_book_state::State, S: BosStr> StatefulBookBuilder<St, S> {
     /// Set the `events` field (optional)
-    pub fn events(mut self, value: impl Into<Option<Vec<book::ConfirmedEvent<S>>>>) -> Self {
+    pub fn events(
+        mut self,
+        value: impl Into<Option<Vec<book::ConfirmedEvent<S>>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -1376,7 +1437,7 @@ impl<S: BosStr, St: stateful_book_state::State> StatefulBookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StatefulBookBuilder<S, St>
+impl<St, S: BosStr> StatefulBookBuilder<St, S>
 where
     St: stateful_book_state::State,
     St::Registration: stateful_book_state::IsUnset,
@@ -1385,7 +1446,7 @@ where
     pub fn registration(
         mut self,
         value: impl Into<book::RegistrationView<S>>,
-    ) -> StatefulBookBuilder<S, stateful_book_state::SetRegistration<St>> {
+    ) -> StatefulBookBuilder<stateful_book_state::SetRegistration<St>, S> {
         self._fields.6 = Option::Some(value.into());
         StatefulBookBuilder {
             _state: PhantomData,
@@ -1395,7 +1456,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatefulBookBuilder<S, St>
+impl<St, S: BosStr> StatefulBookBuilder<St, S>
 where
     St: stateful_book_state::State,
     St::State: stateful_book_state::IsUnset,
@@ -1404,7 +1465,7 @@ where
     pub fn state(
         mut self,
         value: impl Into<StatefulBookState<S>>,
-    ) -> StatefulBookBuilder<S, stateful_book_state::SetState<St>> {
+    ) -> StatefulBookBuilder<stateful_book_state::SetState<St>, S> {
         self._fields.7 = Option::Some(value.into());
         StatefulBookBuilder {
             _state: PhantomData,
@@ -1414,7 +1475,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatefulBookBuilder<S, St>
+impl<St, S: BosStr> StatefulBookBuilder<St, S>
 where
     St: stateful_book_state::State,
     St::Uri: stateful_book_state::IsUnset,
@@ -1423,7 +1484,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StatefulBookBuilder<S, stateful_book_state::SetUri<St>> {
+    ) -> StatefulBookBuilder<stateful_book_state::SetUri<St>, S> {
         self._fields.8 = Option::Some(value.into());
         StatefulBookBuilder {
             _state: PhantomData,
@@ -1433,13 +1494,13 @@ where
     }
 }
 
-impl<S: BosStr, St> StatefulBookBuilder<S, St>
+impl<St, S: BosStr> StatefulBookBuilder<St, S>
 where
     St: stateful_book_state::State,
-    St::Cid: stateful_book_state::IsSet,
     St::Registration: stateful_book_state::IsSet,
-    St::Uri: stateful_book_state::IsSet,
     St::State: stateful_book_state::IsSet,
+    St::Uri: stateful_book_state::IsSet,
+    St::Cid: stateful_book_state::IsSet,
     St::CurrentHolder: stateful_book_state::IsSet,
 {
     /// Build the final struct.
@@ -1458,7 +1519,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StatefulBook<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StatefulBook<S> {
         StatefulBook {
             aspect_ratio: self._fields.0,
             cid: self._fields.1.unwrap(),

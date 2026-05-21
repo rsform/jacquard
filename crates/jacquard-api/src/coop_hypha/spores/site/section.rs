@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A single site section for spores.garden. Each section is a record in a collection.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -481,7 +481,7 @@ impl<S: BosStr> LexiconSchema for Section<S> {
 
 pub mod section_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -512,7 +512,7 @@ pub mod section_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SectionBuilder<S: BosStr, St: section_state::State> {
+pub struct SectionBuilder<St: section_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -530,27 +530,43 @@ pub struct SectionBuilder<S: BosStr, St: section_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Section<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SectionBuilder<S, section_state::Empty> {
+impl Section<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SectionBuilder<section_state::Empty, DefaultStr> {
         SectionBuilder::new()
     }
 }
 
-impl<S: BosStr> SectionBuilder<S, section_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Section<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SectionBuilder<section_state::Empty, S> {
+        SectionBuilder::builder()
+    }
+}
+
+impl SectionBuilder<section_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SectionBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
+impl<S: BosStr> SectionBuilder<section_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SectionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: section_state::State, S: BosStr> SectionBuilder<St, S> {
     /// Set the `collection` field (optional)
     pub fn collection(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -563,7 +579,7 @@ impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
+impl<St: section_state::State, S: BosStr> SectionBuilder<St, S> {
     /// Set the `content` field (optional)
     pub fn content(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -576,7 +592,7 @@ impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
+impl<St: section_state::State, S: BosStr> SectionBuilder<St, S> {
     /// Set the `format` field (optional)
     pub fn format(mut self, value: impl Into<Option<SectionFormat<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -589,7 +605,7 @@ impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
+impl<St: section_state::State, S: BosStr> SectionBuilder<St, S> {
     /// Set the `hideHeader` field (optional)
     pub fn hide_header(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -602,7 +618,7 @@ impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
+impl<St: section_state::State, S: BosStr> SectionBuilder<St, S> {
     /// Set the `layout` field (optional)
     pub fn layout(mut self, value: impl Into<Option<SectionLayout<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -615,7 +631,7 @@ impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
+impl<St: section_state::State, S: BosStr> SectionBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -628,7 +644,7 @@ impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
+impl<St: section_state::State, S: BosStr> SectionBuilder<St, S> {
     /// Set the `records` field (optional)
     pub fn records(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -641,7 +657,7 @@ impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
+impl<St: section_state::State, S: BosStr> SectionBuilder<St, S> {
     /// Set the `ref` field (optional)
     pub fn r#ref(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -654,7 +670,7 @@ impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
+impl<St: section_state::State, S: BosStr> SectionBuilder<St, S> {
     /// Set the `rkey` field (optional)
     pub fn rkey(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -667,7 +683,7 @@ impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
+impl<St: section_state::State, S: BosStr> SectionBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -680,7 +696,7 @@ impl<S: BosStr, St: section_state::State> SectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SectionBuilder<S, St>
+impl<St, S: BosStr> SectionBuilder<St, S>
 where
     St: section_state::State,
     St::Type: section_state::IsUnset,
@@ -689,7 +705,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<SectionType<S>>,
-    ) -> SectionBuilder<S, section_state::SetType<St>> {
+    ) -> SectionBuilder<section_state::SetType<St>, S> {
         self._fields.10 = Option::Some(value.into());
         SectionBuilder {
             _state: PhantomData,
@@ -699,7 +715,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SectionBuilder<S, St>
+impl<St, S: BosStr> SectionBuilder<St, S>
 where
     St: section_state::State,
     St::Type: section_state::IsSet,
@@ -741,10 +757,10 @@ where
 }
 
 fn lexicon_doc_coop_hypha_spores_site_section() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("coop.hypha.spores.site.section"),

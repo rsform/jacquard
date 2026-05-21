@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -104,7 +104,7 @@ impl<S: BosStr> LexiconSchema for Document<S> {
 
 pub mod document_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -147,21 +147,28 @@ pub mod document_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DocumentBuilder<S: BosStr, St: document_state::State> {
+pub struct DocumentBuilder<St: document_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Document<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DocumentBuilder<S, document_state::Empty> {
+impl Document<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DocumentBuilder<document_state::Empty, DefaultStr> {
         DocumentBuilder::new()
     }
 }
 
-impl<S: BosStr> DocumentBuilder<S, document_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Document<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DocumentBuilder<document_state::Empty, S> {
+        DocumentBuilder::builder()
+    }
+}
+
+impl DocumentBuilder<document_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DocumentBuilder {
             _state: PhantomData,
@@ -171,7 +178,18 @@ impl<S: BosStr> DocumentBuilder<S, document_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DocumentBuilder<S, St>
+impl<S: BosStr> DocumentBuilder<document_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DocumentBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DocumentBuilder<St, S>
 where
     St: document_state::State,
     St::Document: document_state::IsUnset,
@@ -180,7 +198,7 @@ where
     pub fn document(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> DocumentBuilder<S, document_state::SetDocument<St>> {
+    ) -> DocumentBuilder<document_state::SetDocument<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
@@ -190,7 +208,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DocumentBuilder<S, St>
+impl<St, S: BosStr> DocumentBuilder<St, S>
 where
     St: document_state::State,
     St::Site: document_state::IsUnset,
@@ -199,7 +217,7 @@ where
     pub fn site(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> DocumentBuilder<S, document_state::SetSite<St>> {
+    ) -> DocumentBuilder<document_state::SetSite<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
@@ -209,7 +227,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DocumentBuilder<S, St>
+impl<St, S: BosStr> DocumentBuilder<St, S>
 where
     St: document_state::State,
     St::Document: document_state::IsSet,
@@ -234,10 +252,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_document() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.document"),
@@ -248,10 +266,11 @@ fn lexicon_doc_blog_pckt_document() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("document"),
-                            SmolStr::new_static("site"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("document"), SmolStr::new_static("site")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

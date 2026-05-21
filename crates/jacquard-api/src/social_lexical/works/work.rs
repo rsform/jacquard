@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 ///
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -275,7 +275,7 @@ impl<S: BosStr> LexiconSchema for Work<S> {
 
 pub mod work_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -318,21 +318,28 @@ pub mod work_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WorkBuilder<S: BosStr, St: work_state::State> {
+pub struct WorkBuilder<St: work_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<WorkWorkType<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Work<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> WorkBuilder<S, work_state::Empty> {
+impl Work<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> WorkBuilder<work_state::Empty, DefaultStr> {
         WorkBuilder::new()
     }
 }
 
-impl<S: BosStr> WorkBuilder<S, work_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Work<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> WorkBuilder<work_state::Empty, S> {
+        WorkBuilder::builder()
+    }
+}
+
+impl WorkBuilder<work_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         WorkBuilder {
             _state: PhantomData,
@@ -342,7 +349,18 @@ impl<S: BosStr> WorkBuilder<S, work_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: work_state::State> WorkBuilder<S, St> {
+impl<S: BosStr> WorkBuilder<work_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        WorkBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: work_state::State, S: BosStr> WorkBuilder<St, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -355,13 +373,16 @@ impl<S: BosStr, St: work_state::State> WorkBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WorkBuilder<S, St>
+impl<St, S: BosStr> WorkBuilder<St, S>
 where
     St: work_state::State,
     St::Title: work_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> WorkBuilder<S, work_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> WorkBuilder<work_state::SetTitle<St>, S> {
         self._fields.1 = Option::Some(value.into());
         WorkBuilder {
             _state: PhantomData,
@@ -371,7 +392,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WorkBuilder<S, St>
+impl<St, S: BosStr> WorkBuilder<St, S>
 where
     St: work_state::State,
     St::WorkType: work_state::IsUnset,
@@ -380,7 +401,7 @@ where
     pub fn work_type(
         mut self,
         value: impl Into<WorkWorkType<S>>,
-    ) -> WorkBuilder<S, work_state::SetWorkType<St>> {
+    ) -> WorkBuilder<work_state::SetWorkType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         WorkBuilder {
             _state: PhantomData,
@@ -390,7 +411,7 @@ where
     }
 }
 
-impl<S: BosStr, St: work_state::State> WorkBuilder<S, St> {
+impl<St: work_state::State, S: BosStr> WorkBuilder<St, S> {
     /// Set the `year` field (optional)
     pub fn year(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -403,7 +424,7 @@ impl<S: BosStr, St: work_state::State> WorkBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WorkBuilder<S, St>
+impl<St, S: BosStr> WorkBuilder<St, S>
 where
     St: work_state::State,
     St::Title: work_state::IsSet,
@@ -432,10 +453,10 @@ where
 }
 
 fn lexicon_doc_social_lexical_works_work() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.lexical.works.work"),
@@ -447,10 +468,12 @@ fn lexicon_doc_social_lexical_works_work() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("")),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("workType"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"),
+                                SmolStr::new_static("workType")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

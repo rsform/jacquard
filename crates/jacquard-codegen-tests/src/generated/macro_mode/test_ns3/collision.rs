@@ -140,21 +140,31 @@ pub mod foo_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FooBuilder<S: jacquard_common::BosStr, St: foo_state::State> {
+pub struct FooBuilder<
+    St: foo_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
+> {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (core::option::Option<S>, core::option::Option<i64>),
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> Foo<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FooBuilder<S, foo_state::Empty> {
+impl Foo<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FooBuilder<foo_state::Empty, jacquard_common::DefaultStr> {
         FooBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> FooBuilder<S, foo_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> Foo<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FooBuilder<foo_state::Empty, S> {
+        FooBuilder::builder()
+    }
+}
+
+impl FooBuilder<foo_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FooBuilder {
             _state: ::core::marker::PhantomData,
@@ -164,7 +174,18 @@ impl<S: jacquard_common::BosStr> FooBuilder<S, foo_state::Empty> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St: foo_state::State> FooBuilder<S, St> {
+impl<S: jacquard_common::BosStr> FooBuilder<foo_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FooBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None, None),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St: foo_state::State, S: jacquard_common::BosStr> FooBuilder<St, S> {
     /// Set the `label` field (optional)
     pub fn label(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -177,7 +198,7 @@ impl<S: jacquard_common::BosStr, St: foo_state::State> FooBuilder<S, St> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St> FooBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> FooBuilder<St, S>
 where
     St: foo_state::State,
     St::LocalId: foo_state::IsUnset,
@@ -186,7 +207,7 @@ where
     pub fn local_id(
         mut self,
         value: impl Into<i64>,
-    ) -> FooBuilder<S, foo_state::SetLocalId<St>> {
+    ) -> FooBuilder<foo_state::SetLocalId<St>, S> {
         self._fields.1 = ::core::option::Option::Some(value.into());
         FooBuilder {
             _state: ::core::marker::PhantomData,
@@ -196,7 +217,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> FooBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> FooBuilder<St, S>
 where
     St: foo_state::State,
     St::LocalId: foo_state::IsSet,
@@ -370,7 +391,10 @@ pub mod collision_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollisionBuilder<S: jacquard_common::BosStr, St: collision_state::State> {
+pub struct CollisionBuilder<
+    St: collision_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
+> {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
         core::option::Option<crate::macro_mode::test_ns1::Foo<S>>,
@@ -380,15 +404,25 @@ pub struct CollisionBuilder<S: jacquard_common::BosStr, St: collision_state::Sta
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> Collision<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CollisionBuilder<S, collision_state::Empty> {
+impl Collision<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CollisionBuilder<
+        collision_state::Empty,
+        jacquard_common::DefaultStr,
+    > {
         CollisionBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> CollisionBuilder<S, collision_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> Collision<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CollisionBuilder<collision_state::Empty, S> {
+        CollisionBuilder::builder()
+    }
+}
+
+impl CollisionBuilder<collision_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CollisionBuilder {
             _state: ::core::marker::PhantomData,
@@ -398,7 +432,18 @@ impl<S: jacquard_common::BosStr> CollisionBuilder<S, collision_state::Empty> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St> CollisionBuilder<S, St>
+impl<S: jacquard_common::BosStr> CollisionBuilder<collision_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CollisionBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None, None, None),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St, S: jacquard_common::BosStr> CollisionBuilder<St, S>
 where
     St: collision_state::State,
     St::ExternalFoo: collision_state::IsUnset,
@@ -407,7 +452,7 @@ where
     pub fn external_foo(
         mut self,
         value: impl Into<crate::macro_mode::test_ns1::Foo<S>>,
-    ) -> CollisionBuilder<S, collision_state::SetExternalFoo<St>> {
+    ) -> CollisionBuilder<collision_state::SetExternalFoo<St>, S> {
         self._fields.0 = ::core::option::Option::Some(value.into());
         CollisionBuilder {
             _state: ::core::marker::PhantomData,
@@ -417,7 +462,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> CollisionBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> CollisionBuilder<St, S>
 where
     St: collision_state::State,
     St::LocalFoo: collision_state::IsUnset,
@@ -426,7 +471,7 @@ where
     pub fn local_foo(
         mut self,
         value: impl Into<crate::macro_mode::test_ns3::collision::Foo<S>>,
-    ) -> CollisionBuilder<S, collision_state::SetLocalFoo<St>> {
+    ) -> CollisionBuilder<collision_state::SetLocalFoo<St>, S> {
         self._fields.1 = ::core::option::Option::Some(value.into());
         CollisionBuilder {
             _state: ::core::marker::PhantomData,
@@ -436,7 +481,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St: collision_state::State> CollisionBuilder<S, St> {
+impl<St: collision_state::State, S: jacquard_common::BosStr> CollisionBuilder<St, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -449,7 +494,7 @@ impl<S: jacquard_common::BosStr, St: collision_state::State> CollisionBuilder<S,
     }
 }
 
-impl<S: jacquard_common::BosStr, St> CollisionBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> CollisionBuilder<St, S>
 where
     St: collision_state::State,
     St::ExternalFoo: collision_state::IsSet,

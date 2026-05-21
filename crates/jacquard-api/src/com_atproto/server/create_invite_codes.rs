@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::server::create_invite_codes;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::server::create_invite_codes;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AccountCodes<S: BosStr = DefaultStr> {
     pub account: S,
     pub codes: Vec<S>,
@@ -38,11 +35,9 @@ pub struct AccountCodes<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateInviteCodes<S: BosStr = DefaultStr> {
     /// Defaults to `1`.
     #[serde(default = "_default_create_invite_codes_code_count")]
@@ -54,11 +49,9 @@ pub struct CreateInviteCodes<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateInviteCodesOutput<S: BosStr = DefaultStr> {
     pub codes: Vec<create_invite_codes::AccountCodes<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -91,8 +84,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateInviteCodesResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateInviteCodes<S> {
     const NSID: &'static str = "com.atproto.server.createInviteCodes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateInviteCodesResponse;
 }
 
@@ -100,15 +94,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateInviteCodes<S> {
 pub struct CreateInviteCodesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateInviteCodesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.createInviteCodes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateInviteCodes<S>;
     type Response = CreateInviteCodesResponse;
 }
 
 pub mod account_codes_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -116,56 +111,63 @@ pub mod account_codes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Codes;
         type Account;
+        type Codes;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Codes = Unset;
         type Account = Unset;
-    }
-    ///State transition - sets the `codes` field to Set
-    pub struct SetCodes<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCodes<St> {}
-    impl<St: State> State for SetCodes<St> {
-        type Codes = Set<members::codes>;
-        type Account = St::Account;
+        type Codes = Unset;
     }
     ///State transition - sets the `account` field to Set
     pub struct SetAccount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAccount<St> {}
     impl<St: State> State for SetAccount<St> {
-        type Codes = St::Codes;
         type Account = Set<members::account>;
+        type Codes = St::Codes;
+    }
+    ///State transition - sets the `codes` field to Set
+    pub struct SetCodes<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCodes<St> {}
+    impl<St: State> State for SetCodes<St> {
+        type Account = St::Account;
+        type Codes = Set<members::codes>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `codes` field
-        pub struct codes(());
         ///Marker type for the `account` field
         pub struct account(());
+        ///Marker type for the `codes` field
+        pub struct codes(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AccountCodesBuilder<S: BosStr, St: account_codes_state::State> {
+pub struct AccountCodesBuilder<St: account_codes_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> AccountCodes<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AccountCodesBuilder<S, account_codes_state::Empty> {
+impl AccountCodes<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AccountCodesBuilder<account_codes_state::Empty, DefaultStr> {
         AccountCodesBuilder::new()
     }
 }
 
-impl<S: BosStr> AccountCodesBuilder<S, account_codes_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> AccountCodes<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AccountCodesBuilder<account_codes_state::Empty, S> {
+        AccountCodesBuilder::builder()
+    }
+}
+
+impl AccountCodesBuilder<account_codes_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AccountCodesBuilder {
             _state: PhantomData,
@@ -175,7 +177,18 @@ impl<S: BosStr> AccountCodesBuilder<S, account_codes_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AccountCodesBuilder<S, St>
+impl<S: BosStr> AccountCodesBuilder<account_codes_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AccountCodesBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AccountCodesBuilder<St, S>
 where
     St: account_codes_state::State,
     St::Account: account_codes_state::IsUnset,
@@ -184,7 +197,7 @@ where
     pub fn account(
         mut self,
         value: impl Into<S>,
-    ) -> AccountCodesBuilder<S, account_codes_state::SetAccount<St>> {
+    ) -> AccountCodesBuilder<account_codes_state::SetAccount<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AccountCodesBuilder {
             _state: PhantomData,
@@ -194,7 +207,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AccountCodesBuilder<S, St>
+impl<St, S: BosStr> AccountCodesBuilder<St, S>
 where
     St: account_codes_state::State,
     St::Codes: account_codes_state::IsUnset,
@@ -203,7 +216,7 @@ where
     pub fn codes(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> AccountCodesBuilder<S, account_codes_state::SetCodes<St>> {
+    ) -> AccountCodesBuilder<account_codes_state::SetCodes<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AccountCodesBuilder {
             _state: PhantomData,
@@ -213,11 +226,11 @@ where
     }
 }
 
-impl<S: BosStr, St> AccountCodesBuilder<S, St>
+impl<St, S: BosStr> AccountCodesBuilder<St, S>
 where
     St: account_codes_state::State,
-    St::Codes: account_codes_state::IsSet,
     St::Account: account_codes_state::IsSet,
+    St::Codes: account_codes_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AccountCodes<S> {
@@ -228,7 +241,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AccountCodes<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AccountCodes<S> {
         AccountCodes {
             account: self._fields.0.unwrap(),
             codes: self._fields.1.unwrap(),
@@ -238,10 +254,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_server_createInviteCodes() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.server.createInviteCodes"),
@@ -250,18 +266,17 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("accountCodes"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("account"),
-                        SmolStr::new_static("codes"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("account"), SmolStr::new_static("codes")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("account"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("codes"),
@@ -282,40 +297,44 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![
-                                SmolStr::new_static("codeCount"),
-                                SmolStr::new_static("useCount"),
-                            ]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("codeCount"),
-                                    LexObjectProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("forAccounts"),
-                                    LexObjectProperty::Array(LexArray {
-                                        items: LexArrayItem::String(LexString {
-                                            format: Some(LexStringFormat::Did),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(
+                                    vec![
+                                        SmolStr::new_static("codeCount"),
+                                        SmolStr::new_static("useCount")
+                                    ],
+                                ),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("codeCount"),
+                                        LexObjectProperty::Integer(LexInteger {
                                             ..Default::default()
                                         }),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("useCount"),
-                                    LexObjectProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("forAccounts"),
+                                        LexObjectProperty::Array(LexArray {
+                                            items: LexArrayItem::String(LexString {
+                                                format: Some(LexStringFormat::Did),
+                                                ..Default::default()
+                                            }),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("useCount"),
+                                        LexObjectProperty::Integer(LexInteger {
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -333,7 +352,7 @@ fn _default_create_invite_codes_code_count() -> i64 {
 
 pub mod create_invite_codes_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -376,21 +395,34 @@ pub mod create_invite_codes_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateInviteCodesBuilder<S: BosStr, St: create_invite_codes_state::State> {
+pub struct CreateInviteCodesBuilder<
+    St: create_invite_codes_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Vec<Did<S>>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CreateInviteCodes<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CreateInviteCodesBuilder<S, create_invite_codes_state::Empty> {
+impl CreateInviteCodes<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CreateInviteCodesBuilder<
+        create_invite_codes_state::Empty,
+        DefaultStr,
+    > {
         CreateInviteCodesBuilder::new()
     }
 }
 
-impl<S: BosStr> CreateInviteCodesBuilder<S, create_invite_codes_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CreateInviteCodes<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CreateInviteCodesBuilder<create_invite_codes_state::Empty, S> {
+        CreateInviteCodesBuilder::builder()
+    }
+}
+
+impl CreateInviteCodesBuilder<create_invite_codes_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CreateInviteCodesBuilder {
             _state: PhantomData,
@@ -400,7 +432,18 @@ impl<S: BosStr> CreateInviteCodesBuilder<S, create_invite_codes_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CreateInviteCodesBuilder<S, St>
+impl<S: BosStr> CreateInviteCodesBuilder<create_invite_codes_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CreateInviteCodesBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CreateInviteCodesBuilder<St, S>
 where
     St: create_invite_codes_state::State,
     St::CodeCount: create_invite_codes_state::IsUnset,
@@ -409,7 +452,7 @@ where
     pub fn code_count(
         mut self,
         value: impl Into<i64>,
-    ) -> CreateInviteCodesBuilder<S, create_invite_codes_state::SetCodeCount<St>> {
+    ) -> CreateInviteCodesBuilder<create_invite_codes_state::SetCodeCount<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CreateInviteCodesBuilder {
             _state: PhantomData,
@@ -419,7 +462,7 @@ where
     }
 }
 
-impl<S: BosStr, St: create_invite_codes_state::State> CreateInviteCodesBuilder<S, St> {
+impl<St: create_invite_codes_state::State, S: BosStr> CreateInviteCodesBuilder<St, S> {
     /// Set the `forAccounts` field (optional)
     pub fn for_accounts(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -432,7 +475,7 @@ impl<S: BosStr, St: create_invite_codes_state::State> CreateInviteCodesBuilder<S
     }
 }
 
-impl<S: BosStr, St> CreateInviteCodesBuilder<S, St>
+impl<St, S: BosStr> CreateInviteCodesBuilder<St, S>
 where
     St: create_invite_codes_state::State,
     St::UseCount: create_invite_codes_state::IsUnset,
@@ -441,7 +484,7 @@ where
     pub fn use_count(
         mut self,
         value: impl Into<i64>,
-    ) -> CreateInviteCodesBuilder<S, create_invite_codes_state::SetUseCount<St>> {
+    ) -> CreateInviteCodesBuilder<create_invite_codes_state::SetUseCount<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CreateInviteCodesBuilder {
             _state: PhantomData,
@@ -451,7 +494,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CreateInviteCodesBuilder<S, St>
+impl<St, S: BosStr> CreateInviteCodesBuilder<St, S>
 where
     St: create_invite_codes_state::State,
     St::UseCount: create_invite_codes_state::IsSet,
@@ -467,7 +510,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateInviteCodes<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateInviteCodes<S> {
         CreateInviteCodes {
             code_count: self._fields.0.unwrap(),
             for_accounts: self._fields.1,

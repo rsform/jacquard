@@ -8,27 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::team::Member;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::team::Member;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AddMember<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub role: AddMemberRole<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AddMemberRole<S: BosStr = DefaultStr> {
@@ -115,11 +113,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AddMemberOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Member<S>,
@@ -127,9 +123,18 @@ pub struct AddMemberOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum AddMemberError {
     /// Member already exists in the team.
@@ -137,10 +142,7 @@ pub enum AddMemberError {
     MemberAlreadyExists(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for AddMemberError {
@@ -175,8 +177,9 @@ impl jacquard_common::xrpc::XrpcResp for AddMemberResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AddMember<S> {
     const NSID: &'static str = "tools.ozone.team.addMember";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = AddMemberResponse;
 }
 
@@ -184,15 +187,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AddMember<S> {
 pub struct AddMemberRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddMemberRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.team.addMember";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = AddMember<S>;
     type Response = AddMemberResponse;
 }
 
 pub mod add_member_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -235,21 +239,28 @@ pub mod add_member_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AddMemberBuilder<S: BosStr, St: add_member_state::State> {
+pub struct AddMemberBuilder<St: add_member_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<AddMemberRole<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> AddMember<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AddMemberBuilder<S, add_member_state::Empty> {
+impl AddMember<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AddMemberBuilder<add_member_state::Empty, DefaultStr> {
         AddMemberBuilder::new()
     }
 }
 
-impl<S: BosStr> AddMemberBuilder<S, add_member_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> AddMember<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AddMemberBuilder<add_member_state::Empty, S> {
+        AddMemberBuilder::builder()
+    }
+}
+
+impl AddMemberBuilder<add_member_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AddMemberBuilder {
             _state: PhantomData,
@@ -259,7 +270,18 @@ impl<S: BosStr> AddMemberBuilder<S, add_member_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AddMemberBuilder<S, St>
+impl<S: BosStr> AddMemberBuilder<add_member_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AddMemberBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AddMemberBuilder<St, S>
 where
     St: add_member_state::State,
     St::Did: add_member_state::IsUnset,
@@ -268,7 +290,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> AddMemberBuilder<S, add_member_state::SetDid<St>> {
+    ) -> AddMemberBuilder<add_member_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AddMemberBuilder {
             _state: PhantomData,
@@ -278,7 +300,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AddMemberBuilder<S, St>
+impl<St, S: BosStr> AddMemberBuilder<St, S>
 where
     St: add_member_state::State,
     St::Role: add_member_state::IsUnset,
@@ -287,7 +309,7 @@ where
     pub fn role(
         mut self,
         value: impl Into<AddMemberRole<S>>,
-    ) -> AddMemberBuilder<S, add_member_state::SetRole<St>> {
+    ) -> AddMemberBuilder<add_member_state::SetRole<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AddMemberBuilder {
             _state: PhantomData,
@@ -297,7 +319,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AddMemberBuilder<S, St>
+impl<St, S: BosStr> AddMemberBuilder<St, S>
 where
     St: add_member_state::State,
     St::Did: add_member_state::IsSet,
@@ -312,7 +334,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AddMember<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AddMember<S> {
         AddMember {
             did: self._fields.0.unwrap(),
             role: self._fields.1.unwrap(),

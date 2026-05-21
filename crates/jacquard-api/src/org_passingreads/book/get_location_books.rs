@@ -8,29 +8,24 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::org_passingreads::book::StatefulBook;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_passingreads::book::StatefulBook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetLocationBooks<S: BosStr = DefaultStr> {
     pub h3: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetLocationBooksOutput<S: BosStr = DefaultStr> {
     pub books: Vec<StatefulBook<S>>,
     ///Human-readable name of the requested location
@@ -66,7 +61,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetLocationBooksRequest {
 
 pub mod get_location_books_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -97,21 +92,34 @@ pub mod get_location_books_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetLocationBooksBuilder<S: BosStr, St: get_location_books_state::State> {
+pub struct GetLocationBooksBuilder<
+    St: get_location_books_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetLocationBooks<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetLocationBooksBuilder<S, get_location_books_state::Empty> {
+impl GetLocationBooks<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetLocationBooksBuilder<
+        get_location_books_state::Empty,
+        DefaultStr,
+    > {
         GetLocationBooksBuilder::new()
     }
 }
 
-impl<S: BosStr> GetLocationBooksBuilder<S, get_location_books_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetLocationBooks<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetLocationBooksBuilder<get_location_books_state::Empty, S> {
+        GetLocationBooksBuilder::builder()
+    }
+}
+
+impl GetLocationBooksBuilder<get_location_books_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetLocationBooksBuilder {
             _state: PhantomData,
@@ -121,7 +129,18 @@ impl<S: BosStr> GetLocationBooksBuilder<S, get_location_books_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetLocationBooksBuilder<S, St>
+impl<S: BosStr> GetLocationBooksBuilder<get_location_books_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetLocationBooksBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetLocationBooksBuilder<St, S>
 where
     St: get_location_books_state::State,
     St::H3: get_location_books_state::IsUnset,
@@ -130,7 +149,7 @@ where
     pub fn h3(
         mut self,
         value: impl Into<S>,
-    ) -> GetLocationBooksBuilder<S, get_location_books_state::SetH3<St>> {
+    ) -> GetLocationBooksBuilder<get_location_books_state::SetH3<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetLocationBooksBuilder {
             _state: PhantomData,
@@ -140,7 +159,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetLocationBooksBuilder<S, St>
+impl<St, S: BosStr> GetLocationBooksBuilder<St, S>
 where
     St: get_location_books_state::State,
     St::H3: get_location_books_state::IsSet,

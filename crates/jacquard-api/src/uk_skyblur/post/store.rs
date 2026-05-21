@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Store<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional: Option<S>,
@@ -33,11 +30,9 @@ pub struct Store<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StoreOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
@@ -57,8 +52,9 @@ impl jacquard_common::xrpc::XrpcResp for StoreResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Store<S> {
     const NSID: &'static str = "uk.skyblur.post.store";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = StoreResponse;
 }
 
@@ -66,15 +62,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Store<S> {
 pub struct StoreRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StoreRequest {
     const PATH: &'static str = "/xrpc/uk.skyblur.post.store";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Store<S>;
     type Response = StoreResponse;
 }
 
 pub mod store_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -82,70 +79,77 @@ pub mod store_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
         type Visibility;
+        type Text;
         type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
         type Visibility = Unset;
+        type Text = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetText<St> {}
-    impl<St: State> State for SetText<St> {
-        type Text = Set<members::text>;
-        type Visibility = St::Visibility;
-        type Uri = St::Uri;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetVisibility<St> {}
     impl<St: State> State for SetVisibility<St> {
-        type Text = St::Text;
         type Visibility = Set<members::visibility>;
+        type Text = St::Text;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Visibility = St::Visibility;
+        type Text = Set<members::text>;
         type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Text = St::Text;
         type Visibility = St::Visibility;
+        type Text = St::Text;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
+        ///Marker type for the `text` field
+        pub struct text(());
         ///Marker type for the `uri` field
         pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StoreBuilder<S: BosStr, St: store_state::State> {
+pub struct StoreBuilder<St: store_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<AtUri<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Store<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StoreBuilder<S, store_state::Empty> {
+impl Store<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StoreBuilder<store_state::Empty, DefaultStr> {
         StoreBuilder::new()
     }
 }
 
-impl<S: BosStr> StoreBuilder<S, store_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Store<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StoreBuilder<store_state::Empty, S> {
+        StoreBuilder::builder()
+    }
+}
+
+impl StoreBuilder<store_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StoreBuilder {
             _state: PhantomData,
@@ -155,7 +159,18 @@ impl<S: BosStr> StoreBuilder<S, store_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
+impl<S: BosStr> StoreBuilder<store_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StoreBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `additional` field (optional)
     pub fn additional(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -168,13 +183,16 @@ impl<S: BosStr, St: store_state::State> StoreBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StoreBuilder<S, St>
+impl<St, S: BosStr> StoreBuilder<St, S>
 where
     St: store_state::State,
     St::Text: store_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(mut self, value: impl Into<S>) -> StoreBuilder<S, store_state::SetText<St>> {
+    pub fn text(
+        mut self,
+        value: impl Into<S>,
+    ) -> StoreBuilder<store_state::SetText<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StoreBuilder {
             _state: PhantomData,
@@ -184,13 +202,16 @@ where
     }
 }
 
-impl<S: BosStr, St> StoreBuilder<S, St>
+impl<St, S: BosStr> StoreBuilder<St, S>
 where
     St: store_state::State,
     St::Uri: store_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(mut self, value: impl Into<AtUri<S>>) -> StoreBuilder<S, store_state::SetUri<St>> {
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> StoreBuilder<store_state::SetUri<St>, S> {
         self._fields.2 = Option::Some(value.into());
         StoreBuilder {
             _state: PhantomData,
@@ -200,7 +221,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StoreBuilder<S, St>
+impl<St, S: BosStr> StoreBuilder<St, S>
 where
     St: store_state::State,
     St::Visibility: store_state::IsUnset,
@@ -209,7 +230,7 @@ where
     pub fn visibility(
         mut self,
         value: impl Into<S>,
-    ) -> StoreBuilder<S, store_state::SetVisibility<St>> {
+    ) -> StoreBuilder<store_state::SetVisibility<St>, S> {
         self._fields.3 = Option::Some(value.into());
         StoreBuilder {
             _state: PhantomData,
@@ -219,11 +240,11 @@ where
     }
 }
 
-impl<S: BosStr, St> StoreBuilder<S, St>
+impl<St, S: BosStr> StoreBuilder<St, S>
 where
     St: store_state::State,
-    St::Text: store_state::IsSet,
     St::Visibility: store_state::IsSet,
+    St::Text: store_state::IsSet,
     St::Uri: store_state::IsSet,
 {
     /// Build the final struct.

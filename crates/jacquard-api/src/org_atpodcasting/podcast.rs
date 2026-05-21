@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::org_atpodcasting::AppleCategory;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_atpodcasting::AppleCategory;
 /// A podcast feed/show. Record key is the podcast's Podcasting 2.0 UUIDv5 GUID, enabling direct lookup from RSS feed metadata.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -141,20 +141,25 @@ impl<S: BosStr> LexiconSchema for Podcast<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("artwork"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -210,7 +215,7 @@ impl<S: BosStr> LexiconSchema for Podcast<S> {
 
 pub mod podcast_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -218,156 +223,156 @@ pub mod podcast_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Guid;
         type Artwork;
-        type Title;
-        type FeedUrl;
         type Description;
-        type Language;
+        type Title;
         type Categories;
+        type Language;
+        type FeedUrl;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Guid = Unset;
         type Artwork = Unset;
-        type Title = Unset;
-        type FeedUrl = Unset;
         type Description = Unset;
-        type Language = Unset;
+        type Title = Unset;
         type Categories = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Guid = St::Guid;
-        type Artwork = St::Artwork;
-        type Title = St::Title;
-        type FeedUrl = St::FeedUrl;
-        type Description = St::Description;
-        type Language = St::Language;
-        type Categories = St::Categories;
+        type Language = Unset;
+        type FeedUrl = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `guid` field to Set
     pub struct SetGuid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGuid<St> {}
     impl<St: State> State for SetGuid<St> {
-        type CreatedAt = St::CreatedAt;
         type Guid = Set<members::guid>;
         type Artwork = St::Artwork;
-        type Title = St::Title;
-        type FeedUrl = St::FeedUrl;
         type Description = St::Description;
-        type Language = St::Language;
+        type Title = St::Title;
         type Categories = St::Categories;
+        type Language = St::Language;
+        type FeedUrl = St::FeedUrl;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `artwork` field to Set
     pub struct SetArtwork<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetArtwork<St> {}
     impl<St: State> State for SetArtwork<St> {
-        type CreatedAt = St::CreatedAt;
         type Guid = St::Guid;
         type Artwork = Set<members::artwork>;
+        type Description = St::Description;
         type Title = St::Title;
+        type Categories = St::Categories;
+        type Language = St::Language;
         type FeedUrl = St::FeedUrl;
-        type Description = St::Description;
-        type Language = St::Language;
-        type Categories = St::Categories;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
         type CreatedAt = St::CreatedAt;
-        type Guid = St::Guid;
-        type Artwork = St::Artwork;
-        type Title = Set<members::title>;
-        type FeedUrl = St::FeedUrl;
-        type Description = St::Description;
-        type Language = St::Language;
-        type Categories = St::Categories;
-    }
-    ///State transition - sets the `feed_url` field to Set
-    pub struct SetFeedUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFeedUrl<St> {}
-    impl<St: State> State for SetFeedUrl<St> {
-        type CreatedAt = St::CreatedAt;
-        type Guid = St::Guid;
-        type Artwork = St::Artwork;
-        type Title = St::Title;
-        type FeedUrl = Set<members::feed_url>;
-        type Description = St::Description;
-        type Language = St::Language;
-        type Categories = St::Categories;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDescription<St> {}
     impl<St: State> State for SetDescription<St> {
-        type CreatedAt = St::CreatedAt;
         type Guid = St::Guid;
         type Artwork = St::Artwork;
-        type Title = St::Title;
-        type FeedUrl = St::FeedUrl;
         type Description = Set<members::description>;
-        type Language = St::Language;
+        type Title = St::Title;
         type Categories = St::Categories;
-    }
-    ///State transition - sets the `language` field to Set
-    pub struct SetLanguage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLanguage<St> {}
-    impl<St: State> State for SetLanguage<St> {
+        type Language = St::Language;
+        type FeedUrl = St::FeedUrl;
         type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Guid = St::Guid;
         type Artwork = St::Artwork;
-        type Title = St::Title;
-        type FeedUrl = St::FeedUrl;
         type Description = St::Description;
-        type Language = Set<members::language>;
+        type Title = Set<members::title>;
         type Categories = St::Categories;
+        type Language = St::Language;
+        type FeedUrl = St::FeedUrl;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `categories` field to Set
     pub struct SetCategories<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCategories<St> {}
     impl<St: State> State for SetCategories<St> {
-        type CreatedAt = St::CreatedAt;
         type Guid = St::Guid;
         type Artwork = St::Artwork;
-        type Title = St::Title;
-        type FeedUrl = St::FeedUrl;
         type Description = St::Description;
-        type Language = St::Language;
+        type Title = St::Title;
         type Categories = Set<members::categories>;
+        type Language = St::Language;
+        type FeedUrl = St::FeedUrl;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `language` field to Set
+    pub struct SetLanguage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLanguage<St> {}
+    impl<St: State> State for SetLanguage<St> {
+        type Guid = St::Guid;
+        type Artwork = St::Artwork;
+        type Description = St::Description;
+        type Title = St::Title;
+        type Categories = St::Categories;
+        type Language = Set<members::language>;
+        type FeedUrl = St::FeedUrl;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `feed_url` field to Set
+    pub struct SetFeedUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFeedUrl<St> {}
+    impl<St: State> State for SetFeedUrl<St> {
+        type Guid = St::Guid;
+        type Artwork = St::Artwork;
+        type Description = St::Description;
+        type Title = St::Title;
+        type Categories = St::Categories;
+        type Language = St::Language;
+        type FeedUrl = Set<members::feed_url>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Guid = St::Guid;
+        type Artwork = St::Artwork;
+        type Description = St::Description;
+        type Title = St::Title;
+        type Categories = St::Categories;
+        type Language = St::Language;
+        type FeedUrl = St::FeedUrl;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `guid` field
         pub struct guid(());
         ///Marker type for the `artwork` field
         pub struct artwork(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `feed_url` field
-        pub struct feed_url(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `language` field
-        pub struct language(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `categories` field
         pub struct categories(());
+        ///Marker type for the `language` field
+        pub struct language(());
+        ///Marker type for the `feed_url` field
+        pub struct feed_url(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PodcastBuilder<S: BosStr, St: podcast_state::State> {
+pub struct PodcastBuilder<St: podcast_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
@@ -385,27 +390,43 @@ pub struct PodcastBuilder<S: BosStr, St: podcast_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Podcast<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PodcastBuilder<S, podcast_state::Empty> {
+impl Podcast<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PodcastBuilder<podcast_state::Empty, DefaultStr> {
         PodcastBuilder::new()
     }
 }
 
-impl<S: BosStr> PodcastBuilder<S, podcast_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Podcast<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PodcastBuilder<podcast_state::Empty, S> {
+        PodcastBuilder::builder()
+    }
+}
+
+impl PodcastBuilder<podcast_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PodcastBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St> PodcastBuilder<S, St>
+impl<S: BosStr> PodcastBuilder<podcast_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PodcastBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PodcastBuilder<St, S>
 where
     St: podcast_state::State,
     St::Artwork: podcast_state::IsUnset,
@@ -414,7 +435,7 @@ where
     pub fn artwork(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> PodcastBuilder<S, podcast_state::SetArtwork<St>> {
+    ) -> PodcastBuilder<podcast_state::SetArtwork<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PodcastBuilder {
             _state: PhantomData,
@@ -424,7 +445,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PodcastBuilder<S, St>
+impl<St, S: BosStr> PodcastBuilder<St, S>
 where
     St: podcast_state::State,
     St::Categories: podcast_state::IsUnset,
@@ -433,7 +454,7 @@ where
     pub fn categories(
         mut self,
         value: impl Into<Vec<AppleCategory<S>>>,
-    ) -> PodcastBuilder<S, podcast_state::SetCategories<St>> {
+    ) -> PodcastBuilder<podcast_state::SetCategories<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PodcastBuilder {
             _state: PhantomData,
@@ -443,7 +464,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PodcastBuilder<S, St>
+impl<St, S: BosStr> PodcastBuilder<St, S>
 where
     St: podcast_state::State,
     St::CreatedAt: podcast_state::IsUnset,
@@ -452,7 +473,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PodcastBuilder<S, podcast_state::SetCreatedAt<St>> {
+    ) -> PodcastBuilder<podcast_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PodcastBuilder {
             _state: PhantomData,
@@ -462,7 +483,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PodcastBuilder<S, St>
+impl<St, S: BosStr> PodcastBuilder<St, S>
 where
     St: podcast_state::State,
     St::Description: podcast_state::IsUnset,
@@ -471,7 +492,7 @@ where
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> PodcastBuilder<S, podcast_state::SetDescription<St>> {
+    ) -> PodcastBuilder<podcast_state::SetDescription<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PodcastBuilder {
             _state: PhantomData,
@@ -481,7 +502,7 @@ where
     }
 }
 
-impl<S: BosStr, St: podcast_state::State> PodcastBuilder<S, St> {
+impl<St: podcast_state::State, S: BosStr> PodcastBuilder<St, S> {
     /// Set the `explicit` field (optional)
     pub fn explicit(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.4 = value.into();
@@ -494,7 +515,7 @@ impl<S: BosStr, St: podcast_state::State> PodcastBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PodcastBuilder<S, St>
+impl<St, S: BosStr> PodcastBuilder<St, S>
 where
     St: podcast_state::State,
     St::FeedUrl: podcast_state::IsUnset,
@@ -503,7 +524,7 @@ where
     pub fn feed_url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> PodcastBuilder<S, podcast_state::SetFeedUrl<St>> {
+    ) -> PodcastBuilder<podcast_state::SetFeedUrl<St>, S> {
         self._fields.5 = Option::Some(value.into());
         PodcastBuilder {
             _state: PhantomData,
@@ -513,13 +534,16 @@ where
     }
 }
 
-impl<S: BosStr, St> PodcastBuilder<S, St>
+impl<St, S: BosStr> PodcastBuilder<St, S>
 where
     St: podcast_state::State,
     St::Guid: podcast_state::IsUnset,
 {
     /// Set the `guid` field (required)
-    pub fn guid(mut self, value: impl Into<S>) -> PodcastBuilder<S, podcast_state::SetGuid<St>> {
+    pub fn guid(
+        mut self,
+        value: impl Into<S>,
+    ) -> PodcastBuilder<podcast_state::SetGuid<St>, S> {
         self._fields.6 = Option::Some(value.into());
         PodcastBuilder {
             _state: PhantomData,
@@ -529,7 +553,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PodcastBuilder<S, St>
+impl<St, S: BosStr> PodcastBuilder<St, S>
 where
     St: podcast_state::State,
     St::Language: podcast_state::IsUnset,
@@ -538,7 +562,7 @@ where
     pub fn language(
         mut self,
         value: impl Into<Language>,
-    ) -> PodcastBuilder<S, podcast_state::SetLanguage<St>> {
+    ) -> PodcastBuilder<podcast_state::SetLanguage<St>, S> {
         self._fields.7 = Option::Some(value.into());
         PodcastBuilder {
             _state: PhantomData,
@@ -548,7 +572,7 @@ where
     }
 }
 
-impl<S: BosStr, St: podcast_state::State> PodcastBuilder<S, St> {
+impl<St: podcast_state::State, S: BosStr> PodcastBuilder<St, S> {
     /// Set the `link` field (optional)
     pub fn link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -561,7 +585,7 @@ impl<S: BosStr, St: podcast_state::State> PodcastBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: podcast_state::State> PodcastBuilder<S, St> {
+impl<St: podcast_state::State, S: BosStr> PodcastBuilder<St, S> {
     /// Set the `movedTo` field (optional)
     pub fn moved_to(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -574,13 +598,16 @@ impl<S: BosStr, St: podcast_state::State> PodcastBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PodcastBuilder<S, St>
+impl<St, S: BosStr> PodcastBuilder<St, S>
 where
     St: podcast_state::State,
     St::Title: podcast_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> PodcastBuilder<S, podcast_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> PodcastBuilder<podcast_state::SetTitle<St>, S> {
         self._fields.10 = Option::Some(value.into());
         PodcastBuilder {
             _state: PhantomData,
@@ -590,17 +617,17 @@ where
     }
 }
 
-impl<S: BosStr, St> PodcastBuilder<S, St>
+impl<St, S: BosStr> PodcastBuilder<St, S>
 where
     St: podcast_state::State,
-    St::CreatedAt: podcast_state::IsSet,
     St::Guid: podcast_state::IsSet,
     St::Artwork: podcast_state::IsSet,
-    St::Title: podcast_state::IsSet,
-    St::FeedUrl: podcast_state::IsSet,
     St::Description: podcast_state::IsSet,
-    St::Language: podcast_state::IsSet,
+    St::Title: podcast_state::IsSet,
     St::Categories: podcast_state::IsSet,
+    St::Language: podcast_state::IsSet,
+    St::FeedUrl: podcast_state::IsSet,
+    St::CreatedAt: podcast_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Podcast<S> {
@@ -639,10 +666,10 @@ where
 }
 
 fn lexicon_doc_org_atpodcasting_podcast() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.atpodcasting.podcast"),

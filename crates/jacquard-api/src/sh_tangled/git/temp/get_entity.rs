@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_tangled::git::temp::Blob;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::git::temp::Blob;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntity<S: BosStr = DefaultStr> {
     pub path: S,
     ///Defaults to `"HEAD"`.
@@ -32,11 +29,9 @@ pub struct GetEntity<S: BosStr = DefaultStr> {
     pub repo: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntityOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Blob<S>,
@@ -44,9 +39,18 @@ pub struct GetEntityOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetEntityError {
     /// Repository not found or access denied
@@ -60,10 +64,7 @@ pub enum GetEntityError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetEntityError {
@@ -131,7 +132,7 @@ fn _default_ref<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_entity_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -174,21 +175,28 @@ pub mod get_entity_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetEntityBuilder<S: BosStr, St: get_entity_state::State> {
+pub struct GetEntityBuilder<St: get_entity_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetEntity<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetEntityBuilder<S, get_entity_state::Empty> {
+impl GetEntity<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetEntityBuilder<get_entity_state::Empty, DefaultStr> {
         GetEntityBuilder::new()
     }
 }
 
-impl<S: BosStr> GetEntityBuilder<S, get_entity_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetEntity<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetEntityBuilder<get_entity_state::Empty, S> {
+        GetEntityBuilder::builder()
+    }
+}
+
+impl GetEntityBuilder<get_entity_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetEntityBuilder {
             _state: PhantomData,
@@ -198,7 +206,18 @@ impl<S: BosStr> GetEntityBuilder<S, get_entity_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetEntityBuilder<S, St>
+impl<S: BosStr> GetEntityBuilder<get_entity_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetEntityBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetEntityBuilder<St, S>
 where
     St: get_entity_state::State,
     St::Path: get_entity_state::IsUnset,
@@ -207,7 +226,7 @@ where
     pub fn path(
         mut self,
         value: impl Into<S>,
-    ) -> GetEntityBuilder<S, get_entity_state::SetPath<St>> {
+    ) -> GetEntityBuilder<get_entity_state::SetPath<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetEntityBuilder {
             _state: PhantomData,
@@ -217,7 +236,7 @@ where
     }
 }
 
-impl<S: BosStr, St: get_entity_state::State> GetEntityBuilder<S, St> {
+impl<St: get_entity_state::State, S: BosStr> GetEntityBuilder<St, S> {
     /// Set the `ref` field (optional)
     pub fn r#ref(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -230,7 +249,7 @@ impl<S: BosStr, St: get_entity_state::State> GetEntityBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetEntityBuilder<S, St>
+impl<St, S: BosStr> GetEntityBuilder<St, S>
 where
     St: get_entity_state::State,
     St::Repo: get_entity_state::IsUnset,
@@ -239,7 +258,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetEntityBuilder<S, get_entity_state::SetRepo<St>> {
+    ) -> GetEntityBuilder<get_entity_state::SetRepo<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GetEntityBuilder {
             _state: PhantomData,
@@ -249,7 +268,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetEntityBuilder<S, St>
+impl<St, S: BosStr> GetEntityBuilder<St, S>
 where
     St: get_entity_state::State,
     St::Path: get_entity_state::IsSet,

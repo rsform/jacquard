@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Record created by a Streamplace broadcaster to indicate that they will be replicating a livestream. NYI
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -108,7 +108,7 @@ impl<S: BosStr> LexiconSchema for Syndication<S> {
 
 pub mod syndication_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -116,70 +116,77 @@ pub mod syndication_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Broadcaster;
         type Streamer;
         type CreatedAt;
+        type Broadcaster;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Broadcaster = Unset;
         type Streamer = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `broadcaster` field to Set
-    pub struct SetBroadcaster<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBroadcaster<St> {}
-    impl<St: State> State for SetBroadcaster<St> {
-        type Broadcaster = Set<members::broadcaster>;
-        type Streamer = St::Streamer;
-        type CreatedAt = St::CreatedAt;
+        type Broadcaster = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStreamer<St> {}
     impl<St: State> State for SetStreamer<St> {
-        type Broadcaster = St::Broadcaster;
         type Streamer = Set<members::streamer>;
         type CreatedAt = St::CreatedAt;
+        type Broadcaster = St::Broadcaster;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Broadcaster = St::Broadcaster;
         type Streamer = St::Streamer;
         type CreatedAt = Set<members::created_at>;
+        type Broadcaster = St::Broadcaster;
+    }
+    ///State transition - sets the `broadcaster` field to Set
+    pub struct SetBroadcaster<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBroadcaster<St> {}
+    impl<St: State> State for SetBroadcaster<St> {
+        type Streamer = St::Streamer;
+        type CreatedAt = St::CreatedAt;
+        type Broadcaster = Set<members::broadcaster>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `broadcaster` field
-        pub struct broadcaster(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `broadcaster` field
+        pub struct broadcaster(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SyndicationBuilder<S: BosStr, St: syndication_state::State> {
+pub struct SyndicationBuilder<St: syndication_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Datetime>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Syndication<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SyndicationBuilder<S, syndication_state::Empty> {
+impl Syndication<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SyndicationBuilder<syndication_state::Empty, DefaultStr> {
         SyndicationBuilder::new()
     }
 }
 
-impl<S: BosStr> SyndicationBuilder<S, syndication_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Syndication<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SyndicationBuilder<syndication_state::Empty, S> {
+        SyndicationBuilder::builder()
+    }
+}
+
+impl SyndicationBuilder<syndication_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SyndicationBuilder {
             _state: PhantomData,
@@ -189,7 +196,18 @@ impl<S: BosStr> SyndicationBuilder<S, syndication_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SyndicationBuilder<S, St>
+impl<S: BosStr> SyndicationBuilder<syndication_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SyndicationBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SyndicationBuilder<St, S>
 where
     St: syndication_state::State,
     St::Broadcaster: syndication_state::IsUnset,
@@ -198,7 +216,7 @@ where
     pub fn broadcaster(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SyndicationBuilder<S, syndication_state::SetBroadcaster<St>> {
+    ) -> SyndicationBuilder<syndication_state::SetBroadcaster<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SyndicationBuilder {
             _state: PhantomData,
@@ -208,7 +226,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SyndicationBuilder<S, St>
+impl<St, S: BosStr> SyndicationBuilder<St, S>
 where
     St: syndication_state::State,
     St::CreatedAt: syndication_state::IsUnset,
@@ -217,7 +235,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SyndicationBuilder<S, syndication_state::SetCreatedAt<St>> {
+    ) -> SyndicationBuilder<syndication_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SyndicationBuilder {
             _state: PhantomData,
@@ -227,7 +245,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SyndicationBuilder<S, St>
+impl<St, S: BosStr> SyndicationBuilder<St, S>
 where
     St: syndication_state::State,
     St::Streamer: syndication_state::IsUnset,
@@ -236,7 +254,7 @@ where
     pub fn streamer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SyndicationBuilder<S, syndication_state::SetStreamer<St>> {
+    ) -> SyndicationBuilder<syndication_state::SetStreamer<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SyndicationBuilder {
             _state: PhantomData,
@@ -246,12 +264,12 @@ where
     }
 }
 
-impl<S: BosStr, St> SyndicationBuilder<S, St>
+impl<St, S: BosStr> SyndicationBuilder<St, S>
 where
     St: syndication_state::State,
-    St::Broadcaster: syndication_state::IsSet,
     St::Streamer: syndication_state::IsSet,
     St::CreatedAt: syndication_state::IsSet,
+    St::Broadcaster: syndication_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Syndication<S> {
@@ -263,7 +281,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Syndication<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Syndication<S> {
         Syndication {
             broadcaster: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -274,10 +295,10 @@ where
 }
 
 fn lexicon_doc_place_stream_broadcast_syndication() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.broadcast.syndication"),

@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Cover<S: BosStr = DefaultStr> {
     ///DID of the blob owner. Used to resolve blob URLs.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -33,11 +30,9 @@ pub struct Cover<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CoverOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -56,8 +51,9 @@ impl jacquard_common::xrpc::XrpcResp for CoverResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Cover<S> {
     const NSID: &'static str = "org.atsui.Cover";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CoverResponse;
 }
 
@@ -65,15 +61,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Cover<S> {
 pub struct CoverRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CoverRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Cover";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Cover<S>;
     type Response = CoverResponse;
 }
 
 pub mod cover_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -104,21 +101,28 @@ pub mod cover_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CoverBuilder<S: BosStr, St: cover_state::State> {
+pub struct CoverBuilder<St: cover_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Data<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Cover<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CoverBuilder<S, cover_state::Empty> {
+impl Cover<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CoverBuilder<cover_state::Empty, DefaultStr> {
         CoverBuilder::new()
     }
 }
 
-impl<S: BosStr> CoverBuilder<S, cover_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Cover<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CoverBuilder<cover_state::Empty, S> {
+        CoverBuilder::builder()
+    }
+}
+
+impl CoverBuilder<cover_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CoverBuilder {
             _state: PhantomData,
@@ -128,7 +132,18 @@ impl<S: BosStr> CoverBuilder<S, cover_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: cover_state::State> CoverBuilder<S, St> {
+impl<S: BosStr> CoverBuilder<cover_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CoverBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: cover_state::State, S: BosStr> CoverBuilder<St, S> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -141,13 +156,16 @@ impl<S: BosStr, St: cover_state::State> CoverBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CoverBuilder<S, St>
+impl<St, S: BosStr> CoverBuilder<St, S>
 where
     St: cover_state::State,
     St::Src: cover_state::IsUnset,
 {
     /// Set the `src` field (required)
-    pub fn src(mut self, value: impl Into<Data<S>>) -> CoverBuilder<S, cover_state::SetSrc<St>> {
+    pub fn src(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> CoverBuilder<cover_state::SetSrc<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CoverBuilder {
             _state: PhantomData,
@@ -157,7 +175,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CoverBuilder<S, St>
+impl<St, S: BosStr> CoverBuilder<St, S>
 where
     St: cover_state::State,
     St::Src: cover_state::IsSet,

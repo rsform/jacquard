@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, UriValue};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Configure<S: BosStr = DefaultStr> {
     ///When true, the RSVP button redirects to an external ticketing URL instead of creating a direct RSVP.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -38,19 +35,26 @@ pub struct Configure<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ConfigureOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ConfigureError {
     /// The specified event does not exist.
@@ -64,10 +68,7 @@ pub enum ConfigureError {
     InvalidRedirectUrl(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ConfigureError {
@@ -116,8 +117,9 @@ impl jacquard_common::xrpc::XrpcResp for ConfigureResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Configure<S> {
     const NSID: &'static str = "events.smokesignal.event.configure";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ConfigureResponse;
 }
 
@@ -125,15 +127,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Configure<S> {
 pub struct ConfigureRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ConfigureRequest {
     const PATH: &'static str = "/xrpc/events.smokesignal.event.configure";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Configure<S>;
     type Response = ConfigureResponse;
 }
 
 pub mod configure_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -164,26 +167,28 @@ pub mod configure_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ConfigureBuilder<S: BosStr, St: configure_state::State> {
+pub struct ConfigureBuilder<St: configure_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<bool>,
-        Option<AtUri<S>>,
-        Option<bool>,
-        Option<UriValue<S>>,
-    ),
+    _fields: (Option<bool>, Option<AtUri<S>>, Option<bool>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Configure<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ConfigureBuilder<S, configure_state::Empty> {
+impl Configure<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ConfigureBuilder<configure_state::Empty, DefaultStr> {
         ConfigureBuilder::new()
     }
 }
 
-impl<S: BosStr> ConfigureBuilder<S, configure_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Configure<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ConfigureBuilder<configure_state::Empty, S> {
+        ConfigureBuilder::builder()
+    }
+}
+
+impl ConfigureBuilder<configure_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ConfigureBuilder {
             _state: PhantomData,
@@ -193,7 +198,18 @@ impl<S: BosStr> ConfigureBuilder<S, configure_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: configure_state::State> ConfigureBuilder<S, St> {
+impl<S: BosStr> ConfigureBuilder<configure_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ConfigureBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: configure_state::State, S: BosStr> ConfigureBuilder<St, S> {
     /// Set the `disableDirectRsvp` field (optional)
     pub fn disable_direct_rsvp(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -206,7 +222,7 @@ impl<S: BosStr, St: configure_state::State> ConfigureBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ConfigureBuilder<S, St>
+impl<St, S: BosStr> ConfigureBuilder<St, S>
 where
     St: configure_state::State,
     St::Event: configure_state::IsUnset,
@@ -215,7 +231,7 @@ where
     pub fn event(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ConfigureBuilder<S, configure_state::SetEvent<St>> {
+    ) -> ConfigureBuilder<configure_state::SetEvent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ConfigureBuilder {
             _state: PhantomData,
@@ -225,7 +241,7 @@ where
     }
 }
 
-impl<S: BosStr, St: configure_state::State> ConfigureBuilder<S, St> {
+impl<St: configure_state::State, S: BosStr> ConfigureBuilder<St, S> {
     /// Set the `requireConfirmedEmail` field (optional)
     pub fn require_confirmed_email(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -238,7 +254,7 @@ impl<S: BosStr, St: configure_state::State> ConfigureBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: configure_state::State> ConfigureBuilder<S, St> {
+impl<St: configure_state::State, S: BosStr> ConfigureBuilder<St, S> {
     /// Set the `rsvpRedirectUrl` field (optional)
     pub fn rsvp_redirect_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -251,7 +267,7 @@ impl<S: BosStr, St: configure_state::State> ConfigureBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ConfigureBuilder<S, St>
+impl<St, S: BosStr> ConfigureBuilder<St, S>
 where
     St: configure_state::State,
     St::Event: configure_state::IsSet,
@@ -267,7 +283,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Configure<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Configure<S> {
         Configure {
             disable_direct_rsvp: self._fields.0,
             event: self._fields.1.unwrap(),

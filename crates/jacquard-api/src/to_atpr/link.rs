@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A shortened URL mapping
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -115,7 +115,7 @@ impl<S: BosStr> LexiconSchema for Link<S> {
 
 pub mod link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -158,21 +158,28 @@ pub mod link_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LinkBuilder<S: BosStr, St: link_state::State> {
+pub struct LinkBuilder<St: link_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Link<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LinkBuilder<S, link_state::Empty> {
+impl Link<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LinkBuilder<link_state::Empty, DefaultStr> {
         LinkBuilder::new()
     }
 }
 
-impl<S: BosStr> LinkBuilder<S, link_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Link<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LinkBuilder<link_state::Empty, S> {
+        LinkBuilder::builder()
+    }
+}
+
+impl LinkBuilder<link_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LinkBuilder {
             _state: PhantomData,
@@ -182,7 +189,18 @@ impl<S: BosStr> LinkBuilder<S, link_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LinkBuilder<S, St>
+impl<S: BosStr> LinkBuilder<link_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LinkBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LinkBuilder<St, S>
 where
     St: link_state::State,
     St::UpdatedAt: link_state::IsUnset,
@@ -191,7 +209,7 @@ where
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LinkBuilder<S, link_state::SetUpdatedAt<St>> {
+    ) -> LinkBuilder<link_state::SetUpdatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LinkBuilder {
             _state: PhantomData,
@@ -201,13 +219,16 @@ where
     }
 }
 
-impl<S: BosStr, St> LinkBuilder<S, St>
+impl<St, S: BosStr> LinkBuilder<St, S>
 where
     St: link_state::State,
     St::Url: link_state::IsUnset,
 {
     /// Set the `url` field (required)
-    pub fn url(mut self, value: impl Into<UriValue<S>>) -> LinkBuilder<S, link_state::SetUrl<St>> {
+    pub fn url(
+        mut self,
+        value: impl Into<UriValue<S>>,
+    ) -> LinkBuilder<link_state::SetUrl<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LinkBuilder {
             _state: PhantomData,
@@ -217,7 +238,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LinkBuilder<S, St>
+impl<St, S: BosStr> LinkBuilder<St, S>
 where
     St: link_state::State,
     St::UpdatedAt: link_state::IsSet,
@@ -242,10 +263,10 @@ where
 }
 
 fn lexicon_doc_to_atpr_link() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("to.atpr.link"),
@@ -257,10 +278,11 @@ fn lexicon_doc_to_atpr_link() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A shortened URL mapping")),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("url"),
-                            SmolStr::new_static("updatedAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("url"), SmolStr::new_static("updatedAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::knot::subscribe_repos;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::knot::subscribe_repos;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GitSync1<S: BosStr = DefaultStr> {
     ///Repository DID identifier
     pub did: Did<S>,
@@ -40,11 +37,9 @@ pub struct GitSync1<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GitSync2<S: BosStr = DefaultStr> {
     ///Repository AT-URI identifier
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,11 +50,9 @@ pub struct GitSync2<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Identity<S: BosStr = DefaultStr> {
     ///Repository DID identifier
     pub did: Did<S>,
@@ -70,12 +63,14 @@ pub struct Identity<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeRepos {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<i64>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -95,26 +90,43 @@ impl<S: BosStr> SubscribeReposMessage<S> {
     where
         S: serde::Deserialize<'de>,
     {
-        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
+            bytes,
+        )?;
         match header.t.as_str() {
             "#identity" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::Identity(Box::new(variant)))
             }
             "gitRefUpdate" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::GitRefUpdate(Box::new(variant)))
             }
-            unknown => Err(jacquard_common::error::DecodeError::UnknownEventType(
-                unknown.into(),
-            )),
+            unknown => {
+                Err(
+                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
+                )
+            }
         }
     }
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum SubscribeReposError {
     #[serde(rename = "FutureCursor")]
@@ -124,10 +136,7 @@ pub enum SubscribeReposError {
     ConsumerTooSlow(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for SubscribeReposError {
@@ -208,31 +217,28 @@ impl<S: BosStr> LexiconSchema for Identity<S> {
 pub struct SubscribeReposStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeReposStream {
     const NSID: &'static str = "sh.tangled.knot.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Message<S: BosStr> = SubscribeReposMessage<S>;
     type Error = SubscribeReposError;
 }
 
 impl jacquard_common::xrpc::XrpcSubscription for SubscribeRepos {
     const NSID: &'static str = "sh.tangled.knot.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Stream = SubscribeReposStream;
 }
 
 pub struct SubscribeReposEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeReposEndpoint {
     const PATH: &'static str = "/xrpc/sh.tangled.knot.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Params<S: BosStr> = SubscribeRepos;
     type Stream = SubscribeReposStream;
 }
 
 pub mod git_sync1_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -275,21 +281,28 @@ pub mod git_sync1_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GitSync1Builder<S: BosStr, St: git_sync1_state::State> {
+pub struct GitSync1Builder<St: git_sync1_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GitSync1<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GitSync1Builder<S, git_sync1_state::Empty> {
+impl GitSync1<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GitSync1Builder<git_sync1_state::Empty, DefaultStr> {
         GitSync1Builder::new()
     }
 }
 
-impl<S: BosStr> GitSync1Builder<S, git_sync1_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GitSync1<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GitSync1Builder<git_sync1_state::Empty, S> {
+        GitSync1Builder::builder()
+    }
+}
+
+impl GitSync1Builder<git_sync1_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GitSync1Builder {
             _state: PhantomData,
@@ -299,7 +312,18 @@ impl<S: BosStr> GitSync1Builder<S, git_sync1_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GitSync1Builder<S, St>
+impl<S: BosStr> GitSync1Builder<git_sync1_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GitSync1Builder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GitSync1Builder<St, S>
 where
     St: git_sync1_state::State,
     St::Did: git_sync1_state::IsUnset,
@@ -308,7 +332,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GitSync1Builder<S, git_sync1_state::SetDid<St>> {
+    ) -> GitSync1Builder<git_sync1_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GitSync1Builder {
             _state: PhantomData,
@@ -318,13 +342,16 @@ where
     }
 }
 
-impl<S: BosStr, St> GitSync1Builder<S, St>
+impl<St, S: BosStr> GitSync1Builder<St, S>
 where
     St: git_sync1_state::State,
     St::Seq: git_sync1_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(mut self, value: impl Into<i64>) -> GitSync1Builder<S, git_sync1_state::SetSeq<St>> {
+    pub fn seq(
+        mut self,
+        value: impl Into<i64>,
+    ) -> GitSync1Builder<git_sync1_state::SetSeq<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GitSync1Builder {
             _state: PhantomData,
@@ -334,7 +361,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GitSync1Builder<S, St>
+impl<St, S: BosStr> GitSync1Builder<St, S>
 where
     St: git_sync1_state::State,
     St::Seq: git_sync1_state::IsSet,
@@ -359,10 +386,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_knot_subscribeRepos() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.knot.subscribeRepos"),
@@ -371,14 +398,18 @@ fn lexicon_doc_sh_tangled_knot_subscribeRepos() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("gitSync1"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("seq"), SmolStr::new_static("did")]),
+                    required: Some(
+                        vec![SmolStr::new_static("seq"), SmolStr::new_static("did")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Repository DID identifier")),
+                                description: Some(
+                                    CowStr::new_static("Repository DID identifier"),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -397,19 +428,18 @@ fn lexicon_doc_sh_tangled_knot_subscribeRepos() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("gitSync2"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("seq"),
-                        SmolStr::new_static("repo"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("seq"), SmolStr::new_static("repo")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Repository AT-URI identifier",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Repository AT-URI identifier"),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -428,18 +458,21 @@ fn lexicon_doc_sh_tangled_knot_subscribeRepos() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("identity"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("seq"),
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("time"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("seq"), SmolStr::new_static("did"),
+                            SmolStr::new_static("time")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Repository DID identifier")),
+                                description: Some(
+                                    CowStr::new_static("Repository DID identifier"),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -465,20 +498,22 @@ fn lexicon_doc_sh_tangled_knot_subscribeRepos() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcSubscription(LexXrpcSubscription {
-                    parameters: Some(LexXrpcSubscriptionParameter::Params(LexXrpcParameters {
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcSubscriptionParameter::Params(LexXrpcParameters {
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -490,7 +525,7 @@ fn lexicon_doc_sh_tangled_knot_subscribeRepos() -> LexiconDoc<'static> {
 
 pub mod git_sync2_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -498,56 +533,63 @@ pub mod git_sync2_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Seq;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Seq = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Repo = Set<members::repo>;
-        type Seq = St::Seq;
+        type Repo = Unset;
     }
     ///State transition - sets the `seq` field to Set
     pub struct SetSeq<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSeq<St> {}
     impl<St: State> State for SetSeq<St> {
-        type Repo = St::Repo;
         type Seq = Set<members::seq>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Seq = St::Seq;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `seq` field
         pub struct seq(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GitSync2Builder<S: BosStr, St: git_sync2_state::State> {
+pub struct GitSync2Builder<St: git_sync2_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GitSync2<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GitSync2Builder<S, git_sync2_state::Empty> {
+impl GitSync2<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GitSync2Builder<git_sync2_state::Empty, DefaultStr> {
         GitSync2Builder::new()
     }
 }
 
-impl<S: BosStr> GitSync2Builder<S, git_sync2_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GitSync2<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GitSync2Builder<git_sync2_state::Empty, S> {
+        GitSync2Builder::builder()
+    }
+}
+
+impl GitSync2Builder<git_sync2_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GitSync2Builder {
             _state: PhantomData,
@@ -557,7 +599,18 @@ impl<S: BosStr> GitSync2Builder<S, git_sync2_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: git_sync2_state::State> GitSync2Builder<S, St> {
+impl<S: BosStr> GitSync2Builder<git_sync2_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GitSync2Builder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: git_sync2_state::State, S: BosStr> GitSync2Builder<St, S> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -570,13 +623,16 @@ impl<S: BosStr, St: git_sync2_state::State> GitSync2Builder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GitSync2Builder<S, St>
+impl<St, S: BosStr> GitSync2Builder<St, S>
 where
     St: git_sync2_state::State,
     St::Seq: git_sync2_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(mut self, value: impl Into<i64>) -> GitSync2Builder<S, git_sync2_state::SetSeq<St>> {
+    pub fn seq(
+        mut self,
+        value: impl Into<i64>,
+    ) -> GitSync2Builder<git_sync2_state::SetSeq<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GitSync2Builder {
             _state: PhantomData,
@@ -586,11 +642,11 @@ where
     }
 }
 
-impl<S: BosStr, St> GitSync2Builder<S, St>
+impl<St, S: BosStr> GitSync2Builder<St, S>
 where
     St: git_sync2_state::State,
-    St::Repo: git_sync2_state::IsSet,
     St::Seq: git_sync2_state::IsSet,
+    St::Repo: git_sync2_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GitSync2<S> {
@@ -612,7 +668,7 @@ where
 
 pub mod identity_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -620,70 +676,77 @@ pub mod identity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Time;
         type Seq;
         type Did;
+        type Time;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Time = Unset;
         type Seq = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTime<St> {}
-    impl<St: State> State for SetTime<St> {
-        type Time = Set<members::time>;
-        type Seq = St::Seq;
-        type Did = St::Did;
+        type Time = Unset;
     }
     ///State transition - sets the `seq` field to Set
     pub struct SetSeq<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSeq<St> {}
     impl<St: State> State for SetSeq<St> {
-        type Time = St::Time;
         type Seq = Set<members::seq>;
         type Did = St::Did;
+        type Time = St::Time;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Time = St::Time;
         type Seq = St::Seq;
         type Did = Set<members::did>;
+        type Time = St::Time;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTime<St> {}
+    impl<St: State> State for SetTime<St> {
+        type Seq = St::Seq;
+        type Did = St::Did;
+        type Time = Set<members::time>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `time` field
-        pub struct time(());
         ///Marker type for the `seq` field
         pub struct seq(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `time` field
+        pub struct time(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IdentityBuilder<S: BosStr, St: identity_state::State> {
+pub struct IdentityBuilder<St: identity_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<i64>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Identity<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> IdentityBuilder<S, identity_state::Empty> {
+impl Identity<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> IdentityBuilder<identity_state::Empty, DefaultStr> {
         IdentityBuilder::new()
     }
 }
 
-impl<S: BosStr> IdentityBuilder<S, identity_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Identity<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> IdentityBuilder<identity_state::Empty, S> {
+        IdentityBuilder::builder()
+    }
+}
+
+impl IdentityBuilder<identity_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         IdentityBuilder {
             _state: PhantomData,
@@ -693,7 +756,18 @@ impl<S: BosStr> IdentityBuilder<S, identity_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> IdentityBuilder<S, St>
+impl<S: BosStr> IdentityBuilder<identity_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        IdentityBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> IdentityBuilder<St, S>
 where
     St: identity_state::State,
     St::Did: identity_state::IsUnset,
@@ -702,7 +776,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> IdentityBuilder<S, identity_state::SetDid<St>> {
+    ) -> IdentityBuilder<identity_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         IdentityBuilder {
             _state: PhantomData,
@@ -712,13 +786,16 @@ where
     }
 }
 
-impl<S: BosStr, St> IdentityBuilder<S, St>
+impl<St, S: BosStr> IdentityBuilder<St, S>
 where
     St: identity_state::State,
     St::Seq: identity_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(mut self, value: impl Into<i64>) -> IdentityBuilder<S, identity_state::SetSeq<St>> {
+    pub fn seq(
+        mut self,
+        value: impl Into<i64>,
+    ) -> IdentityBuilder<identity_state::SetSeq<St>, S> {
         self._fields.1 = Option::Some(value.into());
         IdentityBuilder {
             _state: PhantomData,
@@ -728,7 +805,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IdentityBuilder<S, St>
+impl<St, S: BosStr> IdentityBuilder<St, S>
 where
     St: identity_state::State,
     St::Time: identity_state::IsUnset,
@@ -737,7 +814,7 @@ where
     pub fn time(
         mut self,
         value: impl Into<Datetime>,
-    ) -> IdentityBuilder<S, identity_state::SetTime<St>> {
+    ) -> IdentityBuilder<identity_state::SetTime<St>, S> {
         self._fields.2 = Option::Some(value.into());
         IdentityBuilder {
             _state: PhantomData,
@@ -747,12 +824,12 @@ where
     }
 }
 
-impl<S: BosStr, St> IdentityBuilder<S, St>
+impl<St, S: BosStr> IdentityBuilder<St, S>
 where
     St: identity_state::State,
-    St::Time: identity_state::IsSet,
     St::Seq: identity_state::IsSet,
     St::Did: identity_state::IsSet,
+    St::Time: identity_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Identity<S> {
@@ -776,7 +853,7 @@ where
 
 pub mod subscribe_repos_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -807,8 +884,18 @@ impl SubscribeRepos {
 }
 
 impl SubscribeReposBuilder<subscribe_repos_state::Empty> {
-    /// Create a new builder with all fields unset.
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
+        SubscribeReposBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+        }
+    }
+}
+
+impl SubscribeReposBuilder<subscribe_repos_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
         SubscribeReposBuilder {
             _state: PhantomData,
             _fields: (None,),

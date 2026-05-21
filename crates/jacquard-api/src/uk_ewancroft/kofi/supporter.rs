@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A single Ko-fi payment event. One record per event, rkey is a TID.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -109,7 +109,7 @@ impl<S: BosStr> LexiconSchema for Supporter<S> {
 
 pub mod supporter_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -152,21 +152,28 @@ pub mod supporter_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SupporterBuilder<S: BosStr, St: supporter_state::State> {
+pub struct SupporterBuilder<St: supporter_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Supporter<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SupporterBuilder<S, supporter_state::Empty> {
+impl Supporter<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SupporterBuilder<supporter_state::Empty, DefaultStr> {
         SupporterBuilder::new()
     }
 }
 
-impl<S: BosStr> SupporterBuilder<S, supporter_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Supporter<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SupporterBuilder<supporter_state::Empty, S> {
+        SupporterBuilder::builder()
+    }
+}
+
+impl SupporterBuilder<supporter_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SupporterBuilder {
             _state: PhantomData,
@@ -176,7 +183,18 @@ impl<S: BosStr> SupporterBuilder<S, supporter_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SupporterBuilder<S, St>
+impl<S: BosStr> SupporterBuilder<supporter_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SupporterBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SupporterBuilder<St, S>
 where
     St: supporter_state::State,
     St::Name: supporter_state::IsUnset,
@@ -185,7 +203,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> SupporterBuilder<S, supporter_state::SetName<St>> {
+    ) -> SupporterBuilder<supporter_state::SetName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SupporterBuilder {
             _state: PhantomData,
@@ -195,7 +213,7 @@ where
     }
 }
 
-impl<S: BosStr, St: supporter_state::State> SupporterBuilder<S, St> {
+impl<St: supporter_state::State, S: BosStr> SupporterBuilder<St, S> {
     /// Set the `tier` field (optional)
     pub fn tier(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -208,7 +226,7 @@ impl<S: BosStr, St: supporter_state::State> SupporterBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SupporterBuilder<S, St>
+impl<St, S: BosStr> SupporterBuilder<St, S>
 where
     St: supporter_state::State,
     St::Type: supporter_state::IsUnset,
@@ -217,7 +235,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> SupporterBuilder<S, supporter_state::SetType<St>> {
+    ) -> SupporterBuilder<supporter_state::SetType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SupporterBuilder {
             _state: PhantomData,
@@ -227,7 +245,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SupporterBuilder<S, St>
+impl<St, S: BosStr> SupporterBuilder<St, S>
 where
     St: supporter_state::State,
     St::Name: supporter_state::IsSet,
@@ -243,7 +261,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Supporter<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Supporter<S> {
         Supporter {
             name: self._fields.0.unwrap(),
             tier: self._fields.1,
@@ -254,10 +275,10 @@ where
 }
 
 fn lexicon_doc_uk_ewancroft_kofi_supporter() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("uk.ewancroft.kofi.supporter"),

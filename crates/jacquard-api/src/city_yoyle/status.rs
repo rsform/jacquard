@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Short status update
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -129,7 +129,7 @@ impl<S: BosStr> LexiconSchema for Status<S> {
 
 pub mod status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -160,21 +160,28 @@ pub mod status_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StatusBuilder<S: BosStr, St: status_state::State> {
+pub struct StatusBuilder<St: status_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Status<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StatusBuilder<S, status_state::Empty> {
+impl Status<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StatusBuilder<status_state::Empty, DefaultStr> {
         StatusBuilder::new()
     }
 }
 
-impl<S: BosStr> StatusBuilder<S, status_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Status<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StatusBuilder<status_state::Empty, S> {
+        StatusBuilder::builder()
+    }
+}
+
+impl StatusBuilder<status_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StatusBuilder {
             _state: PhantomData,
@@ -184,7 +191,18 @@ impl<S: BosStr> StatusBuilder<S, status_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: status_state::State> StatusBuilder<S, St> {
+impl<S: BosStr> StatusBuilder<status_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StatusBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: status_state::State, S: BosStr> StatusBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -197,13 +215,16 @@ impl<S: BosStr, St: status_state::State> StatusBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StatusBuilder<S, St>
+impl<St, S: BosStr> StatusBuilder<St, S>
 where
     St: status_state::State,
     St::Text: status_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(mut self, value: impl Into<S>) -> StatusBuilder<S, status_state::SetText<St>> {
+    pub fn text(
+        mut self,
+        value: impl Into<S>,
+    ) -> StatusBuilder<status_state::SetText<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
@@ -213,7 +234,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatusBuilder<S, St>
+impl<St, S: BosStr> StatusBuilder<St, S>
 where
     St: status_state::State,
     St::Text: status_state::IsSet,
@@ -237,10 +258,10 @@ where
 }
 
 fn lexicon_doc_city_yoyle_status() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("city.yoyle.status"),

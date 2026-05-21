@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::systems_timker::hawlt::note::Note;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::systems_timker::hawlt::note::Note;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PutNote<S: BosStr = DefaultStr> {
     ///The note record to write.
     pub record: Note<S>,
@@ -32,11 +29,9 @@ pub struct PutNote<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PutNoteOutput<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -55,8 +50,9 @@ impl jacquard_common::xrpc::XrpcResp for PutNoteResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutNote<S> {
     const NSID: &'static str = "systems.timker.hawlt.putNote";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PutNoteResponse;
 }
 
@@ -64,15 +60,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutNote<S> {
 pub struct PutNoteRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutNoteRequest {
     const PATH: &'static str = "/xrpc/systems.timker.hawlt.putNote";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = PutNote<S>;
     type Response = PutNoteResponse;
 }
 
 pub mod put_note_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -80,56 +77,63 @@ pub mod put_note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rkey;
         type Record;
+        type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rkey = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRkey<St> {}
-    impl<St: State> State for SetRkey<St> {
-        type Rkey = Set<members::rkey>;
-        type Record = St::Record;
+        type Rkey = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecord<St> {}
     impl<St: State> State for SetRecord<St> {
-        type Rkey = St::Rkey;
         type Record = Set<members::record>;
+        type Rkey = St::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRkey<St> {}
+    impl<St: State> State for SetRkey<St> {
+        type Record = St::Record;
+        type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PutNoteBuilder<S: BosStr, St: put_note_state::State> {
+pub struct PutNoteBuilder<St: put_note_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Note<S>>, Option<RecordKey<Rkey<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PutNote<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PutNoteBuilder<S, put_note_state::Empty> {
+impl PutNote<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PutNoteBuilder<put_note_state::Empty, DefaultStr> {
         PutNoteBuilder::new()
     }
 }
 
-impl<S: BosStr> PutNoteBuilder<S, put_note_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PutNote<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PutNoteBuilder<put_note_state::Empty, S> {
+        PutNoteBuilder::builder()
+    }
+}
+
+impl PutNoteBuilder<put_note_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PutNoteBuilder {
             _state: PhantomData,
@@ -139,7 +143,18 @@ impl<S: BosStr> PutNoteBuilder<S, put_note_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PutNoteBuilder<S, St>
+impl<S: BosStr> PutNoteBuilder<put_note_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PutNoteBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PutNoteBuilder<St, S>
 where
     St: put_note_state::State,
     St::Record: put_note_state::IsUnset,
@@ -148,7 +163,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<Note<S>>,
-    ) -> PutNoteBuilder<S, put_note_state::SetRecord<St>> {
+    ) -> PutNoteBuilder<put_note_state::SetRecord<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PutNoteBuilder {
             _state: PhantomData,
@@ -158,7 +173,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PutNoteBuilder<S, St>
+impl<St, S: BosStr> PutNoteBuilder<St, S>
 where
     St: put_note_state::State,
     St::Rkey: put_note_state::IsUnset,
@@ -167,7 +182,7 @@ where
     pub fn rkey(
         mut self,
         value: impl Into<RecordKey<Rkey<S>>>,
-    ) -> PutNoteBuilder<S, put_note_state::SetRkey<St>> {
+    ) -> PutNoteBuilder<put_note_state::SetRkey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PutNoteBuilder {
             _state: PhantomData,
@@ -177,11 +192,11 @@ where
     }
 }
 
-impl<S: BosStr, St> PutNoteBuilder<S, St>
+impl<St, S: BosStr> PutNoteBuilder<St, S>
 where
     St: put_note_state::State,
-    St::Rkey: put_note_state::IsSet,
     St::Record: put_note_state::IsSet,
+    St::Rkey: put_note_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PutNote<S> {

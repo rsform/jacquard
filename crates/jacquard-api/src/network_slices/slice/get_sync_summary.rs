@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,16 +20,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::network_slices::slice::get_sync_summary;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::slice::get_sync_summary;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CollectionSummary<S: BosStr = DefaultStr> {
     pub collection: S,
     pub estimated_repos: i64,
@@ -38,11 +35,9 @@ pub struct CollectionSummary<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSyncSummary<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collections: Option<Vec<S>>,
@@ -53,11 +48,9 @@ pub struct GetSyncSummary<S: BosStr = DefaultStr> {
     pub slice: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSyncSummaryOutput<S: BosStr = DefaultStr> {
     ///The actual limit applied (user-specified or default)
     pub applied_limit: i64,
@@ -113,7 +106,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSyncSummaryRequest {
 
 pub mod collection_summary_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -121,70 +114,83 @@ pub mod collection_summary_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Collection;
         type EstimatedRepos;
         type IsExternal;
-        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Collection = Unset;
         type EstimatedRepos = Unset;
         type IsExternal = Unset;
-        type Collection = Unset;
-    }
-    ///State transition - sets the `estimated_repos` field to Set
-    pub struct SetEstimatedRepos<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEstimatedRepos<St> {}
-    impl<St: State> State for SetEstimatedRepos<St> {
-        type EstimatedRepos = Set<members::estimated_repos>;
-        type IsExternal = St::IsExternal;
-        type Collection = St::Collection;
-    }
-    ///State transition - sets the `is_external` field to Set
-    pub struct SetIsExternal<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIsExternal<St> {}
-    impl<St: State> State for SetIsExternal<St> {
-        type EstimatedRepos = St::EstimatedRepos;
-        type IsExternal = Set<members::is_external>;
-        type Collection = St::Collection;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
+        type Collection = Set<members::collection>;
         type EstimatedRepos = St::EstimatedRepos;
         type IsExternal = St::IsExternal;
-        type Collection = Set<members::collection>;
+    }
+    ///State transition - sets the `estimated_repos` field to Set
+    pub struct SetEstimatedRepos<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEstimatedRepos<St> {}
+    impl<St: State> State for SetEstimatedRepos<St> {
+        type Collection = St::Collection;
+        type EstimatedRepos = Set<members::estimated_repos>;
+        type IsExternal = St::IsExternal;
+    }
+    ///State transition - sets the `is_external` field to Set
+    pub struct SetIsExternal<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIsExternal<St> {}
+    impl<St: State> State for SetIsExternal<St> {
+        type Collection = St::Collection;
+        type EstimatedRepos = St::EstimatedRepos;
+        type IsExternal = Set<members::is_external>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `collection` field
+        pub struct collection(());
         ///Marker type for the `estimated_repos` field
         pub struct estimated_repos(());
         ///Marker type for the `is_external` field
         pub struct is_external(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionSummaryBuilder<S: BosStr, St: collection_summary_state::State> {
+pub struct CollectionSummaryBuilder<
+    St: collection_summary_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<bool>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CollectionSummary<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CollectionSummaryBuilder<S, collection_summary_state::Empty> {
+impl CollectionSummary<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CollectionSummaryBuilder<
+        collection_summary_state::Empty,
+        DefaultStr,
+    > {
         CollectionSummaryBuilder::new()
     }
 }
 
-impl<S: BosStr> CollectionSummaryBuilder<S, collection_summary_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CollectionSummary<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CollectionSummaryBuilder<collection_summary_state::Empty, S> {
+        CollectionSummaryBuilder::builder()
+    }
+}
+
+impl CollectionSummaryBuilder<collection_summary_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CollectionSummaryBuilder {
             _state: PhantomData,
@@ -194,7 +200,18 @@ impl<S: BosStr> CollectionSummaryBuilder<S, collection_summary_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CollectionSummaryBuilder<S, St>
+impl<S: BosStr> CollectionSummaryBuilder<collection_summary_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CollectionSummaryBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CollectionSummaryBuilder<St, S>
 where
     St: collection_summary_state::State,
     St::Collection: collection_summary_state::IsUnset,
@@ -203,7 +220,7 @@ where
     pub fn collection(
         mut self,
         value: impl Into<S>,
-    ) -> CollectionSummaryBuilder<S, collection_summary_state::SetCollection<St>> {
+    ) -> CollectionSummaryBuilder<collection_summary_state::SetCollection<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CollectionSummaryBuilder {
             _state: PhantomData,
@@ -213,7 +230,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CollectionSummaryBuilder<S, St>
+impl<St, S: BosStr> CollectionSummaryBuilder<St, S>
 where
     St: collection_summary_state::State,
     St::EstimatedRepos: collection_summary_state::IsUnset,
@@ -222,7 +239,7 @@ where
     pub fn estimated_repos(
         mut self,
         value: impl Into<i64>,
-    ) -> CollectionSummaryBuilder<S, collection_summary_state::SetEstimatedRepos<St>> {
+    ) -> CollectionSummaryBuilder<collection_summary_state::SetEstimatedRepos<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CollectionSummaryBuilder {
             _state: PhantomData,
@@ -232,7 +249,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CollectionSummaryBuilder<S, St>
+impl<St, S: BosStr> CollectionSummaryBuilder<St, S>
 where
     St: collection_summary_state::State,
     St::IsExternal: collection_summary_state::IsUnset,
@@ -241,7 +258,7 @@ where
     pub fn is_external(
         mut self,
         value: impl Into<bool>,
-    ) -> CollectionSummaryBuilder<S, collection_summary_state::SetIsExternal<St>> {
+    ) -> CollectionSummaryBuilder<collection_summary_state::SetIsExternal<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CollectionSummaryBuilder {
             _state: PhantomData,
@@ -251,12 +268,12 @@ where
     }
 }
 
-impl<S: BosStr, St> CollectionSummaryBuilder<S, St>
+impl<St, S: BosStr> CollectionSummaryBuilder<St, S>
 where
     St: collection_summary_state::State,
+    St::Collection: collection_summary_state::IsSet,
     St::EstimatedRepos: collection_summary_state::IsSet,
     St::IsExternal: collection_summary_state::IsSet,
-    St::Collection: collection_summary_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CollectionSummary<S> {
@@ -268,7 +285,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CollectionSummary<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CollectionSummary<S> {
         CollectionSummary {
             collection: self._fields.0.unwrap(),
             estimated_repos: self._fields.1.unwrap(),
@@ -279,10 +299,10 @@ where
 }
 
 fn lexicon_doc_network_slices_slice_getSyncSummary() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.slice.getSyncSummary"),
@@ -291,19 +311,19 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("collectionSummary"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("collection"),
-                        SmolStr::new_static("estimatedRepos"),
-                        SmolStr::new_static("isExternal"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("collection"),
+                            SmolStr::new_static("estimatedRepos"),
+                            SmolStr::new_static("isExternal")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("collection"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("estimatedRepos"),
@@ -325,51 +345,53 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("slice")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("collections"),
-                                LexXrpcParametersProperty::Array(LexPrimitiveArray {
-                                    items: LexPrimitiveArrayItem::String(LexString {
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("slice")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("collections"),
+                                    LexXrpcParametersProperty::Array(LexPrimitiveArray {
+                                        items: LexPrimitiveArrayItem::String(LexString {
+                                            ..Default::default()
+                                        }),
                                         ..Default::default()
                                     }),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("externalCollections"),
-                                LexXrpcParametersProperty::Array(LexPrimitiveArray {
-                                    items: LexPrimitiveArrayItem::String(LexString {
+                                );
+                                map.insert(
+                                    SmolStr::new_static("externalCollections"),
+                                    LexXrpcParametersProperty::Array(LexPrimitiveArray {
+                                        items: LexPrimitiveArrayItem::String(LexString {
+                                            ..Default::default()
+                                        }),
                                         ..Default::default()
                                     }),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("repos"),
-                                LexXrpcParametersProperty::Array(LexPrimitiveArray {
-                                    items: LexPrimitiveArrayItem::String(LexString {
+                                );
+                                map.insert(
+                                    SmolStr::new_static("repos"),
+                                    LexXrpcParametersProperty::Array(LexPrimitiveArray {
+                                        items: LexPrimitiveArrayItem::String(LexString {
+                                            ..Default::default()
+                                        }),
                                         ..Default::default()
                                     }),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("slice"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "URI of the slice to sync",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("slice"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("URI of the slice to sync"),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -381,7 +403,7 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> LexiconDoc<'static> {
 
 pub mod get_sync_summary_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -412,21 +434,31 @@ pub mod get_sync_summary_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetSyncSummaryBuilder<S: BosStr, St: get_sync_summary_state::State> {
+pub struct GetSyncSummaryBuilder<
+    St: get_sync_summary_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<S>>, Option<Vec<S>>, Option<Vec<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetSyncSummary<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetSyncSummaryBuilder<S, get_sync_summary_state::Empty> {
+impl GetSyncSummary<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetSyncSummaryBuilder<get_sync_summary_state::Empty, DefaultStr> {
         GetSyncSummaryBuilder::new()
     }
 }
 
-impl<S: BosStr> GetSyncSummaryBuilder<S, get_sync_summary_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetSyncSummary<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetSyncSummaryBuilder<get_sync_summary_state::Empty, S> {
+        GetSyncSummaryBuilder::builder()
+    }
+}
+
+impl GetSyncSummaryBuilder<get_sync_summary_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetSyncSummaryBuilder {
             _state: PhantomData,
@@ -436,7 +468,18 @@ impl<S: BosStr> GetSyncSummaryBuilder<S, get_sync_summary_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_sync_summary_state::State> GetSyncSummaryBuilder<S, St> {
+impl<S: BosStr> GetSyncSummaryBuilder<get_sync_summary_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetSyncSummaryBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_sync_summary_state::State, S: BosStr> GetSyncSummaryBuilder<St, S> {
     /// Set the `collections` field (optional)
     pub fn collections(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -449,7 +492,7 @@ impl<S: BosStr, St: get_sync_summary_state::State> GetSyncSummaryBuilder<S, St> 
     }
 }
 
-impl<S: BosStr, St: get_sync_summary_state::State> GetSyncSummaryBuilder<S, St> {
+impl<St: get_sync_summary_state::State, S: BosStr> GetSyncSummaryBuilder<St, S> {
     /// Set the `externalCollections` field (optional)
     pub fn external_collections(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -462,7 +505,7 @@ impl<S: BosStr, St: get_sync_summary_state::State> GetSyncSummaryBuilder<S, St> 
     }
 }
 
-impl<S: BosStr, St: get_sync_summary_state::State> GetSyncSummaryBuilder<S, St> {
+impl<St: get_sync_summary_state::State, S: BosStr> GetSyncSummaryBuilder<St, S> {
     /// Set the `repos` field (optional)
     pub fn repos(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -475,7 +518,7 @@ impl<S: BosStr, St: get_sync_summary_state::State> GetSyncSummaryBuilder<S, St> 
     }
 }
 
-impl<S: BosStr, St> GetSyncSummaryBuilder<S, St>
+impl<St, S: BosStr> GetSyncSummaryBuilder<St, S>
 where
     St: get_sync_summary_state::State,
     St::Slice: get_sync_summary_state::IsUnset,
@@ -484,7 +527,7 @@ where
     pub fn slice(
         mut self,
         value: impl Into<S>,
-    ) -> GetSyncSummaryBuilder<S, get_sync_summary_state::SetSlice<St>> {
+    ) -> GetSyncSummaryBuilder<get_sync_summary_state::SetSlice<St>, S> {
         self._fields.3 = Option::Some(value.into());
         GetSyncSummaryBuilder {
             _state: PhantomData,
@@ -494,7 +537,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetSyncSummaryBuilder<S, St>
+impl<St, S: BosStr> GetSyncSummaryBuilder<St, S>
 where
     St: get_sync_summary_state::State,
     St::Slice: get_sync_summary_state::IsSet,

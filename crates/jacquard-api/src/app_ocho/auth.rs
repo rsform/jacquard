@@ -14,12 +14,13 @@ pub mod update_email;
 pub mod update_handle;
 pub mod whoami;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,13 +33,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AuthCallback<S: BosStr = DefaultStr> {
     pub access_jwt: S,
     pub did: Did<S>,
@@ -65,7 +63,7 @@ impl<S: BosStr> LexiconSchema for AuthCallback<S> {
 
 pub mod auth_callback_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -74,85 +72,92 @@ pub mod auth_callback_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type RefreshJwt;
+        type AccessJwt;
         type Did;
         type Handle;
-        type AccessJwt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type RefreshJwt = Unset;
+        type AccessJwt = Unset;
         type Did = Unset;
         type Handle = Unset;
-        type AccessJwt = Unset;
     }
     ///State transition - sets the `refresh_jwt` field to Set
     pub struct SetRefreshJwt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRefreshJwt<St> {}
     impl<St: State> State for SetRefreshJwt<St> {
         type RefreshJwt = Set<members::refresh_jwt>;
+        type AccessJwt = St::AccessJwt;
         type Did = St::Did;
         type Handle = St::Handle;
-        type AccessJwt = St::AccessJwt;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type RefreshJwt = St::RefreshJwt;
-        type Did = Set<members::did>;
-        type Handle = St::Handle;
-        type AccessJwt = St::AccessJwt;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHandle<St> {}
-    impl<St: State> State for SetHandle<St> {
-        type RefreshJwt = St::RefreshJwt;
-        type Did = St::Did;
-        type Handle = Set<members::handle>;
-        type AccessJwt = St::AccessJwt;
     }
     ///State transition - sets the `access_jwt` field to Set
     pub struct SetAccessJwt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAccessJwt<St> {}
     impl<St: State> State for SetAccessJwt<St> {
         type RefreshJwt = St::RefreshJwt;
+        type AccessJwt = Set<members::access_jwt>;
         type Did = St::Did;
         type Handle = St::Handle;
-        type AccessJwt = Set<members::access_jwt>;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type RefreshJwt = St::RefreshJwt;
+        type AccessJwt = St::AccessJwt;
+        type Did = Set<members::did>;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type RefreshJwt = St::RefreshJwt;
+        type AccessJwt = St::AccessJwt;
+        type Did = St::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `refresh_jwt` field
         pub struct refresh_jwt(());
+        ///Marker type for the `access_jwt` field
+        pub struct access_jwt(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
-        ///Marker type for the `access_jwt` field
-        pub struct access_jwt(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AuthCallbackBuilder<S: BosStr, St: auth_callback_state::State> {
+pub struct AuthCallbackBuilder<St: auth_callback_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> AuthCallback<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AuthCallbackBuilder<S, auth_callback_state::Empty> {
+impl AuthCallback<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AuthCallbackBuilder<auth_callback_state::Empty, DefaultStr> {
         AuthCallbackBuilder::new()
     }
 }
 
-impl<S: BosStr> AuthCallbackBuilder<S, auth_callback_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> AuthCallback<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AuthCallbackBuilder<auth_callback_state::Empty, S> {
+        AuthCallbackBuilder::builder()
+    }
+}
+
+impl AuthCallbackBuilder<auth_callback_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AuthCallbackBuilder {
             _state: PhantomData,
@@ -162,7 +167,18 @@ impl<S: BosStr> AuthCallbackBuilder<S, auth_callback_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AuthCallbackBuilder<S, St>
+impl<S: BosStr> AuthCallbackBuilder<auth_callback_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AuthCallbackBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AuthCallbackBuilder<St, S>
 where
     St: auth_callback_state::State,
     St::AccessJwt: auth_callback_state::IsUnset,
@@ -171,7 +187,7 @@ where
     pub fn access_jwt(
         mut self,
         value: impl Into<S>,
-    ) -> AuthCallbackBuilder<S, auth_callback_state::SetAccessJwt<St>> {
+    ) -> AuthCallbackBuilder<auth_callback_state::SetAccessJwt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AuthCallbackBuilder {
             _state: PhantomData,
@@ -181,7 +197,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AuthCallbackBuilder<S, St>
+impl<St, S: BosStr> AuthCallbackBuilder<St, S>
 where
     St: auth_callback_state::State,
     St::Did: auth_callback_state::IsUnset,
@@ -190,7 +206,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> AuthCallbackBuilder<S, auth_callback_state::SetDid<St>> {
+    ) -> AuthCallbackBuilder<auth_callback_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AuthCallbackBuilder {
             _state: PhantomData,
@@ -200,7 +216,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AuthCallbackBuilder<S, St>
+impl<St, S: BosStr> AuthCallbackBuilder<St, S>
 where
     St: auth_callback_state::State,
     St::Handle: auth_callback_state::IsUnset,
@@ -209,7 +225,7 @@ where
     pub fn handle(
         mut self,
         value: impl Into<S>,
-    ) -> AuthCallbackBuilder<S, auth_callback_state::SetHandle<St>> {
+    ) -> AuthCallbackBuilder<auth_callback_state::SetHandle<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AuthCallbackBuilder {
             _state: PhantomData,
@@ -219,7 +235,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AuthCallbackBuilder<S, St>
+impl<St, S: BosStr> AuthCallbackBuilder<St, S>
 where
     St: auth_callback_state::State,
     St::RefreshJwt: auth_callback_state::IsUnset,
@@ -228,7 +244,7 @@ where
     pub fn refresh_jwt(
         mut self,
         value: impl Into<S>,
-    ) -> AuthCallbackBuilder<S, auth_callback_state::SetRefreshJwt<St>> {
+    ) -> AuthCallbackBuilder<auth_callback_state::SetRefreshJwt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         AuthCallbackBuilder {
             _state: PhantomData,
@@ -238,13 +254,13 @@ where
     }
 }
 
-impl<S: BosStr, St> AuthCallbackBuilder<S, St>
+impl<St, S: BosStr> AuthCallbackBuilder<St, S>
 where
     St: auth_callback_state::State,
     St::RefreshJwt: auth_callback_state::IsSet,
+    St::AccessJwt: auth_callback_state::IsSet,
     St::Did: auth_callback_state::IsSet,
     St::Handle: auth_callback_state::IsSet,
-    St::AccessJwt: auth_callback_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AuthCallback<S> {
@@ -257,7 +273,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AuthCallback<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AuthCallback<S> {
         AuthCallback {
             access_jwt: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -269,10 +288,10 @@ where
 }
 
 fn lexicon_doc_app_ocho_auth_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.ocho.auth.defs"),
@@ -281,20 +300,19 @@ fn lexicon_doc_app_ocho_auth_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("authCallback"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("refreshJwt"),
-                        SmolStr::new_static("accessJwt"),
-                        SmolStr::new_static("handle"),
-                        SmolStr::new_static("did"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("refreshJwt"),
+                            SmolStr::new_static("accessJwt"),
+                            SmolStr::new_static("handle"), SmolStr::new_static("did")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("accessJwt"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("did"),
@@ -305,15 +323,11 @@ fn lexicon_doc_app_ocho_auth_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("handle"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("refreshJwt"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },

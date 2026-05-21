@@ -10,23 +10,21 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTag<S: BosStr = DefaultStr> {
     pub repo: AtUri<S>,
     pub tag: S,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -34,9 +32,18 @@ pub struct GetTagOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetTagError {
     /// Repository not found or access denied
@@ -50,10 +57,7 @@ pub enum GetTagError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetTagError {
@@ -136,7 +140,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetTagRequest {
 
 pub mod get_tag_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -144,56 +148,63 @@ pub mod get_tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tag;
         type Repo;
+        type Tag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tag = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTag<St> {}
-    impl<St: State> State for SetTag<St> {
-        type Tag = Set<members::tag>;
-        type Repo = St::Repo;
+        type Tag = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
-        type Tag = St::Tag;
         type Repo = Set<members::repo>;
+        type Tag = St::Tag;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTag<St> {}
+    impl<St: State> State for SetTag<St> {
+        type Repo = St::Repo;
+        type Tag = Set<members::tag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tag` field
-        pub struct tag(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetTagBuilder<S: BosStr, St: get_tag_state::State> {
+pub struct GetTagBuilder<St: get_tag_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetTag<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetTagBuilder<S, get_tag_state::Empty> {
+impl GetTag<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetTagBuilder<get_tag_state::Empty, DefaultStr> {
         GetTagBuilder::new()
     }
 }
 
-impl<S: BosStr> GetTagBuilder<S, get_tag_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetTag<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetTagBuilder<get_tag_state::Empty, S> {
+        GetTagBuilder::builder()
+    }
+}
+
+impl GetTagBuilder<get_tag_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetTagBuilder {
             _state: PhantomData,
@@ -203,7 +214,18 @@ impl<S: BosStr> GetTagBuilder<S, get_tag_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetTagBuilder<S, St>
+impl<S: BosStr> GetTagBuilder<get_tag_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetTagBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetTagBuilder<St, S>
 where
     St: get_tag_state::State,
     St::Repo: get_tag_state::IsUnset,
@@ -212,7 +234,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetTagBuilder<S, get_tag_state::SetRepo<St>> {
+    ) -> GetTagBuilder<get_tag_state::SetRepo<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetTagBuilder {
             _state: PhantomData,
@@ -222,13 +244,16 @@ where
     }
 }
 
-impl<S: BosStr, St> GetTagBuilder<S, St>
+impl<St, S: BosStr> GetTagBuilder<St, S>
 where
     St: get_tag_state::State,
     St::Tag: get_tag_state::IsUnset,
 {
     /// Set the `tag` field (required)
-    pub fn tag(mut self, value: impl Into<S>) -> GetTagBuilder<S, get_tag_state::SetTag<St>> {
+    pub fn tag(
+        mut self,
+        value: impl Into<S>,
+    ) -> GetTagBuilder<get_tag_state::SetTag<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetTagBuilder {
             _state: PhantomData,
@@ -238,11 +263,11 @@ where
     }
 }
 
-impl<S: BosStr, St> GetTagBuilder<S, St>
+impl<St, S: BosStr> GetTagBuilder<St, S>
 where
     St: get_tag_state::State,
-    St::Tag: get_tag_state::IsSet,
     St::Repo: get_tag_state::IsSet,
+    St::Tag: get_tag_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GetTag<S> {

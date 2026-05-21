@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A user's Goals Garden profile record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -104,7 +104,7 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -135,21 +135,28 @@ pub mod profile_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
+pub struct ProfileBuilder<St: profile_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Profile<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProfileBuilder<S, profile_state::Empty> {
+impl Profile<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProfileBuilder<profile_state::Empty, DefaultStr> {
         ProfileBuilder::new()
     }
 }
 
-impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Profile<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProfileBuilder<profile_state::Empty, S> {
+        ProfileBuilder::builder()
+    }
+}
+
+impl ProfileBuilder<profile_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
@@ -159,7 +166,18 @@ impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProfileBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::JoinedAt: profile_state::IsUnset,
@@ -168,7 +186,7 @@ where
     pub fn joined_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ProfileBuilder<S, profile_state::SetJoinedAt<St>> {
+    ) -> ProfileBuilder<profile_state::SetJoinedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -178,7 +196,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::JoinedAt: profile_state::IsSet,
@@ -200,10 +218,10 @@ where
 }
 
 fn lexicon_doc_garden_goals_profile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.goals.profile"),
@@ -212,7 +230,9 @@ fn lexicon_doc_garden_goals_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A user's Goals Garden profile record.")),
+                    description: Some(
+                        CowStr::new_static("A user's Goals Garden profile record."),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("joinedAt")]),
@@ -222,9 +242,11 @@ fn lexicon_doc_garden_goals_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("joinedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the user joined Goals Garden",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp when the user joined Goals Garden",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

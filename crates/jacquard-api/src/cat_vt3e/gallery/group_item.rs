@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// defines an item in a gallery group
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -109,7 +109,7 @@ impl<S: BosStr> LexiconSchema for GroupItem<S> {
 
 pub mod group_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -117,75 +117,77 @@ pub mod group_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AddedAt;
         type Group;
+        type AddedAt;
         type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AddedAt = Unset;
         type Group = Unset;
+        type AddedAt = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAddedAt<St> {}
-    impl<St: State> State for SetAddedAt<St> {
-        type AddedAt = Set<members::added_at>;
-        type Group = St::Group;
-        type Image = St::Image;
     }
     ///State transition - sets the `group` field to Set
     pub struct SetGroup<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGroup<St> {}
     impl<St: State> State for SetGroup<St> {
-        type AddedAt = St::AddedAt;
         type Group = Set<members::group>;
+        type AddedAt = St::AddedAt;
+        type Image = St::Image;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddedAt<St> {}
+    impl<St: State> State for SetAddedAt<St> {
+        type Group = St::Group;
+        type AddedAt = Set<members::added_at>;
         type Image = St::Image;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetImage<St> {}
     impl<St: State> State for SetImage<St> {
-        type AddedAt = St::AddedAt;
         type Group = St::Group;
+        type AddedAt = St::AddedAt;
         type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
         ///Marker type for the `group` field
         pub struct group(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
         ///Marker type for the `image` field
         pub struct image(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GroupItemBuilder<S: BosStr, St: group_item_state::State> {
+pub struct GroupItemBuilder<St: group_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<AtUri<S>>,
-        Option<AtUri<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<Datetime>, Option<AtUri<S>>, Option<AtUri<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GroupItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GroupItemBuilder<S, group_item_state::Empty> {
+impl GroupItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GroupItemBuilder<group_item_state::Empty, DefaultStr> {
         GroupItemBuilder::new()
     }
 }
 
-impl<S: BosStr> GroupItemBuilder<S, group_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GroupItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GroupItemBuilder<group_item_state::Empty, S> {
+        GroupItemBuilder::builder()
+    }
+}
+
+impl GroupItemBuilder<group_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GroupItemBuilder {
             _state: PhantomData,
@@ -195,7 +197,18 @@ impl<S: BosStr> GroupItemBuilder<S, group_item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GroupItemBuilder<S, St>
+impl<S: BosStr> GroupItemBuilder<group_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GroupItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GroupItemBuilder<St, S>
 where
     St: group_item_state::State,
     St::AddedAt: group_item_state::IsUnset,
@@ -204,7 +217,7 @@ where
     pub fn added_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GroupItemBuilder<S, group_item_state::SetAddedAt<St>> {
+    ) -> GroupItemBuilder<group_item_state::SetAddedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GroupItemBuilder {
             _state: PhantomData,
@@ -214,7 +227,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GroupItemBuilder<S, St>
+impl<St, S: BosStr> GroupItemBuilder<St, S>
 where
     St: group_item_state::State,
     St::Group: group_item_state::IsUnset,
@@ -223,7 +236,7 @@ where
     pub fn group(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GroupItemBuilder<S, group_item_state::SetGroup<St>> {
+    ) -> GroupItemBuilder<group_item_state::SetGroup<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GroupItemBuilder {
             _state: PhantomData,
@@ -233,7 +246,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GroupItemBuilder<S, St>
+impl<St, S: BosStr> GroupItemBuilder<St, S>
 where
     St: group_item_state::State,
     St::Image: group_item_state::IsUnset,
@@ -242,7 +255,7 @@ where
     pub fn image(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GroupItemBuilder<S, group_item_state::SetImage<St>> {
+    ) -> GroupItemBuilder<group_item_state::SetImage<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GroupItemBuilder {
             _state: PhantomData,
@@ -252,7 +265,7 @@ where
     }
 }
 
-impl<S: BosStr, St: group_item_state::State> GroupItemBuilder<S, St> {
+impl<St: group_item_state::State, S: BosStr> GroupItemBuilder<St, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -265,11 +278,11 @@ impl<S: BosStr, St: group_item_state::State> GroupItemBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GroupItemBuilder<S, St>
+impl<St, S: BosStr> GroupItemBuilder<St, S>
 where
     St: group_item_state::State,
-    St::AddedAt: group_item_state::IsSet,
     St::Group: group_item_state::IsSet,
+    St::AddedAt: group_item_state::IsSet,
     St::Image: group_item_state::IsSet,
 {
     /// Build the final struct.
@@ -283,7 +296,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GroupItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GroupItem<S> {
         GroupItem {
             added_at: self._fields.0.unwrap(),
             group: self._fields.1.unwrap(),
@@ -295,10 +311,10 @@ where
 }
 
 fn lexicon_doc_cat_vt3e_gallery_groupItem() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("cat.vt3e.gallery.groupItem"),
@@ -307,14 +323,17 @@ fn lexicon_doc_cat_vt3e_gallery_groupItem() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("defines an item in a gallery group")),
+                    description: Some(
+                        CowStr::new_static("defines an item in a gallery group"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("group"),
-                            SmolStr::new_static("image"),
-                            SmolStr::new_static("addedAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("group"), SmolStr::new_static("image"),
+                                SmolStr::new_static("addedAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -328,9 +347,11 @@ fn lexicon_doc_cat_vt3e_gallery_groupItem() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("group"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "uri of the group that the image belongs to",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "uri of the group that the image belongs to",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -338,9 +359,11 @@ fn lexicon_doc_cat_vt3e_gallery_groupItem() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("image"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "uri of the image that this item represents",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "uri of the image that this item represents",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

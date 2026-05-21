@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A collection of flashcards and sources.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -272,7 +272,7 @@ impl<S: BosStr> LexiconSchema for Deck<S> {
 
 pub mod deck_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -315,7 +315,7 @@ pub mod deck_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeckBuilder<S: BosStr, St: deck_state::State> {
+pub struct DeckBuilder<St: deck_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<AtUri<S>>>,
@@ -332,15 +332,22 @@ pub struct DeckBuilder<S: BosStr, St: deck_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Deck<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DeckBuilder<S, deck_state::Empty> {
+impl Deck<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DeckBuilder<deck_state::Empty, DefaultStr> {
         DeckBuilder::new()
     }
 }
 
-impl<S: BosStr> DeckBuilder<S, deck_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Deck<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DeckBuilder<deck_state::Empty, S> {
+        DeckBuilder::builder()
+    }
+}
+
+impl DeckBuilder<deck_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DeckBuilder {
             _state: PhantomData,
@@ -350,7 +357,18 @@ impl<S: BosStr> DeckBuilder<S, deck_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
+impl<S: BosStr> DeckBuilder<deck_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DeckBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: deck_state::State, S: BosStr> DeckBuilder<St, S> {
     /// Set the `cardRefs` field (optional)
     pub fn card_refs(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -363,7 +381,7 @@ impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DeckBuilder<S, St>
+impl<St, S: BosStr> DeckBuilder<St, S>
 where
     St: deck_state::State,
     St::CreatedAt: deck_state::IsUnset,
@@ -372,7 +390,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DeckBuilder<S, deck_state::SetCreatedAt<St>> {
+    ) -> DeckBuilder<deck_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DeckBuilder {
             _state: PhantomData,
@@ -382,7 +400,7 @@ where
     }
 }
 
-impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
+impl<St: deck_state::State, S: BosStr> DeckBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -395,7 +413,7 @@ impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
+impl<St: deck_state::State, S: BosStr> DeckBuilder<St, S> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -408,7 +426,7 @@ impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
+impl<St: deck_state::State, S: BosStr> DeckBuilder<St, S> {
     /// Set the `license` field (optional)
     pub fn license(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -421,7 +439,7 @@ impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
+impl<St: deck_state::State, S: BosStr> DeckBuilder<St, S> {
     /// Set the `sourceRefs` field (optional)
     pub fn source_refs(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.5 = value.into();
@@ -434,7 +452,7 @@ impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
+impl<St: deck_state::State, S: BosStr> DeckBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -447,13 +465,16 @@ impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DeckBuilder<S, St>
+impl<St, S: BosStr> DeckBuilder<St, S>
 where
     St: deck_state::State,
     St::Title: deck_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> DeckBuilder<S, deck_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> DeckBuilder<deck_state::SetTitle<St>, S> {
         self._fields.7 = Option::Some(value.into());
         DeckBuilder {
             _state: PhantomData,
@@ -463,7 +484,7 @@ where
     }
 }
 
-impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
+impl<St: deck_state::State, S: BosStr> DeckBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.8 = value.into();
@@ -476,7 +497,7 @@ impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
+impl<St: deck_state::State, S: BosStr> DeckBuilder<St, S> {
     /// Set the `visibility` field (optional)
     pub fn visibility(mut self, value: impl Into<Option<DeckVisibility<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -489,7 +510,7 @@ impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DeckBuilder<S, St>
+impl<St, S: BosStr> DeckBuilder<St, S>
 where
     St: deck_state::State,
     St::Title: deck_state::IsSet,
@@ -530,10 +551,10 @@ where
 }
 
 fn lexicon_doc_org_stormlightlabs_malfestio_deck() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.stormlightlabs.malfestio.deck"),

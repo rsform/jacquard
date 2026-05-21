@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::artist::ArtistViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::artist::ArtistViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorArtists<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -38,11 +35,9 @@ pub struct GetActorArtists<S: BosStr = DefaultStr> {
     pub start_date: Option<Datetime>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorArtistsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artists: Option<Vec<ArtistViewBasic<S>>>,
@@ -76,7 +71,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorArtistsRequest {
 
 pub mod get_actor_artists_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -107,7 +102,10 @@ pub mod get_actor_artists_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetActorArtistsBuilder<S: BosStr, St: get_actor_artists_state::State> {
+pub struct GetActorArtistsBuilder<
+    St: get_actor_artists_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtIdentifier<S>>,
@@ -119,15 +117,22 @@ pub struct GetActorArtistsBuilder<S: BosStr, St: get_actor_artists_state::State>
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetActorArtists<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetActorArtistsBuilder<S, get_actor_artists_state::Empty> {
+impl GetActorArtists<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetActorArtistsBuilder<get_actor_artists_state::Empty, DefaultStr> {
         GetActorArtistsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetActorArtistsBuilder<S, get_actor_artists_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetActorArtists<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetActorArtistsBuilder<get_actor_artists_state::Empty, S> {
+        GetActorArtistsBuilder::builder()
+    }
+}
+
+impl GetActorArtistsBuilder<get_actor_artists_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetActorArtistsBuilder {
             _state: PhantomData,
@@ -137,7 +142,18 @@ impl<S: BosStr> GetActorArtistsBuilder<S, get_actor_artists_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetActorArtistsBuilder<S, St>
+impl<S: BosStr> GetActorArtistsBuilder<get_actor_artists_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetActorArtistsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetActorArtistsBuilder<St, S>
 where
     St: get_actor_artists_state::State,
     St::Did: get_actor_artists_state::IsUnset,
@@ -146,7 +162,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetActorArtistsBuilder<S, get_actor_artists_state::SetDid<St>> {
+    ) -> GetActorArtistsBuilder<get_actor_artists_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetActorArtistsBuilder {
             _state: PhantomData,
@@ -156,7 +172,7 @@ where
     }
 }
 
-impl<S: BosStr, St: get_actor_artists_state::State> GetActorArtistsBuilder<S, St> {
+impl<St: get_actor_artists_state::State, S: BosStr> GetActorArtistsBuilder<St, S> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -169,7 +185,7 @@ impl<S: BosStr, St: get_actor_artists_state::State> GetActorArtistsBuilder<S, St
     }
 }
 
-impl<S: BosStr, St: get_actor_artists_state::State> GetActorArtistsBuilder<S, St> {
+impl<St: get_actor_artists_state::State, S: BosStr> GetActorArtistsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -182,7 +198,7 @@ impl<S: BosStr, St: get_actor_artists_state::State> GetActorArtistsBuilder<S, St
     }
 }
 
-impl<S: BosStr, St: get_actor_artists_state::State> GetActorArtistsBuilder<S, St> {
+impl<St: get_actor_artists_state::State, S: BosStr> GetActorArtistsBuilder<St, S> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -195,7 +211,7 @@ impl<S: BosStr, St: get_actor_artists_state::State> GetActorArtistsBuilder<S, St
     }
 }
 
-impl<S: BosStr, St: get_actor_artists_state::State> GetActorArtistsBuilder<S, St> {
+impl<St: get_actor_artists_state::State, S: BosStr> GetActorArtistsBuilder<St, S> {
     /// Set the `startDate` field (optional)
     pub fn start_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -208,7 +224,7 @@ impl<S: BosStr, St: get_actor_artists_state::State> GetActorArtistsBuilder<S, St
     }
 }
 
-impl<S: BosStr, St> GetActorArtistsBuilder<S, St>
+impl<St, S: BosStr> GetActorArtistsBuilder<St, S>
 where
     St: get_actor_artists_state::State,
     St::Did: get_actor_artists_state::IsSet,

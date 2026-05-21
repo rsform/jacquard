@@ -8,6 +8,7 @@
 pub mod get_services;
 pub mod service;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -18,28 +19,25 @@ use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Nsid};
+use jacquard_common::types::string::{AtUri, Nsid, Cid, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileView;
-use crate::app_bsky::labeler;
 use crate::com_atproto::label::Label;
 use crate::com_atproto::label::LabelValue;
 use crate::com_atproto::label::LabelValueDefinition;
 use crate::com_atproto::moderation::ReasonType;
 use crate::com_atproto::moderation::SubjectType;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use crate::app_bsky::labeler;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LabelerPolicies<S: BosStr = DefaultStr> {
     ///Label values created by this labeler and scoped exclusively to it. Labels defined here will override global label definitions for this labeler.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,11 +48,9 @@ pub struct LabelerPolicies<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LabelerView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub creator: ProfileView<S>,
@@ -70,11 +66,9 @@ pub struct LabelerView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LabelerViewDetailed<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub creator: ProfileView<S>,
@@ -100,11 +94,9 @@ pub struct LabelerViewDetailed<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LabelerViewerState<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub like: Option<AtUri<S>>,
@@ -192,7 +184,7 @@ impl<S: BosStr> LexiconSchema for LabelerViewerState<S> {
 
 pub mod labeler_policies_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -223,24 +215,31 @@ pub mod labeler_policies_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LabelerPoliciesBuilder<S: BosStr, St: labeler_policies_state::State> {
+pub struct LabelerPoliciesBuilder<
+    St: labeler_policies_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Vec<LabelValueDefinition<S>>>,
-        Option<Vec<LabelValue<S>>>,
-    ),
+    _fields: (Option<Vec<LabelValueDefinition<S>>>, Option<Vec<LabelValue<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LabelerPolicies<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LabelerPoliciesBuilder<S, labeler_policies_state::Empty> {
+impl LabelerPolicies<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LabelerPoliciesBuilder<labeler_policies_state::Empty, DefaultStr> {
         LabelerPoliciesBuilder::new()
     }
 }
 
-impl<S: BosStr> LabelerPoliciesBuilder<S, labeler_policies_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LabelerPolicies<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LabelerPoliciesBuilder<labeler_policies_state::Empty, S> {
+        LabelerPoliciesBuilder::builder()
+    }
+}
+
+impl LabelerPoliciesBuilder<labeler_policies_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LabelerPoliciesBuilder {
             _state: PhantomData,
@@ -250,7 +249,18 @@ impl<S: BosStr> LabelerPoliciesBuilder<S, labeler_policies_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: labeler_policies_state::State> LabelerPoliciesBuilder<S, St> {
+impl<S: BosStr> LabelerPoliciesBuilder<labeler_policies_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LabelerPoliciesBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: labeler_policies_state::State, S: BosStr> LabelerPoliciesBuilder<St, S> {
     /// Set the `labelValueDefinitions` field (optional)
     pub fn label_value_definitions(
         mut self,
@@ -269,7 +279,7 @@ impl<S: BosStr, St: labeler_policies_state::State> LabelerPoliciesBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St> LabelerPoliciesBuilder<S, St>
+impl<St, S: BosStr> LabelerPoliciesBuilder<St, S>
 where
     St: labeler_policies_state::State,
     St::LabelValues: labeler_policies_state::IsUnset,
@@ -278,7 +288,7 @@ where
     pub fn label_values(
         mut self,
         value: impl Into<Vec<LabelValue<S>>>,
-    ) -> LabelerPoliciesBuilder<S, labeler_policies_state::SetLabelValues<St>> {
+    ) -> LabelerPoliciesBuilder<labeler_policies_state::SetLabelValues<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LabelerPoliciesBuilder {
             _state: PhantomData,
@@ -288,7 +298,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LabelerPoliciesBuilder<S, St>
+impl<St, S: BosStr> LabelerPoliciesBuilder<St, S>
 where
     St: labeler_policies_state::State,
     St::LabelValues: labeler_policies_state::IsSet,
@@ -302,7 +312,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LabelerPolicies<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LabelerPolicies<S> {
         LabelerPolicies {
             label_value_definitions: self._fields.0,
             label_values: self._fields.1.unwrap(),
@@ -312,10 +325,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_labeler_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.labeler.defs"),
@@ -370,12 +383,13 @@ fn lexicon_doc_app_bsky_labeler_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("labelerView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("creator"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("creator"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -389,7 +403,9 @@ fn lexicon_doc_app_bsky_labeler_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("creator"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileView"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#profileView",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -593,7 +609,7 @@ fn lexicon_doc_app_bsky_labeler_defs() -> LexiconDoc<'static> {
 
 pub mod labeler_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -601,72 +617,72 @@ pub mod labeler_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type IndexedAt;
         type Creator;
+        type Uri;
         type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type IndexedAt = Unset;
         type Creator = Unset;
+        type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type IndexedAt = St::IndexedAt;
-        type Creator = St::Creator;
-        type Cid = St::Cid;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
     impl<St: State> State for SetIndexedAt<St> {
-        type Uri = St::Uri;
         type IndexedAt = Set<members::indexed_at>;
         type Creator = St::Creator;
+        type Uri = St::Uri;
         type Cid = St::Cid;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreator<St> {}
     impl<St: State> State for SetCreator<St> {
-        type Uri = St::Uri;
         type IndexedAt = St::IndexedAt;
         type Creator = Set<members::creator>;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type IndexedAt = St::IndexedAt;
+        type Creator = St::Creator;
+        type Uri = Set<members::uri>;
         type Cid = St::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
         type IndexedAt = St::IndexedAt;
         type Creator = St::Creator;
+        type Uri = St::Uri;
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
         ///Marker type for the `creator` field
         pub struct creator(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LabelerViewBuilder<S: BosStr, St: labeler_view_state::State> {
+pub struct LabelerViewBuilder<St: labeler_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
@@ -680,15 +696,22 @@ pub struct LabelerViewBuilder<S: BosStr, St: labeler_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LabelerView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LabelerViewBuilder<S, labeler_view_state::Empty> {
+impl LabelerView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LabelerViewBuilder<labeler_view_state::Empty, DefaultStr> {
         LabelerViewBuilder::new()
     }
 }
 
-impl<S: BosStr> LabelerViewBuilder<S, labeler_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LabelerView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LabelerViewBuilder<labeler_view_state::Empty, S> {
+        LabelerViewBuilder::builder()
+    }
+}
+
+impl LabelerViewBuilder<labeler_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LabelerViewBuilder {
             _state: PhantomData,
@@ -698,7 +721,18 @@ impl<S: BosStr> LabelerViewBuilder<S, labeler_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LabelerViewBuilder<S, St>
+impl<S: BosStr> LabelerViewBuilder<labeler_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LabelerViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LabelerViewBuilder<St, S>
 where
     St: labeler_view_state::State,
     St::Cid: labeler_view_state::IsUnset,
@@ -707,7 +741,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> LabelerViewBuilder<S, labeler_view_state::SetCid<St>> {
+    ) -> LabelerViewBuilder<labeler_view_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LabelerViewBuilder {
             _state: PhantomData,
@@ -717,7 +751,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LabelerViewBuilder<S, St>
+impl<St, S: BosStr> LabelerViewBuilder<St, S>
 where
     St: labeler_view_state::State,
     St::Creator: labeler_view_state::IsUnset,
@@ -726,7 +760,7 @@ where
     pub fn creator(
         mut self,
         value: impl Into<ProfileView<S>>,
-    ) -> LabelerViewBuilder<S, labeler_view_state::SetCreator<St>> {
+    ) -> LabelerViewBuilder<labeler_view_state::SetCreator<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LabelerViewBuilder {
             _state: PhantomData,
@@ -736,7 +770,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LabelerViewBuilder<S, St>
+impl<St, S: BosStr> LabelerViewBuilder<St, S>
 where
     St: labeler_view_state::State,
     St::IndexedAt: labeler_view_state::IsUnset,
@@ -745,7 +779,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LabelerViewBuilder<S, labeler_view_state::SetIndexedAt<St>> {
+    ) -> LabelerViewBuilder<labeler_view_state::SetIndexedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LabelerViewBuilder {
             _state: PhantomData,
@@ -755,7 +789,7 @@ where
     }
 }
 
-impl<S: BosStr, St: labeler_view_state::State> LabelerViewBuilder<S, St> {
+impl<St: labeler_view_state::State, S: BosStr> LabelerViewBuilder<St, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -768,7 +802,7 @@ impl<S: BosStr, St: labeler_view_state::State> LabelerViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: labeler_view_state::State> LabelerViewBuilder<S, St> {
+impl<St: labeler_view_state::State, S: BosStr> LabelerViewBuilder<St, S> {
     /// Set the `likeCount` field (optional)
     pub fn like_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -781,7 +815,7 @@ impl<S: BosStr, St: labeler_view_state::State> LabelerViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LabelerViewBuilder<S, St>
+impl<St, S: BosStr> LabelerViewBuilder<St, S>
 where
     St: labeler_view_state::State,
     St::Uri: labeler_view_state::IsUnset,
@@ -790,7 +824,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> LabelerViewBuilder<S, labeler_view_state::SetUri<St>> {
+    ) -> LabelerViewBuilder<labeler_view_state::SetUri<St>, S> {
         self._fields.5 = Option::Some(value.into());
         LabelerViewBuilder {
             _state: PhantomData,
@@ -800,25 +834,31 @@ where
     }
 }
 
-impl<S: BosStr, St: labeler_view_state::State> LabelerViewBuilder<S, St> {
+impl<St: labeler_view_state::State, S: BosStr> LabelerViewBuilder<St, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(mut self, value: impl Into<Option<labeler::LabelerViewerState<S>>>) -> Self {
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<labeler::LabelerViewerState<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<labeler::LabelerViewerState<S>>) -> Self {
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<labeler::LabelerViewerState<S>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
 }
 
-impl<S: BosStr, St> LabelerViewBuilder<S, St>
+impl<St, S: BosStr> LabelerViewBuilder<St, S>
 where
     St: labeler_view_state::State,
-    St::Uri: labeler_view_state::IsSet,
     St::IndexedAt: labeler_view_state::IsSet,
     St::Creator: labeler_view_state::IsSet,
+    St::Uri: labeler_view_state::IsSet,
     St::Cid: labeler_view_state::IsSet,
 {
     /// Build the final struct.
@@ -835,7 +875,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LabelerView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LabelerView<S> {
         LabelerView {
             cid: self._fields.0.unwrap(),
             creator: self._fields.1.unwrap(),
@@ -851,7 +894,7 @@ where
 
 pub mod labeler_view_detailed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -859,90 +902,93 @@ pub mod labeler_view_detailed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type IndexedAt;
+        type Creator;
         type Policies;
         type Uri;
         type Cid;
-        type Creator;
-        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type IndexedAt = Unset;
+        type Creator = Unset;
         type Policies = Unset;
         type Uri = Unset;
         type Cid = Unset;
-        type Creator = Unset;
-        type IndexedAt = Unset;
-    }
-    ///State transition - sets the `policies` field to Set
-    pub struct SetPolicies<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPolicies<St> {}
-    impl<St: State> State for SetPolicies<St> {
-        type Policies = Set<members::policies>;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-        type Creator = St::Creator;
-        type IndexedAt = St::IndexedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Policies = St::Policies;
-        type Uri = Set<members::uri>;
-        type Cid = St::Cid;
-        type Creator = St::Creator;
-        type IndexedAt = St::IndexedAt;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Policies = St::Policies;
-        type Uri = St::Uri;
-        type Cid = Set<members::cid>;
-        type Creator = St::Creator;
-        type IndexedAt = St::IndexedAt;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreator<St> {}
-    impl<St: State> State for SetCreator<St> {
-        type Policies = St::Policies;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-        type Creator = Set<members::creator>;
-        type IndexedAt = St::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
     impl<St: State> State for SetIndexedAt<St> {
+        type IndexedAt = Set<members::indexed_at>;
+        type Creator = St::Creator;
         type Policies = St::Policies;
         type Uri = St::Uri;
         type Cid = St::Cid;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreator<St> {}
+    impl<St: State> State for SetCreator<St> {
+        type IndexedAt = St::IndexedAt;
+        type Creator = Set<members::creator>;
+        type Policies = St::Policies;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `policies` field to Set
+    pub struct SetPolicies<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPolicies<St> {}
+    impl<St: State> State for SetPolicies<St> {
+        type IndexedAt = St::IndexedAt;
         type Creator = St::Creator;
-        type IndexedAt = Set<members::indexed_at>;
+        type Policies = Set<members::policies>;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type IndexedAt = St::IndexedAt;
+        type Creator = St::Creator;
+        type Policies = St::Policies;
+        type Uri = Set<members::uri>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type IndexedAt = St::IndexedAt;
+        type Creator = St::Creator;
+        type Policies = St::Policies;
+        type Uri = St::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
         ///Marker type for the `policies` field
         pub struct policies(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `creator` field
-        pub struct creator(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LabelerViewDetailedBuilder<S: BosStr, St: labeler_view_detailed_state::State> {
+pub struct LabelerViewDetailedBuilder<
+    St: labeler_view_detailed_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
@@ -960,27 +1006,49 @@ pub struct LabelerViewDetailedBuilder<S: BosStr, St: labeler_view_detailed_state
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LabelerViewDetailed<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LabelerViewDetailedBuilder<S, labeler_view_detailed_state::Empty> {
+impl LabelerViewDetailed<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LabelerViewDetailedBuilder<
+        labeler_view_detailed_state::Empty,
+        DefaultStr,
+    > {
         LabelerViewDetailedBuilder::new()
     }
 }
 
-impl<S: BosStr> LabelerViewDetailedBuilder<S, labeler_view_detailed_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LabelerViewDetailed<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LabelerViewDetailedBuilder<
+        labeler_view_detailed_state::Empty,
+        S,
+    > {
+        LabelerViewDetailedBuilder::builder()
+    }
+}
+
+impl LabelerViewDetailedBuilder<labeler_view_detailed_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LabelerViewDetailedBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St> LabelerViewDetailedBuilder<S, St>
+impl<S: BosStr> LabelerViewDetailedBuilder<labeler_view_detailed_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LabelerViewDetailedBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LabelerViewDetailedBuilder<St, S>
 where
     St: labeler_view_detailed_state::State,
     St::Cid: labeler_view_detailed_state::IsUnset,
@@ -989,7 +1057,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> LabelerViewDetailedBuilder<S, labeler_view_detailed_state::SetCid<St>> {
+    ) -> LabelerViewDetailedBuilder<labeler_view_detailed_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LabelerViewDetailedBuilder {
             _state: PhantomData,
@@ -999,7 +1067,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LabelerViewDetailedBuilder<S, St>
+impl<St, S: BosStr> LabelerViewDetailedBuilder<St, S>
 where
     St: labeler_view_detailed_state::State,
     St::Creator: labeler_view_detailed_state::IsUnset,
@@ -1008,7 +1076,7 @@ where
     pub fn creator(
         mut self,
         value: impl Into<ProfileView<S>>,
-    ) -> LabelerViewDetailedBuilder<S, labeler_view_detailed_state::SetCreator<St>> {
+    ) -> LabelerViewDetailedBuilder<labeler_view_detailed_state::SetCreator<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LabelerViewDetailedBuilder {
             _state: PhantomData,
@@ -1018,7 +1086,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LabelerViewDetailedBuilder<S, St>
+impl<St, S: BosStr> LabelerViewDetailedBuilder<St, S>
 where
     St: labeler_view_detailed_state::State,
     St::IndexedAt: labeler_view_detailed_state::IsUnset,
@@ -1027,7 +1095,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LabelerViewDetailedBuilder<S, labeler_view_detailed_state::SetIndexedAt<St>> {
+    ) -> LabelerViewDetailedBuilder<labeler_view_detailed_state::SetIndexedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LabelerViewDetailedBuilder {
             _state: PhantomData,
@@ -1037,7 +1105,10 @@ where
     }
 }
 
-impl<S: BosStr, St: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<S, St> {
+impl<
+    St: labeler_view_detailed_state::State,
+    S: BosStr,
+> LabelerViewDetailedBuilder<St, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -1050,7 +1121,10 @@ impl<S: BosStr, St: labeler_view_detailed_state::State> LabelerViewDetailedBuild
     }
 }
 
-impl<S: BosStr, St: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<S, St> {
+impl<
+    St: labeler_view_detailed_state::State,
+    S: BosStr,
+> LabelerViewDetailedBuilder<St, S> {
     /// Set the `likeCount` field (optional)
     pub fn like_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -1063,7 +1137,7 @@ impl<S: BosStr, St: labeler_view_detailed_state::State> LabelerViewDetailedBuild
     }
 }
 
-impl<S: BosStr, St> LabelerViewDetailedBuilder<S, St>
+impl<St, S: BosStr> LabelerViewDetailedBuilder<St, S>
 where
     St: labeler_view_detailed_state::State,
     St::Policies: labeler_view_detailed_state::IsUnset,
@@ -1072,7 +1146,7 @@ where
     pub fn policies(
         mut self,
         value: impl Into<labeler::LabelerPolicies<S>>,
-    ) -> LabelerViewDetailedBuilder<S, labeler_view_detailed_state::SetPolicies<St>> {
+    ) -> LabelerViewDetailedBuilder<labeler_view_detailed_state::SetPolicies<St>, S> {
         self._fields.5 = Option::Some(value.into());
         LabelerViewDetailedBuilder {
             _state: PhantomData,
@@ -1082,7 +1156,10 @@ where
     }
 }
 
-impl<S: BosStr, St: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<S, St> {
+impl<
+    St: labeler_view_detailed_state::State,
+    S: BosStr,
+> LabelerViewDetailedBuilder<St, S> {
     /// Set the `reasonTypes` field (optional)
     pub fn reason_types(mut self, value: impl Into<Option<Vec<ReasonType<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -1095,9 +1172,15 @@ impl<S: BosStr, St: labeler_view_detailed_state::State> LabelerViewDetailedBuild
     }
 }
 
-impl<S: BosStr, St: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<S, St> {
+impl<
+    St: labeler_view_detailed_state::State,
+    S: BosStr,
+> LabelerViewDetailedBuilder<St, S> {
     /// Set the `subjectCollections` field (optional)
-    pub fn subject_collections(mut self, value: impl Into<Option<Vec<Nsid<S>>>>) -> Self {
+    pub fn subject_collections(
+        mut self,
+        value: impl Into<Option<Vec<Nsid<S>>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
@@ -1108,9 +1191,15 @@ impl<S: BosStr, St: labeler_view_detailed_state::State> LabelerViewDetailedBuild
     }
 }
 
-impl<S: BosStr, St: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<S, St> {
+impl<
+    St: labeler_view_detailed_state::State,
+    S: BosStr,
+> LabelerViewDetailedBuilder<St, S> {
     /// Set the `subjectTypes` field (optional)
-    pub fn subject_types(mut self, value: impl Into<Option<Vec<SubjectType<S>>>>) -> Self {
+    pub fn subject_types(
+        mut self,
+        value: impl Into<Option<Vec<SubjectType<S>>>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
@@ -1121,7 +1210,7 @@ impl<S: BosStr, St: labeler_view_detailed_state::State> LabelerViewDetailedBuild
     }
 }
 
-impl<S: BosStr, St> LabelerViewDetailedBuilder<S, St>
+impl<St, S: BosStr> LabelerViewDetailedBuilder<St, S>
 where
     St: labeler_view_detailed_state::State,
     St::Uri: labeler_view_detailed_state::IsUnset,
@@ -1130,7 +1219,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> LabelerViewDetailedBuilder<S, labeler_view_detailed_state::SetUri<St>> {
+    ) -> LabelerViewDetailedBuilder<labeler_view_detailed_state::SetUri<St>, S> {
         self._fields.9 = Option::Some(value.into());
         LabelerViewDetailedBuilder {
             _state: PhantomData,
@@ -1140,27 +1229,36 @@ where
     }
 }
 
-impl<S: BosStr, St: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<S, St> {
+impl<
+    St: labeler_view_detailed_state::State,
+    S: BosStr,
+> LabelerViewDetailedBuilder<St, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(mut self, value: impl Into<Option<labeler::LabelerViewerState<S>>>) -> Self {
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<labeler::LabelerViewerState<S>>>,
+    ) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<labeler::LabelerViewerState<S>>) -> Self {
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<labeler::LabelerViewerState<S>>,
+    ) -> Self {
         self._fields.10 = value;
         self
     }
 }
 
-impl<S: BosStr, St> LabelerViewDetailedBuilder<S, St>
+impl<St, S: BosStr> LabelerViewDetailedBuilder<St, S>
 where
     St: labeler_view_detailed_state::State,
+    St::IndexedAt: labeler_view_detailed_state::IsSet,
+    St::Creator: labeler_view_detailed_state::IsSet,
     St::Policies: labeler_view_detailed_state::IsSet,
     St::Uri: labeler_view_detailed_state::IsSet,
     St::Cid: labeler_view_detailed_state::IsSet,
-    St::Creator: labeler_view_detailed_state::IsSet,
-    St::IndexedAt: labeler_view_detailed_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LabelerViewDetailed<S> {
@@ -1180,7 +1278,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LabelerViewDetailed<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LabelerViewDetailed<S> {
         LabelerViewDetailed {
             cid: self._fields.0.unwrap(),
             creator: self._fields.1.unwrap(),

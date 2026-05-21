@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::place_stream::multistream::TargetView;
-use crate::place_stream::multistream::target::Target;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{RecordKey, Rkey};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::multistream::TargetView;
+use crate::place_stream::multistream::target::Target;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PutTarget<S: BosStr = DefaultStr> {
     pub multistream_target: Target<S>,
     ///The Record Key.
@@ -33,11 +30,9 @@ pub struct PutTarget<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PutTargetOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: TargetView<S>,
@@ -45,9 +40,18 @@ pub struct PutTargetOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum PutTargetError {
     /// The provided target URL is invalid or unreachable.
@@ -55,10 +59,7 @@ pub enum PutTargetError {
     InvalidTargetUrl(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for PutTargetError {
@@ -93,8 +94,9 @@ impl jacquard_common::xrpc::XrpcResp for PutTargetResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutTarget<S> {
     const NSID: &'static str = "place.stream.multistream.putTarget";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PutTargetResponse;
 }
 
@@ -102,15 +104,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutTarget<S> {
 pub struct PutTargetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutTargetRequest {
     const PATH: &'static str = "/xrpc/place.stream.multistream.putTarget";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = PutTarget<S>;
     type Response = PutTargetResponse;
 }
 
 pub mod put_target_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -141,21 +144,28 @@ pub mod put_target_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PutTargetBuilder<S: BosStr, St: put_target_state::State> {
+pub struct PutTargetBuilder<St: put_target_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Target<S>>, Option<RecordKey<Rkey<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PutTarget<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PutTargetBuilder<S, put_target_state::Empty> {
+impl PutTarget<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PutTargetBuilder<put_target_state::Empty, DefaultStr> {
         PutTargetBuilder::new()
     }
 }
 
-impl<S: BosStr> PutTargetBuilder<S, put_target_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PutTarget<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PutTargetBuilder<put_target_state::Empty, S> {
+        PutTargetBuilder::builder()
+    }
+}
+
+impl PutTargetBuilder<put_target_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PutTargetBuilder {
             _state: PhantomData,
@@ -165,7 +175,18 @@ impl<S: BosStr> PutTargetBuilder<S, put_target_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PutTargetBuilder<S, St>
+impl<S: BosStr> PutTargetBuilder<put_target_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PutTargetBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PutTargetBuilder<St, S>
 where
     St: put_target_state::State,
     St::MultistreamTarget: put_target_state::IsUnset,
@@ -174,7 +195,7 @@ where
     pub fn multistream_target(
         mut self,
         value: impl Into<Target<S>>,
-    ) -> PutTargetBuilder<S, put_target_state::SetMultistreamTarget<St>> {
+    ) -> PutTargetBuilder<put_target_state::SetMultistreamTarget<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PutTargetBuilder {
             _state: PhantomData,
@@ -184,7 +205,7 @@ where
     }
 }
 
-impl<S: BosStr, St: put_target_state::State> PutTargetBuilder<S, St> {
+impl<St: put_target_state::State, S: BosStr> PutTargetBuilder<St, S> {
     /// Set the `rkey` field (optional)
     pub fn rkey(mut self, value: impl Into<Option<RecordKey<Rkey<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -197,7 +218,7 @@ impl<S: BosStr, St: put_target_state::State> PutTargetBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PutTargetBuilder<S, St>
+impl<St, S: BosStr> PutTargetBuilder<St, S>
 where
     St: put_target_state::State,
     St::MultistreamTarget: put_target_state::IsSet,
@@ -211,7 +232,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PutTarget<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PutTarget<S> {
         PutTarget {
             multistream_target: self._fields.0.unwrap(),
             rkey: self._fields.1,

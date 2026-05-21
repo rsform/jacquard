@@ -8,29 +8,24 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::moderation::SubjectView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::SubjectView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSubjects<S: BosStr = DefaultStr> {
     pub subjects: Vec<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSubjectsOutput<S: BosStr = DefaultStr> {
     pub subjects: Vec<SubjectView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -63,7 +58,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSubjectsRequest {
 
 pub mod get_subjects_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -94,21 +89,28 @@ pub mod get_subjects_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetSubjectsBuilder<S: BosStr, St: get_subjects_state::State> {
+pub struct GetSubjectsBuilder<St: get_subjects_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetSubjects<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetSubjectsBuilder<S, get_subjects_state::Empty> {
+impl GetSubjects<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetSubjectsBuilder<get_subjects_state::Empty, DefaultStr> {
         GetSubjectsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetSubjectsBuilder<S, get_subjects_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetSubjects<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetSubjectsBuilder<get_subjects_state::Empty, S> {
+        GetSubjectsBuilder::builder()
+    }
+}
+
+impl GetSubjectsBuilder<get_subjects_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetSubjectsBuilder {
             _state: PhantomData,
@@ -118,7 +120,18 @@ impl<S: BosStr> GetSubjectsBuilder<S, get_subjects_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetSubjectsBuilder<S, St>
+impl<S: BosStr> GetSubjectsBuilder<get_subjects_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetSubjectsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetSubjectsBuilder<St, S>
 where
     St: get_subjects_state::State,
     St::Subjects: get_subjects_state::IsUnset,
@@ -127,7 +140,7 @@ where
     pub fn subjects(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> GetSubjectsBuilder<S, get_subjects_state::SetSubjects<St>> {
+    ) -> GetSubjectsBuilder<get_subjects_state::SetSubjects<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetSubjectsBuilder {
             _state: PhantomData,
@@ -137,7 +150,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetSubjectsBuilder<S, St>
+impl<St, S: BosStr> GetSubjectsBuilder<St, S>
 where
     St: get_subjects_state::State,
     St::Subjects: get_subjects_state::IsSet,

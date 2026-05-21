@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::EntryView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::EntryView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntry<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntryOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: EntryView<S>,
@@ -39,19 +34,25 @@ pub struct GetEntryOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetEntryError {
     #[serde(rename = "EntryNotFound")]
     EntryNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetEntryError {
@@ -101,7 +102,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetEntryRequest {
 
 pub mod get_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -132,21 +133,28 @@ pub mod get_entry_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetEntryBuilder<S: BosStr, St: get_entry_state::State> {
+pub struct GetEntryBuilder<St: get_entry_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetEntry<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetEntryBuilder<S, get_entry_state::Empty> {
+impl GetEntry<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetEntryBuilder<get_entry_state::Empty, DefaultStr> {
         GetEntryBuilder::new()
     }
 }
 
-impl<S: BosStr> GetEntryBuilder<S, get_entry_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetEntry<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetEntryBuilder<get_entry_state::Empty, S> {
+        GetEntryBuilder::builder()
+    }
+}
+
+impl GetEntryBuilder<get_entry_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetEntryBuilder {
             _state: PhantomData,
@@ -156,7 +164,18 @@ impl<S: BosStr> GetEntryBuilder<S, get_entry_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetEntryBuilder<S, St>
+impl<S: BosStr> GetEntryBuilder<get_entry_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetEntryBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetEntryBuilder<St, S>
 where
     St: get_entry_state::State,
     St::Uri: get_entry_state::IsUnset,
@@ -165,7 +184,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetEntryBuilder<S, get_entry_state::SetUri<St>> {
+    ) -> GetEntryBuilder<get_entry_state::SetUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetEntryBuilder {
             _state: PhantomData,
@@ -175,7 +194,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetEntryBuilder<S, St>
+impl<St, S: BosStr> GetEntryBuilder<St, S>
 where
     St: get_entry_state::State,
     St::Uri: get_entry_state::IsSet,

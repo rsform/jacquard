@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A post created in response to a request
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -133,7 +133,7 @@ impl<S: BosStr> LexiconSchema for RequestResponse<S> {
 
 pub mod request_response_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -190,26 +190,31 @@ pub mod request_response_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RequestResponseBuilder<S: BosStr, St: request_response_state::State> {
+pub struct RequestResponseBuilder<
+    St: request_response_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<S>,
-        Option<StrongRef<S>>,
-        Option<StrongRef<S>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<StrongRef<S>>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RequestResponse<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RequestResponseBuilder<S, request_response_state::Empty> {
+impl RequestResponse<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RequestResponseBuilder<request_response_state::Empty, DefaultStr> {
         RequestResponseBuilder::new()
     }
 }
 
-impl<S: BosStr> RequestResponseBuilder<S, request_response_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RequestResponse<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RequestResponseBuilder<request_response_state::Empty, S> {
+        RequestResponseBuilder::builder()
+    }
+}
+
+impl RequestResponseBuilder<request_response_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RequestResponseBuilder {
             _state: PhantomData,
@@ -219,7 +224,18 @@ impl<S: BosStr> RequestResponseBuilder<S, request_response_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RequestResponseBuilder<S, St>
+impl<S: BosStr> RequestResponseBuilder<request_response_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RequestResponseBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RequestResponseBuilder<St, S>
 where
     St: request_response_state::State,
     St::CreatedAt: request_response_state::IsUnset,
@@ -228,7 +244,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RequestResponseBuilder<S, request_response_state::SetCreatedAt<St>> {
+    ) -> RequestResponseBuilder<request_response_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RequestResponseBuilder {
             _state: PhantomData,
@@ -238,7 +254,7 @@ where
     }
 }
 
-impl<S: BosStr, St: request_response_state::State> RequestResponseBuilder<S, St> {
+impl<St: request_response_state::State, S: BosStr> RequestResponseBuilder<St, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -251,7 +267,7 @@ impl<S: BosStr, St: request_response_state::State> RequestResponseBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St> RequestResponseBuilder<S, St>
+impl<St, S: BosStr> RequestResponseBuilder<St, S>
 where
     St: request_response_state::State,
     St::Post: request_response_state::IsUnset,
@@ -260,7 +276,7 @@ where
     pub fn post(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> RequestResponseBuilder<S, request_response_state::SetPost<St>> {
+    ) -> RequestResponseBuilder<request_response_state::SetPost<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RequestResponseBuilder {
             _state: PhantomData,
@@ -270,7 +286,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RequestResponseBuilder<S, St>
+impl<St, S: BosStr> RequestResponseBuilder<St, S>
 where
     St: request_response_state::State,
     St::Request: request_response_state::IsUnset,
@@ -279,7 +295,7 @@ where
     pub fn request(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> RequestResponseBuilder<S, request_response_state::SetRequest<St>> {
+    ) -> RequestResponseBuilder<request_response_state::SetRequest<St>, S> {
         self._fields.3 = Option::Some(value.into());
         RequestResponseBuilder {
             _state: PhantomData,
@@ -289,7 +305,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RequestResponseBuilder<S, St>
+impl<St, S: BosStr> RequestResponseBuilder<St, S>
 where
     St: request_response_state::State,
     St::Request: request_response_state::IsSet,
@@ -307,7 +323,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RequestResponse<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RequestResponse<S> {
         RequestResponse {
             created_at: self._fields.0.unwrap(),
             message: self._fields.1,
@@ -319,10 +338,10 @@ where
 }
 
 fn lexicon_doc_tech_tokimeki_kaku_requestResponse() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tech.tokimeki.kaku.requestResponse"),
@@ -331,16 +350,17 @@ fn lexicon_doc_tech_tokimeki_kaku_requestResponse() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A post created in response to a request",
-                    )),
+                    description: Some(
+                        CowStr::new_static("A post created in response to a request"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("request"),
-                            SmolStr::new_static("post"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("request"), SmolStr::new_static("post"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -354,9 +374,9 @@ fn lexicon_doc_tech_tokimeki_kaku_requestResponse() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("message"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Optional message to the requester",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Optional message to the requester"),
+                                    ),
                                     max_length: Some(500usize),
                                     max_graphemes: Some(150usize),
                                     ..Default::default()

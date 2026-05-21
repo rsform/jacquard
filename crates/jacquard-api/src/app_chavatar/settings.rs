@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_chavatar::settings;
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::app_chavatar::settings;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AvatarItem<S: BosStr = DefaultStr> {
     pub id: S,
     pub image: StrongRef<S>,
@@ -59,6 +56,7 @@ pub struct Settings<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SettingsInterval<S: BosStr = DefaultStr> {
@@ -156,6 +154,7 @@ where
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SettingsMode<S: BosStr = DefaultStr> {
@@ -343,7 +342,7 @@ impl<S: BosStr> LexiconSchema for Settings<S> {
 
 pub mod avatar_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -351,56 +350,63 @@ pub mod avatar_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Image;
         type Id;
+        type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Image = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetImage<St> {}
-    impl<St: State> State for SetImage<St> {
-        type Image = Set<members::image>;
-        type Id = St::Id;
+        type Image = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type Image = St::Image;
         type Id = Set<members::id>;
+        type Image = St::Image;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
+        type Id = St::Id;
+        type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image` field
-        pub struct image(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `image` field
+        pub struct image(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AvatarItemBuilder<S: BosStr, St: avatar_item_state::State> {
+pub struct AvatarItemBuilder<St: avatar_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> AvatarItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AvatarItemBuilder<S, avatar_item_state::Empty> {
+impl AvatarItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AvatarItemBuilder<avatar_item_state::Empty, DefaultStr> {
         AvatarItemBuilder::new()
     }
 }
 
-impl<S: BosStr> AvatarItemBuilder<S, avatar_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> AvatarItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AvatarItemBuilder<avatar_item_state::Empty, S> {
+        AvatarItemBuilder::builder()
+    }
+}
+
+impl AvatarItemBuilder<avatar_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AvatarItemBuilder {
             _state: PhantomData,
@@ -410,13 +416,27 @@ impl<S: BosStr> AvatarItemBuilder<S, avatar_item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AvatarItemBuilder<S, St>
+impl<S: BosStr> AvatarItemBuilder<avatar_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AvatarItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AvatarItemBuilder<St, S>
 where
     St: avatar_item_state::State,
     St::Id: avatar_item_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<S>) -> AvatarItemBuilder<S, avatar_item_state::SetId<St>> {
+    pub fn id(
+        mut self,
+        value: impl Into<S>,
+    ) -> AvatarItemBuilder<avatar_item_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AvatarItemBuilder {
             _state: PhantomData,
@@ -426,7 +446,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AvatarItemBuilder<S, St>
+impl<St, S: BosStr> AvatarItemBuilder<St, S>
 where
     St: avatar_item_state::State,
     St::Image: avatar_item_state::IsUnset,
@@ -435,7 +455,7 @@ where
     pub fn image(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> AvatarItemBuilder<S, avatar_item_state::SetImage<St>> {
+    ) -> AvatarItemBuilder<avatar_item_state::SetImage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AvatarItemBuilder {
             _state: PhantomData,
@@ -445,11 +465,11 @@ where
     }
 }
 
-impl<S: BosStr, St> AvatarItemBuilder<S, St>
+impl<St, S: BosStr> AvatarItemBuilder<St, S>
 where
     St: avatar_item_state::State,
-    St::Image: avatar_item_state::IsSet,
     St::Id: avatar_item_state::IsSet,
+    St::Image: avatar_item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AvatarItem<S> {
@@ -460,7 +480,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AvatarItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AvatarItem<S> {
         AvatarItem {
             id: self._fields.0.unwrap(),
             image: self._fields.1.unwrap(),
@@ -470,10 +493,10 @@ where
 }
 
 fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chavatar.settings"),
@@ -482,10 +505,9 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("avatarItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("image"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("id"), SmolStr::new_static("image")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -511,15 +533,18 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("Rotation configuration for a user.")),
+                    description: Some(
+                        CowStr::new_static("Rotation configuration for a user."),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("enabled"),
-                            SmolStr::new_static("interval"),
-                            SmolStr::new_static("mode"),
-                            SmolStr::new_static("avatars"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("enabled"),
+                                SmolStr::new_static("interval"),
+                                SmolStr::new_static("mode"), SmolStr::new_static("avatars")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -568,7 +593,7 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
 
 pub mod settings_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -576,72 +601,72 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Avatars;
-        type Enabled;
         type Interval;
         type Mode;
+        type Enabled;
+        type Avatars;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Avatars = Unset;
-        type Enabled = Unset;
         type Interval = Unset;
         type Mode = Unset;
-    }
-    ///State transition - sets the `avatars` field to Set
-    pub struct SetAvatars<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAvatars<St> {}
-    impl<St: State> State for SetAvatars<St> {
-        type Avatars = Set<members::avatars>;
-        type Enabled = St::Enabled;
-        type Interval = St::Interval;
-        type Mode = St::Mode;
-    }
-    ///State transition - sets the `enabled` field to Set
-    pub struct SetEnabled<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEnabled<St> {}
-    impl<St: State> State for SetEnabled<St> {
-        type Avatars = St::Avatars;
-        type Enabled = Set<members::enabled>;
-        type Interval = St::Interval;
-        type Mode = St::Mode;
+        type Enabled = Unset;
+        type Avatars = Unset;
     }
     ///State transition - sets the `interval` field to Set
     pub struct SetInterval<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetInterval<St> {}
     impl<St: State> State for SetInterval<St> {
-        type Avatars = St::Avatars;
-        type Enabled = St::Enabled;
         type Interval = Set<members::interval>;
         type Mode = St::Mode;
+        type Enabled = St::Enabled;
+        type Avatars = St::Avatars;
     }
     ///State transition - sets the `mode` field to Set
     pub struct SetMode<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMode<St> {}
     impl<St: State> State for SetMode<St> {
-        type Avatars = St::Avatars;
-        type Enabled = St::Enabled;
         type Interval = St::Interval;
         type Mode = Set<members::mode>;
+        type Enabled = St::Enabled;
+        type Avatars = St::Avatars;
+    }
+    ///State transition - sets the `enabled` field to Set
+    pub struct SetEnabled<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEnabled<St> {}
+    impl<St: State> State for SetEnabled<St> {
+        type Interval = St::Interval;
+        type Mode = St::Mode;
+        type Enabled = Set<members::enabled>;
+        type Avatars = St::Avatars;
+    }
+    ///State transition - sets the `avatars` field to Set
+    pub struct SetAvatars<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAvatars<St> {}
+    impl<St: State> State for SetAvatars<St> {
+        type Interval = St::Interval;
+        type Mode = St::Mode;
+        type Enabled = St::Enabled;
+        type Avatars = Set<members::avatars>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `avatars` field
-        pub struct avatars(());
-        ///Marker type for the `enabled` field
-        pub struct enabled(());
         ///Marker type for the `interval` field
         pub struct interval(());
         ///Marker type for the `mode` field
         pub struct mode(());
+        ///Marker type for the `enabled` field
+        pub struct enabled(());
+        ///Marker type for the `avatars` field
+        pub struct avatars(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SettingsBuilder<S: BosStr, St: settings_state::State> {
+pub struct SettingsBuilder<St: settings_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<settings::AvatarItem<S>>>,
@@ -652,15 +677,22 @@ pub struct SettingsBuilder<S: BosStr, St: settings_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Settings<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SettingsBuilder<S, settings_state::Empty> {
+impl Settings<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SettingsBuilder<settings_state::Empty, DefaultStr> {
         SettingsBuilder::new()
     }
 }
 
-impl<S: BosStr> SettingsBuilder<S, settings_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Settings<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SettingsBuilder<settings_state::Empty, S> {
+        SettingsBuilder::builder()
+    }
+}
+
+impl SettingsBuilder<settings_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SettingsBuilder {
             _state: PhantomData,
@@ -670,7 +702,18 @@ impl<S: BosStr> SettingsBuilder<S, settings_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<S: BosStr> SettingsBuilder<settings_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SettingsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
     St::Avatars: settings_state::IsUnset,
@@ -679,7 +722,7 @@ where
     pub fn avatars(
         mut self,
         value: impl Into<Vec<settings::AvatarItem<S>>>,
-    ) -> SettingsBuilder<S, settings_state::SetAvatars<St>> {
+    ) -> SettingsBuilder<settings_state::SetAvatars<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
@@ -689,7 +732,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
     St::Enabled: settings_state::IsUnset,
@@ -698,7 +741,7 @@ where
     pub fn enabled(
         mut self,
         value: impl Into<bool>,
-    ) -> SettingsBuilder<S, settings_state::SetEnabled<St>> {
+    ) -> SettingsBuilder<settings_state::SetEnabled<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
@@ -708,7 +751,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
     St::Interval: settings_state::IsUnset,
@@ -717,7 +760,7 @@ where
     pub fn interval(
         mut self,
         value: impl Into<SettingsInterval<S>>,
-    ) -> SettingsBuilder<S, settings_state::SetInterval<St>> {
+    ) -> SettingsBuilder<settings_state::SetInterval<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
@@ -727,7 +770,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
     St::Mode: settings_state::IsUnset,
@@ -736,7 +779,7 @@ where
     pub fn mode(
         mut self,
         value: impl Into<SettingsMode<S>>,
-    ) -> SettingsBuilder<S, settings_state::SetMode<St>> {
+    ) -> SettingsBuilder<settings_state::SetMode<St>, S> {
         self._fields.3 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
@@ -746,13 +789,13 @@ where
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
-    St::Avatars: settings_state::IsSet,
-    St::Enabled: settings_state::IsSet,
     St::Interval: settings_state::IsSet,
     St::Mode: settings_state::IsSet,
+    St::Enabled: settings_state::IsSet,
+    St::Avatars: settings_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Settings<S> {

@@ -10,24 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Nsid;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RemoveOptions<S: BosStr = DefaultStr> {
     pub keys: Vec<Nsid<S>>,
     pub scope: RemoveOptionsScope<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RemoveOptionsScope<S: BosStr = DefaultStr> {
@@ -106,11 +104,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RemoveOptionsOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -127,8 +123,9 @@ impl jacquard_common::xrpc::XrpcResp for RemoveOptionsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RemoveOptions<S> {
     const NSID: &'static str = "tools.ozone.setting.removeOptions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RemoveOptionsResponse;
 }
 
@@ -136,15 +133,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RemoveOptions<S> {
 pub struct RemoveOptionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveOptionsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.setting.removeOptions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = RemoveOptions<S>;
     type Response = RemoveOptionsResponse;
 }
 
 pub mod remove_options_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -187,21 +185,31 @@ pub mod remove_options_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RemoveOptionsBuilder<S: BosStr, St: remove_options_state::State> {
+pub struct RemoveOptionsBuilder<
+    St: remove_options_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Nsid<S>>>, Option<RemoveOptionsScope<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RemoveOptions<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RemoveOptionsBuilder<S, remove_options_state::Empty> {
+impl RemoveOptions<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RemoveOptionsBuilder<remove_options_state::Empty, DefaultStr> {
         RemoveOptionsBuilder::new()
     }
 }
 
-impl<S: BosStr> RemoveOptionsBuilder<S, remove_options_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RemoveOptions<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RemoveOptionsBuilder<remove_options_state::Empty, S> {
+        RemoveOptionsBuilder::builder()
+    }
+}
+
+impl RemoveOptionsBuilder<remove_options_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RemoveOptionsBuilder {
             _state: PhantomData,
@@ -211,7 +219,18 @@ impl<S: BosStr> RemoveOptionsBuilder<S, remove_options_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RemoveOptionsBuilder<S, St>
+impl<S: BosStr> RemoveOptionsBuilder<remove_options_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RemoveOptionsBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RemoveOptionsBuilder<St, S>
 where
     St: remove_options_state::State,
     St::Keys: remove_options_state::IsUnset,
@@ -220,7 +239,7 @@ where
     pub fn keys(
         mut self,
         value: impl Into<Vec<Nsid<S>>>,
-    ) -> RemoveOptionsBuilder<S, remove_options_state::SetKeys<St>> {
+    ) -> RemoveOptionsBuilder<remove_options_state::SetKeys<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RemoveOptionsBuilder {
             _state: PhantomData,
@@ -230,7 +249,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RemoveOptionsBuilder<S, St>
+impl<St, S: BosStr> RemoveOptionsBuilder<St, S>
 where
     St: remove_options_state::State,
     St::Scope: remove_options_state::IsUnset,
@@ -239,7 +258,7 @@ where
     pub fn scope(
         mut self,
         value: impl Into<RemoveOptionsScope<S>>,
-    ) -> RemoveOptionsBuilder<S, remove_options_state::SetScope<St>> {
+    ) -> RemoveOptionsBuilder<remove_options_state::SetScope<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RemoveOptionsBuilder {
             _state: PhantomData,
@@ -249,7 +268,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RemoveOptionsBuilder<S, St>
+impl<St, S: BosStr> RemoveOptionsBuilder<St, S>
 where
     St: remove_options_state::State,
     St::Scope: remove_options_state::IsSet,
@@ -264,7 +283,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RemoveOptions<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RemoveOptions<S> {
         RemoveOptions {
             keys: self._fields.0.unwrap(),
             scope: self._fields.1.unwrap(),

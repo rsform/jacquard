@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,18 +20,15 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::chat_bsky::convo::MessageInput;
 use crate::chat_bsky::convo::MessageView;
 use crate::chat_bsky::convo::send_message_batch;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BatchItem<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: MessageInput<S>,
@@ -39,22 +36,18 @@ pub struct BatchItem<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SendMessageBatch<S: BosStr = DefaultStr> {
     pub items: Vec<send_message_batch::BatchItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SendMessageBatchOutput<S: BosStr = DefaultStr> {
     pub items: Vec<MessageView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -87,8 +80,9 @@ impl jacquard_common::xrpc::XrpcResp for SendMessageBatchResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SendMessageBatch<S> {
     const NSID: &'static str = "chat.bsky.convo.sendMessageBatch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = SendMessageBatchResponse;
 }
 
@@ -96,15 +90,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SendMessageBatch<S> {
 pub struct SendMessageBatchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendMessageBatchRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.sendMessageBatch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = SendMessageBatch<S>;
     type Response = SendMessageBatchResponse;
 }
 
 pub mod batch_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -112,56 +107,63 @@ pub mod batch_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ConvoId;
         type Message;
+        type ConvoId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ConvoId = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `convo_id` field to Set
-    pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetConvoId<St> {}
-    impl<St: State> State for SetConvoId<St> {
-        type ConvoId = Set<members::convo_id>;
-        type Message = St::Message;
+        type ConvoId = Unset;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessage<St> {}
     impl<St: State> State for SetMessage<St> {
-        type ConvoId = St::ConvoId;
         type Message = Set<members::message>;
+        type ConvoId = St::ConvoId;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetConvoId<St> {}
+    impl<St: State> State for SetConvoId<St> {
+        type Message = St::Message;
+        type ConvoId = Set<members::convo_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `convo_id` field
-        pub struct convo_id(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BatchItemBuilder<S: BosStr, St: batch_item_state::State> {
+pub struct BatchItemBuilder<St: batch_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<MessageInput<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> BatchItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BatchItemBuilder<S, batch_item_state::Empty> {
+impl BatchItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BatchItemBuilder<batch_item_state::Empty, DefaultStr> {
         BatchItemBuilder::new()
     }
 }
 
-impl<S: BosStr> BatchItemBuilder<S, batch_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> BatchItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BatchItemBuilder<batch_item_state::Empty, S> {
+        BatchItemBuilder::builder()
+    }
+}
+
+impl BatchItemBuilder<batch_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BatchItemBuilder {
             _state: PhantomData,
@@ -171,7 +173,18 @@ impl<S: BosStr> BatchItemBuilder<S, batch_item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BatchItemBuilder<S, St>
+impl<S: BosStr> BatchItemBuilder<batch_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BatchItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BatchItemBuilder<St, S>
 where
     St: batch_item_state::State,
     St::ConvoId: batch_item_state::IsUnset,
@@ -180,7 +193,7 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> BatchItemBuilder<S, batch_item_state::SetConvoId<St>> {
+    ) -> BatchItemBuilder<batch_item_state::SetConvoId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BatchItemBuilder {
             _state: PhantomData,
@@ -190,7 +203,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BatchItemBuilder<S, St>
+impl<St, S: BosStr> BatchItemBuilder<St, S>
 where
     St: batch_item_state::State,
     St::Message: batch_item_state::IsUnset,
@@ -199,7 +212,7 @@ where
     pub fn message(
         mut self,
         value: impl Into<MessageInput<S>>,
-    ) -> BatchItemBuilder<S, batch_item_state::SetMessage<St>> {
+    ) -> BatchItemBuilder<batch_item_state::SetMessage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BatchItemBuilder {
             _state: PhantomData,
@@ -209,11 +222,11 @@ where
     }
 }
 
-impl<S: BosStr, St> BatchItemBuilder<S, St>
+impl<St, S: BosStr> BatchItemBuilder<St, S>
 where
     St: batch_item_state::State,
-    St::ConvoId: batch_item_state::IsSet,
     St::Message: batch_item_state::IsSet,
+    St::ConvoId: batch_item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> BatchItem<S> {
@@ -224,7 +237,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BatchItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BatchItem<S> {
         BatchItem {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -234,10 +250,10 @@ where
 }
 
 fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.convo.sendMessageBatch"),
@@ -246,23 +262,25 @@ fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("batchItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("convoId"),
-                        SmolStr::new_static("message"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("convoId"),
+                            SmolStr::new_static("message")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("chat.bsky.convo.defs#messageInput"),
+                                r#ref: CowStr::new_static(
+                                    "chat.bsky.convo.defs#messageInput",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -276,26 +294,28 @@ fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![SmolStr::new_static("items")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("items"),
-                                    LexObjectProperty::Array(LexArray {
-                                        items: LexArrayItem::Ref(LexRef {
-                                            r#ref: CowStr::new_static("#batchItem"),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(vec![SmolStr::new_static("items")]),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("items"),
+                                        LexObjectProperty::Array(LexArray {
+                                            items: LexArrayItem::Ref(LexRef {
+                                                r#ref: CowStr::new_static("#batchItem"),
+                                                ..Default::default()
+                                            }),
+                                            max_length: Some(100usize),
                                             ..Default::default()
                                         }),
-                                        max_length: Some(100usize),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -309,7 +329,7 @@ fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> LexiconDoc<'static> {
 
 pub mod send_message_batch_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -340,21 +360,34 @@ pub mod send_message_batch_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SendMessageBatchBuilder<S: BosStr, St: send_message_batch_state::State> {
+pub struct SendMessageBatchBuilder<
+    St: send_message_batch_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<send_message_batch::BatchItem<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SendMessageBatch<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SendMessageBatchBuilder<S, send_message_batch_state::Empty> {
+impl SendMessageBatch<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SendMessageBatchBuilder<
+        send_message_batch_state::Empty,
+        DefaultStr,
+    > {
         SendMessageBatchBuilder::new()
     }
 }
 
-impl<S: BosStr> SendMessageBatchBuilder<S, send_message_batch_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SendMessageBatch<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SendMessageBatchBuilder<send_message_batch_state::Empty, S> {
+        SendMessageBatchBuilder::builder()
+    }
+}
+
+impl SendMessageBatchBuilder<send_message_batch_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SendMessageBatchBuilder {
             _state: PhantomData,
@@ -364,7 +397,18 @@ impl<S: BosStr> SendMessageBatchBuilder<S, send_message_batch_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SendMessageBatchBuilder<S, St>
+impl<S: BosStr> SendMessageBatchBuilder<send_message_batch_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SendMessageBatchBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SendMessageBatchBuilder<St, S>
 where
     St: send_message_batch_state::State,
     St::Items: send_message_batch_state::IsUnset,
@@ -373,7 +417,7 @@ where
     pub fn items(
         mut self,
         value: impl Into<Vec<send_message_batch::BatchItem<S>>>,
-    ) -> SendMessageBatchBuilder<S, send_message_batch_state::SetItems<St>> {
+    ) -> SendMessageBatchBuilder<send_message_batch_state::SetItems<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SendMessageBatchBuilder {
             _state: PhantomData,
@@ -383,7 +427,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SendMessageBatchBuilder<S, St>
+impl<St, S: BosStr> SendMessageBatchBuilder<St, S>
 where
     St: send_message_batch_state::State,
     St::Items: send_message_batch_state::IsSet,
@@ -396,7 +440,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SendMessageBatch<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SendMessageBatch<S> {
         SendMessageBatch {
             items: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_protoimsg::chat::community;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_protoimsg::chat::community;
 /// A named group of community members.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CommunityGroup<S: BosStr = DefaultStr> {
     ///Whether this is an inner circle group for presence visibility.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,10 +48,7 @@ pub struct CommunityGroup<S: BosStr = DefaultStr> {
 /// A member in a community group.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CommunityMember<S: BosStr = DefaultStr> {
     ///When this member was added.
     pub added_at: Datetime,
@@ -208,7 +202,7 @@ fn _default_community_group_is_inner_circle() -> Option<bool> {
 
 pub mod community_group_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -216,60 +210,66 @@ pub mod community_group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Members;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Members = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Members = St::Members;
+        type Name = Unset;
     }
     ///State transition - sets the `members` field to Set
     pub struct SetMembers<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMembers<St> {}
     impl<St: State> State for SetMembers<St> {
-        type Name = St::Name;
         type Members = Set<members::members>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Members = St::Members;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `members` field
         pub struct members(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CommunityGroupBuilder<S: BosStr, St: community_group_state::State> {
+pub struct CommunityGroupBuilder<
+    St: community_group_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<bool>,
-        Option<Vec<community::CommunityMember<S>>>,
-        Option<S>,
-    ),
+    _fields: (Option<bool>, Option<Vec<community::CommunityMember<S>>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CommunityGroup<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CommunityGroupBuilder<S, community_group_state::Empty> {
+impl CommunityGroup<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CommunityGroupBuilder<community_group_state::Empty, DefaultStr> {
         CommunityGroupBuilder::new()
     }
 }
 
-impl<S: BosStr> CommunityGroupBuilder<S, community_group_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CommunityGroup<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CommunityGroupBuilder<community_group_state::Empty, S> {
+        CommunityGroupBuilder::builder()
+    }
+}
+
+impl CommunityGroupBuilder<community_group_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CommunityGroupBuilder {
             _state: PhantomData,
@@ -279,7 +279,18 @@ impl<S: BosStr> CommunityGroupBuilder<S, community_group_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: community_group_state::State> CommunityGroupBuilder<S, St> {
+impl<S: BosStr> CommunityGroupBuilder<community_group_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CommunityGroupBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: community_group_state::State, S: BosStr> CommunityGroupBuilder<St, S> {
     /// Set the `isInnerCircle` field (optional)
     pub fn is_inner_circle(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -292,7 +303,7 @@ impl<S: BosStr, St: community_group_state::State> CommunityGroupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CommunityGroupBuilder<S, St>
+impl<St, S: BosStr> CommunityGroupBuilder<St, S>
 where
     St: community_group_state::State,
     St::Members: community_group_state::IsUnset,
@@ -301,7 +312,7 @@ where
     pub fn members(
         mut self,
         value: impl Into<Vec<community::CommunityMember<S>>>,
-    ) -> CommunityGroupBuilder<S, community_group_state::SetMembers<St>> {
+    ) -> CommunityGroupBuilder<community_group_state::SetMembers<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CommunityGroupBuilder {
             _state: PhantomData,
@@ -311,7 +322,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CommunityGroupBuilder<S, St>
+impl<St, S: BosStr> CommunityGroupBuilder<St, S>
 where
     St: community_group_state::State,
     St::Name: community_group_state::IsUnset,
@@ -320,7 +331,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> CommunityGroupBuilder<S, community_group_state::SetName<St>> {
+    ) -> CommunityGroupBuilder<community_group_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CommunityGroupBuilder {
             _state: PhantomData,
@@ -330,11 +341,11 @@ where
     }
 }
 
-impl<S: BosStr, St> CommunityGroupBuilder<S, St>
+impl<St, S: BosStr> CommunityGroupBuilder<St, S>
 where
     St: community_group_state::State,
-    St::Name: community_group_state::IsSet,
     St::Members: community_group_state::IsSet,
+    St::Name: community_group_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CommunityGroup<S> {
@@ -346,7 +357,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CommunityGroup<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CommunityGroup<S> {
         CommunityGroup {
             is_inner_circle: self._fields.0.or_else(|| Some(false)),
             members: self._fields.1.unwrap(),
@@ -357,10 +371,10 @@ where
 }
 
 fn lexicon_doc_app_protoimsg_chat_community() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.protoimsg.chat.community"),
@@ -369,11 +383,12 @@ fn lexicon_doc_app_protoimsg_chat_community() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("communityGroup"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A named group of community members.")),
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("members"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A named group of community members."),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("members")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -386,7 +401,9 @@ fn lexicon_doc_app_protoimsg_chat_community() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("members"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static("DIDs of group members.")),
+                                description: Some(
+                                    CowStr::new_static("DIDs of group members."),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#communityMember"),
                                     ..Default::default()
@@ -411,20 +428,21 @@ fn lexicon_doc_app_protoimsg_chat_community() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("communityMember"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A member in a community group.")),
-                    required: Some(vec![
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("addedAt"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A member in a community group."),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("did"), SmolStr::new_static("addedAt")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("addedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When this member was added.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When this member was added."),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -487,7 +505,7 @@ fn lexicon_doc_app_protoimsg_chat_community() -> LexiconDoc<'static> {
 
 pub mod community_member_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -495,56 +513,66 @@ pub mod community_member_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type AddedAt;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type AddedAt = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type AddedAt = St::AddedAt;
+        type Did = Unset;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAddedAt<St> {}
     impl<St: State> State for SetAddedAt<St> {
-        type Did = St::Did;
         type AddedAt = Set<members::added_at>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type AddedAt = St::AddedAt;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CommunityMemberBuilder<S: BosStr, St: community_member_state::State> {
+pub struct CommunityMemberBuilder<
+    St: community_member_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CommunityMember<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CommunityMemberBuilder<S, community_member_state::Empty> {
+impl CommunityMember<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CommunityMemberBuilder<community_member_state::Empty, DefaultStr> {
         CommunityMemberBuilder::new()
     }
 }
 
-impl<S: BosStr> CommunityMemberBuilder<S, community_member_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CommunityMember<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CommunityMemberBuilder<community_member_state::Empty, S> {
+        CommunityMemberBuilder::builder()
+    }
+}
+
+impl CommunityMemberBuilder<community_member_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CommunityMemberBuilder {
             _state: PhantomData,
@@ -554,7 +582,18 @@ impl<S: BosStr> CommunityMemberBuilder<S, community_member_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CommunityMemberBuilder<S, St>
+impl<S: BosStr> CommunityMemberBuilder<community_member_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CommunityMemberBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CommunityMemberBuilder<St, S>
 where
     St: community_member_state::State,
     St::AddedAt: community_member_state::IsUnset,
@@ -563,7 +602,7 @@ where
     pub fn added_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CommunityMemberBuilder<S, community_member_state::SetAddedAt<St>> {
+    ) -> CommunityMemberBuilder<community_member_state::SetAddedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CommunityMemberBuilder {
             _state: PhantomData,
@@ -573,7 +612,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CommunityMemberBuilder<S, St>
+impl<St, S: BosStr> CommunityMemberBuilder<St, S>
 where
     St: community_member_state::State,
     St::Did: community_member_state::IsUnset,
@@ -582,7 +621,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> CommunityMemberBuilder<S, community_member_state::SetDid<St>> {
+    ) -> CommunityMemberBuilder<community_member_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CommunityMemberBuilder {
             _state: PhantomData,
@@ -592,11 +631,11 @@ where
     }
 }
 
-impl<S: BosStr, St> CommunityMemberBuilder<S, St>
+impl<St, S: BosStr> CommunityMemberBuilder<St, S>
 where
     St: community_member_state::State,
-    St::Did: community_member_state::IsSet,
     St::AddedAt: community_member_state::IsSet,
+    St::Did: community_member_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CommunityMember<S> {
@@ -607,7 +646,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CommunityMember<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CommunityMember<S> {
         CommunityMember {
             added_at: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -618,7 +660,7 @@ where
 
 pub mod community_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -649,21 +691,28 @@ pub mod community_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CommunityBuilder<S: BosStr, St: community_state::State> {
+pub struct CommunityBuilder<St: community_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<community::CommunityGroup<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Community<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CommunityBuilder<S, community_state::Empty> {
+impl Community<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CommunityBuilder<community_state::Empty, DefaultStr> {
         CommunityBuilder::new()
     }
 }
 
-impl<S: BosStr> CommunityBuilder<S, community_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Community<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CommunityBuilder<community_state::Empty, S> {
+        CommunityBuilder::builder()
+    }
+}
+
+impl CommunityBuilder<community_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CommunityBuilder {
             _state: PhantomData,
@@ -673,7 +722,18 @@ impl<S: BosStr> CommunityBuilder<S, community_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CommunityBuilder<S, St>
+impl<S: BosStr> CommunityBuilder<community_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CommunityBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CommunityBuilder<St, S>
 where
     St: community_state::State,
     St::Groups: community_state::IsUnset,
@@ -682,7 +742,7 @@ where
     pub fn groups(
         mut self,
         value: impl Into<Vec<community::CommunityGroup<S>>>,
-    ) -> CommunityBuilder<S, community_state::SetGroups<St>> {
+    ) -> CommunityBuilder<community_state::SetGroups<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CommunityBuilder {
             _state: PhantomData,
@@ -692,7 +752,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CommunityBuilder<S, St>
+impl<St, S: BosStr> CommunityBuilder<St, S>
 where
     St: community_state::State,
     St::Groups: community_state::IsSet,
@@ -705,7 +765,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Community<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Community<S> {
         Community {
             groups: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

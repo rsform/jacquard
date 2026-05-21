@@ -5,9 +5,9 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Appeal a previously taken moderation action
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
@@ -338,6 +338,7 @@ impl core::fmt::Display for ReasonSexualUnlabeled {
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReasonType<S: BosStr = DefaultStr> {
     ToolsOzoneReportDefsReasonAppeal,
@@ -386,8 +387,12 @@ pub enum ReasonType<S: BosStr = DefaultStr> {
 impl<S: BosStr> ReasonType<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::ToolsOzoneReportDefsReasonAppeal => "tools.ozone.report.defs#reasonAppeal",
-            Self::ToolsOzoneReportDefsReasonOther => "tools.ozone.report.defs#reasonOther",
+            Self::ToolsOzoneReportDefsReasonAppeal => {
+                "tools.ozone.report.defs#reasonAppeal"
+            }
+            Self::ToolsOzoneReportDefsReasonOther => {
+                "tools.ozone.report.defs#reasonOther"
+            }
             Self::ToolsOzoneReportDefsReasonViolenceAnimal => {
                 "tools.ozone.report.defs#reasonViolenceAnimal"
             }
@@ -484,7 +489,9 @@ impl<S: BosStr> ReasonType<S> {
             Self::ToolsOzoneReportDefsReasonRuleBanEvasion => {
                 "tools.ozone.report.defs#reasonRuleBanEvasion"
             }
-            Self::ToolsOzoneReportDefsReasonRuleOther => "tools.ozone.report.defs#reasonRuleOther",
+            Self::ToolsOzoneReportDefsReasonRuleOther => {
+                "tools.ozone.report.defs#reasonRuleOther"
+            }
             Self::ToolsOzoneReportDefsReasonSelfHarmContent => {
                 "tools.ozone.report.defs#reasonSelfHarmContent"
             }
@@ -506,8 +513,12 @@ impl<S: BosStr> ReasonType<S> {
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "tools.ozone.report.defs#reasonAppeal" => Self::ToolsOzoneReportDefsReasonAppeal,
-            "tools.ozone.report.defs#reasonOther" => Self::ToolsOzoneReportDefsReasonOther,
+            "tools.ozone.report.defs#reasonAppeal" => {
+                Self::ToolsOzoneReportDefsReasonAppeal
+            }
+            "tools.ozone.report.defs#reasonOther" => {
+                Self::ToolsOzoneReportDefsReasonOther
+            }
             "tools.ozone.report.defs#reasonViolenceAnimal" => {
                 Self::ToolsOzoneReportDefsReasonViolenceAnimal
             }
@@ -604,7 +615,9 @@ impl<S: BosStr> ReasonType<S> {
             "tools.ozone.report.defs#reasonRuleBanEvasion" => {
                 Self::ToolsOzoneReportDefsReasonRuleBanEvasion
             }
-            "tools.ozone.report.defs#reasonRuleOther" => Self::ToolsOzoneReportDefsReasonRuleOther,
+            "tools.ozone.report.defs#reasonRuleOther" => {
+                Self::ToolsOzoneReportDefsReasonRuleOther
+            }
             "tools.ozone.report.defs#reasonSelfHarmContent" => {
                 Self::ToolsOzoneReportDefsReasonSelfHarmContent
             }

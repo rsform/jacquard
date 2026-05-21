@@ -10,12 +10,13 @@ pub mod log;
 pub mod programme;
 pub mod service;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,19 +27,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::media_ionosphere;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::media_ionosphere;
 /// BearerURI as specified in ETSI TS 103 270
 pub type Bearer<S = DefaultStr> = UriValue<S>;
 /// Represents the method of accessing a broadcast; i.e. live
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Broadcast<S: BosStr = DefaultStr> {
     pub bearer: media_ionosphere::Bearer<S>,
     ///When used in a list, this can be used to sort the attempted connections or preferred methods  Defaults to `0`.
@@ -59,11 +57,9 @@ pub struct Broadcast<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Credit<S: BosStr = DefaultStr> {
     pub entity: media_ionosphere::Entity<S>,
     ///Self-explanatory, but beware that the expected values may change in future (possibly to match TV-Anytime role classification schema)
@@ -155,11 +151,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Entity<S: BosStr = DefaultStr> {
     pub name: S,
     pub r#type: S,
@@ -171,10 +165,7 @@ pub struct Entity<S: BosStr = DefaultStr> {
 pub type Genre<S = DefaultStr> = UriValue<S>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Geocoordinates<S: BosStr = DefaultStr> {
     pub latitude: S,
     pub longitude: S,
@@ -185,10 +176,7 @@ pub struct Geocoordinates<S: BosStr = DefaultStr> {
 /// Represents membership to a group, optionally with an index
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Membership<S: BosStr = DefaultStr> {
     pub group: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -200,10 +188,7 @@ pub struct Membership<S: BosStr = DefaultStr> {
 /// Represents the method of accessing a recording
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Recording<S: BosStr = DefaultStr> {
     pub bearer: media_ionosphere::Bearer<S>,
     ///When used in a list, this can be used to sort the attempted connections or preferred methods  Defaults to `0`.
@@ -220,11 +205,9 @@ pub struct Recording<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Track<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub album: Option<S>,
@@ -428,7 +411,7 @@ fn _default_broadcast_offset() -> Option<i64> {
 
 pub mod broadcast_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -459,7 +442,7 @@ pub mod broadcast_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BroadcastBuilder<S: BosStr, St: broadcast_state::State> {
+pub struct BroadcastBuilder<St: broadcast_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<media_ionosphere::Bearer<S>>,
@@ -471,15 +454,22 @@ pub struct BroadcastBuilder<S: BosStr, St: broadcast_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Broadcast<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BroadcastBuilder<S, broadcast_state::Empty> {
+impl Broadcast<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BroadcastBuilder<broadcast_state::Empty, DefaultStr> {
         BroadcastBuilder::new()
     }
 }
 
-impl<S: BosStr> BroadcastBuilder<S, broadcast_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Broadcast<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BroadcastBuilder<broadcast_state::Empty, S> {
+        BroadcastBuilder::builder()
+    }
+}
+
+impl BroadcastBuilder<broadcast_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BroadcastBuilder {
             _state: PhantomData,
@@ -489,7 +479,18 @@ impl<S: BosStr> BroadcastBuilder<S, broadcast_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BroadcastBuilder<S, St>
+impl<S: BosStr> BroadcastBuilder<broadcast_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BroadcastBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BroadcastBuilder<St, S>
 where
     St: broadcast_state::State,
     St::Bearer: broadcast_state::IsUnset,
@@ -498,7 +499,7 @@ where
     pub fn bearer(
         mut self,
         value: impl Into<media_ionosphere::Bearer<S>>,
-    ) -> BroadcastBuilder<S, broadcast_state::SetBearer<St>> {
+    ) -> BroadcastBuilder<broadcast_state::SetBearer<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BroadcastBuilder {
             _state: PhantomData,
@@ -508,7 +509,7 @@ where
     }
 }
 
-impl<S: BosStr, St: broadcast_state::State> BroadcastBuilder<S, St> {
+impl<St: broadcast_state::State, S: BosStr> BroadcastBuilder<St, S> {
     /// Set the `cost` field (optional)
     pub fn cost(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -521,7 +522,7 @@ impl<S: BosStr, St: broadcast_state::State> BroadcastBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: broadcast_state::State> BroadcastBuilder<S, St> {
+impl<St: broadcast_state::State, S: BosStr> BroadcastBuilder<St, S> {
     /// Set the `from` field (optional)
     pub fn from(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -534,7 +535,7 @@ impl<S: BosStr, St: broadcast_state::State> BroadcastBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: broadcast_state::State> BroadcastBuilder<S, St> {
+impl<St: broadcast_state::State, S: BosStr> BroadcastBuilder<St, S> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -547,7 +548,7 @@ impl<S: BosStr, St: broadcast_state::State> BroadcastBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: broadcast_state::State> BroadcastBuilder<S, St> {
+impl<St: broadcast_state::State, S: BosStr> BroadcastBuilder<St, S> {
     /// Set the `until` field (optional)
     pub fn until(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -560,7 +561,7 @@ impl<S: BosStr, St: broadcast_state::State> BroadcastBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BroadcastBuilder<S, St>
+impl<St, S: BosStr> BroadcastBuilder<St, S>
 where
     St: broadcast_state::State,
     St::Bearer: broadcast_state::IsSet,
@@ -577,7 +578,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Broadcast<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Broadcast<S> {
         Broadcast {
             bearer: self._fields.0.unwrap(),
             cost: self._fields.1.or_else(|| Some(0i64)),
@@ -590,10 +594,10 @@ where
 }
 
 fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("media.ionosphere.defs"),
@@ -602,9 +606,9 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("bearer"),
                 LexUserType::String(LexString {
-                    description: Some(CowStr::new_static(
-                        "BearerURI as specified in ETSI TS 103 270",
-                    )),
+                    description: Some(
+                        CowStr::new_static("BearerURI as specified in ETSI TS 103 270"),
+                    ),
                     format: Some(LexStringFormat::Uri),
                     ..Default::default()
                 }),
@@ -612,9 +616,11 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("broadcast"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Represents the method of accessing a broadcast; i.e. live",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Represents the method of accessing a broadcast; i.e. live",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("bearer")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -635,9 +641,11 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("from"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The datetime from which this method is available",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The datetime from which this method is available",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -651,9 +659,11 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("until"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The datetime where this method is no longer available",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The datetime where this method is no longer available",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -699,10 +709,9 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("entity"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("name"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("type"), SmolStr::new_static("name")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -740,10 +749,12 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("geocoordinates"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("latitude"),
-                        SmolStr::new_static("longitude"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("latitude"),
+                            SmolStr::new_static("longitude")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -769,9 +780,11 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("membership"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Represents membership to a group, optionally with an index",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Represents membership to a group, optionally with an index",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("group")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -797,9 +810,11 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("recording"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Represents the method of accessing a recording",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Represents the method of accessing a recording",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("bearer")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -820,9 +835,11 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("from"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The datetime from which this method is available",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The datetime from which this method is available",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -830,9 +847,11 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("until"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The datetime where this method is no longer available",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The datetime where this method is no longer available",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -845,10 +864,11 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("track"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("title"),
-                        SmolStr::new_static("artists"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("title"), SmolStr::new_static("artists")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -862,9 +882,11 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artists"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Artists in order of importance to the track",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Artists in order of importance to the track",
+                                    ),
+                                ),
                                 items: LexArrayItem::String(LexString {
                                     max_length: Some(256usize),
                                     ..Default::default()
@@ -892,7 +914,7 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
 
 pub mod credit_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -900,56 +922,63 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Entity;
         type Role;
+        type Entity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Entity = Unset;
         type Role = Unset;
-    }
-    ///State transition - sets the `entity` field to Set
-    pub struct SetEntity<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEntity<St> {}
-    impl<St: State> State for SetEntity<St> {
-        type Entity = Set<members::entity>;
-        type Role = St::Role;
+        type Entity = Unset;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRole<St> {}
     impl<St: State> State for SetRole<St> {
-        type Entity = St::Entity;
         type Role = Set<members::role>;
+        type Entity = St::Entity;
+    }
+    ///State transition - sets the `entity` field to Set
+    pub struct SetEntity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEntity<St> {}
+    impl<St: State> State for SetEntity<St> {
+        type Role = St::Role;
+        type Entity = Set<members::entity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entity` field
-        pub struct entity(());
         ///Marker type for the `role` field
         pub struct role(());
+        ///Marker type for the `entity` field
+        pub struct entity(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreditBuilder<S: BosStr, St: credit_state::State> {
+pub struct CreditBuilder<St: credit_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<media_ionosphere::Entity<S>>, Option<CreditRole<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Credit<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CreditBuilder<S, credit_state::Empty> {
+impl Credit<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CreditBuilder<credit_state::Empty, DefaultStr> {
         CreditBuilder::new()
     }
 }
 
-impl<S: BosStr> CreditBuilder<S, credit_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Credit<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CreditBuilder<credit_state::Empty, S> {
+        CreditBuilder::builder()
+    }
+}
+
+impl CreditBuilder<credit_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CreditBuilder {
             _state: PhantomData,
@@ -959,7 +988,18 @@ impl<S: BosStr> CreditBuilder<S, credit_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CreditBuilder<S, St>
+impl<S: BosStr> CreditBuilder<credit_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CreditBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CreditBuilder<St, S>
 where
     St: credit_state::State,
     St::Entity: credit_state::IsUnset,
@@ -968,7 +1008,7 @@ where
     pub fn entity(
         mut self,
         value: impl Into<media_ionosphere::Entity<S>>,
-    ) -> CreditBuilder<S, credit_state::SetEntity<St>> {
+    ) -> CreditBuilder<credit_state::SetEntity<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CreditBuilder {
             _state: PhantomData,
@@ -978,7 +1018,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CreditBuilder<S, St>
+impl<St, S: BosStr> CreditBuilder<St, S>
 where
     St: credit_state::State,
     St::Role: credit_state::IsUnset,
@@ -987,7 +1027,7 @@ where
     pub fn role(
         mut self,
         value: impl Into<CreditRole<S>>,
-    ) -> CreditBuilder<S, credit_state::SetRole<St>> {
+    ) -> CreditBuilder<credit_state::SetRole<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CreditBuilder {
             _state: PhantomData,
@@ -997,11 +1037,11 @@ where
     }
 }
 
-impl<S: BosStr, St> CreditBuilder<S, St>
+impl<St, S: BosStr> CreditBuilder<St, S>
 where
     St: credit_state::State,
-    St::Entity: credit_state::IsSet,
     St::Role: credit_state::IsSet,
+    St::Entity: credit_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Credit<S> {
@@ -1023,7 +1063,7 @@ where
 
 pub mod membership_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1054,21 +1094,28 @@ pub mod membership_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MembershipBuilder<S: BosStr, St: membership_state::State> {
+pub struct MembershipBuilder<St: membership_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Membership<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MembershipBuilder<S, membership_state::Empty> {
+impl Membership<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MembershipBuilder<membership_state::Empty, DefaultStr> {
         MembershipBuilder::new()
     }
 }
 
-impl<S: BosStr> MembershipBuilder<S, membership_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Membership<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MembershipBuilder<membership_state::Empty, S> {
+        MembershipBuilder::builder()
+    }
+}
+
+impl MembershipBuilder<membership_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MembershipBuilder {
             _state: PhantomData,
@@ -1078,7 +1125,18 @@ impl<S: BosStr> MembershipBuilder<S, membership_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MembershipBuilder<S, St>
+impl<S: BosStr> MembershipBuilder<membership_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MembershipBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MembershipBuilder<St, S>
 where
     St: membership_state::State,
     St::Group: membership_state::IsUnset,
@@ -1087,7 +1145,7 @@ where
     pub fn group(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> MembershipBuilder<S, membership_state::SetGroup<St>> {
+    ) -> MembershipBuilder<membership_state::SetGroup<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MembershipBuilder {
             _state: PhantomData,
@@ -1097,7 +1155,7 @@ where
     }
 }
 
-impl<S: BosStr, St: membership_state::State> MembershipBuilder<S, St> {
+impl<St: membership_state::State, S: BosStr> MembershipBuilder<St, S> {
     /// Set the `index` field (optional)
     pub fn index(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -1110,7 +1168,7 @@ impl<S: BosStr, St: membership_state::State> MembershipBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MembershipBuilder<S, St>
+impl<St, S: BosStr> MembershipBuilder<St, S>
 where
     St: membership_state::State,
     St::Group: membership_state::IsSet,
@@ -1124,7 +1182,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Membership<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Membership<S> {
         Membership {
             group: self._fields.0.unwrap(),
             index: self._fields.1,
@@ -1139,7 +1200,7 @@ fn _default_recording_cost() -> Option<i64> {
 
 pub mod recording_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1170,7 +1231,7 @@ pub mod recording_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RecordingBuilder<S: BosStr, St: recording_state::State> {
+pub struct RecordingBuilder<St: recording_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<media_ionosphere::Bearer<S>>,
@@ -1181,15 +1242,22 @@ pub struct RecordingBuilder<S: BosStr, St: recording_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Recording<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RecordingBuilder<S, recording_state::Empty> {
+impl Recording<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RecordingBuilder<recording_state::Empty, DefaultStr> {
         RecordingBuilder::new()
     }
 }
 
-impl<S: BosStr> RecordingBuilder<S, recording_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Recording<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RecordingBuilder<recording_state::Empty, S> {
+        RecordingBuilder::builder()
+    }
+}
+
+impl RecordingBuilder<recording_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RecordingBuilder {
             _state: PhantomData,
@@ -1199,7 +1267,18 @@ impl<S: BosStr> RecordingBuilder<S, recording_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RecordingBuilder<S, St>
+impl<S: BosStr> RecordingBuilder<recording_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RecordingBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RecordingBuilder<St, S>
 where
     St: recording_state::State,
     St::Bearer: recording_state::IsUnset,
@@ -1208,7 +1287,7 @@ where
     pub fn bearer(
         mut self,
         value: impl Into<media_ionosphere::Bearer<S>>,
-    ) -> RecordingBuilder<S, recording_state::SetBearer<St>> {
+    ) -> RecordingBuilder<recording_state::SetBearer<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RecordingBuilder {
             _state: PhantomData,
@@ -1218,7 +1297,7 @@ where
     }
 }
 
-impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
+impl<St: recording_state::State, S: BosStr> RecordingBuilder<St, S> {
     /// Set the `cost` field (optional)
     pub fn cost(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -1231,7 +1310,7 @@ impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
+impl<St: recording_state::State, S: BosStr> RecordingBuilder<St, S> {
     /// Set the `from` field (optional)
     pub fn from(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -1244,7 +1323,7 @@ impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
+impl<St: recording_state::State, S: BosStr> RecordingBuilder<St, S> {
     /// Set the `until` field (optional)
     pub fn until(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -1257,7 +1336,7 @@ impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RecordingBuilder<S, St>
+impl<St, S: BosStr> RecordingBuilder<St, S>
 where
     St: recording_state::State,
     St::Bearer: recording_state::IsSet,
@@ -1273,7 +1352,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Recording<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Recording<S> {
         Recording {
             bearer: self._fields.0.unwrap(),
             cost: self._fields.1.or_else(|| Some(0i64)),
@@ -1286,7 +1368,7 @@ where
 
 pub mod track_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1294,56 +1376,63 @@ pub mod track_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artists;
         type Title;
+        type Artists;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artists = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `artists` field to Set
-    pub struct SetArtists<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetArtists<St> {}
-    impl<St: State> State for SetArtists<St> {
-        type Artists = Set<members::artists>;
-        type Title = St::Title;
+        type Artists = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Artists = St::Artists;
         type Title = Set<members::title>;
+        type Artists = St::Artists;
+    }
+    ///State transition - sets the `artists` field to Set
+    pub struct SetArtists<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtists<St> {}
+    impl<St: State> State for SetArtists<St> {
+        type Title = St::Title;
+        type Artists = Set<members::artists>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artists` field
-        pub struct artists(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `artists` field
+        pub struct artists(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TrackBuilder<S: BosStr, St: track_state::State> {
+pub struct TrackBuilder<St: track_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Track<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TrackBuilder<S, track_state::Empty> {
+impl Track<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TrackBuilder<track_state::Empty, DefaultStr> {
         TrackBuilder::new()
     }
 }
 
-impl<S: BosStr> TrackBuilder<S, track_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Track<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TrackBuilder<track_state::Empty, S> {
+        TrackBuilder::builder()
+    }
+}
+
+impl TrackBuilder<track_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TrackBuilder {
             _state: PhantomData,
@@ -1353,7 +1442,18 @@ impl<S: BosStr> TrackBuilder<S, track_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: track_state::State> TrackBuilder<S, St> {
+impl<S: BosStr> TrackBuilder<track_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TrackBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: track_state::State, S: BosStr> TrackBuilder<St, S> {
     /// Set the `album` field (optional)
     pub fn album(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -1366,7 +1466,7 @@ impl<S: BosStr, St: track_state::State> TrackBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TrackBuilder<S, St>
+impl<St, S: BosStr> TrackBuilder<St, S>
 where
     St: track_state::State,
     St::Artists: track_state::IsUnset,
@@ -1375,7 +1475,7 @@ where
     pub fn artists(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> TrackBuilder<S, track_state::SetArtists<St>> {
+    ) -> TrackBuilder<track_state::SetArtists<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TrackBuilder {
             _state: PhantomData,
@@ -1385,13 +1485,16 @@ where
     }
 }
 
-impl<S: BosStr, St> TrackBuilder<S, St>
+impl<St, S: BosStr> TrackBuilder<St, S>
 where
     St: track_state::State,
     St::Title: track_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> TrackBuilder<S, track_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> TrackBuilder<track_state::SetTitle<St>, S> {
         self._fields.2 = Option::Some(value.into());
         TrackBuilder {
             _state: PhantomData,
@@ -1401,11 +1504,11 @@ where
     }
 }
 
-impl<S: BosStr, St> TrackBuilder<S, St>
+impl<St, S: BosStr> TrackBuilder<St, S>
 where
     St: track_state::State,
-    St::Artists: track_state::IsSet,
     St::Title: track_state::IsSet,
+    St::Artists: track_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Track<S> {

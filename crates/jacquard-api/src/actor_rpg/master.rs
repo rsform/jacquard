@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A master record validating one player's stats for one system. Multiple GMs can validate the same player.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -225,7 +225,7 @@ impl<S: BosStr> LexiconSchema for Master<S> {
 
 pub mod master_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -234,55 +234,55 @@ pub mod master_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Player;
-        type CreatedAt;
         type System;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Player = Unset;
-        type CreatedAt = Unset;
         type System = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `player` field to Set
     pub struct SetPlayer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPlayer<St> {}
     impl<St: State> State for SetPlayer<St> {
         type Player = Set<members::player>;
+        type System = St::System;
         type CreatedAt = St::CreatedAt;
-        type System = St::System;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Player = St::Player;
-        type CreatedAt = Set<members::created_at>;
-        type System = St::System;
     }
     ///State transition - sets the `system` field to Set
     pub struct SetSystem<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSystem<St> {}
     impl<St: State> State for SetSystem<St> {
         type Player = St::Player;
-        type CreatedAt = St::CreatedAt;
         type System = Set<members::system>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Player = St::Player;
+        type System = St::System;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `player` field
         pub struct player(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `system` field
         pub struct system(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MasterBuilder<S: BosStr, St: master_state::State> {
+pub struct MasterBuilder<St: master_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -297,15 +297,22 @@ pub struct MasterBuilder<S: BosStr, St: master_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Master<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MasterBuilder<S, master_state::Empty> {
+impl Master<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MasterBuilder<master_state::Empty, DefaultStr> {
         MasterBuilder::new()
     }
 }
 
-impl<S: BosStr> MasterBuilder<S, master_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Master<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MasterBuilder<master_state::Empty, S> {
+        MasterBuilder::builder()
+    }
+}
+
+impl MasterBuilder<master_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MasterBuilder {
             _state: PhantomData,
@@ -315,7 +322,18 @@ impl<S: BosStr> MasterBuilder<S, master_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: master_state::State> MasterBuilder<S, St> {
+impl<S: BosStr> MasterBuilder<master_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MasterBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: master_state::State, S: BosStr> MasterBuilder<St, S> {
     /// Set the `campaign` field (optional)
     pub fn campaign(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -328,7 +346,7 @@ impl<S: BosStr, St: master_state::State> MasterBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MasterBuilder<S, St>
+impl<St, S: BosStr> MasterBuilder<St, S>
 where
     St: master_state::State,
     St::CreatedAt: master_state::IsUnset,
@@ -337,7 +355,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MasterBuilder<S, master_state::SetCreatedAt<St>> {
+    ) -> MasterBuilder<master_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         MasterBuilder {
             _state: PhantomData,
@@ -347,7 +365,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MasterBuilder<S, St>
+impl<St, S: BosStr> MasterBuilder<St, S>
 where
     St: master_state::State,
     St::Player: master_state::IsUnset,
@@ -356,7 +374,7 @@ where
     pub fn player(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> MasterBuilder<S, master_state::SetPlayer<St>> {
+    ) -> MasterBuilder<master_state::SetPlayer<St>, S> {
         self._fields.2 = Option::Some(value.into());
         MasterBuilder {
             _state: PhantomData,
@@ -366,20 +384,26 @@ where
     }
 }
 
-impl<S: BosStr, St: master_state::State> MasterBuilder<S, St> {
+impl<St: master_state::State, S: BosStr> MasterBuilder<St, S> {
     /// Set the `snapshotScope` field (optional)
-    pub fn snapshot_scope(mut self, value: impl Into<Option<MasterSnapshotScope<S>>>) -> Self {
+    pub fn snapshot_scope(
+        mut self,
+        value: impl Into<Option<MasterSnapshotScope<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `snapshotScope` field to an Option value (optional)
-    pub fn maybe_snapshot_scope(mut self, value: Option<MasterSnapshotScope<S>>) -> Self {
+    pub fn maybe_snapshot_scope(
+        mut self,
+        value: Option<MasterSnapshotScope<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
 }
 
-impl<S: BosStr, St: master_state::State> MasterBuilder<S, St> {
+impl<St: master_state::State, S: BosStr> MasterBuilder<St, S> {
     /// Set the `spriteCid` field (optional)
     pub fn sprite_cid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -392,7 +416,7 @@ impl<S: BosStr, St: master_state::State> MasterBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: master_state::State> MasterBuilder<S, St> {
+impl<St: master_state::State, S: BosStr> MasterBuilder<St, S> {
     /// Set the `stats` field (optional)
     pub fn stats(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -405,13 +429,16 @@ impl<S: BosStr, St: master_state::State> MasterBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MasterBuilder<S, St>
+impl<St, S: BosStr> MasterBuilder<St, S>
 where
     St: master_state::State,
     St::System: master_state::IsUnset,
 {
     /// Set the `system` field (required)
-    pub fn system(mut self, value: impl Into<S>) -> MasterBuilder<S, master_state::SetSystem<St>> {
+    pub fn system(
+        mut self,
+        value: impl Into<S>,
+    ) -> MasterBuilder<master_state::SetSystem<St>, S> {
         self._fields.6 = Option::Some(value.into());
         MasterBuilder {
             _state: PhantomData,
@@ -421,7 +448,7 @@ where
     }
 }
 
-impl<S: BosStr, St: master_state::State> MasterBuilder<S, St> {
+impl<St: master_state::State, S: BosStr> MasterBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.7 = value.into();
@@ -434,12 +461,12 @@ impl<S: BosStr, St: master_state::State> MasterBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MasterBuilder<S, St>
+impl<St, S: BosStr> MasterBuilder<St, S>
 where
     St: master_state::State,
     St::Player: master_state::IsSet,
-    St::CreatedAt: master_state::IsSet,
     St::System: master_state::IsSet,
+    St::CreatedAt: master_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Master<S> {
@@ -472,10 +499,10 @@ where
 }
 
 fn lexicon_doc_actor_rpg_master() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("actor.rpg.master"),

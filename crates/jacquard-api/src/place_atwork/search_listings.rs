@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,18 +21,15 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::place_atwork::listing::Listing;
-use crate::place_atwork::search_listings;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_atwork::listing::Listing;
+use crate::place_atwork::search_listings;
 /// A job listing record with metadata for strong references
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListingRecord<S: BosStr = DefaultStr> {
     ///CID of the listing record
     pub cid: Cid<S>,
@@ -45,29 +42,34 @@ pub struct ListingRecord<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchListings<S: BosStr = DefaultStr> {
     pub query: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchListingsOutput<S: BosStr = DefaultStr> {
     pub listings: Vec<search_listings::ListingRecord<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum SearchListingsError {
     /// Failed to search listings
@@ -75,10 +77,7 @@ pub enum SearchListingsError {
     SearchFailed(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for SearchListingsError {
@@ -143,7 +142,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SearchListingsRequest {
 
 pub mod listing_record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -151,56 +150,66 @@ pub mod listing_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Cid = St::Cid;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
         type Cid = Set<members::cid>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListingRecordBuilder<S: BosStr, St: listing_record_state::State> {
+pub struct ListingRecordBuilder<
+    St: listing_record_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>, Option<Listing<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListingRecord<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListingRecordBuilder<S, listing_record_state::Empty> {
+impl ListingRecord<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListingRecordBuilder<listing_record_state::Empty, DefaultStr> {
         ListingRecordBuilder::new()
     }
 }
 
-impl<S: BosStr> ListingRecordBuilder<S, listing_record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListingRecord<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListingRecordBuilder<listing_record_state::Empty, S> {
+        ListingRecordBuilder::builder()
+    }
+}
+
+impl ListingRecordBuilder<listing_record_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListingRecordBuilder {
             _state: PhantomData,
@@ -210,7 +219,18 @@ impl<S: BosStr> ListingRecordBuilder<S, listing_record_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ListingRecordBuilder<S, St>
+impl<S: BosStr> ListingRecordBuilder<listing_record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListingRecordBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ListingRecordBuilder<St, S>
 where
     St: listing_record_state::State,
     St::Cid: listing_record_state::IsUnset,
@@ -219,7 +239,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> ListingRecordBuilder<S, listing_record_state::SetCid<St>> {
+    ) -> ListingRecordBuilder<listing_record_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ListingRecordBuilder {
             _state: PhantomData,
@@ -229,7 +249,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ListingRecordBuilder<S, St>
+impl<St, S: BosStr> ListingRecordBuilder<St, S>
 where
     St: listing_record_state::State,
     St::Uri: listing_record_state::IsUnset,
@@ -238,7 +258,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ListingRecordBuilder<S, listing_record_state::SetUri<St>> {
+    ) -> ListingRecordBuilder<listing_record_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ListingRecordBuilder {
             _state: PhantomData,
@@ -248,7 +268,7 @@ where
     }
 }
 
-impl<S: BosStr, St: listing_record_state::State> ListingRecordBuilder<S, St> {
+impl<St: listing_record_state::State, S: BosStr> ListingRecordBuilder<St, S> {
     /// Set the `value` field (optional)
     pub fn value(mut self, value: impl Into<Option<Listing<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -261,11 +281,11 @@ impl<S: BosStr, St: listing_record_state::State> ListingRecordBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListingRecordBuilder<S, St>
+impl<St, S: BosStr> ListingRecordBuilder<St, S>
 where
     St: listing_record_state::State,
-    St::Uri: listing_record_state::IsSet,
     St::Cid: listing_record_state::IsSet,
+    St::Uri: listing_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ListingRecord<S> {
@@ -277,7 +297,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ListingRecord<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ListingRecord<S> {
         ListingRecord {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -288,10 +311,10 @@ where
 }
 
 fn lexicon_doc_place_atwork_searchListings() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.atwork.searchListings"),
@@ -300,17 +323,23 @@ fn lexicon_doc_place_atwork_searchListings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("listingRecord"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A job listing record with metadata for strong references",
-                    )),
-                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A job listing record with metadata for strong references",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("CID of the listing record")),
+                                description: Some(
+                                    CowStr::new_static("CID of the listing record"),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -318,9 +347,11 @@ fn lexicon_doc_place_atwork_searchListings() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT-URI of the listing (at://did/place.atwork.listing/rkey)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "AT-URI of the listing (at://did/place.atwork.listing/rkey)",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -340,24 +371,28 @@ fn lexicon_doc_place_atwork_searchListings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("query")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("query"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Search query string for full-text search",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("query")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("query"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Search query string for full-text search",
+                                            ),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -369,7 +404,7 @@ fn lexicon_doc_place_atwork_searchListings() -> LexiconDoc<'static> {
 
 pub mod search_listings_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -400,21 +435,31 @@ pub mod search_listings_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchListingsBuilder<S: BosStr, St: search_listings_state::State> {
+pub struct SearchListingsBuilder<
+    St: search_listings_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SearchListings<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SearchListingsBuilder<S, search_listings_state::Empty> {
+impl SearchListings<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SearchListingsBuilder<search_listings_state::Empty, DefaultStr> {
         SearchListingsBuilder::new()
     }
 }
 
-impl<S: BosStr> SearchListingsBuilder<S, search_listings_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SearchListings<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SearchListingsBuilder<search_listings_state::Empty, S> {
+        SearchListingsBuilder::builder()
+    }
+}
+
+impl SearchListingsBuilder<search_listings_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SearchListingsBuilder {
             _state: PhantomData,
@@ -424,7 +469,18 @@ impl<S: BosStr> SearchListingsBuilder<S, search_listings_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SearchListingsBuilder<S, St>
+impl<S: BosStr> SearchListingsBuilder<search_listings_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SearchListingsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SearchListingsBuilder<St, S>
 where
     St: search_listings_state::State,
     St::Query: search_listings_state::IsUnset,
@@ -433,7 +489,7 @@ where
     pub fn query(
         mut self,
         value: impl Into<S>,
-    ) -> SearchListingsBuilder<S, search_listings_state::SetQuery<St>> {
+    ) -> SearchListingsBuilder<search_listings_state::SetQuery<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SearchListingsBuilder {
             _state: PhantomData,
@@ -443,7 +499,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SearchListingsBuilder<S, St>
+impl<St, S: BosStr> SearchListingsBuilder<St, S>
 where
     St: search_listings_state::State,
     St::Query: search_listings_state::IsSet,

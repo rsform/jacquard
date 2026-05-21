@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::settings;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::settings;
 /// Animation timing and speed settings for various UI animations
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AnimationTiming<S: BosStr = DefaultStr> {
     ///Card advance exit to right and entrance back in from right (stored as string)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -70,11 +67,9 @@ pub struct AnimationTiming<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BatchNotificationTypes<S: BosStr = DefaultStr> {
     ///Batch follow notifications
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -101,10 +96,7 @@ pub struct BatchNotificationTypes<S: BosStr = DefaultStr> {
 /// App behavior and functionality settings
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BehaviorSettings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub animation_timing: Option<settings::AnimationTiming<S>>,
@@ -251,10 +243,7 @@ pub struct BehaviorSettings<S: BosStr = DefaultStr> {
 /// Control button visibility settings
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ControlSettings<S: BosStr = DefaultStr> {
     ///Show account list button
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -347,10 +336,7 @@ pub struct ControlSettings<S: BosStr = DefaultStr> {
 /// Corner element positioning settings
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CornerElements<S: BosStr = DefaultStr> {
     ///Element to show in bottom left corner
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -368,11 +354,9 @@ pub struct CornerElements<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FilterNotificationTypes<S: BosStr = DefaultStr> {
     ///Show follow notifications
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -396,11 +380,9 @@ pub struct FilterNotificationTypes<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FilterRelationshipTypes<S: BosStr = DefaultStr> {
     ///Show notifications from followers
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -418,11 +400,9 @@ pub struct FilterRelationshipTypes<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HideReposts<S: BosStr = DefaultStr> {
     ///Hide reposts in feed
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -434,11 +414,9 @@ pub struct HideReposts<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HighlightNotificationTypes<S: BosStr = DefaultStr> {
     ///Highlight follow notifications
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -465,10 +443,7 @@ pub struct HighlightNotificationTypes<S: BosStr = DefaultStr> {
 /// Keyboard shortcut configuration
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct KeyboardShortcuts<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub composer: Option<settings::KeyboardShortcutsComposer<S>>,
@@ -487,10 +462,7 @@ pub struct KeyboardShortcuts<S: BosStr = DefaultStr> {
 /// Post composer keyboard shortcuts
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct KeyboardShortcutsComposer<S: BosStr = DefaultStr> {
     ///Publish post (e.g., ctrl+enter)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -502,10 +474,7 @@ pub struct KeyboardShortcutsComposer<S: BosStr = DefaultStr> {
 /// Global navigation keyboard shortcuts
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct KeyboardShortcutsGlobal<S: BosStr = DefaultStr> {
     ///Navigate to collection
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -526,10 +495,7 @@ pub struct KeyboardShortcutsGlobal<S: BosStr = DefaultStr> {
 /// Modal keyboard shortcuts
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct KeyboardShortcutsModals<S: BosStr = DefaultStr> {
     ///Show keyboard shortcuts help
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -553,10 +519,7 @@ pub struct KeyboardShortcutsModals<S: BosStr = DefaultStr> {
 /// Navigation keyboard shortcuts
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct KeyboardShortcutsNavigation<S: BosStr = DefaultStr> {
     ///Scroll down or next item
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -580,10 +543,7 @@ pub struct KeyboardShortcutsNavigation<S: BosStr = DefaultStr> {
 /// Post interaction keyboard shortcuts
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct KeyboardShortcutsPostInteractions<S: BosStr = DefaultStr> {
     ///Like current post
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -647,10 +607,7 @@ pub struct SettingsGetRecordOutput<S: BosStr = DefaultStr> {
 /// Content moderation and filtering settings
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModerationSettings<S: BosStr = DefaultStr> {
     ///How to handle posts from muted accounts
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -662,11 +619,9 @@ pub struct ModerationSettings<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StatsVisibleSections<S: BosStr = DefaultStr> {
     ///Show activity section in stats overview
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -684,10 +639,7 @@ pub struct StatsVisibleSections<S: BosStr = DefaultStr> {
 /// UI visibility and behavior settings
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UiSettings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub corner_elements: Option<settings::CornerElements<S>>,
@@ -1487,10 +1439,10 @@ impl<S: BosStr> LexiconSchema for UiSettings<S> {
 }
 
 fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.settings"),
@@ -2040,7 +1992,9 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("controlSettings"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Control button visibility settings")),
+                    description: Some(
+                        CowStr::new_static("Control button visibility settings"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2220,43 +2174,45 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("cornerElements"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Corner element positioning settings")),
+                    description: Some(
+                        CowStr::new_static("Corner element positioning settings"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("bottomLeft"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Element to show in bottom left corner",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Element to show in bottom left corner"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("bottomRight"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Element to show in bottom right corner",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Element to show in bottom right corner"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("topLeft"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Element to show in top left corner",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Element to show in top left corner"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("topRight"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Element to show in top right corner",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Element to show in top right corner"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2420,7 +2376,9 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("keyboardShortcuts"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Keyboard shortcut configuration")),
+                    description: Some(
+                        CowStr::new_static("Keyboard shortcut configuration"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2455,7 +2413,9 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("postInteractions"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("#keyboardShortcutsPostInteractions"),
+                                r#ref: CowStr::new_static(
+                                    "#keyboardShortcutsPostInteractions",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2467,16 +2427,18 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("keyboardShortcutsComposer"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Post composer keyboard shortcuts")),
+                    description: Some(
+                        CowStr::new_static("Post composer keyboard shortcuts"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("publish"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Publish post (e.g., ctrl+enter)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Publish post (e.g., ctrl+enter)"),
+                                ),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -2489,14 +2451,18 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("keyboardShortcutsGlobal"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Global navigation keyboard shortcuts")),
+                    description: Some(
+                        CowStr::new_static("Global navigation keyboard shortcuts"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("collection"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Navigate to collection")),
+                                description: Some(
+                                    CowStr::new_static("Navigate to collection"),
+                                ),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -2512,7 +2478,9 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("inventory"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Navigate to inventory")),
+                                description: Some(
+                                    CowStr::new_static("Navigate to inventory"),
+                                ),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -2520,7 +2488,9 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("profile"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Navigate to profile")),
+                                description: Some(
+                                    CowStr::new_static("Navigate to profile"),
+                                ),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -2540,9 +2510,9 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("keyboardHelp"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Show keyboard shortcuts help",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Show keyboard shortcuts help"),
+                                ),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -2587,14 +2557,18 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("keyboardShortcutsNavigation"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Navigation keyboard shortcuts")),
+                    description: Some(
+                        CowStr::new_static("Navigation keyboard shortcuts"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("arrowDown"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Scroll down or next item")),
+                                description: Some(
+                                    CowStr::new_static("Scroll down or next item"),
+                                ),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -2602,7 +2576,9 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("arrowLeft"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Go back to previous card")),
+                                description: Some(
+                                    CowStr::new_static("Go back to previous card"),
+                                ),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -2610,7 +2586,9 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("arrowRight"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Advance to next card")),
+                                description: Some(
+                                    CowStr::new_static("Advance to next card"),
+                                ),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -2618,7 +2596,9 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("arrowUp"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Scroll up or previous item")),
+                                description: Some(
+                                    CowStr::new_static("Scroll up or previous item"),
+                                ),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -2626,9 +2606,9 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("escape"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Exit fullscreen or close modals",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Exit fullscreen or close modals"),
+                                ),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -2641,7 +2621,9 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("keyboardShortcutsPostInteractions"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Post interaction keyboard shortcuts")),
+                    description: Some(
+                        CowStr::new_static("Post interaction keyboard shortcuts"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2664,7 +2646,9 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("reply"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Reply to current post")),
+                                description: Some(
+                                    CowStr::new_static("Reply to current post"),
+                                ),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -2672,7 +2656,9 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("repost"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Repost current post")),
+                                description: Some(
+                                    CowStr::new_static("Repost current post"),
+                                ),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -2783,27 +2769,31 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("moderationSettings"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Content moderation and filtering settings",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Content moderation and filtering settings"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("mutedAccountsHandling"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "How to handle posts from muted accounts",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "How to handle posts from muted accounts",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("mutedContentHandling"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "How to handle posts containing muted words or phrases",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "How to handle posts containing muted words or phrases",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2844,7 +2834,9 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("uiSettings"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("UI visibility and behavior settings")),
+                    description: Some(
+                        CowStr::new_static("UI visibility and behavior settings"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2858,9 +2850,11 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("fontSize"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Font size scale (0.8 = 80%, 1.0 = 100% default, 1.2 = 120%)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Font size scale (0.8 = 80%, 1.0 = 100% default, 1.2 = 120%)",
+                                    ),
+                                ),
                                 max_length: Some(10usize),
                                 ..Default::default()
                             }),
@@ -2868,36 +2862,36 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("postCardPrimarySlot"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Primary name slot for post cards",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Primary name slot for post cards"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("postCardSecondarySlot"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Secondary name slot for post cards",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Secondary name slot for post cards"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("profileCardPrimarySlot"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Primary name slot for profile cards",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Primary name slot for profile cards"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("profileCardSecondarySlot"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Secondary name slot for profile cards",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Secondary name slot for profile cards"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -3112,7 +3106,7 @@ fn lexicon_doc_net_anisota_settings() -> LexiconDoc<'static> {
 
 pub mod settings_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3120,56 +3114,56 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
         type CreatedAt;
         type Version;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
         type CreatedAt = Unset;
         type Version = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
-    impl<St: State> State for SetUpdatedAt<St> {
-        type UpdatedAt = Set<members::updated_at>;
-        type CreatedAt = St::CreatedAt;
-        type Version = St::Version;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type UpdatedAt = St::UpdatedAt;
         type CreatedAt = Set<members::created_at>;
         type Version = St::Version;
+        type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `version` field to Set
     pub struct SetVersion<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetVersion<St> {}
     impl<St: State> State for SetVersion<St> {
-        type UpdatedAt = St::UpdatedAt;
         type CreatedAt = St::CreatedAt;
         type Version = Set<members::version>;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type CreatedAt = St::CreatedAt;
+        type Version = St::Version;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `version` field
         pub struct version(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SettingsBuilder<S: BosStr, St: settings_state::State> {
+pub struct SettingsBuilder<St: settings_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<settings::BehaviorSettings<S>>,
@@ -3184,15 +3178,22 @@ pub struct SettingsBuilder<S: BosStr, St: settings_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Settings<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SettingsBuilder<S, settings_state::Empty> {
+impl Settings<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SettingsBuilder<settings_state::Empty, DefaultStr> {
         SettingsBuilder::new()
     }
 }
 
-impl<S: BosStr> SettingsBuilder<S, settings_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Settings<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SettingsBuilder<settings_state::Empty, S> {
+        SettingsBuilder::builder()
+    }
+}
+
+impl SettingsBuilder<settings_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SettingsBuilder {
             _state: PhantomData,
@@ -3202,7 +3203,18 @@ impl<S: BosStr> SettingsBuilder<S, settings_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
+impl<S: BosStr> SettingsBuilder<settings_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SettingsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `behaviorSettings` field (optional)
     pub fn behavior_settings(
         mut self,
@@ -3212,13 +3224,16 @@ impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
         self
     }
     /// Set the `behaviorSettings` field to an Option value (optional)
-    pub fn maybe_behavior_settings(mut self, value: Option<settings::BehaviorSettings<S>>) -> Self {
+    pub fn maybe_behavior_settings(
+        mut self,
+        value: Option<settings::BehaviorSettings<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
 }
 
-impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `controlOrder` field (optional)
     pub fn control_order(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -3231,7 +3246,7 @@ impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `controlSettings` field (optional)
     pub fn control_settings(
         mut self,
@@ -3241,13 +3256,16 @@ impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
         self
     }
     /// Set the `controlSettings` field to an Option value (optional)
-    pub fn maybe_control_settings(mut self, value: Option<settings::ControlSettings<S>>) -> Self {
+    pub fn maybe_control_settings(
+        mut self,
+        value: Option<settings::ControlSettings<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
     St::CreatedAt: settings_state::IsUnset,
@@ -3256,7 +3274,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SettingsBuilder<S, settings_state::SetCreatedAt<St>> {
+    ) -> SettingsBuilder<settings_state::SetCreatedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
@@ -3266,7 +3284,7 @@ where
     }
 }
 
-impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -3279,9 +3297,12 @@ impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `uiSettings` field (optional)
-    pub fn ui_settings(mut self, value: impl Into<Option<settings::UiSettings<S>>>) -> Self {
+    pub fn ui_settings(
+        mut self,
+        value: impl Into<Option<settings::UiSettings<S>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -3292,7 +3313,7 @@ impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
     St::UpdatedAt: settings_state::IsUnset,
@@ -3301,7 +3322,7 @@ where
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SettingsBuilder<S, settings_state::SetUpdatedAt<St>> {
+    ) -> SettingsBuilder<settings_state::SetUpdatedAt<St>, S> {
         self._fields.6 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
@@ -3311,7 +3332,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
     St::Version: settings_state::IsUnset,
@@ -3320,7 +3341,7 @@ where
     pub fn version(
         mut self,
         value: impl Into<i64>,
-    ) -> SettingsBuilder<S, settings_state::SetVersion<St>> {
+    ) -> SettingsBuilder<settings_state::SetVersion<St>, S> {
         self._fields.7 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
@@ -3330,12 +3351,12 @@ where
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
-    St::UpdatedAt: settings_state::IsSet,
     St::CreatedAt: settings_state::IsSet,
     St::Version: settings_state::IsSet,
+    St::UpdatedAt: settings_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Settings<S> {

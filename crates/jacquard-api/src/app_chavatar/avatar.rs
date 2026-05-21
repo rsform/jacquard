@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// An individual avatar image record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -117,23 +117,25 @@ impl<S: BosStr> LexiconSchema for Avatar<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/webp".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -146,7 +148,7 @@ impl<S: BosStr> LexiconSchema for Avatar<S> {
 
 pub mod avatar_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -154,56 +156,63 @@ pub mod avatar_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Avatar;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Avatar = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Avatar = St::Avatar;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `avatar` field to Set
     pub struct SetAvatar<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAvatar<St> {}
     impl<St: State> State for SetAvatar<St> {
-        type CreatedAt = St::CreatedAt;
         type Avatar = Set<members::avatar>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Avatar = St::Avatar;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `avatar` field
         pub struct avatar(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AvatarBuilder<S: BosStr, St: avatar_state::State> {
+pub struct AvatarBuilder<St: avatar_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Avatar<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AvatarBuilder<S, avatar_state::Empty> {
+impl Avatar<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AvatarBuilder<avatar_state::Empty, DefaultStr> {
         AvatarBuilder::new()
     }
 }
 
-impl<S: BosStr> AvatarBuilder<S, avatar_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Avatar<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AvatarBuilder<avatar_state::Empty, S> {
+        AvatarBuilder::builder()
+    }
+}
+
+impl AvatarBuilder<avatar_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AvatarBuilder {
             _state: PhantomData,
@@ -213,7 +222,18 @@ impl<S: BosStr> AvatarBuilder<S, avatar_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AvatarBuilder<S, St>
+impl<S: BosStr> AvatarBuilder<avatar_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AvatarBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AvatarBuilder<St, S>
 where
     St: avatar_state::State,
     St::Avatar: avatar_state::IsUnset,
@@ -222,7 +242,7 @@ where
     pub fn avatar(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> AvatarBuilder<S, avatar_state::SetAvatar<St>> {
+    ) -> AvatarBuilder<avatar_state::SetAvatar<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AvatarBuilder {
             _state: PhantomData,
@@ -232,7 +252,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AvatarBuilder<S, St>
+impl<St, S: BosStr> AvatarBuilder<St, S>
 where
     St: avatar_state::State,
     St::CreatedAt: avatar_state::IsUnset,
@@ -241,7 +261,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AvatarBuilder<S, avatar_state::SetCreatedAt<St>> {
+    ) -> AvatarBuilder<avatar_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AvatarBuilder {
             _state: PhantomData,
@@ -251,11 +271,11 @@ where
     }
 }
 
-impl<S: BosStr, St> AvatarBuilder<S, St>
+impl<St, S: BosStr> AvatarBuilder<St, S>
 where
     St: avatar_state::State,
-    St::CreatedAt: avatar_state::IsSet,
     St::Avatar: avatar_state::IsSet,
+    St::CreatedAt: avatar_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Avatar<S> {
@@ -276,10 +296,10 @@ where
 }
 
 fn lexicon_doc_app_chavatar_avatar() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chavatar.avatar"),
@@ -288,21 +308,23 @@ fn lexicon_doc_app_chavatar_avatar() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("An individual avatar image record.")),
+                    description: Some(
+                        CowStr::new_static("An individual avatar image record."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("avatar"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("avatar"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("avatar"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),

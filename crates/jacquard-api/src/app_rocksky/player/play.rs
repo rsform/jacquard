@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlayParams<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub player_id: Option<S>,
@@ -41,8 +38,9 @@ impl jacquard_common::xrpc::XrpcResp for PlayResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Play {
     const NSID: &'static str = "app.rocksky.player.play";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PlayResponse;
 }
 
@@ -50,15 +48,16 @@ impl jacquard_common::xrpc::XrpcRequest for Play {
 pub struct PlayRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PlayRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.player.play";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Play;
     type Response = PlayResponse;
 }
 
 pub mod play_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -76,21 +75,28 @@ pub mod play_params_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PlayParamsBuilder<S: BosStr, St: play_params_state::State> {
+pub struct PlayParamsBuilder<St: play_params_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PlayParams<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PlayParamsBuilder<S, play_params_state::Empty> {
+impl PlayParams<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PlayParamsBuilder<play_params_state::Empty, DefaultStr> {
         PlayParamsBuilder::new()
     }
 }
 
-impl<S: BosStr> PlayParamsBuilder<S, play_params_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PlayParams<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PlayParamsBuilder<play_params_state::Empty, S> {
+        PlayParamsBuilder::builder()
+    }
+}
+
+impl PlayParamsBuilder<play_params_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PlayParamsBuilder {
             _state: PhantomData,
@@ -100,7 +106,18 @@ impl<S: BosStr> PlayParamsBuilder<S, play_params_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: play_params_state::State> PlayParamsBuilder<S, St> {
+impl<S: BosStr> PlayParamsBuilder<play_params_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PlayParamsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: play_params_state::State, S: BosStr> PlayParamsBuilder<St, S> {
     /// Set the `playerId` field (optional)
     pub fn player_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -113,7 +130,7 @@ impl<S: BosStr, St: play_params_state::State> PlayParamsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PlayParamsBuilder<S, St>
+impl<St, S: BosStr> PlayParamsBuilder<St, S>
 where
     St: play_params_state::State,
 {

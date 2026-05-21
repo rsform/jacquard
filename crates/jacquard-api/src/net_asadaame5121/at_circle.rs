@@ -11,6 +11,7 @@ pub mod member;
 pub mod request;
 pub mod ring;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -29,13 +30,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RingRef<S: BosStr = DefaultStr> {
     ///Optional CID for strong reference
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -84,7 +82,7 @@ impl<S: BosStr> LexiconSchema for RingRef<S> {
 
 pub mod ring_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -115,21 +113,28 @@ pub mod ring_ref_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RingRefBuilder<S: BosStr, St: ring_ref_state::State> {
+pub struct RingRefBuilder<St: ring_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RingRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RingRefBuilder<S, ring_ref_state::Empty> {
+impl RingRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RingRefBuilder<ring_ref_state::Empty, DefaultStr> {
         RingRefBuilder::new()
     }
 }
 
-impl<S: BosStr> RingRefBuilder<S, ring_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RingRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RingRefBuilder<ring_ref_state::Empty, S> {
+        RingRefBuilder::builder()
+    }
+}
+
+impl RingRefBuilder<ring_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RingRefBuilder {
             _state: PhantomData,
@@ -139,7 +144,18 @@ impl<S: BosStr> RingRefBuilder<S, ring_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: ring_ref_state::State> RingRefBuilder<S, St> {
+impl<S: BosStr> RingRefBuilder<ring_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RingRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: ring_ref_state::State, S: BosStr> RingRefBuilder<St, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -152,7 +168,7 @@ impl<S: BosStr, St: ring_ref_state::State> RingRefBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RingRefBuilder<S, St>
+impl<St, S: BosStr> RingRefBuilder<St, S>
 where
     St: ring_ref_state::State,
     St::Uri: ring_ref_state::IsUnset,
@@ -161,7 +177,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RingRefBuilder<S, ring_ref_state::SetUri<St>> {
+    ) -> RingRefBuilder<ring_ref_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RingRefBuilder {
             _state: PhantomData,
@@ -171,7 +187,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RingRefBuilder<S, St>
+impl<St, S: BosStr> RingRefBuilder<St, S>
 where
     St: ring_ref_state::State,
     St::Uri: ring_ref_state::IsSet,
@@ -195,10 +211,10 @@ where
 }
 
 fn lexicon_doc_net_asadaame5121_at_circle_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.asadaame5121.at-circle.defs"),
@@ -214,9 +230,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Optional CID for strong reference",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Optional CID for strong reference"),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 max_length: Some(100usize),
                                 ..Default::default()

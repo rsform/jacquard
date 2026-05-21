@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// DEPRECATED: Use app.gainforest.dwc.occurrence instead. A declaration of a flora observation for an organization.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -106,7 +106,7 @@ impl<S: BosStr> LexiconSchema for Flora<S> {
 
 pub mod flora_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -114,56 +114,63 @@ pub mod flora_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GbifTaxonKeys;
         type CreatedAt;
+        type GbifTaxonKeys;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GbifTaxonKeys = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `gbif_taxon_keys` field to Set
-    pub struct SetGbifTaxonKeys<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGbifTaxonKeys<St> {}
-    impl<St: State> State for SetGbifTaxonKeys<St> {
-        type GbifTaxonKeys = Set<members::gbif_taxon_keys>;
-        type CreatedAt = St::CreatedAt;
+        type GbifTaxonKeys = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type GbifTaxonKeys = St::GbifTaxonKeys;
         type CreatedAt = Set<members::created_at>;
+        type GbifTaxonKeys = St::GbifTaxonKeys;
+    }
+    ///State transition - sets the `gbif_taxon_keys` field to Set
+    pub struct SetGbifTaxonKeys<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGbifTaxonKeys<St> {}
+    impl<St: State> State for SetGbifTaxonKeys<St> {
+        type CreatedAt = St::CreatedAt;
+        type GbifTaxonKeys = Set<members::gbif_taxon_keys>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `gbif_taxon_keys` field
-        pub struct gbif_taxon_keys(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `gbif_taxon_keys` field
+        pub struct gbif_taxon_keys(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FloraBuilder<S: BosStr, St: flora_state::State> {
+pub struct FloraBuilder<St: flora_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Flora<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FloraBuilder<S, flora_state::Empty> {
+impl Flora<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FloraBuilder<flora_state::Empty, DefaultStr> {
         FloraBuilder::new()
     }
 }
 
-impl<S: BosStr> FloraBuilder<S, flora_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Flora<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FloraBuilder<flora_state::Empty, S> {
+        FloraBuilder::builder()
+    }
+}
+
+impl FloraBuilder<flora_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FloraBuilder {
             _state: PhantomData,
@@ -173,7 +180,18 @@ impl<S: BosStr> FloraBuilder<S, flora_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FloraBuilder<S, St>
+impl<S: BosStr> FloraBuilder<flora_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FloraBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FloraBuilder<St, S>
 where
     St: flora_state::State,
     St::CreatedAt: flora_state::IsUnset,
@@ -182,7 +200,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FloraBuilder<S, flora_state::SetCreatedAt<St>> {
+    ) -> FloraBuilder<flora_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FloraBuilder {
             _state: PhantomData,
@@ -192,7 +210,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FloraBuilder<S, St>
+impl<St, S: BosStr> FloraBuilder<St, S>
 where
     St: flora_state::State,
     St::GbifTaxonKeys: flora_state::IsUnset,
@@ -201,7 +219,7 @@ where
     pub fn gbif_taxon_keys(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> FloraBuilder<S, flora_state::SetGbifTaxonKeys<St>> {
+    ) -> FloraBuilder<flora_state::SetGbifTaxonKeys<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FloraBuilder {
             _state: PhantomData,
@@ -211,11 +229,11 @@ where
     }
 }
 
-impl<S: BosStr, St> FloraBuilder<S, St>
+impl<St, S: BosStr> FloraBuilder<St, S>
 where
     St: flora_state::State,
-    St::GbifTaxonKeys: flora_state::IsSet,
     St::CreatedAt: flora_state::IsSet,
+    St::GbifTaxonKeys: flora_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Flora<S> {
@@ -236,10 +254,10 @@ where
 }
 
 fn lexicon_doc_app_gainforest_organization_observations_flora() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.gainforest.organization.observations.flora"),

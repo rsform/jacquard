@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Nsid};
+use jacquard_common::types::string::{AtUri, Nsid, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::garden_lexicon::service;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::garden_lexicon::service;
 /// Declares XRPC methods available on a DID document service. The rkey is the service fragment ID without the # prefix (e.g., 'atproto_pds' for '#atproto_pds').
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -64,11 +64,9 @@ pub struct ServiceGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Service<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Method<S: BosStr = DefaultStr> {
     ///Authentication methods supported by this method.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -82,11 +80,9 @@ pub struct Method<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UrlTemplate<S: BosStr = DefaultStr> {
     ///NSIDs of collections this URL template applies to.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -222,7 +218,7 @@ impl<S: BosStr> LexiconSchema for UrlTemplate<S> {
 
 pub mod service_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -253,7 +249,7 @@ pub mod service_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ServiceBuilder<S: BosStr, St: service_state::State> {
+pub struct ServiceBuilder<St: service_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -264,15 +260,22 @@ pub struct ServiceBuilder<S: BosStr, St: service_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Service<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ServiceBuilder<S, service_state::Empty> {
+impl Service<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ServiceBuilder<service_state::Empty, DefaultStr> {
         ServiceBuilder::new()
     }
 }
 
-impl<S: BosStr> ServiceBuilder<S, service_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Service<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ServiceBuilder<service_state::Empty, S> {
+        ServiceBuilder::builder()
+    }
+}
+
+impl ServiceBuilder<service_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ServiceBuilder {
             _state: PhantomData,
@@ -282,7 +285,18 @@ impl<S: BosStr> ServiceBuilder<S, service_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
+impl<S: BosStr> ServiceBuilder<service_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ServiceBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -295,7 +309,7 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
+impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `methods` field (optional)
     pub fn methods(mut self, value: impl Into<Option<Vec<service::Method<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -308,7 +322,7 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ServiceBuilder<S, St>
+impl<St, S: BosStr> ServiceBuilder<St, S>
 where
     St: service_state::State,
     St::ServiceType: service_state::IsUnset,
@@ -317,7 +331,7 @@ where
     pub fn service_type(
         mut self,
         value: impl Into<S>,
-    ) -> ServiceBuilder<S, service_state::SetServiceType<St>> {
+    ) -> ServiceBuilder<service_state::SetServiceType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ServiceBuilder {
             _state: PhantomData,
@@ -327,20 +341,26 @@ where
     }
 }
 
-impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
+impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `urlTemplates` field (optional)
-    pub fn url_templates(mut self, value: impl Into<Option<Vec<service::UrlTemplate<S>>>>) -> Self {
+    pub fn url_templates(
+        mut self,
+        value: impl Into<Option<Vec<service::UrlTemplate<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `urlTemplates` field to an Option value (optional)
-    pub fn maybe_url_templates(mut self, value: Option<Vec<service::UrlTemplate<S>>>) -> Self {
+    pub fn maybe_url_templates(
+        mut self,
+        value: Option<Vec<service::UrlTemplate<S>>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
 }
 
-impl<S: BosStr, St> ServiceBuilder<S, St>
+impl<St, S: BosStr> ServiceBuilder<St, S>
 where
     St: service_state::State,
     St::ServiceType: service_state::IsSet,
@@ -368,10 +388,10 @@ where
 }
 
 fn lexicon_doc_garden_lexicon_service() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.lexicon.service"),
@@ -458,9 +478,11 @@ fn lexicon_doc_garden_lexicon_service() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("authMethods"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Authentication methods supported by this method.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Authentication methods supported by this method.",
+                                    ),
+                                ),
                                 items: LexArrayItem::String(LexString {
                                     max_length: Some(50usize),
                                     ..Default::default()
@@ -477,9 +499,11 @@ fn lexicon_doc_garden_lexicon_service() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("lexicon"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT-URI pointing to a lexicon schema that defines this method.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "AT-URI pointing to a lexicon schema that defines this method.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -499,9 +523,11 @@ fn lexicon_doc_garden_lexicon_service() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("collections"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "NSIDs of collections this URL template applies to.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "NSIDs of collections this URL template applies to.",
+                                    ),
+                                ),
                                 items: LexArrayItem::String(LexString {
                                     format: Some(LexStringFormat::Nsid),
                                     ..Default::default()
@@ -512,9 +538,11 @@ fn lexicon_doc_garden_lexicon_service() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Description of what this URL template is for.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Description of what this URL template is for.",
+                                    ),
+                                ),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
@@ -522,9 +550,11 @@ fn lexicon_doc_garden_lexicon_service() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URI template with placeholders for record data",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "URI template with placeholders for record data",
+                                    ),
+                                ),
                                 max_length: Some(2000usize),
                                 ..Default::default()
                             }),
@@ -542,7 +572,7 @@ fn lexicon_doc_garden_lexicon_service() -> LexiconDoc<'static> {
 
 pub mod method_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -573,21 +603,28 @@ pub mod method_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MethodBuilder<S: BosStr, St: method_state::State> {
+pub struct MethodBuilder<St: method_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<S>>, Option<bool>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Method<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MethodBuilder<S, method_state::Empty> {
+impl Method<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MethodBuilder<method_state::Empty, DefaultStr> {
         MethodBuilder::new()
     }
 }
 
-impl<S: BosStr> MethodBuilder<S, method_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Method<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MethodBuilder<method_state::Empty, S> {
+        MethodBuilder::builder()
+    }
+}
+
+impl MethodBuilder<method_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MethodBuilder {
             _state: PhantomData,
@@ -597,7 +634,18 @@ impl<S: BosStr> MethodBuilder<S, method_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: method_state::State> MethodBuilder<S, St> {
+impl<S: BosStr> MethodBuilder<method_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MethodBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: method_state::State, S: BosStr> MethodBuilder<St, S> {
     /// Set the `authMethods` field (optional)
     pub fn auth_methods(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -610,7 +658,7 @@ impl<S: BosStr, St: method_state::State> MethodBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: method_state::State> MethodBuilder<S, St> {
+impl<St: method_state::State, S: BosStr> MethodBuilder<St, S> {
     /// Set the `deprecated` field (optional)
     pub fn deprecated(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -623,7 +671,7 @@ impl<S: BosStr, St: method_state::State> MethodBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MethodBuilder<S, St>
+impl<St, S: BosStr> MethodBuilder<St, S>
 where
     St: method_state::State,
     St::Lexicon: method_state::IsUnset,
@@ -632,7 +680,7 @@ where
     pub fn lexicon(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> MethodBuilder<S, method_state::SetLexicon<St>> {
+    ) -> MethodBuilder<method_state::SetLexicon<St>, S> {
         self._fields.2 = Option::Some(value.into());
         MethodBuilder {
             _state: PhantomData,
@@ -642,7 +690,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MethodBuilder<S, St>
+impl<St, S: BosStr> MethodBuilder<St, S>
 where
     St: method_state::State,
     St::Lexicon: method_state::IsSet,

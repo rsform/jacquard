@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::unspecced::TrendingTopic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::unspecced::TrendingTopic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTrendingTopics<S: BosStr = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 25.
     #[serde(default = "_default_limit")]
@@ -32,11 +29,9 @@ pub struct GetTrendingTopics<S: BosStr = DefaultStr> {
     pub viewer: Option<Did<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTrendingTopicsOutput<S: BosStr = DefaultStr> {
     pub suggested: Vec<TrendingTopic<S>>,
     pub topics: Vec<TrendingTopic<S>>,
@@ -74,7 +69,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_trending_topics_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -92,21 +87,34 @@ pub mod get_trending_topics_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetTrendingTopicsBuilder<S: BosStr, St: get_trending_topics_state::State> {
+pub struct GetTrendingTopicsBuilder<
+    St: get_trending_topics_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetTrendingTopics<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetTrendingTopicsBuilder<S, get_trending_topics_state::Empty> {
+impl GetTrendingTopics<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetTrendingTopicsBuilder<
+        get_trending_topics_state::Empty,
+        DefaultStr,
+    > {
         GetTrendingTopicsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetTrendingTopicsBuilder<S, get_trending_topics_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetTrendingTopics<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetTrendingTopicsBuilder<get_trending_topics_state::Empty, S> {
+        GetTrendingTopicsBuilder::builder()
+    }
+}
+
+impl GetTrendingTopicsBuilder<get_trending_topics_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetTrendingTopicsBuilder {
             _state: PhantomData,
@@ -116,7 +124,18 @@ impl<S: BosStr> GetTrendingTopicsBuilder<S, get_trending_topics_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_trending_topics_state::State> GetTrendingTopicsBuilder<S, St> {
+impl<S: BosStr> GetTrendingTopicsBuilder<get_trending_topics_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetTrendingTopicsBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_trending_topics_state::State, S: BosStr> GetTrendingTopicsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -129,7 +148,7 @@ impl<S: BosStr, St: get_trending_topics_state::State> GetTrendingTopicsBuilder<S
     }
 }
 
-impl<S: BosStr, St: get_trending_topics_state::State> GetTrendingTopicsBuilder<S, St> {
+impl<St: get_trending_topics_state::State, S: BosStr> GetTrendingTopicsBuilder<St, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -142,7 +161,7 @@ impl<S: BosStr, St: get_trending_topics_state::State> GetTrendingTopicsBuilder<S
     }
 }
 
-impl<S: BosStr, St> GetTrendingTopicsBuilder<S, St>
+impl<St, S: BosStr> GetTrendingTopicsBuilder<St, S>
 where
     St: get_trending_topics_state::State,
 {

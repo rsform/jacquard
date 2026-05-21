@@ -21,26 +21,21 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::ooo_bsky::authfetch::fetch_records;
-use crate::ooo_bsky::authfetch::strategy::Strategy;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::ooo_bsky::authfetch::strategy::Strategy;
+use crate::ooo_bsky::authfetch::fetch_records;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FetchRecords<S: BosStr = DefaultStr> {
     pub uris: Vec<AtUri<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FetchRecordsOutput<S: BosStr = DefaultStr> {
     ///The results of the queries. Missing results indicate an error. For privacy, the error is not returned.
     pub results: Vec<fetch_records::FetchRecordsResult<S>>,
@@ -51,10 +46,7 @@ pub struct FetchRecordsOutput<S: BosStr = DefaultStr> {
 /// Successful result, with the record value.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FetchRecordsResult<S: BosStr = DefaultStr> {
     ///The stored private record value.
     pub record: Data<S>,
@@ -107,7 +99,7 @@ impl<S: BosStr> LexiconSchema for FetchRecordsResult<S> {
 
 pub mod fetch_records_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -138,21 +130,28 @@ pub mod fetch_records_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FetchRecordsBuilder<S: BosStr, St: fetch_records_state::State> {
+pub struct FetchRecordsBuilder<St: fetch_records_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> FetchRecords<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FetchRecordsBuilder<S, fetch_records_state::Empty> {
+impl FetchRecords<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FetchRecordsBuilder<fetch_records_state::Empty, DefaultStr> {
         FetchRecordsBuilder::new()
     }
 }
 
-impl<S: BosStr> FetchRecordsBuilder<S, fetch_records_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> FetchRecords<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FetchRecordsBuilder<fetch_records_state::Empty, S> {
+        FetchRecordsBuilder::builder()
+    }
+}
+
+impl FetchRecordsBuilder<fetch_records_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FetchRecordsBuilder {
             _state: PhantomData,
@@ -162,7 +161,18 @@ impl<S: BosStr> FetchRecordsBuilder<S, fetch_records_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FetchRecordsBuilder<S, St>
+impl<S: BosStr> FetchRecordsBuilder<fetch_records_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FetchRecordsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FetchRecordsBuilder<St, S>
 where
     St: fetch_records_state::State,
     St::Uris: fetch_records_state::IsUnset,
@@ -171,7 +181,7 @@ where
     pub fn uris(
         mut self,
         value: impl Into<Vec<AtUri<S>>>,
-    ) -> FetchRecordsBuilder<S, fetch_records_state::SetUris<St>> {
+    ) -> FetchRecordsBuilder<fetch_records_state::SetUris<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FetchRecordsBuilder {
             _state: PhantomData,
@@ -181,7 +191,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FetchRecordsBuilder<S, St>
+impl<St, S: BosStr> FetchRecordsBuilder<St, S>
 where
     St: fetch_records_state::State,
     St::Uris: fetch_records_state::IsSet,
@@ -196,7 +206,7 @@ where
 
 pub mod fetch_records_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -204,70 +214,83 @@ pub mod fetch_records_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Strategy;
+        type Uri;
         type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Strategy = Unset;
+        type Uri = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Strategy = St::Strategy;
-        type Record = St::Record;
     }
     ///State transition - sets the `strategy` field to Set
     pub struct SetStrategy<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStrategy<St> {}
     impl<St: State> State for SetStrategy<St> {
-        type Uri = St::Uri;
         type Strategy = Set<members::strategy>;
+        type Uri = St::Uri;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Strategy = St::Strategy;
+        type Uri = Set<members::uri>;
         type Record = St::Record;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecord<St> {}
     impl<St: State> State for SetRecord<St> {
-        type Uri = St::Uri;
         type Strategy = St::Strategy;
+        type Uri = St::Uri;
         type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `strategy` field
         pub struct strategy(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `record` field
         pub struct record(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FetchRecordsResultBuilder<S: BosStr, St: fetch_records_result_state::State> {
+pub struct FetchRecordsResultBuilder<
+    St: fetch_records_result_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>, Option<Strategy<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> FetchRecordsResult<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FetchRecordsResultBuilder<S, fetch_records_result_state::Empty> {
+impl FetchRecordsResult<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FetchRecordsResultBuilder<
+        fetch_records_result_state::Empty,
+        DefaultStr,
+    > {
         FetchRecordsResultBuilder::new()
     }
 }
 
-impl<S: BosStr> FetchRecordsResultBuilder<S, fetch_records_result_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> FetchRecordsResult<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FetchRecordsResultBuilder<fetch_records_result_state::Empty, S> {
+        FetchRecordsResultBuilder::builder()
+    }
+}
+
+impl FetchRecordsResultBuilder<fetch_records_result_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FetchRecordsResultBuilder {
             _state: PhantomData,
@@ -277,7 +300,18 @@ impl<S: BosStr> FetchRecordsResultBuilder<S, fetch_records_result_state::Empty> 
     }
 }
 
-impl<S: BosStr, St> FetchRecordsResultBuilder<S, St>
+impl<S: BosStr> FetchRecordsResultBuilder<fetch_records_result_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FetchRecordsResultBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FetchRecordsResultBuilder<St, S>
 where
     St: fetch_records_result_state::State,
     St::Record: fetch_records_result_state::IsUnset,
@@ -286,7 +320,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> FetchRecordsResultBuilder<S, fetch_records_result_state::SetRecord<St>> {
+    ) -> FetchRecordsResultBuilder<fetch_records_result_state::SetRecord<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FetchRecordsResultBuilder {
             _state: PhantomData,
@@ -296,7 +330,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FetchRecordsResultBuilder<S, St>
+impl<St, S: BosStr> FetchRecordsResultBuilder<St, S>
 where
     St: fetch_records_result_state::State,
     St::Strategy: fetch_records_result_state::IsUnset,
@@ -305,7 +339,7 @@ where
     pub fn strategy(
         mut self,
         value: impl Into<Strategy<S>>,
-    ) -> FetchRecordsResultBuilder<S, fetch_records_result_state::SetStrategy<St>> {
+    ) -> FetchRecordsResultBuilder<fetch_records_result_state::SetStrategy<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FetchRecordsResultBuilder {
             _state: PhantomData,
@@ -315,7 +349,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FetchRecordsResultBuilder<S, St>
+impl<St, S: BosStr> FetchRecordsResultBuilder<St, S>
 where
     St: fetch_records_result_state::State,
     St::Uri: fetch_records_result_state::IsUnset,
@@ -324,7 +358,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> FetchRecordsResultBuilder<S, fetch_records_result_state::SetUri<St>> {
+    ) -> FetchRecordsResultBuilder<fetch_records_result_state::SetUri<St>, S> {
         self._fields.2 = Option::Some(value.into());
         FetchRecordsResultBuilder {
             _state: PhantomData,
@@ -334,11 +368,11 @@ where
     }
 }
 
-impl<S: BosStr, St> FetchRecordsResultBuilder<S, St>
+impl<St, S: BosStr> FetchRecordsResultBuilder<St, S>
 where
     St: fetch_records_result_state::State,
-    St::Uri: fetch_records_result_state::IsSet,
     St::Strategy: fetch_records_result_state::IsSet,
+    St::Uri: fetch_records_result_state::IsSet,
     St::Record: fetch_records_result_state::IsSet,
 {
     /// Build the final struct.
@@ -351,7 +385,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FetchRecordsResult<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FetchRecordsResult<S> {
         FetchRecordsResult {
             record: self._fields.0.unwrap(),
             strategy: self._fields.1.unwrap(),
@@ -362,10 +399,10 @@ where
 }
 
 fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ooo.bsky.authfetch.fetchRecords"),
@@ -374,41 +411,44 @@ fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("uris")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("uris"),
-                                LexXrpcParametersProperty::Array(LexPrimitiveArray {
-                                    items: LexPrimitiveArrayItem::String(LexString {
-                                        format: Some(LexStringFormat::AtUri),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("uris")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("uris"),
+                                    LexXrpcParametersProperty::Array(LexPrimitiveArray {
+                                        items: LexPrimitiveArrayItem::String(LexString {
+                                            format: Some(LexStringFormat::AtUri),
+                                            ..Default::default()
+                                        }),
+                                        min_length: Some(1usize),
+                                        max_length: Some(50usize),
                                         ..Default::default()
                                     }),
-                                    min_length: Some(1usize),
-                                    max_length: Some(50usize),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("result"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Successful result, with the record value.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("strategy"),
-                        SmolStr::new_static("record"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Successful result, with the record value."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("strategy"),
+                            SmolStr::new_static("record")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -428,7 +468,9 @@ fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The AT URI of the record.")),
+                                description: Some(
+                                    CowStr::new_static("The AT URI of the record."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),

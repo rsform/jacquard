@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,17 +21,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::at_inlay::Response;
-use crate::org_atsui::blob;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
+use crate::org_atsui::blob;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -39,11 +36,9 @@ pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Blob<S: BosStr = DefaultStr> {
     ///DID of the blob owner. Used to resolve blob URLs.
     pub did: Did<S>,
@@ -59,11 +54,9 @@ pub struct Blob<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlobOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -117,8 +110,9 @@ impl jacquard_common::xrpc::XrpcResp for BlobResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Blob<S> {
     const NSID: &'static str = "org.atsui.Blob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = BlobResponse;
 }
 
@@ -126,15 +120,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Blob<S> {
 pub struct BlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for BlobRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Blob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Blob<S>;
     type Response = BlobResponse;
 }
 
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -177,21 +172,28 @@ pub mod aspect_ratio_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AspectRatioBuilder<S: BosStr, St: aspect_ratio_state::State> {
+pub struct AspectRatioBuilder<St: aspect_ratio_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> AspectRatio<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
+impl AspectRatio<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AspectRatioBuilder<aspect_ratio_state::Empty, DefaultStr> {
         AspectRatioBuilder::new()
     }
 }
 
-impl<S: BosStr> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> AspectRatio<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AspectRatioBuilder<aspect_ratio_state::Empty, S> {
+        AspectRatioBuilder::builder()
+    }
+}
+
+impl AspectRatioBuilder<aspect_ratio_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AspectRatioBuilder {
             _state: PhantomData,
@@ -201,7 +203,18 @@ impl<S: BosStr> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AspectRatioBuilder<S, St>
+impl<S: BosStr> AspectRatioBuilder<aspect_ratio_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AspectRatioBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
 where
     St: aspect_ratio_state::State,
     St::Height: aspect_ratio_state::IsUnset,
@@ -210,7 +223,7 @@ where
     pub fn height(
         mut self,
         value: impl Into<i64>,
-    ) -> AspectRatioBuilder<S, aspect_ratio_state::SetHeight<St>> {
+    ) -> AspectRatioBuilder<aspect_ratio_state::SetHeight<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AspectRatioBuilder {
             _state: PhantomData,
@@ -220,7 +233,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AspectRatioBuilder<S, St>
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
 where
     St: aspect_ratio_state::State,
     St::Width: aspect_ratio_state::IsUnset,
@@ -229,7 +242,7 @@ where
     pub fn width(
         mut self,
         value: impl Into<i64>,
-    ) -> AspectRatioBuilder<S, aspect_ratio_state::SetWidth<St>> {
+    ) -> AspectRatioBuilder<aspect_ratio_state::SetWidth<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AspectRatioBuilder {
             _state: PhantomData,
@@ -239,7 +252,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AspectRatioBuilder<S, St>
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
 where
     St: aspect_ratio_state::State,
     St::Height: aspect_ratio_state::IsSet,
@@ -254,7 +267,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AspectRatio<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -264,10 +280,10 @@ where
 }
 
 fn lexicon_doc_org_atsui_Blob() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.atsui.Blob"),
@@ -276,10 +292,9 @@ fn lexicon_doc_org_atsui_Blob() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("aspectRatio"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("width"),
-                        SmolStr::new_static("height"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -370,7 +385,7 @@ fn lexicon_doc_org_atsui_Blob() -> LexiconDoc<'static> {
 
 pub mod blob_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -413,26 +428,28 @@ pub mod blob_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BlobBuilder<S: BosStr, St: blob_state::State> {
+pub struct BlobBuilder<St: blob_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Did<S>>,
-        Option<S>,
-        Option<blob::AspectRatio<S>>,
-        Option<Data<S>>,
-    ),
+    _fields: (Option<Did<S>>, Option<S>, Option<blob::AspectRatio<S>>, Option<Data<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Blob<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BlobBuilder<S, blob_state::Empty> {
+impl Blob<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BlobBuilder<blob_state::Empty, DefaultStr> {
         BlobBuilder::new()
     }
 }
 
-impl<S: BosStr> BlobBuilder<S, blob_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Blob<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BlobBuilder<blob_state::Empty, S> {
+        BlobBuilder::builder()
+    }
+}
+
+impl BlobBuilder<blob_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BlobBuilder {
             _state: PhantomData,
@@ -442,13 +459,27 @@ impl<S: BosStr> BlobBuilder<S, blob_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BlobBuilder<S, St>
+impl<S: BosStr> BlobBuilder<blob_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BlobBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BlobBuilder<St, S>
 where
     St: blob_state::State,
     St::Did: blob_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> BlobBuilder<S, blob_state::SetDid<St>> {
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> BlobBuilder<blob_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BlobBuilder {
             _state: PhantomData,
@@ -458,7 +489,7 @@ where
     }
 }
 
-impl<S: BosStr, St: blob_state::State> BlobBuilder<S, St> {
+impl<St: blob_state::State, S: BosStr> BlobBuilder<St, S> {
     /// Set the `fit` field (optional)
     pub fn fit(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -471,7 +502,7 @@ impl<S: BosStr, St: blob_state::State> BlobBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: blob_state::State> BlobBuilder<S, St> {
+impl<St: blob_state::State, S: BosStr> BlobBuilder<St, S> {
     /// Set the `ratio` field (optional)
     pub fn ratio(mut self, value: impl Into<Option<blob::AspectRatio<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -484,13 +515,16 @@ impl<S: BosStr, St: blob_state::State> BlobBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BlobBuilder<S, St>
+impl<St, S: BosStr> BlobBuilder<St, S>
 where
     St: blob_state::State,
     St::Src: blob_state::IsUnset,
 {
     /// Set the `src` field (required)
-    pub fn src(mut self, value: impl Into<Data<S>>) -> BlobBuilder<S, blob_state::SetSrc<St>> {
+    pub fn src(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> BlobBuilder<blob_state::SetSrc<St>, S> {
         self._fields.3 = Option::Some(value.into());
         BlobBuilder {
             _state: PhantomData,
@@ -500,7 +534,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BlobBuilder<S, St>
+impl<St, S: BosStr> BlobBuilder<St, S>
 where
     St: blob_state::State,
     St::Did: blob_state::IsSet,

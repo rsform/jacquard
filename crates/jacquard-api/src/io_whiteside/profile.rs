@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Profile information (bio, skills, etc.)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -130,7 +130,7 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -187,21 +187,28 @@ pub mod profile_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
+pub struct ProfileBuilder<St: profile_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Profile<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProfileBuilder<S, profile_state::Empty> {
+impl Profile<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProfileBuilder<profile_state::Empty, DefaultStr> {
         ProfileBuilder::new()
     }
 }
 
-impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Profile<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProfileBuilder<profile_state::Empty, S> {
+        ProfileBuilder::builder()
+    }
+}
+
+impl ProfileBuilder<profile_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
@@ -211,7 +218,18 @@ impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProfileBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::Content: profile_state::IsUnset,
@@ -220,7 +238,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> ProfileBuilder<S, profile_state::SetContent<St>> {
+    ) -> ProfileBuilder<profile_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -230,7 +248,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::Heading: profile_state::IsUnset,
@@ -239,7 +257,7 @@ where
     pub fn heading(
         mut self,
         value: impl Into<S>,
-    ) -> ProfileBuilder<S, profile_state::SetHeading<St>> {
+    ) -> ProfileBuilder<profile_state::SetHeading<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -249,7 +267,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::UpdatedAt: profile_state::IsUnset,
@@ -258,7 +276,7 @@ where
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ProfileBuilder<S, profile_state::SetUpdatedAt<St>> {
+    ) -> ProfileBuilder<profile_state::SetUpdatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -268,7 +286,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::Heading: profile_state::IsSet,
@@ -296,10 +314,10 @@ where
 }
 
 fn lexicon_doc_io_whiteside_profile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.whiteside.profile"),
@@ -308,25 +326,29 @@ fn lexicon_doc_io_whiteside_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Profile information (bio, skills, etc.)",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Profile information (bio, skills, etc.)"),
+                    ),
                     key: Some(CowStr::new_static("literal:bio")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("heading"),
-                            SmolStr::new_static("content"),
-                            SmolStr::new_static("updatedAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("heading"),
+                                SmolStr::new_static("content"),
+                                SmolStr::new_static("updatedAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("content"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Profile content in plain text or markdown format",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Profile content in plain text or markdown format",
+                                        ),
+                                    ),
                                     max_length: Some(5000usize),
                                     ..Default::default()
                                 }),
@@ -334,9 +356,11 @@ fn lexicon_doc_io_whiteside_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("heading"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Profile section heading (e.g. 'Hey, I'm John')",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Profile section heading (e.g. 'Hey, I'm John')",
+                                        ),
+                                    ),
                                     max_length: Some(200usize),
                                     ..Default::default()
                                 }),
@@ -344,9 +368,11 @@ fn lexicon_doc_io_whiteside_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("updatedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Last update timestamp in ISO 8601 format",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Last update timestamp in ISO 8601 format",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

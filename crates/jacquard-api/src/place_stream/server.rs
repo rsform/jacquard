@@ -13,12 +13,13 @@ pub mod list_webhooks;
 pub mod settings;
 pub mod update_webhook;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,16 +30,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::place_stream::server;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::server;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RewriteRule<S: BosStr = DefaultStr> {
     ///Text to search for and replace.
     pub from: S,
@@ -51,10 +49,7 @@ pub struct RewriteRule<S: BosStr = DefaultStr> {
 /// A webhook configuration for receiving Streamplace events.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Webhook<S: BosStr = DefaultStr> {
     ///Whether this webhook is currently active.
     pub active: bool,
@@ -201,10 +196,10 @@ impl<S: BosStr> LexiconSchema for Webhook<S> {
 }
 
 fn lexicon_doc_place_stream_server_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.server.defs"),
@@ -213,16 +208,18 @@ fn lexicon_doc_place_stream_server_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("rewriteRule"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("from"), SmolStr::new_static("to")]),
+                    required: Some(
+                        vec![SmolStr::new_static("from"), SmolStr::new_static("to")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("from"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Text to search for and replace.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Text to search for and replace."),
+                                ),
                                 min_length: Some(1usize),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -231,7 +228,9 @@ fn lexicon_doc_place_stream_server_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("to"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Text to replace with.")),
+                                description: Some(
+                                    CowStr::new_static("Text to replace with."),
+                                ),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -421,7 +420,7 @@ fn lexicon_doc_place_stream_server_defs() -> LexiconDoc<'static> {
 
 pub mod webhook_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -429,90 +428,90 @@ pub mod webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Active;
-        type Id;
-        type CreatedAt;
         type Events;
+        type Active;
+        type CreatedAt;
+        type Id;
         type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Active = Unset;
-        type Id = Unset;
-        type CreatedAt = Unset;
         type Events = Unset;
+        type Active = Unset;
+        type CreatedAt = Unset;
+        type Id = Unset;
         type Url = Unset;
+    }
+    ///State transition - sets the `events` field to Set
+    pub struct SetEvents<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEvents<St> {}
+    impl<St: State> State for SetEvents<St> {
+        type Events = Set<members::events>;
+        type Active = St::Active;
+        type CreatedAt = St::CreatedAt;
+        type Id = St::Id;
+        type Url = St::Url;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetActive<St> {}
     impl<St: State> State for SetActive<St> {
+        type Events = St::Events;
         type Active = Set<members::active>;
+        type CreatedAt = St::CreatedAt;
         type Id = St::Id;
-        type CreatedAt = St::CreatedAt;
-        type Events = St::Events;
-        type Url = St::Url;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Active = St::Active;
-        type Id = Set<members::id>;
-        type CreatedAt = St::CreatedAt;
-        type Events = St::Events;
         type Url = St::Url;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Active = St::Active;
-        type Id = St::Id;
-        type CreatedAt = Set<members::created_at>;
         type Events = St::Events;
+        type Active = St::Active;
+        type CreatedAt = Set<members::created_at>;
+        type Id = St::Id;
         type Url = St::Url;
     }
-    ///State transition - sets the `events` field to Set
-    pub struct SetEvents<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEvents<St> {}
-    impl<St: State> State for SetEvents<St> {
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Events = St::Events;
         type Active = St::Active;
-        type Id = St::Id;
         type CreatedAt = St::CreatedAt;
-        type Events = Set<members::events>;
+        type Id = Set<members::id>;
         type Url = St::Url;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUrl<St> {}
     impl<St: State> State for SetUrl<St> {
-        type Active = St::Active;
-        type Id = St::Id;
-        type CreatedAt = St::CreatedAt;
         type Events = St::Events;
+        type Active = St::Active;
+        type CreatedAt = St::CreatedAt;
+        type Id = St::Id;
         type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `active` field
-        pub struct active(());
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `events` field
         pub struct events(());
+        ///Marker type for the `active` field
+        pub struct active(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `url` field
         pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WebhookBuilder<S: BosStr, St: webhook_state::State> {
+pub struct WebhookBuilder<St: webhook_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -533,27 +532,73 @@ pub struct WebhookBuilder<S: BosStr, St: webhook_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Webhook<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> WebhookBuilder<S, webhook_state::Empty> {
+impl Webhook<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> WebhookBuilder<webhook_state::Empty, DefaultStr> {
         WebhookBuilder::new()
     }
 }
 
-impl<S: BosStr> WebhookBuilder<S, webhook_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Webhook<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> WebhookBuilder<webhook_state::Empty, S> {
+        WebhookBuilder::builder()
+    }
+}
+
+impl WebhookBuilder<webhook_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         WebhookBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St> WebhookBuilder<S, St>
+impl<S: BosStr> WebhookBuilder<webhook_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        WebhookBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> WebhookBuilder<St, S>
 where
     St: webhook_state::State,
     St::Active: webhook_state::IsUnset,
@@ -562,7 +607,7 @@ where
     pub fn active(
         mut self,
         value: impl Into<bool>,
-    ) -> WebhookBuilder<S, webhook_state::SetActive<St>> {
+    ) -> WebhookBuilder<webhook_state::SetActive<St>, S> {
         self._fields.0 = Option::Some(value.into());
         WebhookBuilder {
             _state: PhantomData,
@@ -572,7 +617,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WebhookBuilder<S, St>
+impl<St, S: BosStr> WebhookBuilder<St, S>
 where
     St: webhook_state::State,
     St::CreatedAt: webhook_state::IsUnset,
@@ -581,7 +626,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WebhookBuilder<S, webhook_state::SetCreatedAt<St>> {
+    ) -> WebhookBuilder<webhook_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         WebhookBuilder {
             _state: PhantomData,
@@ -591,7 +636,7 @@ where
     }
 }
 
-impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
+impl<St: webhook_state::State, S: BosStr> WebhookBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -604,7 +649,7 @@ impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
+impl<St: webhook_state::State, S: BosStr> WebhookBuilder<St, S> {
     /// Set the `errorCount` field (optional)
     pub fn error_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -617,7 +662,7 @@ impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WebhookBuilder<S, St>
+impl<St, S: BosStr> WebhookBuilder<St, S>
 where
     St: webhook_state::State,
     St::Events: webhook_state::IsUnset,
@@ -626,7 +671,7 @@ where
     pub fn events(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> WebhookBuilder<S, webhook_state::SetEvents<St>> {
+    ) -> WebhookBuilder<webhook_state::SetEvents<St>, S> {
         self._fields.4 = Option::Some(value.into());
         WebhookBuilder {
             _state: PhantomData,
@@ -636,13 +681,16 @@ where
     }
 }
 
-impl<S: BosStr, St> WebhookBuilder<S, St>
+impl<St, S: BosStr> WebhookBuilder<St, S>
 where
     St: webhook_state::State,
     St::Id: webhook_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<S>) -> WebhookBuilder<S, webhook_state::SetId<St>> {
+    pub fn id(
+        mut self,
+        value: impl Into<S>,
+    ) -> WebhookBuilder<webhook_state::SetId<St>, S> {
         self._fields.5 = Option::Some(value.into());
         WebhookBuilder {
             _state: PhantomData,
@@ -652,7 +700,7 @@ where
     }
 }
 
-impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
+impl<St: webhook_state::State, S: BosStr> WebhookBuilder<St, S> {
     /// Set the `lastTriggered` field (optional)
     pub fn last_triggered(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -665,7 +713,7 @@ impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
+impl<St: webhook_state::State, S: BosStr> WebhookBuilder<St, S> {
     /// Set the `muteWords` field (optional)
     pub fn mute_words(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -678,7 +726,7 @@ impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
+impl<St: webhook_state::State, S: BosStr> WebhookBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -691,7 +739,7 @@ impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
+impl<St: webhook_state::State, S: BosStr> WebhookBuilder<St, S> {
     /// Set the `prefix` field (optional)
     pub fn prefix(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -704,9 +752,12 @@ impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
+impl<St: webhook_state::State, S: BosStr> WebhookBuilder<St, S> {
     /// Set the `rewrite` field (optional)
-    pub fn rewrite(mut self, value: impl Into<Option<Vec<server::RewriteRule<S>>>>) -> Self {
+    pub fn rewrite(
+        mut self,
+        value: impl Into<Option<Vec<server::RewriteRule<S>>>>,
+    ) -> Self {
         self._fields.10 = value.into();
         self
     }
@@ -717,7 +768,7 @@ impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
+impl<St: webhook_state::State, S: BosStr> WebhookBuilder<St, S> {
     /// Set the `suffix` field (optional)
     pub fn suffix(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
@@ -730,7 +781,7 @@ impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
+impl<St: webhook_state::State, S: BosStr> WebhookBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.12 = value.into();
@@ -743,7 +794,7 @@ impl<S: BosStr, St: webhook_state::State> WebhookBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WebhookBuilder<S, St>
+impl<St, S: BosStr> WebhookBuilder<St, S>
 where
     St: webhook_state::State,
     St::Url: webhook_state::IsUnset,
@@ -752,7 +803,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> WebhookBuilder<S, webhook_state::SetUrl<St>> {
+    ) -> WebhookBuilder<webhook_state::SetUrl<St>, S> {
         self._fields.13 = Option::Some(value.into());
         WebhookBuilder {
             _state: PhantomData,
@@ -762,13 +813,13 @@ where
     }
 }
 
-impl<S: BosStr, St> WebhookBuilder<S, St>
+impl<St, S: BosStr> WebhookBuilder<St, S>
 where
     St: webhook_state::State,
-    St::Active: webhook_state::IsSet,
-    St::Id: webhook_state::IsSet,
-    St::CreatedAt: webhook_state::IsSet,
     St::Events: webhook_state::IsSet,
+    St::Active: webhook_state::IsSet,
+    St::CreatedAt: webhook_state::IsSet,
+    St::Id: webhook_state::IsSet,
     St::Url: webhook_state::IsSet,
 {
     /// Build the final struct.

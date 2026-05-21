@@ -7,12 +7,13 @@
 
 pub mod entry;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +25,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_greengale::blog;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_greengale::blog;
 /// Metadata for uploaded binary content
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlobMetadata<S: BosStr = DefaultStr> {
     ///Alt text for accessibility
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,10 +52,7 @@ pub struct BlobMetadata<S: BosStr = DefaultStr> {
 /// Custom color values (CSS color strings)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CustomColors<S: BosStr = DefaultStr> {
     ///Accent/link color
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -78,10 +73,7 @@ pub struct CustomColors<S: BosStr = DefaultStr> {
 /// Open Graph Protocol metadata for social sharing
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Ogp<S: BosStr = DefaultStr> {
     ///Image height in pixels
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -98,10 +90,7 @@ pub struct Ogp<S: BosStr = DefaultStr> {
 /// Metadata tag on an atproto resource, published by the author
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SelfLabel<S: BosStr = DefaultStr> {
     ///The short string name of the value or type of this label
     pub val: S,
@@ -112,10 +101,7 @@ pub struct SelfLabel<S: BosStr = DefaultStr> {
 /// Metadata tags on an atproto resource, published by the author
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SelfLabels<S: BosStr = DefaultStr> {
     pub values: Vec<blog::SelfLabel<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -125,10 +111,7 @@ pub struct SelfLabels<S: BosStr = DefaultStr> {
 /// Theme configuration for a blog entry
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Theme<S: BosStr = DefaultStr> {
     ///Custom color overrides
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -143,10 +126,7 @@ pub struct Theme<S: BosStr = DefaultStr> {
 /// Voice theme configuration for TTS playback
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VoiceTheme<S: BosStr = DefaultStr> {
     ///Pitch multiplier x100 (100 = normal, range 50-150)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -187,16 +167,19 @@ impl<S: BosStr> LexiconSchema for BlobMetadata<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blobref"),
@@ -405,7 +388,7 @@ impl<S: BosStr> LexiconSchema for VoiceTheme<S> {
 
 pub mod blob_metadata_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -436,26 +419,28 @@ pub mod blob_metadata_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BlobMetadataBuilder<S: BosStr, St: blob_metadata_state::State> {
+pub struct BlobMetadataBuilder<St: blob_metadata_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<BlobRef<S>>,
-        Option<blog::SelfLabels<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<S>, Option<BlobRef<S>>, Option<blog::SelfLabels<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> BlobMetadata<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BlobMetadataBuilder<S, blob_metadata_state::Empty> {
+impl BlobMetadata<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BlobMetadataBuilder<blob_metadata_state::Empty, DefaultStr> {
         BlobMetadataBuilder::new()
     }
 }
 
-impl<S: BosStr> BlobMetadataBuilder<S, blob_metadata_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> BlobMetadata<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BlobMetadataBuilder<blob_metadata_state::Empty, S> {
+        BlobMetadataBuilder::builder()
+    }
+}
+
+impl BlobMetadataBuilder<blob_metadata_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BlobMetadataBuilder {
             _state: PhantomData,
@@ -465,7 +450,18 @@ impl<S: BosStr> BlobMetadataBuilder<S, blob_metadata_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: blob_metadata_state::State> BlobMetadataBuilder<S, St> {
+impl<S: BosStr> BlobMetadataBuilder<blob_metadata_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BlobMetadataBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: blob_metadata_state::State, S: BosStr> BlobMetadataBuilder<St, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -478,7 +474,7 @@ impl<S: BosStr, St: blob_metadata_state::State> BlobMetadataBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BlobMetadataBuilder<S, St>
+impl<St, S: BosStr> BlobMetadataBuilder<St, S>
 where
     St: blob_metadata_state::State,
     St::Blobref: blob_metadata_state::IsUnset,
@@ -487,7 +483,7 @@ where
     pub fn blobref(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> BlobMetadataBuilder<S, blob_metadata_state::SetBlobref<St>> {
+    ) -> BlobMetadataBuilder<blob_metadata_state::SetBlobref<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BlobMetadataBuilder {
             _state: PhantomData,
@@ -497,7 +493,7 @@ where
     }
 }
 
-impl<S: BosStr, St: blob_metadata_state::State> BlobMetadataBuilder<S, St> {
+impl<St: blob_metadata_state::State, S: BosStr> BlobMetadataBuilder<St, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<blog::SelfLabels<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -510,7 +506,7 @@ impl<S: BosStr, St: blob_metadata_state::State> BlobMetadataBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: blob_metadata_state::State> BlobMetadataBuilder<S, St> {
+impl<St: blob_metadata_state::State, S: BosStr> BlobMetadataBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -523,7 +519,7 @@ impl<S: BosStr, St: blob_metadata_state::State> BlobMetadataBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BlobMetadataBuilder<S, St>
+impl<St, S: BosStr> BlobMetadataBuilder<St, S>
 where
     St: blob_metadata_state::State,
     St::Blobref: blob_metadata_state::IsSet,
@@ -539,7 +535,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BlobMetadata<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BlobMetadata<S> {
         BlobMetadata {
             alt: self._fields.0,
             blobref: self._fields.1.unwrap(),
@@ -551,10 +550,10 @@ where
 }
 
 fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.greengale.blog.defs"),
@@ -563,7 +562,9 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("blobMetadata"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Metadata for uploaded binary content")),
+                    description: Some(
+                        CowStr::new_static("Metadata for uploaded binary content"),
+                    ),
                     required: Some(vec![SmolStr::new_static("blobref")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -571,16 +572,16 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Alt text for accessibility")),
+                                description: Some(
+                                    CowStr::new_static("Alt text for accessibility"),
+                                ),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("blobref"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("labels"),
@@ -605,9 +606,9 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("customColors"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Custom color values (CSS color strings)",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Custom color values (CSS color strings)"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -630,9 +631,9 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("codeBackground"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Code block background color",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Code block background color"),
+                                ),
                                 max_length: Some(64usize),
                                 ..Default::default()
                             }),
@@ -653,9 +654,11 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("ogp"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Open Graph Protocol metadata for social sharing",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Open Graph Protocol metadata for social sharing",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("url")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -669,7 +672,9 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("URL of the OGP image")),
+                                description: Some(
+                                    CowStr::new_static("URL of the OGP image"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 max_length: Some(2048usize),
                                 ..Default::default()
@@ -689,9 +694,11 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("selfLabel"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Metadata tag on an atproto resource, published by the author",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Metadata tag on an atproto resource, published by the author",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("val")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -699,9 +706,11 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("val"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The short string name of the value or type of this label",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The short string name of the value or type of this label",
+                                    ),
+                                ),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),
@@ -714,9 +723,11 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("selfLabels"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Metadata tags on an atproto resource, published by the author",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Metadata tags on an atproto resource, published by the author",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("values")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -740,7 +751,9 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("theme"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Theme configuration for a blog entry")),
+                    description: Some(
+                        CowStr::new_static("Theme configuration for a blog entry"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -754,7 +767,9 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("preset"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Predefined color theme")),
+                                description: Some(
+                                    CowStr::new_static("Predefined color theme"),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -767,9 +782,9 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("voiceTheme"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Voice theme configuration for TTS playback",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Voice theme configuration for TTS playback"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -788,9 +803,11 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("voice"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Voice ID for TTS (e.g., 'af_heart', 'am_adam')",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Voice ID for TTS (e.g., 'af_heart', 'am_adam')",
+                                    ),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -808,7 +825,7 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
 
 pub mod ogp_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -839,21 +856,28 @@ pub mod ogp_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct OgpBuilder<S: BosStr, St: ogp_state::State> {
+pub struct OgpBuilder<St: ogp_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<UriValue<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Ogp<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> OgpBuilder<S, ogp_state::Empty> {
+impl Ogp<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> OgpBuilder<ogp_state::Empty, DefaultStr> {
         OgpBuilder::new()
     }
 }
 
-impl<S: BosStr> OgpBuilder<S, ogp_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Ogp<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> OgpBuilder<ogp_state::Empty, S> {
+        OgpBuilder::builder()
+    }
+}
+
+impl OgpBuilder<ogp_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         OgpBuilder {
             _state: PhantomData,
@@ -863,7 +887,18 @@ impl<S: BosStr> OgpBuilder<S, ogp_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: ogp_state::State> OgpBuilder<S, St> {
+impl<S: BosStr> OgpBuilder<ogp_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        OgpBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: ogp_state::State, S: BosStr> OgpBuilder<St, S> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -876,13 +911,16 @@ impl<S: BosStr, St: ogp_state::State> OgpBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> OgpBuilder<S, St>
+impl<St, S: BosStr> OgpBuilder<St, S>
 where
     St: ogp_state::State,
     St::Url: ogp_state::IsUnset,
 {
     /// Set the `url` field (required)
-    pub fn url(mut self, value: impl Into<UriValue<S>>) -> OgpBuilder<S, ogp_state::SetUrl<St>> {
+    pub fn url(
+        mut self,
+        value: impl Into<UriValue<S>>,
+    ) -> OgpBuilder<ogp_state::SetUrl<St>, S> {
         self._fields.1 = Option::Some(value.into());
         OgpBuilder {
             _state: PhantomData,
@@ -892,7 +930,7 @@ where
     }
 }
 
-impl<S: BosStr, St: ogp_state::State> OgpBuilder<S, St> {
+impl<St: ogp_state::State, S: BosStr> OgpBuilder<St, S> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -905,7 +943,7 @@ impl<S: BosStr, St: ogp_state::State> OgpBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> OgpBuilder<S, St>
+impl<St, S: BosStr> OgpBuilder<St, S>
 where
     St: ogp_state::State,
     St::Url: ogp_state::IsSet,
@@ -932,7 +970,7 @@ where
 
 pub mod self_labels_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -963,21 +1001,28 @@ pub mod self_labels_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SelfLabelsBuilder<S: BosStr, St: self_labels_state::State> {
+pub struct SelfLabelsBuilder<St: self_labels_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<blog::SelfLabel<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SelfLabels<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SelfLabelsBuilder<S, self_labels_state::Empty> {
+impl SelfLabels<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SelfLabelsBuilder<self_labels_state::Empty, DefaultStr> {
         SelfLabelsBuilder::new()
     }
 }
 
-impl<S: BosStr> SelfLabelsBuilder<S, self_labels_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SelfLabels<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SelfLabelsBuilder<self_labels_state::Empty, S> {
+        SelfLabelsBuilder::builder()
+    }
+}
+
+impl SelfLabelsBuilder<self_labels_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SelfLabelsBuilder {
             _state: PhantomData,
@@ -987,7 +1032,18 @@ impl<S: BosStr> SelfLabelsBuilder<S, self_labels_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SelfLabelsBuilder<S, St>
+impl<S: BosStr> SelfLabelsBuilder<self_labels_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SelfLabelsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SelfLabelsBuilder<St, S>
 where
     St: self_labels_state::State,
     St::Values: self_labels_state::IsUnset,
@@ -996,7 +1052,7 @@ where
     pub fn values(
         mut self,
         value: impl Into<Vec<blog::SelfLabel<S>>>,
-    ) -> SelfLabelsBuilder<S, self_labels_state::SetValues<St>> {
+    ) -> SelfLabelsBuilder<self_labels_state::SetValues<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SelfLabelsBuilder {
             _state: PhantomData,
@@ -1006,7 +1062,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SelfLabelsBuilder<S, St>
+impl<St, S: BosStr> SelfLabelsBuilder<St, S>
 where
     St: self_labels_state::State,
     St::Values: self_labels_state::IsSet,
@@ -1019,7 +1075,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SelfLabels<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SelfLabels<S> {
         SelfLabels {
             values: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

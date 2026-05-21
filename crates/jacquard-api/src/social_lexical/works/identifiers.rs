@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,16 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::social_lexical::works::identifiers;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_lexical::works::identifiers;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Identifier<S: BosStr = DefaultStr> {
     ///
     pub provider: IdentifierProvider<S>,
@@ -128,6 +125,7 @@ where
         }
     }
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -230,10 +228,10 @@ impl<S: BosStr> LexiconSchema for Identifiers<S> {
 }
 
 fn lexicon_doc_social_lexical_works_identifiers() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.lexical.works.identifiers"),
@@ -242,10 +240,12 @@ fn lexicon_doc_social_lexical_works_identifiers() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("identifier"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("provider"),
-                        SmolStr::new_static("providerId"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("provider"),
+                            SmolStr::new_static("providerId")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -281,10 +281,12 @@ fn lexicon_doc_social_lexical_works_identifiers() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("work"),
-                            SmolStr::new_static("identifiers"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("work"),
+                                SmolStr::new_static("identifiers")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -323,7 +325,7 @@ fn lexicon_doc_social_lexical_works_identifiers() -> LexiconDoc<'static> {
 
 pub mod identifiers_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -331,56 +333,63 @@ pub mod identifiers_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Work;
         type Identifiers;
+        type Work;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Work = Unset;
         type Identifiers = Unset;
-    }
-    ///State transition - sets the `work` field to Set
-    pub struct SetWork<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWork<St> {}
-    impl<St: State> State for SetWork<St> {
-        type Work = Set<members::work>;
-        type Identifiers = St::Identifiers;
+        type Work = Unset;
     }
     ///State transition - sets the `identifiers` field to Set
     pub struct SetIdentifiers<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIdentifiers<St> {}
     impl<St: State> State for SetIdentifiers<St> {
-        type Work = St::Work;
         type Identifiers = Set<members::identifiers>;
+        type Work = St::Work;
+    }
+    ///State transition - sets the `work` field to Set
+    pub struct SetWork<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWork<St> {}
+    impl<St: State> State for SetWork<St> {
+        type Identifiers = St::Identifiers;
+        type Work = Set<members::work>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `work` field
-        pub struct work(());
         ///Marker type for the `identifiers` field
         pub struct identifiers(());
+        ///Marker type for the `work` field
+        pub struct work(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IdentifiersBuilder<S: BosStr, St: identifiers_state::State> {
+pub struct IdentifiersBuilder<St: identifiers_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<identifiers::Identifier<S>>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Identifiers<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> IdentifiersBuilder<S, identifiers_state::Empty> {
+impl Identifiers<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> IdentifiersBuilder<identifiers_state::Empty, DefaultStr> {
         IdentifiersBuilder::new()
     }
 }
 
-impl<S: BosStr> IdentifiersBuilder<S, identifiers_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Identifiers<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> IdentifiersBuilder<identifiers_state::Empty, S> {
+        IdentifiersBuilder::builder()
+    }
+}
+
+impl IdentifiersBuilder<identifiers_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         IdentifiersBuilder {
             _state: PhantomData,
@@ -390,7 +399,18 @@ impl<S: BosStr> IdentifiersBuilder<S, identifiers_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> IdentifiersBuilder<S, St>
+impl<S: BosStr> IdentifiersBuilder<identifiers_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        IdentifiersBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> IdentifiersBuilder<St, S>
 where
     St: identifiers_state::State,
     St::Identifiers: identifiers_state::IsUnset,
@@ -399,7 +419,7 @@ where
     pub fn identifiers(
         mut self,
         value: impl Into<Vec<identifiers::Identifier<S>>>,
-    ) -> IdentifiersBuilder<S, identifiers_state::SetIdentifiers<St>> {
+    ) -> IdentifiersBuilder<identifiers_state::SetIdentifiers<St>, S> {
         self._fields.0 = Option::Some(value.into());
         IdentifiersBuilder {
             _state: PhantomData,
@@ -409,7 +429,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IdentifiersBuilder<S, St>
+impl<St, S: BosStr> IdentifiersBuilder<St, S>
 where
     St: identifiers_state::State,
     St::Work: identifiers_state::IsUnset,
@@ -418,7 +438,7 @@ where
     pub fn work(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> IdentifiersBuilder<S, identifiers_state::SetWork<St>> {
+    ) -> IdentifiersBuilder<identifiers_state::SetWork<St>, S> {
         self._fields.1 = Option::Some(value.into());
         IdentifiersBuilder {
             _state: PhantomData,
@@ -428,11 +448,11 @@ where
     }
 }
 
-impl<S: BosStr, St> IdentifiersBuilder<S, St>
+impl<St, S: BosStr> IdentifiersBuilder<St, S>
 where
     St: identifiers_state::State,
-    St::Work: identifiers_state::IsSet,
     St::Identifiers: identifiers_state::IsSet,
+    St::Work: identifiers_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Identifiers<S> {
@@ -443,7 +463,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Identifiers<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Identifiers<S> {
         Identifiers {
             identifiers: self._fields.0.unwrap(),
             work: self._fields.1.unwrap(),

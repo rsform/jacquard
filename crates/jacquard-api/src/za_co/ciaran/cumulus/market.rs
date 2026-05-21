@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// The record containing a Cumulus Market
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -117,7 +117,7 @@ impl<S: BosStr> LexiconSchema for Market<S> {
 
 pub mod market_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -126,85 +126,92 @@ pub mod market_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type ClosesAt;
-        type Liquidity;
         type Question;
+        type Liquidity;
+        type ClosesAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type ClosesAt = Unset;
-        type Liquidity = Unset;
         type Question = Unset;
+        type Liquidity = Unset;
+        type ClosesAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type ClosesAt = St::ClosesAt;
+        type Question = St::Question;
         type Liquidity = St::Liquidity;
-        type Question = St::Question;
-    }
-    ///State transition - sets the `closes_at` field to Set
-    pub struct SetClosesAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetClosesAt<St> {}
-    impl<St: State> State for SetClosesAt<St> {
-        type CreatedAt = St::CreatedAt;
-        type ClosesAt = Set<members::closes_at>;
-        type Liquidity = St::Liquidity;
-        type Question = St::Question;
-    }
-    ///State transition - sets the `liquidity` field to Set
-    pub struct SetLiquidity<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLiquidity<St> {}
-    impl<St: State> State for SetLiquidity<St> {
-        type CreatedAt = St::CreatedAt;
         type ClosesAt = St::ClosesAt;
-        type Liquidity = Set<members::liquidity>;
-        type Question = St::Question;
     }
     ///State transition - sets the `question` field to Set
     pub struct SetQuestion<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetQuestion<St> {}
     impl<St: State> State for SetQuestion<St> {
         type CreatedAt = St::CreatedAt;
-        type ClosesAt = St::ClosesAt;
-        type Liquidity = St::Liquidity;
         type Question = Set<members::question>;
+        type Liquidity = St::Liquidity;
+        type ClosesAt = St::ClosesAt;
+    }
+    ///State transition - sets the `liquidity` field to Set
+    pub struct SetLiquidity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLiquidity<St> {}
+    impl<St: State> State for SetLiquidity<St> {
+        type CreatedAt = St::CreatedAt;
+        type Question = St::Question;
+        type Liquidity = Set<members::liquidity>;
+        type ClosesAt = St::ClosesAt;
+    }
+    ///State transition - sets the `closes_at` field to Set
+    pub struct SetClosesAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetClosesAt<St> {}
+    impl<St: State> State for SetClosesAt<St> {
+        type CreatedAt = St::CreatedAt;
+        type Question = St::Question;
+        type Liquidity = St::Liquidity;
+        type ClosesAt = Set<members::closes_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `closes_at` field
-        pub struct closes_at(());
-        ///Marker type for the `liquidity` field
-        pub struct liquidity(());
         ///Marker type for the `question` field
         pub struct question(());
+        ///Marker type for the `liquidity` field
+        pub struct liquidity(());
+        ///Marker type for the `closes_at` field
+        pub struct closes_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MarketBuilder<S: BosStr, St: market_state::State> {
+pub struct MarketBuilder<St: market_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Datetime>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Market<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MarketBuilder<S, market_state::Empty> {
+impl Market<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MarketBuilder<market_state::Empty, DefaultStr> {
         MarketBuilder::new()
     }
 }
 
-impl<S: BosStr> MarketBuilder<S, market_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Market<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MarketBuilder<market_state::Empty, S> {
+        MarketBuilder::builder()
+    }
+}
+
+impl MarketBuilder<market_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MarketBuilder {
             _state: PhantomData,
@@ -214,7 +221,18 @@ impl<S: BosStr> MarketBuilder<S, market_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MarketBuilder<S, St>
+impl<S: BosStr> MarketBuilder<market_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MarketBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MarketBuilder<St, S>
 where
     St: market_state::State,
     St::ClosesAt: market_state::IsUnset,
@@ -223,7 +241,7 @@ where
     pub fn closes_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MarketBuilder<S, market_state::SetClosesAt<St>> {
+    ) -> MarketBuilder<market_state::SetClosesAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MarketBuilder {
             _state: PhantomData,
@@ -233,7 +251,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MarketBuilder<S, St>
+impl<St, S: BosStr> MarketBuilder<St, S>
 where
     St: market_state::State,
     St::CreatedAt: market_state::IsUnset,
@@ -242,7 +260,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MarketBuilder<S, market_state::SetCreatedAt<St>> {
+    ) -> MarketBuilder<market_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         MarketBuilder {
             _state: PhantomData,
@@ -252,7 +270,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MarketBuilder<S, St>
+impl<St, S: BosStr> MarketBuilder<St, S>
 where
     St: market_state::State,
     St::Liquidity: market_state::IsUnset,
@@ -261,7 +279,7 @@ where
     pub fn liquidity(
         mut self,
         value: impl Into<i64>,
-    ) -> MarketBuilder<S, market_state::SetLiquidity<St>> {
+    ) -> MarketBuilder<market_state::SetLiquidity<St>, S> {
         self._fields.2 = Option::Some(value.into());
         MarketBuilder {
             _state: PhantomData,
@@ -271,7 +289,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MarketBuilder<S, St>
+impl<St, S: BosStr> MarketBuilder<St, S>
 where
     St: market_state::State,
     St::Question: market_state::IsUnset,
@@ -280,7 +298,7 @@ where
     pub fn question(
         mut self,
         value: impl Into<S>,
-    ) -> MarketBuilder<S, market_state::SetQuestion<St>> {
+    ) -> MarketBuilder<market_state::SetQuestion<St>, S> {
         self._fields.3 = Option::Some(value.into());
         MarketBuilder {
             _state: PhantomData,
@@ -290,13 +308,13 @@ where
     }
 }
 
-impl<S: BosStr, St> MarketBuilder<S, St>
+impl<St, S: BosStr> MarketBuilder<St, S>
 where
     St: market_state::State,
     St::CreatedAt: market_state::IsSet,
-    St::ClosesAt: market_state::IsSet,
-    St::Liquidity: market_state::IsSet,
     St::Question: market_state::IsSet,
+    St::Liquidity: market_state::IsSet,
+    St::ClosesAt: market_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Market<S> {
@@ -321,10 +339,10 @@ where
 }
 
 fn lexicon_doc_za_co_ciaran_cumulus_market() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("za.co.ciaran.cumulus.market"),
@@ -333,15 +351,19 @@ fn lexicon_doc_za_co_ciaran_cumulus_market() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("The record containing a Cumulus Market")),
+                    description: Some(
+                        CowStr::new_static("The record containing a Cumulus Market"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("question"),
-                            SmolStr::new_static("liquidity"),
-                            SmolStr::new_static("closesAt"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("question"),
+                                SmolStr::new_static("liquidity"),
+                                SmolStr::new_static("closesAt"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

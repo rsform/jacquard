@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Marks an answer as answering a given question
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -107,7 +107,7 @@ impl<S: BosStr> LexiconSchema for SelectedAnswer<S> {
 
 pub mod selected_answer_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -115,70 +115,80 @@ pub mod selected_answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type AnswerRef;
         type CreatedAt;
         type QuestionRef;
-        type AnswerRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type AnswerRef = Unset;
         type CreatedAt = Unset;
         type QuestionRef = Unset;
-        type AnswerRef = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type QuestionRef = St::QuestionRef;
-        type AnswerRef = St::AnswerRef;
-    }
-    ///State transition - sets the `question_ref` field to Set
-    pub struct SetQuestionRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetQuestionRef<St> {}
-    impl<St: State> State for SetQuestionRef<St> {
-        type CreatedAt = St::CreatedAt;
-        type QuestionRef = Set<members::question_ref>;
-        type AnswerRef = St::AnswerRef;
     }
     ///State transition - sets the `answer_ref` field to Set
     pub struct SetAnswerRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAnswerRef<St> {}
     impl<St: State> State for SetAnswerRef<St> {
+        type AnswerRef = Set<members::answer_ref>;
         type CreatedAt = St::CreatedAt;
         type QuestionRef = St::QuestionRef;
-        type AnswerRef = Set<members::answer_ref>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type AnswerRef = St::AnswerRef;
+        type CreatedAt = Set<members::created_at>;
+        type QuestionRef = St::QuestionRef;
+    }
+    ///State transition - sets the `question_ref` field to Set
+    pub struct SetQuestionRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuestionRef<St> {}
+    impl<St: State> State for SetQuestionRef<St> {
+        type AnswerRef = St::AnswerRef;
+        type CreatedAt = St::CreatedAt;
+        type QuestionRef = Set<members::question_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `answer_ref` field
+        pub struct answer_ref(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `question_ref` field
         pub struct question_ref(());
-        ///Marker type for the `answer_ref` field
-        pub struct answer_ref(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SelectedAnswerBuilder<S: BosStr, St: selected_answer_state::State> {
+pub struct SelectedAnswerBuilder<
+    St: selected_answer_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>, Option<Datetime>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SelectedAnswer<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SelectedAnswerBuilder<S, selected_answer_state::Empty> {
+impl SelectedAnswer<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SelectedAnswerBuilder<selected_answer_state::Empty, DefaultStr> {
         SelectedAnswerBuilder::new()
     }
 }
 
-impl<S: BosStr> SelectedAnswerBuilder<S, selected_answer_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SelectedAnswer<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SelectedAnswerBuilder<selected_answer_state::Empty, S> {
+        SelectedAnswerBuilder::builder()
+    }
+}
+
+impl SelectedAnswerBuilder<selected_answer_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SelectedAnswerBuilder {
             _state: PhantomData,
@@ -188,7 +198,18 @@ impl<S: BosStr> SelectedAnswerBuilder<S, selected_answer_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SelectedAnswerBuilder<S, St>
+impl<S: BosStr> SelectedAnswerBuilder<selected_answer_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SelectedAnswerBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SelectedAnswerBuilder<St, S>
 where
     St: selected_answer_state::State,
     St::AnswerRef: selected_answer_state::IsUnset,
@@ -197,7 +218,7 @@ where
     pub fn answer_ref(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> SelectedAnswerBuilder<S, selected_answer_state::SetAnswerRef<St>> {
+    ) -> SelectedAnswerBuilder<selected_answer_state::SetAnswerRef<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SelectedAnswerBuilder {
             _state: PhantomData,
@@ -207,7 +228,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SelectedAnswerBuilder<S, St>
+impl<St, S: BosStr> SelectedAnswerBuilder<St, S>
 where
     St: selected_answer_state::State,
     St::CreatedAt: selected_answer_state::IsUnset,
@@ -216,7 +237,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SelectedAnswerBuilder<S, selected_answer_state::SetCreatedAt<St>> {
+    ) -> SelectedAnswerBuilder<selected_answer_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SelectedAnswerBuilder {
             _state: PhantomData,
@@ -226,7 +247,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SelectedAnswerBuilder<S, St>
+impl<St, S: BosStr> SelectedAnswerBuilder<St, S>
 where
     St: selected_answer_state::State,
     St::QuestionRef: selected_answer_state::IsUnset,
@@ -235,7 +256,7 @@ where
     pub fn question_ref(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> SelectedAnswerBuilder<S, selected_answer_state::SetQuestionRef<St>> {
+    ) -> SelectedAnswerBuilder<selected_answer_state::SetQuestionRef<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SelectedAnswerBuilder {
             _state: PhantomData,
@@ -245,12 +266,12 @@ where
     }
 }
 
-impl<S: BosStr, St> SelectedAnswerBuilder<S, St>
+impl<St, S: BosStr> SelectedAnswerBuilder<St, S>
 where
     St: selected_answer_state::State,
+    St::AnswerRef: selected_answer_state::IsSet,
     St::CreatedAt: selected_answer_state::IsSet,
     St::QuestionRef: selected_answer_state::IsSet,
-    St::AnswerRef: selected_answer_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SelectedAnswer<S> {
@@ -262,7 +283,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SelectedAnswer<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SelectedAnswer<S> {
         SelectedAnswer {
             answer_ref: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -273,10 +297,10 @@ where
 }
 
 fn lexicon_doc_fyi_questionable_selectedAnswer() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fyi.questionable.selectedAnswer"),

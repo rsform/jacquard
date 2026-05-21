@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -127,7 +127,7 @@ impl<S: BosStr> LexiconSchema for Now<S> {
 
 pub mod now_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -170,21 +170,28 @@ pub mod now_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NowBuilder<S: BosStr, St: now_state::State> {
+pub struct NowBuilder<St: now_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Now<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> NowBuilder<S, now_state::Empty> {
+impl Now<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> NowBuilder<now_state::Empty, DefaultStr> {
         NowBuilder::new()
     }
 }
 
-impl<S: BosStr> NowBuilder<S, now_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Now<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> NowBuilder<now_state::Empty, S> {
+        NowBuilder::builder()
+    }
+}
+
+impl NowBuilder<now_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         NowBuilder {
             _state: PhantomData,
@@ -194,7 +201,18 @@ impl<S: BosStr> NowBuilder<S, now_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> NowBuilder<S, St>
+impl<S: BosStr> NowBuilder<now_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        NowBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> NowBuilder<St, S>
 where
     St: now_state::State,
     St::CreatedAt: now_state::IsUnset,
@@ -203,7 +221,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> NowBuilder<S, now_state::SetCreatedAt<St>> {
+    ) -> NowBuilder<now_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         NowBuilder {
             _state: PhantomData,
@@ -213,13 +231,13 @@ where
     }
 }
 
-impl<S: BosStr, St> NowBuilder<S, St>
+impl<St, S: BosStr> NowBuilder<St, S>
 where
     St: now_state::State,
     St::Text: now_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(mut self, value: impl Into<S>) -> NowBuilder<S, now_state::SetText<St>> {
+    pub fn text(mut self, value: impl Into<S>) -> NowBuilder<now_state::SetText<St>, S> {
         self._fields.1 = Option::Some(value.into());
         NowBuilder {
             _state: PhantomData,
@@ -229,7 +247,7 @@ where
     }
 }
 
-impl<S: BosStr, St> NowBuilder<S, St>
+impl<St, S: BosStr> NowBuilder<St, S>
 where
     St: now_state::State,
     St::Text: now_state::IsSet,
@@ -254,10 +272,10 @@ where
 }
 
 fn lexicon_doc_uk_ewancroft_now() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("uk.ewancroft.now"),
@@ -268,19 +286,23 @@ fn lexicon_doc_uk_ewancroft_now() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("text"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("text"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The ISO 8601 date and time when the status was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The ISO 8601 date and time when the status was created.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -288,9 +310,11 @@ fn lexicon_doc_uk_ewancroft_now() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("text"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The status text formatted as plain text.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The status text formatted as plain text.",
+                                        ),
+                                    ),
                                     min_length: Some(1usize),
                                     max_length: Some(64usize),
                                     ..Default::default()

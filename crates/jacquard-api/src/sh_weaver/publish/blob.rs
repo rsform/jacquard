@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A simple record referencing a file hosted on a PDS
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -130,16 +130,19 @@ impl<S: BosStr> LexiconSchema for Blob<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("upload"),
@@ -155,7 +158,7 @@ impl<S: BosStr> LexiconSchema for Blob<S> {
 
 pub mod blob_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -198,21 +201,28 @@ pub mod blob_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BlobBuilder<S: BosStr, St: blob_state::State> {
+pub struct BlobBuilder<St: blob_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Blob<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BlobBuilder<S, blob_state::Empty> {
+impl Blob<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BlobBuilder<blob_state::Empty, DefaultStr> {
         BlobBuilder::new()
     }
 }
 
-impl<S: BosStr> BlobBuilder<S, blob_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Blob<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BlobBuilder<blob_state::Empty, S> {
+        BlobBuilder::builder()
+    }
+}
+
+impl BlobBuilder<blob_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BlobBuilder {
             _state: PhantomData,
@@ -222,13 +232,27 @@ impl<S: BosStr> BlobBuilder<S, blob_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BlobBuilder<S, St>
+impl<S: BosStr> BlobBuilder<blob_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BlobBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BlobBuilder<St, S>
 where
     St: blob_state::State,
     St::Path: blob_state::IsUnset,
 {
     /// Set the `path` field (required)
-    pub fn path(mut self, value: impl Into<S>) -> BlobBuilder<S, blob_state::SetPath<St>> {
+    pub fn path(
+        mut self,
+        value: impl Into<S>,
+    ) -> BlobBuilder<blob_state::SetPath<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BlobBuilder {
             _state: PhantomData,
@@ -238,7 +262,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BlobBuilder<S, St>
+impl<St, S: BosStr> BlobBuilder<St, S>
 where
     St: blob_state::State,
     St::Upload: blob_state::IsUnset,
@@ -247,7 +271,7 @@ where
     pub fn upload(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> BlobBuilder<S, blob_state::SetUpload<St>> {
+    ) -> BlobBuilder<blob_state::SetUpload<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BlobBuilder {
             _state: PhantomData,
@@ -257,7 +281,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BlobBuilder<S, St>
+impl<St, S: BosStr> BlobBuilder<St, S>
 where
     St: blob_state::State,
     St::Upload: blob_state::IsSet,
@@ -282,10 +306,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_publish_blob() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.publish.blob"),
@@ -294,33 +318,34 @@ fn lexicon_doc_sh_weaver_publish_blob() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A simple record referencing a file hosted on a PDS",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A simple record referencing a file hosted on a PDS",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("upload"),
-                            SmolStr::new_static("path"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("upload"), SmolStr::new_static("path")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("path"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "relative path to the blob",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("relative path to the blob"),
+                                    ),
                                     min_length: Some(1usize),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("upload"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map
                         },

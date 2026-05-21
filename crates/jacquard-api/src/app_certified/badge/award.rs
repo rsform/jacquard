@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_certified::Did;
 use crate::app_certified::badge::definition::Definition;
 use crate::com_atproto::repo::strong_ref::StrongRef;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// Records a badge award to a user, project, or activity claim.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -55,6 +55,7 @@ pub struct Award<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -147,7 +148,7 @@ impl<S: BosStr> LexiconSchema for Award<S> {
 
 pub mod award_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -155,56 +156,56 @@ pub mod award_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type CreatedAt;
+        type Subject;
         type Badge;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type CreatedAt = Unset;
+        type Subject = Unset;
         type Badge = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = St::CreatedAt;
-        type Badge = St::Badge;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Subject = St::Subject;
         type CreatedAt = Set<members::created_at>;
+        type Subject = St::Subject;
+        type Badge = St::Badge;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subject = Set<members::subject>;
         type Badge = St::Badge;
     }
     ///State transition - sets the `badge` field to Set
     pub struct SetBadge<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBadge<St> {}
     impl<St: State> State for SetBadge<St> {
-        type Subject = St::Subject;
         type CreatedAt = St::CreatedAt;
+        type Subject = St::Subject;
         type Badge = Set<members::badge>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `badge` field
         pub struct badge(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AwardBuilder<S: BosStr, St: award_state::State> {
+pub struct AwardBuilder<St: award_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Definition<S>>,
@@ -216,15 +217,22 @@ pub struct AwardBuilder<S: BosStr, St: award_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Award<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AwardBuilder<S, award_state::Empty> {
+impl Award<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AwardBuilder<award_state::Empty, DefaultStr> {
         AwardBuilder::new()
     }
 }
 
-impl<S: BosStr> AwardBuilder<S, award_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Award<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AwardBuilder<award_state::Empty, S> {
+        AwardBuilder::builder()
+    }
+}
+
+impl AwardBuilder<award_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AwardBuilder {
             _state: PhantomData,
@@ -234,7 +242,18 @@ impl<S: BosStr> AwardBuilder<S, award_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AwardBuilder<S, St>
+impl<S: BosStr> AwardBuilder<award_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AwardBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AwardBuilder<St, S>
 where
     St: award_state::State,
     St::Badge: award_state::IsUnset,
@@ -243,7 +262,7 @@ where
     pub fn badge(
         mut self,
         value: impl Into<Definition<S>>,
-    ) -> AwardBuilder<S, award_state::SetBadge<St>> {
+    ) -> AwardBuilder<award_state::SetBadge<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AwardBuilder {
             _state: PhantomData,
@@ -253,7 +272,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AwardBuilder<S, St>
+impl<St, S: BosStr> AwardBuilder<St, S>
 where
     St: award_state::State,
     St::CreatedAt: award_state::IsUnset,
@@ -262,7 +281,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AwardBuilder<S, award_state::SetCreatedAt<St>> {
+    ) -> AwardBuilder<award_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AwardBuilder {
             _state: PhantomData,
@@ -272,7 +291,7 @@ where
     }
 }
 
-impl<S: BosStr, St: award_state::State> AwardBuilder<S, St> {
+impl<St: award_state::State, S: BosStr> AwardBuilder<St, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -285,7 +304,7 @@ impl<S: BosStr, St: award_state::State> AwardBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AwardBuilder<S, St>
+impl<St, S: BosStr> AwardBuilder<St, S>
 where
     St: award_state::State,
     St::Subject: award_state::IsUnset,
@@ -294,7 +313,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<AwardSubject<S>>,
-    ) -> AwardBuilder<S, award_state::SetSubject<St>> {
+    ) -> AwardBuilder<award_state::SetSubject<St>, S> {
         self._fields.3 = Option::Some(value.into());
         AwardBuilder {
             _state: PhantomData,
@@ -304,7 +323,7 @@ where
     }
 }
 
-impl<S: BosStr, St: award_state::State> AwardBuilder<S, St> {
+impl<St: award_state::State, S: BosStr> AwardBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -317,11 +336,11 @@ impl<S: BosStr, St: award_state::State> AwardBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AwardBuilder<S, St>
+impl<St, S: BosStr> AwardBuilder<St, S>
 where
     St: award_state::State,
-    St::Subject: award_state::IsSet,
     St::CreatedAt: award_state::IsSet,
+    St::Subject: award_state::IsSet,
     St::Badge: award_state::IsSet,
 {
     /// Build the final struct.
@@ -349,10 +368,10 @@ where
 }
 
 fn lexicon_doc_app_certified_badge_award() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.certified.badge.award"),

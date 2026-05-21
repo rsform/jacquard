@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::fyi_questionable::richtext::content::Content;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::fyi_questionable::richtext::content::Content;
 /// A question asked on questionable.fyi
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -159,7 +159,7 @@ impl<S: BosStr> LexiconSchema for Question<S> {
 
 pub mod question_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -167,56 +167,56 @@ pub mod question_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Summary;
-        type Content;
         type CreatedAt;
+        type Content;
+        type Summary;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Summary = Unset;
-        type Content = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `summary` field to Set
-    pub struct SetSummary<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSummary<St> {}
-    impl<St: State> State for SetSummary<St> {
-        type Summary = Set<members::summary>;
-        type Content = St::Content;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type Summary = St::Summary;
-        type Content = Set<members::content>;
-        type CreatedAt = St::CreatedAt;
+        type Content = Unset;
+        type Summary = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Summary = St::Summary;
-        type Content = St::Content;
         type CreatedAt = Set<members::created_at>;
+        type Content = St::Content;
+        type Summary = St::Summary;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type CreatedAt = St::CreatedAt;
+        type Content = Set<members::content>;
+        type Summary = St::Summary;
+    }
+    ///State transition - sets the `summary` field to Set
+    pub struct SetSummary<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSummary<St> {}
+    impl<St: State> State for SetSummary<St> {
+        type CreatedAt = St::CreatedAt;
+        type Content = St::Content;
+        type Summary = Set<members::summary>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `summary` field
-        pub struct summary(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `summary` field
+        pub struct summary(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct QuestionBuilder<S: BosStr, St: question_state::State> {
+pub struct QuestionBuilder<St: question_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Content<S>>,
@@ -228,15 +228,22 @@ pub struct QuestionBuilder<S: BosStr, St: question_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Question<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> QuestionBuilder<S, question_state::Empty> {
+impl Question<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> QuestionBuilder<question_state::Empty, DefaultStr> {
         QuestionBuilder::new()
     }
 }
 
-impl<S: BosStr> QuestionBuilder<S, question_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Question<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> QuestionBuilder<question_state::Empty, S> {
+        QuestionBuilder::builder()
+    }
+}
+
+impl QuestionBuilder<question_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         QuestionBuilder {
             _state: PhantomData,
@@ -246,7 +253,18 @@ impl<S: BosStr> QuestionBuilder<S, question_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> QuestionBuilder<S, St>
+impl<S: BosStr> QuestionBuilder<question_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        QuestionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> QuestionBuilder<St, S>
 where
     St: question_state::State,
     St::Content: question_state::IsUnset,
@@ -255,7 +273,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<Content<S>>,
-    ) -> QuestionBuilder<S, question_state::SetContent<St>> {
+    ) -> QuestionBuilder<question_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         QuestionBuilder {
             _state: PhantomData,
@@ -265,7 +283,7 @@ where
     }
 }
 
-impl<S: BosStr, St: question_state::State> QuestionBuilder<S, St> {
+impl<St: question_state::State, S: BosStr> QuestionBuilder<St, S> {
     /// Set the `contextRef` field (optional)
     pub fn context_ref(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -278,7 +296,7 @@ impl<S: BosStr, St: question_state::State> QuestionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> QuestionBuilder<S, St>
+impl<St, S: BosStr> QuestionBuilder<St, S>
 where
     St: question_state::State,
     St::CreatedAt: question_state::IsUnset,
@@ -287,7 +305,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> QuestionBuilder<S, question_state::SetCreatedAt<St>> {
+    ) -> QuestionBuilder<question_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         QuestionBuilder {
             _state: PhantomData,
@@ -297,7 +315,7 @@ where
     }
 }
 
-impl<S: BosStr, St: question_state::State> QuestionBuilder<S, St> {
+impl<St: question_state::State, S: BosStr> QuestionBuilder<St, S> {
     /// Set the `languages` field (optional)
     pub fn languages(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
         self._fields.3 = value.into();
@@ -310,7 +328,7 @@ impl<S: BosStr, St: question_state::State> QuestionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> QuestionBuilder<S, St>
+impl<St, S: BosStr> QuestionBuilder<St, S>
 where
     St: question_state::State,
     St::Summary: question_state::IsUnset,
@@ -319,7 +337,7 @@ where
     pub fn summary(
         mut self,
         value: impl Into<S>,
-    ) -> QuestionBuilder<S, question_state::SetSummary<St>> {
+    ) -> QuestionBuilder<question_state::SetSummary<St>, S> {
         self._fields.4 = Option::Some(value.into());
         QuestionBuilder {
             _state: PhantomData,
@@ -329,12 +347,12 @@ where
     }
 }
 
-impl<S: BosStr, St> QuestionBuilder<S, St>
+impl<St, S: BosStr> QuestionBuilder<St, S>
 where
     St: question_state::State,
-    St::Summary: question_state::IsSet,
-    St::Content: question_state::IsSet,
     St::CreatedAt: question_state::IsSet,
+    St::Content: question_state::IsSet,
+    St::Summary: question_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Question<S> {
@@ -361,10 +379,10 @@ where
 }
 
 fn lexicon_doc_fyi_questionable_question() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fyi.questionable.question"),
@@ -373,21 +391,27 @@ fn lexicon_doc_fyi_questionable_question() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A question asked on questionable.fyi")),
+                    description: Some(
+                        CowStr::new_static("A question asked on questionable.fyi"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("summary"),
-                            SmolStr::new_static("content"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("summary"),
+                                SmolStr::new_static("content"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("content"),
                                 LexObjectProperty::Ref(LexRef {
-                                    r#ref: CowStr::new_static("fyi.questionable.richtext.content"),
+                                    r#ref: CowStr::new_static(
+                                        "fyi.questionable.richtext.content",
+                                    ),
                                     ..Default::default()
                                 }),
                             );
@@ -408,9 +432,11 @@ fn lexicon_doc_fyi_questionable_question() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("languages"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Indicates human language of the primary text content.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Indicates human language of the primary text content.",
+                                        ),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         format: Some(LexStringFormat::Language),
                                         ..Default::default()
@@ -422,9 +448,9 @@ fn lexicon_doc_fyi_questionable_question() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("summary"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "A short summary of the question",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("A short summary of the question"),
+                                    ),
                                     min_length: Some(1usize),
                                     max_length: Some(3000usize),
                                     max_graphemes: Some(300usize),

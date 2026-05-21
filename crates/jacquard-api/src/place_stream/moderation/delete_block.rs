@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Did};
+use jacquard_common::types::string::{Did, AtUri};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteBlock<S: BosStr = DefaultStr> {
     ///The AT-URI of the block record to delete.
     pub block_uri: AtUri<S>,
@@ -31,19 +28,26 @@ pub struct DeleteBlock<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteBlockOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum DeleteBlockError {
     /// The request lacks valid authentication credentials.
@@ -57,10 +61,7 @@ pub enum DeleteBlockError {
     SessionNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for DeleteBlockError {
@@ -109,8 +110,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteBlockResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteBlock<S> {
     const NSID: &'static str = "place.stream.moderation.deleteBlock";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteBlockResponse;
 }
 
@@ -118,15 +120,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteBlock<S> {
 pub struct DeleteBlockRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteBlockRequest {
     const PATH: &'static str = "/xrpc/place.stream.moderation.deleteBlock";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeleteBlock<S>;
     type Response = DeleteBlockResponse;
 }
 
 pub mod delete_block_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -169,21 +172,28 @@ pub mod delete_block_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeleteBlockBuilder<S: BosStr, St: delete_block_state::State> {
+pub struct DeleteBlockBuilder<St: delete_block_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DeleteBlock<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DeleteBlockBuilder<S, delete_block_state::Empty> {
+impl DeleteBlock<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DeleteBlockBuilder<delete_block_state::Empty, DefaultStr> {
         DeleteBlockBuilder::new()
     }
 }
 
-impl<S: BosStr> DeleteBlockBuilder<S, delete_block_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DeleteBlock<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DeleteBlockBuilder<delete_block_state::Empty, S> {
+        DeleteBlockBuilder::builder()
+    }
+}
+
+impl DeleteBlockBuilder<delete_block_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DeleteBlockBuilder {
             _state: PhantomData,
@@ -193,7 +203,18 @@ impl<S: BosStr> DeleteBlockBuilder<S, delete_block_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DeleteBlockBuilder<S, St>
+impl<S: BosStr> DeleteBlockBuilder<delete_block_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DeleteBlockBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DeleteBlockBuilder<St, S>
 where
     St: delete_block_state::State,
     St::BlockUri: delete_block_state::IsUnset,
@@ -202,7 +223,7 @@ where
     pub fn block_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> DeleteBlockBuilder<S, delete_block_state::SetBlockUri<St>> {
+    ) -> DeleteBlockBuilder<delete_block_state::SetBlockUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DeleteBlockBuilder {
             _state: PhantomData,
@@ -212,7 +233,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeleteBlockBuilder<S, St>
+impl<St, S: BosStr> DeleteBlockBuilder<St, S>
 where
     St: delete_block_state::State,
     St::Streamer: delete_block_state::IsUnset,
@@ -221,7 +242,7 @@ where
     pub fn streamer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> DeleteBlockBuilder<S, delete_block_state::SetStreamer<St>> {
+    ) -> DeleteBlockBuilder<delete_block_state::SetStreamer<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DeleteBlockBuilder {
             _state: PhantomData,
@@ -231,7 +252,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeleteBlockBuilder<S, St>
+impl<St, S: BosStr> DeleteBlockBuilder<St, S>
 where
     St: delete_block_state::State,
     St::Streamer: delete_block_state::IsSet,
@@ -246,7 +267,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeleteBlock<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteBlock<S> {
         DeleteBlock {
             block_uri: self._fields.0.unwrap(),
             streamer: self._fields.1.unwrap(),

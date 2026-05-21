@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,6 +24,9 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::brand;
 use crate::social_flockfeeds::lexical::r#type::event;
 use crate::social_flockfeeds::lexical::r#type::image_object;
@@ -31,16 +34,10 @@ use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A person (alive, dead, undead, or fictional).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_name: Option<EmbeddedAdditionalName<S>>,
@@ -204,6 +201,7 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -227,6 +225,7 @@ pub enum EmbeddedAffiliation<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -244,6 +243,7 @@ pub enum EmbeddedAlumniOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -275,6 +275,7 @@ pub enum EmbeddedBrand<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -288,6 +289,7 @@ pub enum EmbeddedChildren<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -296,6 +298,7 @@ pub enum EmbeddedColleague<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -303,6 +306,7 @@ pub enum EmbeddedColleagues<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     Embedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -362,6 +366,7 @@ pub enum EmbeddedFollows<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -371,6 +376,7 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     Embedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -450,6 +456,7 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -472,6 +479,7 @@ pub enum EmbeddedKnows<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     Embedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -496,6 +504,7 @@ pub enum EmbeddedMakesOffer<S: BosStr = DefaultStr> {
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -503,6 +512,7 @@ pub enum EmbeddedMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -532,6 +542,7 @@ pub enum EmbeddedOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -539,6 +550,7 @@ pub enum EmbeddedParent<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     Embedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -548,6 +560,7 @@ pub enum EmbeddedParents<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -555,6 +568,7 @@ pub enum EmbeddedPerformerIn<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -579,6 +593,7 @@ pub enum EmbeddedRelatedTo<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -597,6 +612,7 @@ pub enum EmbeddedSibling<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -604,6 +620,7 @@ pub enum EmbeddedSiblings<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     Embedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -620,6 +637,7 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -628,6 +646,7 @@ pub enum EmbeddedSpouse<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -635,6 +654,7 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -673,6 +693,7 @@ pub enum EmbeddedWorksFor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -844,6 +865,7 @@ pub struct Person<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -867,6 +889,7 @@ pub enum PersonAffiliation<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -884,6 +907,7 @@ pub enum PersonAlumniOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -915,6 +939,7 @@ pub enum PersonBrand<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -928,6 +953,7 @@ pub enum PersonChildren<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -936,6 +962,7 @@ pub enum PersonColleague<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -943,6 +970,7 @@ pub enum PersonColleagues<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     Embedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1002,6 +1030,7 @@ pub enum PersonFollows<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1011,6 +1040,7 @@ pub enum PersonFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     Embedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1090,6 +1120,7 @@ pub enum PersonImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1112,6 +1143,7 @@ pub enum PersonKnows<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     Embedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1136,6 +1168,7 @@ pub enum PersonMakesOffer<S: BosStr = DefaultStr> {
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1143,6 +1176,7 @@ pub enum PersonMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1172,6 +1206,7 @@ pub enum PersonOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1179,6 +1214,7 @@ pub enum PersonParent<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     Embedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1188,6 +1224,7 @@ pub enum PersonParents<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1195,6 +1232,7 @@ pub enum PersonPerformerIn<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1219,6 +1257,7 @@ pub enum PersonRelatedTo<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1237,6 +1276,7 @@ pub enum PersonSibling<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1244,6 +1284,7 @@ pub enum PersonSiblings<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     Embedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1260,6 +1301,7 @@ pub enum PersonSponsor<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1268,6 +1310,7 @@ pub enum PersonSpouse<S: BosStr = DefaultStr> {
     Embedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1275,6 +1318,7 @@ pub enum PersonSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1389,10 +1433,10 @@ impl<S: BosStr> LexiconSchema for Person<S> {
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_Person() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.Person"),
@@ -3080,7 +3124,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Person() -> LexiconDoc<'static> {
 
 pub mod person_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3098,7 +3142,7 @@ pub mod person_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PersonBuilder<S: BosStr, St: person_state::State> {
+pub struct PersonBuilder<St: person_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<PersonAdditionalName<S>>,
@@ -3184,58 +3228,241 @@ pub struct PersonBuilder<S: BosStr, St: person_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Person<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PersonBuilder<S, person_state::Empty> {
+impl Person<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PersonBuilder<person_state::Empty, DefaultStr> {
         PersonBuilder::new()
     }
 }
 
-impl<S: BosStr> PersonBuilder<S, person_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Person<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PersonBuilder<person_state::Empty, S> {
+        PersonBuilder::builder()
+    }
+}
+
+impl PersonBuilder<person_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PersonBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<S: BosStr> PersonBuilder<person_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PersonBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `additionalName` field (optional)
-    pub fn additional_name(mut self, value: impl Into<Option<PersonAdditionalName<S>>>) -> Self {
+    pub fn additional_name(
+        mut self,
+        value: impl Into<Option<PersonAdditionalName<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `additionalName` field to an Option value (optional)
-    pub fn maybe_additional_name(mut self, value: Option<PersonAdditionalName<S>>) -> Self {
+    pub fn maybe_additional_name(
+        mut self,
+        value: Option<PersonAdditionalName<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `additionalType` field (optional)
-    pub fn additional_type(mut self, value: impl Into<Option<PersonAdditionalType<S>>>) -> Self {
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<PersonAdditionalType<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(mut self, value: Option<PersonAdditionalType<S>>) -> Self {
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<PersonAdditionalType<S>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `address` field (optional)
     pub fn address(mut self, value: impl Into<Option<PersonAddress<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -3248,9 +3475,12 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `affiliation` field (optional)
-    pub fn affiliation(mut self, value: impl Into<Option<PersonAffiliation<S>>>) -> Self {
+    pub fn affiliation(
+        mut self,
+        value: impl Into<Option<PersonAffiliation<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -3261,7 +3491,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `agentInteractionStatistic` field (optional)
     pub fn agent_interaction_statistic(
         mut self,
@@ -3280,20 +3510,26 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(mut self, value: impl Into<Option<PersonAlternateName<S>>>) -> Self {
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<PersonAlternateName<S>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(mut self, value: Option<PersonAlternateName<S>>) -> Self {
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<PersonAlternateName<S>>,
+    ) -> Self {
         self._fields.5 = value;
         self
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `alumniOf` field (optional)
     pub fn alumni_of(mut self, value: impl Into<Option<PersonAlumniOf<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -3306,7 +3542,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<PersonAward<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -3319,7 +3555,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<PersonAwards<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -3332,7 +3568,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `birthDate` field (optional)
     pub fn birth_date(mut self, value: impl Into<Option<PersonBirthDate<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -3345,7 +3581,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `birthPlace` field (optional)
     pub fn birth_place(mut self, value: impl Into<Option<PersonBirthPlace<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -3358,7 +3594,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `brand` field (optional)
     pub fn brand(mut self, value: impl Into<Option<PersonBrand<S>>>) -> Self {
         self._fields.11 = value.into();
@@ -3371,7 +3607,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `callSign` field (optional)
     pub fn call_sign(mut self, value: impl Into<Option<PersonCallSign<S>>>) -> Self {
         self._fields.12 = value.into();
@@ -3384,7 +3620,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `children` field (optional)
     pub fn children(mut self, value: impl Into<Option<PersonChildren<S>>>) -> Self {
         self._fields.13 = value.into();
@@ -3397,7 +3633,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `colleague` field (optional)
     pub fn colleague(mut self, value: impl Into<Option<PersonColleague<S>>>) -> Self {
         self._fields.14 = value.into();
@@ -3410,7 +3646,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `colleagues` field (optional)
     pub fn colleagues(mut self, value: impl Into<Option<PersonColleagues<S>>>) -> Self {
         self._fields.15 = value.into();
@@ -3423,9 +3659,12 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `contactPoint` field (optional)
-    pub fn contact_point(mut self, value: impl Into<Option<PersonContactPoint<S>>>) -> Self {
+    pub fn contact_point(
+        mut self,
+        value: impl Into<Option<PersonContactPoint<S>>>,
+    ) -> Self {
         self._fields.16 = value.into();
         self
     }
@@ -3436,20 +3675,26 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `contactPoints` field (optional)
-    pub fn contact_points(mut self, value: impl Into<Option<PersonContactPoints<S>>>) -> Self {
+    pub fn contact_points(
+        mut self,
+        value: impl Into<Option<PersonContactPoints<S>>>,
+    ) -> Self {
         self._fields.17 = value.into();
         self
     }
     /// Set the `contactPoints` field to an Option value (optional)
-    pub fn maybe_contact_points(mut self, value: Option<PersonContactPoints<S>>) -> Self {
+    pub fn maybe_contact_points(
+        mut self,
+        value: Option<PersonContactPoints<S>>,
+    ) -> Self {
         self._fields.17 = value;
         self
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `deathDate` field (optional)
     pub fn death_date(mut self, value: impl Into<Option<PersonDeathDate<S>>>) -> Self {
         self._fields.18 = value.into();
@@ -3462,7 +3707,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `deathPlace` field (optional)
     pub fn death_place(mut self, value: impl Into<Option<PersonDeathPlace<S>>>) -> Self {
         self._fields.19 = value.into();
@@ -3475,9 +3720,12 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<PersonDescription<S>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<PersonDescription<S>>>,
+    ) -> Self {
         self._fields.20 = value.into();
         self
     }
@@ -3488,7 +3736,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
@@ -3507,7 +3755,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `duns` field (optional)
     pub fn duns(mut self, value: impl Into<Option<PersonDuns<S>>>) -> Self {
         self._fields.22 = value.into();
@@ -3520,7 +3768,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<PersonEmail<S>>>) -> Self {
         self._fields.23 = value.into();
@@ -3533,7 +3781,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `familyName` field (optional)
     pub fn family_name(mut self, value: impl Into<Option<PersonFamilyName<S>>>) -> Self {
         self._fields.24 = value.into();
@@ -3546,7 +3794,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `faxNumber` field (optional)
     pub fn fax_number(mut self, value: impl Into<Option<PersonFaxNumber<S>>>) -> Self {
         self._fields.25 = value.into();
@@ -3559,7 +3807,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `follows` field (optional)
     pub fn follows(mut self, value: impl Into<Option<PersonFollows<S>>>) -> Self {
         self._fields.26 = value.into();
@@ -3572,7 +3820,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<PersonFunder<S>>>) -> Self {
         self._fields.27 = value.into();
@@ -3585,7 +3833,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<PersonFunding<S>>>) -> Self {
         self._fields.28 = value.into();
@@ -3598,7 +3846,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `gender` field (optional)
     pub fn gender(mut self, value: impl Into<Option<PersonGender<S>>>) -> Self {
         self._fields.29 = value.into();
@@ -3611,7 +3859,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `givenName` field (optional)
     pub fn given_name(mut self, value: impl Into<Option<PersonGivenName<S>>>) -> Self {
         self._fields.30 = value.into();
@@ -3624,7 +3872,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `globalLocationNumber` field (optional)
     pub fn global_location_number(
         mut self,
@@ -3643,7 +3891,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `hasCertification` field (optional)
     pub fn has_certification(
         mut self,
@@ -3653,52 +3901,73 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
         self
     }
     /// Set the `hasCertification` field to an Option value (optional)
-    pub fn maybe_has_certification(mut self, value: Option<PersonHasCertification<S>>) -> Self {
+    pub fn maybe_has_certification(
+        mut self,
+        value: Option<PersonHasCertification<S>>,
+    ) -> Self {
         self._fields.32 = value;
         self
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `hasCredential` field (optional)
-    pub fn has_credential(mut self, value: impl Into<Option<PersonHasCredential<S>>>) -> Self {
+    pub fn has_credential(
+        mut self,
+        value: impl Into<Option<PersonHasCredential<S>>>,
+    ) -> Self {
         self._fields.33 = value.into();
         self
     }
     /// Set the `hasCredential` field to an Option value (optional)
-    pub fn maybe_has_credential(mut self, value: Option<PersonHasCredential<S>>) -> Self {
+    pub fn maybe_has_credential(
+        mut self,
+        value: Option<PersonHasCredential<S>>,
+    ) -> Self {
         self._fields.33 = value;
         self
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `hasOccupation` field (optional)
-    pub fn has_occupation(mut self, value: impl Into<Option<PersonHasOccupation<S>>>) -> Self {
+    pub fn has_occupation(
+        mut self,
+        value: impl Into<Option<PersonHasOccupation<S>>>,
+    ) -> Self {
         self._fields.34 = value.into();
         self
     }
     /// Set the `hasOccupation` field to an Option value (optional)
-    pub fn maybe_has_occupation(mut self, value: Option<PersonHasOccupation<S>>) -> Self {
+    pub fn maybe_has_occupation(
+        mut self,
+        value: Option<PersonHasOccupation<S>>,
+    ) -> Self {
         self._fields.34 = value;
         self
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `hasOfferCatalog` field (optional)
-    pub fn has_offer_catalog(mut self, value: impl Into<Option<PersonHasOfferCatalog<S>>>) -> Self {
+    pub fn has_offer_catalog(
+        mut self,
+        value: impl Into<Option<PersonHasOfferCatalog<S>>>,
+    ) -> Self {
         self._fields.35 = value.into();
         self
     }
     /// Set the `hasOfferCatalog` field to an Option value (optional)
-    pub fn maybe_has_offer_catalog(mut self, value: Option<PersonHasOfferCatalog<S>>) -> Self {
+    pub fn maybe_has_offer_catalog(
+        mut self,
+        value: Option<PersonHasOfferCatalog<S>>,
+    ) -> Self {
         self._fields.35 = value;
         self
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `hasPOS` field (optional)
     pub fn has_pos(mut self, value: impl Into<Option<PersonHasPos<S>>>) -> Self {
         self._fields.36 = value.into();
@@ -3711,7 +3980,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<PersonHeight<S>>>) -> Self {
         self._fields.37 = value.into();
@@ -3724,9 +3993,12 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `homeLocation` field (optional)
-    pub fn home_location(mut self, value: impl Into<Option<PersonHomeLocation<S>>>) -> Self {
+    pub fn home_location(
+        mut self,
+        value: impl Into<Option<PersonHomeLocation<S>>>,
+    ) -> Self {
         self._fields.38 = value.into();
         self
     }
@@ -3737,33 +4009,45 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `honorificPrefix` field (optional)
-    pub fn honorific_prefix(mut self, value: impl Into<Option<PersonHonorificPrefix<S>>>) -> Self {
+    pub fn honorific_prefix(
+        mut self,
+        value: impl Into<Option<PersonHonorificPrefix<S>>>,
+    ) -> Self {
         self._fields.39 = value.into();
         self
     }
     /// Set the `honorificPrefix` field to an Option value (optional)
-    pub fn maybe_honorific_prefix(mut self, value: Option<PersonHonorificPrefix<S>>) -> Self {
+    pub fn maybe_honorific_prefix(
+        mut self,
+        value: Option<PersonHonorificPrefix<S>>,
+    ) -> Self {
         self._fields.39 = value;
         self
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `honorificSuffix` field (optional)
-    pub fn honorific_suffix(mut self, value: impl Into<Option<PersonHonorificSuffix<S>>>) -> Self {
+    pub fn honorific_suffix(
+        mut self,
+        value: impl Into<Option<PersonHonorificSuffix<S>>>,
+    ) -> Self {
         self._fields.40 = value.into();
         self
     }
     /// Set the `honorificSuffix` field to an Option value (optional)
-    pub fn maybe_honorific_suffix(mut self, value: Option<PersonHonorificSuffix<S>>) -> Self {
+    pub fn maybe_honorific_suffix(
+        mut self,
+        value: Option<PersonHonorificSuffix<S>>,
+    ) -> Self {
         self._fields.40 = value;
         self
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<PersonIdentifier<S>>>) -> Self {
         self._fields.41 = value.into();
@@ -3776,7 +4060,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<PersonImage<S>>>) -> Self {
         self._fields.42 = value.into();
@@ -3789,7 +4073,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `interactionStatistic` field (optional)
     pub fn interaction_statistic(
         mut self,
@@ -3808,7 +4092,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `isicV4` field (optional)
     pub fn isic_v4(mut self, value: impl Into<Option<PersonIsicV4<S>>>) -> Self {
         self._fields.44 = value.into();
@@ -3821,7 +4105,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `jobTitle` field (optional)
     pub fn job_title(mut self, value: impl Into<Option<PersonJobTitle<S>>>) -> Self {
         self._fields.45 = value.into();
@@ -3834,7 +4118,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `knows` field (optional)
     pub fn knows(mut self, value: impl Into<Option<PersonKnows<S>>>) -> Self {
         self._fields.46 = value.into();
@@ -3847,7 +4131,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `knowsAbout` field (optional)
     pub fn knows_about(mut self, value: impl Into<Option<PersonKnowsAbout<S>>>) -> Self {
         self._fields.47 = value.into();
@@ -3860,20 +4144,26 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `knowsLanguage` field (optional)
-    pub fn knows_language(mut self, value: impl Into<Option<PersonKnowsLanguage<S>>>) -> Self {
+    pub fn knows_language(
+        mut self,
+        value: impl Into<Option<PersonKnowsLanguage<S>>>,
+    ) -> Self {
         self._fields.48 = value.into();
         self
     }
     /// Set the `knowsLanguage` field to an Option value (optional)
-    pub fn maybe_knows_language(mut self, value: Option<PersonKnowsLanguage<S>>) -> Self {
+    pub fn maybe_knows_language(
+        mut self,
+        value: Option<PersonKnowsLanguage<S>>,
+    ) -> Self {
         self._fields.48 = value;
         self
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
@@ -3883,13 +4173,16 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
-    pub fn maybe_main_entity_of_page(mut self, value: Option<PersonMainEntityOfPage<S>>) -> Self {
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<PersonMainEntityOfPage<S>>,
+    ) -> Self {
         self._fields.49 = value;
         self
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `makesOffer` field (optional)
     pub fn makes_offer(mut self, value: impl Into<Option<PersonMakesOffer<S>>>) -> Self {
         self._fields.50 = value.into();
@@ -3902,7 +4195,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `memberOf` field (optional)
     pub fn member_of(mut self, value: impl Into<Option<PersonMemberOf<S>>>) -> Self {
         self._fields.51 = value.into();
@@ -3915,7 +4208,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `naics` field (optional)
     pub fn naics(mut self, value: impl Into<Option<PersonNaics<S>>>) -> Self {
         self._fields.52 = value.into();
@@ -3928,7 +4221,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<PersonName<S>>>) -> Self {
         self._fields.53 = value.into();
@@ -3941,9 +4234,12 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `nationality` field (optional)
-    pub fn nationality(mut self, value: impl Into<Option<PersonNationality<S>>>) -> Self {
+    pub fn nationality(
+        mut self,
+        value: impl Into<Option<PersonNationality<S>>>,
+    ) -> Self {
         self._fields.54 = value.into();
         self
     }
@@ -3954,7 +4250,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `netWorth` field (optional)
     pub fn net_worth(mut self, value: impl Into<Option<PersonNetWorth<S>>>) -> Self {
         self._fields.55 = value.into();
@@ -3967,7 +4263,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `owns` field (optional)
     pub fn owns(mut self, value: impl Into<Option<PersonOwns<S>>>) -> Self {
         self._fields.56 = value.into();
@@ -3980,7 +4276,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<PersonParent<S>>>) -> Self {
         self._fields.57 = value.into();
@@ -3993,7 +4289,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `parents` field (optional)
     pub fn parents(mut self, value: impl Into<Option<PersonParents<S>>>) -> Self {
         self._fields.58 = value.into();
@@ -4006,9 +4302,12 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `performerIn` field (optional)
-    pub fn performer_in(mut self, value: impl Into<Option<PersonPerformerIn<S>>>) -> Self {
+    pub fn performer_in(
+        mut self,
+        value: impl Into<Option<PersonPerformerIn<S>>>,
+    ) -> Self {
         self._fields.59 = value.into();
         self
     }
@@ -4019,20 +4318,26 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `potentialAction` field (optional)
-    pub fn potential_action(mut self, value: impl Into<Option<PersonPotentialAction<S>>>) -> Self {
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<PersonPotentialAction<S>>>,
+    ) -> Self {
         self._fields.60 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(mut self, value: Option<PersonPotentialAction<S>>) -> Self {
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<PersonPotentialAction<S>>,
+    ) -> Self {
         self._fields.60 = value;
         self
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `pronouns` field (optional)
     pub fn pronouns(mut self, value: impl Into<Option<PersonPronouns<S>>>) -> Self {
         self._fields.61 = value.into();
@@ -4045,7 +4350,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `publishingPrinciples` field (optional)
     pub fn publishing_principles(
         mut self,
@@ -4064,7 +4369,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `relatedTo` field (optional)
     pub fn related_to(mut self, value: impl Into<Option<PersonRelatedTo<S>>>) -> Self {
         self._fields.63 = value.into();
@@ -4077,7 +4382,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<PersonSameAs<S>>>) -> Self {
         self._fields.64 = value.into();
@@ -4090,7 +4395,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `seeks` field (optional)
     pub fn seeks(mut self, value: impl Into<Option<PersonSeeks<S>>>) -> Self {
         self._fields.65 = value.into();
@@ -4103,7 +4408,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `sibling` field (optional)
     pub fn sibling(mut self, value: impl Into<Option<PersonSibling<S>>>) -> Self {
         self._fields.66 = value.into();
@@ -4116,7 +4421,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `siblings` field (optional)
     pub fn siblings(mut self, value: impl Into<Option<PersonSiblings<S>>>) -> Self {
         self._fields.67 = value.into();
@@ -4129,7 +4434,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `skills` field (optional)
     pub fn skills(mut self, value: impl Into<Option<PersonSkills<S>>>) -> Self {
         self._fields.68 = value.into();
@@ -4142,7 +4447,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<PersonSponsor<S>>>) -> Self {
         self._fields.69 = value.into();
@@ -4155,7 +4460,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `spouse` field (optional)
     pub fn spouse(mut self, value: impl Into<Option<PersonSpouse<S>>>) -> Self {
         self._fields.70 = value.into();
@@ -4168,7 +4473,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<PersonSubjectOf<S>>>) -> Self {
         self._fields.71 = value.into();
@@ -4181,7 +4486,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `taxID` field (optional)
     pub fn tax_id(mut self, value: impl Into<Option<PersonTaxId<S>>>) -> Self {
         self._fields.72 = value.into();
@@ -4194,7 +4499,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `telephone` field (optional)
     pub fn telephone(mut self, value: impl Into<Option<PersonTelephone<S>>>) -> Self {
         self._fields.73 = value.into();
@@ -4207,7 +4512,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<PersonUrl<S>>>) -> Self {
         self._fields.74 = value.into();
@@ -4220,7 +4525,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `vatID` field (optional)
     pub fn vat_id(mut self, value: impl Into<Option<PersonVatId<S>>>) -> Self {
         self._fields.75 = value.into();
@@ -4233,7 +4538,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `weight` field (optional)
     pub fn weight(mut self, value: impl Into<Option<PersonWeight<S>>>) -> Self {
         self._fields.76 = value.into();
@@ -4246,9 +4551,12 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `workLocation` field (optional)
-    pub fn work_location(mut self, value: impl Into<Option<PersonWorkLocation<S>>>) -> Self {
+    pub fn work_location(
+        mut self,
+        value: impl Into<Option<PersonWorkLocation<S>>>,
+    ) -> Self {
         self._fields.77 = value.into();
         self
     }
@@ -4259,7 +4567,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
+impl<St: person_state::State, S: BosStr> PersonBuilder<St, S> {
     /// Set the `worksFor` field (optional)
     pub fn works_for(mut self, value: impl Into<Option<PersonWorksFor<S>>>) -> Self {
         self._fields.78 = value.into();
@@ -4272,7 +4580,7 @@ impl<S: BosStr, St: person_state::State> PersonBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PersonBuilder<S, St>
+impl<St, S: BosStr> PersonBuilder<St, S>
 where
     St: person_state::State,
 {

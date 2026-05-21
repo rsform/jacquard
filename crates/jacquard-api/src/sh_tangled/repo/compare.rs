@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Compare<S: BosStr = DefaultStr> {
     pub repo: S,
     pub rev1: S,
@@ -36,9 +33,18 @@ pub struct CompareOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum CompareError {
     /// Repository not found or access denied
@@ -55,10 +61,7 @@ pub enum CompareError {
     CompareError(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for CompareError {
@@ -148,7 +151,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CompareRequest {
 
 pub mod compare_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -156,70 +159,77 @@ pub mod compare_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Rev2;
         type Repo;
         type Rev1;
-        type Rev2;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Rev2 = Unset;
         type Repo = Unset;
         type Rev1 = Unset;
-        type Rev2 = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Repo = Set<members::repo>;
-        type Rev1 = St::Rev1;
-        type Rev2 = St::Rev2;
-    }
-    ///State transition - sets the `rev1` field to Set
-    pub struct SetRev1<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev1<St> {}
-    impl<St: State> State for SetRev1<St> {
-        type Repo = St::Repo;
-        type Rev1 = Set<members::rev1>;
-        type Rev2 = St::Rev2;
     }
     ///State transition - sets the `rev2` field to Set
     pub struct SetRev2<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRev2<St> {}
     impl<St: State> State for SetRev2<St> {
+        type Rev2 = Set<members::rev2>;
         type Repo = St::Repo;
         type Rev1 = St::Rev1;
-        type Rev2 = Set<members::rev2>;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Rev2 = St::Rev2;
+        type Repo = Set<members::repo>;
+        type Rev1 = St::Rev1;
+    }
+    ///State transition - sets the `rev1` field to Set
+    pub struct SetRev1<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev1<St> {}
+    impl<St: State> State for SetRev1<St> {
+        type Rev2 = St::Rev2;
+        type Repo = St::Repo;
+        type Rev1 = Set<members::rev1>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `rev2` field
+        pub struct rev2(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `rev1` field
         pub struct rev1(());
-        ///Marker type for the `rev2` field
-        pub struct rev2(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CompareBuilder<S: BosStr, St: compare_state::State> {
+pub struct CompareBuilder<St: compare_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Compare<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CompareBuilder<S, compare_state::Empty> {
+impl Compare<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CompareBuilder<compare_state::Empty, DefaultStr> {
         CompareBuilder::new()
     }
 }
 
-impl<S: BosStr> CompareBuilder<S, compare_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Compare<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CompareBuilder<compare_state::Empty, S> {
+        CompareBuilder::builder()
+    }
+}
+
+impl CompareBuilder<compare_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CompareBuilder {
             _state: PhantomData,
@@ -229,13 +239,27 @@ impl<S: BosStr> CompareBuilder<S, compare_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CompareBuilder<S, St>
+impl<S: BosStr> CompareBuilder<compare_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CompareBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CompareBuilder<St, S>
 where
     St: compare_state::State,
     St::Repo: compare_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(mut self, value: impl Into<S>) -> CompareBuilder<S, compare_state::SetRepo<St>> {
+    pub fn repo(
+        mut self,
+        value: impl Into<S>,
+    ) -> CompareBuilder<compare_state::SetRepo<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CompareBuilder {
             _state: PhantomData,
@@ -245,13 +269,16 @@ where
     }
 }
 
-impl<S: BosStr, St> CompareBuilder<S, St>
+impl<St, S: BosStr> CompareBuilder<St, S>
 where
     St: compare_state::State,
     St::Rev1: compare_state::IsUnset,
 {
     /// Set the `rev1` field (required)
-    pub fn rev1(mut self, value: impl Into<S>) -> CompareBuilder<S, compare_state::SetRev1<St>> {
+    pub fn rev1(
+        mut self,
+        value: impl Into<S>,
+    ) -> CompareBuilder<compare_state::SetRev1<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CompareBuilder {
             _state: PhantomData,
@@ -261,13 +288,16 @@ where
     }
 }
 
-impl<S: BosStr, St> CompareBuilder<S, St>
+impl<St, S: BosStr> CompareBuilder<St, S>
 where
     St: compare_state::State,
     St::Rev2: compare_state::IsUnset,
 {
     /// Set the `rev2` field (required)
-    pub fn rev2(mut self, value: impl Into<S>) -> CompareBuilder<S, compare_state::SetRev2<St>> {
+    pub fn rev2(
+        mut self,
+        value: impl Into<S>,
+    ) -> CompareBuilder<compare_state::SetRev2<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CompareBuilder {
             _state: PhantomData,
@@ -277,12 +307,12 @@ where
     }
 }
 
-impl<S: BosStr, St> CompareBuilder<S, St>
+impl<St, S: BosStr> CompareBuilder<St, S>
 where
     St: compare_state::State,
+    St::Rev2: compare_state::IsSet,
     St::Repo: compare_state::IsSet,
     St::Rev1: compare_state::IsSet,
-    St::Rev2: compare_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Compare<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Record declaring a list of account references.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -104,7 +104,7 @@ impl<S: BosStr> LexiconSchema for Accounts<S> {
 
 pub mod accounts_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -135,21 +135,28 @@ pub mod accounts_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AccountsBuilder<S: BosStr, St: accounts_state::State> {
+pub struct AccountsBuilder<St: accounts_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<StrongRef<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Accounts<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AccountsBuilder<S, accounts_state::Empty> {
+impl Accounts<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AccountsBuilder<accounts_state::Empty, DefaultStr> {
         AccountsBuilder::new()
     }
 }
 
-impl<S: BosStr> AccountsBuilder<S, accounts_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Accounts<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AccountsBuilder<accounts_state::Empty, S> {
+        AccountsBuilder::builder()
+    }
+}
+
+impl AccountsBuilder<accounts_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AccountsBuilder {
             _state: PhantomData,
@@ -159,7 +166,18 @@ impl<S: BosStr> AccountsBuilder<S, accounts_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AccountsBuilder<S, St>
+impl<S: BosStr> AccountsBuilder<accounts_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AccountsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AccountsBuilder<St, S>
 where
     St: accounts_state::State,
     St::Accounts: accounts_state::IsUnset,
@@ -168,7 +186,7 @@ where
     pub fn accounts(
         mut self,
         value: impl Into<Vec<StrongRef<S>>>,
-    ) -> AccountsBuilder<S, accounts_state::SetAccounts<St>> {
+    ) -> AccountsBuilder<accounts_state::SetAccounts<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AccountsBuilder {
             _state: PhantomData,
@@ -178,7 +196,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AccountsBuilder<S, St>
+impl<St, S: BosStr> AccountsBuilder<St, S>
 where
     St: accounts_state::State,
     St::Accounts: accounts_state::IsSet,
@@ -200,10 +218,10 @@ where
 }
 
 fn lexicon_doc_net_mmatt_my_accounts() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.mmatt.my.accounts"),
@@ -212,9 +230,11 @@ fn lexicon_doc_net_mmatt_my_accounts() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Record declaring a list of account references.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Record declaring a list of account references.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("accounts")]),

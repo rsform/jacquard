@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// it's a kind of fungus
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -153,7 +153,7 @@ impl<S: BosStr> LexiconSchema for M<S> {
 
 pub mod m_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -184,21 +184,28 @@ pub mod m_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MBuilder<S: BosStr, St: m_state::State> {
+pub struct MBuilder<St: m_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<bool>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> M<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MBuilder<S, m_state::Empty> {
+impl M<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MBuilder<m_state::Empty, DefaultStr> {
         MBuilder::new()
     }
 }
 
-impl<S: BosStr> MBuilder<S, m_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> M<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MBuilder<m_state::Empty, S> {
+        MBuilder::builder()
+    }
+}
+
+impl MBuilder<m_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MBuilder {
             _state: PhantomData,
@@ -208,13 +215,27 @@ impl<S: BosStr> MBuilder<S, m_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MBuilder<S, St>
+impl<S: BosStr> MBuilder<m_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MBuilder<St, S>
 where
     St: m_state::State,
     St::CommonName: m_state::IsUnset,
 {
     /// Set the `commonName` field (required)
-    pub fn common_name(mut self, value: impl Into<S>) -> MBuilder<S, m_state::SetCommonName<St>> {
+    pub fn common_name(
+        mut self,
+        value: impl Into<S>,
+    ) -> MBuilder<m_state::SetCommonName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MBuilder {
             _state: PhantomData,
@@ -224,7 +245,7 @@ where
     }
 }
 
-impl<S: BosStr, St: m_state::State> MBuilder<S, St> {
+impl<St: m_state::State, S: BosStr> MBuilder<St, S> {
     /// Set the `edible` field (optional)
     pub fn edible(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -237,7 +258,7 @@ impl<S: BosStr, St: m_state::State> MBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: m_state::State> MBuilder<S, St> {
+impl<St: m_state::State, S: BosStr> MBuilder<St, S> {
     /// Set the `species` field (optional)
     pub fn species(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -250,7 +271,7 @@ impl<S: BosStr, St: m_state::State> MBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MBuilder<S, St>
+impl<St, S: BosStr> MBuilder<St, S>
 where
     St: m_state::State,
     St::CommonName: m_state::IsSet,
@@ -276,10 +297,10 @@ where
 }
 
 fn lexicon_doc_net_bnewbold_m() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.bnewbold.m"),

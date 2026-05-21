@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::bond_biblio::BookRequirement;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::bond_biblio::BookRequirement;
 /// A reading list curated by a librarian
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -162,7 +162,7 @@ impl<S: BosStr> LexiconSchema for List<S> {
 
 pub mod list_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -170,90 +170,90 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Librarians;
-        type Books;
         type Duedate;
+        type Librarians;
         type Title;
+        type Books;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Librarians = Unset;
-        type Books = Unset;
         type Duedate = Unset;
+        type Librarians = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Librarians = St::Librarians;
-        type Books = St::Books;
-        type Duedate = St::Duedate;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `librarians` field to Set
-    pub struct SetLibrarians<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLibrarians<St> {}
-    impl<St: State> State for SetLibrarians<St> {
-        type CreatedAt = St::CreatedAt;
-        type Librarians = Set<members::librarians>;
-        type Books = St::Books;
-        type Duedate = St::Duedate;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `books` field to Set
-    pub struct SetBooks<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBooks<St> {}
-    impl<St: State> State for SetBooks<St> {
-        type CreatedAt = St::CreatedAt;
-        type Librarians = St::Librarians;
-        type Books = Set<members::books>;
-        type Duedate = St::Duedate;
-        type Title = St::Title;
+        type Books = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `duedate` field to Set
     pub struct SetDuedate<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDuedate<St> {}
     impl<St: State> State for SetDuedate<St> {
-        type CreatedAt = St::CreatedAt;
-        type Librarians = St::Librarians;
-        type Books = St::Books;
         type Duedate = Set<members::duedate>;
+        type Librarians = St::Librarians;
         type Title = St::Title;
+        type Books = St::Books;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `librarians` field to Set
+    pub struct SetLibrarians<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLibrarians<St> {}
+    impl<St: State> State for SetLibrarians<St> {
+        type Duedate = St::Duedate;
+        type Librarians = Set<members::librarians>;
+        type Title = St::Title;
+        type Books = St::Books;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type CreatedAt = St::CreatedAt;
-        type Librarians = St::Librarians;
-        type Books = St::Books;
         type Duedate = St::Duedate;
+        type Librarians = St::Librarians;
         type Title = Set<members::title>;
+        type Books = St::Books;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `books` field to Set
+    pub struct SetBooks<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBooks<St> {}
+    impl<St: State> State for SetBooks<St> {
+        type Duedate = St::Duedate;
+        type Librarians = St::Librarians;
+        type Title = St::Title;
+        type Books = Set<members::books>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Duedate = St::Duedate;
+        type Librarians = St::Librarians;
+        type Title = St::Title;
+        type Books = St::Books;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `librarians` field
-        pub struct librarians(());
-        ///Marker type for the `books` field
-        pub struct books(());
         ///Marker type for the `duedate` field
         pub struct duedate(());
+        ///Marker type for the `librarians` field
+        pub struct librarians(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `books` field
+        pub struct books(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListBuilder<S: BosStr, St: list_state::State> {
+pub struct ListBuilder<St: list_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<BookRequirement<S>>>,
@@ -266,15 +266,22 @@ pub struct ListBuilder<S: BosStr, St: list_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> List<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListBuilder<S, list_state::Empty> {
+impl List<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListBuilder<list_state::Empty, DefaultStr> {
         ListBuilder::new()
     }
 }
 
-impl<S: BosStr> ListBuilder<S, list_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> List<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListBuilder<list_state::Empty, S> {
+        ListBuilder::builder()
+    }
+}
+
+impl ListBuilder<list_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListBuilder {
             _state: PhantomData,
@@ -284,7 +291,18 @@ impl<S: BosStr> ListBuilder<S, list_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<S: BosStr> ListBuilder<list_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
     St::Books: list_state::IsUnset,
@@ -293,7 +311,7 @@ where
     pub fn books(
         mut self,
         value: impl Into<Vec<BookRequirement<S>>>,
-    ) -> ListBuilder<S, list_state::SetBooks<St>> {
+    ) -> ListBuilder<list_state::SetBooks<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -303,7 +321,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
     St::CreatedAt: list_state::IsUnset,
@@ -312,7 +330,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ListBuilder<S, list_state::SetCreatedAt<St>> {
+    ) -> ListBuilder<list_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -322,7 +340,7 @@ where
     }
 }
 
-impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
+impl<St: list_state::State, S: BosStr> ListBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -335,7 +353,7 @@ impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
     St::Duedate: list_state::IsUnset,
@@ -344,7 +362,7 @@ where
     pub fn duedate(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ListBuilder<S, list_state::SetDuedate<St>> {
+    ) -> ListBuilder<list_state::SetDuedate<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -354,7 +372,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
     St::Librarians: list_state::IsUnset,
@@ -363,7 +381,7 @@ where
     pub fn librarians(
         mut self,
         value: impl Into<Vec<Did<S>>>,
-    ) -> ListBuilder<S, list_state::SetLibrarians<St>> {
+    ) -> ListBuilder<list_state::SetLibrarians<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -373,13 +391,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
     St::Title: list_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> ListBuilder<S, list_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> ListBuilder<list_state::SetTitle<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -389,14 +410,14 @@ where
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
-    St::CreatedAt: list_state::IsSet,
-    St::Librarians: list_state::IsSet,
-    St::Books: list_state::IsSet,
     St::Duedate: list_state::IsSet,
+    St::Librarians: list_state::IsSet,
     St::Title: list_state::IsSet,
+    St::Books: list_state::IsSet,
+    St::CreatedAt: list_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> List<S> {
@@ -425,10 +446,10 @@ where
 }
 
 fn lexicon_doc_bond_biblio_list() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("bond.biblio.list"),
@@ -437,25 +458,31 @@ fn lexicon_doc_bond_biblio_list() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A reading list curated by a librarian")),
+                    description: Some(
+                        CowStr::new_static("A reading list curated by a librarian"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("librarians"),
-                            SmolStr::new_static("books"),
-                            SmolStr::new_static("duedate"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"),
+                                SmolStr::new_static("librarians"),
+                                SmolStr::new_static("books"),
+                                SmolStr::new_static("duedate"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("books"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Required books for this reading challenge",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Required books for this reading challenge",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static(
                                             "bond.biblio.defs#bookRequirement",
@@ -468,9 +495,9 @@ fn lexicon_doc_bond_biblio_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When this list was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When this list was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -478,9 +505,9 @@ fn lexicon_doc_bond_biblio_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Description of the reading challenge",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Description of the reading challenge"),
+                                    ),
                                     max_length: Some(2000usize),
                                     max_graphemes: Some(1000usize),
                                     ..Default::default()
@@ -489,9 +516,11 @@ fn lexicon_doc_bond_biblio_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("duedate"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Deadline for completing the reading challenge",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Deadline for completing the reading challenge",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -499,9 +528,11 @@ fn lexicon_doc_bond_biblio_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("librarians"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "DIDs of users who can issue stamps for this list",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "DIDs of users who can issue stamps for this list",
+                                        ),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         format: Some(LexStringFormat::Did),
                                         ..Default::default()
@@ -512,9 +543,9 @@ fn lexicon_doc_bond_biblio_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("title"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Display name for the reading list",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Display name for the reading list"),
+                                    ),
                                     max_length: Some(200usize),
                                     max_graphemes: Some(100usize),
                                     ..Default::default()

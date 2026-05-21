@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// User preferences for fragrance review scoring
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -283,7 +283,7 @@ impl<S: BosStr> LexiconSchema for Settings<S> {
 
 pub mod settings_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -314,7 +314,7 @@ pub mod settings_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SettingsBuilder<S: BosStr, St: settings_state::State> {
+pub struct SettingsBuilder<St: settings_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
@@ -328,15 +328,22 @@ pub struct SettingsBuilder<S: BosStr, St: settings_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Settings<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SettingsBuilder<S, settings_state::Empty> {
+impl Settings<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SettingsBuilder<settings_state::Empty, DefaultStr> {
         SettingsBuilder::new()
     }
 }
 
-impl<S: BosStr> SettingsBuilder<S, settings_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Settings<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SettingsBuilder<settings_state::Empty, S> {
+        SettingsBuilder::builder()
+    }
+}
+
+impl SettingsBuilder<settings_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SettingsBuilder {
             _state: PhantomData,
@@ -346,7 +353,18 @@ impl<S: BosStr> SettingsBuilder<S, settings_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
+impl<S: BosStr> SettingsBuilder<settings_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SettingsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `complexityPreference` field (optional)
     pub fn complexity_preference(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -359,7 +377,7 @@ impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
     St::CreatedAt: settings_state::IsUnset,
@@ -368,7 +386,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SettingsBuilder<S, settings_state::SetCreatedAt<St>> {
+    ) -> SettingsBuilder<settings_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
@@ -378,7 +396,7 @@ where
     }
 }
 
-impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `longevityPriority` field (optional)
     pub fn longevity_priority(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -391,7 +409,7 @@ impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `presenceStyle` field (optional)
     pub fn presence_style(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -404,7 +422,7 @@ impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `scoreLens` field (optional)
     pub fn score_lens(mut self, value: impl Into<Option<SettingsScoreLens<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -417,7 +435,7 @@ impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `scoringApproach` field (optional)
     pub fn scoring_approach(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -430,7 +448,7 @@ impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -443,7 +461,7 @@ impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
     St::CreatedAt: settings_state::IsSet,
@@ -477,10 +495,10 @@ where
 }
 
 fn lexicon_doc_social_drydown_settings() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.drydown.settings"),

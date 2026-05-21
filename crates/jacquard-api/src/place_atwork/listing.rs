@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,11 +25,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::richtext::facet::Facet;
-use crate::community_lexicon::location::hthree::Hthree;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::richtext::facet::Facet;
+use crate::community_lexicon::location::hthree::Hthree;
 /// A job listing
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -135,20 +135,25 @@ impl<S: BosStr> LexiconSchema for Listing<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("banner"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -195,7 +200,7 @@ impl<S: BosStr> LexiconSchema for Listing<S> {
 
 pub mod listing_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -268,7 +273,7 @@ pub mod listing_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListingBuilder<S: BosStr, St: listing_state::State> {
+pub struct ListingBuilder<St: listing_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<UriValue<S>>,
@@ -283,15 +288,22 @@ pub struct ListingBuilder<S: BosStr, St: listing_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Listing<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListingBuilder<S, listing_state::Empty> {
+impl Listing<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListingBuilder<listing_state::Empty, DefaultStr> {
         ListingBuilder::new()
     }
 }
 
-impl<S: BosStr> ListingBuilder<S, listing_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Listing<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListingBuilder<listing_state::Empty, S> {
+        ListingBuilder::builder()
+    }
+}
+
+impl ListingBuilder<listing_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListingBuilder {
             _state: PhantomData,
@@ -301,7 +313,18 @@ impl<S: BosStr> ListingBuilder<S, listing_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: listing_state::State> ListingBuilder<S, St> {
+impl<S: BosStr> ListingBuilder<listing_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListingBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: listing_state::State, S: BosStr> ListingBuilder<St, S> {
     /// Set the `applyLink` field (optional)
     pub fn apply_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -314,7 +337,7 @@ impl<S: BosStr, St: listing_state::State> ListingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: listing_state::State> ListingBuilder<S, St> {
+impl<St: listing_state::State, S: BosStr> ListingBuilder<St, S> {
     /// Set the `banner` field (optional)
     pub fn banner(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -327,7 +350,7 @@ impl<S: BosStr, St: listing_state::State> ListingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListingBuilder<S, St>
+impl<St, S: BosStr> ListingBuilder<St, S>
 where
     St: listing_state::State,
     St::Description: listing_state::IsUnset,
@@ -336,7 +359,7 @@ where
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> ListingBuilder<S, listing_state::SetDescription<St>> {
+    ) -> ListingBuilder<listing_state::SetDescription<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ListingBuilder {
             _state: PhantomData,
@@ -346,7 +369,7 @@ where
     }
 }
 
-impl<S: BosStr, St: listing_state::State> ListingBuilder<S, St> {
+impl<St: listing_state::State, S: BosStr> ListingBuilder<St, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -359,7 +382,7 @@ impl<S: BosStr, St: listing_state::State> ListingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: listing_state::State> ListingBuilder<S, St> {
+impl<St: listing_state::State, S: BosStr> ListingBuilder<St, S> {
     /// Set the `locations` field (optional)
     pub fn locations(mut self, value: impl Into<Option<Vec<Hthree<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -372,7 +395,7 @@ impl<S: BosStr, St: listing_state::State> ListingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListingBuilder<S, St>
+impl<St, S: BosStr> ListingBuilder<St, S>
 where
     St: listing_state::State,
     St::NotAfter: listing_state::IsUnset,
@@ -381,7 +404,7 @@ where
     pub fn not_after(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ListingBuilder<S, listing_state::SetNotAfter<St>> {
+    ) -> ListingBuilder<listing_state::SetNotAfter<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ListingBuilder {
             _state: PhantomData,
@@ -391,7 +414,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ListingBuilder<S, St>
+impl<St, S: BosStr> ListingBuilder<St, S>
 where
     St: listing_state::State,
     St::NotBefore: listing_state::IsUnset,
@@ -400,7 +423,7 @@ where
     pub fn not_before(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ListingBuilder<S, listing_state::SetNotBefore<St>> {
+    ) -> ListingBuilder<listing_state::SetNotBefore<St>, S> {
         self._fields.6 = Option::Some(value.into());
         ListingBuilder {
             _state: PhantomData,
@@ -410,13 +433,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ListingBuilder<S, St>
+impl<St, S: BosStr> ListingBuilder<St, S>
 where
     St: listing_state::State,
     St::Title: listing_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> ListingBuilder<S, listing_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> ListingBuilder<listing_state::SetTitle<St>, S> {
         self._fields.7 = Option::Some(value.into());
         ListingBuilder {
             _state: PhantomData,
@@ -426,7 +452,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ListingBuilder<S, St>
+impl<St, S: BosStr> ListingBuilder<St, S>
 where
     St: listing_state::State,
     St::Title: listing_state::IsSet,
@@ -465,10 +491,10 @@ where
 }
 
 fn lexicon_doc_place_atwork_listing() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.atwork.listing"),

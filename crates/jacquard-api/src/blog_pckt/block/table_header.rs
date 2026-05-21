@@ -20,16 +20,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blog_pckt::block::text::Text;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blog_pckt::block::text::Text;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TableHeader<S: BosStr = DefaultStr> {
     ///Number of columns this cell spans
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -78,7 +75,7 @@ impl<S: BosStr> LexiconSchema for TableHeader<S> {
 
 pub mod table_header_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -109,21 +106,28 @@ pub mod table_header_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TableHeaderBuilder<S: BosStr, St: table_header_state::State> {
+pub struct TableHeaderBuilder<St: table_header_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Vec<Text<S>>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> TableHeader<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TableHeaderBuilder<S, table_header_state::Empty> {
+impl TableHeader<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TableHeaderBuilder<table_header_state::Empty, DefaultStr> {
         TableHeaderBuilder::new()
     }
 }
 
-impl<S: BosStr> TableHeaderBuilder<S, table_header_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> TableHeader<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TableHeaderBuilder<table_header_state::Empty, S> {
+        TableHeaderBuilder::builder()
+    }
+}
+
+impl TableHeaderBuilder<table_header_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TableHeaderBuilder {
             _state: PhantomData,
@@ -133,7 +137,18 @@ impl<S: BosStr> TableHeaderBuilder<S, table_header_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: table_header_state::State> TableHeaderBuilder<S, St> {
+impl<S: BosStr> TableHeaderBuilder<table_header_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TableHeaderBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: table_header_state::State, S: BosStr> TableHeaderBuilder<St, S> {
     /// Set the `colspan` field (optional)
     pub fn colspan(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -146,7 +161,7 @@ impl<S: BosStr, St: table_header_state::State> TableHeaderBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TableHeaderBuilder<S, St>
+impl<St, S: BosStr> TableHeaderBuilder<St, S>
 where
     St: table_header_state::State,
     St::Content: table_header_state::IsUnset,
@@ -155,7 +170,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<Vec<Text<S>>>,
-    ) -> TableHeaderBuilder<S, table_header_state::SetContent<St>> {
+    ) -> TableHeaderBuilder<table_header_state::SetContent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TableHeaderBuilder {
             _state: PhantomData,
@@ -165,7 +180,7 @@ where
     }
 }
 
-impl<S: BosStr, St: table_header_state::State> TableHeaderBuilder<S, St> {
+impl<St: table_header_state::State, S: BosStr> TableHeaderBuilder<St, S> {
     /// Set the `rowspan` field (optional)
     pub fn rowspan(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -178,7 +193,7 @@ impl<S: BosStr, St: table_header_state::State> TableHeaderBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TableHeaderBuilder<S, St>
+impl<St, S: BosStr> TableHeaderBuilder<St, S>
 where
     St: table_header_state::State,
     St::Content: table_header_state::IsSet,
@@ -193,7 +208,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TableHeader<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TableHeader<S> {
         TableHeader {
             colspan: self._fields.0,
             content: self._fields.1.unwrap(),
@@ -204,10 +222,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_block_tableHeader() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.block.tableHeader"),
@@ -230,9 +248,11 @@ fn lexicon_doc_blog_pckt_block_tableHeader() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("content"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Array of block content (typically text)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Array of block content (typically text)",
+                                    ),
+                                ),
                                 items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![CowStr::new_static("blog.pckt.block.text")],
                                     closed: Some(false),

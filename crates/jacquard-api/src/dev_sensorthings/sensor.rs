@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// An instrument or procedure that produces observations.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -153,7 +153,7 @@ impl<S: BosStr> LexiconSchema for Sensor<S> {
 
 pub mod sensor_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -162,69 +162,76 @@ pub mod sensor_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type EncodingType;
         type Name;
+        type EncodingType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type EncodingType = Unset;
         type Name = Unset;
+        type EncodingType = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
         type EncodingType = St::EncodingType;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `encoding_type` field to Set
-    pub struct SetEncodingType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEncodingType<St> {}
-    impl<St: State> State for SetEncodingType<St> {
-        type CreatedAt = St::CreatedAt;
-        type EncodingType = Set<members::encoding_type>;
-        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
         type CreatedAt = St::CreatedAt;
-        type EncodingType = St::EncodingType;
         type Name = Set<members::name>;
+        type EncodingType = St::EncodingType;
+    }
+    ///State transition - sets the `encoding_type` field to Set
+    pub struct SetEncodingType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEncodingType<St> {}
+    impl<St: State> State for SetEncodingType<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type EncodingType = Set<members::encoding_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `encoding_type` field
-        pub struct encoding_type(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `encoding_type` field
+        pub struct encoding_type(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SensorBuilder<S: BosStr, St: sensor_state::State> {
+pub struct SensorBuilder<St: sensor_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Sensor<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SensorBuilder<S, sensor_state::Empty> {
+impl Sensor<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SensorBuilder<sensor_state::Empty, DefaultStr> {
         SensorBuilder::new()
     }
 }
 
-impl<S: BosStr> SensorBuilder<S, sensor_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Sensor<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SensorBuilder<sensor_state::Empty, S> {
+        SensorBuilder::builder()
+    }
+}
+
+impl SensorBuilder<sensor_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SensorBuilder {
             _state: PhantomData,
@@ -234,7 +241,18 @@ impl<S: BosStr> SensorBuilder<S, sensor_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SensorBuilder<S, St>
+impl<S: BosStr> SensorBuilder<sensor_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SensorBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SensorBuilder<St, S>
 where
     St: sensor_state::State,
     St::CreatedAt: sensor_state::IsUnset,
@@ -243,7 +261,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SensorBuilder<S, sensor_state::SetCreatedAt<St>> {
+    ) -> SensorBuilder<sensor_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SensorBuilder {
             _state: PhantomData,
@@ -253,7 +271,7 @@ where
     }
 }
 
-impl<S: BosStr, St: sensor_state::State> SensorBuilder<S, St> {
+impl<St: sensor_state::State, S: BosStr> SensorBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -266,7 +284,7 @@ impl<S: BosStr, St: sensor_state::State> SensorBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SensorBuilder<S, St>
+impl<St, S: BosStr> SensorBuilder<St, S>
 where
     St: sensor_state::State,
     St::EncodingType: sensor_state::IsUnset,
@@ -275,7 +293,7 @@ where
     pub fn encoding_type(
         mut self,
         value: impl Into<S>,
-    ) -> SensorBuilder<S, sensor_state::SetEncodingType<St>> {
+    ) -> SensorBuilder<sensor_state::SetEncodingType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SensorBuilder {
             _state: PhantomData,
@@ -285,7 +303,7 @@ where
     }
 }
 
-impl<S: BosStr, St: sensor_state::State> SensorBuilder<S, St> {
+impl<St: sensor_state::State, S: BosStr> SensorBuilder<St, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -298,13 +316,16 @@ impl<S: BosStr, St: sensor_state::State> SensorBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SensorBuilder<S, St>
+impl<St, S: BosStr> SensorBuilder<St, S>
 where
     St: sensor_state::State,
     St::Name: sensor_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> SensorBuilder<S, sensor_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> SensorBuilder<sensor_state::SetName<St>, S> {
         self._fields.4 = Option::Some(value.into());
         SensorBuilder {
             _state: PhantomData,
@@ -314,12 +335,12 @@ where
     }
 }
 
-impl<S: BosStr, St> SensorBuilder<S, St>
+impl<St, S: BosStr> SensorBuilder<St, S>
 where
     St: sensor_state::State,
     St::CreatedAt: sensor_state::IsSet,
-    St::EncodingType: sensor_state::IsSet,
     St::Name: sensor_state::IsSet,
+    St::EncodingType: sensor_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Sensor<S> {
@@ -346,10 +367,10 @@ where
 }
 
 fn lexicon_doc_dev_sensorthings_sensor() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.sensorthings.sensor"),

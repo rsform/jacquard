@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::world_ptah::temp::character;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::world_ptah::temp::character;
 /// Flexible key-value properties for any kind of world. All fields optional — worlds define what matters.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CharacterProperties<S: BosStr = DefaultStr> {
     ///Notable abilities or powers.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -111,18 +108,30 @@ pub enum CharacterCanonicalStatus<S: BosStr = DefaultStr> {
 impl<S: BosStr> CharacterCanonicalStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::CanonicalStatusOfficial => "world.ptah.temp.defs#canonicalStatusOfficial",
-            Self::CanonicalStatusCommunity => "world.ptah.temp.defs#canonicalStatusCommunity",
-            Self::CanonicalStatusApocryphal => "world.ptah.temp.defs#canonicalStatusApocryphal",
+            Self::CanonicalStatusOfficial => {
+                "world.ptah.temp.defs#canonicalStatusOfficial"
+            }
+            Self::CanonicalStatusCommunity => {
+                "world.ptah.temp.defs#canonicalStatusCommunity"
+            }
+            Self::CanonicalStatusApocryphal => {
+                "world.ptah.temp.defs#canonicalStatusApocryphal"
+            }
             Self::Other(s) => s.as_ref(),
         }
     }
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "world.ptah.temp.defs#canonicalStatusOfficial" => Self::CanonicalStatusOfficial,
-            "world.ptah.temp.defs#canonicalStatusCommunity" => Self::CanonicalStatusCommunity,
-            "world.ptah.temp.defs#canonicalStatusApocryphal" => Self::CanonicalStatusApocryphal,
+            "world.ptah.temp.defs#canonicalStatusOfficial" => {
+                Self::CanonicalStatusOfficial
+            }
+            "world.ptah.temp.defs#canonicalStatusCommunity" => {
+                Self::CanonicalStatusCommunity
+            }
+            "world.ptah.temp.defs#canonicalStatusApocryphal" => {
+                Self::CanonicalStatusApocryphal
+            }
             _ => Self::Other(s),
         }
     }
@@ -149,7 +158,8 @@ impl<S: BosStr> Serialize for CharacterCanonicalStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CharacterCanonicalStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for CharacterCanonicalStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -182,7 +192,9 @@ where
             CharacterCanonicalStatus::CanonicalStatusApocryphal => {
                 CharacterCanonicalStatus::CanonicalStatusApocryphal
             }
-            CharacterCanonicalStatus::Other(v) => CharacterCanonicalStatus::Other(v.into_static()),
+            CharacterCanonicalStatus::Other(v) => {
+                CharacterCanonicalStatus::Other(v.into_static())
+            }
         }
     }
 }
@@ -265,7 +277,9 @@ where
             CharacterControlType::Exclusive => CharacterControlType::Exclusive,
             CharacterControlType::Open => CharacterControlType::Open,
             CharacterControlType::Delegated => CharacterControlType::Delegated,
-            CharacterControlType::Other(v) => CharacterControlType::Other(v.into_static()),
+            CharacterControlType::Other(v) => {
+                CharacterControlType::Other(v.into_static())
+            }
         }
     }
 }
@@ -345,7 +359,9 @@ where
     type Output = CharacterOriginType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            CharacterOriginType::SourceTypeOriginalIp => CharacterOriginType::SourceTypeOriginalIp,
+            CharacterOriginType::SourceTypeOriginalIp => {
+                CharacterOriginType::SourceTypeOriginalIp
+            }
             CharacterOriginType::SourceTypePublicDomain => {
                 CharacterOriginType::SourceTypePublicDomain
             }
@@ -608,10 +624,10 @@ impl<S: BosStr> LexiconSchema for Character<S> {
 }
 
 fn lexicon_doc_world_ptah_temp_character() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("world.ptah.temp.character"),
@@ -852,7 +868,7 @@ fn lexicon_doc_world_ptah_temp_character() -> LexiconDoc<'static> {
 
 pub mod character_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -861,71 +877,71 @@ pub mod character_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
+        type CreatedAt;
         type WorldReference;
         type CreatorDid;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
+        type CreatedAt = Unset;
         type WorldReference = Unset;
         type CreatorDid = Unset;
-        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
         type WorldReference = St::WorldReference;
         type CreatorDid = St::CreatorDid;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `world_reference` field to Set
-    pub struct SetWorldReference<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWorldReference<St> {}
-    impl<St: State> State for SetWorldReference<St> {
-        type Name = St::Name;
-        type WorldReference = Set<members::world_reference>;
-        type CreatorDid = St::CreatorDid;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `creator_did` field to Set
-    pub struct SetCreatorDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatorDid<St> {}
-    impl<St: State> State for SetCreatorDid<St> {
-        type Name = St::Name;
-        type WorldReference = St::WorldReference;
-        type CreatorDid = Set<members::creator_did>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
         type WorldReference = St::WorldReference;
         type CreatorDid = St::CreatorDid;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `world_reference` field to Set
+    pub struct SetWorldReference<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWorldReference<St> {}
+    impl<St: State> State for SetWorldReference<St> {
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type WorldReference = Set<members::world_reference>;
+        type CreatorDid = St::CreatorDid;
+    }
+    ///State transition - sets the `creator_did` field to Set
+    pub struct SetCreatorDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatorDid<St> {}
+    impl<St: State> State for SetCreatorDid<St> {
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type WorldReference = St::WorldReference;
+        type CreatorDid = Set<members::creator_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `world_reference` field
         pub struct world_reference(());
         ///Marker type for the `creator_did` field
         pub struct creator_did(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CharacterBuilder<S: BosStr, St: character_state::State> {
+pub struct CharacterBuilder<St: character_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -944,27 +960,69 @@ pub struct CharacterBuilder<S: BosStr, St: character_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Character<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CharacterBuilder<S, character_state::Empty> {
+impl Character<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CharacterBuilder<character_state::Empty, DefaultStr> {
         CharacterBuilder::new()
     }
 }
 
-impl<S: BosStr> CharacterBuilder<S, character_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Character<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CharacterBuilder<character_state::Empty, S> {
+        CharacterBuilder::builder()
+    }
+}
+
+impl CharacterBuilder<character_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CharacterBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
+impl<S: BosStr> CharacterBuilder<character_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CharacterBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: character_state::State, S: BosStr> CharacterBuilder<St, S> {
     /// Set the `authorshipRecord` field (optional)
     pub fn authorship_record(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -977,7 +1035,7 @@ impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
+impl<St: character_state::State, S: BosStr> CharacterBuilder<St, S> {
     /// Set the `canonicalStatus` field (optional)
     pub fn canonical_status(
         mut self,
@@ -987,15 +1045,21 @@ impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
         self
     }
     /// Set the `canonicalStatus` field to an Option value (optional)
-    pub fn maybe_canonical_status(mut self, value: Option<CharacterCanonicalStatus<S>>) -> Self {
+    pub fn maybe_canonical_status(
+        mut self,
+        value: Option<CharacterCanonicalStatus<S>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
+impl<St: character_state::State, S: BosStr> CharacterBuilder<St, S> {
     /// Set the `controlType` field (optional)
-    pub fn control_type(mut self, value: impl Into<Option<CharacterControlType<S>>>) -> Self {
+    pub fn control_type(
+        mut self,
+        value: impl Into<Option<CharacterControlType<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -1006,7 +1070,7 @@ impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CharacterBuilder<S, St>
+impl<St, S: BosStr> CharacterBuilder<St, S>
 where
     St: character_state::State,
     St::CreatedAt: character_state::IsUnset,
@@ -1015,7 +1079,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CharacterBuilder<S, character_state::SetCreatedAt<St>> {
+    ) -> CharacterBuilder<character_state::SetCreatedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         CharacterBuilder {
             _state: PhantomData,
@@ -1025,7 +1089,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CharacterBuilder<S, St>
+impl<St, S: BosStr> CharacterBuilder<St, S>
 where
     St: character_state::State,
     St::CreatorDid: character_state::IsUnset,
@@ -1034,7 +1098,7 @@ where
     pub fn creator_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> CharacterBuilder<S, character_state::SetCreatorDid<St>> {
+    ) -> CharacterBuilder<character_state::SetCreatorDid<St>, S> {
         self._fields.4 = Option::Some(value.into());
         CharacterBuilder {
             _state: PhantomData,
@@ -1044,7 +1108,7 @@ where
     }
 }
 
-impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
+impl<St: character_state::State, S: BosStr> CharacterBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -1057,7 +1121,7 @@ impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CharacterBuilder<S, St>
+impl<St, S: BosStr> CharacterBuilder<St, S>
 where
     St: character_state::State,
     St::Name: character_state::IsUnset,
@@ -1066,7 +1130,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> CharacterBuilder<S, character_state::SetName<St>> {
+    ) -> CharacterBuilder<character_state::SetName<St>, S> {
         self._fields.6 = Option::Some(value.into());
         CharacterBuilder {
             _state: PhantomData,
@@ -1076,9 +1140,12 @@ where
     }
 }
 
-impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
+impl<St: character_state::State, S: BosStr> CharacterBuilder<St, S> {
     /// Set the `originType` field (optional)
-    pub fn origin_type(mut self, value: impl Into<Option<CharacterOriginType<S>>>) -> Self {
+    pub fn origin_type(
+        mut self,
+        value: impl Into<Option<CharacterOriginType<S>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
@@ -1089,7 +1156,7 @@ impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
+impl<St: character_state::State, S: BosStr> CharacterBuilder<St, S> {
     /// Set the `properties` field (optional)
     pub fn properties(
         mut self,
@@ -1099,13 +1166,16 @@ impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
         self
     }
     /// Set the `properties` field to an Option value (optional)
-    pub fn maybe_properties(mut self, value: Option<character::CharacterProperties<S>>) -> Self {
+    pub fn maybe_properties(
+        mut self,
+        value: Option<character::CharacterProperties<S>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
 }
 
-impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
+impl<St: character_state::State, S: BosStr> CharacterBuilder<St, S> {
     /// Set the `roleReference` field (optional)
     pub fn role_reference(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -1118,7 +1188,7 @@ impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
+impl<St: character_state::State, S: BosStr> CharacterBuilder<St, S> {
     /// Set the `sourceReference` field (optional)
     pub fn source_reference(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -1131,7 +1201,7 @@ impl<S: BosStr, St: character_state::State> CharacterBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CharacterBuilder<S, St>
+impl<St, S: BosStr> CharacterBuilder<St, S>
 where
     St: character_state::State,
     St::WorldReference: character_state::IsUnset,
@@ -1140,7 +1210,7 @@ where
     pub fn world_reference(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> CharacterBuilder<S, character_state::SetWorldReference<St>> {
+    ) -> CharacterBuilder<character_state::SetWorldReference<St>, S> {
         self._fields.11 = Option::Some(value.into());
         CharacterBuilder {
             _state: PhantomData,
@@ -1150,13 +1220,13 @@ where
     }
 }
 
-impl<S: BosStr, St> CharacterBuilder<S, St>
+impl<St, S: BosStr> CharacterBuilder<St, S>
 where
     St: character_state::State,
     St::Name: character_state::IsSet,
+    St::CreatedAt: character_state::IsSet,
     St::WorldReference: character_state::IsSet,
     St::CreatorDid: character_state::IsSet,
-    St::CreatedAt: character_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Character<S> {
@@ -1177,7 +1247,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Character<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Character<S> {
         Character {
             authorship_record: self._fields.0,
             canonical_status: self._fields.1,

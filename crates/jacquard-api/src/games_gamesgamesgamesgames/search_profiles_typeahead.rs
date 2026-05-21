@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::games_gamesgamesgamesgames::ProfileSummaryView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::ProfileSummaryView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchProfilesTypeahead<S: BosStr = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 25.
     #[serde(default = "_default_limit")]
@@ -30,11 +27,9 @@ pub struct SearchProfilesTypeahead<S: BosStr = DefaultStr> {
     pub q: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchProfilesTypeaheadOutput<S: BosStr = DefaultStr> {
     pub profiles: Vec<ProfileSummaryView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -71,7 +66,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_profiles_typeahead_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -102,21 +97,37 @@ pub mod search_profiles_typeahead_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchProfilesTypeaheadBuilder<S: BosStr, St: search_profiles_typeahead_state::State> {
+pub struct SearchProfilesTypeaheadBuilder<
+    St: search_profiles_typeahead_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SearchProfilesTypeahead<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SearchProfilesTypeaheadBuilder<S, search_profiles_typeahead_state::Empty> {
+impl SearchProfilesTypeahead<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SearchProfilesTypeaheadBuilder<
+        search_profiles_typeahead_state::Empty,
+        DefaultStr,
+    > {
         SearchProfilesTypeaheadBuilder::new()
     }
 }
 
-impl<S: BosStr> SearchProfilesTypeaheadBuilder<S, search_profiles_typeahead_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SearchProfilesTypeahead<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SearchProfilesTypeaheadBuilder<
+        search_profiles_typeahead_state::Empty,
+        S,
+    > {
+        SearchProfilesTypeaheadBuilder::builder()
+    }
+}
+
+impl SearchProfilesTypeaheadBuilder<search_profiles_typeahead_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SearchProfilesTypeaheadBuilder {
             _state: PhantomData,
@@ -126,7 +137,23 @@ impl<S: BosStr> SearchProfilesTypeaheadBuilder<S, search_profiles_typeahead_stat
     }
 }
 
-impl<S: BosStr, St: search_profiles_typeahead_state::State> SearchProfilesTypeaheadBuilder<S, St> {
+impl<
+    S: BosStr,
+> SearchProfilesTypeaheadBuilder<search_profiles_typeahead_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SearchProfilesTypeaheadBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<
+    St: search_profiles_typeahead_state::State,
+    S: BosStr,
+> SearchProfilesTypeaheadBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -139,7 +166,7 @@ impl<S: BosStr, St: search_profiles_typeahead_state::State> SearchProfilesTypeah
     }
 }
 
-impl<S: BosStr, St> SearchProfilesTypeaheadBuilder<S, St>
+impl<St, S: BosStr> SearchProfilesTypeaheadBuilder<St, S>
 where
     St: search_profiles_typeahead_state::State,
     St::Q: search_profiles_typeahead_state::IsUnset,
@@ -148,7 +175,7 @@ where
     pub fn q(
         mut self,
         value: impl Into<S>,
-    ) -> SearchProfilesTypeaheadBuilder<S, search_profiles_typeahead_state::SetQ<St>> {
+    ) -> SearchProfilesTypeaheadBuilder<search_profiles_typeahead_state::SetQ<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SearchProfilesTypeaheadBuilder {
             _state: PhantomData,
@@ -158,7 +185,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SearchProfilesTypeaheadBuilder<S, St>
+impl<St, S: BosStr> SearchProfilesTypeaheadBuilder<St, S>
 where
     St: search_profiles_typeahead_state::State,
     St::Q: search_profiles_typeahead_state::IsSet,

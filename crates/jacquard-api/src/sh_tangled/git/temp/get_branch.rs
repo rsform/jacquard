@@ -8,31 +8,26 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_tangled::git::temp::Signature;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::git::temp::Signature;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBranch<S: BosStr = DefaultStr> {
     pub name: S,
     pub repo: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBranchOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<Signature<S>>,
@@ -49,9 +44,18 @@ pub struct GetBranchOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetBranchError {
     /// Repository not found or access denied
@@ -65,10 +69,7 @@ pub enum GetBranchError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetBranchError {
@@ -132,7 +133,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetBranchRequest {
 
 pub mod get_branch_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -140,56 +141,63 @@ pub mod get_branch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Name;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Repo = Set<members::repo>;
-        type Name = St::Name;
+        type Repo = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Repo = St::Repo;
         type Name = Set<members::name>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Name = St::Name;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetBranchBuilder<S: BosStr, St: get_branch_state::State> {
+pub struct GetBranchBuilder<St: get_branch_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetBranch<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetBranchBuilder<S, get_branch_state::Empty> {
+impl GetBranch<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetBranchBuilder<get_branch_state::Empty, DefaultStr> {
         GetBranchBuilder::new()
     }
 }
 
-impl<S: BosStr> GetBranchBuilder<S, get_branch_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetBranch<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetBranchBuilder<get_branch_state::Empty, S> {
+        GetBranchBuilder::builder()
+    }
+}
+
+impl GetBranchBuilder<get_branch_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetBranchBuilder {
             _state: PhantomData,
@@ -199,7 +207,18 @@ impl<S: BosStr> GetBranchBuilder<S, get_branch_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetBranchBuilder<S, St>
+impl<S: BosStr> GetBranchBuilder<get_branch_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetBranchBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetBranchBuilder<St, S>
 where
     St: get_branch_state::State,
     St::Name: get_branch_state::IsUnset,
@@ -208,7 +227,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> GetBranchBuilder<S, get_branch_state::SetName<St>> {
+    ) -> GetBranchBuilder<get_branch_state::SetName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetBranchBuilder {
             _state: PhantomData,
@@ -218,7 +237,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetBranchBuilder<S, St>
+impl<St, S: BosStr> GetBranchBuilder<St, S>
 where
     St: get_branch_state::State,
     St::Repo: get_branch_state::IsUnset,
@@ -227,7 +246,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetBranchBuilder<S, get_branch_state::SetRepo<St>> {
+    ) -> GetBranchBuilder<get_branch_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetBranchBuilder {
             _state: PhantomData,
@@ -237,11 +256,11 @@ where
     }
 }
 
-impl<S: BosStr, St> GetBranchBuilder<S, St>
+impl<St, S: BosStr> GetBranchBuilder<St, S>
 where
     St: get_branch_state::State,
-    St::Repo: get_branch_state::IsSet,
     St::Name: get_branch_state::IsSet,
+    St::Repo: get_branch_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GetBranch<S> {

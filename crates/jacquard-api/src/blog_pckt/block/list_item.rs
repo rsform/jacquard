@@ -20,24 +20,22 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::blog_pckt::block::bullet_list::BulletList;
 use crate::blog_pckt::block::ordered_list::OrderedList;
 use crate::blog_pckt::block::text::Text;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListItem<S: BosStr = DefaultStr> {
     ///Array of block content (text or nested lists)
     pub content: Vec<ListItemContentItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -68,7 +66,7 @@ impl<S: BosStr> LexiconSchema for ListItem<S> {
 
 pub mod list_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -99,21 +97,28 @@ pub mod list_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListItemBuilder<S: BosStr, St: list_item_state::State> {
+pub struct ListItemBuilder<St: list_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<ListItemContentItem<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListItemBuilder<S, list_item_state::Empty> {
+impl ListItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListItemBuilder<list_item_state::Empty, DefaultStr> {
         ListItemBuilder::new()
     }
 }
 
-impl<S: BosStr> ListItemBuilder<S, list_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListItemBuilder<list_item_state::Empty, S> {
+        ListItemBuilder::builder()
+    }
+}
+
+impl ListItemBuilder<list_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListItemBuilder {
             _state: PhantomData,
@@ -123,7 +128,18 @@ impl<S: BosStr> ListItemBuilder<S, list_item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ListItemBuilder<S, St>
+impl<S: BosStr> ListItemBuilder<list_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListItemBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ListItemBuilder<St, S>
 where
     St: list_item_state::State,
     St::Content: list_item_state::IsUnset,
@@ -132,7 +148,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<Vec<ListItemContentItem<S>>>,
-    ) -> ListItemBuilder<S, list_item_state::SetContent<St>> {
+    ) -> ListItemBuilder<list_item_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ListItemBuilder {
             _state: PhantomData,
@@ -142,7 +158,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ListItemBuilder<S, St>
+impl<St, S: BosStr> ListItemBuilder<St, S>
 where
     St: list_item_state::State,
     St::Content: list_item_state::IsSet,
@@ -164,10 +180,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_block_listItem() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.block.listItem"),
@@ -183,14 +199,16 @@ fn lexicon_doc_blog_pckt_block_listItem() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("content"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Array of block content (text or nested lists)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Array of block content (text or nested lists)",
+                                    ),
+                                ),
                                 items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("blog.pckt.block.text"),
                                         CowStr::new_static("blog.pckt.block.bulletList"),
-                                        CowStr::new_static("blog.pckt.block.orderedList"),
+                                        CowStr::new_static("blog.pckt.block.orderedList")
                                     ],
                                     closed: Some(false),
                                     ..Default::default()

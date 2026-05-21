@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,16 +20,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::games_firehose::barklesheep::place_sheeps;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_firehose::barklesheep::place_sheeps;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlaceSheeps<S: BosStr = DefaultStr> {
     pub game_id: S,
     pub sheeps: Vec<place_sheeps::SheepPlacement<S>>,
@@ -37,11 +34,9 @@ pub struct PlaceSheeps<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlaceSheepsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub success: Option<bool>,
@@ -49,11 +44,9 @@ pub struct PlaceSheepsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SheepPlacement<S: BosStr = DefaultStr> {
     pub horizontal: bool,
     pub start: i64,
@@ -73,8 +66,9 @@ impl jacquard_common::xrpc::XrpcResp for PlaceSheepsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PlaceSheeps<S> {
     const NSID: &'static str = "games.firehose.barklesheep.placeSheeps";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PlaceSheepsResponse;
 }
 
@@ -82,8 +76,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PlaceSheeps<S> {
 pub struct PlaceSheepsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PlaceSheepsRequest {
     const PATH: &'static str = "/xrpc/games.firehose.barklesheep.placeSheeps";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = PlaceSheeps<S>;
     type Response = PlaceSheepsResponse;
 }
@@ -105,7 +100,7 @@ impl<S: BosStr> LexiconSchema for SheepPlacement<S> {
 
 pub mod place_sheeps_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -113,56 +108,63 @@ pub mod place_sheeps_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GameId;
         type Sheeps;
+        type GameId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GameId = Unset;
         type Sheeps = Unset;
-    }
-    ///State transition - sets the `game_id` field to Set
-    pub struct SetGameId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGameId<St> {}
-    impl<St: State> State for SetGameId<St> {
-        type GameId = Set<members::game_id>;
-        type Sheeps = St::Sheeps;
+        type GameId = Unset;
     }
     ///State transition - sets the `sheeps` field to Set
     pub struct SetSheeps<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSheeps<St> {}
     impl<St: State> State for SetSheeps<St> {
-        type GameId = St::GameId;
         type Sheeps = Set<members::sheeps>;
+        type GameId = St::GameId;
+    }
+    ///State transition - sets the `game_id` field to Set
+    pub struct SetGameId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGameId<St> {}
+    impl<St: State> State for SetGameId<St> {
+        type Sheeps = St::Sheeps;
+        type GameId = Set<members::game_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `game_id` field
-        pub struct game_id(());
         ///Marker type for the `sheeps` field
         pub struct sheeps(());
+        ///Marker type for the `game_id` field
+        pub struct game_id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PlaceSheepsBuilder<S: BosStr, St: place_sheeps_state::State> {
+pub struct PlaceSheepsBuilder<St: place_sheeps_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<place_sheeps::SheepPlacement<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PlaceSheeps<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PlaceSheepsBuilder<S, place_sheeps_state::Empty> {
+impl PlaceSheeps<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PlaceSheepsBuilder<place_sheeps_state::Empty, DefaultStr> {
         PlaceSheepsBuilder::new()
     }
 }
 
-impl<S: BosStr> PlaceSheepsBuilder<S, place_sheeps_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PlaceSheeps<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PlaceSheepsBuilder<place_sheeps_state::Empty, S> {
+        PlaceSheepsBuilder::builder()
+    }
+}
+
+impl PlaceSheepsBuilder<place_sheeps_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PlaceSheepsBuilder {
             _state: PhantomData,
@@ -172,7 +174,18 @@ impl<S: BosStr> PlaceSheepsBuilder<S, place_sheeps_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PlaceSheepsBuilder<S, St>
+impl<S: BosStr> PlaceSheepsBuilder<place_sheeps_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PlaceSheepsBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PlaceSheepsBuilder<St, S>
 where
     St: place_sheeps_state::State,
     St::GameId: place_sheeps_state::IsUnset,
@@ -181,7 +194,7 @@ where
     pub fn game_id(
         mut self,
         value: impl Into<S>,
-    ) -> PlaceSheepsBuilder<S, place_sheeps_state::SetGameId<St>> {
+    ) -> PlaceSheepsBuilder<place_sheeps_state::SetGameId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PlaceSheepsBuilder {
             _state: PhantomData,
@@ -191,7 +204,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PlaceSheepsBuilder<S, St>
+impl<St, S: BosStr> PlaceSheepsBuilder<St, S>
 where
     St: place_sheeps_state::State,
     St::Sheeps: place_sheeps_state::IsUnset,
@@ -200,7 +213,7 @@ where
     pub fn sheeps(
         mut self,
         value: impl Into<Vec<place_sheeps::SheepPlacement<S>>>,
-    ) -> PlaceSheepsBuilder<S, place_sheeps_state::SetSheeps<St>> {
+    ) -> PlaceSheepsBuilder<place_sheeps_state::SetSheeps<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PlaceSheepsBuilder {
             _state: PhantomData,
@@ -210,11 +223,11 @@ where
     }
 }
 
-impl<S: BosStr, St> PlaceSheepsBuilder<S, St>
+impl<St, S: BosStr> PlaceSheepsBuilder<St, S>
 where
     St: place_sheeps_state::State,
-    St::GameId: place_sheeps_state::IsSet,
     St::Sheeps: place_sheeps_state::IsSet,
+    St::GameId: place_sheeps_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PlaceSheeps<S> {
@@ -225,7 +238,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PlaceSheeps<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PlaceSheeps<S> {
         PlaceSheeps {
             game_id: self._fields.0.unwrap(),
             sheeps: self._fields.1.unwrap(),
@@ -236,7 +252,7 @@ where
 
 pub mod sheep_placement_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -244,70 +260,80 @@ pub mod sheep_placement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Horizontal;
         type Start;
         type Type;
-        type Horizontal;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Horizontal = Unset;
         type Start = Unset;
         type Type = Unset;
-        type Horizontal = Unset;
-    }
-    ///State transition - sets the `start` field to Set
-    pub struct SetStart<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStart<St> {}
-    impl<St: State> State for SetStart<St> {
-        type Start = Set<members::start>;
-        type Type = St::Type;
-        type Horizontal = St::Horizontal;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Start = St::Start;
-        type Type = Set<members::r#type>;
-        type Horizontal = St::Horizontal;
     }
     ///State transition - sets the `horizontal` field to Set
     pub struct SetHorizontal<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHorizontal<St> {}
     impl<St: State> State for SetHorizontal<St> {
+        type Horizontal = Set<members::horizontal>;
         type Start = St::Start;
         type Type = St::Type;
-        type Horizontal = Set<members::horizontal>;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStart<St> {}
+    impl<St: State> State for SetStart<St> {
+        type Horizontal = St::Horizontal;
+        type Start = Set<members::start>;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Horizontal = St::Horizontal;
+        type Start = St::Start;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `horizontal` field
+        pub struct horizontal(());
         ///Marker type for the `start` field
         pub struct start(());
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `horizontal` field
-        pub struct horizontal(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SheepPlacementBuilder<S: BosStr, St: sheep_placement_state::State> {
+pub struct SheepPlacementBuilder<
+    St: sheep_placement_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SheepPlacement<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SheepPlacementBuilder<S, sheep_placement_state::Empty> {
+impl SheepPlacement<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SheepPlacementBuilder<sheep_placement_state::Empty, DefaultStr> {
         SheepPlacementBuilder::new()
     }
 }
 
-impl<S: BosStr> SheepPlacementBuilder<S, sheep_placement_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SheepPlacement<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SheepPlacementBuilder<sheep_placement_state::Empty, S> {
+        SheepPlacementBuilder::builder()
+    }
+}
+
+impl SheepPlacementBuilder<sheep_placement_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SheepPlacementBuilder {
             _state: PhantomData,
@@ -317,7 +343,18 @@ impl<S: BosStr> SheepPlacementBuilder<S, sheep_placement_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SheepPlacementBuilder<S, St>
+impl<S: BosStr> SheepPlacementBuilder<sheep_placement_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SheepPlacementBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SheepPlacementBuilder<St, S>
 where
     St: sheep_placement_state::State,
     St::Horizontal: sheep_placement_state::IsUnset,
@@ -326,7 +363,7 @@ where
     pub fn horizontal(
         mut self,
         value: impl Into<bool>,
-    ) -> SheepPlacementBuilder<S, sheep_placement_state::SetHorizontal<St>> {
+    ) -> SheepPlacementBuilder<sheep_placement_state::SetHorizontal<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SheepPlacementBuilder {
             _state: PhantomData,
@@ -336,7 +373,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SheepPlacementBuilder<S, St>
+impl<St, S: BosStr> SheepPlacementBuilder<St, S>
 where
     St: sheep_placement_state::State,
     St::Start: sheep_placement_state::IsUnset,
@@ -345,7 +382,7 @@ where
     pub fn start(
         mut self,
         value: impl Into<i64>,
-    ) -> SheepPlacementBuilder<S, sheep_placement_state::SetStart<St>> {
+    ) -> SheepPlacementBuilder<sheep_placement_state::SetStart<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SheepPlacementBuilder {
             _state: PhantomData,
@@ -355,7 +392,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SheepPlacementBuilder<S, St>
+impl<St, S: BosStr> SheepPlacementBuilder<St, S>
 where
     St: sheep_placement_state::State,
     St::Type: sheep_placement_state::IsUnset,
@@ -364,7 +401,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> SheepPlacementBuilder<S, sheep_placement_state::SetType<St>> {
+    ) -> SheepPlacementBuilder<sheep_placement_state::SetType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SheepPlacementBuilder {
             _state: PhantomData,
@@ -374,12 +411,12 @@ where
     }
 }
 
-impl<S: BosStr, St> SheepPlacementBuilder<S, St>
+impl<St, S: BosStr> SheepPlacementBuilder<St, S>
 where
     St: sheep_placement_state::State,
+    St::Horizontal: sheep_placement_state::IsSet,
     St::Start: sheep_placement_state::IsSet,
     St::Type: sheep_placement_state::IsSet,
-    St::Horizontal: sheep_placement_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SheepPlacement<S> {
@@ -391,7 +428,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SheepPlacement<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SheepPlacement<S> {
         SheepPlacement {
             horizontal: self._fields.0.unwrap(),
             start: self._fields.1.unwrap(),
@@ -402,10 +442,10 @@ where
 }
 
 fn lexicon_doc_games_firehose_barklesheep_placeSheeps() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.firehose.barklesheep.placeSheeps"),
@@ -416,34 +456,37 @@ fn lexicon_doc_games_firehose_barklesheep_placeSheeps() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![
-                                SmolStr::new_static("gameId"),
-                                SmolStr::new_static("sheeps"),
-                            ]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("gameId"),
-                                    LexObjectProperty::String(LexString {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("sheeps"),
-                                    LexObjectProperty::Array(LexArray {
-                                        items: LexArrayItem::Ref(LexRef {
-                                            r#ref: CowStr::new_static("#sheepPlacement"),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(
+                                    vec![
+                                        SmolStr::new_static("gameId"), SmolStr::new_static("sheeps")
+                                    ],
+                                ),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("gameId"),
+                                        LexObjectProperty::String(LexString {
                                             ..Default::default()
                                         }),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("sheeps"),
+                                        LexObjectProperty::Array(LexArray {
+                                            items: LexArrayItem::Ref(LexRef {
+                                                r#ref: CowStr::new_static("#sheepPlacement"),
+                                                ..Default::default()
+                                            }),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -452,11 +495,12 @@ fn lexicon_doc_games_firehose_barklesheep_placeSheeps() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("sheepPlacement"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("start"),
-                        SmolStr::new_static("horizontal"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("type"), SmolStr::new_static("start"),
+                            SmolStr::new_static("horizontal")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -474,9 +518,7 @@ fn lexicon_doc_games_firehose_barklesheep_placeSheeps() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },

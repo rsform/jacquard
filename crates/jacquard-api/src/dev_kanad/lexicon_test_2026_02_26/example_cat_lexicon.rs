@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// some example cat lexicon
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -119,20 +119,25 @@ impl<S: BosStr> LexiconSchema for ExampleCatLexicon<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -179,7 +184,7 @@ impl<S: BosStr> LexiconSchema for ExampleCatLexicon<S> {
 
 pub mod example_cat_lexicon_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -187,56 +192,69 @@ pub mod example_cat_lexicon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = St::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ExampleCatLexiconBuilder<S: BosStr, St: example_cat_lexicon_state::State> {
+pub struct ExampleCatLexiconBuilder<
+    St: example_cat_lexicon_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<Datetime>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ExampleCatLexicon<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ExampleCatLexiconBuilder<S, example_cat_lexicon_state::Empty> {
+impl ExampleCatLexicon<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ExampleCatLexiconBuilder<
+        example_cat_lexicon_state::Empty,
+        DefaultStr,
+    > {
         ExampleCatLexiconBuilder::new()
     }
 }
 
-impl<S: BosStr> ExampleCatLexiconBuilder<S, example_cat_lexicon_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ExampleCatLexicon<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ExampleCatLexiconBuilder<example_cat_lexicon_state::Empty, S> {
+        ExampleCatLexiconBuilder::builder()
+    }
+}
+
+impl ExampleCatLexiconBuilder<example_cat_lexicon_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ExampleCatLexiconBuilder {
             _state: PhantomData,
@@ -246,7 +264,18 @@ impl<S: BosStr> ExampleCatLexiconBuilder<S, example_cat_lexicon_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: example_cat_lexicon_state::State> ExampleCatLexiconBuilder<S, St> {
+impl<S: BosStr> ExampleCatLexiconBuilder<example_cat_lexicon_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ExampleCatLexiconBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: example_cat_lexicon_state::State, S: BosStr> ExampleCatLexiconBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -259,7 +288,7 @@ impl<S: BosStr, St: example_cat_lexicon_state::State> ExampleCatLexiconBuilder<S
     }
 }
 
-impl<S: BosStr, St> ExampleCatLexiconBuilder<S, St>
+impl<St, S: BosStr> ExampleCatLexiconBuilder<St, S>
 where
     St: example_cat_lexicon_state::State,
     St::CreatedAt: example_cat_lexicon_state::IsUnset,
@@ -268,7 +297,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ExampleCatLexiconBuilder<S, example_cat_lexicon_state::SetCreatedAt<St>> {
+    ) -> ExampleCatLexiconBuilder<example_cat_lexicon_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ExampleCatLexiconBuilder {
             _state: PhantomData,
@@ -278,7 +307,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ExampleCatLexiconBuilder<S, St>
+impl<St, S: BosStr> ExampleCatLexiconBuilder<St, S>
 where
     St: example_cat_lexicon_state::State,
     St::Name: example_cat_lexicon_state::IsUnset,
@@ -287,7 +316,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ExampleCatLexiconBuilder<S, example_cat_lexicon_state::SetName<St>> {
+    ) -> ExampleCatLexiconBuilder<example_cat_lexicon_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ExampleCatLexiconBuilder {
             _state: PhantomData,
@@ -297,11 +326,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ExampleCatLexiconBuilder<S, St>
+impl<St, S: BosStr> ExampleCatLexiconBuilder<St, S>
 where
     St: example_cat_lexicon_state::State,
-    St::CreatedAt: example_cat_lexicon_state::IsSet,
     St::Name: example_cat_lexicon_state::IsSet,
+    St::CreatedAt: example_cat_lexicon_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ExampleCatLexicon<S> {
@@ -313,7 +342,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ExampleCatLexicon<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ExampleCatLexicon<S> {
         ExampleCatLexicon {
             avatar: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -323,11 +355,13 @@ where
     }
 }
 
-fn lexicon_doc_dev_kanad_lexicon_test_2026_02_26_exampleCatLexicon() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
+fn lexicon_doc_dev_kanad_lexicon_test_2026_02_26_exampleCatLexicon() -> LexiconDoc<
+    'static,
+> {
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.kanad.lexicon-test-2026-02-26.exampleCatLexicon"),
@@ -339,18 +373,18 @@ fn lexicon_doc_dev_kanad_lexicon_test_2026_02_26_exampleCatLexicon() -> LexiconD
                     description: Some(CowStr::new_static("some example cat lexicon")),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("avatar"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),

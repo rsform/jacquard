@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A daily recording of your steps for that day. This record is expected to be update throughout the day and represent's 12am-12pm in your timezone, or what you count as a "day". The key is also traditionally the date of your "day" yyy-mm-dd.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -108,7 +108,7 @@ impl<S: BosStr> LexiconSchema for Step<S> {
 
 pub mod step_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -116,70 +116,77 @@ pub mod step_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Steps;
-        type CreatedAt;
         type UpdatedAt;
+        type CreatedAt;
+        type Steps;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Steps = Unset;
-        type CreatedAt = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `steps` field to Set
-    pub struct SetSteps<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSteps<St> {}
-    impl<St: State> State for SetSteps<St> {
-        type Steps = Set<members::steps>;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Steps = St::Steps;
-        type CreatedAt = Set<members::created_at>;
-        type UpdatedAt = St::UpdatedAt;
+        type CreatedAt = Unset;
+        type Steps = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
     impl<St: State> State for SetUpdatedAt<St> {
-        type Steps = St::Steps;
-        type CreatedAt = St::CreatedAt;
         type UpdatedAt = Set<members::updated_at>;
+        type CreatedAt = St::CreatedAt;
+        type Steps = St::Steps;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type CreatedAt = Set<members::created_at>;
+        type Steps = St::Steps;
+    }
+    ///State transition - sets the `steps` field to Set
+    pub struct SetSteps<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSteps<St> {}
+    impl<St: State> State for SetSteps<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type CreatedAt = St::CreatedAt;
+        type Steps = Set<members::steps>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `steps` field
-        pub struct steps(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `steps` field
+        pub struct steps(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StepBuilder<S: BosStr, St: step_state::State> {
+pub struct StepBuilder<St: step_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<i64>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Step<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StepBuilder<S, step_state::Empty> {
+impl Step<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StepBuilder<step_state::Empty, DefaultStr> {
         StepBuilder::new()
     }
 }
 
-impl<S: BosStr> StepBuilder<S, step_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Step<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StepBuilder<step_state::Empty, S> {
+        StepBuilder::builder()
+    }
+}
+
+impl StepBuilder<step_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StepBuilder {
             _state: PhantomData,
@@ -189,7 +196,18 @@ impl<S: BosStr> StepBuilder<S, step_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StepBuilder<S, St>
+impl<S: BosStr> StepBuilder<step_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StepBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StepBuilder<St, S>
 where
     St: step_state::State,
     St::CreatedAt: step_state::IsUnset,
@@ -198,7 +216,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StepBuilder<S, step_state::SetCreatedAt<St>> {
+    ) -> StepBuilder<step_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StepBuilder {
             _state: PhantomData,
@@ -208,13 +226,16 @@ where
     }
 }
 
-impl<S: BosStr, St> StepBuilder<S, St>
+impl<St, S: BosStr> StepBuilder<St, S>
 where
     St: step_state::State,
     St::Steps: step_state::IsUnset,
 {
     /// Set the `steps` field (required)
-    pub fn steps(mut self, value: impl Into<i64>) -> StepBuilder<S, step_state::SetSteps<St>> {
+    pub fn steps(
+        mut self,
+        value: impl Into<i64>,
+    ) -> StepBuilder<step_state::SetSteps<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StepBuilder {
             _state: PhantomData,
@@ -224,7 +245,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StepBuilder<S, St>
+impl<St, S: BosStr> StepBuilder<St, S>
 where
     St: step_state::State,
     St::UpdatedAt: step_state::IsUnset,
@@ -233,7 +254,7 @@ where
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StepBuilder<S, step_state::SetUpdatedAt<St>> {
+    ) -> StepBuilder<step_state::SetUpdatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         StepBuilder {
             _state: PhantomData,
@@ -243,12 +264,12 @@ where
     }
 }
 
-impl<S: BosStr, St> StepBuilder<S, St>
+impl<St, S: BosStr> StepBuilder<St, S>
 where
     St: step_state::State,
-    St::Steps: step_state::IsSet,
-    St::CreatedAt: step_state::IsSet,
     St::UpdatedAt: step_state::IsSet,
+    St::CreatedAt: step_state::IsSet,
+    St::Steps: step_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Step<S> {
@@ -271,10 +292,10 @@ where
 }
 
 fn lexicon_doc_social_pace_daily_step() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.pace.daily.step"),

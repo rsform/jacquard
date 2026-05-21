@@ -20,29 +20,27 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::embed::external;
-use crate::app_bsky::embed::external::ExternalRecord;
-use crate::app_bsky::embed::images;
-use crate::app_bsky::embed::images::Images;
-use crate::app_bsky::embed::record;
-use crate::app_bsky::embed::record::Record;
-use crate::app_bsky::embed::video;
-use crate::app_bsky::embed::video::Video;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::embed::external::ExternalRecord;
+use crate::app_bsky::embed::images::Images;
+use crate::app_bsky::embed::record::Record;
+use crate::app_bsky::embed::video::Video;
+use crate::app_bsky::embed::external;
+use crate::app_bsky::embed::images;
+use crate::app_bsky::embed::record;
+use crate::app_bsky::embed::video;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordWithMedia<S: BosStr = DefaultStr> {
     pub media: RecordWithMediaMedia<S>,
     pub record: Record<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -56,17 +54,16 @@ pub enum RecordWithMediaMedia<S: BosStr = DefaultStr> {
     External(Box<ExternalRecord<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct View<S: BosStr = DefaultStr> {
     pub media: ViewMedia<S>,
     pub record: record::View<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -112,7 +109,7 @@ impl<S: BosStr> LexiconSchema for View<S> {
 
 pub mod record_with_media_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -155,21 +152,31 @@ pub mod record_with_media_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RecordWithMediaBuilder<S: BosStr, St: record_with_media_state::State> {
+pub struct RecordWithMediaBuilder<
+    St: record_with_media_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<RecordWithMediaMedia<S>>, Option<Record<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RecordWithMedia<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RecordWithMediaBuilder<S, record_with_media_state::Empty> {
+impl RecordWithMedia<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RecordWithMediaBuilder<record_with_media_state::Empty, DefaultStr> {
         RecordWithMediaBuilder::new()
     }
 }
 
-impl<S: BosStr> RecordWithMediaBuilder<S, record_with_media_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RecordWithMedia<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RecordWithMediaBuilder<record_with_media_state::Empty, S> {
+        RecordWithMediaBuilder::builder()
+    }
+}
+
+impl RecordWithMediaBuilder<record_with_media_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RecordWithMediaBuilder {
             _state: PhantomData,
@@ -179,7 +186,18 @@ impl<S: BosStr> RecordWithMediaBuilder<S, record_with_media_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RecordWithMediaBuilder<S, St>
+impl<S: BosStr> RecordWithMediaBuilder<record_with_media_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RecordWithMediaBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RecordWithMediaBuilder<St, S>
 where
     St: record_with_media_state::State,
     St::Media: record_with_media_state::IsUnset,
@@ -188,7 +206,7 @@ where
     pub fn media(
         mut self,
         value: impl Into<RecordWithMediaMedia<S>>,
-    ) -> RecordWithMediaBuilder<S, record_with_media_state::SetMedia<St>> {
+    ) -> RecordWithMediaBuilder<record_with_media_state::SetMedia<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RecordWithMediaBuilder {
             _state: PhantomData,
@@ -198,7 +216,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RecordWithMediaBuilder<S, St>
+impl<St, S: BosStr> RecordWithMediaBuilder<St, S>
 where
     St: record_with_media_state::State,
     St::Record: record_with_media_state::IsUnset,
@@ -207,7 +225,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<Record<S>>,
-    ) -> RecordWithMediaBuilder<S, record_with_media_state::SetRecord<St>> {
+    ) -> RecordWithMediaBuilder<record_with_media_state::SetRecord<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RecordWithMediaBuilder {
             _state: PhantomData,
@@ -217,7 +235,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RecordWithMediaBuilder<S, St>
+impl<St, S: BosStr> RecordWithMediaBuilder<St, S>
 where
     St: record_with_media_state::State,
     St::Media: record_with_media_state::IsSet,
@@ -232,7 +250,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordWithMedia<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RecordWithMedia<S> {
         RecordWithMedia {
             media: self._fields.0.unwrap(),
             record: self._fields.1.unwrap(),
@@ -242,10 +263,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_embed_recordWithMedia() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.embed.recordWithMedia"),
@@ -254,10 +275,9 @@ fn lexicon_doc_app_bsky_embed_recordWithMedia() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("record"),
-                        SmolStr::new_static("media"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("record"), SmolStr::new_static("media")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -267,7 +287,7 @@ fn lexicon_doc_app_bsky_embed_recordWithMedia() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("app.bsky.embed.images"),
                                     CowStr::new_static("app.bsky.embed.video"),
-                                    CowStr::new_static("app.bsky.embed.external"),
+                                    CowStr::new_static("app.bsky.embed.external")
                                 ],
                                 ..Default::default()
                             }),
@@ -287,10 +307,9 @@ fn lexicon_doc_app_bsky_embed_recordWithMedia() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("view"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("record"),
-                        SmolStr::new_static("media"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("record"), SmolStr::new_static("media")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -300,7 +319,7 @@ fn lexicon_doc_app_bsky_embed_recordWithMedia() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("app.bsky.embed.images#view"),
                                     CowStr::new_static("app.bsky.embed.video#view"),
-                                    CowStr::new_static("app.bsky.embed.external#view"),
+                                    CowStr::new_static("app.bsky.embed.external#view")
                                 ],
                                 ..Default::default()
                             }),
@@ -325,7 +344,7 @@ fn lexicon_doc_app_bsky_embed_recordWithMedia() -> LexiconDoc<'static> {
 
 pub mod view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -368,21 +387,28 @@ pub mod view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ViewBuilder<S: BosStr, St: view_state::State> {
+pub struct ViewBuilder<St: view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<ViewMedia<S>>, Option<record::View<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> View<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ViewBuilder<S, view_state::Empty> {
+impl View<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ViewBuilder<view_state::Empty, DefaultStr> {
         ViewBuilder::new()
     }
 }
 
-impl<S: BosStr> ViewBuilder<S, view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> View<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ViewBuilder<view_state::Empty, S> {
+        ViewBuilder::builder()
+    }
+}
+
+impl ViewBuilder<view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ViewBuilder {
             _state: PhantomData,
@@ -392,7 +418,18 @@ impl<S: BosStr> ViewBuilder<S, view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<S: BosStr> ViewBuilder<view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
     St::Media: view_state::IsUnset,
@@ -401,7 +438,7 @@ where
     pub fn media(
         mut self,
         value: impl Into<ViewMedia<S>>,
-    ) -> ViewBuilder<S, view_state::SetMedia<St>> {
+    ) -> ViewBuilder<view_state::SetMedia<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ViewBuilder {
             _state: PhantomData,
@@ -411,7 +448,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
     St::Record: view_state::IsUnset,
@@ -420,7 +457,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<record::View<S>>,
-    ) -> ViewBuilder<S, view_state::SetRecord<St>> {
+    ) -> ViewBuilder<view_state::SetRecord<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ViewBuilder {
             _state: PhantomData,
@@ -430,7 +467,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
     St::Record: view_state::IsSet,

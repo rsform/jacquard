@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,16 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::dev_sensorthings::observation_batch;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::dev_sensorthings::observation_batch;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BatchEntry<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub q: Option<BatchEntryQ<S>>,
@@ -44,6 +41,7 @@ pub struct BatchEntry<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BatchEntryQ<S: BosStr = DefaultStr> {
@@ -125,6 +123,7 @@ where
         }
     }
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -236,7 +235,7 @@ impl<S: BosStr> LexiconSchema for ObservationBatch<S> {
 
 pub mod batch_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -279,25 +278,28 @@ pub mod batch_entry_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BatchEntryBuilder<S: BosStr, St: batch_entry_state::State> {
+pub struct BatchEntryBuilder<St: batch_entry_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<BatchEntryQ<S>>,
-        Option<BatchEntryResult<S>>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<BatchEntryQ<S>>, Option<BatchEntryResult<S>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> BatchEntry<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BatchEntryBuilder<S, batch_entry_state::Empty> {
+impl BatchEntry<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BatchEntryBuilder<batch_entry_state::Empty, DefaultStr> {
         BatchEntryBuilder::new()
     }
 }
 
-impl<S: BosStr> BatchEntryBuilder<S, batch_entry_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> BatchEntry<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BatchEntryBuilder<batch_entry_state::Empty, S> {
+        BatchEntryBuilder::builder()
+    }
+}
+
+impl BatchEntryBuilder<batch_entry_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BatchEntryBuilder {
             _state: PhantomData,
@@ -307,7 +309,18 @@ impl<S: BosStr> BatchEntryBuilder<S, batch_entry_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: batch_entry_state::State> BatchEntryBuilder<S, St> {
+impl<S: BosStr> BatchEntryBuilder<batch_entry_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BatchEntryBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: batch_entry_state::State, S: BosStr> BatchEntryBuilder<St, S> {
     /// Set the `q` field (optional)
     pub fn q(mut self, value: impl Into<Option<BatchEntryQ<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -320,7 +333,7 @@ impl<S: BosStr, St: batch_entry_state::State> BatchEntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BatchEntryBuilder<S, St>
+impl<St, S: BosStr> BatchEntryBuilder<St, S>
 where
     St: batch_entry_state::State,
     St::Result: batch_entry_state::IsUnset,
@@ -329,7 +342,7 @@ where
     pub fn result(
         mut self,
         value: impl Into<BatchEntryResult<S>>,
-    ) -> BatchEntryBuilder<S, batch_entry_state::SetResult<St>> {
+    ) -> BatchEntryBuilder<batch_entry_state::SetResult<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BatchEntryBuilder {
             _state: PhantomData,
@@ -339,7 +352,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BatchEntryBuilder<S, St>
+impl<St, S: BosStr> BatchEntryBuilder<St, S>
 where
     St: batch_entry_state::State,
     St::T: batch_entry_state::IsUnset,
@@ -348,7 +361,7 @@ where
     pub fn t(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BatchEntryBuilder<S, batch_entry_state::SetT<St>> {
+    ) -> BatchEntryBuilder<batch_entry_state::SetT<St>, S> {
         self._fields.2 = Option::Some(value.into());
         BatchEntryBuilder {
             _state: PhantomData,
@@ -358,7 +371,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BatchEntryBuilder<S, St>
+impl<St, S: BosStr> BatchEntryBuilder<St, S>
 where
     St: batch_entry_state::State,
     St::T: batch_entry_state::IsSet,
@@ -374,7 +387,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BatchEntry<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BatchEntry<S> {
         BatchEntry {
             q: self._fields.0,
             result: self._fields.1.unwrap(),
@@ -385,10 +401,10 @@ where
 }
 
 fn lexicon_doc_dev_sensorthings_observationBatch() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.sensorthings.observationBatch"),
@@ -511,7 +527,7 @@ fn lexicon_doc_dev_sensorthings_observationBatch() -> LexiconDoc<'static> {
 
 pub mod observation_batch_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -520,71 +536,74 @@ pub mod observation_batch_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Datastream;
-        type WindowEnd;
-        type Observations;
         type WindowStart;
+        type Observations;
+        type WindowEnd;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Datastream = Unset;
-        type WindowEnd = Unset;
-        type Observations = Unset;
         type WindowStart = Unset;
+        type Observations = Unset;
+        type WindowEnd = Unset;
     }
     ///State transition - sets the `datastream` field to Set
     pub struct SetDatastream<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDatastream<St> {}
     impl<St: State> State for SetDatastream<St> {
         type Datastream = Set<members::datastream>;
-        type WindowEnd = St::WindowEnd;
+        type WindowStart = St::WindowStart;
         type Observations = St::Observations;
-        type WindowStart = St::WindowStart;
-    }
-    ///State transition - sets the `window_end` field to Set
-    pub struct SetWindowEnd<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWindowEnd<St> {}
-    impl<St: State> State for SetWindowEnd<St> {
-        type Datastream = St::Datastream;
-        type WindowEnd = Set<members::window_end>;
-        type Observations = St::Observations;
-        type WindowStart = St::WindowStart;
-    }
-    ///State transition - sets the `observations` field to Set
-    pub struct SetObservations<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetObservations<St> {}
-    impl<St: State> State for SetObservations<St> {
-        type Datastream = St::Datastream;
         type WindowEnd = St::WindowEnd;
-        type Observations = Set<members::observations>;
-        type WindowStart = St::WindowStart;
     }
     ///State transition - sets the `window_start` field to Set
     pub struct SetWindowStart<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWindowStart<St> {}
     impl<St: State> State for SetWindowStart<St> {
         type Datastream = St::Datastream;
-        type WindowEnd = St::WindowEnd;
-        type Observations = St::Observations;
         type WindowStart = Set<members::window_start>;
+        type Observations = St::Observations;
+        type WindowEnd = St::WindowEnd;
+    }
+    ///State transition - sets the `observations` field to Set
+    pub struct SetObservations<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetObservations<St> {}
+    impl<St: State> State for SetObservations<St> {
+        type Datastream = St::Datastream;
+        type WindowStart = St::WindowStart;
+        type Observations = Set<members::observations>;
+        type WindowEnd = St::WindowEnd;
+    }
+    ///State transition - sets the `window_end` field to Set
+    pub struct SetWindowEnd<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWindowEnd<St> {}
+    impl<St: State> State for SetWindowEnd<St> {
+        type Datastream = St::Datastream;
+        type WindowStart = St::WindowStart;
+        type Observations = St::Observations;
+        type WindowEnd = Set<members::window_end>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `datastream` field
         pub struct datastream(());
-        ///Marker type for the `window_end` field
-        pub struct window_end(());
-        ///Marker type for the `observations` field
-        pub struct observations(());
         ///Marker type for the `window_start` field
         pub struct window_start(());
+        ///Marker type for the `observations` field
+        pub struct observations(());
+        ///Marker type for the `window_end` field
+        pub struct window_end(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ObservationBatchBuilder<S: BosStr, St: observation_batch_state::State> {
+pub struct ObservationBatchBuilder<
+    St: observation_batch_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
@@ -595,15 +614,22 @@ pub struct ObservationBatchBuilder<S: BosStr, St: observation_batch_state::State
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ObservationBatch<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ObservationBatchBuilder<S, observation_batch_state::Empty> {
+impl ObservationBatch<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ObservationBatchBuilder<observation_batch_state::Empty, DefaultStr> {
         ObservationBatchBuilder::new()
     }
 }
 
-impl<S: BosStr> ObservationBatchBuilder<S, observation_batch_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ObservationBatch<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ObservationBatchBuilder<observation_batch_state::Empty, S> {
+        ObservationBatchBuilder::builder()
+    }
+}
+
+impl ObservationBatchBuilder<observation_batch_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ObservationBatchBuilder {
             _state: PhantomData,
@@ -613,7 +639,18 @@ impl<S: BosStr> ObservationBatchBuilder<S, observation_batch_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ObservationBatchBuilder<S, St>
+impl<S: BosStr> ObservationBatchBuilder<observation_batch_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ObservationBatchBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ObservationBatchBuilder<St, S>
 where
     St: observation_batch_state::State,
     St::Datastream: observation_batch_state::IsUnset,
@@ -622,7 +659,7 @@ where
     pub fn datastream(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ObservationBatchBuilder<S, observation_batch_state::SetDatastream<St>> {
+    ) -> ObservationBatchBuilder<observation_batch_state::SetDatastream<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ObservationBatchBuilder {
             _state: PhantomData,
@@ -632,7 +669,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ObservationBatchBuilder<S, St>
+impl<St, S: BosStr> ObservationBatchBuilder<St, S>
 where
     St: observation_batch_state::State,
     St::Observations: observation_batch_state::IsUnset,
@@ -641,7 +678,7 @@ where
     pub fn observations(
         mut self,
         value: impl Into<Vec<observation_batch::BatchEntry<S>>>,
-    ) -> ObservationBatchBuilder<S, observation_batch_state::SetObservations<St>> {
+    ) -> ObservationBatchBuilder<observation_batch_state::SetObservations<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ObservationBatchBuilder {
             _state: PhantomData,
@@ -651,7 +688,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ObservationBatchBuilder<S, St>
+impl<St, S: BosStr> ObservationBatchBuilder<St, S>
 where
     St: observation_batch_state::State,
     St::WindowEnd: observation_batch_state::IsUnset,
@@ -660,7 +697,7 @@ where
     pub fn window_end(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ObservationBatchBuilder<S, observation_batch_state::SetWindowEnd<St>> {
+    ) -> ObservationBatchBuilder<observation_batch_state::SetWindowEnd<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ObservationBatchBuilder {
             _state: PhantomData,
@@ -670,7 +707,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ObservationBatchBuilder<S, St>
+impl<St, S: BosStr> ObservationBatchBuilder<St, S>
 where
     St: observation_batch_state::State,
     St::WindowStart: observation_batch_state::IsUnset,
@@ -679,7 +716,7 @@ where
     pub fn window_start(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ObservationBatchBuilder<S, observation_batch_state::SetWindowStart<St>> {
+    ) -> ObservationBatchBuilder<observation_batch_state::SetWindowStart<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ObservationBatchBuilder {
             _state: PhantomData,
@@ -689,13 +726,13 @@ where
     }
 }
 
-impl<S: BosStr, St> ObservationBatchBuilder<S, St>
+impl<St, S: BosStr> ObservationBatchBuilder<St, S>
 where
     St: observation_batch_state::State,
     St::Datastream: observation_batch_state::IsSet,
-    St::WindowEnd: observation_batch_state::IsSet,
-    St::Observations: observation_batch_state::IsSet,
     St::WindowStart: observation_batch_state::IsSet,
+    St::Observations: observation_batch_state::IsSet,
+    St::WindowEnd: observation_batch_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ObservationBatch<S> {
@@ -708,7 +745,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ObservationBatch<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ObservationBatch<S> {
         ObservationBatch {
             datastream: self._fields.0.unwrap(),
             observations: self._fields.1.unwrap(),

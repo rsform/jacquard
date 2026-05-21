@@ -10,22 +10,20 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct WhepParams<S: BosStr = DefaultStr> {
     pub rendition: S,
     pub streamer: S,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -33,15 +31,25 @@ pub struct Whep {
     pub body: Bytes,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct WhepOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum WhepError {
     /// This user may not play this stream.
@@ -49,10 +57,7 @@ pub enum WhepError {
     Unauthorized(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for WhepError {
@@ -106,16 +111,22 @@ impl jacquard_common::xrpc::XrpcResp for WhepResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Whep {
     const NSID: &'static str = "place.stream.playback.whep";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("*/*");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
     type Response = WhepResponse;
-    fn encode_body(&self, buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError>
+    fn encode_body(
+        &self,
+        buffer: &mut Vec<u8>,
+    ) -> Result<(), jacquard_common::xrpc::EncodeError>
     where
         Self: Serialize,
     {
         Ok(buffer.copy_from_slice(self.body.as_ref()))
     }
-    fn decode_body<'de>(body: &'de [u8]) -> Result<Self, jacquard_common::error::DecodeError>
+    fn decode_body<'de>(
+        body: &'de [u8],
+    ) -> Result<Self, jacquard_common::error::DecodeError>
     where
         Self: Deserialize<'de>,
     {
@@ -129,15 +140,16 @@ impl jacquard_common::xrpc::XrpcRequest for Whep {
 pub struct WhepRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for WhepRequest {
     const PATH: &'static str = "/xrpc/place.stream.playback.whep";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("*/*");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
     type Request<S: BosStr> = Whep;
     type Response = WhepResponse;
 }
 
 pub mod whep_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -180,21 +192,28 @@ pub mod whep_params_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WhepParamsBuilder<S: BosStr, St: whep_params_state::State> {
+pub struct WhepParamsBuilder<St: whep_params_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> WhepParams<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> WhepParamsBuilder<S, whep_params_state::Empty> {
+impl WhepParams<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> WhepParamsBuilder<whep_params_state::Empty, DefaultStr> {
         WhepParamsBuilder::new()
     }
 }
 
-impl<S: BosStr> WhepParamsBuilder<S, whep_params_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> WhepParams<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> WhepParamsBuilder<whep_params_state::Empty, S> {
+        WhepParamsBuilder::builder()
+    }
+}
+
+impl WhepParamsBuilder<whep_params_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         WhepParamsBuilder {
             _state: PhantomData,
@@ -204,7 +223,18 @@ impl<S: BosStr> WhepParamsBuilder<S, whep_params_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> WhepParamsBuilder<S, St>
+impl<S: BosStr> WhepParamsBuilder<whep_params_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        WhepParamsBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> WhepParamsBuilder<St, S>
 where
     St: whep_params_state::State,
     St::Rendition: whep_params_state::IsUnset,
@@ -213,7 +243,7 @@ where
     pub fn rendition(
         mut self,
         value: impl Into<S>,
-    ) -> WhepParamsBuilder<S, whep_params_state::SetRendition<St>> {
+    ) -> WhepParamsBuilder<whep_params_state::SetRendition<St>, S> {
         self._fields.0 = Option::Some(value.into());
         WhepParamsBuilder {
             _state: PhantomData,
@@ -223,7 +253,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WhepParamsBuilder<S, St>
+impl<St, S: BosStr> WhepParamsBuilder<St, S>
 where
     St: whep_params_state::State,
     St::Streamer: whep_params_state::IsUnset,
@@ -232,7 +262,7 @@ where
     pub fn streamer(
         mut self,
         value: impl Into<S>,
-    ) -> WhepParamsBuilder<S, whep_params_state::SetStreamer<St>> {
+    ) -> WhepParamsBuilder<whep_params_state::SetStreamer<St>, S> {
         self._fields.1 = Option::Some(value.into());
         WhepParamsBuilder {
             _state: PhantomData,
@@ -242,7 +272,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WhepParamsBuilder<S, St>
+impl<St, S: BosStr> WhepParamsBuilder<St, S>
 where
     St: whep_params_state::State,
     St::Rendition: whep_params_state::IsSet,

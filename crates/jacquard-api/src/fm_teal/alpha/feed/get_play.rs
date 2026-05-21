@@ -8,31 +8,26 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::fm_teal::alpha::feed::PlayView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::fm_teal::alpha::feed::PlayView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPlay<S: BosStr = DefaultStr> {
     pub author_did: AtIdentifier<S>,
     pub rkey: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPlayOutput<S: BosStr = DefaultStr> {
     pub play: PlayView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -65,7 +60,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPlayRequest {
 
 pub mod get_play_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -73,56 +68,63 @@ pub mod get_play_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rkey;
         type AuthorDid;
+        type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rkey = Unset;
         type AuthorDid = Unset;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRkey<St> {}
-    impl<St: State> State for SetRkey<St> {
-        type Rkey = Set<members::rkey>;
-        type AuthorDid = St::AuthorDid;
+        type Rkey = Unset;
     }
     ///State transition - sets the `author_did` field to Set
     pub struct SetAuthorDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthorDid<St> {}
     impl<St: State> State for SetAuthorDid<St> {
-        type Rkey = St::Rkey;
         type AuthorDid = Set<members::author_did>;
+        type Rkey = St::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRkey<St> {}
+    impl<St: State> State for SetRkey<St> {
+        type AuthorDid = St::AuthorDid;
+        type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
         ///Marker type for the `author_did` field
         pub struct author_did(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetPlayBuilder<S: BosStr, St: get_play_state::State> {
+pub struct GetPlayBuilder<St: get_play_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetPlay<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetPlayBuilder<S, get_play_state::Empty> {
+impl GetPlay<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetPlayBuilder<get_play_state::Empty, DefaultStr> {
         GetPlayBuilder::new()
     }
 }
 
-impl<S: BosStr> GetPlayBuilder<S, get_play_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetPlay<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetPlayBuilder<get_play_state::Empty, S> {
+        GetPlayBuilder::builder()
+    }
+}
+
+impl GetPlayBuilder<get_play_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetPlayBuilder {
             _state: PhantomData,
@@ -132,7 +134,18 @@ impl<S: BosStr> GetPlayBuilder<S, get_play_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetPlayBuilder<S, St>
+impl<S: BosStr> GetPlayBuilder<get_play_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetPlayBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetPlayBuilder<St, S>
 where
     St: get_play_state::State,
     St::AuthorDid: get_play_state::IsUnset,
@@ -141,7 +154,7 @@ where
     pub fn author_did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetPlayBuilder<S, get_play_state::SetAuthorDid<St>> {
+    ) -> GetPlayBuilder<get_play_state::SetAuthorDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetPlayBuilder {
             _state: PhantomData,
@@ -151,13 +164,16 @@ where
     }
 }
 
-impl<S: BosStr, St> GetPlayBuilder<S, St>
+impl<St, S: BosStr> GetPlayBuilder<St, S>
 where
     St: get_play_state::State,
     St::Rkey: get_play_state::IsUnset,
 {
     /// Set the `rkey` field (required)
-    pub fn rkey(mut self, value: impl Into<S>) -> GetPlayBuilder<S, get_play_state::SetRkey<St>> {
+    pub fn rkey(
+        mut self,
+        value: impl Into<S>,
+    ) -> GetPlayBuilder<get_play_state::SetRkey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetPlayBuilder {
             _state: PhantomData,
@@ -167,11 +183,11 @@ where
     }
 }
 
-impl<S: BosStr, St> GetPlayBuilder<S, St>
+impl<St, S: BosStr> GetPlayBuilder<St, S>
 where
     St: get_play_state::State,
-    St::Rkey: get_play_state::IsSet,
     St::AuthorDid: get_play_state::IsSet,
+    St::Rkey: get_play_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GetPlay<S> {

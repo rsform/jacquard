@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateFolderRelationship<S: BosStr = DefaultStr> {
     pub relation: S,
     pub resource: S,
@@ -40,8 +37,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateFolderRelationshipResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateFolderRelationship<S> {
     const NSID: &'static str = "app.blebbit.authr.folder.updateFolderRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateFolderRelationshipResponse;
 }
 
@@ -49,8 +47,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateFolderRelationship<
 pub struct UpdateFolderRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateFolderRelationshipRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.folder.updateFolderRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateFolderRelationship<S>;
     type Response = UpdateFolderRelationshipResponse;
 }

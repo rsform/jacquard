@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,31 +21,26 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::unspecced::get_tagged_suggestions;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::unspecced::get_tagged_suggestions;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTaggedSuggestions;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTaggedSuggestionsOutput<S: BosStr = DefaultStr> {
     pub suggestions: Vec<get_tagged_suggestions::Suggestion<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Suggestion<S: BosStr = DefaultStr> {
     pub subject: UriValue<S>,
     pub subject_type: SuggestionSubjectType<S>,
@@ -53,6 +48,7 @@ pub struct Suggestion<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SuggestionSubjectType<S: BosStr = DefaultStr> {
@@ -126,7 +122,9 @@ where
         match self {
             SuggestionSubjectType::Actor => SuggestionSubjectType::Actor,
             SuggestionSubjectType::Feed => SuggestionSubjectType::Feed,
-            SuggestionSubjectType::Other(v) => SuggestionSubjectType::Other(v.into_static()),
+            SuggestionSubjectType::Other(v) => {
+                SuggestionSubjectType::Other(v.into_static())
+            }
         }
     }
 }
@@ -172,7 +170,7 @@ impl<S: BosStr> LexiconSchema for Suggestion<S> {
 
 pub mod suggestion_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -180,74 +178,77 @@ pub mod suggestion_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SubjectType;
         type Tag;
         type Subject;
+        type SubjectType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SubjectType = Unset;
         type Tag = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `subject_type` field to Set
-    pub struct SetSubjectType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubjectType<St> {}
-    impl<St: State> State for SetSubjectType<St> {
-        type SubjectType = Set<members::subject_type>;
-        type Tag = St::Tag;
-        type Subject = St::Subject;
+        type SubjectType = Unset;
     }
     ///State transition - sets the `tag` field to Set
     pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTag<St> {}
     impl<St: State> State for SetTag<St> {
-        type SubjectType = St::SubjectType;
         type Tag = Set<members::tag>;
         type Subject = St::Subject;
+        type SubjectType = St::SubjectType;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
-        type SubjectType = St::SubjectType;
         type Tag = St::Tag;
         type Subject = Set<members::subject>;
+        type SubjectType = St::SubjectType;
+    }
+    ///State transition - sets the `subject_type` field to Set
+    pub struct SetSubjectType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubjectType<St> {}
+    impl<St: State> State for SetSubjectType<St> {
+        type Tag = St::Tag;
+        type Subject = St::Subject;
+        type SubjectType = Set<members::subject_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject_type` field
-        pub struct subject_type(());
         ///Marker type for the `tag` field
         pub struct tag(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `subject_type` field
+        pub struct subject_type(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SuggestionBuilder<S: BosStr, St: suggestion_state::State> {
+pub struct SuggestionBuilder<St: suggestion_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<UriValue<S>>,
-        Option<SuggestionSubjectType<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<UriValue<S>>, Option<SuggestionSubjectType<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Suggestion<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SuggestionBuilder<S, suggestion_state::Empty> {
+impl Suggestion<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SuggestionBuilder<suggestion_state::Empty, DefaultStr> {
         SuggestionBuilder::new()
     }
 }
 
-impl<S: BosStr> SuggestionBuilder<S, suggestion_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Suggestion<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SuggestionBuilder<suggestion_state::Empty, S> {
+        SuggestionBuilder::builder()
+    }
+}
+
+impl SuggestionBuilder<suggestion_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SuggestionBuilder {
             _state: PhantomData,
@@ -257,7 +258,18 @@ impl<S: BosStr> SuggestionBuilder<S, suggestion_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SuggestionBuilder<S, St>
+impl<S: BosStr> SuggestionBuilder<suggestion_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SuggestionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SuggestionBuilder<St, S>
 where
     St: suggestion_state::State,
     St::Subject: suggestion_state::IsUnset,
@@ -266,7 +278,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> SuggestionBuilder<S, suggestion_state::SetSubject<St>> {
+    ) -> SuggestionBuilder<suggestion_state::SetSubject<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SuggestionBuilder {
             _state: PhantomData,
@@ -276,7 +288,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SuggestionBuilder<S, St>
+impl<St, S: BosStr> SuggestionBuilder<St, S>
 where
     St: suggestion_state::State,
     St::SubjectType: suggestion_state::IsUnset,
@@ -285,7 +297,7 @@ where
     pub fn subject_type(
         mut self,
         value: impl Into<SuggestionSubjectType<S>>,
-    ) -> SuggestionBuilder<S, suggestion_state::SetSubjectType<St>> {
+    ) -> SuggestionBuilder<suggestion_state::SetSubjectType<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SuggestionBuilder {
             _state: PhantomData,
@@ -295,7 +307,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SuggestionBuilder<S, St>
+impl<St, S: BosStr> SuggestionBuilder<St, S>
 where
     St: suggestion_state::State,
     St::Tag: suggestion_state::IsUnset,
@@ -304,7 +316,7 @@ where
     pub fn tag(
         mut self,
         value: impl Into<S>,
-    ) -> SuggestionBuilder<S, suggestion_state::SetTag<St>> {
+    ) -> SuggestionBuilder<suggestion_state::SetTag<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SuggestionBuilder {
             _state: PhantomData,
@@ -314,12 +326,12 @@ where
     }
 }
 
-impl<S: BosStr, St> SuggestionBuilder<S, St>
+impl<St, S: BosStr> SuggestionBuilder<St, S>
 where
     St: suggestion_state::State,
-    St::SubjectType: suggestion_state::IsSet,
     St::Tag: suggestion_state::IsSet,
     St::Subject: suggestion_state::IsSet,
+    St::SubjectType: suggestion_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Suggestion<S> {
@@ -331,7 +343,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Suggestion<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Suggestion<S> {
         Suggestion {
             subject: self._fields.0.unwrap(),
             subject_type: self._fields.1.unwrap(),
@@ -342,10 +357,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_unspecced_getTaggedSuggestions() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.unspecced.getTaggedSuggestions"),
@@ -354,25 +369,29 @@ fn lexicon_doc_app_bsky_unspecced_getTaggedSuggestions() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("suggestion"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("tag"),
-                        SmolStr::new_static("subjectType"),
-                        SmolStr::new_static("subject"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("tag"),
+                            SmolStr::new_static("subjectType"),
+                            SmolStr::new_static("subject")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -385,15 +404,11 @@ fn lexicon_doc_app_bsky_unspecced_getTaggedSuggestions() -> LexiconDoc<'static> 
                         );
                         map.insert(
                             SmolStr::new_static("subjectType"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("tag"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },

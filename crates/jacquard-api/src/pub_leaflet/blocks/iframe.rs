@@ -23,13 +23,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Iframe<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
@@ -73,7 +70,7 @@ impl<S: BosStr> LexiconSchema for Iframe<S> {
 
 pub mod iframe_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -104,21 +101,28 @@ pub mod iframe_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IframeBuilder<S: BosStr, St: iframe_state::State> {
+pub struct IframeBuilder<St: iframe_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Iframe<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> IframeBuilder<S, iframe_state::Empty> {
+impl Iframe<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> IframeBuilder<iframe_state::Empty, DefaultStr> {
         IframeBuilder::new()
     }
 }
 
-impl<S: BosStr> IframeBuilder<S, iframe_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Iframe<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> IframeBuilder<iframe_state::Empty, S> {
+        IframeBuilder::builder()
+    }
+}
+
+impl IframeBuilder<iframe_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         IframeBuilder {
             _state: PhantomData,
@@ -128,7 +132,18 @@ impl<S: BosStr> IframeBuilder<S, iframe_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: iframe_state::State> IframeBuilder<S, St> {
+impl<S: BosStr> IframeBuilder<iframe_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        IframeBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: iframe_state::State, S: BosStr> IframeBuilder<St, S> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -141,7 +156,7 @@ impl<S: BosStr, St: iframe_state::State> IframeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> IframeBuilder<S, St>
+impl<St, S: BosStr> IframeBuilder<St, S>
 where
     St: iframe_state::State,
     St::Url: iframe_state::IsUnset,
@@ -150,7 +165,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> IframeBuilder<S, iframe_state::SetUrl<St>> {
+    ) -> IframeBuilder<iframe_state::SetUrl<St>, S> {
         self._fields.1 = Option::Some(value.into());
         IframeBuilder {
             _state: PhantomData,
@@ -160,7 +175,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IframeBuilder<S, St>
+impl<St, S: BosStr> IframeBuilder<St, S>
 where
     St: iframe_state::State,
     St::Url: iframe_state::IsSet,
@@ -184,10 +199,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_blocks_iframe() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.blocks.iframe"),

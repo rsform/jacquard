@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Stack<S: BosStr = DefaultStr> {
     ///Cross-axis alignment of children.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -310,11 +307,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StackOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -333,8 +328,9 @@ impl jacquard_common::xrpc::XrpcResp for StackResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Stack<S> {
     const NSID: &'static str = "org.atsui.Stack";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = StackResponse;
 }
 
@@ -342,15 +338,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Stack<S> {
 pub struct StackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StackRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Stack";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Stack<S>;
     type Response = StackResponse;
 }
 
 pub mod stack_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -381,7 +378,7 @@ pub mod stack_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StackBuilder<S: BosStr, St: stack_state::State> {
+pub struct StackBuilder<St: stack_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<StackAlign<S>>,
@@ -396,15 +393,22 @@ pub struct StackBuilder<S: BosStr, St: stack_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Stack<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StackBuilder<S, stack_state::Empty> {
+impl Stack<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StackBuilder<stack_state::Empty, DefaultStr> {
         StackBuilder::new()
     }
 }
 
-impl<S: BosStr> StackBuilder<S, stack_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Stack<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StackBuilder<stack_state::Empty, S> {
+        StackBuilder::builder()
+    }
+}
+
+impl StackBuilder<stack_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StackBuilder {
             _state: PhantomData,
@@ -414,7 +418,18 @@ impl<S: BosStr> StackBuilder<S, stack_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
+impl<S: BosStr> StackBuilder<stack_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StackBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: stack_state::State, S: BosStr> StackBuilder<St, S> {
     /// Set the `align` field (optional)
     pub fn align(mut self, value: impl Into<Option<StackAlign<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -427,7 +442,7 @@ impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StackBuilder<S, St>
+impl<St, S: BosStr> StackBuilder<St, S>
 where
     St: stack_state::State,
     St::Children: stack_state::IsUnset,
@@ -436,7 +451,7 @@ where
     pub fn children(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> StackBuilder<S, stack_state::SetChildren<St>> {
+    ) -> StackBuilder<stack_state::SetChildren<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StackBuilder {
             _state: PhantomData,
@@ -446,7 +461,7 @@ where
     }
 }
 
-impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
+impl<St: stack_state::State, S: BosStr> StackBuilder<St, S> {
     /// Set the `gap` field (optional)
     pub fn gap(mut self, value: impl Into<Option<StackGap<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -459,7 +474,7 @@ impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
+impl<St: stack_state::State, S: BosStr> StackBuilder<St, S> {
     /// Set the `inset` field (optional)
     pub fn inset(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -472,7 +487,7 @@ impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
+impl<St: stack_state::State, S: BosStr> StackBuilder<St, S> {
     /// Set the `justify` field (optional)
     pub fn justify(mut self, value: impl Into<Option<StackJustify<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -485,7 +500,7 @@ impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
+impl<St: stack_state::State, S: BosStr> StackBuilder<St, S> {
     /// Set the `opaque` field (optional)
     pub fn opaque(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.5 = value.into();
@@ -498,7 +513,7 @@ impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
+impl<St: stack_state::State, S: BosStr> StackBuilder<St, S> {
     /// Set the `separator` field (optional)
     pub fn separator(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.6 = value.into();
@@ -511,7 +526,7 @@ impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
+impl<St: stack_state::State, S: BosStr> StackBuilder<St, S> {
     /// Set the `sticky` field (optional)
     pub fn sticky(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.7 = value.into();
@@ -524,7 +539,7 @@ impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StackBuilder<S, St>
+impl<St, S: BosStr> StackBuilder<St, S>
 where
     St: stack_state::State,
     St::Children: stack_state::IsSet,

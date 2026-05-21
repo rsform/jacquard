@@ -21,16 +21,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::zone_stratos::repo::hydrate_records;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::zone_stratos::repo::hydrate_records;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HydrateRecords<S: BosStr = DefaultStr> {
     ///Array of AT-URIs to hydrate (max 100)
     pub uris: Vec<AtUri<S>>,
@@ -38,11 +35,9 @@ pub struct HydrateRecords<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HydrateRecordsOutput<S: BosStr = DefaultStr> {
     ///URIs blocked due to boundary restrictions
     pub blocked: Vec<AtUri<S>>,
@@ -54,11 +49,9 @@ pub struct HydrateRecordsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -78,8 +71,9 @@ impl jacquard_common::xrpc::XrpcResp for HydrateRecordsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for HydrateRecords<S> {
     const NSID: &'static str = "zone.stratos.repo.hydrateRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = HydrateRecordsResponse;
 }
 
@@ -87,8 +81,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for HydrateRecords<S> {
 pub struct HydrateRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for HydrateRecordsRequest {
     const PATH: &'static str = "/xrpc/zone.stratos.repo.hydrateRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = HydrateRecords<S>;
     type Response = HydrateRecordsResponse;
 }
@@ -110,7 +105,7 @@ impl<S: BosStr> LexiconSchema for RecordView<S> {
 
 pub mod hydrate_records_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -141,21 +136,31 @@ pub mod hydrate_records_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HydrateRecordsBuilder<S: BosStr, St: hydrate_records_state::State> {
+pub struct HydrateRecordsBuilder<
+    St: hydrate_records_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> HydrateRecords<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> HydrateRecordsBuilder<S, hydrate_records_state::Empty> {
+impl HydrateRecords<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> HydrateRecordsBuilder<hydrate_records_state::Empty, DefaultStr> {
         HydrateRecordsBuilder::new()
     }
 }
 
-impl<S: BosStr> HydrateRecordsBuilder<S, hydrate_records_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> HydrateRecords<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> HydrateRecordsBuilder<hydrate_records_state::Empty, S> {
+        HydrateRecordsBuilder::builder()
+    }
+}
+
+impl HydrateRecordsBuilder<hydrate_records_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         HydrateRecordsBuilder {
             _state: PhantomData,
@@ -165,7 +170,18 @@ impl<S: BosStr> HydrateRecordsBuilder<S, hydrate_records_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> HydrateRecordsBuilder<S, St>
+impl<S: BosStr> HydrateRecordsBuilder<hydrate_records_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        HydrateRecordsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> HydrateRecordsBuilder<St, S>
 where
     St: hydrate_records_state::State,
     St::Uris: hydrate_records_state::IsUnset,
@@ -174,7 +190,7 @@ where
     pub fn uris(
         mut self,
         value: impl Into<Vec<AtUri<S>>>,
-    ) -> HydrateRecordsBuilder<S, hydrate_records_state::SetUris<St>> {
+    ) -> HydrateRecordsBuilder<hydrate_records_state::SetUris<St>, S> {
         self._fields.0 = Option::Some(value.into());
         HydrateRecordsBuilder {
             _state: PhantomData,
@@ -184,7 +200,7 @@ where
     }
 }
 
-impl<S: BosStr, St> HydrateRecordsBuilder<S, St>
+impl<St, S: BosStr> HydrateRecordsBuilder<St, S>
 where
     St: hydrate_records_state::State,
     St::Uris: hydrate_records_state::IsSet,
@@ -197,7 +213,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> HydrateRecords<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> HydrateRecords<S> {
         HydrateRecords {
             uris: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -207,7 +226,7 @@ where
 
 pub mod record_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -215,70 +234,77 @@ pub mod record_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Cid;
         type Value;
+        type Cid;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Cid = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Cid = St::Cid;
-        type Value = St::Value;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
-        type Cid = Set<members::cid>;
-        type Value = St::Value;
+        type Cid = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
-        type Uri = St::Uri;
-        type Cid = St::Cid;
         type Value = Set<members::value>;
+        type Cid = St::Cid;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Value = St::Value;
+        type Cid = Set<members::cid>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Value = St::Value;
+        type Cid = St::Cid;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RecordViewBuilder<S: BosStr, St: record_view_state::State> {
+pub struct RecordViewBuilder<St: record_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>, Option<Data<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RecordView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RecordViewBuilder<S, record_view_state::Empty> {
+impl RecordView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RecordViewBuilder<record_view_state::Empty, DefaultStr> {
         RecordViewBuilder::new()
     }
 }
 
-impl<S: BosStr> RecordViewBuilder<S, record_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RecordView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RecordViewBuilder<record_view_state::Empty, S> {
+        RecordViewBuilder::builder()
+    }
+}
+
+impl RecordViewBuilder<record_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RecordViewBuilder {
             _state: PhantomData,
@@ -288,7 +314,18 @@ impl<S: BosStr> RecordViewBuilder<S, record_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RecordViewBuilder<S, St>
+impl<S: BosStr> RecordViewBuilder<record_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RecordViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RecordViewBuilder<St, S>
 where
     St: record_view_state::State,
     St::Cid: record_view_state::IsUnset,
@@ -297,7 +334,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> RecordViewBuilder<S, record_view_state::SetCid<St>> {
+    ) -> RecordViewBuilder<record_view_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RecordViewBuilder {
             _state: PhantomData,
@@ -307,7 +344,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RecordViewBuilder<S, St>
+impl<St, S: BosStr> RecordViewBuilder<St, S>
 where
     St: record_view_state::State,
     St::Uri: record_view_state::IsUnset,
@@ -316,7 +353,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RecordViewBuilder<S, record_view_state::SetUri<St>> {
+    ) -> RecordViewBuilder<record_view_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RecordViewBuilder {
             _state: PhantomData,
@@ -326,7 +363,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RecordViewBuilder<S, St>
+impl<St, S: BosStr> RecordViewBuilder<St, S>
 where
     St: record_view_state::State,
     St::Value: record_view_state::IsUnset,
@@ -335,7 +372,7 @@ where
     pub fn value(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> RecordViewBuilder<S, record_view_state::SetValue<St>> {
+    ) -> RecordViewBuilder<record_view_state::SetValue<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RecordViewBuilder {
             _state: PhantomData,
@@ -345,12 +382,12 @@ where
     }
 }
 
-impl<S: BosStr, St> RecordViewBuilder<S, St>
+impl<St, S: BosStr> RecordViewBuilder<St, S>
 where
     St: record_view_state::State,
-    St::Uri: record_view_state::IsSet,
-    St::Cid: record_view_state::IsSet,
     St::Value: record_view_state::IsSet,
+    St::Cid: record_view_state::IsSet,
+    St::Uri: record_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RecordView<S> {
@@ -362,7 +399,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RecordView<S> {
         RecordView {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -373,10 +413,10 @@ where
 }
 
 fn lexicon_doc_zone_stratos_repo_hydrateRecords() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("zone.stratos.repo.hydrateRecords"),
@@ -387,29 +427,31 @@ fn lexicon_doc_zone_stratos_repo_hydrateRecords() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![SmolStr::new_static("uris")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("uris"),
-                                    LexObjectProperty::Array(LexArray {
-                                        description: Some(CowStr::new_static(
-                                            "Array of AT-URIs to hydrate (max 100)",
-                                        )),
-                                        items: LexArrayItem::String(LexString {
-                                            format: Some(LexStringFormat::AtUri),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(vec![SmolStr::new_static("uris")]),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("uris"),
+                                        LexObjectProperty::Array(LexArray {
+                                            description: Some(
+                                                CowStr::new_static("Array of AT-URIs to hydrate (max 100)"),
+                                            ),
+                                            items: LexArrayItem::String(LexString {
+                                                format: Some(LexStringFormat::AtUri),
+                                                ..Default::default()
+                                            }),
+                                            max_length: Some(100usize),
                                             ..Default::default()
                                         }),
-                                        max_length: Some(100usize),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -418,11 +460,12 @@ fn lexicon_doc_zone_stratos_repo_hydrateRecords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("recordView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("value"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("value")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

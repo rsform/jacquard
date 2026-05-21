@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::network_cosmik::Provenance;
 use crate::network_cosmik::card;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A record representing a card with content.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -62,6 +62,7 @@ pub struct Card<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -166,10 +167,7 @@ pub struct CardGetRecordOutput<S: BosStr = DefaultStr> {
 /// Content structure for a note card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NoteContent<S: BosStr = DefaultStr> {
     ///The note text content
     pub text: S,
@@ -180,10 +178,7 @@ pub struct NoteContent<S: BosStr = DefaultStr> {
 /// Content structure for a URL card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UrlContent<S: BosStr = DefaultStr> {
     ///Optional metadata about the URL
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -197,10 +192,7 @@ pub struct UrlContent<S: BosStr = DefaultStr> {
 /// Metadata about a URL.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UrlMetadata<S: BosStr = DefaultStr> {
     ///Author of the content
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -342,7 +334,7 @@ impl<S: BosStr> LexiconSchema for UrlMetadata<S> {
 
 pub mod card_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -385,7 +377,7 @@ pub mod card_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CardBuilder<S: BosStr, St: card_state::State> {
+pub struct CardBuilder<St: card_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<CardContent<S>>,
@@ -399,15 +391,22 @@ pub struct CardBuilder<S: BosStr, St: card_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Card<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CardBuilder<S, card_state::Empty> {
+impl Card<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CardBuilder<card_state::Empty, DefaultStr> {
         CardBuilder::new()
     }
 }
 
-impl<S: BosStr> CardBuilder<S, card_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Card<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CardBuilder<card_state::Empty, S> {
+        CardBuilder::builder()
+    }
+}
+
+impl CardBuilder<card_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CardBuilder {
             _state: PhantomData,
@@ -417,7 +416,18 @@ impl<S: BosStr> CardBuilder<S, card_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CardBuilder<S, St>
+impl<S: BosStr> CardBuilder<card_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CardBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CardBuilder<St, S>
 where
     St: card_state::State,
     St::Content: card_state::IsUnset,
@@ -426,7 +436,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<CardContent<S>>,
-    ) -> CardBuilder<S, card_state::SetContent<St>> {
+    ) -> CardBuilder<card_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CardBuilder {
             _state: PhantomData,
@@ -436,7 +446,7 @@ where
     }
 }
 
-impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
+impl<St: card_state::State, S: BosStr> CardBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -449,7 +459,7 @@ impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
+impl<St: card_state::State, S: BosStr> CardBuilder<St, S> {
     /// Set the `originalCard` field (optional)
     pub fn original_card(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -462,7 +472,7 @@ impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
+impl<St: card_state::State, S: BosStr> CardBuilder<St, S> {
     /// Set the `parentCard` field (optional)
     pub fn parent_card(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -475,7 +485,7 @@ impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
+impl<St: card_state::State, S: BosStr> CardBuilder<St, S> {
     /// Set the `provenance` field (optional)
     pub fn provenance(mut self, value: impl Into<Option<Provenance<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -488,7 +498,7 @@ impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CardBuilder<S, St>
+impl<St, S: BosStr> CardBuilder<St, S>
 where
     St: card_state::State,
     St::Type: card_state::IsUnset,
@@ -497,7 +507,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<CardType<S>>,
-    ) -> CardBuilder<S, card_state::SetType<St>> {
+    ) -> CardBuilder<card_state::SetType<St>, S> {
         self._fields.5 = Option::Some(value.into());
         CardBuilder {
             _state: PhantomData,
@@ -507,7 +517,7 @@ where
     }
 }
 
-impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
+impl<St: card_state::State, S: BosStr> CardBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -520,7 +530,7 @@ impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CardBuilder<S, St>
+impl<St, S: BosStr> CardBuilder<St, S>
 where
     St: card_state::State,
     St::Type: card_state::IsSet,
@@ -555,10 +565,10 @@ where
 }
 
 fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.cosmik.card"),
@@ -657,7 +667,9 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("noteContent"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Content structure for a note card.")),
+                    description: Some(
+                        CowStr::new_static("Content structure for a note card."),
+                    ),
                     required: Some(vec![SmolStr::new_static("text")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -665,7 +677,9 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The note text content")),
+                                description: Some(
+                                    CowStr::new_static("The note text content"),
+                                ),
                                 max_length: Some(10000usize),
                                 ..Default::default()
                             }),
@@ -678,7 +692,9 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("urlContent"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Content structure for a URL card.")),
+                    description: Some(
+                        CowStr::new_static("Content structure for a URL card."),
+                    ),
                     required: Some(vec![SmolStr::new_static("url")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -693,7 +709,9 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URL being saved")),
+                                description: Some(
+                                    CowStr::new_static("The URL being saved"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -713,32 +731,38 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Author of the content")),
+                                description: Some(
+                                    CowStr::new_static("Author of the content"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Description of the page")),
+                                description: Some(
+                                    CowStr::new_static("Description of the page"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("doi"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Digital Object Identifier (DOI) for academic content",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Digital Object Identifier (DOI) for academic content",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("imageUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URL of a representative image",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("URL of a representative image"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -746,18 +770,20 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("isbn"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "International Standard Book Number (ISBN) for books",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "International Standard Book Number (ISBN) for books",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("publishedDate"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the content was published",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When the content was published"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -765,9 +791,9 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("retrievedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the metadata was retrieved",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When the metadata was retrieved"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -789,9 +815,11 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Type of content (e.g., 'video', 'article')",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Type of content (e.g., 'video', 'article')",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -808,7 +836,7 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
 
 pub mod url_content_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -839,21 +867,28 @@ pub mod url_content_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UrlContentBuilder<S: BosStr, St: url_content_state::State> {
+pub struct UrlContentBuilder<St: url_content_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<card::UrlMetadata<S>>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UrlContent<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UrlContentBuilder<S, url_content_state::Empty> {
+impl UrlContent<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UrlContentBuilder<url_content_state::Empty, DefaultStr> {
         UrlContentBuilder::new()
     }
 }
 
-impl<S: BosStr> UrlContentBuilder<S, url_content_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UrlContent<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UrlContentBuilder<url_content_state::Empty, S> {
+        UrlContentBuilder::builder()
+    }
+}
+
+impl UrlContentBuilder<url_content_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UrlContentBuilder {
             _state: PhantomData,
@@ -863,7 +898,18 @@ impl<S: BosStr> UrlContentBuilder<S, url_content_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: url_content_state::State> UrlContentBuilder<S, St> {
+impl<S: BosStr> UrlContentBuilder<url_content_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UrlContentBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: url_content_state::State, S: BosStr> UrlContentBuilder<St, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<card::UrlMetadata<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -876,7 +922,7 @@ impl<S: BosStr, St: url_content_state::State> UrlContentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> UrlContentBuilder<S, St>
+impl<St, S: BosStr> UrlContentBuilder<St, S>
 where
     St: url_content_state::State,
     St::Url: url_content_state::IsUnset,
@@ -885,7 +931,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> UrlContentBuilder<S, url_content_state::SetUrl<St>> {
+    ) -> UrlContentBuilder<url_content_state::SetUrl<St>, S> {
         self._fields.1 = Option::Some(value.into());
         UrlContentBuilder {
             _state: PhantomData,
@@ -895,7 +941,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UrlContentBuilder<S, St>
+impl<St, S: BosStr> UrlContentBuilder<St, S>
 where
     St: url_content_state::State,
     St::Url: url_content_state::IsSet,
@@ -909,7 +955,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UrlContent<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UrlContent<S> {
         UrlContent {
             metadata: self._fields.0,
             url: self._fields.1.unwrap(),

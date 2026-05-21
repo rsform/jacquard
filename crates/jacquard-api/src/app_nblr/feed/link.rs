@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Record linking a resource to a collection.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -107,7 +107,7 @@ impl<S: BosStr> LexiconSchema for Link<S> {
 
 pub mod link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -116,69 +116,76 @@ pub mod link_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Collection;
-        type Uri;
         type CreatedAt;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Collection = Unset;
-        type Uri = Unset;
         type CreatedAt = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
         type Collection = Set<members::collection>;
+        type CreatedAt = St::CreatedAt;
         type Uri = St::Uri;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Collection = St::Collection;
-        type Uri = Set<members::uri>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type Collection = St::Collection;
-        type Uri = St::Uri;
         type CreatedAt = Set<members::created_at>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Collection = St::Collection;
+        type CreatedAt = St::CreatedAt;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `collection` field
         pub struct collection(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LinkBuilder<S: BosStr, St: link_state::State> {
+pub struct LinkBuilder<St: link_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Datetime>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Link<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LinkBuilder<S, link_state::Empty> {
+impl Link<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LinkBuilder<link_state::Empty, DefaultStr> {
         LinkBuilder::new()
     }
 }
 
-impl<S: BosStr> LinkBuilder<S, link_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Link<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LinkBuilder<link_state::Empty, S> {
+        LinkBuilder::builder()
+    }
+}
+
+impl LinkBuilder<link_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LinkBuilder {
             _state: PhantomData,
@@ -188,7 +195,18 @@ impl<S: BosStr> LinkBuilder<S, link_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LinkBuilder<S, St>
+impl<S: BosStr> LinkBuilder<link_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LinkBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LinkBuilder<St, S>
 where
     St: link_state::State,
     St::Collection: link_state::IsUnset,
@@ -197,7 +215,7 @@ where
     pub fn collection(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> LinkBuilder<S, link_state::SetCollection<St>> {
+    ) -> LinkBuilder<link_state::SetCollection<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LinkBuilder {
             _state: PhantomData,
@@ -207,7 +225,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LinkBuilder<S, St>
+impl<St, S: BosStr> LinkBuilder<St, S>
 where
     St: link_state::State,
     St::CreatedAt: link_state::IsUnset,
@@ -216,7 +234,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LinkBuilder<S, link_state::SetCreatedAt<St>> {
+    ) -> LinkBuilder<link_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LinkBuilder {
             _state: PhantomData,
@@ -226,13 +244,16 @@ where
     }
 }
 
-impl<S: BosStr, St> LinkBuilder<S, St>
+impl<St, S: BosStr> LinkBuilder<St, S>
 where
     St: link_state::State,
     St::Uri: link_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(mut self, value: impl Into<UriValue<S>>) -> LinkBuilder<S, link_state::SetUri<St>> {
+    pub fn uri(
+        mut self,
+        value: impl Into<UriValue<S>>,
+    ) -> LinkBuilder<link_state::SetUri<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LinkBuilder {
             _state: PhantomData,
@@ -242,12 +263,12 @@ where
     }
 }
 
-impl<S: BosStr, St> LinkBuilder<S, St>
+impl<St, S: BosStr> LinkBuilder<St, S>
 where
     St: link_state::State,
     St::Collection: link_state::IsSet,
-    St::Uri: link_state::IsSet,
     St::CreatedAt: link_state::IsSet,
+    St::Uri: link_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Link<S> {
@@ -270,10 +291,10 @@ where
 }
 
 fn lexicon_doc_app_nblr_feed_link() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.nblr.feed.link"),
@@ -282,25 +303,29 @@ fn lexicon_doc_app_nblr_feed_link() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Record linking a resource to a collection.",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Record linking a resource to a collection."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("uri"),
-                            SmolStr::new_static("collection"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("uri"),
+                                SmolStr::new_static("collection"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("collection"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The AT URI of the collection being linked to",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The AT URI of the collection being linked to",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -315,9 +340,11 @@ fn lexicon_doc_app_nblr_feed_link() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("uri"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The URI of the linked resource; a web URL or AT URI",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The URI of the linked resource; a web URL or AT URI",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),

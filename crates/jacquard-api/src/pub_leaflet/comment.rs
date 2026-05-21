@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,18 +24,15 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::pub_leaflet::comment;
-use crate::pub_leaflet::pages::linear_document::Quote;
-use crate::pub_leaflet::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::pub_leaflet::pages::linear_document::Quote;
+use crate::pub_leaflet::richtext::facet::Facet;
+use crate::pub_leaflet::comment;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LinearDocumentQuote<S: BosStr = DefaultStr> {
     pub document: AtUri<S>,
     pub quote: Quote<S>,
@@ -79,11 +76,9 @@ pub struct CommentGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Comment<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReplyRef<S: BosStr = DefaultStr> {
     pub parent: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -170,7 +165,7 @@ impl<S: BosStr> LexiconSchema for ReplyRef<S> {
 
 pub mod linear_document_quote_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -178,56 +173,72 @@ pub mod linear_document_quote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Quote;
         type Document;
+        type Quote;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Quote = Unset;
         type Document = Unset;
-    }
-    ///State transition - sets the `quote` field to Set
-    pub struct SetQuote<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetQuote<St> {}
-    impl<St: State> State for SetQuote<St> {
-        type Quote = Set<members::quote>;
-        type Document = St::Document;
+        type Quote = Unset;
     }
     ///State transition - sets the `document` field to Set
     pub struct SetDocument<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDocument<St> {}
     impl<St: State> State for SetDocument<St> {
-        type Quote = St::Quote;
         type Document = Set<members::document>;
+        type Quote = St::Quote;
+    }
+    ///State transition - sets the `quote` field to Set
+    pub struct SetQuote<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuote<St> {}
+    impl<St: State> State for SetQuote<St> {
+        type Document = St::Document;
+        type Quote = Set<members::quote>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quote` field
-        pub struct quote(());
         ///Marker type for the `document` field
         pub struct document(());
+        ///Marker type for the `quote` field
+        pub struct quote(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LinearDocumentQuoteBuilder<S: BosStr, St: linear_document_quote_state::State> {
+pub struct LinearDocumentQuoteBuilder<
+    St: linear_document_quote_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Quote<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LinearDocumentQuote<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LinearDocumentQuoteBuilder<S, linear_document_quote_state::Empty> {
+impl LinearDocumentQuote<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LinearDocumentQuoteBuilder<
+        linear_document_quote_state::Empty,
+        DefaultStr,
+    > {
         LinearDocumentQuoteBuilder::new()
     }
 }
 
-impl<S: BosStr> LinearDocumentQuoteBuilder<S, linear_document_quote_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LinearDocumentQuote<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LinearDocumentQuoteBuilder<
+        linear_document_quote_state::Empty,
+        S,
+    > {
+        LinearDocumentQuoteBuilder::builder()
+    }
+}
+
+impl LinearDocumentQuoteBuilder<linear_document_quote_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LinearDocumentQuoteBuilder {
             _state: PhantomData,
@@ -237,7 +248,18 @@ impl<S: BosStr> LinearDocumentQuoteBuilder<S, linear_document_quote_state::Empty
     }
 }
 
-impl<S: BosStr, St> LinearDocumentQuoteBuilder<S, St>
+impl<S: BosStr> LinearDocumentQuoteBuilder<linear_document_quote_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LinearDocumentQuoteBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LinearDocumentQuoteBuilder<St, S>
 where
     St: linear_document_quote_state::State,
     St::Document: linear_document_quote_state::IsUnset,
@@ -246,7 +268,7 @@ where
     pub fn document(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> LinearDocumentQuoteBuilder<S, linear_document_quote_state::SetDocument<St>> {
+    ) -> LinearDocumentQuoteBuilder<linear_document_quote_state::SetDocument<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LinearDocumentQuoteBuilder {
             _state: PhantomData,
@@ -256,7 +278,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LinearDocumentQuoteBuilder<S, St>
+impl<St, S: BosStr> LinearDocumentQuoteBuilder<St, S>
 where
     St: linear_document_quote_state::State,
     St::Quote: linear_document_quote_state::IsUnset,
@@ -265,7 +287,7 @@ where
     pub fn quote(
         mut self,
         value: impl Into<Quote<S>>,
-    ) -> LinearDocumentQuoteBuilder<S, linear_document_quote_state::SetQuote<St>> {
+    ) -> LinearDocumentQuoteBuilder<linear_document_quote_state::SetQuote<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LinearDocumentQuoteBuilder {
             _state: PhantomData,
@@ -275,11 +297,11 @@ where
     }
 }
 
-impl<S: BosStr, St> LinearDocumentQuoteBuilder<S, St>
+impl<St, S: BosStr> LinearDocumentQuoteBuilder<St, S>
 where
     St: linear_document_quote_state::State,
-    St::Quote: linear_document_quote_state::IsSet,
     St::Document: linear_document_quote_state::IsSet,
+    St::Quote: linear_document_quote_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LinearDocumentQuote<S> {
@@ -290,7 +312,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LinearDocumentQuote<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LinearDocumentQuote<S> {
         LinearDocumentQuote {
             document: self._fields.0.unwrap(),
             quote: self._fields.1.unwrap(),
@@ -300,10 +325,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_comment() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.comment"),
@@ -312,10 +337,11 @@ fn lexicon_doc_pub_leaflet_comment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("linearDocumentQuote"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("document"),
-                        SmolStr::new_static("quote"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("document"), SmolStr::new_static("quote")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -329,7 +355,9 @@ fn lexicon_doc_pub_leaflet_comment() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("quote"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("pub.leaflet.pages.linearDocument#quote"),
+                                r#ref: CowStr::new_static(
+                                    "pub.leaflet.pages.linearDocument#quote",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -344,11 +372,13 @@ fn lexicon_doc_pub_leaflet_comment() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("Record containing a comment")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("plaintext"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("subject"),
+                                SmolStr::new_static("plaintext"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -436,7 +466,7 @@ fn lexicon_doc_pub_leaflet_comment() -> LexiconDoc<'static> {
 
 pub mod comment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -445,55 +475,55 @@ pub mod comment_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Plaintext;
         type Subject;
+        type Plaintext;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Plaintext = Unset;
         type Subject = Unset;
+        type Plaintext = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Subject = St::Subject;
         type Plaintext = St::Plaintext;
-        type Subject = St::Subject;
-    }
-    ///State transition - sets the `plaintext` field to Set
-    pub struct SetPlaintext<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlaintext<St> {}
-    impl<St: State> State for SetPlaintext<St> {
-        type CreatedAt = St::CreatedAt;
-        type Plaintext = Set<members::plaintext>;
-        type Subject = St::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
         type CreatedAt = St::CreatedAt;
-        type Plaintext = St::Plaintext;
         type Subject = Set<members::subject>;
+        type Plaintext = St::Plaintext;
+    }
+    ///State transition - sets the `plaintext` field to Set
+    pub struct SetPlaintext<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlaintext<St> {}
+    impl<St: State> State for SetPlaintext<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subject = St::Subject;
+        type Plaintext = Set<members::plaintext>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `plaintext` field
-        pub struct plaintext(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `plaintext` field
+        pub struct plaintext(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CommentBuilder<S: BosStr, St: comment_state::State> {
+pub struct CommentBuilder<St: comment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<comment::LinearDocumentQuote<S>>,
@@ -507,15 +537,22 @@ pub struct CommentBuilder<S: BosStr, St: comment_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Comment<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CommentBuilder<S, comment_state::Empty> {
+impl Comment<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CommentBuilder<comment_state::Empty, DefaultStr> {
         CommentBuilder::new()
     }
 }
 
-impl<S: BosStr> CommentBuilder<S, comment_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Comment<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CommentBuilder<comment_state::Empty, S> {
+        CommentBuilder::builder()
+    }
+}
+
+impl CommentBuilder<comment_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CommentBuilder {
             _state: PhantomData,
@@ -525,20 +562,37 @@ impl<S: BosStr> CommentBuilder<S, comment_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: comment_state::State> CommentBuilder<S, St> {
+impl<S: BosStr> CommentBuilder<comment_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CommentBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: comment_state::State, S: BosStr> CommentBuilder<St, S> {
     /// Set the `attachment` field (optional)
-    pub fn attachment(mut self, value: impl Into<Option<comment::LinearDocumentQuote<S>>>) -> Self {
+    pub fn attachment(
+        mut self,
+        value: impl Into<Option<comment::LinearDocumentQuote<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `attachment` field to an Option value (optional)
-    pub fn maybe_attachment(mut self, value: Option<comment::LinearDocumentQuote<S>>) -> Self {
+    pub fn maybe_attachment(
+        mut self,
+        value: Option<comment::LinearDocumentQuote<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::CreatedAt: comment_state::IsUnset,
@@ -547,7 +601,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CommentBuilder<S, comment_state::SetCreatedAt<St>> {
+    ) -> CommentBuilder<comment_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
@@ -557,7 +611,7 @@ where
     }
 }
 
-impl<S: BosStr, St: comment_state::State> CommentBuilder<S, St> {
+impl<St: comment_state::State, S: BosStr> CommentBuilder<St, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.2 = value.into();
@@ -570,7 +624,7 @@ impl<S: BosStr, St: comment_state::State> CommentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: comment_state::State> CommentBuilder<S, St> {
+impl<St: comment_state::State, S: BosStr> CommentBuilder<St, S> {
     /// Set the `onPage` field (optional)
     pub fn on_page(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -583,7 +637,7 @@ impl<S: BosStr, St: comment_state::State> CommentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::Plaintext: comment_state::IsUnset,
@@ -592,7 +646,7 @@ where
     pub fn plaintext(
         mut self,
         value: impl Into<S>,
-    ) -> CommentBuilder<S, comment_state::SetPlaintext<St>> {
+    ) -> CommentBuilder<comment_state::SetPlaintext<St>, S> {
         self._fields.4 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
@@ -602,7 +656,7 @@ where
     }
 }
 
-impl<S: BosStr, St: comment_state::State> CommentBuilder<S, St> {
+impl<St: comment_state::State, S: BosStr> CommentBuilder<St, S> {
     /// Set the `reply` field (optional)
     pub fn reply(mut self, value: impl Into<Option<comment::ReplyRef<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -615,7 +669,7 @@ impl<S: BosStr, St: comment_state::State> CommentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::Subject: comment_state::IsUnset,
@@ -624,7 +678,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> CommentBuilder<S, comment_state::SetSubject<St>> {
+    ) -> CommentBuilder<comment_state::SetSubject<St>, S> {
         self._fields.6 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
@@ -634,12 +688,12 @@ where
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::CreatedAt: comment_state::IsSet,
-    St::Plaintext: comment_state::IsSet,
     St::Subject: comment_state::IsSet,
+    St::Plaintext: comment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Comment<S> {
@@ -671,7 +725,7 @@ where
 
 pub mod reply_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -702,21 +756,28 @@ pub mod reply_ref_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReplyRefBuilder<S: BosStr, St: reply_ref_state::State> {
+pub struct ReplyRefBuilder<St: reply_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ReplyRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ReplyRefBuilder<S, reply_ref_state::Empty> {
+impl ReplyRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReplyRefBuilder<reply_ref_state::Empty, DefaultStr> {
         ReplyRefBuilder::new()
     }
 }
 
-impl<S: BosStr> ReplyRefBuilder<S, reply_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ReplyRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReplyRefBuilder<reply_ref_state::Empty, S> {
+        ReplyRefBuilder::builder()
+    }
+}
+
+impl ReplyRefBuilder<reply_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ReplyRefBuilder {
             _state: PhantomData,
@@ -726,7 +787,18 @@ impl<S: BosStr> ReplyRefBuilder<S, reply_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ReplyRefBuilder<S, St>
+impl<S: BosStr> ReplyRefBuilder<reply_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReplyRefBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReplyRefBuilder<St, S>
 where
     St: reply_ref_state::State,
     St::Parent: reply_ref_state::IsUnset,
@@ -735,7 +807,7 @@ where
     pub fn parent(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ReplyRefBuilder<S, reply_ref_state::SetParent<St>> {
+    ) -> ReplyRefBuilder<reply_ref_state::SetParent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ReplyRefBuilder {
             _state: PhantomData,
@@ -745,7 +817,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReplyRefBuilder<S, St>
+impl<St, S: BosStr> ReplyRefBuilder<St, S>
 where
     St: reply_ref_state::State,
     St::Parent: reply_ref_state::IsSet,

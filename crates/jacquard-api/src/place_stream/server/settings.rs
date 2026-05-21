@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Record containing user settings for a particular Streamplace node
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -105,7 +105,7 @@ impl<S: BosStr> LexiconSchema for Settings<S> {
 
 pub mod settings_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -123,21 +123,28 @@ pub mod settings_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SettingsBuilder<S: BosStr, St: settings_state::State> {
+pub struct SettingsBuilder<St: settings_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Settings<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SettingsBuilder<S, settings_state::Empty> {
+impl Settings<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SettingsBuilder<settings_state::Empty, DefaultStr> {
         SettingsBuilder::new()
     }
 }
 
-impl<S: BosStr> SettingsBuilder<S, settings_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Settings<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SettingsBuilder<settings_state::Empty, S> {
+        SettingsBuilder::builder()
+    }
+}
+
+impl SettingsBuilder<settings_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SettingsBuilder {
             _state: PhantomData,
@@ -147,7 +154,18 @@ impl<S: BosStr> SettingsBuilder<S, settings_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
+impl<S: BosStr> SettingsBuilder<settings_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SettingsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `debugRecording` field (optional)
     pub fn debug_recording(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -160,7 +178,7 @@ impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SettingsBuilder<S, St>
+impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
 {
@@ -181,10 +199,10 @@ where
 }
 
 fn lexicon_doc_place_stream_server_settings() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.server.settings"),
@@ -193,9 +211,11 @@ fn lexicon_doc_place_stream_server_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Record containing user settings for a particular Streamplace node",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Record containing user settings for a particular Streamplace node",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
                         properties: {

@@ -107,13 +107,13 @@ fn generate_required_setter(
     };
 
     let s_param = if has_type_param {
-        quote! { S: #bosstr_path, }
+        quote! {, S: #bosstr_path }
     } else {
         quote! {}
     };
 
     let s_arg = if has_type_param {
-        quote! { S, }
+        quote! {, S }
     } else {
         quote! {}
     };
@@ -133,7 +133,7 @@ fn generate_required_setter(
     let doc = format!(" Set the `{}` field (required)", field_name);
 
     quote! {
-        impl<#lifetime_param #s_param St> #builder_name<#lifetime_param #s_arg St>
+        impl<#lifetime_param St #s_param> #builder_name<#lifetime_param St #s_arg>
         where
             St: #state_mod_name::State,
             St::#field_pascal: #state_mod_name::IsUnset,
@@ -142,7 +142,7 @@ fn generate_required_setter(
             pub fn #field_snake(
                 mut self,
                 value: impl Into<#rust_type>,
-            ) -> #builder_name<#lifetime_param #s_arg #state_mod_name::#transition_type<St>> {
+            ) -> #builder_name<#lifetime_param #state_mod_name::#transition_type<St> #s_arg> {
                 self._fields.#index = #option_some(value.into());
                 #builder_name {
                     _state: #phantom,
@@ -185,13 +185,13 @@ fn generate_optional_setter(
     };
 
     let s_param = if has_type_param {
-        quote! { S: #bosstr_path, }
+        quote! {S: #bosstr_path}
     } else {
         quote! {}
     };
 
     let s_arg = if has_type_param {
-        quote! { S, }
+        quote! {, S }
     } else {
         quote! {}
     };
@@ -203,7 +203,7 @@ fn generate_optional_setter(
     );
 
     quote! {
-        impl<#lifetime_param #s_param St: #state_mod_name::State> #builder_name<#lifetime_param #s_arg St> {
+        impl<#lifetime_param St: #state_mod_name::State, #s_param> #builder_name<#lifetime_param St #s_arg> {
             #[doc = #doc_field]
             pub fn #field_snake(mut self, value: impl Into<Option<#rust_type>>) -> Self {
                 self._fields.#index = value.into();

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,17 +21,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::ooo_bsky::authfetch::list_records;
-use crate::ooo_bsky::authfetch::strategy::Strategy;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::ooo_bsky::authfetch::strategy::Strategy;
+use crate::ooo_bsky::authfetch::list_records;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListRecords<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -44,11 +41,9 @@ pub struct ListRecords<S: BosStr = DefaultStr> {
     pub reverse: Option<bool>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListRecordsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -60,10 +55,7 @@ pub struct ListRecordsOutput<S: BosStr = DefaultStr> {
 /// A record in the hidden repository.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Record<S: BosStr = DefaultStr> {
     ///The strategy used to authenticate fetch requests for this record.
     pub strategy: Strategy<S>,
@@ -120,7 +112,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_records_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -151,21 +143,28 @@ pub mod list_records_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListRecordsBuilder<S: BosStr, St: list_records_state::State> {
+pub struct ListRecordsBuilder<St: list_records_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Nsid<S>>, Option<S>, Option<i64>, Option<bool>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListRecords<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListRecordsBuilder<S, list_records_state::Empty> {
+impl ListRecords<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListRecordsBuilder<list_records_state::Empty, DefaultStr> {
         ListRecordsBuilder::new()
     }
 }
 
-impl<S: BosStr> ListRecordsBuilder<S, list_records_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListRecords<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListRecordsBuilder<list_records_state::Empty, S> {
+        ListRecordsBuilder::builder()
+    }
+}
+
+impl ListRecordsBuilder<list_records_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListRecordsBuilder {
             _state: PhantomData,
@@ -175,7 +174,18 @@ impl<S: BosStr> ListRecordsBuilder<S, list_records_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ListRecordsBuilder<S, St>
+impl<S: BosStr> ListRecordsBuilder<list_records_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListRecordsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ListRecordsBuilder<St, S>
 where
     St: list_records_state::State,
     St::Collection: list_records_state::IsUnset,
@@ -184,7 +194,7 @@ where
     pub fn collection(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> ListRecordsBuilder<S, list_records_state::SetCollection<St>> {
+    ) -> ListRecordsBuilder<list_records_state::SetCollection<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ListRecordsBuilder {
             _state: PhantomData,
@@ -194,7 +204,7 @@ where
     }
 }
 
-impl<S: BosStr, St: list_records_state::State> ListRecordsBuilder<S, St> {
+impl<St: list_records_state::State, S: BosStr> ListRecordsBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -207,7 +217,7 @@ impl<S: BosStr, St: list_records_state::State> ListRecordsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: list_records_state::State> ListRecordsBuilder<S, St> {
+impl<St: list_records_state::State, S: BosStr> ListRecordsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -220,7 +230,7 @@ impl<S: BosStr, St: list_records_state::State> ListRecordsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: list_records_state::State> ListRecordsBuilder<S, St> {
+impl<St: list_records_state::State, S: BosStr> ListRecordsBuilder<St, S> {
     /// Set the `reverse` field (optional)
     pub fn reverse(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -233,7 +243,7 @@ impl<S: BosStr, St: list_records_state::State> ListRecordsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListRecordsBuilder<S, St>
+impl<St, S: BosStr> ListRecordsBuilder<St, S>
 where
     St: list_records_state::State,
     St::Collection: list_records_state::IsSet,
@@ -251,7 +261,7 @@ where
 
 pub mod record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -308,21 +318,28 @@ pub mod record_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RecordBuilder<S: BosStr, St: record_state::State> {
+pub struct RecordBuilder<St: record_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Strategy<S>>, Option<AtUri<S>>, Option<Data<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Record<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RecordBuilder<S, record_state::Empty> {
+impl Record<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RecordBuilder<record_state::Empty, DefaultStr> {
         RecordBuilder::new()
     }
 }
 
-impl<S: BosStr> RecordBuilder<S, record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Record<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RecordBuilder<record_state::Empty, S> {
+        RecordBuilder::builder()
+    }
+}
+
+impl RecordBuilder<record_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RecordBuilder {
             _state: PhantomData,
@@ -332,7 +349,18 @@ impl<S: BosStr> RecordBuilder<S, record_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RecordBuilder<S, St>
+impl<S: BosStr> RecordBuilder<record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RecordBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RecordBuilder<St, S>
 where
     St: record_state::State,
     St::Strategy: record_state::IsUnset,
@@ -341,7 +369,7 @@ where
     pub fn strategy(
         mut self,
         value: impl Into<Strategy<S>>,
-    ) -> RecordBuilder<S, record_state::SetStrategy<St>> {
+    ) -> RecordBuilder<record_state::SetStrategy<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RecordBuilder {
             _state: PhantomData,
@@ -351,13 +379,16 @@ where
     }
 }
 
-impl<S: BosStr, St> RecordBuilder<S, St>
+impl<St, S: BosStr> RecordBuilder<St, S>
 where
     St: record_state::State,
     St::Uri: record_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(mut self, value: impl Into<AtUri<S>>) -> RecordBuilder<S, record_state::SetUri<St>> {
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> RecordBuilder<record_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RecordBuilder {
             _state: PhantomData,
@@ -367,7 +398,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RecordBuilder<S, St>
+impl<St, S: BosStr> RecordBuilder<St, S>
 where
     St: record_state::State,
     St::Value: record_state::IsUnset,
@@ -376,7 +407,7 @@ where
     pub fn value(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> RecordBuilder<S, record_state::SetValue<St>> {
+    ) -> RecordBuilder<record_state::SetValue<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RecordBuilder {
             _state: PhantomData,
@@ -386,7 +417,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RecordBuilder<S, St>
+impl<St, S: BosStr> RecordBuilder<St, S>
 where
     St: record_state::State,
     St::Value: record_state::IsSet,
@@ -414,10 +445,10 @@ where
 }
 
 fn lexicon_doc_ooo_bsky_authfetch_listRecords() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ooo.bsky.authfetch.listRecords"),
@@ -426,55 +457,60 @@ fn lexicon_doc_ooo_bsky_authfetch_listRecords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("collection")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("collection"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The NSID of the record collection.",
-                                    )),
-                                    format: Some(LexStringFormat::Nsid),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("reverse"),
-                                LexXrpcParametersProperty::Boolean(LexBoolean {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("collection")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("collection"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("The NSID of the record collection."),
+                                        ),
+                                        format: Some(LexStringFormat::Nsid),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("reverse"),
+                                    LexXrpcParametersProperty::Boolean(LexBoolean {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("record"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A record in the hidden repository.")),
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("strategy"),
-                        SmolStr::new_static("value"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A record in the hidden repository."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("strategy"),
+                            SmolStr::new_static("value")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -488,7 +524,9 @@ fn lexicon_doc_ooo_bsky_authfetch_listRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The AT URI of the record.")),
+                                description: Some(
+                                    CowStr::new_static("The AT URI of the record."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),

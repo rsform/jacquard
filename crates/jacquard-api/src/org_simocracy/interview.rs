@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::org_simocracy::interview;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::org_simocracy::interview;
 /// An interview transcript for a sim — captures voice answers and value positions to derive the sim's constitution and speaking style.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -65,10 +65,7 @@ pub struct InterviewGetRecordOutput<S: BosStr = DefaultStr> {
 /// A single open-ended interview answer.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct OpenAnswer<S: BosStr = DefaultStr> {
     ///The transcribed voice answer
     pub answer: S,
@@ -81,10 +78,7 @@ pub struct OpenAnswer<S: BosStr = DefaultStr> {
 /// A yes/no response to a value statement.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ValueResponse<S: BosStr = DefaultStr> {
     ///Whether the interviewee agreed (true) or disagreed (false)
     pub answer: bool,
@@ -220,7 +214,7 @@ impl<S: BosStr> LexiconSchema for ValueResponse<S> {
 
 pub mod interview_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -228,72 +222,72 @@ pub mod interview_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Sim;
         type YesNoAnswers;
-        type CreatedAt;
         type OpenAnswers;
+        type Sim;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Sim = Unset;
         type YesNoAnswers = Unset;
-        type CreatedAt = Unset;
         type OpenAnswers = Unset;
-    }
-    ///State transition - sets the `sim` field to Set
-    pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSim<St> {}
-    impl<St: State> State for SetSim<St> {
-        type Sim = Set<members::sim>;
-        type YesNoAnswers = St::YesNoAnswers;
-        type CreatedAt = St::CreatedAt;
-        type OpenAnswers = St::OpenAnswers;
+        type Sim = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `yes_no_answers` field to Set
     pub struct SetYesNoAnswers<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetYesNoAnswers<St> {}
     impl<St: State> State for SetYesNoAnswers<St> {
-        type Sim = St::Sim;
         type YesNoAnswers = Set<members::yes_no_answers>;
-        type CreatedAt = St::CreatedAt;
         type OpenAnswers = St::OpenAnswers;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
         type Sim = St::Sim;
-        type YesNoAnswers = St::YesNoAnswers;
-        type CreatedAt = Set<members::created_at>;
-        type OpenAnswers = St::OpenAnswers;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `open_answers` field to Set
     pub struct SetOpenAnswers<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOpenAnswers<St> {}
     impl<St: State> State for SetOpenAnswers<St> {
-        type Sim = St::Sim;
         type YesNoAnswers = St::YesNoAnswers;
-        type CreatedAt = St::CreatedAt;
         type OpenAnswers = Set<members::open_answers>;
+        type Sim = St::Sim;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `sim` field to Set
+    pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSim<St> {}
+    impl<St: State> State for SetSim<St> {
+        type YesNoAnswers = St::YesNoAnswers;
+        type OpenAnswers = St::OpenAnswers;
+        type Sim = Set<members::sim>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type YesNoAnswers = St::YesNoAnswers;
+        type OpenAnswers = St::OpenAnswers;
+        type Sim = St::Sim;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sim` field
-        pub struct sim(());
         ///Marker type for the `yes_no_answers` field
         pub struct yes_no_answers(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `open_answers` field
         pub struct open_answers(());
+        ///Marker type for the `sim` field
+        pub struct sim(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct InterviewBuilder<S: BosStr, St: interview_state::State> {
+pub struct InterviewBuilder<St: interview_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -304,15 +298,22 @@ pub struct InterviewBuilder<S: BosStr, St: interview_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Interview<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> InterviewBuilder<S, interview_state::Empty> {
+impl Interview<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> InterviewBuilder<interview_state::Empty, DefaultStr> {
         InterviewBuilder::new()
     }
 }
 
-impl<S: BosStr> InterviewBuilder<S, interview_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Interview<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> InterviewBuilder<interview_state::Empty, S> {
+        InterviewBuilder::builder()
+    }
+}
+
+impl InterviewBuilder<interview_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         InterviewBuilder {
             _state: PhantomData,
@@ -322,7 +323,18 @@ impl<S: BosStr> InterviewBuilder<S, interview_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> InterviewBuilder<S, St>
+impl<S: BosStr> InterviewBuilder<interview_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        InterviewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> InterviewBuilder<St, S>
 where
     St: interview_state::State,
     St::CreatedAt: interview_state::IsUnset,
@@ -331,7 +343,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> InterviewBuilder<S, interview_state::SetCreatedAt<St>> {
+    ) -> InterviewBuilder<interview_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         InterviewBuilder {
             _state: PhantomData,
@@ -341,7 +353,7 @@ where
     }
 }
 
-impl<S: BosStr, St> InterviewBuilder<S, St>
+impl<St, S: BosStr> InterviewBuilder<St, S>
 where
     St: interview_state::State,
     St::OpenAnswers: interview_state::IsUnset,
@@ -350,7 +362,7 @@ where
     pub fn open_answers(
         mut self,
         value: impl Into<Vec<interview::OpenAnswer<S>>>,
-    ) -> InterviewBuilder<S, interview_state::SetOpenAnswers<St>> {
+    ) -> InterviewBuilder<interview_state::SetOpenAnswers<St>, S> {
         self._fields.1 = Option::Some(value.into());
         InterviewBuilder {
             _state: PhantomData,
@@ -360,7 +372,7 @@ where
     }
 }
 
-impl<S: BosStr, St> InterviewBuilder<S, St>
+impl<St, S: BosStr> InterviewBuilder<St, S>
 where
     St: interview_state::State,
     St::Sim: interview_state::IsUnset,
@@ -369,7 +381,7 @@ where
     pub fn sim(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> InterviewBuilder<S, interview_state::SetSim<St>> {
+    ) -> InterviewBuilder<interview_state::SetSim<St>, S> {
         self._fields.2 = Option::Some(value.into());
         InterviewBuilder {
             _state: PhantomData,
@@ -379,7 +391,7 @@ where
     }
 }
 
-impl<S: BosStr, St> InterviewBuilder<S, St>
+impl<St, S: BosStr> InterviewBuilder<St, S>
 where
     St: interview_state::State,
     St::YesNoAnswers: interview_state::IsUnset,
@@ -388,7 +400,7 @@ where
     pub fn yes_no_answers(
         mut self,
         value: impl Into<Vec<interview::ValueResponse<S>>>,
-    ) -> InterviewBuilder<S, interview_state::SetYesNoAnswers<St>> {
+    ) -> InterviewBuilder<interview_state::SetYesNoAnswers<St>, S> {
         self._fields.3 = Option::Some(value.into());
         InterviewBuilder {
             _state: PhantomData,
@@ -398,13 +410,13 @@ where
     }
 }
 
-impl<S: BosStr, St> InterviewBuilder<S, St>
+impl<St, S: BosStr> InterviewBuilder<St, S>
 where
     St: interview_state::State,
-    St::Sim: interview_state::IsSet,
     St::YesNoAnswers: interview_state::IsSet,
-    St::CreatedAt: interview_state::IsSet,
     St::OpenAnswers: interview_state::IsSet,
+    St::Sim: interview_state::IsSet,
+    St::CreatedAt: interview_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Interview<S> {
@@ -417,7 +429,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Interview<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Interview<S> {
         Interview {
             created_at: self._fields.0.unwrap(),
             open_answers: self._fields.1.unwrap(),
@@ -429,10 +444,10 @@ where
 }
 
 fn lexicon_doc_org_simocracy_interview() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.simocracy.interview"),
@@ -516,20 +531,24 @@ fn lexicon_doc_org_simocracy_interview() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("openAnswer"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A single open-ended interview answer.")),
-                    required: Some(vec![
-                        SmolStr::new_static("question"),
-                        SmolStr::new_static("answer"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A single open-ended interview answer."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("question"),
+                            SmolStr::new_static("answer")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("answer"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The transcribed voice answer",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The transcribed voice answer"),
+                                ),
                                 max_length: Some(30000usize),
                                 max_graphemes: Some(3000usize),
                                 ..Default::default()
@@ -538,9 +557,9 @@ fn lexicon_doc_org_simocracy_interview() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("question"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The interview question that was asked",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The interview question that was asked"),
+                                ),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
@@ -553,13 +572,15 @@ fn lexicon_doc_org_simocracy_interview() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("valueResponse"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A yes/no response to a value statement.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("statement"),
-                        SmolStr::new_static("answer"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A yes/no response to a value statement."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("statement"),
+                            SmolStr::new_static("answer")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -572,9 +593,9 @@ fn lexicon_doc_org_simocracy_interview() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("statement"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The value statement presented",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The value statement presented"),
+                                ),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
@@ -592,7 +613,7 @@ fn lexicon_doc_org_simocracy_interview() -> LexiconDoc<'static> {
 
 pub mod value_response_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -635,21 +656,31 @@ pub mod value_response_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ValueResponseBuilder<S: BosStr, St: value_response_state::State> {
+pub struct ValueResponseBuilder<
+    St: value_response_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ValueResponse<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ValueResponseBuilder<S, value_response_state::Empty> {
+impl ValueResponse<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ValueResponseBuilder<value_response_state::Empty, DefaultStr> {
         ValueResponseBuilder::new()
     }
 }
 
-impl<S: BosStr> ValueResponseBuilder<S, value_response_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ValueResponse<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ValueResponseBuilder<value_response_state::Empty, S> {
+        ValueResponseBuilder::builder()
+    }
+}
+
+impl ValueResponseBuilder<value_response_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ValueResponseBuilder {
             _state: PhantomData,
@@ -659,7 +690,18 @@ impl<S: BosStr> ValueResponseBuilder<S, value_response_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ValueResponseBuilder<S, St>
+impl<S: BosStr> ValueResponseBuilder<value_response_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ValueResponseBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ValueResponseBuilder<St, S>
 where
     St: value_response_state::State,
     St::Answer: value_response_state::IsUnset,
@@ -668,7 +710,7 @@ where
     pub fn answer(
         mut self,
         value: impl Into<bool>,
-    ) -> ValueResponseBuilder<S, value_response_state::SetAnswer<St>> {
+    ) -> ValueResponseBuilder<value_response_state::SetAnswer<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ValueResponseBuilder {
             _state: PhantomData,
@@ -678,7 +720,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ValueResponseBuilder<S, St>
+impl<St, S: BosStr> ValueResponseBuilder<St, S>
 where
     St: value_response_state::State,
     St::Statement: value_response_state::IsUnset,
@@ -687,7 +729,7 @@ where
     pub fn statement(
         mut self,
         value: impl Into<S>,
-    ) -> ValueResponseBuilder<S, value_response_state::SetStatement<St>> {
+    ) -> ValueResponseBuilder<value_response_state::SetStatement<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ValueResponseBuilder {
             _state: PhantomData,
@@ -697,7 +739,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ValueResponseBuilder<S, St>
+impl<St, S: BosStr> ValueResponseBuilder<St, S>
 where
     St: value_response_state::State,
     St::Answer: value_response_state::IsSet,
@@ -712,7 +754,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ValueResponse<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ValueResponse<S> {
         ValueResponse {
             answer: self._fields.0.unwrap(),
             statement: self._fields.1.unwrap(),

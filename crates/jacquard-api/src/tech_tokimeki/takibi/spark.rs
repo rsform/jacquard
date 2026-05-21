@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A spark record - throwing a short message into the fire. Something you like or words that cheer you up.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -129,7 +129,7 @@ impl<S: BosStr> LexiconSchema for Spark<S> {
 
 pub mod spark_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -137,56 +137,63 @@ pub mod spark_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Text;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Text = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Text = St::Text;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetText<St> {}
     impl<St: State> State for SetText<St> {
-        type CreatedAt = St::CreatedAt;
         type Text = Set<members::text>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Text = St::Text;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SparkBuilder<S: BosStr, St: spark_state::State> {
+pub struct SparkBuilder<St: spark_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Spark<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SparkBuilder<S, spark_state::Empty> {
+impl Spark<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SparkBuilder<spark_state::Empty, DefaultStr> {
         SparkBuilder::new()
     }
 }
 
-impl<S: BosStr> SparkBuilder<S, spark_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Spark<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SparkBuilder<spark_state::Empty, S> {
+        SparkBuilder::builder()
+    }
+}
+
+impl SparkBuilder<spark_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SparkBuilder {
             _state: PhantomData,
@@ -196,7 +203,18 @@ impl<S: BosStr> SparkBuilder<S, spark_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SparkBuilder<S, St>
+impl<S: BosStr> SparkBuilder<spark_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SparkBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SparkBuilder<St, S>
 where
     St: spark_state::State,
     St::CreatedAt: spark_state::IsUnset,
@@ -205,7 +223,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SparkBuilder<S, spark_state::SetCreatedAt<St>> {
+    ) -> SparkBuilder<spark_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SparkBuilder {
             _state: PhantomData,
@@ -215,13 +233,16 @@ where
     }
 }
 
-impl<S: BosStr, St> SparkBuilder<S, St>
+impl<St, S: BosStr> SparkBuilder<St, S>
 where
     St: spark_state::State,
     St::Text: spark_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(mut self, value: impl Into<S>) -> SparkBuilder<S, spark_state::SetText<St>> {
+    pub fn text(
+        mut self,
+        value: impl Into<S>,
+    ) -> SparkBuilder<spark_state::SetText<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SparkBuilder {
             _state: PhantomData,
@@ -231,11 +252,11 @@ where
     }
 }
 
-impl<S: BosStr, St> SparkBuilder<S, St>
+impl<St, S: BosStr> SparkBuilder<St, S>
 where
     St: spark_state::State,
-    St::CreatedAt: spark_state::IsSet,
     St::Text: spark_state::IsSet,
+    St::CreatedAt: spark_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Spark<S> {
@@ -256,10 +277,10 @@ where
 }
 
 fn lexicon_doc_tech_tokimeki_takibi_spark() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tech.tokimeki.takibi.spark"),

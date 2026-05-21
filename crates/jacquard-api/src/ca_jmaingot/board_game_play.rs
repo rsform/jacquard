@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A single board game play
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -107,7 +107,7 @@ impl<S: BosStr> LexiconSchema for BoardGamePlay<S> {
 
 pub mod board_game_play_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -115,70 +115,80 @@ pub mod board_game_play_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PlayedAt;
         type Name;
         type BggId;
+        type PlayedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PlayedAt = Unset;
         type Name = Unset;
         type BggId = Unset;
-    }
-    ///State transition - sets the `played_at` field to Set
-    pub struct SetPlayedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlayedAt<St> {}
-    impl<St: State> State for SetPlayedAt<St> {
-        type PlayedAt = Set<members::played_at>;
-        type Name = St::Name;
-        type BggId = St::BggId;
+        type PlayedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type PlayedAt = St::PlayedAt;
         type Name = Set<members::name>;
         type BggId = St::BggId;
+        type PlayedAt = St::PlayedAt;
     }
     ///State transition - sets the `bgg_id` field to Set
     pub struct SetBggId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBggId<St> {}
     impl<St: State> State for SetBggId<St> {
-        type PlayedAt = St::PlayedAt;
         type Name = St::Name;
         type BggId = Set<members::bgg_id>;
+        type PlayedAt = St::PlayedAt;
+    }
+    ///State transition - sets the `played_at` field to Set
+    pub struct SetPlayedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlayedAt<St> {}
+    impl<St: State> State for SetPlayedAt<St> {
+        type Name = St::Name;
+        type BggId = St::BggId;
+        type PlayedAt = Set<members::played_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `played_at` field
-        pub struct played_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `bgg_id` field
         pub struct bgg_id(());
+        ///Marker type for the `played_at` field
+        pub struct played_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BoardGamePlayBuilder<S: BosStr, St: board_game_play_state::State> {
+pub struct BoardGamePlayBuilder<
+    St: board_game_play_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> BoardGamePlay<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BoardGamePlayBuilder<S, board_game_play_state::Empty> {
+impl BoardGamePlay<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BoardGamePlayBuilder<board_game_play_state::Empty, DefaultStr> {
         BoardGamePlayBuilder::new()
     }
 }
 
-impl<S: BosStr> BoardGamePlayBuilder<S, board_game_play_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> BoardGamePlay<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BoardGamePlayBuilder<board_game_play_state::Empty, S> {
+        BoardGamePlayBuilder::builder()
+    }
+}
+
+impl BoardGamePlayBuilder<board_game_play_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BoardGamePlayBuilder {
             _state: PhantomData,
@@ -188,7 +198,18 @@ impl<S: BosStr> BoardGamePlayBuilder<S, board_game_play_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BoardGamePlayBuilder<S, St>
+impl<S: BosStr> BoardGamePlayBuilder<board_game_play_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BoardGamePlayBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BoardGamePlayBuilder<St, S>
 where
     St: board_game_play_state::State,
     St::BggId: board_game_play_state::IsUnset,
@@ -197,7 +218,7 @@ where
     pub fn bgg_id(
         mut self,
         value: impl Into<S>,
-    ) -> BoardGamePlayBuilder<S, board_game_play_state::SetBggId<St>> {
+    ) -> BoardGamePlayBuilder<board_game_play_state::SetBggId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BoardGamePlayBuilder {
             _state: PhantomData,
@@ -207,7 +228,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BoardGamePlayBuilder<S, St>
+impl<St, S: BosStr> BoardGamePlayBuilder<St, S>
 where
     St: board_game_play_state::State,
     St::Name: board_game_play_state::IsUnset,
@@ -216,7 +237,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> BoardGamePlayBuilder<S, board_game_play_state::SetName<St>> {
+    ) -> BoardGamePlayBuilder<board_game_play_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BoardGamePlayBuilder {
             _state: PhantomData,
@@ -226,7 +247,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BoardGamePlayBuilder<S, St>
+impl<St, S: BosStr> BoardGamePlayBuilder<St, S>
 where
     St: board_game_play_state::State,
     St::PlayedAt: board_game_play_state::IsUnset,
@@ -235,7 +256,7 @@ where
     pub fn played_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BoardGamePlayBuilder<S, board_game_play_state::SetPlayedAt<St>> {
+    ) -> BoardGamePlayBuilder<board_game_play_state::SetPlayedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         BoardGamePlayBuilder {
             _state: PhantomData,
@@ -245,12 +266,12 @@ where
     }
 }
 
-impl<S: BosStr, St> BoardGamePlayBuilder<S, St>
+impl<St, S: BosStr> BoardGamePlayBuilder<St, S>
 where
     St: board_game_play_state::State,
-    St::PlayedAt: board_game_play_state::IsSet,
     St::Name: board_game_play_state::IsSet,
     St::BggId: board_game_play_state::IsSet,
+    St::PlayedAt: board_game_play_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> BoardGamePlay<S> {
@@ -262,7 +283,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BoardGamePlay<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BoardGamePlay<S> {
         BoardGamePlay {
             bgg_id: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -273,10 +297,10 @@ where
 }
 
 fn lexicon_doc_ca_jmaingot_boardGamePlay() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ca.jmaingot.boardGamePlay"),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -103,7 +103,7 @@ impl<S: BosStr> LexiconSchema for Entry<S> {
 
 pub mod entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -111,56 +111,63 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Book;
         type Contents;
+        type Book;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Book = Unset;
         type Contents = Unset;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBook<St> {}
-    impl<St: State> State for SetBook<St> {
-        type Book = Set<members::book>;
-        type Contents = St::Contents;
+        type Book = Unset;
     }
     ///State transition - sets the `contents` field to Set
     pub struct SetContents<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContents<St> {}
     impl<St: State> State for SetContents<St> {
-        type Book = St::Book;
         type Contents = Set<members::contents>;
+        type Book = St::Book;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBook<St> {}
+    impl<St: State> State for SetBook<St> {
+        type Contents = St::Contents;
+        type Book = Set<members::book>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book` field
-        pub struct book(());
         ///Marker type for the `contents` field
         pub struct contents(());
+        ///Marker type for the `book` field
+        pub struct book(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EntryBuilder<S: BosStr, St: entry_state::State> {
+pub struct EntryBuilder<St: entry_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Entry<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EntryBuilder<S, entry_state::Empty> {
+impl Entry<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EntryBuilder<entry_state::Empty, DefaultStr> {
         EntryBuilder::new()
     }
 }
 
-impl<S: BosStr> EntryBuilder<S, entry_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Entry<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EntryBuilder<entry_state::Empty, S> {
+        EntryBuilder::builder()
+    }
+}
+
+impl EntryBuilder<entry_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EntryBuilder {
             _state: PhantomData,
@@ -170,13 +177,27 @@ impl<S: BosStr> EntryBuilder<S, entry_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EntryBuilder<S, St>
+impl<S: BosStr> EntryBuilder<entry_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EntryBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EntryBuilder<St, S>
 where
     St: entry_state::State,
     St::Book: entry_state::IsUnset,
 {
     /// Set the `book` field (required)
-    pub fn book(mut self, value: impl Into<AtUri<S>>) -> EntryBuilder<S, entry_state::SetBook<St>> {
+    pub fn book(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> EntryBuilder<entry_state::SetBook<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
@@ -186,7 +207,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EntryBuilder<S, St>
+impl<St, S: BosStr> EntryBuilder<St, S>
 where
     St: entry_state::State,
     St::Contents: entry_state::IsUnset,
@@ -195,7 +216,7 @@ where
     pub fn contents(
         mut self,
         value: impl Into<S>,
-    ) -> EntryBuilder<S, entry_state::SetContents<St>> {
+    ) -> EntryBuilder<entry_state::SetContents<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
@@ -205,11 +226,11 @@ where
     }
 }
 
-impl<S: BosStr, St> EntryBuilder<S, St>
+impl<St, S: BosStr> EntryBuilder<St, S>
 where
     St: entry_state::State,
-    St::Book: entry_state::IsSet,
     St::Contents: entry_state::IsSet,
+    St::Book: entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Entry<S> {
@@ -230,10 +251,10 @@ where
 }
 
 fn lexicon_doc_dev_vielle_guestbook_entry() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.vielle.guestbook.entry"),
@@ -244,10 +265,11 @@ fn lexicon_doc_dev_vielle_guestbook_entry() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("nsid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("book"),
-                            SmolStr::new_static("contents"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("book"), SmolStr::new_static("contents")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

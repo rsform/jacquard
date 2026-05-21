@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::git::temp::analyze_merge;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::git::temp::analyze_merge;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ConflictInfo<S: BosStr = DefaultStr> {
     ///Name of the conflicted file
     pub filename: S,
@@ -40,22 +37,18 @@ pub struct ConflictInfo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AnalyzeMerge<S: BosStr = DefaultStr> {
     pub branch: S,
     pub patch: S,
     pub repo: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AnalyzeMergeOutput<S: BosStr = DefaultStr> {
     ///List of files with merge conflicts
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -106,10 +99,10 @@ impl jacquard_common::xrpc::XrpcEndpoint for AnalyzeMergeRequest {
 }
 
 fn lexicon_doc_sh_tangled_git_temp_analyzeMerge() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.git.temp.analyzeMerge"),
@@ -118,26 +111,30 @@ fn lexicon_doc_sh_tangled_git_temp_analyzeMerge() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("conflictInfo"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("filename"),
-                        SmolStr::new_static("reason"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("filename"),
+                            SmolStr::new_static("reason")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("filename"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Name of the conflicted file",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Name of the conflicted file"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("reason"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Reason for the conflict")),
+                                description: Some(
+                                    CowStr::new_static("Reason for the conflict"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -149,47 +146,52 @@ fn lexicon_doc_sh_tangled_git_temp_analyzeMerge() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![
-                            SmolStr::new_static("repo"),
-                            SmolStr::new_static("patch"),
-                            SmolStr::new_static("branch"),
-                        ]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("branch"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Target branch to merge into",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("patch"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Patch or pull request to check for merge conflicts",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("repo"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "AT-URI of the repository",
-                                    )),
-                                    format: Some(LexStringFormat::AtUri),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(
+                                vec![
+                                    SmolStr::new_static("repo"), SmolStr::new_static("patch"),
+                                    SmolStr::new_static("branch")
+                                ],
+                            ),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("branch"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("Target branch to merge into"),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("patch"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Patch or pull request to check for merge conflicts",
+                                            ),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("repo"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("AT-URI of the repository"),
+                                        ),
+                                        format: Some(LexStringFormat::AtUri),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -201,7 +203,7 @@ fn lexicon_doc_sh_tangled_git_temp_analyzeMerge() -> LexiconDoc<'static> {
 
 pub mod analyze_merge_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -210,69 +212,76 @@ pub mod analyze_merge_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Patch;
-        type Repo;
         type Branch;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Patch = Unset;
-        type Repo = Unset;
         type Branch = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `patch` field to Set
     pub struct SetPatch<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPatch<St> {}
     impl<St: State> State for SetPatch<St> {
         type Patch = Set<members::patch>;
+        type Branch = St::Branch;
         type Repo = St::Repo;
-        type Branch = St::Branch;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Patch = St::Patch;
-        type Repo = Set<members::repo>;
-        type Branch = St::Branch;
     }
     ///State transition - sets the `branch` field to Set
     pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBranch<St> {}
     impl<St: State> State for SetBranch<St> {
         type Patch = St::Patch;
-        type Repo = St::Repo;
         type Branch = Set<members::branch>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Patch = St::Patch;
+        type Branch = St::Branch;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `patch` field
         pub struct patch(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `branch` field
         pub struct branch(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AnalyzeMergeBuilder<S: BosStr, St: analyze_merge_state::State> {
+pub struct AnalyzeMergeBuilder<St: analyze_merge_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> AnalyzeMerge<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AnalyzeMergeBuilder<S, analyze_merge_state::Empty> {
+impl AnalyzeMerge<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AnalyzeMergeBuilder<analyze_merge_state::Empty, DefaultStr> {
         AnalyzeMergeBuilder::new()
     }
 }
 
-impl<S: BosStr> AnalyzeMergeBuilder<S, analyze_merge_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> AnalyzeMerge<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AnalyzeMergeBuilder<analyze_merge_state::Empty, S> {
+        AnalyzeMergeBuilder::builder()
+    }
+}
+
+impl AnalyzeMergeBuilder<analyze_merge_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AnalyzeMergeBuilder {
             _state: PhantomData,
@@ -282,7 +291,18 @@ impl<S: BosStr> AnalyzeMergeBuilder<S, analyze_merge_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AnalyzeMergeBuilder<S, St>
+impl<S: BosStr> AnalyzeMergeBuilder<analyze_merge_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AnalyzeMergeBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AnalyzeMergeBuilder<St, S>
 where
     St: analyze_merge_state::State,
     St::Branch: analyze_merge_state::IsUnset,
@@ -291,7 +311,7 @@ where
     pub fn branch(
         mut self,
         value: impl Into<S>,
-    ) -> AnalyzeMergeBuilder<S, analyze_merge_state::SetBranch<St>> {
+    ) -> AnalyzeMergeBuilder<analyze_merge_state::SetBranch<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AnalyzeMergeBuilder {
             _state: PhantomData,
@@ -301,7 +321,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AnalyzeMergeBuilder<S, St>
+impl<St, S: BosStr> AnalyzeMergeBuilder<St, S>
 where
     St: analyze_merge_state::State,
     St::Patch: analyze_merge_state::IsUnset,
@@ -310,7 +330,7 @@ where
     pub fn patch(
         mut self,
         value: impl Into<S>,
-    ) -> AnalyzeMergeBuilder<S, analyze_merge_state::SetPatch<St>> {
+    ) -> AnalyzeMergeBuilder<analyze_merge_state::SetPatch<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AnalyzeMergeBuilder {
             _state: PhantomData,
@@ -320,7 +340,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AnalyzeMergeBuilder<S, St>
+impl<St, S: BosStr> AnalyzeMergeBuilder<St, S>
 where
     St: analyze_merge_state::State,
     St::Repo: analyze_merge_state::IsUnset,
@@ -329,7 +349,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> AnalyzeMergeBuilder<S, analyze_merge_state::SetRepo<St>> {
+    ) -> AnalyzeMergeBuilder<analyze_merge_state::SetRepo<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AnalyzeMergeBuilder {
             _state: PhantomData,
@@ -339,12 +359,12 @@ where
     }
 }
 
-impl<S: BosStr, St> AnalyzeMergeBuilder<S, St>
+impl<St, S: BosStr> AnalyzeMergeBuilder<St, S>
 where
     St: analyze_merge_state::State,
     St::Patch: analyze_merge_state::IsSet,
-    St::Repo: analyze_merge_state::IsSet,
     St::Branch: analyze_merge_state::IsSet,
+    St::Repo: analyze_merge_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AnalyzeMerge<S> {

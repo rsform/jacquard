@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,18 +24,15 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_gainforest::evaluator::MethodInfo;
-use crate::app_gainforest::evaluator::service;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_gainforest::evaluator::MethodInfo;
+use crate::app_gainforest::evaluator::service;
 /// Definition of a single evaluation type produced by this evaluator.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EvaluationTypeDefinition<S: BosStr = DefaultStr> {
     ///The evaluation type identifier (must match an entry in evaluationTypes).
     pub identifier: S,
@@ -54,10 +51,7 @@ pub struct EvaluationTypeDefinition<S: BosStr = DefaultStr> {
 /// Localized name and description for an evaluation type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EvaluationTypeLocale<S: BosStr = DefaultStr> {
     ///Longer description of what this evaluation type does.
     pub description: S,
@@ -72,10 +66,7 @@ pub struct EvaluationTypeLocale<S: BosStr = DefaultStr> {
 /// Policies declaring what this evaluator does and how it operates.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EvaluatorPolicies<S: BosStr = DefaultStr> {
     ///Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -140,7 +131,8 @@ impl<S: BosStr> Serialize for EvaluatorPoliciesAccessModel<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for EvaluatorPoliciesAccessModel<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for EvaluatorPoliciesAccessModel<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -416,10 +408,10 @@ impl<S: BosStr> LexiconSchema for Service<S> {
 }
 
 fn lexicon_doc_app_gainforest_evaluator_service() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.gainforest.evaluator.service"),
@@ -499,23 +491,28 @@ fn lexicon_doc_app_gainforest_evaluator_service() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("evaluationTypeLocale"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Localized name and description for an evaluation type.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("lang"),
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("description"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Localized name and description for an evaluation type.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("lang"), SmolStr::new_static("name"),
+                            SmolStr::new_static("description")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Longer description of what this evaluation type does.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Longer description of what this evaluation type does.",
+                                    ),
+                                ),
                                 max_graphemes: Some(2048usize),
                                 ..Default::default()
                             }),
@@ -523,9 +520,11 @@ fn lexicon_doc_app_gainforest_evaluator_service() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("lang"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Language code (BCP-47, e.g., 'en', 'pt-BR').",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Language code (BCP-47, e.g., 'en', 'pt-BR').",
+                                    ),
+                                ),
                                 max_graphemes: Some(16usize),
                                 ..Default::default()
                             }),
@@ -533,9 +532,11 @@ fn lexicon_doc_app_gainforest_evaluator_service() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Short human-readable name for this evaluation type.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Short human-readable name for this evaluation type.",
+                                    ),
+                                ),
                                 max_graphemes: Some(128usize),
                                 ..Default::default()
                             }),
@@ -675,7 +676,7 @@ fn lexicon_doc_app_gainforest_evaluator_service() -> LexiconDoc<'static> {
 
 pub mod evaluator_policies_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -706,7 +707,10 @@ pub mod evaluator_policies_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EvaluatorPoliciesBuilder<S: BosStr, St: evaluator_policies_state::State> {
+pub struct EvaluatorPoliciesBuilder<
+    St: evaluator_policies_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<EvaluatorPoliciesAccessModel<S>>,
@@ -717,15 +721,25 @@ pub struct EvaluatorPoliciesBuilder<S: BosStr, St: evaluator_policies_state::Sta
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> EvaluatorPolicies<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EvaluatorPoliciesBuilder<S, evaluator_policies_state::Empty> {
+impl EvaluatorPolicies<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EvaluatorPoliciesBuilder<
+        evaluator_policies_state::Empty,
+        DefaultStr,
+    > {
         EvaluatorPoliciesBuilder::new()
     }
 }
 
-impl<S: BosStr> EvaluatorPoliciesBuilder<S, evaluator_policies_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> EvaluatorPolicies<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EvaluatorPoliciesBuilder<evaluator_policies_state::Empty, S> {
+        EvaluatorPoliciesBuilder::builder()
+    }
+}
+
+impl EvaluatorPoliciesBuilder<evaluator_policies_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EvaluatorPoliciesBuilder {
             _state: PhantomData,
@@ -735,7 +749,18 @@ impl<S: BosStr> EvaluatorPoliciesBuilder<S, evaluator_policies_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: evaluator_policies_state::State> EvaluatorPoliciesBuilder<S, St> {
+impl<S: BosStr> EvaluatorPoliciesBuilder<evaluator_policies_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EvaluatorPoliciesBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: evaluator_policies_state::State, S: BosStr> EvaluatorPoliciesBuilder<St, S> {
     /// Set the `accessModel` field (optional)
     pub fn access_model(
         mut self,
@@ -745,13 +770,16 @@ impl<S: BosStr, St: evaluator_policies_state::State> EvaluatorPoliciesBuilder<S,
         self
     }
     /// Set the `accessModel` field to an Option value (optional)
-    pub fn maybe_access_model(mut self, value: Option<EvaluatorPoliciesAccessModel<S>>) -> Self {
+    pub fn maybe_access_model(
+        mut self,
+        value: Option<EvaluatorPoliciesAccessModel<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
 }
 
-impl<S: BosStr, St: evaluator_policies_state::State> EvaluatorPoliciesBuilder<S, St> {
+impl<St: evaluator_policies_state::State, S: BosStr> EvaluatorPoliciesBuilder<St, S> {
     /// Set the `evaluationTypeDefinitions` field (optional)
     pub fn evaluation_type_definitions(
         mut self,
@@ -770,7 +798,7 @@ impl<S: BosStr, St: evaluator_policies_state::State> EvaluatorPoliciesBuilder<S,
     }
 }
 
-impl<S: BosStr, St> EvaluatorPoliciesBuilder<S, St>
+impl<St, S: BosStr> EvaluatorPoliciesBuilder<St, S>
 where
     St: evaluator_policies_state::State,
     St::EvaluationTypes: evaluator_policies_state::IsUnset,
@@ -779,7 +807,7 @@ where
     pub fn evaluation_types(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> EvaluatorPoliciesBuilder<S, evaluator_policies_state::SetEvaluationTypes<St>> {
+    ) -> EvaluatorPoliciesBuilder<evaluator_policies_state::SetEvaluationTypes<St>, S> {
         self._fields.2 = Option::Some(value.into());
         EvaluatorPoliciesBuilder {
             _state: PhantomData,
@@ -789,7 +817,7 @@ where
     }
 }
 
-impl<S: BosStr, St: evaluator_policies_state::State> EvaluatorPoliciesBuilder<S, St> {
+impl<St: evaluator_policies_state::State, S: BosStr> EvaluatorPoliciesBuilder<St, S> {
     /// Set the `subjectCollections` field (optional)
     pub fn subject_collections(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -802,7 +830,7 @@ impl<S: BosStr, St: evaluator_policies_state::State> EvaluatorPoliciesBuilder<S,
     }
 }
 
-impl<S: BosStr, St> EvaluatorPoliciesBuilder<S, St>
+impl<St, S: BosStr> EvaluatorPoliciesBuilder<St, S>
 where
     St: evaluator_policies_state::State,
     St::EvaluationTypes: evaluator_policies_state::IsSet,
@@ -818,7 +846,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EvaluatorPolicies<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EvaluatorPolicies<S> {
         EvaluatorPolicies {
             access_model: self._fields.0,
             evaluation_type_definitions: self._fields.1,
@@ -831,7 +862,7 @@ where
 
 pub mod service_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -874,21 +905,28 @@ pub mod service_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ServiceBuilder<S: BosStr, St: service_state::State> {
+pub struct ServiceBuilder<St: service_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<service::EvaluatorPolicies<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Service<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ServiceBuilder<S, service_state::Empty> {
+impl Service<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ServiceBuilder<service_state::Empty, DefaultStr> {
         ServiceBuilder::new()
     }
 }
 
-impl<S: BosStr> ServiceBuilder<S, service_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Service<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ServiceBuilder<service_state::Empty, S> {
+        ServiceBuilder::builder()
+    }
+}
+
+impl ServiceBuilder<service_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ServiceBuilder {
             _state: PhantomData,
@@ -898,7 +936,18 @@ impl<S: BosStr> ServiceBuilder<S, service_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ServiceBuilder<S, St>
+impl<S: BosStr> ServiceBuilder<service_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ServiceBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ServiceBuilder<St, S>
 where
     St: service_state::State,
     St::CreatedAt: service_state::IsUnset,
@@ -907,7 +956,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ServiceBuilder<S, service_state::SetCreatedAt<St>> {
+    ) -> ServiceBuilder<service_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ServiceBuilder {
             _state: PhantomData,
@@ -917,7 +966,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ServiceBuilder<S, St>
+impl<St, S: BosStr> ServiceBuilder<St, S>
 where
     St: service_state::State,
     St::Policies: service_state::IsUnset,
@@ -926,7 +975,7 @@ where
     pub fn policies(
         mut self,
         value: impl Into<service::EvaluatorPolicies<S>>,
-    ) -> ServiceBuilder<S, service_state::SetPolicies<St>> {
+    ) -> ServiceBuilder<service_state::SetPolicies<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ServiceBuilder {
             _state: PhantomData,
@@ -936,7 +985,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ServiceBuilder<S, St>
+impl<St, S: BosStr> ServiceBuilder<St, S>
 where
     St: service_state::State,
     St::Policies: service_state::IsSet,

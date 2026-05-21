@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,16 +25,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::space_remanso::note;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::space_remanso::note;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Image<S: BosStr = DefaultStr> {
     ///Alt text for the image.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -489,16 +486,19 @@ impl<S: BosStr> LexiconSchema for Image<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
@@ -608,7 +608,7 @@ impl<S: BosStr> LexiconSchema for Note<S> {
 
 pub mod image_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -639,21 +639,28 @@ pub mod image_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ImageBuilder<S: BosStr, St: image_state::State> {
+pub struct ImageBuilder<St: image_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Image<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ImageBuilder<S, image_state::Empty> {
+impl Image<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ImageBuilder<image_state::Empty, DefaultStr> {
         ImageBuilder::new()
     }
 }
 
-impl<S: BosStr> ImageBuilder<S, image_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Image<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ImageBuilder<image_state::Empty, S> {
+        ImageBuilder::builder()
+    }
+}
+
+impl ImageBuilder<image_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ImageBuilder {
             _state: PhantomData,
@@ -663,7 +670,18 @@ impl<S: BosStr> ImageBuilder<S, image_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: image_state::State> ImageBuilder<S, St> {
+impl<S: BosStr> ImageBuilder<image_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ImageBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: image_state::State, S: BosStr> ImageBuilder<St, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -676,7 +694,7 @@ impl<S: BosStr, St: image_state::State> ImageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ImageBuilder<S, St>
+impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
     St::Image: image_state::IsUnset,
@@ -685,7 +703,7 @@ where
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ImageBuilder<S, image_state::SetImage<St>> {
+    ) -> ImageBuilder<image_state::SetImage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
@@ -695,7 +713,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ImageBuilder<S, St>
+impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
     St::Image: image_state::IsSet,
@@ -719,10 +737,10 @@ where
 }
 
 fn lexicon_doc_space_remanso_note() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("space.remanso.note"),
@@ -738,16 +756,16 @@ fn lexicon_doc_space_remanso_note() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Alt text for the image.")),
+                                description: Some(
+                                    CowStr::new_static("Alt text for the image."),
+                                ),
                                 max_length: Some(2000usize),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("image"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -881,7 +899,7 @@ fn lexicon_doc_space_remanso_note() -> LexiconDoc<'static> {
 
 pub mod note_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -889,42 +907,42 @@ pub mod note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Title;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type Content = Set<members::content>;
-        type Title = St::Title;
+        type Content = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Content = St::Content;
         type Title = Set<members::title>;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Title = St::Title;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NoteBuilder<S: BosStr, St: note_state::State> {
+pub struct NoteBuilder<St: note_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -941,15 +959,22 @@ pub struct NoteBuilder<S: BosStr, St: note_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Note<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> NoteBuilder<S, note_state::Empty> {
+impl Note<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> NoteBuilder<note_state::Empty, DefaultStr> {
         NoteBuilder::new()
     }
 }
 
-impl<S: BosStr> NoteBuilder<S, note_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Note<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> NoteBuilder<note_state::Empty, S> {
+        NoteBuilder::builder()
+    }
+}
+
+impl NoteBuilder<note_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         NoteBuilder {
             _state: PhantomData,
@@ -959,13 +984,27 @@ impl<S: BosStr> NoteBuilder<S, note_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> NoteBuilder<S, St>
+impl<S: BosStr> NoteBuilder<note_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        NoteBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> NoteBuilder<St, S>
 where
     St: note_state::State,
     St::Content: note_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(mut self, value: impl Into<S>) -> NoteBuilder<S, note_state::SetContent<St>> {
+    pub fn content(
+        mut self,
+        value: impl Into<S>,
+    ) -> NoteBuilder<note_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
@@ -975,7 +1014,7 @@ where
     }
 }
 
-impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
+impl<St: note_state::State, S: BosStr> NoteBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -988,7 +1027,7 @@ impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
+impl<St: note_state::State, S: BosStr> NoteBuilder<St, S> {
     /// Set the `discoverable` field (optional)
     pub fn discoverable(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -1001,7 +1040,7 @@ impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
+impl<St: note_state::State, S: BosStr> NoteBuilder<St, S> {
     /// Set the `fontFamily` field (optional)
     pub fn font_family(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -1014,7 +1053,7 @@ impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
+impl<St: note_state::State, S: BosStr> NoteBuilder<St, S> {
     /// Set the `fontSize` field (optional)
     pub fn font_size(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -1027,7 +1066,7 @@ impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
+impl<St: note_state::State, S: BosStr> NoteBuilder<St, S> {
     /// Set the `images` field (optional)
     pub fn images(mut self, value: impl Into<Option<Vec<note::Image<S>>>>) -> Self {
         self._fields.5 = value.into();
@@ -1040,7 +1079,7 @@ impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
+impl<St: note_state::State, S: BosStr> NoteBuilder<St, S> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<NoteLanguage<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -1053,7 +1092,7 @@ impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
+impl<St: note_state::State, S: BosStr> NoteBuilder<St, S> {
     /// Set the `publishedAt` field (optional)
     pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.7 = value.into();
@@ -1066,7 +1105,7 @@ impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
+impl<St: note_state::State, S: BosStr> NoteBuilder<St, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<NoteTheme<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -1079,13 +1118,16 @@ impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> NoteBuilder<S, St>
+impl<St, S: BosStr> NoteBuilder<St, S>
 where
     St: note_state::State,
     St::Title: note_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> NoteBuilder<S, note_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> NoteBuilder<note_state::SetTitle<St>, S> {
         self._fields.9 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
@@ -1095,11 +1137,11 @@ where
     }
 }
 
-impl<S: BosStr, St> NoteBuilder<S, St>
+impl<St, S: BosStr> NoteBuilder<St, S>
 where
     St: note_state::State,
-    St::Content: note_state::IsSet,
     St::Title: note_state::IsSet,
+    St::Content: note_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Note<S> {

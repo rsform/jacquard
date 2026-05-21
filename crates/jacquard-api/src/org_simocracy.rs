@@ -14,6 +14,7 @@ pub mod skill;
 pub mod style;
 pub mod vote;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -31,13 +32,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SpriteSettings<S: BosStr = DefaultStr> {
     ///0=right, 1=back, 2=left, 3=front
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -68,7 +66,7 @@ impl<S: BosStr> LexiconSchema for SpriteSettings<S> {
 
 pub mod sprite_settings_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -99,21 +97,31 @@ pub mod sprite_settings_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SpriteSettingsBuilder<S: BosStr, St: sprite_settings_state::State> {
+pub struct SpriteSettingsBuilder<
+    St: sprite_settings_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Data<S>>, Option<Data<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SpriteSettings<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SpriteSettingsBuilder<S, sprite_settings_state::Empty> {
+impl SpriteSettings<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SpriteSettingsBuilder<sprite_settings_state::Empty, DefaultStr> {
         SpriteSettingsBuilder::new()
     }
 }
 
-impl<S: BosStr> SpriteSettingsBuilder<S, sprite_settings_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SpriteSettings<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SpriteSettingsBuilder<sprite_settings_state::Empty, S> {
+        SpriteSettingsBuilder::builder()
+    }
+}
+
+impl SpriteSettingsBuilder<sprite_settings_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SpriteSettingsBuilder {
             _state: PhantomData,
@@ -123,7 +131,18 @@ impl<S: BosStr> SpriteSettingsBuilder<S, sprite_settings_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: sprite_settings_state::State> SpriteSettingsBuilder<S, St> {
+impl<S: BosStr> SpriteSettingsBuilder<sprite_settings_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SpriteSettingsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: sprite_settings_state::State, S: BosStr> SpriteSettingsBuilder<St, S> {
     /// Set the `currentAnimDirection` field (optional)
     pub fn current_anim_direction(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -136,7 +155,7 @@ impl<S: BosStr, St: sprite_settings_state::State> SpriteSettingsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: sprite_settings_state::State> SpriteSettingsBuilder<S, St> {
+impl<St: sprite_settings_state::State, S: BosStr> SpriteSettingsBuilder<St, S> {
     /// Set the `partColorSettings` field (optional)
     pub fn part_color_settings(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -149,7 +168,7 @@ impl<S: BosStr, St: sprite_settings_state::State> SpriteSettingsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SpriteSettingsBuilder<S, St>
+impl<St, S: BosStr> SpriteSettingsBuilder<St, S>
 where
     St: sprite_settings_state::State,
     St::SelectedOptions: sprite_settings_state::IsUnset,
@@ -158,7 +177,7 @@ where
     pub fn selected_options(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> SpriteSettingsBuilder<S, sprite_settings_state::SetSelectedOptions<St>> {
+    ) -> SpriteSettingsBuilder<sprite_settings_state::SetSelectedOptions<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SpriteSettingsBuilder {
             _state: PhantomData,
@@ -168,7 +187,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SpriteSettingsBuilder<S, St>
+impl<St, S: BosStr> SpriteSettingsBuilder<St, S>
 where
     St: sprite_settings_state::State,
     St::SelectedOptions: sprite_settings_state::IsSet,
@@ -183,7 +202,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SpriteSettings<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SpriteSettings<S> {
         SpriteSettings {
             current_anim_direction: self._fields.0,
             part_color_settings: self._fields.1,
@@ -194,10 +216,10 @@ where
 }
 
 fn lexicon_doc_org_simocracy_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.simocracy.defs"),

@@ -10,11 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -37,8 +37,9 @@ impl jacquard_common::xrpc::XrpcResp for SeekResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Seek {
     const NSID: &'static str = "app.rocksky.spotify.seek";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = SeekResponse;
 }
 
@@ -46,15 +47,16 @@ impl jacquard_common::xrpc::XrpcRequest for Seek {
 pub struct SeekRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SeekRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.spotify.seek";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Seek;
     type Response = SeekResponse;
 }
 
 pub mod seek_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -98,8 +100,18 @@ impl SeekParams {
 }
 
 impl SeekParamsBuilder<seek_params_state::Empty> {
-    /// Create a new builder with all fields unset.
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
+        SeekParamsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+        }
+    }
+}
+
+impl SeekParamsBuilder<seek_params_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
         SeekParamsBuilder {
             _state: PhantomData,
             _fields: (None,),

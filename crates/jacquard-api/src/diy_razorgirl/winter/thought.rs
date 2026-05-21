@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -50,6 +50,7 @@ pub struct Thought<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ThoughtKind<S: BosStr = DefaultStr> {
@@ -230,7 +231,7 @@ impl<S: BosStr> LexiconSchema for Thought<S> {
 
 pub mod thought_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -287,7 +288,7 @@ pub mod thought_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ThoughtBuilder<S: BosStr, St: thought_state::State> {
+pub struct ThoughtBuilder<St: thought_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -300,15 +301,22 @@ pub struct ThoughtBuilder<S: BosStr, St: thought_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Thought<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ThoughtBuilder<S, thought_state::Empty> {
+impl Thought<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ThoughtBuilder<thought_state::Empty, DefaultStr> {
         ThoughtBuilder::new()
     }
 }
 
-impl<S: BosStr> ThoughtBuilder<S, thought_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Thought<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ThoughtBuilder<thought_state::Empty, S> {
+        ThoughtBuilder::builder()
+    }
+}
+
+impl ThoughtBuilder<thought_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ThoughtBuilder {
             _state: PhantomData,
@@ -318,7 +326,18 @@ impl<S: BosStr> ThoughtBuilder<S, thought_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ThoughtBuilder<S, St>
+impl<S: BosStr> ThoughtBuilder<thought_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ThoughtBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ThoughtBuilder<St, S>
 where
     St: thought_state::State,
     St::Content: thought_state::IsUnset,
@@ -327,7 +346,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> ThoughtBuilder<S, thought_state::SetContent<St>> {
+    ) -> ThoughtBuilder<thought_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ThoughtBuilder {
             _state: PhantomData,
@@ -337,7 +356,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ThoughtBuilder<S, St>
+impl<St, S: BosStr> ThoughtBuilder<St, S>
 where
     St: thought_state::State,
     St::CreatedAt: thought_state::IsUnset,
@@ -346,7 +365,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ThoughtBuilder<S, thought_state::SetCreatedAt<St>> {
+    ) -> ThoughtBuilder<thought_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ThoughtBuilder {
             _state: PhantomData,
@@ -356,7 +375,7 @@ where
     }
 }
 
-impl<S: BosStr, St: thought_state::State> ThoughtBuilder<S, St> {
+impl<St: thought_state::State, S: BosStr> ThoughtBuilder<St, S> {
     /// Set the `durationMs` field (optional)
     pub fn duration_ms(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -369,7 +388,7 @@ impl<S: BosStr, St: thought_state::State> ThoughtBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ThoughtBuilder<S, St>
+impl<St, S: BosStr> ThoughtBuilder<St, S>
 where
     St: thought_state::State,
     St::Kind: thought_state::IsUnset,
@@ -378,7 +397,7 @@ where
     pub fn kind(
         mut self,
         value: impl Into<ThoughtKind<S>>,
-    ) -> ThoughtBuilder<S, thought_state::SetKind<St>> {
+    ) -> ThoughtBuilder<thought_state::SetKind<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ThoughtBuilder {
             _state: PhantomData,
@@ -388,7 +407,7 @@ where
     }
 }
 
-impl<S: BosStr, St: thought_state::State> ThoughtBuilder<S, St> {
+impl<St: thought_state::State, S: BosStr> ThoughtBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -401,7 +420,7 @@ impl<S: BosStr, St: thought_state::State> ThoughtBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: thought_state::State> ThoughtBuilder<S, St> {
+impl<St: thought_state::State, S: BosStr> ThoughtBuilder<St, S> {
     /// Set the `trigger` field (optional)
     pub fn trigger(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -414,7 +433,7 @@ impl<S: BosStr, St: thought_state::State> ThoughtBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ThoughtBuilder<S, St>
+impl<St, S: BosStr> ThoughtBuilder<St, S>
 where
     St: thought_state::State,
     St::Kind: thought_state::IsSet,
@@ -448,10 +467,10 @@ where
 }
 
 fn lexicon_doc_diy_razorgirl_winter_thought() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("diy.razorgirl.winter.thought"),
@@ -462,11 +481,12 @@ fn lexicon_doc_diy_razorgirl_winter_thought() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("kind"),
-                            SmolStr::new_static("content"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("kind"), SmolStr::new_static("content"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -509,9 +529,9 @@ fn lexicon_doc_diy_razorgirl_winter_thought() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("trigger"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "What prompted this thought",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("What prompted this thought"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

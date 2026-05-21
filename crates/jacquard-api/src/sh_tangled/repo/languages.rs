@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,16 +20,13 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::repo::languages;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::repo::languages;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Language<S: BosStr = DefaultStr> {
     ///Hex color code for this language
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,11 +47,9 @@ pub struct Language<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Languages<S: BosStr = DefaultStr> {
     ///Defaults to `"HEAD"`.
     #[serde(default = "_default_ref")]
@@ -63,11 +58,9 @@ pub struct Languages<S: BosStr = DefaultStr> {
     pub repo: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LanguagesOutput<S: BosStr = DefaultStr> {
     pub languages: Vec<languages::Language<S>>,
     ///The git reference used
@@ -82,9 +75,18 @@ pub struct LanguagesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum LanguagesError {
     /// Repository not found or access denied
@@ -98,10 +100,7 @@ pub enum LanguagesError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for LanguagesError {
@@ -180,7 +179,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for LanguagesRequest {
 
 pub mod language_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -189,55 +188,55 @@ pub mod language_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Percentage;
-        type Size;
         type Name;
+        type Size;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Percentage = Unset;
-        type Size = Unset;
         type Name = Unset;
+        type Size = Unset;
     }
     ///State transition - sets the `percentage` field to Set
     pub struct SetPercentage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPercentage<St> {}
     impl<St: State> State for SetPercentage<St> {
         type Percentage = Set<members::percentage>;
+        type Name = St::Name;
         type Size = St::Size;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSize<St> {}
-    impl<St: State> State for SetSize<St> {
-        type Percentage = St::Percentage;
-        type Size = Set<members::size>;
-        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
         type Percentage = St::Percentage;
-        type Size = St::Size;
         type Name = Set<members::name>;
+        type Size = St::Size;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSize<St> {}
+    impl<St: State> State for SetSize<St> {
+        type Percentage = St::Percentage;
+        type Name = St::Name;
+        type Size = Set<members::size>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `percentage` field
         pub struct percentage(());
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `size` field
+        pub struct size(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LanguageBuilder<S: BosStr, St: language_state::State> {
+pub struct LanguageBuilder<St: language_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -250,15 +249,22 @@ pub struct LanguageBuilder<S: BosStr, St: language_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Language<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LanguageBuilder<S, language_state::Empty> {
+impl Language<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LanguageBuilder<language_state::Empty, DefaultStr> {
         LanguageBuilder::new()
     }
 }
 
-impl<S: BosStr> LanguageBuilder<S, language_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Language<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LanguageBuilder<language_state::Empty, S> {
+        LanguageBuilder::builder()
+    }
+}
+
+impl LanguageBuilder<language_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LanguageBuilder {
             _state: PhantomData,
@@ -268,7 +274,18 @@ impl<S: BosStr> LanguageBuilder<S, language_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: language_state::State> LanguageBuilder<S, St> {
+impl<S: BosStr> LanguageBuilder<language_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LanguageBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: language_state::State, S: BosStr> LanguageBuilder<St, S> {
     /// Set the `color` field (optional)
     pub fn color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -281,7 +298,7 @@ impl<S: BosStr, St: language_state::State> LanguageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: language_state::State> LanguageBuilder<S, St> {
+impl<St: language_state::State, S: BosStr> LanguageBuilder<St, S> {
     /// Set the `extensions` field (optional)
     pub fn extensions(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -294,7 +311,7 @@ impl<S: BosStr, St: language_state::State> LanguageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: language_state::State> LanguageBuilder<S, St> {
+impl<St: language_state::State, S: BosStr> LanguageBuilder<St, S> {
     /// Set the `fileCount` field (optional)
     pub fn file_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -307,13 +324,16 @@ impl<S: BosStr, St: language_state::State> LanguageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LanguageBuilder<S, St>
+impl<St, S: BosStr> LanguageBuilder<St, S>
 where
     St: language_state::State,
     St::Name: language_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> LanguageBuilder<S, language_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> LanguageBuilder<language_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LanguageBuilder {
             _state: PhantomData,
@@ -323,7 +343,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LanguageBuilder<S, St>
+impl<St, S: BosStr> LanguageBuilder<St, S>
 where
     St: language_state::State,
     St::Percentage: language_state::IsUnset,
@@ -332,7 +352,7 @@ where
     pub fn percentage(
         mut self,
         value: impl Into<i64>,
-    ) -> LanguageBuilder<S, language_state::SetPercentage<St>> {
+    ) -> LanguageBuilder<language_state::SetPercentage<St>, S> {
         self._fields.4 = Option::Some(value.into());
         LanguageBuilder {
             _state: PhantomData,
@@ -342,7 +362,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LanguageBuilder<S, St>
+impl<St, S: BosStr> LanguageBuilder<St, S>
 where
     St: language_state::State,
     St::Size: language_state::IsUnset,
@@ -351,7 +371,7 @@ where
     pub fn size(
         mut self,
         value: impl Into<i64>,
-    ) -> LanguageBuilder<S, language_state::SetSize<St>> {
+    ) -> LanguageBuilder<language_state::SetSize<St>, S> {
         self._fields.5 = Option::Some(value.into());
         LanguageBuilder {
             _state: PhantomData,
@@ -361,12 +381,12 @@ where
     }
 }
 
-impl<S: BosStr, St> LanguageBuilder<S, St>
+impl<St, S: BosStr> LanguageBuilder<St, S>
 where
     St: language_state::State,
     St::Percentage: language_state::IsSet,
-    St::Size: language_state::IsSet,
     St::Name: language_state::IsSet,
+    St::Size: language_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Language<S> {
@@ -395,10 +415,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_languages() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.languages"),
@@ -407,29 +427,32 @@ fn lexicon_doc_sh_tangled_repo_languages() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("language"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("size"),
-                        SmolStr::new_static("percentage"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("name"), SmolStr::new_static("size"),
+                            SmolStr::new_static("percentage")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("color"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Hex color code for this language",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Hex color code for this language"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("extensions"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "File extensions associated with this language",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "File extensions associated with this language",
+                                    ),
+                                ),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
@@ -445,7 +468,9 @@ fn lexicon_doc_sh_tangled_repo_languages() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Programming language name")),
+                                description: Some(
+                                    CowStr::new_static("Programming language name"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -469,33 +494,39 @@ fn lexicon_doc_sh_tangled_repo_languages() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("repo")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("ref"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Git reference (branch, tag, or commit SHA)",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("repo"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Repository identifier in format 'did:plc:.../repoName'",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("repo")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("ref"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Git reference (branch, tag, or commit SHA)",
+                                            ),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("repo"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Repository identifier in format 'did:plc:.../repoName'",
+                                            ),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -511,7 +542,7 @@ fn _default_ref<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod languages_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -542,21 +573,28 @@ pub mod languages_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LanguagesBuilder<S: BosStr, St: languages_state::State> {
+pub struct LanguagesBuilder<St: languages_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Languages<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LanguagesBuilder<S, languages_state::Empty> {
+impl Languages<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LanguagesBuilder<languages_state::Empty, DefaultStr> {
         LanguagesBuilder::new()
     }
 }
 
-impl<S: BosStr> LanguagesBuilder<S, languages_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Languages<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LanguagesBuilder<languages_state::Empty, S> {
+        LanguagesBuilder::builder()
+    }
+}
+
+impl LanguagesBuilder<languages_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LanguagesBuilder {
             _state: PhantomData,
@@ -566,7 +604,18 @@ impl<S: BosStr> LanguagesBuilder<S, languages_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: languages_state::State> LanguagesBuilder<S, St> {
+impl<S: BosStr> LanguagesBuilder<languages_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LanguagesBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: languages_state::State, S: BosStr> LanguagesBuilder<St, S> {
     /// Set the `ref` field (optional)
     pub fn r#ref(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -579,7 +628,7 @@ impl<S: BosStr, St: languages_state::State> LanguagesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LanguagesBuilder<S, St>
+impl<St, S: BosStr> LanguagesBuilder<St, S>
 where
     St: languages_state::State,
     St::Repo: languages_state::IsUnset,
@@ -588,7 +637,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<S>,
-    ) -> LanguagesBuilder<S, languages_state::SetRepo<St>> {
+    ) -> LanguagesBuilder<languages_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LanguagesBuilder {
             _state: PhantomData,
@@ -598,7 +647,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LanguagesBuilder<S, St>
+impl<St, S: BosStr> LanguagesBuilder<St, S>
 where
     St: languages_state::State,
     St::Repo: languages_state::IsSet,

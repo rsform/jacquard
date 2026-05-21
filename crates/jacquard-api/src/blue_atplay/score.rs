@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,14 +24,11 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Attestation signature proving a score was submitted through ATPlay SDK
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Attestation<S: BosStr = DefaultStr> {
     ///Timestamp when the attestation was created (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -73,7 +70,7 @@ impl<S: BosStr> LexiconSchema for Attestation<S> {
 
 pub mod attestation_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -116,21 +113,28 @@ pub mod attestation_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AttestationBuilder<S: BosStr, St: attestation_state::State> {
+pub struct AttestationBuilder<St: attestation_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<Bytes>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Attestation<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AttestationBuilder<S, attestation_state::Empty> {
+impl Attestation<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AttestationBuilder<attestation_state::Empty, DefaultStr> {
         AttestationBuilder::new()
     }
 }
 
-impl<S: BosStr> AttestationBuilder<S, attestation_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Attestation<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AttestationBuilder<attestation_state::Empty, S> {
+        AttestationBuilder::builder()
+    }
+}
+
+impl AttestationBuilder<attestation_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AttestationBuilder {
             _state: PhantomData,
@@ -140,7 +144,18 @@ impl<S: BosStr> AttestationBuilder<S, attestation_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: attestation_state::State> AttestationBuilder<S, St> {
+impl<S: BosStr> AttestationBuilder<attestation_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AttestationBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: attestation_state::State, S: BosStr> AttestationBuilder<St, S> {
     /// Set the `attestedAt` field (optional)
     pub fn attested_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -153,7 +168,7 @@ impl<S: BosStr, St: attestation_state::State> AttestationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AttestationBuilder<S, St>
+impl<St, S: BosStr> AttestationBuilder<St, S>
 where
     St: attestation_state::State,
     St::Key: attestation_state::IsUnset,
@@ -162,7 +177,7 @@ where
     pub fn key(
         mut self,
         value: impl Into<S>,
-    ) -> AttestationBuilder<S, attestation_state::SetKey<St>> {
+    ) -> AttestationBuilder<attestation_state::SetKey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AttestationBuilder {
             _state: PhantomData,
@@ -172,7 +187,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AttestationBuilder<S, St>
+impl<St, S: BosStr> AttestationBuilder<St, S>
 where
     St: attestation_state::State,
     St::Signature: attestation_state::IsUnset,
@@ -181,7 +196,7 @@ where
     pub fn signature(
         mut self,
         value: impl Into<Bytes>,
-    ) -> AttestationBuilder<S, attestation_state::SetSignature<St>> {
+    ) -> AttestationBuilder<attestation_state::SetSignature<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AttestationBuilder {
             _state: PhantomData,
@@ -191,7 +206,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AttestationBuilder<S, St>
+impl<St, S: BosStr> AttestationBuilder<St, S>
 where
     St: attestation_state::State,
     St::Key: attestation_state::IsSet,
@@ -207,7 +222,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Attestation<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Attestation<S> {
         Attestation {
             attested_at: self._fields.0,
             key: self._fields.1.unwrap(),
@@ -218,10 +236,10 @@ where
 }
 
 fn lexicon_doc_blue_atplay_score_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.atplay.score.defs"),
@@ -230,22 +248,27 @@ fn lexicon_doc_blue_atplay_score_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("attestation"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Attestation signature proving a score was submitted through ATPlay SDK",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("key"),
-                        SmolStr::new_static("signature"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Attestation signature proving a score was submitted through ATPlay SDK",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("key"), SmolStr::new_static("signature")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("attestedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Timestamp when the attestation was created (optional)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Timestamp when the attestation was created (optional)",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -253,9 +276,11 @@ fn lexicon_doc_blue_atplay_score_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("key"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "DID key reference for verifying the signature",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "DID key reference for verifying the signature",
+                                    ),
+                                ),
                                 max_length: Some(512usize),
                                 ..Default::default()
                             }),

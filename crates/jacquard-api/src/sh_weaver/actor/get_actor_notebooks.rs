@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::NotebookView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorNotebooks<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -37,11 +34,9 @@ pub struct GetActorNotebooks<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorNotebooksOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -84,7 +79,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_actor_notebooks_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -115,26 +110,34 @@ pub mod get_actor_notebooks_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetActorNotebooksBuilder<S: BosStr, St: get_actor_notebooks_state::State> {
+pub struct GetActorNotebooksBuilder<
+    St: get_actor_notebooks_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<AtIdentifier<S>>,
-        Option<S>,
-        Option<bool>,
-        Option<i64>,
-    ),
+    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<bool>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetActorNotebooks<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetActorNotebooksBuilder<S, get_actor_notebooks_state::Empty> {
+impl GetActorNotebooks<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetActorNotebooksBuilder<
+        get_actor_notebooks_state::Empty,
+        DefaultStr,
+    > {
         GetActorNotebooksBuilder::new()
     }
 }
 
-impl<S: BosStr> GetActorNotebooksBuilder<S, get_actor_notebooks_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetActorNotebooks<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetActorNotebooksBuilder<get_actor_notebooks_state::Empty, S> {
+        GetActorNotebooksBuilder::builder()
+    }
+}
+
+impl GetActorNotebooksBuilder<get_actor_notebooks_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetActorNotebooksBuilder {
             _state: PhantomData,
@@ -144,7 +147,18 @@ impl<S: BosStr> GetActorNotebooksBuilder<S, get_actor_notebooks_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetActorNotebooksBuilder<S, St>
+impl<S: BosStr> GetActorNotebooksBuilder<get_actor_notebooks_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetActorNotebooksBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetActorNotebooksBuilder<St, S>
 where
     St: get_actor_notebooks_state::State,
     St::Actor: get_actor_notebooks_state::IsUnset,
@@ -153,7 +167,7 @@ where
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetActorNotebooksBuilder<S, get_actor_notebooks_state::SetActor<St>> {
+    ) -> GetActorNotebooksBuilder<get_actor_notebooks_state::SetActor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetActorNotebooksBuilder {
             _state: PhantomData,
@@ -163,7 +177,7 @@ where
     }
 }
 
-impl<S: BosStr, St: get_actor_notebooks_state::State> GetActorNotebooksBuilder<S, St> {
+impl<St: get_actor_notebooks_state::State, S: BosStr> GetActorNotebooksBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -176,7 +190,7 @@ impl<S: BosStr, St: get_actor_notebooks_state::State> GetActorNotebooksBuilder<S
     }
 }
 
-impl<S: BosStr, St: get_actor_notebooks_state::State> GetActorNotebooksBuilder<S, St> {
+impl<St: get_actor_notebooks_state::State, S: BosStr> GetActorNotebooksBuilder<St, S> {
     /// Set the `includeCollaborations` field (optional)
     pub fn include_collaborations(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -189,7 +203,7 @@ impl<S: BosStr, St: get_actor_notebooks_state::State> GetActorNotebooksBuilder<S
     }
 }
 
-impl<S: BosStr, St: get_actor_notebooks_state::State> GetActorNotebooksBuilder<S, St> {
+impl<St: get_actor_notebooks_state::State, S: BosStr> GetActorNotebooksBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -202,7 +216,7 @@ impl<S: BosStr, St: get_actor_notebooks_state::State> GetActorNotebooksBuilder<S
     }
 }
 
-impl<S: BosStr, St> GetActorNotebooksBuilder<S, St>
+impl<St, S: BosStr> GetActorNotebooksBuilder<St, S>
 where
     St: get_actor_notebooks_state::State,
     St::Actor: get_actor_notebooks_state::IsSet,

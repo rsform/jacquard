@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::beta::game::log;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::beta::game::log;
 /// Details about item/specimen collection
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CollectionData<S: BosStr = DefaultStr> {
     ///Catch probability for specimens (decimal string between 0.0 and 1.0)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -64,10 +61,7 @@ pub struct CollectionData<S: BosStr = DefaultStr> {
 /// Details about daily rewards claim
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DailyRewardsData<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reward_items: Option<Vec<log::RewardItem<S>>>,
@@ -87,10 +81,7 @@ pub struct DailyRewardsData<S: BosStr = DefaultStr> {
 /// Context about the feed when event occurred
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FeedContext<S: BosStr = DefaultStr> {
     ///URI of the feed being viewed
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -111,10 +102,7 @@ pub struct FeedContext<S: BosStr = DefaultStr> {
 /// Details about game cards generated or interacted with
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GameCardData<S: BosStr = DefaultStr> {
     ///Type of game card
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -144,10 +132,7 @@ pub struct GameCardData<S: BosStr = DefaultStr> {
 /// Details about item usage
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ItemUsageData<S: BosStr = DefaultStr> {
     ///Effect that was applied
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -229,10 +214,7 @@ pub struct LogGetRecordOutput<S: BosStr = DefaultStr> {
 /// Additional event-specific metadata
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Metadata<S: BosStr = DefaultStr> {
     ///Version of the client application
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -253,10 +235,7 @@ pub struct Metadata<S: BosStr = DefaultStr> {
 /// Item received as a reward
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RewardItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub item_id: Option<S>,
@@ -559,10 +538,10 @@ impl<S: BosStr> LexiconSchema for RewardItem<S> {
 }
 
 fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.beta.game.log"),
@@ -643,7 +622,9 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dailyRewardsData"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Details about daily rewards claim")),
+                    description: Some(
+                        CowStr::new_static("Details about daily rewards claim"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -686,18 +667,18 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("feedContext"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Context about the feed when event occurred",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Context about the feed when event occurred"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("feedUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URI of the feed being viewed",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("URI of the feed being viewed"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -730,9 +711,11 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("gameCardData"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Details about game cards generated or interacted with",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Details about game cards generated or interacted with",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -746,18 +729,20 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("cardUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Unique identifier for the game card",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Unique identifier for the game card"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("generationSeed"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Random seed used for generation (for verification)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Random seed used for generation (for verification)",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -771,7 +756,9 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("itemId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("ID of the item/specimen")),
+                                description: Some(
+                                    CowStr::new_static("ID of the item/specimen"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -785,9 +772,9 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("rarity"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Rarity of the item/specimen",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Rarity of the item/specimen"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -806,23 +793,27 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("effectApplied"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Effect that was applied")),
+                                description: Some(
+                                    CowStr::new_static("Effect that was applied"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("inventoryRecordUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URI of the modified inventory record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("URI of the modified inventory record"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("itemId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("ID of the item used")),
+                                description: Some(
+                                    CowStr::new_static("ID of the item used"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1002,16 +993,18 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("metadata"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Additional event-specific metadata")),
+                    description: Some(
+                        CowStr::new_static("Additional event-specific metadata"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("clientVersion"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Version of the client application",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Version of the client application"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1031,9 +1024,9 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("platform"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Platform (web, mobile, etc.)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Platform (web, mobile, etc.)"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1051,9 +1044,7 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("itemId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("quantity"),
@@ -1064,9 +1055,7 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rarity"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1081,7 +1070,7 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
 
 pub mod log_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1138,7 +1127,7 @@ pub mod log_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogBuilder<S: BosStr, St: log_state::State> {
+pub struct LogBuilder<St: log_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<log::CollectionData<S>>,
@@ -1159,40 +1148,92 @@ pub struct LogBuilder<S: BosStr, St: log_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Log<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LogBuilder<S, log_state::Empty> {
+impl Log<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LogBuilder<log_state::Empty, DefaultStr> {
         LogBuilder::new()
     }
 }
 
-impl<S: BosStr> LogBuilder<S, log_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Log<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LogBuilder<log_state::Empty, S> {
+        LogBuilder::builder()
+    }
+}
+
+impl LogBuilder<log_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LogBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
+impl<S: BosStr> LogBuilder<log_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LogBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `collectionData` field (optional)
-    pub fn collection_data(mut self, value: impl Into<Option<log::CollectionData<S>>>) -> Self {
+    pub fn collection_data(
+        mut self,
+        value: impl Into<Option<log::CollectionData<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `collectionData` field to an Option value (optional)
-    pub fn maybe_collection_data(mut self, value: Option<log::CollectionData<S>>) -> Self {
+    pub fn maybe_collection_data(
+        mut self,
+        value: Option<log::CollectionData<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
 }
 
-impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
+impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -1205,7 +1246,7 @@ impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
+impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `dailyRewardsData` field (optional)
     pub fn daily_rewards_data(
         mut self,
@@ -1215,19 +1256,25 @@ impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
         self
     }
     /// Set the `dailyRewardsData` field to an Option value (optional)
-    pub fn maybe_daily_rewards_data(mut self, value: Option<log::DailyRewardsData<S>>) -> Self {
+    pub fn maybe_daily_rewards_data(
+        mut self,
+        value: Option<log::DailyRewardsData<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
 }
 
-impl<S: BosStr, St> LogBuilder<S, St>
+impl<St, S: BosStr> LogBuilder<St, S>
 where
     St: log_state::State,
     St::EventType: log_state::IsUnset,
 {
     /// Set the `eventType` field (required)
-    pub fn event_type(mut self, value: impl Into<S>) -> LogBuilder<S, log_state::SetEventType<St>> {
+    pub fn event_type(
+        mut self,
+        value: impl Into<S>,
+    ) -> LogBuilder<log_state::SetEventType<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
@@ -1237,9 +1284,12 @@ where
     }
 }
 
-impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
+impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `feedContext` field (optional)
-    pub fn feed_context(mut self, value: impl Into<Option<log::FeedContext<S>>>) -> Self {
+    pub fn feed_context(
+        mut self,
+        value: impl Into<Option<log::FeedContext<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -1250,9 +1300,12 @@ impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
+impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `gameCardData` field (optional)
-    pub fn game_card_data(mut self, value: impl Into<Option<log::GameCardData<S>>>) -> Self {
+    pub fn game_card_data(
+        mut self,
+        value: impl Into<Option<log::GameCardData<S>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -1263,7 +1316,7 @@ impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
+impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `gameCardId` field (optional)
     pub fn game_card_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -1276,20 +1329,26 @@ impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
+impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `itemUsageData` field (optional)
-    pub fn item_usage_data(mut self, value: impl Into<Option<log::ItemUsageData<S>>>) -> Self {
+    pub fn item_usage_data(
+        mut self,
+        value: impl Into<Option<log::ItemUsageData<S>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `itemUsageData` field to an Option value (optional)
-    pub fn maybe_item_usage_data(mut self, value: Option<log::ItemUsageData<S>>) -> Self {
+    pub fn maybe_item_usage_data(
+        mut self,
+        value: Option<log::ItemUsageData<S>>,
+    ) -> Self {
         self._fields.7 = value;
         self
     }
 }
 
-impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
+impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<log::Metadata<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -1302,7 +1361,7 @@ impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
+impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `parentLogUri` field (optional)
     pub fn parent_log_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -1315,7 +1374,7 @@ impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
+impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `rootLogUri` field (optional)
     pub fn root_log_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -1328,13 +1387,16 @@ impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LogBuilder<S, St>
+impl<St, S: BosStr> LogBuilder<St, S>
 where
     St: log_state::State,
     St::SessionId: log_state::IsUnset,
 {
     /// Set the `sessionId` field (required)
-    pub fn session_id(mut self, value: impl Into<S>) -> LogBuilder<S, log_state::SetSessionId<St>> {
+    pub fn session_id(
+        mut self,
+        value: impl Into<S>,
+    ) -> LogBuilder<log_state::SetSessionId<St>, S> {
         self._fields.11 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
@@ -1344,7 +1406,7 @@ where
     }
 }
 
-impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
+impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `sessionUri` field (optional)
     pub fn session_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
@@ -1357,7 +1419,7 @@ impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LogBuilder<S, St>
+impl<St, S: BosStr> LogBuilder<St, S>
 where
     St: log_state::State,
     St::Timestamp: log_state::IsUnset,
@@ -1366,7 +1428,7 @@ where
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LogBuilder<S, log_state::SetTimestamp<St>> {
+    ) -> LogBuilder<log_state::SetTimestamp<St>, S> {
         self._fields.13 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
@@ -1376,7 +1438,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LogBuilder<S, St>
+impl<St, S: BosStr> LogBuilder<St, S>
 where
     St: log_state::State,
     St::SessionId: log_state::IsSet,

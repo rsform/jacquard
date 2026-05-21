@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::stats::StatsView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::stats::StatsView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetStats<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetStatsOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: StatsView<S>,
@@ -65,7 +60,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetStatsRequest {
 
 pub mod get_stats_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -96,21 +91,28 @@ pub mod get_stats_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetStatsBuilder<S: BosStr, St: get_stats_state::State> {
+pub struct GetStatsBuilder<St: get_stats_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetStats<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetStatsBuilder<S, get_stats_state::Empty> {
+impl GetStats<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetStatsBuilder<get_stats_state::Empty, DefaultStr> {
         GetStatsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetStatsBuilder<S, get_stats_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetStats<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetStatsBuilder<get_stats_state::Empty, S> {
+        GetStatsBuilder::builder()
+    }
+}
+
+impl GetStatsBuilder<get_stats_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetStatsBuilder {
             _state: PhantomData,
@@ -120,7 +122,18 @@ impl<S: BosStr> GetStatsBuilder<S, get_stats_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetStatsBuilder<S, St>
+impl<S: BosStr> GetStatsBuilder<get_stats_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetStatsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetStatsBuilder<St, S>
 where
     St: get_stats_state::State,
     St::Did: get_stats_state::IsUnset,
@@ -129,7 +142,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetStatsBuilder<S, get_stats_state::SetDid<St>> {
+    ) -> GetStatsBuilder<get_stats_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetStatsBuilder {
             _state: PhantomData,
@@ -139,7 +152,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetStatsBuilder<S, St>
+impl<St, S: BosStr> GetStatsBuilder<St, S>
 where
     St: get_stats_state::State,
     St::Did: get_stats_state::IsSet,

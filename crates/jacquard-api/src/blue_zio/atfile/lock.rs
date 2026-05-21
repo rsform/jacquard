@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A reference to a locked file.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -104,7 +104,7 @@ impl<S: BosStr> LexiconSchema for Lock<S> {
 
 pub mod lock_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -122,21 +122,28 @@ pub mod lock_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LockBuilder<S: BosStr, St: lock_state::State> {
+pub struct LockBuilder<St: lock_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Lock<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LockBuilder<S, lock_state::Empty> {
+impl Lock<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LockBuilder<lock_state::Empty, DefaultStr> {
         LockBuilder::new()
     }
 }
 
-impl<S: BosStr> LockBuilder<S, lock_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Lock<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LockBuilder<lock_state::Empty, S> {
+        LockBuilder::builder()
+    }
+}
+
+impl LockBuilder<lock_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LockBuilder {
             _state: PhantomData,
@@ -146,7 +153,18 @@ impl<S: BosStr> LockBuilder<S, lock_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: lock_state::State> LockBuilder<S, St> {
+impl<S: BosStr> LockBuilder<lock_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LockBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: lock_state::State, S: BosStr> LockBuilder<St, S> {
     /// Set the `lock` field (optional)
     pub fn lock(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -159,7 +177,7 @@ impl<S: BosStr, St: lock_state::State> LockBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LockBuilder<S, St>
+impl<St, S: BosStr> LockBuilder<St, S>
 where
     St: lock_state::State,
 {
@@ -180,10 +198,10 @@ where
 }
 
 fn lexicon_doc_blue_zio_atfile_lock() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.zio.atfile.lock"),
@@ -192,7 +210,9 @@ fn lexicon_doc_blue_zio_atfile_lock() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A reference to a locked file.")),
+                    description: Some(
+                        CowStr::new_static("A reference to a locked file."),
+                    ),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
                         properties: {

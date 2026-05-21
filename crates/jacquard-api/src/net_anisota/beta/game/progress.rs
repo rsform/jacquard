@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::beta::game::progress;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::beta::game::progress;
 /// Record representing a player's level progression and game statistics
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -94,10 +94,7 @@ pub struct ProgressGetRecordOutput<S: BosStr = DefaultStr> {
 /// Additional metadata about this progress update
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Metadata<S: BosStr = DefaultStr> {
     ///Version of the client when this progress was recorded
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -112,10 +109,7 @@ pub struct Metadata<S: BosStr = DefaultStr> {
 /// Game-specific statistics and metrics
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Stats<S: BosStr = DefaultStr> {
     ///Total daily rewards claimed
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -336,7 +330,7 @@ impl<S: BosStr> LexiconSchema for Stats<S> {
 
 pub mod progress_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -344,90 +338,90 @@ pub mod progress_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type XpToNextLevel;
+        type TotalXp;
         type ProgressPercentage;
         type CreatedAt;
         type Level;
-        type TotalXp;
+        type XpToNextLevel;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type XpToNextLevel = Unset;
+        type TotalXp = Unset;
         type ProgressPercentage = Unset;
         type CreatedAt = Unset;
         type Level = Unset;
-        type TotalXp = Unset;
-    }
-    ///State transition - sets the `xp_to_next_level` field to Set
-    pub struct SetXpToNextLevel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetXpToNextLevel<St> {}
-    impl<St: State> State for SetXpToNextLevel<St> {
-        type XpToNextLevel = Set<members::xp_to_next_level>;
-        type ProgressPercentage = St::ProgressPercentage;
-        type CreatedAt = St::CreatedAt;
-        type Level = St::Level;
-        type TotalXp = St::TotalXp;
-    }
-    ///State transition - sets the `progress_percentage` field to Set
-    pub struct SetProgressPercentage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetProgressPercentage<St> {}
-    impl<St: State> State for SetProgressPercentage<St> {
-        type XpToNextLevel = St::XpToNextLevel;
-        type ProgressPercentage = Set<members::progress_percentage>;
-        type CreatedAt = St::CreatedAt;
-        type Level = St::Level;
-        type TotalXp = St::TotalXp;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type XpToNextLevel = St::XpToNextLevel;
-        type ProgressPercentage = St::ProgressPercentage;
-        type CreatedAt = Set<members::created_at>;
-        type Level = St::Level;
-        type TotalXp = St::TotalXp;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLevel<St> {}
-    impl<St: State> State for SetLevel<St> {
-        type XpToNextLevel = St::XpToNextLevel;
-        type ProgressPercentage = St::ProgressPercentage;
-        type CreatedAt = St::CreatedAt;
-        type Level = Set<members::level>;
-        type TotalXp = St::TotalXp;
+        type XpToNextLevel = Unset;
     }
     ///State transition - sets the `total_xp` field to Set
     pub struct SetTotalXp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTotalXp<St> {}
     impl<St: State> State for SetTotalXp<St> {
-        type XpToNextLevel = St::XpToNextLevel;
+        type TotalXp = Set<members::total_xp>;
         type ProgressPercentage = St::ProgressPercentage;
         type CreatedAt = St::CreatedAt;
         type Level = St::Level;
-        type TotalXp = Set<members::total_xp>;
+        type XpToNextLevel = St::XpToNextLevel;
+    }
+    ///State transition - sets the `progress_percentage` field to Set
+    pub struct SetProgressPercentage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetProgressPercentage<St> {}
+    impl<St: State> State for SetProgressPercentage<St> {
+        type TotalXp = St::TotalXp;
+        type ProgressPercentage = Set<members::progress_percentage>;
+        type CreatedAt = St::CreatedAt;
+        type Level = St::Level;
+        type XpToNextLevel = St::XpToNextLevel;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type TotalXp = St::TotalXp;
+        type ProgressPercentage = St::ProgressPercentage;
+        type CreatedAt = Set<members::created_at>;
+        type Level = St::Level;
+        type XpToNextLevel = St::XpToNextLevel;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
+        type TotalXp = St::TotalXp;
+        type ProgressPercentage = St::ProgressPercentage;
+        type CreatedAt = St::CreatedAt;
+        type Level = Set<members::level>;
+        type XpToNextLevel = St::XpToNextLevel;
+    }
+    ///State transition - sets the `xp_to_next_level` field to Set
+    pub struct SetXpToNextLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetXpToNextLevel<St> {}
+    impl<St: State> State for SetXpToNextLevel<St> {
+        type TotalXp = St::TotalXp;
+        type ProgressPercentage = St::ProgressPercentage;
+        type CreatedAt = St::CreatedAt;
+        type Level = St::Level;
+        type XpToNextLevel = Set<members::xp_to_next_level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `xp_to_next_level` field
-        pub struct xp_to_next_level(());
+        ///Marker type for the `total_xp` field
+        pub struct total_xp(());
         ///Marker type for the `progress_percentage` field
         pub struct progress_percentage(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `level` field
         pub struct level(());
-        ///Marker type for the `total_xp` field
-        pub struct total_xp(());
+        ///Marker type for the `xp_to_next_level` field
+        pub struct xp_to_next_level(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProgressBuilder<S: BosStr, St: progress_state::State> {
+pub struct ProgressBuilder<St: progress_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -449,20 +443,40 @@ pub struct ProgressBuilder<S: BosStr, St: progress_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Progress<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProgressBuilder<S, progress_state::Empty> {
+impl Progress<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProgressBuilder<progress_state::Empty, DefaultStr> {
         ProgressBuilder::new()
     }
 }
 
-impl<S: BosStr> ProgressBuilder<S, progress_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Progress<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProgressBuilder<progress_state::Empty, S> {
+        ProgressBuilder::builder()
+    }
+}
+
+impl ProgressBuilder<progress_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProgressBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -470,7 +484,34 @@ impl<S: BosStr> ProgressBuilder<S, progress_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
+impl<S: BosStr> ProgressBuilder<progress_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProgressBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: progress_state::State, S: BosStr> ProgressBuilder<St, S> {
     /// Set the `cardUri` field (optional)
     pub fn card_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -483,7 +524,7 @@ impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProgressBuilder<S, St>
+impl<St, S: BosStr> ProgressBuilder<St, S>
 where
     St: progress_state::State,
     St::CreatedAt: progress_state::IsUnset,
@@ -492,7 +533,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ProgressBuilder<S, progress_state::SetCreatedAt<St>> {
+    ) -> ProgressBuilder<progress_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ProgressBuilder {
             _state: PhantomData,
@@ -502,7 +543,7 @@ where
     }
 }
 
-impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
+impl<St: progress_state::State, S: BosStr> ProgressBuilder<St, S> {
     /// Set the `currentStamina` field (optional)
     pub fn current_stamina(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -515,7 +556,7 @@ impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProgressBuilder<S, St>
+impl<St, S: BosStr> ProgressBuilder<St, S>
 where
     St: progress_state::State,
     St::Level: progress_state::IsUnset,
@@ -524,7 +565,7 @@ where
     pub fn level(
         mut self,
         value: impl Into<i64>,
-    ) -> ProgressBuilder<S, progress_state::SetLevel<St>> {
+    ) -> ProgressBuilder<progress_state::SetLevel<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ProgressBuilder {
             _state: PhantomData,
@@ -534,7 +575,7 @@ where
     }
 }
 
-impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
+impl<St: progress_state::State, S: BosStr> ProgressBuilder<St, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<progress::Metadata<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -547,7 +588,7 @@ impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
+impl<St: progress_state::State, S: BosStr> ProgressBuilder<St, S> {
     /// Set the `previousLevel` field (optional)
     pub fn previous_level(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -560,7 +601,7 @@ impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProgressBuilder<S, St>
+impl<St, S: BosStr> ProgressBuilder<St, S>
 where
     St: progress_state::State,
     St::ProgressPercentage: progress_state::IsUnset,
@@ -569,7 +610,7 @@ where
     pub fn progress_percentage(
         mut self,
         value: impl Into<S>,
-    ) -> ProgressBuilder<S, progress_state::SetProgressPercentage<St>> {
+    ) -> ProgressBuilder<progress_state::SetProgressPercentage<St>, S> {
         self._fields.6 = Option::Some(value.into());
         ProgressBuilder {
             _state: PhantomData,
@@ -579,7 +620,7 @@ where
     }
 }
 
-impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
+impl<St: progress_state::State, S: BosStr> ProgressBuilder<St, S> {
     /// Set the `relatedLogUris` field (optional)
     pub fn related_log_uris(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -592,7 +633,7 @@ impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
+impl<St: progress_state::State, S: BosStr> ProgressBuilder<St, S> {
     /// Set the `sessionId` field (optional)
     pub fn session_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -605,7 +646,7 @@ impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
+impl<St: progress_state::State, S: BosStr> ProgressBuilder<St, S> {
     /// Set the `sessionUri` field (optional)
     pub fn session_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -618,7 +659,7 @@ impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
+impl<St: progress_state::State, S: BosStr> ProgressBuilder<St, S> {
     /// Set the `stats` field (optional)
     pub fn stats(mut self, value: impl Into<Option<progress::Stats<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -631,7 +672,7 @@ impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProgressBuilder<S, St>
+impl<St, S: BosStr> ProgressBuilder<St, S>
 where
     St: progress_state::State,
     St::TotalXp: progress_state::IsUnset,
@@ -640,7 +681,7 @@ where
     pub fn total_xp(
         mut self,
         value: impl Into<i64>,
-    ) -> ProgressBuilder<S, progress_state::SetTotalXp<St>> {
+    ) -> ProgressBuilder<progress_state::SetTotalXp<St>, S> {
         self._fields.11 = Option::Some(value.into());
         ProgressBuilder {
             _state: PhantomData,
@@ -650,7 +691,7 @@ where
     }
 }
 
-impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
+impl<St: progress_state::State, S: BosStr> ProgressBuilder<St, S> {
     /// Set the `triggerSource` field (optional)
     pub fn trigger_source(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
@@ -663,7 +704,7 @@ impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
+impl<St: progress_state::State, S: BosStr> ProgressBuilder<St, S> {
     /// Set the `xpGainedSinceLastSave` field (optional)
     pub fn xp_gained_since_last_save(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.13 = value.into();
@@ -676,7 +717,7 @@ impl<S: BosStr, St: progress_state::State> ProgressBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProgressBuilder<S, St>
+impl<St, S: BosStr> ProgressBuilder<St, S>
 where
     St: progress_state::State,
     St::XpToNextLevel: progress_state::IsUnset,
@@ -685,7 +726,7 @@ where
     pub fn xp_to_next_level(
         mut self,
         value: impl Into<i64>,
-    ) -> ProgressBuilder<S, progress_state::SetXpToNextLevel<St>> {
+    ) -> ProgressBuilder<progress_state::SetXpToNextLevel<St>, S> {
         self._fields.14 = Option::Some(value.into());
         ProgressBuilder {
             _state: PhantomData,
@@ -695,14 +736,14 @@ where
     }
 }
 
-impl<S: BosStr, St> ProgressBuilder<S, St>
+impl<St, S: BosStr> ProgressBuilder<St, S>
 where
     St: progress_state::State,
-    St::XpToNextLevel: progress_state::IsSet,
+    St::TotalXp: progress_state::IsSet,
     St::ProgressPercentage: progress_state::IsSet,
     St::CreatedAt: progress_state::IsSet,
     St::Level: progress_state::IsSet,
-    St::TotalXp: progress_state::IsSet,
+    St::XpToNextLevel: progress_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Progress<S> {
@@ -749,10 +790,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_beta_game_progress() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.beta.game.progress"),
@@ -929,27 +970,33 @@ fn lexicon_doc_net_anisota_beta_game_progress() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("metadata"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Additional metadata about this progress update",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Additional metadata about this progress update",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("clientVersion"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Version of the client when this progress was recorded",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Version of the client when this progress was recorded",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("platform"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Platform where the level up occurred (web, mobile, etc.)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Platform where the level up occurred (web, mobile, etc.)",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );

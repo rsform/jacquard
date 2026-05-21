@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Authorize<S: BosStr = DefaultStr> {
     pub authorize_options: Data<S>,
     pub input: S,
@@ -28,11 +25,9 @@ pub struct Authorize<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AuthorizeOutput<S: BosStr = DefaultStr> {
     pub url: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -50,8 +45,9 @@ impl jacquard_common::xrpc::XrpcResp for AuthorizeResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Authorize<S> {
     const NSID: &'static str = "app.ocho.auth.authorize";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = AuthorizeResponse;
 }
 
@@ -59,15 +55,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Authorize<S> {
 pub struct AuthorizeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AuthorizeRequest {
     const PATH: &'static str = "/xrpc/app.ocho.auth.authorize";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Authorize<S>;
     type Response = AuthorizeResponse;
 }
 
 pub mod authorize_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -75,56 +72,63 @@ pub mod authorize_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Input;
         type AuthorizeOptions;
+        type Input;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Input = Unset;
         type AuthorizeOptions = Unset;
-    }
-    ///State transition - sets the `input` field to Set
-    pub struct SetInput<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetInput<St> {}
-    impl<St: State> State for SetInput<St> {
-        type Input = Set<members::input>;
-        type AuthorizeOptions = St::AuthorizeOptions;
+        type Input = Unset;
     }
     ///State transition - sets the `authorize_options` field to Set
     pub struct SetAuthorizeOptions<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthorizeOptions<St> {}
     impl<St: State> State for SetAuthorizeOptions<St> {
-        type Input = St::Input;
         type AuthorizeOptions = Set<members::authorize_options>;
+        type Input = St::Input;
+    }
+    ///State transition - sets the `input` field to Set
+    pub struct SetInput<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetInput<St> {}
+    impl<St: State> State for SetInput<St> {
+        type AuthorizeOptions = St::AuthorizeOptions;
+        type Input = Set<members::input>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `input` field
-        pub struct input(());
         ///Marker type for the `authorize_options` field
         pub struct authorize_options(());
+        ///Marker type for the `input` field
+        pub struct input(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AuthorizeBuilder<S: BosStr, St: authorize_state::State> {
+pub struct AuthorizeBuilder<St: authorize_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Authorize<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AuthorizeBuilder<S, authorize_state::Empty> {
+impl Authorize<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AuthorizeBuilder<authorize_state::Empty, DefaultStr> {
         AuthorizeBuilder::new()
     }
 }
 
-impl<S: BosStr> AuthorizeBuilder<S, authorize_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Authorize<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AuthorizeBuilder<authorize_state::Empty, S> {
+        AuthorizeBuilder::builder()
+    }
+}
+
+impl AuthorizeBuilder<authorize_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AuthorizeBuilder {
             _state: PhantomData,
@@ -134,7 +138,18 @@ impl<S: BosStr> AuthorizeBuilder<S, authorize_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AuthorizeBuilder<S, St>
+impl<S: BosStr> AuthorizeBuilder<authorize_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AuthorizeBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AuthorizeBuilder<St, S>
 where
     St: authorize_state::State,
     St::AuthorizeOptions: authorize_state::IsUnset,
@@ -143,7 +158,7 @@ where
     pub fn authorize_options(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> AuthorizeBuilder<S, authorize_state::SetAuthorizeOptions<St>> {
+    ) -> AuthorizeBuilder<authorize_state::SetAuthorizeOptions<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AuthorizeBuilder {
             _state: PhantomData,
@@ -153,7 +168,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AuthorizeBuilder<S, St>
+impl<St, S: BosStr> AuthorizeBuilder<St, S>
 where
     St: authorize_state::State,
     St::Input: authorize_state::IsUnset,
@@ -162,7 +177,7 @@ where
     pub fn input(
         mut self,
         value: impl Into<S>,
-    ) -> AuthorizeBuilder<S, authorize_state::SetInput<St>> {
+    ) -> AuthorizeBuilder<authorize_state::SetInput<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AuthorizeBuilder {
             _state: PhantomData,
@@ -172,11 +187,11 @@ where
     }
 }
 
-impl<S: BosStr, St> AuthorizeBuilder<S, St>
+impl<St, S: BosStr> AuthorizeBuilder<St, S>
 where
     St: authorize_state::State,
-    St::Input: authorize_state::IsSet,
     St::AuthorizeOptions: authorize_state::IsSet,
+    St::Input: authorize_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Authorize<S> {
@@ -187,7 +202,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Authorize<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Authorize<S> {
         Authorize {
             authorize_options: self._fields.0.unwrap(),
             input: self._fields.1.unwrap(),

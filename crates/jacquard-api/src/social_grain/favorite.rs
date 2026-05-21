@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -103,7 +103,7 @@ impl<S: BosStr> LexiconSchema for Favorite<S> {
 
 pub mod favorite_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -146,21 +146,28 @@ pub mod favorite_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FavoriteBuilder<S: BosStr, St: favorite_state::State> {
+pub struct FavoriteBuilder<St: favorite_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Favorite<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FavoriteBuilder<S, favorite_state::Empty> {
+impl Favorite<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FavoriteBuilder<favorite_state::Empty, DefaultStr> {
         FavoriteBuilder::new()
     }
 }
 
-impl<S: BosStr> FavoriteBuilder<S, favorite_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Favorite<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FavoriteBuilder<favorite_state::Empty, S> {
+        FavoriteBuilder::builder()
+    }
+}
+
+impl FavoriteBuilder<favorite_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FavoriteBuilder {
             _state: PhantomData,
@@ -170,7 +177,18 @@ impl<S: BosStr> FavoriteBuilder<S, favorite_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FavoriteBuilder<S, St>
+impl<S: BosStr> FavoriteBuilder<favorite_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FavoriteBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FavoriteBuilder<St, S>
 where
     St: favorite_state::State,
     St::CreatedAt: favorite_state::IsUnset,
@@ -179,7 +197,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FavoriteBuilder<S, favorite_state::SetCreatedAt<St>> {
+    ) -> FavoriteBuilder<favorite_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FavoriteBuilder {
             _state: PhantomData,
@@ -189,7 +207,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FavoriteBuilder<S, St>
+impl<St, S: BosStr> FavoriteBuilder<St, S>
 where
     St: favorite_state::State,
     St::Subject: favorite_state::IsUnset,
@@ -198,7 +216,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> FavoriteBuilder<S, favorite_state::SetSubject<St>> {
+    ) -> FavoriteBuilder<favorite_state::SetSubject<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FavoriteBuilder {
             _state: PhantomData,
@@ -208,7 +226,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FavoriteBuilder<S, St>
+impl<St, S: BosStr> FavoriteBuilder<St, S>
 where
     St: favorite_state::State,
     St::CreatedAt: favorite_state::IsSet,
@@ -233,10 +251,10 @@ where
 }
 
 fn lexicon_doc_social_grain_favorite() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.grain.favorite"),
@@ -247,10 +265,12 @@ fn lexicon_doc_social_grain_favorite() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("subject"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("subject")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

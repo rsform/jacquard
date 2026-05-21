@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Details about a specific contribution including role, description, and timeframe.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -148,7 +148,7 @@ impl<S: BosStr> LexiconSchema for Contribution<S> {
 
 pub mod contribution_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -179,7 +179,7 @@ pub mod contribution_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ContributionBuilder<S: BosStr, St: contribution_state::State> {
+pub struct ContributionBuilder<St: contribution_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -191,15 +191,22 @@ pub struct ContributionBuilder<S: BosStr, St: contribution_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Contribution<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ContributionBuilder<S, contribution_state::Empty> {
+impl Contribution<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ContributionBuilder<contribution_state::Empty, DefaultStr> {
         ContributionBuilder::new()
     }
 }
 
-impl<S: BosStr> ContributionBuilder<S, contribution_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Contribution<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ContributionBuilder<contribution_state::Empty, S> {
+        ContributionBuilder::builder()
+    }
+}
+
+impl ContributionBuilder<contribution_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ContributionBuilder {
             _state: PhantomData,
@@ -209,7 +216,18 @@ impl<S: BosStr> ContributionBuilder<S, contribution_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
+impl<S: BosStr> ContributionBuilder<contribution_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ContributionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: contribution_state::State, S: BosStr> ContributionBuilder<St, S> {
     /// Set the `contributionDescription` field (optional)
     pub fn contribution_description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -222,7 +240,7 @@ impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ContributionBuilder<S, St>
+impl<St, S: BosStr> ContributionBuilder<St, S>
 where
     St: contribution_state::State,
     St::CreatedAt: contribution_state::IsUnset,
@@ -231,7 +249,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ContributionBuilder<S, contribution_state::SetCreatedAt<St>> {
+    ) -> ContributionBuilder<contribution_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ContributionBuilder {
             _state: PhantomData,
@@ -241,7 +259,7 @@ where
     }
 }
 
-impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
+impl<St: contribution_state::State, S: BosStr> ContributionBuilder<St, S> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -254,7 +272,7 @@ impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
+impl<St: contribution_state::State, S: BosStr> ContributionBuilder<St, S> {
     /// Set the `role` field (optional)
     pub fn role(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -267,7 +285,7 @@ impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
+impl<St: contribution_state::State, S: BosStr> ContributionBuilder<St, S> {
     /// Set the `startDate` field (optional)
     pub fn start_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -280,7 +298,7 @@ impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ContributionBuilder<S, St>
+impl<St, S: BosStr> ContributionBuilder<St, S>
 where
     St: contribution_state::State,
     St::CreatedAt: contribution_state::IsSet,
@@ -297,7 +315,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Contribution<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Contribution<S> {
         Contribution {
             contribution_description: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -310,10 +331,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_claim_contribution() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.claim.contribution"),

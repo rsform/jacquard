@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blue__2048::SyncStatus;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blue__2048::SyncStatus;
 /// A declaration of a at://2048 player's stats over the course of their playtime
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -155,7 +155,7 @@ fn _default_stats_total_score() -> i64 {
 
 pub mod stats_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -163,183 +163,190 @@ pub mod stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
+        type GamesPlayed;
+        type LeastMovesToFindTwentyFortyEight;
+        type TimesTwentyFortyEightBeenFound;
+        type TotalScore;
+        type AverageScore;
         type SyncStatus;
+        type CreatedAt;
         type HighestScore;
         type HighestNumberBlock;
-        type TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight;
-        type AverageScore;
-        type TotalScore;
-        type GamesPlayed;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
+        type GamesPlayed = Unset;
+        type LeastMovesToFindTwentyFortyEight = Unset;
+        type TimesTwentyFortyEightBeenFound = Unset;
+        type TotalScore = Unset;
+        type AverageScore = Unset;
         type SyncStatus = Unset;
+        type CreatedAt = Unset;
         type HighestScore = Unset;
         type HighestNumberBlock = Unset;
-        type TimesTwentyFortyEightBeenFound = Unset;
-        type LeastMovesToFindTwentyFortyEight = Unset;
-        type AverageScore = Unset;
-        type TotalScore = Unset;
-        type GamesPlayed = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type SyncStatus = St::SyncStatus;
-        type HighestScore = St::HighestScore;
-        type HighestNumberBlock = St::HighestNumberBlock;
-        type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
-        type AverageScore = St::AverageScore;
-        type TotalScore = St::TotalScore;
-        type GamesPlayed = St::GamesPlayed;
-    }
-    ///State transition - sets the `sync_status` field to Set
-    pub struct SetSyncStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSyncStatus<St> {}
-    impl<St: State> State for SetSyncStatus<St> {
-        type CreatedAt = St::CreatedAt;
-        type SyncStatus = Set<members::sync_status>;
-        type HighestScore = St::HighestScore;
-        type HighestNumberBlock = St::HighestNumberBlock;
-        type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
-        type AverageScore = St::AverageScore;
-        type TotalScore = St::TotalScore;
-        type GamesPlayed = St::GamesPlayed;
-    }
-    ///State transition - sets the `highest_score` field to Set
-    pub struct SetHighestScore<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHighestScore<St> {}
-    impl<St: State> State for SetHighestScore<St> {
-        type CreatedAt = St::CreatedAt;
-        type SyncStatus = St::SyncStatus;
-        type HighestScore = Set<members::highest_score>;
-        type HighestNumberBlock = St::HighestNumberBlock;
-        type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
-        type AverageScore = St::AverageScore;
-        type TotalScore = St::TotalScore;
-        type GamesPlayed = St::GamesPlayed;
-    }
-    ///State transition - sets the `highest_number_block` field to Set
-    pub struct SetHighestNumberBlock<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHighestNumberBlock<St> {}
-    impl<St: State> State for SetHighestNumberBlock<St> {
-        type CreatedAt = St::CreatedAt;
-        type SyncStatus = St::SyncStatus;
-        type HighestScore = St::HighestScore;
-        type HighestNumberBlock = Set<members::highest_number_block>;
-        type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
-        type AverageScore = St::AverageScore;
-        type TotalScore = St::TotalScore;
-        type GamesPlayed = St::GamesPlayed;
-    }
-    ///State transition - sets the `times_twenty_forty_eight_been_found` field to Set
-    pub struct SetTimesTwentyFortyEightBeenFound<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTimesTwentyFortyEightBeenFound<St> {}
-    impl<St: State> State for SetTimesTwentyFortyEightBeenFound<St> {
-        type CreatedAt = St::CreatedAt;
-        type SyncStatus = St::SyncStatus;
-        type HighestScore = St::HighestScore;
-        type HighestNumberBlock = St::HighestNumberBlock;
-        type TimesTwentyFortyEightBeenFound = Set<members::times_twenty_forty_eight_been_found>;
-        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
-        type AverageScore = St::AverageScore;
-        type TotalScore = St::TotalScore;
-        type GamesPlayed = St::GamesPlayed;
-    }
-    ///State transition - sets the `least_moves_to_find_twenty_forty_eight` field to Set
-    pub struct SetLeastMovesToFindTwentyFortyEight<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLeastMovesToFindTwentyFortyEight<St> {}
-    impl<St: State> State for SetLeastMovesToFindTwentyFortyEight<St> {
-        type CreatedAt = St::CreatedAt;
-        type SyncStatus = St::SyncStatus;
-        type HighestScore = St::HighestScore;
-        type HighestNumberBlock = St::HighestNumberBlock;
-        type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight =
-            Set<members::least_moves_to_find_twenty_forty_eight>;
-        type AverageScore = St::AverageScore;
-        type TotalScore = St::TotalScore;
-        type GamesPlayed = St::GamesPlayed;
-    }
-    ///State transition - sets the `average_score` field to Set
-    pub struct SetAverageScore<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAverageScore<St> {}
-    impl<St: State> State for SetAverageScore<St> {
-        type CreatedAt = St::CreatedAt;
-        type SyncStatus = St::SyncStatus;
-        type HighestScore = St::HighestScore;
-        type HighestNumberBlock = St::HighestNumberBlock;
-        type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
-        type AverageScore = Set<members::average_score>;
-        type TotalScore = St::TotalScore;
-        type GamesPlayed = St::GamesPlayed;
-    }
-    ///State transition - sets the `total_score` field to Set
-    pub struct SetTotalScore<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTotalScore<St> {}
-    impl<St: State> State for SetTotalScore<St> {
-        type CreatedAt = St::CreatedAt;
-        type SyncStatus = St::SyncStatus;
-        type HighestScore = St::HighestScore;
-        type HighestNumberBlock = St::HighestNumberBlock;
-        type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
-        type AverageScore = St::AverageScore;
-        type TotalScore = Set<members::total_score>;
-        type GamesPlayed = St::GamesPlayed;
     }
     ///State transition - sets the `games_played` field to Set
     pub struct SetGamesPlayed<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGamesPlayed<St> {}
     impl<St: State> State for SetGamesPlayed<St> {
-        type CreatedAt = St::CreatedAt;
+        type GamesPlayed = Set<members::games_played>;
+        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
+        type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
+        type TotalScore = St::TotalScore;
+        type AverageScore = St::AverageScore;
         type SyncStatus = St::SyncStatus;
+        type CreatedAt = St::CreatedAt;
         type HighestScore = St::HighestScore;
         type HighestNumberBlock = St::HighestNumberBlock;
+    }
+    ///State transition - sets the `least_moves_to_find_twenty_forty_eight` field to Set
+    pub struct SetLeastMovesToFindTwentyFortyEight<St: State = Empty>(
+        PhantomData<fn() -> St>,
+    );
+    impl<St: State> sealed::Sealed for SetLeastMovesToFindTwentyFortyEight<St> {}
+    impl<St: State> State for SetLeastMovesToFindTwentyFortyEight<St> {
+        type GamesPlayed = St::GamesPlayed;
+        type LeastMovesToFindTwentyFortyEight = Set<
+            members::least_moves_to_find_twenty_forty_eight,
+        >;
         type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
-        type AverageScore = St::AverageScore;
         type TotalScore = St::TotalScore;
-        type GamesPlayed = Set<members::games_played>;
+        type AverageScore = St::AverageScore;
+        type SyncStatus = St::SyncStatus;
+        type CreatedAt = St::CreatedAt;
+        type HighestScore = St::HighestScore;
+        type HighestNumberBlock = St::HighestNumberBlock;
+    }
+    ///State transition - sets the `times_twenty_forty_eight_been_found` field to Set
+    pub struct SetTimesTwentyFortyEightBeenFound<St: State = Empty>(
+        PhantomData<fn() -> St>,
+    );
+    impl<St: State> sealed::Sealed for SetTimesTwentyFortyEightBeenFound<St> {}
+    impl<St: State> State for SetTimesTwentyFortyEightBeenFound<St> {
+        type GamesPlayed = St::GamesPlayed;
+        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
+        type TimesTwentyFortyEightBeenFound = Set<
+            members::times_twenty_forty_eight_been_found,
+        >;
+        type TotalScore = St::TotalScore;
+        type AverageScore = St::AverageScore;
+        type SyncStatus = St::SyncStatus;
+        type CreatedAt = St::CreatedAt;
+        type HighestScore = St::HighestScore;
+        type HighestNumberBlock = St::HighestNumberBlock;
+    }
+    ///State transition - sets the `total_score` field to Set
+    pub struct SetTotalScore<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTotalScore<St> {}
+    impl<St: State> State for SetTotalScore<St> {
+        type GamesPlayed = St::GamesPlayed;
+        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
+        type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
+        type TotalScore = Set<members::total_score>;
+        type AverageScore = St::AverageScore;
+        type SyncStatus = St::SyncStatus;
+        type CreatedAt = St::CreatedAt;
+        type HighestScore = St::HighestScore;
+        type HighestNumberBlock = St::HighestNumberBlock;
+    }
+    ///State transition - sets the `average_score` field to Set
+    pub struct SetAverageScore<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAverageScore<St> {}
+    impl<St: State> State for SetAverageScore<St> {
+        type GamesPlayed = St::GamesPlayed;
+        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
+        type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
+        type TotalScore = St::TotalScore;
+        type AverageScore = Set<members::average_score>;
+        type SyncStatus = St::SyncStatus;
+        type CreatedAt = St::CreatedAt;
+        type HighestScore = St::HighestScore;
+        type HighestNumberBlock = St::HighestNumberBlock;
+    }
+    ///State transition - sets the `sync_status` field to Set
+    pub struct SetSyncStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSyncStatus<St> {}
+    impl<St: State> State for SetSyncStatus<St> {
+        type GamesPlayed = St::GamesPlayed;
+        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
+        type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
+        type TotalScore = St::TotalScore;
+        type AverageScore = St::AverageScore;
+        type SyncStatus = Set<members::sync_status>;
+        type CreatedAt = St::CreatedAt;
+        type HighestScore = St::HighestScore;
+        type HighestNumberBlock = St::HighestNumberBlock;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type GamesPlayed = St::GamesPlayed;
+        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
+        type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
+        type TotalScore = St::TotalScore;
+        type AverageScore = St::AverageScore;
+        type SyncStatus = St::SyncStatus;
+        type CreatedAt = Set<members::created_at>;
+        type HighestScore = St::HighestScore;
+        type HighestNumberBlock = St::HighestNumberBlock;
+    }
+    ///State transition - sets the `highest_score` field to Set
+    pub struct SetHighestScore<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHighestScore<St> {}
+    impl<St: State> State for SetHighestScore<St> {
+        type GamesPlayed = St::GamesPlayed;
+        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
+        type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
+        type TotalScore = St::TotalScore;
+        type AverageScore = St::AverageScore;
+        type SyncStatus = St::SyncStatus;
+        type CreatedAt = St::CreatedAt;
+        type HighestScore = Set<members::highest_score>;
+        type HighestNumberBlock = St::HighestNumberBlock;
+    }
+    ///State transition - sets the `highest_number_block` field to Set
+    pub struct SetHighestNumberBlock<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHighestNumberBlock<St> {}
+    impl<St: State> State for SetHighestNumberBlock<St> {
+        type GamesPlayed = St::GamesPlayed;
+        type LeastMovesToFindTwentyFortyEight = St::LeastMovesToFindTwentyFortyEight;
+        type TimesTwentyFortyEightBeenFound = St::TimesTwentyFortyEightBeenFound;
+        type TotalScore = St::TotalScore;
+        type AverageScore = St::AverageScore;
+        type SyncStatus = St::SyncStatus;
+        type CreatedAt = St::CreatedAt;
+        type HighestScore = St::HighestScore;
+        type HighestNumberBlock = Set<members::highest_number_block>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `games_played` field
+        pub struct games_played(());
+        ///Marker type for the `least_moves_to_find_twenty_forty_eight` field
+        pub struct least_moves_to_find_twenty_forty_eight(());
+        ///Marker type for the `times_twenty_forty_eight_been_found` field
+        pub struct times_twenty_forty_eight_been_found(());
+        ///Marker type for the `total_score` field
+        pub struct total_score(());
+        ///Marker type for the `average_score` field
+        pub struct average_score(());
         ///Marker type for the `sync_status` field
         pub struct sync_status(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `highest_score` field
         pub struct highest_score(());
         ///Marker type for the `highest_number_block` field
         pub struct highest_number_block(());
-        ///Marker type for the `times_twenty_forty_eight_been_found` field
-        pub struct times_twenty_forty_eight_been_found(());
-        ///Marker type for the `least_moves_to_find_twenty_forty_eight` field
-        pub struct least_moves_to_find_twenty_forty_eight(());
-        ///Marker type for the `average_score` field
-        pub struct average_score(());
-        ///Marker type for the `total_score` field
-        pub struct total_score(());
-        ///Marker type for the `games_played` field
-        pub struct games_played(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StatsBuilder<S: BosStr, St: stats_state::State> {
+pub struct StatsBuilder<St: stats_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
@@ -355,15 +362,22 @@ pub struct StatsBuilder<S: BosStr, St: stats_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Stats<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StatsBuilder<S, stats_state::Empty> {
+impl Stats<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StatsBuilder<stats_state::Empty, DefaultStr> {
         StatsBuilder::new()
     }
 }
 
-impl<S: BosStr> StatsBuilder<S, stats_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Stats<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StatsBuilder<stats_state::Empty, S> {
+        StatsBuilder::builder()
+    }
+}
+
+impl StatsBuilder<stats_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StatsBuilder {
             _state: PhantomData,
@@ -373,7 +387,18 @@ impl<S: BosStr> StatsBuilder<S, stats_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StatsBuilder<S, St>
+impl<S: BosStr> StatsBuilder<stats_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StatsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StatsBuilder<St, S>
 where
     St: stats_state::State,
     St::AverageScore: stats_state::IsUnset,
@@ -382,7 +407,7 @@ where
     pub fn average_score(
         mut self,
         value: impl Into<i64>,
-    ) -> StatsBuilder<S, stats_state::SetAverageScore<St>> {
+    ) -> StatsBuilder<stats_state::SetAverageScore<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
@@ -392,7 +417,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatsBuilder<S, St>
+impl<St, S: BosStr> StatsBuilder<St, S>
 where
     St: stats_state::State,
     St::CreatedAt: stats_state::IsUnset,
@@ -401,7 +426,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StatsBuilder<S, stats_state::SetCreatedAt<St>> {
+    ) -> StatsBuilder<stats_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
@@ -411,7 +436,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatsBuilder<S, St>
+impl<St, S: BosStr> StatsBuilder<St, S>
 where
     St: stats_state::State,
     St::GamesPlayed: stats_state::IsUnset,
@@ -420,7 +445,7 @@ where
     pub fn games_played(
         mut self,
         value: impl Into<i64>,
-    ) -> StatsBuilder<S, stats_state::SetGamesPlayed<St>> {
+    ) -> StatsBuilder<stats_state::SetGamesPlayed<St>, S> {
         self._fields.2 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
@@ -430,7 +455,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatsBuilder<S, St>
+impl<St, S: BosStr> StatsBuilder<St, S>
 where
     St: stats_state::State,
     St::HighestNumberBlock: stats_state::IsUnset,
@@ -439,7 +464,7 @@ where
     pub fn highest_number_block(
         mut self,
         value: impl Into<i64>,
-    ) -> StatsBuilder<S, stats_state::SetHighestNumberBlock<St>> {
+    ) -> StatsBuilder<stats_state::SetHighestNumberBlock<St>, S> {
         self._fields.3 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
@@ -449,7 +474,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatsBuilder<S, St>
+impl<St, S: BosStr> StatsBuilder<St, S>
 where
     St: stats_state::State,
     St::HighestScore: stats_state::IsUnset,
@@ -458,7 +483,7 @@ where
     pub fn highest_score(
         mut self,
         value: impl Into<i64>,
-    ) -> StatsBuilder<S, stats_state::SetHighestScore<St>> {
+    ) -> StatsBuilder<stats_state::SetHighestScore<St>, S> {
         self._fields.4 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
@@ -468,7 +493,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatsBuilder<S, St>
+impl<St, S: BosStr> StatsBuilder<St, S>
 where
     St: stats_state::State,
     St::LeastMovesToFindTwentyFortyEight: stats_state::IsUnset,
@@ -477,7 +502,7 @@ where
     pub fn least_moves_to_find_twenty_forty_eight(
         mut self,
         value: impl Into<i64>,
-    ) -> StatsBuilder<S, stats_state::SetLeastMovesToFindTwentyFortyEight<St>> {
+    ) -> StatsBuilder<stats_state::SetLeastMovesToFindTwentyFortyEight<St>, S> {
         self._fields.5 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
@@ -487,7 +512,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatsBuilder<S, St>
+impl<St, S: BosStr> StatsBuilder<St, S>
 where
     St: stats_state::State,
     St::SyncStatus: stats_state::IsUnset,
@@ -496,7 +521,7 @@ where
     pub fn sync_status(
         mut self,
         value: impl Into<SyncStatus<S>>,
-    ) -> StatsBuilder<S, stats_state::SetSyncStatus<St>> {
+    ) -> StatsBuilder<stats_state::SetSyncStatus<St>, S> {
         self._fields.6 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
@@ -506,7 +531,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatsBuilder<S, St>
+impl<St, S: BosStr> StatsBuilder<St, S>
 where
     St: stats_state::State,
     St::TimesTwentyFortyEightBeenFound: stats_state::IsUnset,
@@ -515,7 +540,7 @@ where
     pub fn times_twenty_forty_eight_been_found(
         mut self,
         value: impl Into<i64>,
-    ) -> StatsBuilder<S, stats_state::SetTimesTwentyFortyEightBeenFound<St>> {
+    ) -> StatsBuilder<stats_state::SetTimesTwentyFortyEightBeenFound<St>, S> {
         self._fields.7 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
@@ -525,7 +550,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatsBuilder<S, St>
+impl<St, S: BosStr> StatsBuilder<St, S>
 where
     St: stats_state::State,
     St::TotalScore: stats_state::IsUnset,
@@ -534,7 +559,7 @@ where
     pub fn total_score(
         mut self,
         value: impl Into<i64>,
-    ) -> StatsBuilder<S, stats_state::SetTotalScore<St>> {
+    ) -> StatsBuilder<stats_state::SetTotalScore<St>, S> {
         self._fields.8 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
@@ -544,18 +569,18 @@ where
     }
 }
 
-impl<S: BosStr, St> StatsBuilder<S, St>
+impl<St, S: BosStr> StatsBuilder<St, S>
 where
     St: stats_state::State,
-    St::CreatedAt: stats_state::IsSet,
+    St::GamesPlayed: stats_state::IsSet,
+    St::LeastMovesToFindTwentyFortyEight: stats_state::IsSet,
+    St::TimesTwentyFortyEightBeenFound: stats_state::IsSet,
+    St::TotalScore: stats_state::IsSet,
+    St::AverageScore: stats_state::IsSet,
     St::SyncStatus: stats_state::IsSet,
+    St::CreatedAt: stats_state::IsSet,
     St::HighestScore: stats_state::IsSet,
     St::HighestNumberBlock: stats_state::IsSet,
-    St::TimesTwentyFortyEightBeenFound: stats_state::IsSet,
-    St::LeastMovesToFindTwentyFortyEight: stats_state::IsSet,
-    St::AverageScore: stats_state::IsSet,
-    St::TotalScore: stats_state::IsSet,
-    St::GamesPlayed: stats_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Stats<S> {
@@ -590,10 +615,10 @@ where
 }
 
 fn lexicon_doc_blue_2048_player_stats() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.2048.player.stats"),

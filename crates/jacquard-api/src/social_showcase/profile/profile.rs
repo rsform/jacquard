@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::social_showcase::ShowcaseItem;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_showcase::ShowcaseItem;
 /// User profile record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -169,23 +169,25 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/webp".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -208,23 +210,25 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("banner"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/webp".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -332,7 +336,7 @@ fn _default_profile_schema_version() -> Option<i64> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -340,72 +344,72 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Handle;
-        type Tags;
         type Did;
+        type Tags;
+        type Handle;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Handle = Unset;
-        type Tags = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Handle = St::Handle;
-        type Tags = St::Tags;
-        type Did = St::Did;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHandle<St> {}
-    impl<St: State> State for SetHandle<St> {
-        type CreatedAt = St::CreatedAt;
-        type Handle = Set<members::handle>;
-        type Tags = St::Tags;
-        type Did = St::Did;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTags<St> {}
-    impl<St: State> State for SetTags<St> {
-        type CreatedAt = St::CreatedAt;
-        type Handle = St::Handle;
-        type Tags = Set<members::tags>;
-        type Did = St::Did;
+        type Tags = Unset;
+        type Handle = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type CreatedAt = St::CreatedAt;
-        type Handle = St::Handle;
-        type Tags = St::Tags;
         type Did = Set<members::did>;
+        type Tags = St::Tags;
+        type Handle = St::Handle;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTags<St> {}
+    impl<St: State> State for SetTags<St> {
+        type Did = St::Did;
+        type Tags = Set<members::tags>;
+        type Handle = St::Handle;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Did = St::Did;
+        type Tags = St::Tags;
+        type Handle = Set<members::handle>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Did = St::Did;
+        type Tags = St::Tags;
+        type Handle = St::Handle;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `handle` field
-        pub struct handle(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
+pub struct ProfileBuilder<St: profile_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -428,28 +432,77 @@ pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Profile<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProfileBuilder<S, profile_state::Empty> {
+impl Profile<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProfileBuilder<profile_state::Empty, DefaultStr> {
         ProfileBuilder::new()
     }
 }
 
-impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Profile<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProfileBuilder<profile_state::Empty, S> {
+        ProfileBuilder::builder()
+    }
+}
+
+impl ProfileBuilder<profile_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProfileBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `accentColor` field (optional)
     pub fn accent_color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -462,7 +515,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -475,7 +528,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `banner` field (optional)
     pub fn banner(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -488,7 +541,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `bio` field (optional)
     pub fn bio(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -501,7 +554,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `collectionCount` field (optional)
     pub fn collection_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -514,7 +567,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::CreatedAt: profile_state::IsUnset,
@@ -523,7 +576,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ProfileBuilder<S, profile_state::SetCreatedAt<St>> {
+    ) -> ProfileBuilder<profile_state::SetCreatedAt<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -533,13 +586,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::Did: profile_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<S>) -> ProfileBuilder<S, profile_state::SetDid<St>> {
+    pub fn did(
+        mut self,
+        value: impl Into<S>,
+    ) -> ProfileBuilder<profile_state::SetDid<St>, S> {
         self._fields.6 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -549,7 +605,7 @@ where
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -562,7 +618,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::Handle: profile_state::IsUnset,
@@ -571,7 +627,7 @@ where
     pub fn handle(
         mut self,
         value: impl Into<S>,
-    ) -> ProfileBuilder<S, profile_state::SetHandle<St>> {
+    ) -> ProfileBuilder<profile_state::SetHandle<St>, S> {
         self._fields.8 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -581,7 +637,7 @@ where
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `itemCount` field (optional)
     pub fn item_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.9 = value.into();
@@ -594,7 +650,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `schemaVersion` field (optional)
     pub fn schema_version(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.10 = value.into();
@@ -607,7 +663,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `showcase` field (optional)
     pub fn showcase(mut self, value: impl Into<Option<Vec<ShowcaseItem<S>>>>) -> Self {
         self._fields.11 = value.into();
@@ -620,7 +676,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::Tags: profile_state::IsUnset,
@@ -629,7 +685,7 @@ where
     pub fn tags(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> ProfileBuilder<S, profile_state::SetTags<St>> {
+    ) -> ProfileBuilder<profile_state::SetTags<St>, S> {
         self._fields.12 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -639,7 +695,7 @@ where
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.13 = value.into();
@@ -652,7 +708,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.14 = value.into();
@@ -665,7 +721,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `website` field (optional)
     pub fn website(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.15 = value.into();
@@ -678,13 +734,13 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
-    St::CreatedAt: profile_state::IsSet,
-    St::Handle: profile_state::IsSet,
-    St::Tags: profile_state::IsSet,
     St::Did: profile_state::IsSet,
+    St::Tags: profile_state::IsSet,
+    St::Handle: profile_state::IsSet,
+    St::CreatedAt: profile_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Profile<S> {
@@ -733,10 +789,10 @@ where
 }
 
 fn lexicon_doc_social_showcase_profile_profile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.showcase.profile.profile"),
@@ -748,41 +804,42 @@ fn lexicon_doc_social_showcase_profile_profile() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("User profile record")),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("did"),
-                            SmolStr::new_static("handle"),
-                            SmolStr::new_static("tags"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("did"), SmolStr::new_static("handle"),
+                                SmolStr::new_static("tags"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("accentColor"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Custom accent color hex code (e.g. #2e4a6e)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Custom accent color hex code (e.g. #2e4a6e)",
+                                        ),
+                                    ),
                                     max_length: Some(7usize),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("avatar"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("banner"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("bio"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Profile description")),
+                                    description: Some(
+                                        CowStr::new_static("Profile description"),
+                                    ),
                                     max_length: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -839,9 +896,9 @@ fn lexicon_doc_social_showcase_profile_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("showcase"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Featured showcase items",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Featured showcase items"),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static(
                                             "social.showcase.defs#showcaseItem",
@@ -855,9 +912,9 @@ fn lexicon_doc_social_showcase_profile_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tags"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Profile tags for discovery (max 10)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Profile tags for discovery (max 10)"),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(64usize),
                                         ..Default::default()
@@ -869,9 +926,9 @@ fn lexicon_doc_social_showcase_profile_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("theme"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Profile theme preset name",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Profile theme preset name"),
+                                    ),
                                     max_length: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -886,7 +943,9 @@ fn lexicon_doc_social_showcase_profile_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("website"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("External website URL")),
+                                    description: Some(
+                                        CowStr::new_static("External website URL"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     max_length: Some(2048usize),
                                     ..Default::default()

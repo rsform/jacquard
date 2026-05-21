@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Marks the start of a quiz session
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -111,7 +111,7 @@ impl<S: BosStr> LexiconSchema for QuizBegin<S> {
 
 pub mod quiz_begin_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -119,72 +119,72 @@ pub mod quiz_begin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Quiz;
         type EndsAt;
         type League;
         type StartedAt;
-        type Quiz;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Quiz = Unset;
         type EndsAt = Unset;
         type League = Unset;
         type StartedAt = Unset;
-        type Quiz = Unset;
-    }
-    ///State transition - sets the `ends_at` field to Set
-    pub struct SetEndsAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEndsAt<St> {}
-    impl<St: State> State for SetEndsAt<St> {
-        type EndsAt = Set<members::ends_at>;
-        type League = St::League;
-        type StartedAt = St::StartedAt;
-        type Quiz = St::Quiz;
-    }
-    ///State transition - sets the `league` field to Set
-    pub struct SetLeague<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLeague<St> {}
-    impl<St: State> State for SetLeague<St> {
-        type EndsAt = St::EndsAt;
-        type League = Set<members::league>;
-        type StartedAt = St::StartedAt;
-        type Quiz = St::Quiz;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStartedAt<St> {}
-    impl<St: State> State for SetStartedAt<St> {
-        type EndsAt = St::EndsAt;
-        type League = St::League;
-        type StartedAt = Set<members::started_at>;
-        type Quiz = St::Quiz;
     }
     ///State transition - sets the `quiz` field to Set
     pub struct SetQuiz<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetQuiz<St> {}
     impl<St: State> State for SetQuiz<St> {
+        type Quiz = Set<members::quiz>;
         type EndsAt = St::EndsAt;
         type League = St::League;
         type StartedAt = St::StartedAt;
-        type Quiz = Set<members::quiz>;
+    }
+    ///State transition - sets the `ends_at` field to Set
+    pub struct SetEndsAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEndsAt<St> {}
+    impl<St: State> State for SetEndsAt<St> {
+        type Quiz = St::Quiz;
+        type EndsAt = Set<members::ends_at>;
+        type League = St::League;
+        type StartedAt = St::StartedAt;
+    }
+    ///State transition - sets the `league` field to Set
+    pub struct SetLeague<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLeague<St> {}
+    impl<St: State> State for SetLeague<St> {
+        type Quiz = St::Quiz;
+        type EndsAt = St::EndsAt;
+        type League = Set<members::league>;
+        type StartedAt = St::StartedAt;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartedAt<St> {}
+    impl<St: State> State for SetStartedAt<St> {
+        type Quiz = St::Quiz;
+        type EndsAt = St::EndsAt;
+        type League = St::League;
+        type StartedAt = Set<members::started_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `quiz` field
+        pub struct quiz(());
         ///Marker type for the `ends_at` field
         pub struct ends_at(());
         ///Marker type for the `league` field
         pub struct league(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
-        ///Marker type for the `quiz` field
-        pub struct quiz(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct QuizBeginBuilder<S: BosStr, St: quiz_begin_state::State> {
+pub struct QuizBeginBuilder<St: quiz_begin_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -195,15 +195,22 @@ pub struct QuizBeginBuilder<S: BosStr, St: quiz_begin_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> QuizBegin<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> QuizBeginBuilder<S, quiz_begin_state::Empty> {
+impl QuizBegin<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> QuizBeginBuilder<quiz_begin_state::Empty, DefaultStr> {
         QuizBeginBuilder::new()
     }
 }
 
-impl<S: BosStr> QuizBeginBuilder<S, quiz_begin_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> QuizBegin<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> QuizBeginBuilder<quiz_begin_state::Empty, S> {
+        QuizBeginBuilder::builder()
+    }
+}
+
+impl QuizBeginBuilder<quiz_begin_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         QuizBeginBuilder {
             _state: PhantomData,
@@ -213,7 +220,18 @@ impl<S: BosStr> QuizBeginBuilder<S, quiz_begin_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> QuizBeginBuilder<S, St>
+impl<S: BosStr> QuizBeginBuilder<quiz_begin_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        QuizBeginBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> QuizBeginBuilder<St, S>
 where
     St: quiz_begin_state::State,
     St::EndsAt: quiz_begin_state::IsUnset,
@@ -222,7 +240,7 @@ where
     pub fn ends_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> QuizBeginBuilder<S, quiz_begin_state::SetEndsAt<St>> {
+    ) -> QuizBeginBuilder<quiz_begin_state::SetEndsAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         QuizBeginBuilder {
             _state: PhantomData,
@@ -232,7 +250,7 @@ where
     }
 }
 
-impl<S: BosStr, St> QuizBeginBuilder<S, St>
+impl<St, S: BosStr> QuizBeginBuilder<St, S>
 where
     St: quiz_begin_state::State,
     St::League: quiz_begin_state::IsUnset,
@@ -241,7 +259,7 @@ where
     pub fn league(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> QuizBeginBuilder<S, quiz_begin_state::SetLeague<St>> {
+    ) -> QuizBeginBuilder<quiz_begin_state::SetLeague<St>, S> {
         self._fields.1 = Option::Some(value.into());
         QuizBeginBuilder {
             _state: PhantomData,
@@ -251,7 +269,7 @@ where
     }
 }
 
-impl<S: BosStr, St> QuizBeginBuilder<S, St>
+impl<St, S: BosStr> QuizBeginBuilder<St, S>
 where
     St: quiz_begin_state::State,
     St::Quiz: quiz_begin_state::IsUnset,
@@ -260,7 +278,7 @@ where
     pub fn quiz(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> QuizBeginBuilder<S, quiz_begin_state::SetQuiz<St>> {
+    ) -> QuizBeginBuilder<quiz_begin_state::SetQuiz<St>, S> {
         self._fields.2 = Option::Some(value.into());
         QuizBeginBuilder {
             _state: PhantomData,
@@ -270,7 +288,7 @@ where
     }
 }
 
-impl<S: BosStr, St> QuizBeginBuilder<S, St>
+impl<St, S: BosStr> QuizBeginBuilder<St, S>
 where
     St: quiz_begin_state::State,
     St::StartedAt: quiz_begin_state::IsUnset,
@@ -279,7 +297,7 @@ where
     pub fn started_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> QuizBeginBuilder<S, quiz_begin_state::SetStartedAt<St>> {
+    ) -> QuizBeginBuilder<quiz_begin_state::SetStartedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         QuizBeginBuilder {
             _state: PhantomData,
@@ -289,13 +307,13 @@ where
     }
 }
 
-impl<S: BosStr, St> QuizBeginBuilder<S, St>
+impl<St, S: BosStr> QuizBeginBuilder<St, S>
 where
     St: quiz_begin_state::State,
+    St::Quiz: quiz_begin_state::IsSet,
     St::EndsAt: quiz_begin_state::IsSet,
     St::League: quiz_begin_state::IsSet,
     St::StartedAt: quiz_begin_state::IsSet,
-    St::Quiz: quiz_begin_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> QuizBegin<S> {
@@ -308,7 +326,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> QuizBegin<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> QuizBegin<S> {
         QuizBegin {
             ends_at: self._fields.0.unwrap(),
             league: self._fields.1.unwrap(),
@@ -320,10 +341,10 @@ where
 }
 
 fn lexicon_doc_pub_quizzy_quizBegin() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.quizzy.quizBegin"),
@@ -332,15 +353,18 @@ fn lexicon_doc_pub_quizzy_quizBegin() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("Marks the start of a quiz session")),
+                    description: Some(
+                        CowStr::new_static("Marks the start of a quiz session"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("league"),
-                            SmolStr::new_static("quiz"),
-                            SmolStr::new_static("startedAt"),
-                            SmolStr::new_static("endsAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("league"), SmolStr::new_static("quiz"),
+                                SmolStr::new_static("startedAt"),
+                                SmolStr::new_static("endsAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -369,7 +393,9 @@ fn lexicon_doc_pub_quizzy_quizBegin() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("startedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("When the quiz starts")),
+                                    description: Some(
+                                        CowStr::new_static("When the quiz starts"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

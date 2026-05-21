@@ -11,12 +11,13 @@ pub mod list_targets;
 pub mod put_target;
 pub mod target;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,16 +28,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::place_stream::multistream;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::multistream;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Event<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub message: S,
@@ -45,11 +43,9 @@ pub struct Event<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TargetView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -92,7 +88,7 @@ impl<S: BosStr> LexiconSchema for TargetView<S> {
 
 pub mod event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -101,69 +97,76 @@ pub mod event_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Status;
         type Message;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Status = Unset;
         type Message = Unset;
+        type Status = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Message = St::Message;
         type Status = St::Status;
-        type Message = St::Message;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type CreatedAt = St::CreatedAt;
-        type Status = Set<members::status>;
-        type Message = St::Message;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessage<St> {}
     impl<St: State> State for SetMessage<St> {
         type CreatedAt = St::CreatedAt;
-        type Status = St::Status;
         type Message = Set<members::message>;
+        type Status = St::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type CreatedAt = St::CreatedAt;
+        type Message = St::Message;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EventBuilder<S: BosStr, St: event_state::State> {
+pub struct EventBuilder<St: event_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Event<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EventBuilder<S, event_state::Empty> {
+impl Event<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EventBuilder<event_state::Empty, DefaultStr> {
         EventBuilder::new()
     }
 }
 
-impl<S: BosStr> EventBuilder<S, event_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Event<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EventBuilder<event_state::Empty, S> {
+        EventBuilder::builder()
+    }
+}
+
+impl EventBuilder<event_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventBuilder {
             _state: PhantomData,
@@ -173,7 +176,18 @@ impl<S: BosStr> EventBuilder<S, event_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<S: BosStr> EventBuilder<event_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EventBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::CreatedAt: event_state::IsUnset,
@@ -182,7 +196,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventBuilder<S, event_state::SetCreatedAt<St>> {
+    ) -> EventBuilder<event_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -192,13 +206,16 @@ where
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::Message: event_state::IsUnset,
 {
     /// Set the `message` field (required)
-    pub fn message(mut self, value: impl Into<S>) -> EventBuilder<S, event_state::SetMessage<St>> {
+    pub fn message(
+        mut self,
+        value: impl Into<S>,
+    ) -> EventBuilder<event_state::SetMessage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -208,13 +225,16 @@ where
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::Status: event_state::IsUnset,
 {
     /// Set the `status` field (required)
-    pub fn status(mut self, value: impl Into<S>) -> EventBuilder<S, event_state::SetStatus<St>> {
+    pub fn status(
+        mut self,
+        value: impl Into<S>,
+    ) -> EventBuilder<event_state::SetStatus<St>, S> {
         self._fields.2 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -224,12 +244,12 @@ where
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::CreatedAt: event_state::IsSet,
-    St::Status: event_state::IsSet,
     St::Message: event_state::IsSet,
+    St::Status: event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Event<S> {
@@ -252,10 +272,10 @@ where
 }
 
 fn lexicon_doc_place_stream_multistream_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.multistream.defs"),
@@ -264,11 +284,13 @@ fn lexicon_doc_place_stream_multistream_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("event"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("message"),
-                        SmolStr::new_static("status"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("message"),
+                            SmolStr::new_static("status"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -281,15 +303,11 @@ fn lexicon_doc_place_stream_multistream_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("message"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -299,11 +317,12 @@ fn lexicon_doc_place_stream_multistream_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("targetView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("record"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("record")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -317,7 +336,9 @@ fn lexicon_doc_place_stream_multistream_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("latestEvent"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("place.stream.multistream.defs#event"),
+                                r#ref: CowStr::new_static(
+                                    "place.stream.multistream.defs#event",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -347,7 +368,7 @@ fn lexicon_doc_place_stream_multistream_defs() -> LexiconDoc<'static> {
 
 pub mod target_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -355,56 +376,56 @@ pub mod target_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Record;
+        type Cid;
         type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Record = Unset;
+        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Cid = Set<members::cid>;
-        type Record = St::Record;
-        type Uri = St::Uri;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecord<St> {}
     impl<St: State> State for SetRecord<St> {
-        type Cid = St::Cid;
         type Record = Set<members::record>;
+        type Cid = St::Cid;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Record = St::Record;
+        type Cid = Set<members::cid>;
         type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Cid = St::Cid;
         type Record = St::Record;
+        type Cid = St::Cid;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TargetViewBuilder<S: BosStr, St: target_view_state::State> {
+pub struct TargetViewBuilder<St: target_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
@@ -415,15 +436,22 @@ pub struct TargetViewBuilder<S: BosStr, St: target_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> TargetView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TargetViewBuilder<S, target_view_state::Empty> {
+impl TargetView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TargetViewBuilder<target_view_state::Empty, DefaultStr> {
         TargetViewBuilder::new()
     }
 }
 
-impl<S: BosStr> TargetViewBuilder<S, target_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> TargetView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TargetViewBuilder<target_view_state::Empty, S> {
+        TargetViewBuilder::builder()
+    }
+}
+
+impl TargetViewBuilder<target_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TargetViewBuilder {
             _state: PhantomData,
@@ -433,7 +461,18 @@ impl<S: BosStr> TargetViewBuilder<S, target_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> TargetViewBuilder<S, St>
+impl<S: BosStr> TargetViewBuilder<target_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TargetViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> TargetViewBuilder<St, S>
 where
     St: target_view_state::State,
     St::Cid: target_view_state::IsUnset,
@@ -442,7 +481,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> TargetViewBuilder<S, target_view_state::SetCid<St>> {
+    ) -> TargetViewBuilder<target_view_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         TargetViewBuilder {
             _state: PhantomData,
@@ -452,9 +491,12 @@ where
     }
 }
 
-impl<S: BosStr, St: target_view_state::State> TargetViewBuilder<S, St> {
+impl<St: target_view_state::State, S: BosStr> TargetViewBuilder<St, S> {
     /// Set the `latestEvent` field (optional)
-    pub fn latest_event(mut self, value: impl Into<Option<multistream::Event<S>>>) -> Self {
+    pub fn latest_event(
+        mut self,
+        value: impl Into<Option<multistream::Event<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -465,7 +507,7 @@ impl<S: BosStr, St: target_view_state::State> TargetViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TargetViewBuilder<S, St>
+impl<St, S: BosStr> TargetViewBuilder<St, S>
 where
     St: target_view_state::State,
     St::Record: target_view_state::IsUnset,
@@ -474,7 +516,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> TargetViewBuilder<S, target_view_state::SetRecord<St>> {
+    ) -> TargetViewBuilder<target_view_state::SetRecord<St>, S> {
         self._fields.2 = Option::Some(value.into());
         TargetViewBuilder {
             _state: PhantomData,
@@ -484,7 +526,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TargetViewBuilder<S, St>
+impl<St, S: BosStr> TargetViewBuilder<St, S>
 where
     St: target_view_state::State,
     St::Uri: target_view_state::IsUnset,
@@ -493,7 +535,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> TargetViewBuilder<S, target_view_state::SetUri<St>> {
+    ) -> TargetViewBuilder<target_view_state::SetUri<St>, S> {
         self._fields.3 = Option::Some(value.into());
         TargetViewBuilder {
             _state: PhantomData,
@@ -503,11 +545,11 @@ where
     }
 }
 
-impl<S: BosStr, St> TargetViewBuilder<S, St>
+impl<St, S: BosStr> TargetViewBuilder<St, S>
 where
     St: target_view_state::State,
-    St::Cid: target_view_state::IsSet,
     St::Record: target_view_state::IsSet,
+    St::Cid: target_view_state::IsSet,
     St::Uri: target_view_state::IsSet,
 {
     /// Build the final struct.
@@ -521,7 +563,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TargetView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TargetView<S> {
         TargetView {
             cid: self._fields.0.unwrap(),
             latest_event: self._fields.1,

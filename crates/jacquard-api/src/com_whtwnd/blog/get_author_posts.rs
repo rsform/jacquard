@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::com_whtwnd::blog::BlogEntry;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_whtwnd::blog::BlogEntry;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAuthorPosts<S: BosStr = DefaultStr> {
     pub author: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAuthorPostsOutput<S: BosStr = DefaultStr> {
     pub post: Vec<BlogEntry<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -64,7 +59,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorPostsRequest {
 
 pub mod get_author_posts_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,21 +90,31 @@ pub mod get_author_posts_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetAuthorPostsBuilder<S: BosStr, St: get_author_posts_state::State> {
+pub struct GetAuthorPostsBuilder<
+    St: get_author_posts_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetAuthorPosts<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetAuthorPostsBuilder<S, get_author_posts_state::Empty> {
+impl GetAuthorPosts<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetAuthorPostsBuilder<get_author_posts_state::Empty, DefaultStr> {
         GetAuthorPostsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetAuthorPostsBuilder<S, get_author_posts_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetAuthorPosts<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetAuthorPostsBuilder<get_author_posts_state::Empty, S> {
+        GetAuthorPostsBuilder::builder()
+    }
+}
+
+impl GetAuthorPostsBuilder<get_author_posts_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetAuthorPostsBuilder {
             _state: PhantomData,
@@ -119,7 +124,18 @@ impl<S: BosStr> GetAuthorPostsBuilder<S, get_author_posts_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetAuthorPostsBuilder<S, St>
+impl<S: BosStr> GetAuthorPostsBuilder<get_author_posts_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetAuthorPostsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetAuthorPostsBuilder<St, S>
 where
     St: get_author_posts_state::State,
     St::Author: get_author_posts_state::IsUnset,
@@ -128,7 +144,7 @@ where
     pub fn author(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetAuthorPostsBuilder<S, get_author_posts_state::SetAuthor<St>> {
+    ) -> GetAuthorPostsBuilder<get_author_posts_state::SetAuthor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetAuthorPostsBuilder {
             _state: PhantomData,
@@ -138,7 +154,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetAuthorPostsBuilder<S, St>
+impl<St, S: BosStr> GetAuthorPostsBuilder<St, S>
 where
     St: get_author_posts_state::State,
     St::Author: get_author_posts_state::IsSet,

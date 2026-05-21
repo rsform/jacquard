@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Defines what the forum is - name, description, etc.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -148,7 +148,7 @@ impl<S: BosStr> LexiconSchema for Identity<S> {
 
 pub mod identity_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -179,21 +179,28 @@ pub mod identity_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IdentityBuilder<S: BosStr, St: identity_state::State> {
+pub struct IdentityBuilder<St: identity_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Identity<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> IdentityBuilder<S, identity_state::Empty> {
+impl Identity<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> IdentityBuilder<identity_state::Empty, DefaultStr> {
         IdentityBuilder::new()
     }
 }
 
-impl<S: BosStr> IdentityBuilder<S, identity_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Identity<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> IdentityBuilder<identity_state::Empty, S> {
+        IdentityBuilder::builder()
+    }
+}
+
+impl IdentityBuilder<identity_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         IdentityBuilder {
             _state: PhantomData,
@@ -203,7 +210,18 @@ impl<S: BosStr> IdentityBuilder<S, identity_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: identity_state::State> IdentityBuilder<S, St> {
+impl<S: BosStr> IdentityBuilder<identity_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        IdentityBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: identity_state::State, S: BosStr> IdentityBuilder<St, S> {
     /// Set the `accent` field (optional)
     pub fn accent(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -216,7 +234,7 @@ impl<S: BosStr, St: identity_state::State> IdentityBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: identity_state::State> IdentityBuilder<S, St> {
+impl<St: identity_state::State, S: BosStr> IdentityBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -229,13 +247,16 @@ impl<S: BosStr, St: identity_state::State> IdentityBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> IdentityBuilder<S, St>
+impl<St, S: BosStr> IdentityBuilder<St, S>
 where
     St: identity_state::State,
     St::Name: identity_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> IdentityBuilder<S, identity_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> IdentityBuilder<identity_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         IdentityBuilder {
             _state: PhantomData,
@@ -245,7 +266,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IdentityBuilder<S, St>
+impl<St, S: BosStr> IdentityBuilder<St, S>
 where
     St: identity_state::State,
     St::Name: identity_state::IsSet,
@@ -270,11 +291,13 @@ where
     }
 }
 
-fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_identity() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
+fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_identity() -> LexiconDoc<
+    'static,
+> {
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.fudgeu.experimental.atforumv1.forum.identity"),
@@ -283,9 +306,11 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_identity() -> LexiconDoc<
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Defines what the forum is - name, description, etc.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Defines what the forum is - name, description, etc.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("name")]),

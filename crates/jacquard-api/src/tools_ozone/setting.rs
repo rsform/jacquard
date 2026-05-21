@@ -9,17 +9,18 @@ pub mod list_options;
 pub mod remove_options;
 pub mod upsert_option;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did, Nsid};
+use jacquard_common::types::string::{Did, Nsid, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,13 +28,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DefsOption<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -52,6 +50,7 @@ pub struct DefsOption<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DefsOptionManagerRole<S: BosStr = DefaultStr> {
@@ -133,10 +132,13 @@ where
             DefsOptionManagerRole::RoleTriage => DefsOptionManagerRole::RoleTriage,
             DefsOptionManagerRole::RoleAdmin => DefsOptionManagerRole::RoleAdmin,
             DefsOptionManagerRole::RoleVerifier => DefsOptionManagerRole::RoleVerifier,
-            DefsOptionManagerRole::Other(v) => DefsOptionManagerRole::Other(v.into_static()),
+            DefsOptionManagerRole::Other(v) => {
+                DefsOptionManagerRole::Other(v.into_static())
+            }
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DefsOptionScope<S: BosStr = DefaultStr> {
@@ -254,7 +256,7 @@ impl<S: BosStr> LexiconSchema for DefsOption<S> {
 
 pub mod defs_option_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -262,95 +264,93 @@ pub mod defs_option_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Value;
         type Did;
         type Scope;
         type LastUpdatedBy;
+        type Key;
         type CreatedBy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Value = Unset;
         type Did = Unset;
         type Scope = Unset;
         type LastUpdatedBy = Unset;
+        type Key = Unset;
         type CreatedBy = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKey<St> {}
-    impl<St: State> State for SetKey<St> {
-        type Key = Set<members::key>;
-        type Value = St::Value;
-        type Did = St::Did;
-        type Scope = St::Scope;
-        type LastUpdatedBy = St::LastUpdatedBy;
-        type CreatedBy = St::CreatedBy;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
-        type Key = St::Key;
         type Value = Set<members::value>;
         type Did = St::Did;
         type Scope = St::Scope;
         type LastUpdatedBy = St::LastUpdatedBy;
+        type Key = St::Key;
         type CreatedBy = St::CreatedBy;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Key = St::Key;
         type Value = St::Value;
         type Did = Set<members::did>;
         type Scope = St::Scope;
         type LastUpdatedBy = St::LastUpdatedBy;
+        type Key = St::Key;
         type CreatedBy = St::CreatedBy;
     }
     ///State transition - sets the `scope` field to Set
     pub struct SetScope<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetScope<St> {}
     impl<St: State> State for SetScope<St> {
-        type Key = St::Key;
         type Value = St::Value;
         type Did = St::Did;
         type Scope = Set<members::scope>;
         type LastUpdatedBy = St::LastUpdatedBy;
+        type Key = St::Key;
         type CreatedBy = St::CreatedBy;
     }
     ///State transition - sets the `last_updated_by` field to Set
     pub struct SetLastUpdatedBy<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLastUpdatedBy<St> {}
     impl<St: State> State for SetLastUpdatedBy<St> {
-        type Key = St::Key;
         type Value = St::Value;
         type Did = St::Did;
         type Scope = St::Scope;
         type LastUpdatedBy = Set<members::last_updated_by>;
+        type Key = St::Key;
+        type CreatedBy = St::CreatedBy;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type Value = St::Value;
+        type Did = St::Did;
+        type Scope = St::Scope;
+        type LastUpdatedBy = St::LastUpdatedBy;
+        type Key = Set<members::key>;
         type CreatedBy = St::CreatedBy;
     }
     ///State transition - sets the `created_by` field to Set
     pub struct SetCreatedBy<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedBy<St> {}
     impl<St: State> State for SetCreatedBy<St> {
-        type Key = St::Key;
         type Value = St::Value;
         type Did = St::Did;
         type Scope = St::Scope;
         type LastUpdatedBy = St::LastUpdatedBy;
+        type Key = St::Key;
         type CreatedBy = Set<members::created_by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `value` field
         pub struct value(());
         ///Marker type for the `did` field
@@ -359,13 +359,15 @@ pub mod defs_option_state {
         pub struct scope(());
         ///Marker type for the `last_updated_by` field
         pub struct last_updated_by(());
+        ///Marker type for the `key` field
+        pub struct key(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DefsOptionBuilder<S: BosStr, St: defs_option_state::State> {
+pub struct DefsOptionBuilder<St: defs_option_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -382,15 +384,22 @@ pub struct DefsOptionBuilder<S: BosStr, St: defs_option_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DefsOption<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DefsOptionBuilder<S, defs_option_state::Empty> {
+impl DefsOption<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DefsOptionBuilder<defs_option_state::Empty, DefaultStr> {
         DefsOptionBuilder::new()
     }
 }
 
-impl<S: BosStr> DefsOptionBuilder<S, defs_option_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DefsOption<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DefsOptionBuilder<defs_option_state::Empty, S> {
+        DefsOptionBuilder::builder()
+    }
+}
+
+impl DefsOptionBuilder<defs_option_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DefsOptionBuilder {
             _state: PhantomData,
@@ -400,7 +409,18 @@ impl<S: BosStr> DefsOptionBuilder<S, defs_option_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: defs_option_state::State> DefsOptionBuilder<S, St> {
+impl<S: BosStr> DefsOptionBuilder<defs_option_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DefsOptionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: defs_option_state::State, S: BosStr> DefsOptionBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -413,7 +433,7 @@ impl<S: BosStr, St: defs_option_state::State> DefsOptionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DefsOptionBuilder<S, St>
+impl<St, S: BosStr> DefsOptionBuilder<St, S>
 where
     St: defs_option_state::State,
     St::CreatedBy: defs_option_state::IsUnset,
@@ -422,7 +442,7 @@ where
     pub fn created_by(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> DefsOptionBuilder<S, defs_option_state::SetCreatedBy<St>> {
+    ) -> DefsOptionBuilder<defs_option_state::SetCreatedBy<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DefsOptionBuilder {
             _state: PhantomData,
@@ -432,7 +452,7 @@ where
     }
 }
 
-impl<S: BosStr, St: defs_option_state::State> DefsOptionBuilder<S, St> {
+impl<St: defs_option_state::State, S: BosStr> DefsOptionBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -445,7 +465,7 @@ impl<S: BosStr, St: defs_option_state::State> DefsOptionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DefsOptionBuilder<S, St>
+impl<St, S: BosStr> DefsOptionBuilder<St, S>
 where
     St: defs_option_state::State,
     St::Did: defs_option_state::IsUnset,
@@ -454,7 +474,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> DefsOptionBuilder<S, defs_option_state::SetDid<St>> {
+    ) -> DefsOptionBuilder<defs_option_state::SetDid<St>, S> {
         self._fields.3 = Option::Some(value.into());
         DefsOptionBuilder {
             _state: PhantomData,
@@ -464,7 +484,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DefsOptionBuilder<S, St>
+impl<St, S: BosStr> DefsOptionBuilder<St, S>
 where
     St: defs_option_state::State,
     St::Key: defs_option_state::IsUnset,
@@ -473,7 +493,7 @@ where
     pub fn key(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> DefsOptionBuilder<S, defs_option_state::SetKey<St>> {
+    ) -> DefsOptionBuilder<defs_option_state::SetKey<St>, S> {
         self._fields.4 = Option::Some(value.into());
         DefsOptionBuilder {
             _state: PhantomData,
@@ -483,7 +503,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DefsOptionBuilder<S, St>
+impl<St, S: BosStr> DefsOptionBuilder<St, S>
 where
     St: defs_option_state::State,
     St::LastUpdatedBy: defs_option_state::IsUnset,
@@ -492,7 +512,7 @@ where
     pub fn last_updated_by(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> DefsOptionBuilder<S, defs_option_state::SetLastUpdatedBy<St>> {
+    ) -> DefsOptionBuilder<defs_option_state::SetLastUpdatedBy<St>, S> {
         self._fields.5 = Option::Some(value.into());
         DefsOptionBuilder {
             _state: PhantomData,
@@ -502,20 +522,26 @@ where
     }
 }
 
-impl<S: BosStr, St: defs_option_state::State> DefsOptionBuilder<S, St> {
+impl<St: defs_option_state::State, S: BosStr> DefsOptionBuilder<St, S> {
     /// Set the `managerRole` field (optional)
-    pub fn manager_role(mut self, value: impl Into<Option<DefsOptionManagerRole<S>>>) -> Self {
+    pub fn manager_role(
+        mut self,
+        value: impl Into<Option<DefsOptionManagerRole<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `managerRole` field to an Option value (optional)
-    pub fn maybe_manager_role(mut self, value: Option<DefsOptionManagerRole<S>>) -> Self {
+    pub fn maybe_manager_role(
+        mut self,
+        value: Option<DefsOptionManagerRole<S>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
 }
 
-impl<S: BosStr, St> DefsOptionBuilder<S, St>
+impl<St, S: BosStr> DefsOptionBuilder<St, S>
 where
     St: defs_option_state::State,
     St::Scope: defs_option_state::IsUnset,
@@ -524,7 +550,7 @@ where
     pub fn scope(
         mut self,
         value: impl Into<DefsOptionScope<S>>,
-    ) -> DefsOptionBuilder<S, defs_option_state::SetScope<St>> {
+    ) -> DefsOptionBuilder<defs_option_state::SetScope<St>, S> {
         self._fields.7 = Option::Some(value.into());
         DefsOptionBuilder {
             _state: PhantomData,
@@ -534,7 +560,7 @@ where
     }
 }
 
-impl<S: BosStr, St: defs_option_state::State> DefsOptionBuilder<S, St> {
+impl<St: defs_option_state::State, S: BosStr> DefsOptionBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.8 = value.into();
@@ -547,7 +573,7 @@ impl<S: BosStr, St: defs_option_state::State> DefsOptionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DefsOptionBuilder<S, St>
+impl<St, S: BosStr> DefsOptionBuilder<St, S>
 where
     St: defs_option_state::State,
     St::Value: defs_option_state::IsUnset,
@@ -556,7 +582,7 @@ where
     pub fn value(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> DefsOptionBuilder<S, defs_option_state::SetValue<St>> {
+    ) -> DefsOptionBuilder<defs_option_state::SetValue<St>, S> {
         self._fields.9 = Option::Some(value.into());
         DefsOptionBuilder {
             _state: PhantomData,
@@ -566,14 +592,14 @@ where
     }
 }
 
-impl<S: BosStr, St> DefsOptionBuilder<S, St>
+impl<St, S: BosStr> DefsOptionBuilder<St, S>
 where
     St: defs_option_state::State,
-    St::Key: defs_option_state::IsSet,
     St::Value: defs_option_state::IsSet,
     St::Did: defs_option_state::IsSet,
     St::Scope: defs_option_state::IsSet,
     St::LastUpdatedBy: defs_option_state::IsSet,
+    St::Key: defs_option_state::IsSet,
     St::CreatedBy: defs_option_state::IsSet,
 {
     /// Build the final struct.
@@ -593,7 +619,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DefsOption<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DefsOption<S> {
         DefsOption {
             created_at: self._fields.0,
             created_by: self._fields.1.unwrap(),
@@ -611,10 +640,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_setting_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.setting.defs"),
@@ -623,14 +652,14 @@ fn lexicon_doc_tools_ozone_setting_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("option"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("key"),
-                        SmolStr::new_static("value"),
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("scope"),
-                        SmolStr::new_static("createdBy"),
-                        SmolStr::new_static("lastUpdatedBy"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("key"), SmolStr::new_static("value"),
+                            SmolStr::new_static("did"), SmolStr::new_static("scope"),
+                            SmolStr::new_static("createdBy"),
+                            SmolStr::new_static("lastUpdatedBy")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -679,15 +708,11 @@ fn lexicon_doc_tools_ozone_setting_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("managerRole"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("scope"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("updatedAt"),

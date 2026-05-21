@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blog_pckt::block::image::ImageAttrs;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blog_pckt::block::image::ImageAttrs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -177,7 +177,7 @@ impl<S: BosStr> LexiconSchema for Gallery<S> {
 
 pub mod gallery_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -208,21 +208,28 @@ pub mod gallery_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GalleryBuilder<S: BosStr, St: gallery_state::State> {
+pub struct GalleryBuilder<St: gallery_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<ImageAttrs<S>>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Gallery<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GalleryBuilder<S, gallery_state::Empty> {
+impl Gallery<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GalleryBuilder<gallery_state::Empty, DefaultStr> {
         GalleryBuilder::new()
     }
 }
 
-impl<S: BosStr> GalleryBuilder<S, gallery_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Gallery<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GalleryBuilder<gallery_state::Empty, S> {
+        GalleryBuilder::builder()
+    }
+}
+
+impl GalleryBuilder<gallery_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GalleryBuilder {
             _state: PhantomData,
@@ -232,7 +239,18 @@ impl<S: BosStr> GalleryBuilder<S, gallery_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: gallery_state::State> GalleryBuilder<S, St> {
+impl<S: BosStr> GalleryBuilder<gallery_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GalleryBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: gallery_state::State, S: BosStr> GalleryBuilder<St, S> {
     /// Set the `caption` field (optional)
     pub fn caption(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -245,7 +263,7 @@ impl<S: BosStr, St: gallery_state::State> GalleryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GalleryBuilder<S, St>
+impl<St, S: BosStr> GalleryBuilder<St, S>
 where
     St: gallery_state::State,
     St::Images: gallery_state::IsUnset,
@@ -254,7 +272,7 @@ where
     pub fn images(
         mut self,
         value: impl Into<Vec<ImageAttrs<S>>>,
-    ) -> GalleryBuilder<S, gallery_state::SetImages<St>> {
+    ) -> GalleryBuilder<gallery_state::SetImages<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GalleryBuilder {
             _state: PhantomData,
@@ -264,7 +282,7 @@ where
     }
 }
 
-impl<S: BosStr, St: gallery_state::State> GalleryBuilder<S, St> {
+impl<St: gallery_state::State, S: BosStr> GalleryBuilder<St, S> {
     /// Set the `layout` field (optional)
     pub fn layout(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -277,7 +295,7 @@ impl<S: BosStr, St: gallery_state::State> GalleryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: gallery_state::State> GalleryBuilder<S, St> {
+impl<St: gallery_state::State, S: BosStr> GalleryBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -290,7 +308,7 @@ impl<S: BosStr, St: gallery_state::State> GalleryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GalleryBuilder<S, St>
+impl<St, S: BosStr> GalleryBuilder<St, S>
 where
     St: gallery_state::State,
     St::Images: gallery_state::IsSet,
@@ -318,10 +336,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_gallery() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.gallery"),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,16 +20,13 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::io_atcr::hold::complete_upload;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::io_atcr::hold::complete_upload;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CompleteUpload<S: BosStr = DefaultStr> {
     ///Final blob digest (e.g., sha256:abc123...)
     pub digest: S,
@@ -41,11 +38,9 @@ pub struct CompleteUpload<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CompleteUploadOutput<S: BosStr = DefaultStr> {
     ///The digest of the completed blob
     pub digest: S,
@@ -55,9 +50,18 @@ pub struct CompleteUploadOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum CompleteUploadError {
     #[serde(rename = "InvalidUploadId")]
@@ -70,10 +74,7 @@ pub enum CompleteUploadError {
     CompletionFailed(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for CompleteUploadError {
@@ -121,10 +122,7 @@ impl core::fmt::Display for CompleteUploadError {
 /// Information about a completed upload part
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PartInfo<S: BosStr = DefaultStr> {
     ///ETag returned when the part was uploaded
     pub etag: S,
@@ -145,8 +143,9 @@ impl jacquard_common::xrpc::XrpcResp for CompleteUploadResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CompleteUpload<S> {
     const NSID: &'static str = "io.atcr.hold.completeUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CompleteUploadResponse;
 }
 
@@ -154,8 +153,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CompleteUpload<S> {
 pub struct CompleteUploadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CompleteUploadRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.completeUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CompleteUpload<S>;
     type Response = CompleteUploadResponse;
 }
@@ -198,7 +198,7 @@ impl<S: BosStr> LexiconSchema for PartInfo<S> {
 
 pub mod complete_upload_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -206,74 +206,80 @@ pub mod complete_upload_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type UploadId;
         type Digest;
         type Parts;
-        type UploadId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type UploadId = Unset;
         type Digest = Unset;
         type Parts = Unset;
-        type UploadId = Unset;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDigest<St> {}
-    impl<St: State> State for SetDigest<St> {
-        type Digest = Set<members::digest>;
-        type Parts = St::Parts;
-        type UploadId = St::UploadId;
-    }
-    ///State transition - sets the `parts` field to Set
-    pub struct SetParts<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetParts<St> {}
-    impl<St: State> State for SetParts<St> {
-        type Digest = St::Digest;
-        type Parts = Set<members::parts>;
-        type UploadId = St::UploadId;
     }
     ///State transition - sets the `upload_id` field to Set
     pub struct SetUploadId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUploadId<St> {}
     impl<St: State> State for SetUploadId<St> {
+        type UploadId = Set<members::upload_id>;
         type Digest = St::Digest;
         type Parts = St::Parts;
-        type UploadId = Set<members::upload_id>;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDigest<St> {}
+    impl<St: State> State for SetDigest<St> {
+        type UploadId = St::UploadId;
+        type Digest = Set<members::digest>;
+        type Parts = St::Parts;
+    }
+    ///State transition - sets the `parts` field to Set
+    pub struct SetParts<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetParts<St> {}
+    impl<St: State> State for SetParts<St> {
+        type UploadId = St::UploadId;
+        type Digest = St::Digest;
+        type Parts = Set<members::parts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `upload_id` field
+        pub struct upload_id(());
         ///Marker type for the `digest` field
         pub struct digest(());
         ///Marker type for the `parts` field
         pub struct parts(());
-        ///Marker type for the `upload_id` field
-        pub struct upload_id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CompleteUploadBuilder<S: BosStr, St: complete_upload_state::State> {
+pub struct CompleteUploadBuilder<
+    St: complete_upload_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<Vec<complete_upload::PartInfo<S>>>,
-        Option<S>,
-    ),
+    _fields: (Option<S>, Option<Vec<complete_upload::PartInfo<S>>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CompleteUpload<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CompleteUploadBuilder<S, complete_upload_state::Empty> {
+impl CompleteUpload<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CompleteUploadBuilder<complete_upload_state::Empty, DefaultStr> {
         CompleteUploadBuilder::new()
     }
 }
 
-impl<S: BosStr> CompleteUploadBuilder<S, complete_upload_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CompleteUpload<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CompleteUploadBuilder<complete_upload_state::Empty, S> {
+        CompleteUploadBuilder::builder()
+    }
+}
+
+impl CompleteUploadBuilder<complete_upload_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CompleteUploadBuilder {
             _state: PhantomData,
@@ -283,7 +289,18 @@ impl<S: BosStr> CompleteUploadBuilder<S, complete_upload_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CompleteUploadBuilder<S, St>
+impl<S: BosStr> CompleteUploadBuilder<complete_upload_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CompleteUploadBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CompleteUploadBuilder<St, S>
 where
     St: complete_upload_state::State,
     St::Digest: complete_upload_state::IsUnset,
@@ -292,7 +309,7 @@ where
     pub fn digest(
         mut self,
         value: impl Into<S>,
-    ) -> CompleteUploadBuilder<S, complete_upload_state::SetDigest<St>> {
+    ) -> CompleteUploadBuilder<complete_upload_state::SetDigest<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CompleteUploadBuilder {
             _state: PhantomData,
@@ -302,7 +319,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CompleteUploadBuilder<S, St>
+impl<St, S: BosStr> CompleteUploadBuilder<St, S>
 where
     St: complete_upload_state::State,
     St::Parts: complete_upload_state::IsUnset,
@@ -311,7 +328,7 @@ where
     pub fn parts(
         mut self,
         value: impl Into<Vec<complete_upload::PartInfo<S>>>,
-    ) -> CompleteUploadBuilder<S, complete_upload_state::SetParts<St>> {
+    ) -> CompleteUploadBuilder<complete_upload_state::SetParts<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CompleteUploadBuilder {
             _state: PhantomData,
@@ -321,7 +338,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CompleteUploadBuilder<S, St>
+impl<St, S: BosStr> CompleteUploadBuilder<St, S>
 where
     St: complete_upload_state::State,
     St::UploadId: complete_upload_state::IsUnset,
@@ -330,7 +347,7 @@ where
     pub fn upload_id(
         mut self,
         value: impl Into<S>,
-    ) -> CompleteUploadBuilder<S, complete_upload_state::SetUploadId<St>> {
+    ) -> CompleteUploadBuilder<complete_upload_state::SetUploadId<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CompleteUploadBuilder {
             _state: PhantomData,
@@ -340,12 +357,12 @@ where
     }
 }
 
-impl<S: BosStr, St> CompleteUploadBuilder<S, St>
+impl<St, S: BosStr> CompleteUploadBuilder<St, S>
 where
     St: complete_upload_state::State,
+    St::UploadId: complete_upload_state::IsSet,
     St::Digest: complete_upload_state::IsSet,
     St::Parts: complete_upload_state::IsSet,
-    St::UploadId: complete_upload_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CompleteUpload<S> {
@@ -357,7 +374,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CompleteUpload<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CompleteUpload<S> {
         CompleteUpload {
             digest: self._fields.0.unwrap(),
             parts: self._fields.1.unwrap(),
@@ -369,7 +389,7 @@ where
 
 pub mod part_info_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -377,56 +397,63 @@ pub mod part_info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PartNumber;
         type Etag;
+        type PartNumber;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PartNumber = Unset;
         type Etag = Unset;
-    }
-    ///State transition - sets the `part_number` field to Set
-    pub struct SetPartNumber<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPartNumber<St> {}
-    impl<St: State> State for SetPartNumber<St> {
-        type PartNumber = Set<members::part_number>;
-        type Etag = St::Etag;
+        type PartNumber = Unset;
     }
     ///State transition - sets the `etag` field to Set
     pub struct SetEtag<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEtag<St> {}
     impl<St: State> State for SetEtag<St> {
-        type PartNumber = St::PartNumber;
         type Etag = Set<members::etag>;
+        type PartNumber = St::PartNumber;
+    }
+    ///State transition - sets the `part_number` field to Set
+    pub struct SetPartNumber<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPartNumber<St> {}
+    impl<St: State> State for SetPartNumber<St> {
+        type Etag = St::Etag;
+        type PartNumber = Set<members::part_number>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `part_number` field
-        pub struct part_number(());
         ///Marker type for the `etag` field
         pub struct etag(());
+        ///Marker type for the `part_number` field
+        pub struct part_number(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PartInfoBuilder<S: BosStr, St: part_info_state::State> {
+pub struct PartInfoBuilder<St: part_info_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PartInfo<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PartInfoBuilder<S, part_info_state::Empty> {
+impl PartInfo<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PartInfoBuilder<part_info_state::Empty, DefaultStr> {
         PartInfoBuilder::new()
     }
 }
 
-impl<S: BosStr> PartInfoBuilder<S, part_info_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PartInfo<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PartInfoBuilder<part_info_state::Empty, S> {
+        PartInfoBuilder::builder()
+    }
+}
+
+impl PartInfoBuilder<part_info_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PartInfoBuilder {
             _state: PhantomData,
@@ -436,13 +463,27 @@ impl<S: BosStr> PartInfoBuilder<S, part_info_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PartInfoBuilder<S, St>
+impl<S: BosStr> PartInfoBuilder<part_info_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PartInfoBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PartInfoBuilder<St, S>
 where
     St: part_info_state::State,
     St::Etag: part_info_state::IsUnset,
 {
     /// Set the `etag` field (required)
-    pub fn etag(mut self, value: impl Into<S>) -> PartInfoBuilder<S, part_info_state::SetEtag<St>> {
+    pub fn etag(
+        mut self,
+        value: impl Into<S>,
+    ) -> PartInfoBuilder<part_info_state::SetEtag<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PartInfoBuilder {
             _state: PhantomData,
@@ -452,7 +493,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PartInfoBuilder<S, St>
+impl<St, S: BosStr> PartInfoBuilder<St, S>
 where
     St: part_info_state::State,
     St::PartNumber: part_info_state::IsUnset,
@@ -461,7 +502,7 @@ where
     pub fn part_number(
         mut self,
         value: impl Into<i64>,
-    ) -> PartInfoBuilder<S, part_info_state::SetPartNumber<St>> {
+    ) -> PartInfoBuilder<part_info_state::SetPartNumber<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PartInfoBuilder {
             _state: PhantomData,
@@ -471,11 +512,11 @@ where
     }
 }
 
-impl<S: BosStr, St> PartInfoBuilder<S, St>
+impl<St, S: BosStr> PartInfoBuilder<St, S>
 where
     St: part_info_state::State,
-    St::PartNumber: part_info_state::IsSet,
     St::Etag: part_info_state::IsSet,
+    St::PartNumber: part_info_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PartInfo<S> {
@@ -496,10 +537,10 @@ where
 }
 
 fn lexicon_doc_io_atcr_hold_completeUpload() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.hold.completeUpload"),
@@ -510,52 +551,59 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![
-                                SmolStr::new_static("uploadId"),
-                                SmolStr::new_static("digest"),
-                                SmolStr::new_static("parts"),
-                            ]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("digest"),
-                                    LexObjectProperty::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "Final blob digest (e.g., sha256:abc123...)",
-                                        )),
-                                        max_length: Some(128usize),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("parts"),
-                                    LexObjectProperty::Array(LexArray {
-                                        description: Some(CowStr::new_static(
-                                            "List of uploaded parts with their ETags",
-                                        )),
-                                        items: LexArrayItem::Ref(LexRef {
-                                            r#ref: CowStr::new_static("#partInfo"),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(
+                                    vec![
+                                        SmolStr::new_static("uploadId"),
+                                        SmolStr::new_static("digest"), SmolStr::new_static("parts")
+                                    ],
+                                ),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("digest"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static(
+                                                    "Final blob digest (e.g., sha256:abc123...)",
+                                                ),
+                                            ),
+                                            max_length: Some(128usize),
                                             ..Default::default()
                                         }),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("uploadId"),
-                                    LexObjectProperty::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "Upload session ID from initiateUpload",
-                                        )),
-                                        max_length: Some(256usize),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("parts"),
+                                        LexObjectProperty::Array(LexArray {
+                                            description: Some(
+                                                CowStr::new_static(
+                                                    "List of uploaded parts with their ETags",
+                                                ),
+                                            ),
+                                            items: LexArrayItem::Ref(LexRef {
+                                                r#ref: CowStr::new_static("#partInfo"),
+                                                ..Default::default()
+                                            }),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("uploadId"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static("Upload session ID from initiateUpload"),
+                                            ),
+                                            max_length: Some(256usize),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -564,22 +612,26 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("partInfo"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Information about a completed upload part",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("partNumber"),
-                        SmolStr::new_static("etag"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Information about a completed upload part"),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("partNumber"),
+                            SmolStr::new_static("etag")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("etag"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "ETag returned when the part was uploaded",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "ETag returned when the part was uploaded",
+                                    ),
+                                ),
                                 max_length: Some(256usize),
                                 ..Default::default()
                             }),

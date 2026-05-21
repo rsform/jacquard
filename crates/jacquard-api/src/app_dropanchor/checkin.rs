@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,17 +25,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_dropanchor::checkin;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_dropanchor::checkin;
 /// Street address (based on community.lexicon.location.address)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Address<S: BosStr = DefaultStr> {
     ///The ISO 3166 country code (preferably 2-letter)
     pub country: S,
@@ -61,10 +58,7 @@ pub struct Address<S: BosStr = DefaultStr> {
 /// Image attachment with thumbnail and full-size versions
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CheckinImage<S: BosStr = DefaultStr> {
     ///Alt text for accessibility
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -80,10 +74,7 @@ pub struct CheckinImage<S: BosStr = DefaultStr> {
 /// Foursquare venue data (based on community.lexicon.location.fsq)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FsqPlace<S: BosStr = DefaultStr> {
     ///The unique identifier of a Foursquare POI
     pub fsq_place_id: S,
@@ -103,10 +94,7 @@ pub struct FsqPlace<S: BosStr = DefaultStr> {
 /// Geographic coordinates in WGS84 (based on community.lexicon.location.geo)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Geo<S: BosStr = DefaultStr> {
     ///Altitude in meters
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -302,23 +290,25 @@ impl<S: BosStr> LexiconSchema for CheckinImage<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/jpeg", "image/png", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("fullsize"),
                         accepted: vec![
-                            "image/jpeg".to_string(),
-                            "image/png".to_string(),
-                            "image/webp".to_string(),
+                            "image/jpeg".to_string(), "image/png".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -343,23 +333,25 @@ impl<S: BosStr> LexiconSchema for CheckinImage<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/jpeg", "image/png", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("thumb"),
                         accepted: vec![
-                            "image/jpeg".to_string(),
-                            "image/png".to_string(),
-                            "image/webp".to_string(),
+                            "image/jpeg".to_string(), "image/png".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -567,10 +559,10 @@ impl<S: BosStr> LexiconSchema for Checkin<S> {
 }
 
 fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.dropanchor.checkin"),
@@ -579,9 +571,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("address"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Street address (based on community.lexicon.location.address)",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Street address (based on community.lexicon.location.address)",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("country")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -589,9 +583,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("country"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The ISO 3166 country code (preferably 2-letter)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The ISO 3166 country code (preferably 2-letter)",
+                                    ),
+                                ),
                                 min_length: Some(2usize),
                                 max_length: Some(10usize),
                                 ..Default::default()
@@ -600,9 +596,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("locality"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The locality (city, town, etc.)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The locality (city, town, etc.)"),
+                                ),
                                 max_length: Some(200usize),
                                 ..Default::default()
                             }),
@@ -610,7 +606,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The name of the location")),
+                                description: Some(
+                                    CowStr::new_static("The name of the location"),
+                                ),
                                 max_length: Some(500usize),
                                 ..Default::default()
                             }),
@@ -626,9 +624,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("region"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The administrative region (state, province, etc.)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The administrative region (state, province, etc.)",
+                                    ),
+                                ),
                                 max_length: Some(200usize),
                                 ..Default::default()
                             }),
@@ -649,35 +649,36 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("checkinImage"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Image attachment with thumbnail and full-size versions",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("thumb"),
-                        SmolStr::new_static("fullsize"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Image attachment with thumbnail and full-size versions",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("thumb"), SmolStr::new_static("fullsize")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Alt text for accessibility")),
+                                description: Some(
+                                    CowStr::new_static("Alt text for accessibility"),
+                                ),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("fullsize"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("thumb"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -687,9 +688,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("fsqPlace"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Foursquare venue data (based on community.lexicon.location.fsq)",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Foursquare venue data (based on community.lexicon.location.fsq)",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("fsqPlaceId")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -697,9 +700,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("fsqPlaceId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The unique identifier of a Foursquare POI",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The unique identifier of a Foursquare POI",
+                                    ),
+                                ),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -707,9 +712,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("latitude"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Latitude in decimal degrees",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Latitude in decimal degrees"),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -717,9 +722,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("longitude"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Longitude in decimal degrees",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Longitude in decimal degrees"),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -727,7 +732,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The name of the location")),
+                                description: Some(
+                                    CowStr::new_static("The name of the location"),
+                                ),
                                 max_length: Some(500usize),
                                 ..Default::default()
                             }),
@@ -740,13 +747,17 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("geo"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Geographic coordinates in WGS84 (based on community.lexicon.location.geo)",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("latitude"),
-                        SmolStr::new_static("longitude"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Geographic coordinates in WGS84 (based on community.lexicon.location.geo)",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("latitude"),
+                            SmolStr::new_static("longitude")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -761,9 +772,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("latitude"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Latitude in decimal degrees (range: -90 to 90)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Latitude in decimal degrees (range: -90 to 90)",
+                                    ),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -771,9 +784,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("longitude"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Longitude in decimal degrees (range: -180 to 180)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Longitude in decimal degrees (range: -180 to 180)",
+                                    ),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -781,7 +796,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Name of the location")),
+                                description: Some(
+                                    CowStr::new_static("Name of the location"),
+                                ),
                                 max_length: Some(500usize),
                                 ..Default::default()
                             }),
@@ -794,17 +811,20 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A location check-in record for the Anchor app",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A location check-in record for the Anchor app",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("text"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("address"),
-                            SmolStr::new_static("geo"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("text"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("address"), SmolStr::new_static("geo")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -818,9 +838,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("category"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Place category (e.g., cafe, restaurant)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Place category (e.g., cafe, restaurant)",
+                                        ),
+                                    ),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
@@ -828,9 +850,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("categoryGroup"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Category group for organization",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Category group for organization"),
+                                    ),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
@@ -838,9 +860,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("categoryIcon"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Emoji icon for the category",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Emoji icon for the category"),
+                                    ),
                                     max_length: Some(10usize),
                                     ..Default::default()
                                 }),
@@ -848,9 +870,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When the check-in was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When the check-in was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -879,9 +901,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("text"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The check-in message or note",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The check-in message or note"),
+                                    ),
                                     max_length: Some(3000usize),
                                     ..Default::default()
                                 }),
@@ -901,7 +923,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
 
 pub mod checkin_image_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -909,56 +931,63 @@ pub mod checkin_image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Fullsize;
         type Thumb;
+        type Fullsize;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Fullsize = Unset;
         type Thumb = Unset;
-    }
-    ///State transition - sets the `fullsize` field to Set
-    pub struct SetFullsize<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFullsize<St> {}
-    impl<St: State> State for SetFullsize<St> {
-        type Fullsize = Set<members::fullsize>;
-        type Thumb = St::Thumb;
+        type Fullsize = Unset;
     }
     ///State transition - sets the `thumb` field to Set
     pub struct SetThumb<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetThumb<St> {}
     impl<St: State> State for SetThumb<St> {
-        type Fullsize = St::Fullsize;
         type Thumb = Set<members::thumb>;
+        type Fullsize = St::Fullsize;
+    }
+    ///State transition - sets the `fullsize` field to Set
+    pub struct SetFullsize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFullsize<St> {}
+    impl<St: State> State for SetFullsize<St> {
+        type Thumb = St::Thumb;
+        type Fullsize = Set<members::fullsize>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `fullsize` field
-        pub struct fullsize(());
         ///Marker type for the `thumb` field
         pub struct thumb(());
+        ///Marker type for the `fullsize` field
+        pub struct fullsize(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CheckinImageBuilder<S: BosStr, St: checkin_image_state::State> {
+pub struct CheckinImageBuilder<St: checkin_image_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>, Option<BlobRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CheckinImage<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CheckinImageBuilder<S, checkin_image_state::Empty> {
+impl CheckinImage<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CheckinImageBuilder<checkin_image_state::Empty, DefaultStr> {
         CheckinImageBuilder::new()
     }
 }
 
-impl<S: BosStr> CheckinImageBuilder<S, checkin_image_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CheckinImage<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CheckinImageBuilder<checkin_image_state::Empty, S> {
+        CheckinImageBuilder::builder()
+    }
+}
+
+impl CheckinImageBuilder<checkin_image_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CheckinImageBuilder {
             _state: PhantomData,
@@ -968,7 +997,18 @@ impl<S: BosStr> CheckinImageBuilder<S, checkin_image_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: checkin_image_state::State> CheckinImageBuilder<S, St> {
+impl<S: BosStr> CheckinImageBuilder<checkin_image_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CheckinImageBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: checkin_image_state::State, S: BosStr> CheckinImageBuilder<St, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -981,7 +1021,7 @@ impl<S: BosStr, St: checkin_image_state::State> CheckinImageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CheckinImageBuilder<S, St>
+impl<St, S: BosStr> CheckinImageBuilder<St, S>
 where
     St: checkin_image_state::State,
     St::Fullsize: checkin_image_state::IsUnset,
@@ -990,7 +1030,7 @@ where
     pub fn fullsize(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> CheckinImageBuilder<S, checkin_image_state::SetFullsize<St>> {
+    ) -> CheckinImageBuilder<checkin_image_state::SetFullsize<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CheckinImageBuilder {
             _state: PhantomData,
@@ -1000,7 +1040,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CheckinImageBuilder<S, St>
+impl<St, S: BosStr> CheckinImageBuilder<St, S>
 where
     St: checkin_image_state::State,
     St::Thumb: checkin_image_state::IsUnset,
@@ -1009,7 +1049,7 @@ where
     pub fn thumb(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> CheckinImageBuilder<S, checkin_image_state::SetThumb<St>> {
+    ) -> CheckinImageBuilder<checkin_image_state::SetThumb<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CheckinImageBuilder {
             _state: PhantomData,
@@ -1019,11 +1059,11 @@ where
     }
 }
 
-impl<S: BosStr, St> CheckinImageBuilder<S, St>
+impl<St, S: BosStr> CheckinImageBuilder<St, S>
 where
     St: checkin_image_state::State,
-    St::Fullsize: checkin_image_state::IsSet,
     St::Thumb: checkin_image_state::IsSet,
+    St::Fullsize: checkin_image_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CheckinImage<S> {
@@ -1035,7 +1075,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CheckinImage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CheckinImage<S> {
         CheckinImage {
             alt: self._fields.0,
             fullsize: self._fields.1.unwrap(),
@@ -1047,7 +1090,7 @@ where
 
 pub mod checkin_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1055,72 +1098,72 @@ pub mod checkin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Address;
         type Text;
         type Geo;
+        type Address;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Address = Unset;
         type Text = Unset;
         type Geo = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Address = St::Address;
-        type Text = St::Text;
-        type Geo = St::Geo;
-    }
-    ///State transition - sets the `address` field to Set
-    pub struct SetAddress<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAddress<St> {}
-    impl<St: State> State for SetAddress<St> {
-        type CreatedAt = St::CreatedAt;
-        type Address = Set<members::address>;
-        type Text = St::Text;
-        type Geo = St::Geo;
+        type Address = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetText<St> {}
     impl<St: State> State for SetText<St> {
-        type CreatedAt = St::CreatedAt;
-        type Address = St::Address;
         type Text = Set<members::text>;
         type Geo = St::Geo;
+        type Address = St::Address;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `geo` field to Set
     pub struct SetGeo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGeo<St> {}
     impl<St: State> State for SetGeo<St> {
-        type CreatedAt = St::CreatedAt;
-        type Address = St::Address;
         type Text = St::Text;
         type Geo = Set<members::geo>;
+        type Address = St::Address;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddress<St> {}
+    impl<St: State> State for SetAddress<St> {
+        type Text = St::Text;
+        type Geo = St::Geo;
+        type Address = Set<members::address>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Text = St::Text;
+        type Geo = St::Geo;
+        type Address = St::Address;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `address` field
-        pub struct address(());
         ///Marker type for the `text` field
         pub struct text(());
         ///Marker type for the `geo` field
         pub struct geo(());
+        ///Marker type for the `address` field
+        pub struct address(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CheckinBuilder<S: BosStr, St: checkin_state::State> {
+pub struct CheckinBuilder<St: checkin_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<checkin::Address<S>>,
@@ -1136,15 +1179,22 @@ pub struct CheckinBuilder<S: BosStr, St: checkin_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Checkin<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CheckinBuilder<S, checkin_state::Empty> {
+impl Checkin<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CheckinBuilder<checkin_state::Empty, DefaultStr> {
         CheckinBuilder::new()
     }
 }
 
-impl<S: BosStr> CheckinBuilder<S, checkin_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Checkin<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CheckinBuilder<checkin_state::Empty, S> {
+        CheckinBuilder::builder()
+    }
+}
+
+impl CheckinBuilder<checkin_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CheckinBuilder {
             _state: PhantomData,
@@ -1154,7 +1204,18 @@ impl<S: BosStr> CheckinBuilder<S, checkin_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CheckinBuilder<S, St>
+impl<S: BosStr> CheckinBuilder<checkin_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CheckinBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CheckinBuilder<St, S>
 where
     St: checkin_state::State,
     St::Address: checkin_state::IsUnset,
@@ -1163,7 +1224,7 @@ where
     pub fn address(
         mut self,
         value: impl Into<checkin::Address<S>>,
-    ) -> CheckinBuilder<S, checkin_state::SetAddress<St>> {
+    ) -> CheckinBuilder<checkin_state::SetAddress<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CheckinBuilder {
             _state: PhantomData,
@@ -1173,7 +1234,7 @@ where
     }
 }
 
-impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
+impl<St: checkin_state::State, S: BosStr> CheckinBuilder<St, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -1186,7 +1247,7 @@ impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
+impl<St: checkin_state::State, S: BosStr> CheckinBuilder<St, S> {
     /// Set the `categoryGroup` field (optional)
     pub fn category_group(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1199,7 +1260,7 @@ impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
+impl<St: checkin_state::State, S: BosStr> CheckinBuilder<St, S> {
     /// Set the `categoryIcon` field (optional)
     pub fn category_icon(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -1212,7 +1273,7 @@ impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CheckinBuilder<S, St>
+impl<St, S: BosStr> CheckinBuilder<St, S>
 where
     St: checkin_state::State,
     St::CreatedAt: checkin_state::IsUnset,
@@ -1221,7 +1282,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CheckinBuilder<S, checkin_state::SetCreatedAt<St>> {
+    ) -> CheckinBuilder<checkin_state::SetCreatedAt<St>, S> {
         self._fields.4 = Option::Some(value.into());
         CheckinBuilder {
             _state: PhantomData,
@@ -1231,7 +1292,7 @@ where
     }
 }
 
-impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
+impl<St: checkin_state::State, S: BosStr> CheckinBuilder<St, S> {
     /// Set the `fsq` field (optional)
     pub fn fsq(mut self, value: impl Into<Option<checkin::FsqPlace<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -1244,7 +1305,7 @@ impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CheckinBuilder<S, St>
+impl<St, S: BosStr> CheckinBuilder<St, S>
 where
     St: checkin_state::State,
     St::Geo: checkin_state::IsUnset,
@@ -1253,7 +1314,7 @@ where
     pub fn geo(
         mut self,
         value: impl Into<checkin::Geo<S>>,
-    ) -> CheckinBuilder<S, checkin_state::SetGeo<St>> {
+    ) -> CheckinBuilder<checkin_state::SetGeo<St>, S> {
         self._fields.6 = Option::Some(value.into());
         CheckinBuilder {
             _state: PhantomData,
@@ -1263,7 +1324,7 @@ where
     }
 }
 
-impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
+impl<St: checkin_state::State, S: BosStr> CheckinBuilder<St, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<checkin::CheckinImage<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -1276,13 +1337,16 @@ impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CheckinBuilder<S, St>
+impl<St, S: BosStr> CheckinBuilder<St, S>
 where
     St: checkin_state::State,
     St::Text: checkin_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(mut self, value: impl Into<S>) -> CheckinBuilder<S, checkin_state::SetText<St>> {
+    pub fn text(
+        mut self,
+        value: impl Into<S>,
+    ) -> CheckinBuilder<checkin_state::SetText<St>, S> {
         self._fields.8 = Option::Some(value.into());
         CheckinBuilder {
             _state: PhantomData,
@@ -1292,13 +1356,13 @@ where
     }
 }
 
-impl<S: BosStr, St> CheckinBuilder<S, St>
+impl<St, S: BosStr> CheckinBuilder<St, S>
 where
     St: checkin_state::State,
-    St::CreatedAt: checkin_state::IsSet,
-    St::Address: checkin_state::IsSet,
     St::Text: checkin_state::IsSet,
     St::Geo: checkin_state::IsSet,
+    St::Address: checkin_state::IsSet,
+    St::CreatedAt: checkin_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Checkin<S> {

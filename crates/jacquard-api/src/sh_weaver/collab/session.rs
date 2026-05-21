@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Active real-time collaboration session. Published when joining a collaborative editing session, deleted on disconnect.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -114,7 +114,7 @@ impl<S: BosStr> LexiconSchema for Session<S> {
 
 pub mod session_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -122,56 +122,56 @@ pub mod session_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Resource;
+        type CreatedAt;
         type NodeId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Resource = Unset;
+        type CreatedAt = Unset;
         type NodeId = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Resource = St::Resource;
-        type NodeId = St::NodeId;
     }
     ///State transition - sets the `resource` field to Set
     pub struct SetResource<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetResource<St> {}
     impl<St: State> State for SetResource<St> {
-        type CreatedAt = St::CreatedAt;
         type Resource = Set<members::resource>;
+        type CreatedAt = St::CreatedAt;
+        type NodeId = St::NodeId;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Resource = St::Resource;
+        type CreatedAt = Set<members::created_at>;
         type NodeId = St::NodeId;
     }
     ///State transition - sets the `node_id` field to Set
     pub struct SetNodeId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetNodeId<St> {}
     impl<St: State> State for SetNodeId<St> {
-        type CreatedAt = St::CreatedAt;
         type Resource = St::Resource;
+        type CreatedAt = St::CreatedAt;
         type NodeId = Set<members::node_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `resource` field
         pub struct resource(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `node_id` field
         pub struct node_id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SessionBuilder<S: BosStr, St: session_state::State> {
+pub struct SessionBuilder<St: session_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -183,15 +183,22 @@ pub struct SessionBuilder<S: BosStr, St: session_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Session<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SessionBuilder<S, session_state::Empty> {
+impl Session<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SessionBuilder<session_state::Empty, DefaultStr> {
         SessionBuilder::new()
     }
 }
 
-impl<S: BosStr> SessionBuilder<S, session_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Session<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SessionBuilder<session_state::Empty, S> {
+        SessionBuilder::builder()
+    }
+}
+
+impl SessionBuilder<session_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SessionBuilder {
             _state: PhantomData,
@@ -201,7 +208,18 @@ impl<S: BosStr> SessionBuilder<S, session_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SessionBuilder<S, St>
+impl<S: BosStr> SessionBuilder<session_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SessionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SessionBuilder<St, S>
 where
     St: session_state::State,
     St::CreatedAt: session_state::IsUnset,
@@ -210,7 +228,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SessionBuilder<S, session_state::SetCreatedAt<St>> {
+    ) -> SessionBuilder<session_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SessionBuilder {
             _state: PhantomData,
@@ -220,7 +238,7 @@ where
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -233,7 +251,7 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SessionBuilder<S, St>
+impl<St, S: BosStr> SessionBuilder<St, S>
 where
     St: session_state::State,
     St::NodeId: session_state::IsUnset,
@@ -242,7 +260,7 @@ where
     pub fn node_id(
         mut self,
         value: impl Into<S>,
-    ) -> SessionBuilder<S, session_state::SetNodeId<St>> {
+    ) -> SessionBuilder<session_state::SetNodeId<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SessionBuilder {
             _state: PhantomData,
@@ -252,7 +270,7 @@ where
     }
 }
 
-impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
+impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `relayUrl` field (optional)
     pub fn relay_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -265,7 +283,7 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SessionBuilder<S, St>
+impl<St, S: BosStr> SessionBuilder<St, S>
 where
     St: session_state::State,
     St::Resource: session_state::IsUnset,
@@ -274,7 +292,7 @@ where
     pub fn resource(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> SessionBuilder<S, session_state::SetResource<St>> {
+    ) -> SessionBuilder<session_state::SetResource<St>, S> {
         self._fields.4 = Option::Some(value.into());
         SessionBuilder {
             _state: PhantomData,
@@ -284,11 +302,11 @@ where
     }
 }
 
-impl<S: BosStr, St> SessionBuilder<S, St>
+impl<St, S: BosStr> SessionBuilder<St, S>
 where
     St: session_state::State,
-    St::CreatedAt: session_state::IsSet,
     St::Resource: session_state::IsSet,
+    St::CreatedAt: session_state::IsSet,
     St::NodeId: session_state::IsSet,
 {
     /// Build the final struct.
@@ -316,10 +334,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_collab_session() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.collab.session"),

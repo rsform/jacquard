@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A user-published public key.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -140,7 +140,9 @@ where
             UserPublicKeyKeyType::Pgp => UserPublicKeyKeyType::Pgp,
             UserPublicKeyKeyType::SshEd25519 => UserPublicKeyKeyType::SshEd25519,
             UserPublicKeyKeyType::SshEcdsa => UserPublicKeyKeyType::SshEcdsa,
-            UserPublicKeyKeyType::Other(v) => UserPublicKeyKeyType::Other(v.into_static()),
+            UserPublicKeyKeyType::Other(v) => {
+                UserPublicKeyKeyType::Other(v.into_static())
+            }
         }
     }
 }
@@ -266,7 +268,7 @@ impl<S: BosStr> LexiconSchema for UserPublicKey<S> {
 
 pub mod user_public_key_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -274,56 +276,59 @@ pub mod user_public_key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type KeyType;
         type PublicKeyArmored;
+        type KeyType;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type KeyType = Unset;
         type PublicKeyArmored = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type KeyType = St::KeyType;
-        type PublicKeyArmored = St::PublicKeyArmored;
-    }
-    ///State transition - sets the `key_type` field to Set
-    pub struct SetKeyType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKeyType<St> {}
-    impl<St: State> State for SetKeyType<St> {
-        type CreatedAt = St::CreatedAt;
-        type KeyType = Set<members::key_type>;
-        type PublicKeyArmored = St::PublicKeyArmored;
+        type KeyType = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `public_key_armored` field to Set
     pub struct SetPublicKeyArmored<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPublicKeyArmored<St> {}
     impl<St: State> State for SetPublicKeyArmored<St> {
-        type CreatedAt = St::CreatedAt;
-        type KeyType = St::KeyType;
         type PublicKeyArmored = Set<members::public_key_armored>;
+        type KeyType = St::KeyType;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `key_type` field to Set
+    pub struct SetKeyType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKeyType<St> {}
+    impl<St: State> State for SetKeyType<St> {
+        type PublicKeyArmored = St::PublicKeyArmored;
+        type KeyType = Set<members::key_type>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type PublicKeyArmored = St::PublicKeyArmored;
+        type KeyType = St::KeyType;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `key_type` field
-        pub struct key_type(());
         ///Marker type for the `public_key_armored` field
         pub struct public_key_armored(());
+        ///Marker type for the `key_type` field
+        pub struct key_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UserPublicKeyBuilder<S: BosStr, St: user_public_key_state::State> {
+pub struct UserPublicKeyBuilder<
+    St: user_public_key_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -338,15 +343,22 @@ pub struct UserPublicKeyBuilder<S: BosStr, St: user_public_key_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UserPublicKey<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UserPublicKeyBuilder<S, user_public_key_state::Empty> {
+impl UserPublicKey<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UserPublicKeyBuilder<user_public_key_state::Empty, DefaultStr> {
         UserPublicKeyBuilder::new()
     }
 }
 
-impl<S: BosStr> UserPublicKeyBuilder<S, user_public_key_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UserPublicKey<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UserPublicKeyBuilder<user_public_key_state::Empty, S> {
+        UserPublicKeyBuilder::builder()
+    }
+}
+
+impl UserPublicKeyBuilder<user_public_key_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UserPublicKeyBuilder {
             _state: PhantomData,
@@ -356,7 +368,18 @@ impl<S: BosStr> UserPublicKeyBuilder<S, user_public_key_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: user_public_key_state::State> UserPublicKeyBuilder<S, St> {
+impl<S: BosStr> UserPublicKeyBuilder<user_public_key_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UserPublicKeyBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: user_public_key_state::State, S: BosStr> UserPublicKeyBuilder<St, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -369,7 +392,7 @@ impl<S: BosStr, St: user_public_key_state::State> UserPublicKeyBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> UserPublicKeyBuilder<S, St>
+impl<St, S: BosStr> UserPublicKeyBuilder<St, S>
 where
     St: user_public_key_state::State,
     St::CreatedAt: user_public_key_state::IsUnset,
@@ -378,7 +401,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> UserPublicKeyBuilder<S, user_public_key_state::SetCreatedAt<St>> {
+    ) -> UserPublicKeyBuilder<user_public_key_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         UserPublicKeyBuilder {
             _state: PhantomData,
@@ -388,7 +411,7 @@ where
     }
 }
 
-impl<S: BosStr, St: user_public_key_state::State> UserPublicKeyBuilder<S, St> {
+impl<St: user_public_key_state::State, S: BosStr> UserPublicKeyBuilder<St, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -401,7 +424,7 @@ impl<S: BosStr, St: user_public_key_state::State> UserPublicKeyBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: user_public_key_state::State> UserPublicKeyBuilder<S, St> {
+impl<St: user_public_key_state::State, S: BosStr> UserPublicKeyBuilder<St, S> {
     /// Set the `fingerprint` field (optional)
     pub fn fingerprint(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -414,7 +437,7 @@ impl<S: BosStr, St: user_public_key_state::State> UserPublicKeyBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> UserPublicKeyBuilder<S, St>
+impl<St, S: BosStr> UserPublicKeyBuilder<St, S>
 where
     St: user_public_key_state::State,
     St::KeyType: user_public_key_state::IsUnset,
@@ -423,7 +446,7 @@ where
     pub fn key_type(
         mut self,
         value: impl Into<UserPublicKeyKeyType<S>>,
-    ) -> UserPublicKeyBuilder<S, user_public_key_state::SetKeyType<St>> {
+    ) -> UserPublicKeyBuilder<user_public_key_state::SetKeyType<St>, S> {
         self._fields.4 = Option::Some(value.into());
         UserPublicKeyBuilder {
             _state: PhantomData,
@@ -433,7 +456,7 @@ where
     }
 }
 
-impl<S: BosStr, St: user_public_key_state::State> UserPublicKeyBuilder<S, St> {
+impl<St: user_public_key_state::State, S: BosStr> UserPublicKeyBuilder<St, S> {
     /// Set the `label` field (optional)
     pub fn label(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -446,7 +469,7 @@ impl<S: BosStr, St: user_public_key_state::State> UserPublicKeyBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> UserPublicKeyBuilder<S, St>
+impl<St, S: BosStr> UserPublicKeyBuilder<St, S>
 where
     St: user_public_key_state::State,
     St::PublicKeyArmored: user_public_key_state::IsUnset,
@@ -455,7 +478,7 @@ where
     pub fn public_key_armored(
         mut self,
         value: impl Into<S>,
-    ) -> UserPublicKeyBuilder<S, user_public_key_state::SetPublicKeyArmored<St>> {
+    ) -> UserPublicKeyBuilder<user_public_key_state::SetPublicKeyArmored<St>, S> {
         self._fields.6 = Option::Some(value.into());
         UserPublicKeyBuilder {
             _state: PhantomData,
@@ -465,7 +488,7 @@ where
     }
 }
 
-impl<S: BosStr, St: user_public_key_state::State> UserPublicKeyBuilder<S, St> {
+impl<St: user_public_key_state::State, S: BosStr> UserPublicKeyBuilder<St, S> {
     /// Set the `retractedAt` field (optional)
     pub fn retracted_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.7 = value.into();
@@ -478,12 +501,12 @@ impl<S: BosStr, St: user_public_key_state::State> UserPublicKeyBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> UserPublicKeyBuilder<S, St>
+impl<St, S: BosStr> UserPublicKeyBuilder<St, S>
 where
     St: user_public_key_state::State,
-    St::CreatedAt: user_public_key_state::IsSet,
-    St::KeyType: user_public_key_state::IsSet,
     St::PublicKeyArmored: user_public_key_state::IsSet,
+    St::KeyType: user_public_key_state::IsSet,
+    St::CreatedAt: user_public_key_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> UserPublicKey<S> {
@@ -500,7 +523,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UserPublicKey<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UserPublicKey<S> {
         UserPublicKey {
             comment: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -516,10 +542,10 @@ where
 }
 
 fn lexicon_doc_dev_keytrace_userPublicKey() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.keytrace.userPublicKey"),

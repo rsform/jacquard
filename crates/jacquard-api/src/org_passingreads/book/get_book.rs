@@ -8,29 +8,24 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::org_passingreads::book::StatefulBook;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_passingreads::book::StatefulBook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBook<S: BosStr = DefaultStr> {
     pub id: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBookOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub book: Option<StatefulBook<S>>,
@@ -64,7 +59,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetBookRequest {
 
 pub mod get_book_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,21 +90,28 @@ pub mod get_book_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetBookBuilder<S: BosStr, St: get_book_state::State> {
+pub struct GetBookBuilder<St: get_book_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetBook<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetBookBuilder<S, get_book_state::Empty> {
+impl GetBook<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetBookBuilder<get_book_state::Empty, DefaultStr> {
         GetBookBuilder::new()
     }
 }
 
-impl<S: BosStr> GetBookBuilder<S, get_book_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetBook<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetBookBuilder<get_book_state::Empty, S> {
+        GetBookBuilder::builder()
+    }
+}
+
+impl GetBookBuilder<get_book_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetBookBuilder {
             _state: PhantomData,
@@ -119,13 +121,27 @@ impl<S: BosStr> GetBookBuilder<S, get_book_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetBookBuilder<S, St>
+impl<S: BosStr> GetBookBuilder<get_book_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetBookBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetBookBuilder<St, S>
 where
     St: get_book_state::State,
     St::Id: get_book_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<S>) -> GetBookBuilder<S, get_book_state::SetId<St>> {
+    pub fn id(
+        mut self,
+        value: impl Into<S>,
+    ) -> GetBookBuilder<get_book_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetBookBuilder {
             _state: PhantomData,
@@ -135,7 +151,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetBookBuilder<S, St>
+impl<St, S: BosStr> GetBookBuilder<St, S>
 where
     St: get_book_state::State,
     St::Id: get_book_state::IsSet,

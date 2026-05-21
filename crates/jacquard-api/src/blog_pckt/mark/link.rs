@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,17 +21,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blog_pckt::mark::link;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blog_pckt::mark::link;
 /// Link attributes
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LinkAttrs<S: BosStr = DefaultStr> {
     ///The URL destination of the hyperlink
     pub href: UriValue<S>,
@@ -48,11 +45,9 @@ pub struct LinkAttrs<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Link<S: BosStr = DefaultStr> {
     ///Link attributes that define the hyperlink behavior and destination
     pub attrs: link::LinkAttrs<S>,
@@ -133,7 +128,7 @@ impl<S: BosStr> LexiconSchema for Link<S> {
 
 pub mod link_attrs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -164,21 +159,28 @@ pub mod link_attrs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LinkAttrsBuilder<S: BosStr, St: link_attrs_state::State> {
+pub struct LinkAttrsBuilder<St: link_attrs_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>, Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LinkAttrs<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LinkAttrsBuilder<S, link_attrs_state::Empty> {
+impl LinkAttrs<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LinkAttrsBuilder<link_attrs_state::Empty, DefaultStr> {
         LinkAttrsBuilder::new()
     }
 }
 
-impl<S: BosStr> LinkAttrsBuilder<S, link_attrs_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LinkAttrs<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LinkAttrsBuilder<link_attrs_state::Empty, S> {
+        LinkAttrsBuilder::builder()
+    }
+}
+
+impl LinkAttrsBuilder<link_attrs_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LinkAttrsBuilder {
             _state: PhantomData,
@@ -188,7 +190,18 @@ impl<S: BosStr> LinkAttrsBuilder<S, link_attrs_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LinkAttrsBuilder<S, St>
+impl<S: BosStr> LinkAttrsBuilder<link_attrs_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LinkAttrsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LinkAttrsBuilder<St, S>
 where
     St: link_attrs_state::State,
     St::Href: link_attrs_state::IsUnset,
@@ -197,7 +210,7 @@ where
     pub fn href(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> LinkAttrsBuilder<S, link_attrs_state::SetHref<St>> {
+    ) -> LinkAttrsBuilder<link_attrs_state::SetHref<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LinkAttrsBuilder {
             _state: PhantomData,
@@ -207,7 +220,7 @@ where
     }
 }
 
-impl<S: BosStr, St: link_attrs_state::State> LinkAttrsBuilder<S, St> {
+impl<St: link_attrs_state::State, S: BosStr> LinkAttrsBuilder<St, S> {
     /// Set the `rel` field (optional)
     pub fn rel(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -220,7 +233,7 @@ impl<S: BosStr, St: link_attrs_state::State> LinkAttrsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: link_attrs_state::State> LinkAttrsBuilder<S, St> {
+impl<St: link_attrs_state::State, S: BosStr> LinkAttrsBuilder<St, S> {
     /// Set the `target` field (optional)
     pub fn target(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -233,7 +246,7 @@ impl<S: BosStr, St: link_attrs_state::State> LinkAttrsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: link_attrs_state::State> LinkAttrsBuilder<S, St> {
+impl<St: link_attrs_state::State, S: BosStr> LinkAttrsBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -246,7 +259,7 @@ impl<S: BosStr, St: link_attrs_state::State> LinkAttrsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LinkAttrsBuilder<S, St>
+impl<St, S: BosStr> LinkAttrsBuilder<St, S>
 where
     St: link_attrs_state::State,
     St::Href: link_attrs_state::IsSet,
@@ -262,7 +275,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LinkAttrs<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LinkAttrs<S> {
         LinkAttrs {
             href: self._fields.0.unwrap(),
             rel: self._fields.1,
@@ -274,10 +290,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_mark_link() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.mark.link"),
@@ -370,7 +386,7 @@ fn lexicon_doc_blog_pckt_mark_link() -> LexiconDoc<'static> {
 
 pub mod link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -401,21 +417,28 @@ pub mod link_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LinkBuilder<S: BosStr, St: link_state::State> {
+pub struct LinkBuilder<St: link_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<link::LinkAttrs<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Link<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LinkBuilder<S, link_state::Empty> {
+impl Link<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LinkBuilder<link_state::Empty, DefaultStr> {
         LinkBuilder::new()
     }
 }
 
-impl<S: BosStr> LinkBuilder<S, link_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Link<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LinkBuilder<link_state::Empty, S> {
+        LinkBuilder::builder()
+    }
+}
+
+impl LinkBuilder<link_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LinkBuilder {
             _state: PhantomData,
@@ -425,7 +448,18 @@ impl<S: BosStr> LinkBuilder<S, link_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LinkBuilder<S, St>
+impl<S: BosStr> LinkBuilder<link_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LinkBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LinkBuilder<St, S>
 where
     St: link_state::State,
     St::Attrs: link_state::IsUnset,
@@ -434,7 +468,7 @@ where
     pub fn attrs(
         mut self,
         value: impl Into<link::LinkAttrs<S>>,
-    ) -> LinkBuilder<S, link_state::SetAttrs<St>> {
+    ) -> LinkBuilder<link_state::SetAttrs<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LinkBuilder {
             _state: PhantomData,
@@ -444,7 +478,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LinkBuilder<S, St>
+impl<St, S: BosStr> LinkBuilder<St, S>
 where
     St: link_state::State,
     St::Attrs: link_state::IsSet,

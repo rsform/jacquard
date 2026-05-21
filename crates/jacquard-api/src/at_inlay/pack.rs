@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Nsid};
+use jacquard_common::types::string::{AtUri, Nsid, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,16 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::at_inlay::pack;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::pack;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Export<S: BosStr = DefaultStr> {
     ///AT-URI of the component record
     pub component: AtUri<S>,
@@ -150,7 +147,7 @@ impl<S: BosStr> LexiconSchema for Pack<S> {
 
 pub mod export_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -193,21 +190,28 @@ pub mod export_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ExportBuilder<S: BosStr, St: export_state::State> {
+pub struct ExportBuilder<St: export_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Nsid<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Export<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ExportBuilder<S, export_state::Empty> {
+impl Export<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ExportBuilder<export_state::Empty, DefaultStr> {
         ExportBuilder::new()
     }
 }
 
-impl<S: BosStr> ExportBuilder<S, export_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Export<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ExportBuilder<export_state::Empty, S> {
+        ExportBuilder::builder()
+    }
+}
+
+impl ExportBuilder<export_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ExportBuilder {
             _state: PhantomData,
@@ -217,7 +221,18 @@ impl<S: BosStr> ExportBuilder<S, export_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ExportBuilder<S, St>
+impl<S: BosStr> ExportBuilder<export_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ExportBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ExportBuilder<St, S>
 where
     St: export_state::State,
     St::Component: export_state::IsUnset,
@@ -226,7 +241,7 @@ where
     pub fn component(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ExportBuilder<S, export_state::SetComponent<St>> {
+    ) -> ExportBuilder<export_state::SetComponent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ExportBuilder {
             _state: PhantomData,
@@ -236,7 +251,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ExportBuilder<S, St>
+impl<St, S: BosStr> ExportBuilder<St, S>
 where
     St: export_state::State,
     St::Type: export_state::IsUnset,
@@ -245,7 +260,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> ExportBuilder<S, export_state::SetType<St>> {
+    ) -> ExportBuilder<export_state::SetType<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ExportBuilder {
             _state: PhantomData,
@@ -255,7 +270,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ExportBuilder<S, St>
+impl<St, S: BosStr> ExportBuilder<St, S>
 where
     St: export_state::State,
     St::Type: export_state::IsSet,
@@ -280,10 +295,10 @@ where
 }
 
 fn lexicon_doc_at_inlay_pack() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.inlay.pack"),
@@ -292,19 +307,20 @@ fn lexicon_doc_at_inlay_pack() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("export"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("component"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("type"), SmolStr::new_static("component")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("component"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT-URI of the component record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("AT-URI of the component record"),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -312,9 +328,9 @@ fn lexicon_doc_at_inlay_pack() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "NSID of the type being exported",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("NSID of the type being exported"),
+                                ),
                                 format: Some(LexStringFormat::Nsid),
                                 ..Default::default()
                             }),
@@ -327,13 +343,16 @@ fn lexicon_doc_at_inlay_pack() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A list of type to component exports")),
+                    description: Some(
+                        CowStr::new_static("A list of type to component exports"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("exports"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"), SmolStr::new_static("exports")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -347,9 +366,9 @@ fn lexicon_doc_at_inlay_pack() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("exports"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Type to component mappings",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Type to component mappings"),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#export"),
                                         ..Default::default()
@@ -360,9 +379,11 @@ fn lexicon_doc_at_inlay_pack() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Short slug for the pack (e.g. \"core\", \"ui\")",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Short slug for the pack (e.g. \"core\", \"ui\")",
+                                        ),
+                                    ),
                                     max_length: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -382,7 +403,7 @@ fn lexicon_doc_at_inlay_pack() -> LexiconDoc<'static> {
 
 pub mod pack_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -390,56 +411,63 @@ pub mod pack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Exports;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Exports = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Exports = St::Exports;
+        type Name = Unset;
     }
     ///State transition - sets the `exports` field to Set
     pub struct SetExports<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetExports<St> {}
     impl<St: State> State for SetExports<St> {
-        type Name = St::Name;
         type Exports = Set<members::exports>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Exports = St::Exports;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `exports` field
         pub struct exports(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PackBuilder<S: BosStr, St: pack_state::State> {
+pub struct PackBuilder<St: pack_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Vec<pack::Export<S>>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Pack<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PackBuilder<S, pack_state::Empty> {
+impl Pack<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PackBuilder<pack_state::Empty, DefaultStr> {
         PackBuilder::new()
     }
 }
 
-impl<S: BosStr> PackBuilder<S, pack_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Pack<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PackBuilder<pack_state::Empty, S> {
+        PackBuilder::builder()
+    }
+}
+
+impl PackBuilder<pack_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PackBuilder {
             _state: PhantomData,
@@ -449,7 +477,18 @@ impl<S: BosStr> PackBuilder<S, pack_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: pack_state::State> PackBuilder<S, St> {
+impl<S: BosStr> PackBuilder<pack_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PackBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: pack_state::State, S: BosStr> PackBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -462,7 +501,7 @@ impl<S: BosStr, St: pack_state::State> PackBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PackBuilder<S, St>
+impl<St, S: BosStr> PackBuilder<St, S>
 where
     St: pack_state::State,
     St::Exports: pack_state::IsUnset,
@@ -471,7 +510,7 @@ where
     pub fn exports(
         mut self,
         value: impl Into<Vec<pack::Export<S>>>,
-    ) -> PackBuilder<S, pack_state::SetExports<St>> {
+    ) -> PackBuilder<pack_state::SetExports<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PackBuilder {
             _state: PhantomData,
@@ -481,13 +520,16 @@ where
     }
 }
 
-impl<S: BosStr, St> PackBuilder<S, St>
+impl<St, S: BosStr> PackBuilder<St, S>
 where
     St: pack_state::State,
     St::Name: pack_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> PackBuilder<S, pack_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> PackBuilder<pack_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PackBuilder {
             _state: PhantomData,
@@ -497,11 +539,11 @@ where
     }
 }
 
-impl<S: BosStr, St> PackBuilder<S, St>
+impl<St, S: BosStr> PackBuilder<St, S>
 where
     St: pack_state::State,
-    St::Name: pack_state::IsSet,
     St::Exports: pack_state::IsSet,
+    St::Name: pack_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Pack<S> {

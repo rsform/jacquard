@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_dropanchor::comment;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_dropanchor::comment;
 /// A comment record for check-ins in the Anchor app
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -62,10 +62,7 @@ pub struct CommentGetRecordOutput<S: BosStr = DefaultStr> {
 /// A strong reference to another record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StrongRef<S: BosStr = DefaultStr> {
     ///Content identifier (CID) of the referenced record
     pub cid: Cid<S>,
@@ -151,7 +148,7 @@ impl<S: BosStr> LexiconSchema for StrongRef<S> {
 
 pub mod comment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -160,69 +157,76 @@ pub mod comment_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Text;
-        type CreatedAt;
         type CheckinRef;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Text = Unset;
-        type CreatedAt = Unset;
         type CheckinRef = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetText<St> {}
     impl<St: State> State for SetText<St> {
         type Text = Set<members::text>;
+        type CheckinRef = St::CheckinRef;
         type CreatedAt = St::CreatedAt;
-        type CheckinRef = St::CheckinRef;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Text = St::Text;
-        type CreatedAt = Set<members::created_at>;
-        type CheckinRef = St::CheckinRef;
     }
     ///State transition - sets the `checkin_ref` field to Set
     pub struct SetCheckinRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCheckinRef<St> {}
     impl<St: State> State for SetCheckinRef<St> {
         type Text = St::Text;
-        type CreatedAt = St::CreatedAt;
         type CheckinRef = Set<members::checkin_ref>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Text = St::Text;
+        type CheckinRef = St::CheckinRef;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `checkin_ref` field
         pub struct checkin_ref(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CommentBuilder<S: BosStr, St: comment_state::State> {
+pub struct CommentBuilder<St: comment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<comment::StrongRef<S>>, Option<Datetime>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Comment<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CommentBuilder<S, comment_state::Empty> {
+impl Comment<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CommentBuilder<comment_state::Empty, DefaultStr> {
         CommentBuilder::new()
     }
 }
 
-impl<S: BosStr> CommentBuilder<S, comment_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Comment<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CommentBuilder<comment_state::Empty, S> {
+        CommentBuilder::builder()
+    }
+}
+
+impl CommentBuilder<comment_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CommentBuilder {
             _state: PhantomData,
@@ -232,7 +236,18 @@ impl<S: BosStr> CommentBuilder<S, comment_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<S: BosStr> CommentBuilder<comment_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CommentBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::CheckinRef: comment_state::IsUnset,
@@ -241,7 +256,7 @@ where
     pub fn checkin_ref(
         mut self,
         value: impl Into<comment::StrongRef<S>>,
-    ) -> CommentBuilder<S, comment_state::SetCheckinRef<St>> {
+    ) -> CommentBuilder<comment_state::SetCheckinRef<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
@@ -251,7 +266,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::CreatedAt: comment_state::IsUnset,
@@ -260,7 +275,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CommentBuilder<S, comment_state::SetCreatedAt<St>> {
+    ) -> CommentBuilder<comment_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
@@ -270,13 +285,16 @@ where
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::Text: comment_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(mut self, value: impl Into<S>) -> CommentBuilder<S, comment_state::SetText<St>> {
+    pub fn text(
+        mut self,
+        value: impl Into<S>,
+    ) -> CommentBuilder<comment_state::SetText<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
@@ -286,12 +304,12 @@ where
     }
 }
 
-impl<S: BosStr, St> CommentBuilder<S, St>
+impl<St, S: BosStr> CommentBuilder<St, S>
 where
     St: comment_state::State,
     St::Text: comment_state::IsSet,
-    St::CreatedAt: comment_state::IsSet,
     St::CheckinRef: comment_state::IsSet,
+    St::CreatedAt: comment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Comment<S> {
@@ -314,10 +332,10 @@ where
 }
 
 fn lexicon_doc_app_dropanchor_comment() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.dropanchor.comment"),
@@ -326,16 +344,20 @@ fn lexicon_doc_app_dropanchor_comment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A comment record for check-ins in the Anchor app",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A comment record for check-ins in the Anchor app",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("text"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("checkinRef"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("text"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("checkinRef")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -349,9 +371,9 @@ fn lexicon_doc_app_dropanchor_comment() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When the comment was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When the comment was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -359,9 +381,9 @@ fn lexicon_doc_app_dropanchor_comment() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("text"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The comment text content",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The comment text content"),
+                                    ),
                                     max_length: Some(1000usize),
                                     ..Default::default()
                                 }),
@@ -376,17 +398,23 @@ fn lexicon_doc_app_dropanchor_comment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("strongRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A strong reference to another record")),
-                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
+                    description: Some(
+                        CowStr::new_static("A strong reference to another record"),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Content identifier (CID) of the referenced record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Content identifier (CID) of the referenced record",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -394,9 +422,11 @@ fn lexicon_doc_app_dropanchor_comment() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT Protocol URI of the referenced record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "AT Protocol URI of the referenced record",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -414,7 +444,7 @@ fn lexicon_doc_app_dropanchor_comment() -> LexiconDoc<'static> {
 
 pub mod strong_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -457,21 +487,28 @@ pub mod strong_ref_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StrongRefBuilder<S: BosStr, St: strong_ref_state::State> {
+pub struct StrongRefBuilder<St: strong_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> StrongRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StrongRefBuilder<S, strong_ref_state::Empty> {
+impl StrongRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StrongRefBuilder<strong_ref_state::Empty, DefaultStr> {
         StrongRefBuilder::new()
     }
 }
 
-impl<S: BosStr> StrongRefBuilder<S, strong_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> StrongRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StrongRefBuilder<strong_ref_state::Empty, S> {
+        StrongRefBuilder::builder()
+    }
+}
+
+impl StrongRefBuilder<strong_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StrongRefBuilder {
             _state: PhantomData,
@@ -481,7 +518,18 @@ impl<S: BosStr> StrongRefBuilder<S, strong_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StrongRefBuilder<S, St>
+impl<S: BosStr> StrongRefBuilder<strong_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StrongRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StrongRefBuilder<St, S>
 where
     St: strong_ref_state::State,
     St::Cid: strong_ref_state::IsUnset,
@@ -490,7 +538,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> StrongRefBuilder<S, strong_ref_state::SetCid<St>> {
+    ) -> StrongRefBuilder<strong_ref_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StrongRefBuilder {
             _state: PhantomData,
@@ -500,7 +548,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StrongRefBuilder<S, St>
+impl<St, S: BosStr> StrongRefBuilder<St, S>
 where
     St: strong_ref_state::State,
     St::Uri: strong_ref_state::IsUnset,
@@ -509,7 +557,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StrongRefBuilder<S, strong_ref_state::SetUri<St>> {
+    ) -> StrongRefBuilder<strong_ref_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StrongRefBuilder {
             _state: PhantomData,
@@ -519,7 +567,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StrongRefBuilder<S, St>
+impl<St, S: BosStr> StrongRefBuilder<St, S>
 where
     St: strong_ref_state::State,
     St::Uri: strong_ref_state::IsSet,
@@ -534,7 +582,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StrongRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StrongRef<S> {
         StrongRef {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),

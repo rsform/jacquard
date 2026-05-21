@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_blebbit::authr::page::PageView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_blebbit::authr::page::PageView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPages<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -29,11 +26,9 @@ pub struct GetPages<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPagesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pages: Option<Vec<PageView<S>>>,
@@ -67,7 +62,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPagesRequest {
 
 pub mod get_pages_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -85,21 +80,28 @@ pub mod get_pages_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetPagesBuilder<S: BosStr, St: get_pages_state::State> {
+pub struct GetPagesBuilder<St: get_pages_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetPages<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetPagesBuilder<S, get_pages_state::Empty> {
+impl GetPages<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetPagesBuilder<get_pages_state::Empty, DefaultStr> {
         GetPagesBuilder::new()
     }
 }
 
-impl<S: BosStr> GetPagesBuilder<S, get_pages_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetPages<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetPagesBuilder<get_pages_state::Empty, S> {
+        GetPagesBuilder::builder()
+    }
+}
+
+impl GetPagesBuilder<get_pages_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetPagesBuilder {
             _state: PhantomData,
@@ -109,7 +111,18 @@ impl<S: BosStr> GetPagesBuilder<S, get_pages_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_pages_state::State> GetPagesBuilder<S, St> {
+impl<S: BosStr> GetPagesBuilder<get_pages_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetPagesBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_pages_state::State, S: BosStr> GetPagesBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -122,7 +135,7 @@ impl<S: BosStr, St: get_pages_state::State> GetPagesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_pages_state::State> GetPagesBuilder<S, St> {
+impl<St: get_pages_state::State, S: BosStr> GetPagesBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -135,7 +148,7 @@ impl<S: BosStr, St: get_pages_state::State> GetPagesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetPagesBuilder<S, St>
+impl<St, S: BosStr> GetPagesBuilder<St, S>
 where
     St: get_pages_state::State,
 {

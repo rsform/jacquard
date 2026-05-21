@@ -11,6 +11,7 @@ pub mod deck;
 pub mod richtext;
 pub mod social;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -29,17 +30,14 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Reference to a Magic: The Gathering card with printing and oracle identifiers.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CardRef<S: BosStr = DefaultStr> {
     /**Oracle card URI (oracle:<uuid>) - for external indexing.
-    Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
+Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
     pub oracle_uri: UriValue<S>,
     ///Scryfall printing URI (scry:<uuid>) - authoritative identifier
     pub scryfall_uri: UriValue<S>,
@@ -64,7 +62,7 @@ impl<S: BosStr> LexiconSchema for CardRef<S> {
 
 pub mod card_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -107,21 +105,28 @@ pub mod card_ref_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CardRefBuilder<S: BosStr, St: card_ref_state::State> {
+pub struct CardRefBuilder<St: card_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CardRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CardRefBuilder<S, card_ref_state::Empty> {
+impl CardRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CardRefBuilder<card_ref_state::Empty, DefaultStr> {
         CardRefBuilder::new()
     }
 }
 
-impl<S: BosStr> CardRefBuilder<S, card_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CardRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CardRefBuilder<card_ref_state::Empty, S> {
+        CardRefBuilder::builder()
+    }
+}
+
+impl CardRefBuilder<card_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CardRefBuilder {
             _state: PhantomData,
@@ -131,7 +136,18 @@ impl<S: BosStr> CardRefBuilder<S, card_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CardRefBuilder<S, St>
+impl<S: BosStr> CardRefBuilder<card_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CardRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CardRefBuilder<St, S>
 where
     St: card_ref_state::State,
     St::OracleUri: card_ref_state::IsUnset,
@@ -140,7 +156,7 @@ where
     pub fn oracle_uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> CardRefBuilder<S, card_ref_state::SetOracleUri<St>> {
+    ) -> CardRefBuilder<card_ref_state::SetOracleUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CardRefBuilder {
             _state: PhantomData,
@@ -150,7 +166,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CardRefBuilder<S, St>
+impl<St, S: BosStr> CardRefBuilder<St, S>
 where
     St: card_ref_state::State,
     St::ScryfallUri: card_ref_state::IsUnset,
@@ -159,7 +175,7 @@ where
     pub fn scryfall_uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> CardRefBuilder<S, card_ref_state::SetScryfallUri<St>> {
+    ) -> CardRefBuilder<card_ref_state::SetScryfallUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CardRefBuilder {
             _state: PhantomData,
@@ -169,7 +185,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CardRefBuilder<S, St>
+impl<St, S: BosStr> CardRefBuilder<St, S>
 where
     St: card_ref_state::State,
     St::ScryfallUri: card_ref_state::IsSet,
@@ -194,10 +210,10 @@ where
 }
 
 fn lexicon_doc_com_deckbelcher_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.deckbelcher.defs"),

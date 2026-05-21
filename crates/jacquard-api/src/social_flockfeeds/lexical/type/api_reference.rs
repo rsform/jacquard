@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,22 +24,19 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::event;
 use crate::social_flockfeeds::lexical::r#type::image_object;
 use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// Reference documentation for application programming interfaces (APIs).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub about: Option<EmbeddedAbout<S>>,
@@ -327,6 +324,7 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -379,6 +377,7 @@ pub enum EmbeddedAccountablePerson<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -460,6 +459,7 @@ pub enum EmbeddedAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -482,6 +482,7 @@ pub enum EmbeddedCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -528,6 +529,7 @@ pub enum EmbeddedContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -537,6 +539,7 @@ pub enum EmbeddedCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -572,6 +575,7 @@ pub enum EmbeddedCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -630,6 +634,7 @@ pub enum EmbeddedEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -691,6 +696,7 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -723,6 +729,7 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -757,6 +764,7 @@ pub enum EmbeddedIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -764,6 +772,7 @@ pub enum EmbeddedIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -815,6 +824,7 @@ pub enum EmbeddedMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -822,6 +832,7 @@ pub enum EmbeddedMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -845,6 +856,7 @@ pub enum EmbeddedOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -886,6 +898,7 @@ pub enum EmbeddedProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -906,6 +919,7 @@ pub enum EmbeddedProvider<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -921,6 +935,7 @@ pub enum EmbeddedPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -928,6 +943,7 @@ pub enum EmbeddedPublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -941,6 +957,7 @@ pub enum EmbeddedRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -987,6 +1004,7 @@ pub enum EmbeddedSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -999,6 +1017,7 @@ pub enum EmbeddedSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1025,6 +1044,7 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1032,6 +1052,7 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1066,6 +1087,7 @@ pub enum EmbeddedThumbnail<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1090,6 +1112,7 @@ pub enum EmbeddedTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1425,6 +1448,7 @@ pub struct ApiReference<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1477,6 +1501,7 @@ pub enum ApiReferenceAccountablePerson<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1558,6 +1583,7 @@ pub enum ApiReferenceAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1580,6 +1606,7 @@ pub enum ApiReferenceCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1626,6 +1653,7 @@ pub enum ApiReferenceContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1635,6 +1663,7 @@ pub enum ApiReferenceCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1670,6 +1699,7 @@ pub enum ApiReferenceCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1728,6 +1758,7 @@ pub enum ApiReferenceEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1789,6 +1820,7 @@ pub enum ApiReferenceFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1821,6 +1853,7 @@ pub enum ApiReferenceImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1855,6 +1888,7 @@ pub enum ApiReferenceIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1862,6 +1896,7 @@ pub enum ApiReferenceIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1913,6 +1948,7 @@ pub enum ApiReferenceMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1920,6 +1956,7 @@ pub enum ApiReferenceMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1943,6 +1980,7 @@ pub enum ApiReferenceOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1984,6 +2022,7 @@ pub enum ApiReferenceProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2004,6 +2043,7 @@ pub enum ApiReferenceProvider<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2019,6 +2059,7 @@ pub enum ApiReferencePublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2026,6 +2067,7 @@ pub enum ApiReferencePublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2039,6 +2081,7 @@ pub enum ApiReferenceRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2085,6 +2128,7 @@ pub enum ApiReferenceSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2097,6 +2141,7 @@ pub enum ApiReferenceSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2123,6 +2168,7 @@ pub enum ApiReferenceSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2130,6 +2176,7 @@ pub enum ApiReferenceSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2164,6 +2211,7 @@ pub enum ApiReferenceThumbnail<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2188,6 +2236,7 @@ pub enum ApiReferenceTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2303,10 +2352,10 @@ impl<S: BosStr> LexiconSchema for ApiReference<S> {
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_APIReference() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.APIReference"),
@@ -5280,7 +5329,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_APIReference() -> LexiconDoc<'stat
 
 pub mod api_reference_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5298,7 +5347,7 @@ pub mod api_reference_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ApiReferenceBuilder<S: BosStr, St: api_reference_state::State> {
+pub struct ApiReferenceBuilder<St: api_reference_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ApiReferenceAbout<S>>,
@@ -5446,29 +5495,166 @@ pub struct ApiReferenceBuilder<S: BosStr, St: api_reference_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ApiReference<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ApiReferenceBuilder<S, api_reference_state::Empty> {
+impl ApiReference<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ApiReferenceBuilder<api_reference_state::Empty, DefaultStr> {
         ApiReferenceBuilder::new()
     }
 }
 
-impl<S: BosStr> ApiReferenceBuilder<S, api_reference_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ApiReference<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ApiReferenceBuilder<api_reference_state::Empty, S> {
+        ApiReferenceBuilder::builder()
+    }
+}
+
+impl ApiReferenceBuilder<api_reference_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ApiReferenceBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -5476,7 +5662,160 @@ impl<S: BosStr> ApiReferenceBuilder<S, api_reference_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<S: BosStr> ApiReferenceBuilder<api_reference_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ApiReferenceBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `about` field (optional)
     pub fn about(mut self, value: impl Into<Option<ApiReferenceAbout<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -5489,9 +5828,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `abstract` field (optional)
-    pub fn r#abstract(mut self, value: impl Into<Option<ApiReferenceAbstract<S>>>) -> Self {
+    pub fn r#abstract(
+        mut self,
+        value: impl Into<Option<ApiReferenceAbstract<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -5502,20 +5844,26 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `accessMode` field (optional)
-    pub fn access_mode(mut self, value: impl Into<Option<ApiReferenceAccessMode<S>>>) -> Self {
+    pub fn access_mode(
+        mut self,
+        value: impl Into<Option<ApiReferenceAccessMode<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `accessMode` field to an Option value (optional)
-    pub fn maybe_access_mode(mut self, value: Option<ApiReferenceAccessMode<S>>) -> Self {
+    pub fn maybe_access_mode(
+        mut self,
+        value: Option<ApiReferenceAccessMode<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `accessModeSufficient` field (optional)
     pub fn access_mode_sufficient(
         mut self,
@@ -5534,7 +5882,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `accessibilityAPI` field (optional)
     pub fn accessibility_api(
         mut self,
@@ -5553,7 +5901,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `accessibilityControl` field (optional)
     pub fn accessibility_control(
         mut self,
@@ -5572,7 +5920,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `accessibilityFeature` field (optional)
     pub fn accessibility_feature(
         mut self,
@@ -5591,7 +5939,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `accessibilityHazard` field (optional)
     pub fn accessibility_hazard(
         mut self,
@@ -5610,7 +5958,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `accessibilitySummary` field (optional)
     pub fn accessibility_summary(
         mut self,
@@ -5629,7 +5977,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `accountablePerson` field (optional)
     pub fn accountable_person(
         mut self,
@@ -5648,7 +5996,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `acquireLicensePage` field (optional)
     pub fn acquire_license_page(
         mut self,
@@ -5667,7 +6015,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `additionalType` field (optional)
     pub fn additional_type(
         mut self,
@@ -5677,13 +6025,16 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(mut self, value: Option<ApiReferenceAdditionalType<S>>) -> Self {
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<ApiReferenceAdditionalType<S>>,
+    ) -> Self {
         self._fields.11 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `aggregateRating` field (optional)
     pub fn aggregate_rating(
         mut self,
@@ -5693,13 +6044,16 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(mut self, value: Option<ApiReferenceAggregateRating<S>>) -> Self {
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<ApiReferenceAggregateRating<S>>,
+    ) -> Self {
         self._fields.12 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `alternateName` field (optional)
     pub fn alternate_name(
         mut self,
@@ -5709,13 +6063,16 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(mut self, value: Option<ApiReferenceAlternateName<S>>) -> Self {
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<ApiReferenceAlternateName<S>>,
+    ) -> Self {
         self._fields.13 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `alternativeHeadline` field (optional)
     pub fn alternative_headline(
         mut self,
@@ -5734,33 +6091,45 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `archivedAt` field (optional)
-    pub fn archived_at(mut self, value: impl Into<Option<ApiReferenceArchivedAt<S>>>) -> Self {
+    pub fn archived_at(
+        mut self,
+        value: impl Into<Option<ApiReferenceArchivedAt<S>>>,
+    ) -> Self {
         self._fields.15 = value.into();
         self
     }
     /// Set the `archivedAt` field to an Option value (optional)
-    pub fn maybe_archived_at(mut self, value: Option<ApiReferenceArchivedAt<S>>) -> Self {
+    pub fn maybe_archived_at(
+        mut self,
+        value: Option<ApiReferenceArchivedAt<S>>,
+    ) -> Self {
         self._fields.15 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `articleBody` field (optional)
-    pub fn article_body(mut self, value: impl Into<Option<ApiReferenceArticleBody<S>>>) -> Self {
+    pub fn article_body(
+        mut self,
+        value: impl Into<Option<ApiReferenceArticleBody<S>>>,
+    ) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `articleBody` field to an Option value (optional)
-    pub fn maybe_article_body(mut self, value: Option<ApiReferenceArticleBody<S>>) -> Self {
+    pub fn maybe_article_body(
+        mut self,
+        value: Option<ApiReferenceArticleBody<S>>,
+    ) -> Self {
         self._fields.16 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `articleSection` field (optional)
     pub fn article_section(
         mut self,
@@ -5770,15 +6139,21 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `articleSection` field to an Option value (optional)
-    pub fn maybe_article_section(mut self, value: Option<ApiReferenceArticleSection<S>>) -> Self {
+    pub fn maybe_article_section(
+        mut self,
+        value: Option<ApiReferenceArticleSection<S>>,
+    ) -> Self {
         self._fields.17 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `assembly` field (optional)
-    pub fn assembly(mut self, value: impl Into<Option<ApiReferenceAssembly<S>>>) -> Self {
+    pub fn assembly(
+        mut self,
+        value: impl Into<Option<ApiReferenceAssembly<S>>>,
+    ) -> Self {
         self._fields.18 = value.into();
         self
     }
@@ -5789,7 +6164,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `assemblyVersion` field (optional)
     pub fn assembly_version(
         mut self,
@@ -5799,15 +6174,21 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `assemblyVersion` field to an Option value (optional)
-    pub fn maybe_assembly_version(mut self, value: Option<ApiReferenceAssemblyVersion<S>>) -> Self {
+    pub fn maybe_assembly_version(
+        mut self,
+        value: Option<ApiReferenceAssemblyVersion<S>>,
+    ) -> Self {
         self._fields.19 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `assesses` field (optional)
-    pub fn assesses(mut self, value: impl Into<Option<ApiReferenceAssesses<S>>>) -> Self {
+    pub fn assesses(
+        mut self,
+        value: impl Into<Option<ApiReferenceAssesses<S>>>,
+    ) -> Self {
         self._fields.20 = value.into();
         self
     }
@@ -5818,7 +6199,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `associatedMedia` field (optional)
     pub fn associated_media(
         mut self,
@@ -5828,15 +6209,21 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
-    pub fn maybe_associated_media(mut self, value: Option<ApiReferenceAssociatedMedia<S>>) -> Self {
+    pub fn maybe_associated_media(
+        mut self,
+        value: Option<ApiReferenceAssociatedMedia<S>>,
+    ) -> Self {
         self._fields.21 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `audience` field (optional)
-    pub fn audience(mut self, value: impl Into<Option<ApiReferenceAudience<S>>>) -> Self {
+    pub fn audience(
+        mut self,
+        value: impl Into<Option<ApiReferenceAudience<S>>>,
+    ) -> Self {
         self._fields.22 = value.into();
         self
     }
@@ -5847,7 +6234,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `audio` field (optional)
     pub fn audio(mut self, value: impl Into<Option<ApiReferenceAudio<S>>>) -> Self {
         self._fields.23 = value.into();
@@ -5860,7 +6247,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<ApiReferenceAuthor<S>>>) -> Self {
         self._fields.24 = value.into();
@@ -5873,7 +6260,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<ApiReferenceAward<S>>>) -> Self {
         self._fields.25 = value.into();
@@ -5886,7 +6273,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<ApiReferenceAwards<S>>>) -> Self {
         self._fields.26 = value.into();
@@ -5899,9 +6286,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `backstory` field (optional)
-    pub fn backstory(mut self, value: impl Into<Option<ApiReferenceBackstory<S>>>) -> Self {
+    pub fn backstory(
+        mut self,
+        value: impl Into<Option<ApiReferenceBackstory<S>>>,
+    ) -> Self {
         self._fields.27 = value.into();
         self
     }
@@ -5912,9 +6302,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `character` field (optional)
-    pub fn character(mut self, value: impl Into<Option<ApiReferenceCharacter<S>>>) -> Self {
+    pub fn character(
+        mut self,
+        value: impl Into<Option<ApiReferenceCharacter<S>>>,
+    ) -> Self {
         self._fields.28 = value.into();
         self
     }
@@ -5925,9 +6318,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `citation` field (optional)
-    pub fn citation(mut self, value: impl Into<Option<ApiReferenceCitation<S>>>) -> Self {
+    pub fn citation(
+        mut self,
+        value: impl Into<Option<ApiReferenceCitation<S>>>,
+    ) -> Self {
         self._fields.29 = value.into();
         self
     }
@@ -5938,7 +6334,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<ApiReferenceComment<S>>>) -> Self {
         self._fields.30 = value.into();
@@ -5951,20 +6347,26 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `commentCount` field (optional)
-    pub fn comment_count(mut self, value: impl Into<Option<ApiReferenceCommentCount<S>>>) -> Self {
+    pub fn comment_count(
+        mut self,
+        value: impl Into<Option<ApiReferenceCommentCount<S>>>,
+    ) -> Self {
         self._fields.31 = value.into();
         self
     }
     /// Set the `commentCount` field to an Option value (optional)
-    pub fn maybe_comment_count(mut self, value: Option<ApiReferenceCommentCount<S>>) -> Self {
+    pub fn maybe_comment_count(
+        mut self,
+        value: Option<ApiReferenceCommentCount<S>>,
+    ) -> Self {
         self._fields.31 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `conditionsOfAccess` field (optional)
     pub fn conditions_of_access(
         mut self,
@@ -5983,7 +6385,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `contentLocation` field (optional)
     pub fn content_location(
         mut self,
@@ -5993,13 +6395,16 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `contentLocation` field to an Option value (optional)
-    pub fn maybe_content_location(mut self, value: Option<ApiReferenceContentLocation<S>>) -> Self {
+    pub fn maybe_content_location(
+        mut self,
+        value: Option<ApiReferenceContentLocation<S>>,
+    ) -> Self {
         self._fields.33 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `contentRating` field (optional)
     pub fn content_rating(
         mut self,
@@ -6009,13 +6414,16 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `contentRating` field to an Option value (optional)
-    pub fn maybe_content_rating(mut self, value: Option<ApiReferenceContentRating<S>>) -> Self {
+    pub fn maybe_content_rating(
+        mut self,
+        value: Option<ApiReferenceContentRating<S>>,
+    ) -> Self {
         self._fields.34 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `contentReferenceTime` field (optional)
     pub fn content_reference_time(
         mut self,
@@ -6034,20 +6442,26 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `contributor` field (optional)
-    pub fn contributor(mut self, value: impl Into<Option<ApiReferenceContributor<S>>>) -> Self {
+    pub fn contributor(
+        mut self,
+        value: impl Into<Option<ApiReferenceContributor<S>>>,
+    ) -> Self {
         self._fields.36 = value.into();
         self
     }
     /// Set the `contributor` field to an Option value (optional)
-    pub fn maybe_contributor(mut self, value: Option<ApiReferenceContributor<S>>) -> Self {
+    pub fn maybe_contributor(
+        mut self,
+        value: Option<ApiReferenceContributor<S>>,
+    ) -> Self {
         self._fields.36 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `copyrightHolder` field (optional)
     pub fn copyright_holder(
         mut self,
@@ -6057,13 +6471,16 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `copyrightHolder` field to an Option value (optional)
-    pub fn maybe_copyright_holder(mut self, value: Option<ApiReferenceCopyrightHolder<S>>) -> Self {
+    pub fn maybe_copyright_holder(
+        mut self,
+        value: Option<ApiReferenceCopyrightHolder<S>>,
+    ) -> Self {
         self._fields.37 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `copyrightNotice` field (optional)
     pub fn copyright_notice(
         mut self,
@@ -6073,13 +6490,16 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `copyrightNotice` field to an Option value (optional)
-    pub fn maybe_copyright_notice(mut self, value: Option<ApiReferenceCopyrightNotice<S>>) -> Self {
+    pub fn maybe_copyright_notice(
+        mut self,
+        value: Option<ApiReferenceCopyrightNotice<S>>,
+    ) -> Self {
         self._fields.38 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `copyrightYear` field (optional)
     pub fn copyright_year(
         mut self,
@@ -6089,15 +6509,21 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `copyrightYear` field to an Option value (optional)
-    pub fn maybe_copyright_year(mut self, value: Option<ApiReferenceCopyrightYear<S>>) -> Self {
+    pub fn maybe_copyright_year(
+        mut self,
+        value: Option<ApiReferenceCopyrightYear<S>>,
+    ) -> Self {
         self._fields.39 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `correction` field (optional)
-    pub fn correction(mut self, value: impl Into<Option<ApiReferenceCorrection<S>>>) -> Self {
+    pub fn correction(
+        mut self,
+        value: impl Into<Option<ApiReferenceCorrection<S>>>,
+    ) -> Self {
         self._fields.40 = value.into();
         self
     }
@@ -6108,7 +6534,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `countryOfOrigin` field (optional)
     pub fn country_of_origin(
         mut self,
@@ -6127,7 +6553,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `creativeWorkStatus` field (optional)
     pub fn creative_work_status(
         mut self,
@@ -6146,7 +6572,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `creator` field (optional)
     pub fn creator(mut self, value: impl Into<Option<ApiReferenceCreator<S>>>) -> Self {
         self._fields.43 = value.into();
@@ -6159,46 +6585,64 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `creditText` field (optional)
-    pub fn credit_text(mut self, value: impl Into<Option<ApiReferenceCreditText<S>>>) -> Self {
+    pub fn credit_text(
+        mut self,
+        value: impl Into<Option<ApiReferenceCreditText<S>>>,
+    ) -> Self {
         self._fields.44 = value.into();
         self
     }
     /// Set the `creditText` field to an Option value (optional)
-    pub fn maybe_credit_text(mut self, value: Option<ApiReferenceCreditText<S>>) -> Self {
+    pub fn maybe_credit_text(
+        mut self,
+        value: Option<ApiReferenceCreditText<S>>,
+    ) -> Self {
         self._fields.44 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `dateCreated` field (optional)
-    pub fn date_created(mut self, value: impl Into<Option<ApiReferenceDateCreated<S>>>) -> Self {
+    pub fn date_created(
+        mut self,
+        value: impl Into<Option<ApiReferenceDateCreated<S>>>,
+    ) -> Self {
         self._fields.45 = value.into();
         self
     }
     /// Set the `dateCreated` field to an Option value (optional)
-    pub fn maybe_date_created(mut self, value: Option<ApiReferenceDateCreated<S>>) -> Self {
+    pub fn maybe_date_created(
+        mut self,
+        value: Option<ApiReferenceDateCreated<S>>,
+    ) -> Self {
         self._fields.45 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `dateModified` field (optional)
-    pub fn date_modified(mut self, value: impl Into<Option<ApiReferenceDateModified<S>>>) -> Self {
+    pub fn date_modified(
+        mut self,
+        value: impl Into<Option<ApiReferenceDateModified<S>>>,
+    ) -> Self {
         self._fields.46 = value.into();
         self
     }
     /// Set the `dateModified` field to an Option value (optional)
-    pub fn maybe_date_modified(mut self, value: Option<ApiReferenceDateModified<S>>) -> Self {
+    pub fn maybe_date_modified(
+        mut self,
+        value: Option<ApiReferenceDateModified<S>>,
+    ) -> Self {
         self._fields.46 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `datePublished` field (optional)
     pub fn date_published(
         mut self,
@@ -6208,39 +6652,54 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `datePublished` field to an Option value (optional)
-    pub fn maybe_date_published(mut self, value: Option<ApiReferenceDatePublished<S>>) -> Self {
+    pub fn maybe_date_published(
+        mut self,
+        value: Option<ApiReferenceDatePublished<S>>,
+    ) -> Self {
         self._fields.47 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `dependencies` field (optional)
-    pub fn dependencies(mut self, value: impl Into<Option<ApiReferenceDependencies<S>>>) -> Self {
+    pub fn dependencies(
+        mut self,
+        value: impl Into<Option<ApiReferenceDependencies<S>>>,
+    ) -> Self {
         self._fields.48 = value.into();
         self
     }
     /// Set the `dependencies` field to an Option value (optional)
-    pub fn maybe_dependencies(mut self, value: Option<ApiReferenceDependencies<S>>) -> Self {
+    pub fn maybe_dependencies(
+        mut self,
+        value: Option<ApiReferenceDependencies<S>>,
+    ) -> Self {
         self._fields.48 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<ApiReferenceDescription<S>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<ApiReferenceDescription<S>>>,
+    ) -> Self {
         self._fields.49 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<ApiReferenceDescription<S>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<ApiReferenceDescription<S>>,
+    ) -> Self {
         self._fields.49 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `digitalSourceType` field (optional)
     pub fn digital_source_type(
         mut self,
@@ -6259,7 +6718,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
@@ -6278,7 +6737,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `discussionUrl` field (optional)
     pub fn discussion_url(
         mut self,
@@ -6288,15 +6747,21 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `discussionUrl` field to an Option value (optional)
-    pub fn maybe_discussion_url(mut self, value: Option<ApiReferenceDiscussionUrl<S>>) -> Self {
+    pub fn maybe_discussion_url(
+        mut self,
+        value: Option<ApiReferenceDiscussionUrl<S>>,
+    ) -> Self {
         self._fields.52 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `editEIDR` field (optional)
-    pub fn edit_eidr(mut self, value: impl Into<Option<ApiReferenceEditEidr<S>>>) -> Self {
+    pub fn edit_eidr(
+        mut self,
+        value: impl Into<Option<ApiReferenceEditEidr<S>>>,
+    ) -> Self {
         self._fields.53 = value.into();
         self
     }
@@ -6307,7 +6772,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `editor` field (optional)
     pub fn editor(mut self, value: impl Into<Option<ApiReferenceEditor<S>>>) -> Self {
         self._fields.54 = value.into();
@@ -6320,7 +6785,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `educationalAlignment` field (optional)
     pub fn educational_alignment(
         mut self,
@@ -6339,7 +6804,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `educationalLevel` field (optional)
     pub fn educational_level(
         mut self,
@@ -6358,7 +6823,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `educationalUse` field (optional)
     pub fn educational_use(
         mut self,
@@ -6368,15 +6833,21 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `educationalUse` field to an Option value (optional)
-    pub fn maybe_educational_use(mut self, value: Option<ApiReferenceEducationalUse<S>>) -> Self {
+    pub fn maybe_educational_use(
+        mut self,
+        value: Option<ApiReferenceEducationalUse<S>>,
+    ) -> Self {
         self._fields.57 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `encoding` field (optional)
-    pub fn encoding(mut self, value: impl Into<Option<ApiReferenceEncoding<S>>>) -> Self {
+    pub fn encoding(
+        mut self,
+        value: impl Into<Option<ApiReferenceEncoding<S>>>,
+    ) -> Self {
         self._fields.58 = value.into();
         self
     }
@@ -6387,7 +6858,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `encodingFormat` field (optional)
     pub fn encoding_format(
         mut self,
@@ -6397,15 +6868,21 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `encodingFormat` field to an Option value (optional)
-    pub fn maybe_encoding_format(mut self, value: Option<ApiReferenceEncodingFormat<S>>) -> Self {
+    pub fn maybe_encoding_format(
+        mut self,
+        value: Option<ApiReferenceEncodingFormat<S>>,
+    ) -> Self {
         self._fields.59 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `encodings` field (optional)
-    pub fn encodings(mut self, value: impl Into<Option<ApiReferenceEncodings<S>>>) -> Self {
+    pub fn encodings(
+        mut self,
+        value: impl Into<Option<ApiReferenceEncodings<S>>>,
+    ) -> Self {
         self._fields.60 = value.into();
         self
     }
@@ -6416,7 +6893,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `exampleOfWork` field (optional)
     pub fn example_of_work(
         mut self,
@@ -6426,13 +6903,16 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `exampleOfWork` field to an Option value (optional)
-    pub fn maybe_example_of_work(mut self, value: Option<ApiReferenceExampleOfWork<S>>) -> Self {
+    pub fn maybe_example_of_work(
+        mut self,
+        value: Option<ApiReferenceExampleOfWork<S>>,
+    ) -> Self {
         self._fields.61 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `executableLibraryName` field (optional)
     pub fn executable_library_name(
         mut self,
@@ -6451,7 +6931,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `expires` field (optional)
     pub fn expires(mut self, value: impl Into<Option<ApiReferenceExpires<S>>>) -> Self {
         self._fields.63 = value.into();
@@ -6464,20 +6944,26 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `fileFormat` field (optional)
-    pub fn file_format(mut self, value: impl Into<Option<ApiReferenceFileFormat<S>>>) -> Self {
+    pub fn file_format(
+        mut self,
+        value: impl Into<Option<ApiReferenceFileFormat<S>>>,
+    ) -> Self {
         self._fields.64 = value.into();
         self
     }
     /// Set the `fileFormat` field to an Option value (optional)
-    pub fn maybe_file_format(mut self, value: Option<ApiReferenceFileFormat<S>>) -> Self {
+    pub fn maybe_file_format(
+        mut self,
+        value: Option<ApiReferenceFileFormat<S>>,
+    ) -> Self {
         self._fields.64 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<ApiReferenceFunder<S>>>) -> Self {
         self._fields.65 = value.into();
@@ -6490,7 +6976,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<ApiReferenceFunding<S>>>) -> Self {
         self._fields.66 = value.into();
@@ -6503,7 +6989,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<ApiReferenceGenre<S>>>) -> Self {
         self._fields.67 = value.into();
@@ -6516,7 +7002,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `hasPart` field (optional)
     pub fn has_part(mut self, value: impl Into<Option<ApiReferenceHasPart<S>>>) -> Self {
         self._fields.68 = value.into();
@@ -6529,9 +7015,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `headline` field (optional)
-    pub fn headline(mut self, value: impl Into<Option<ApiReferenceHeadline<S>>>) -> Self {
+    pub fn headline(
+        mut self,
+        value: impl Into<Option<ApiReferenceHeadline<S>>>,
+    ) -> Self {
         self._fields.69 = value.into();
         self
     }
@@ -6542,9 +7031,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(mut self, value: impl Into<Option<ApiReferenceIdentifier<S>>>) -> Self {
+    pub fn identifier(
+        mut self,
+        value: impl Into<Option<ApiReferenceIdentifier<S>>>,
+    ) -> Self {
         self._fields.70 = value.into();
         self
     }
@@ -6555,7 +7047,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<ApiReferenceImage<S>>>) -> Self {
         self._fields.71 = value.into();
@@ -6568,20 +7060,26 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `inLanguage` field (optional)
-    pub fn in_language(mut self, value: impl Into<Option<ApiReferenceInLanguage<S>>>) -> Self {
+    pub fn in_language(
+        mut self,
+        value: impl Into<Option<ApiReferenceInLanguage<S>>>,
+    ) -> Self {
         self._fields.72 = value.into();
         self
     }
     /// Set the `inLanguage` field to an Option value (optional)
-    pub fn maybe_in_language(mut self, value: Option<ApiReferenceInLanguage<S>>) -> Self {
+    pub fn maybe_in_language(
+        mut self,
+        value: Option<ApiReferenceInLanguage<S>>,
+    ) -> Self {
         self._fields.72 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `interactionStatistic` field (optional)
     pub fn interaction_statistic(
         mut self,
@@ -6600,7 +7098,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `interactivityType` field (optional)
     pub fn interactivity_type(
         mut self,
@@ -6619,7 +7117,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `interpretedAsClaim` field (optional)
     pub fn interpreted_as_claim(
         mut self,
@@ -6638,7 +7136,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `isAccessibleForFree` field (optional)
     pub fn is_accessible_for_free(
         mut self,
@@ -6657,9 +7155,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `isBasedOn` field (optional)
-    pub fn is_based_on(mut self, value: impl Into<Option<ApiReferenceIsBasedOn<S>>>) -> Self {
+    pub fn is_based_on(
+        mut self,
+        value: impl Into<Option<ApiReferenceIsBasedOn<S>>>,
+    ) -> Self {
         self._fields.77 = value.into();
         self
     }
@@ -6670,7 +7171,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `isBasedOnUrl` field (optional)
     pub fn is_based_on_url(
         mut self,
@@ -6680,13 +7181,16 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `isBasedOnUrl` field to an Option value (optional)
-    pub fn maybe_is_based_on_url(mut self, value: Option<ApiReferenceIsBasedOnUrl<S>>) -> Self {
+    pub fn maybe_is_based_on_url(
+        mut self,
+        value: Option<ApiReferenceIsBasedOnUrl<S>>,
+    ) -> Self {
         self._fields.78 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `isFamilyFriendly` field (optional)
     pub fn is_family_friendly(
         mut self,
@@ -6705,9 +7209,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `isPartOf` field (optional)
-    pub fn is_part_of(mut self, value: impl Into<Option<ApiReferenceIsPartOf<S>>>) -> Self {
+    pub fn is_part_of(
+        mut self,
+        value: impl Into<Option<ApiReferenceIsPartOf<S>>>,
+    ) -> Self {
         self._fields.80 = value.into();
         self
     }
@@ -6718,9 +7225,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(mut self, value: impl Into<Option<ApiReferenceKeywords<S>>>) -> Self {
+    pub fn keywords(
+        mut self,
+        value: impl Into<Option<ApiReferenceKeywords<S>>>,
+    ) -> Self {
         self._fields.81 = value.into();
         self
     }
@@ -6731,7 +7241,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `learningResourceType` field (optional)
     pub fn learning_resource_type(
         mut self,
@@ -6750,7 +7260,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `license` field (optional)
     pub fn license(mut self, value: impl Into<Option<ApiReferenceLicense<S>>>) -> Self {
         self._fields.83 = value.into();
@@ -6763,7 +7273,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `locationCreated` field (optional)
     pub fn location_created(
         mut self,
@@ -6773,26 +7283,35 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `locationCreated` field to an Option value (optional)
-    pub fn maybe_location_created(mut self, value: Option<ApiReferenceLocationCreated<S>>) -> Self {
+    pub fn maybe_location_created(
+        mut self,
+        value: Option<ApiReferenceLocationCreated<S>>,
+    ) -> Self {
         self._fields.84 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `mainEntity` field (optional)
-    pub fn main_entity(mut self, value: impl Into<Option<ApiReferenceMainEntity<S>>>) -> Self {
+    pub fn main_entity(
+        mut self,
+        value: impl Into<Option<ApiReferenceMainEntity<S>>>,
+    ) -> Self {
         self._fields.85 = value.into();
         self
     }
     /// Set the `mainEntity` field to an Option value (optional)
-    pub fn maybe_main_entity(mut self, value: Option<ApiReferenceMainEntity<S>>) -> Self {
+    pub fn maybe_main_entity(
+        mut self,
+        value: Option<ApiReferenceMainEntity<S>>,
+    ) -> Self {
         self._fields.85 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
@@ -6811,9 +7330,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `maintainer` field (optional)
-    pub fn maintainer(mut self, value: impl Into<Option<ApiReferenceMaintainer<S>>>) -> Self {
+    pub fn maintainer(
+        mut self,
+        value: impl Into<Option<ApiReferenceMaintainer<S>>>,
+    ) -> Self {
         self._fields.87 = value.into();
         self
     }
@@ -6824,9 +7346,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `material` field (optional)
-    pub fn material(mut self, value: impl Into<Option<ApiReferenceMaterial<S>>>) -> Self {
+    pub fn material(
+        mut self,
+        value: impl Into<Option<ApiReferenceMaterial<S>>>,
+    ) -> Self {
         self._fields.88 = value.into();
         self
     }
@@ -6837,7 +7362,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `materialExtent` field (optional)
     pub fn material_extent(
         mut self,
@@ -6847,15 +7372,21 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `materialExtent` field to an Option value (optional)
-    pub fn maybe_material_extent(mut self, value: Option<ApiReferenceMaterialExtent<S>>) -> Self {
+    pub fn maybe_material_extent(
+        mut self,
+        value: Option<ApiReferenceMaterialExtent<S>>,
+    ) -> Self {
         self._fields.89 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `mentions` field (optional)
-    pub fn mentions(mut self, value: impl Into<Option<ApiReferenceMentions<S>>>) -> Self {
+    pub fn mentions(
+        mut self,
+        value: impl Into<Option<ApiReferenceMentions<S>>>,
+    ) -> Self {
         self._fields.90 = value.into();
         self
     }
@@ -6866,7 +7397,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<ApiReferenceName<S>>>) -> Self {
         self._fields.91 = value.into();
@@ -6879,7 +7410,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `offers` field (optional)
     pub fn offers(mut self, value: impl Into<Option<ApiReferenceOffers<S>>>) -> Self {
         self._fields.92 = value.into();
@@ -6892,7 +7423,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `pageEnd` field (optional)
     pub fn page_end(mut self, value: impl Into<Option<ApiReferencePageEnd<S>>>) -> Self {
         self._fields.93 = value.into();
@@ -6905,9 +7436,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `pageStart` field (optional)
-    pub fn page_start(mut self, value: impl Into<Option<ApiReferencePageStart<S>>>) -> Self {
+    pub fn page_start(
+        mut self,
+        value: impl Into<Option<ApiReferencePageStart<S>>>,
+    ) -> Self {
         self._fields.94 = value.into();
         self
     }
@@ -6918,9 +7452,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `pagination` field (optional)
-    pub fn pagination(mut self, value: impl Into<Option<ApiReferencePagination<S>>>) -> Self {
+    pub fn pagination(
+        mut self,
+        value: impl Into<Option<ApiReferencePagination<S>>>,
+    ) -> Self {
         self._fields.95 = value.into();
         self
     }
@@ -6931,7 +7468,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `pattern` field (optional)
     pub fn pattern(mut self, value: impl Into<Option<ApiReferencePattern<S>>>) -> Self {
         self._fields.96 = value.into();
@@ -6944,9 +7481,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `position` field (optional)
-    pub fn position(mut self, value: impl Into<Option<ApiReferencePosition<S>>>) -> Self {
+    pub fn position(
+        mut self,
+        value: impl Into<Option<ApiReferencePosition<S>>>,
+    ) -> Self {
         self._fields.97 = value.into();
         self
     }
@@ -6957,7 +7497,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `potentialAction` field (optional)
     pub fn potential_action(
         mut self,
@@ -6967,15 +7507,21 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(mut self, value: Option<ApiReferencePotentialAction<S>>) -> Self {
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<ApiReferencePotentialAction<S>>,
+    ) -> Self {
         self._fields.98 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `producer` field (optional)
-    pub fn producer(mut self, value: impl Into<Option<ApiReferenceProducer<S>>>) -> Self {
+    pub fn producer(
+        mut self,
+        value: impl Into<Option<ApiReferenceProducer<S>>>,
+    ) -> Self {
         self._fields.99 = value.into();
         self
     }
@@ -6986,7 +7532,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `proficiencyLevel` field (optional)
     pub fn proficiency_level(
         mut self,
@@ -7005,7 +7551,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `programmingModel` field (optional)
     pub fn programming_model(
         mut self,
@@ -7024,9 +7570,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `provider` field (optional)
-    pub fn provider(mut self, value: impl Into<Option<ApiReferenceProvider<S>>>) -> Self {
+    pub fn provider(
+        mut self,
+        value: impl Into<Option<ApiReferenceProvider<S>>>,
+    ) -> Self {
         self._fields.102 = value.into();
         self
     }
@@ -7037,22 +7586,31 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `publication` field (optional)
-    pub fn publication(mut self, value: impl Into<Option<ApiReferencePublication<S>>>) -> Self {
+    pub fn publication(
+        mut self,
+        value: impl Into<Option<ApiReferencePublication<S>>>,
+    ) -> Self {
         self._fields.103 = value.into();
         self
     }
     /// Set the `publication` field to an Option value (optional)
-    pub fn maybe_publication(mut self, value: Option<ApiReferencePublication<S>>) -> Self {
+    pub fn maybe_publication(
+        mut self,
+        value: Option<ApiReferencePublication<S>>,
+    ) -> Self {
         self._fields.103 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `publisher` field (optional)
-    pub fn publisher(mut self, value: impl Into<Option<ApiReferencePublisher<S>>>) -> Self {
+    pub fn publisher(
+        mut self,
+        value: impl Into<Option<ApiReferencePublisher<S>>>,
+    ) -> Self {
         self._fields.104 = value.into();
         self
     }
@@ -7063,7 +7621,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `publisherImprint` field (optional)
     pub fn publisher_imprint(
         mut self,
@@ -7082,7 +7640,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `publishingPrinciples` field (optional)
     pub fn publishing_principles(
         mut self,
@@ -7101,20 +7659,26 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `recordedAt` field (optional)
-    pub fn recorded_at(mut self, value: impl Into<Option<ApiReferenceRecordedAt<S>>>) -> Self {
+    pub fn recorded_at(
+        mut self,
+        value: impl Into<Option<ApiReferenceRecordedAt<S>>>,
+    ) -> Self {
         self._fields.107 = value.into();
         self
     }
     /// Set the `recordedAt` field to an Option value (optional)
-    pub fn maybe_recorded_at(mut self, value: Option<ApiReferenceRecordedAt<S>>) -> Self {
+    pub fn maybe_recorded_at(
+        mut self,
+        value: Option<ApiReferenceRecordedAt<S>>,
+    ) -> Self {
         self._fields.107 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `releasedEvent` field (optional)
     pub fn released_event(
         mut self,
@@ -7124,13 +7688,16 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `releasedEvent` field to an Option value (optional)
-    pub fn maybe_released_event(mut self, value: Option<ApiReferenceReleasedEvent<S>>) -> Self {
+    pub fn maybe_released_event(
+        mut self,
+        value: Option<ApiReferenceReleasedEvent<S>>,
+    ) -> Self {
         self._fields.108 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<ApiReferenceReview<S>>>) -> Self {
         self._fields.109 = value.into();
@@ -7143,7 +7710,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<ApiReferenceReviews<S>>>) -> Self {
         self._fields.110 = value.into();
@@ -7156,7 +7723,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<ApiReferenceSameAs<S>>>) -> Self {
         self._fields.111 = value.into();
@@ -7169,7 +7736,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `schemaVersion` field (optional)
     pub fn schema_version(
         mut self,
@@ -7179,13 +7746,16 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `schemaVersion` field to an Option value (optional)
-    pub fn maybe_schema_version(mut self, value: Option<ApiReferenceSchemaVersion<S>>) -> Self {
+    pub fn maybe_schema_version(
+        mut self,
+        value: Option<ApiReferenceSchemaVersion<S>>,
+    ) -> Self {
         self._fields.112 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `sdDatePublished` field (optional)
     pub fn sd_date_published(
         mut self,
@@ -7204,9 +7774,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `sdLicense` field (optional)
-    pub fn sd_license(mut self, value: impl Into<Option<ApiReferenceSdLicense<S>>>) -> Self {
+    pub fn sd_license(
+        mut self,
+        value: impl Into<Option<ApiReferenceSdLicense<S>>>,
+    ) -> Self {
         self._fields.114 = value.into();
         self
     }
@@ -7217,20 +7790,26 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `sdPublisher` field (optional)
-    pub fn sd_publisher(mut self, value: impl Into<Option<ApiReferenceSdPublisher<S>>>) -> Self {
+    pub fn sd_publisher(
+        mut self,
+        value: impl Into<Option<ApiReferenceSdPublisher<S>>>,
+    ) -> Self {
         self._fields.115 = value.into();
         self
     }
     /// Set the `sdPublisher` field to an Option value (optional)
-    pub fn maybe_sd_publisher(mut self, value: Option<ApiReferenceSdPublisher<S>>) -> Self {
+    pub fn maybe_sd_publisher(
+        mut self,
+        value: Option<ApiReferenceSdPublisher<S>>,
+    ) -> Self {
         self._fields.115 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<ApiReferenceSize<S>>>) -> Self {
         self._fields.116 = value.into();
@@ -7243,7 +7822,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `sourceOrganization` field (optional)
     pub fn source_organization(
         mut self,
@@ -7262,7 +7841,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `spatial` field (optional)
     pub fn spatial(mut self, value: impl Into<Option<ApiReferenceSpatial<S>>>) -> Self {
         self._fields.118 = value.into();
@@ -7275,7 +7854,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `spatialCoverage` field (optional)
     pub fn spatial_coverage(
         mut self,
@@ -7285,15 +7864,21 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `spatialCoverage` field to an Option value (optional)
-    pub fn maybe_spatial_coverage(mut self, value: Option<ApiReferenceSpatialCoverage<S>>) -> Self {
+    pub fn maybe_spatial_coverage(
+        mut self,
+        value: Option<ApiReferenceSpatialCoverage<S>>,
+    ) -> Self {
         self._fields.119 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `speakable` field (optional)
-    pub fn speakable(mut self, value: impl Into<Option<ApiReferenceSpeakable<S>>>) -> Self {
+    pub fn speakable(
+        mut self,
+        value: impl Into<Option<ApiReferenceSpeakable<S>>>,
+    ) -> Self {
         self._fields.120 = value.into();
         self
     }
@@ -7304,7 +7889,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<ApiReferenceSponsor<S>>>) -> Self {
         self._fields.121 = value.into();
@@ -7317,9 +7902,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `subjectOf` field (optional)
-    pub fn subject_of(mut self, value: impl Into<Option<ApiReferenceSubjectOf<S>>>) -> Self {
+    pub fn subject_of(
+        mut self,
+        value: impl Into<Option<ApiReferenceSubjectOf<S>>>,
+    ) -> Self {
         self._fields.122 = value.into();
         self
     }
@@ -7330,7 +7918,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `targetPlatform` field (optional)
     pub fn target_platform(
         mut self,
@@ -7340,13 +7928,16 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `targetPlatform` field to an Option value (optional)
-    pub fn maybe_target_platform(mut self, value: Option<ApiReferenceTargetPlatform<S>>) -> Self {
+    pub fn maybe_target_platform(
+        mut self,
+        value: Option<ApiReferenceTargetPlatform<S>>,
+    ) -> Self {
         self._fields.123 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `teaches` field (optional)
     pub fn teaches(mut self, value: impl Into<Option<ApiReferenceTeaches<S>>>) -> Self {
         self._fields.124 = value.into();
@@ -7359,9 +7950,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `temporal` field (optional)
-    pub fn temporal(mut self, value: impl Into<Option<ApiReferenceTemporal<S>>>) -> Self {
+    pub fn temporal(
+        mut self,
+        value: impl Into<Option<ApiReferenceTemporal<S>>>,
+    ) -> Self {
         self._fields.125 = value.into();
         self
     }
@@ -7372,7 +7966,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `temporalCoverage` field (optional)
     pub fn temporal_coverage(
         mut self,
@@ -7391,7 +7985,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<ApiReferenceText<S>>>) -> Self {
         self._fields.127 = value.into();
@@ -7404,9 +7998,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `thumbnail` field (optional)
-    pub fn thumbnail(mut self, value: impl Into<Option<ApiReferenceThumbnail<S>>>) -> Self {
+    pub fn thumbnail(
+        mut self,
+        value: impl Into<Option<ApiReferenceThumbnail<S>>>,
+    ) -> Self {
         self._fields.128 = value.into();
         self
     }
@@ -7417,33 +8014,45 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `thumbnailUrl` field (optional)
-    pub fn thumbnail_url(mut self, value: impl Into<Option<ApiReferenceThumbnailUrl<S>>>) -> Self {
+    pub fn thumbnail_url(
+        mut self,
+        value: impl Into<Option<ApiReferenceThumbnailUrl<S>>>,
+    ) -> Self {
         self._fields.129 = value.into();
         self
     }
     /// Set the `thumbnailUrl` field to an Option value (optional)
-    pub fn maybe_thumbnail_url(mut self, value: Option<ApiReferenceThumbnailUrl<S>>) -> Self {
+    pub fn maybe_thumbnail_url(
+        mut self,
+        value: Option<ApiReferenceThumbnailUrl<S>>,
+    ) -> Self {
         self._fields.129 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `timeRequired` field (optional)
-    pub fn time_required(mut self, value: impl Into<Option<ApiReferenceTimeRequired<S>>>) -> Self {
+    pub fn time_required(
+        mut self,
+        value: impl Into<Option<ApiReferenceTimeRequired<S>>>,
+    ) -> Self {
         self._fields.130 = value.into();
         self
     }
     /// Set the `timeRequired` field to an Option value (optional)
-    pub fn maybe_time_required(mut self, value: Option<ApiReferenceTimeRequired<S>>) -> Self {
+    pub fn maybe_time_required(
+        mut self,
+        value: Option<ApiReferenceTimeRequired<S>>,
+    ) -> Self {
         self._fields.130 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `translationOfWork` field (optional)
     pub fn translation_of_work(
         mut self,
@@ -7462,9 +8071,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `translator` field (optional)
-    pub fn translator(mut self, value: impl Into<Option<ApiReferenceTranslator<S>>>) -> Self {
+    pub fn translator(
+        mut self,
+        value: impl Into<Option<ApiReferenceTranslator<S>>>,
+    ) -> Self {
         self._fields.132 = value.into();
         self
     }
@@ -7475,7 +8087,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `typicalAgeRange` field (optional)
     pub fn typical_age_range(
         mut self,
@@ -7494,7 +8106,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<ApiReferenceUrl<S>>>) -> Self {
         self._fields.134 = value.into();
@@ -7507,9 +8119,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `usageInfo` field (optional)
-    pub fn usage_info(mut self, value: impl Into<Option<ApiReferenceUsageInfo<S>>>) -> Self {
+    pub fn usage_info(
+        mut self,
+        value: impl Into<Option<ApiReferenceUsageInfo<S>>>,
+    ) -> Self {
         self._fields.135 = value.into();
         self
     }
@@ -7520,7 +8135,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<ApiReferenceVersion<S>>>) -> Self {
         self._fields.136 = value.into();
@@ -7533,7 +8148,7 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `video` field (optional)
     pub fn video(mut self, value: impl Into<Option<ApiReferenceVideo<S>>>) -> Self {
         self._fields.137 = value.into();
@@ -7546,9 +8161,12 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `wordCount` field (optional)
-    pub fn word_count(mut self, value: impl Into<Option<ApiReferenceWordCount<S>>>) -> Self {
+    pub fn word_count(
+        mut self,
+        value: impl Into<Option<ApiReferenceWordCount<S>>>,
+    ) -> Self {
         self._fields.138 = value.into();
         self
     }
@@ -7559,20 +8177,26 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `workExample` field (optional)
-    pub fn work_example(mut self, value: impl Into<Option<ApiReferenceWorkExample<S>>>) -> Self {
+    pub fn work_example(
+        mut self,
+        value: impl Into<Option<ApiReferenceWorkExample<S>>>,
+    ) -> Self {
         self._fields.139 = value.into();
         self
     }
     /// Set the `workExample` field to an Option value (optional)
-    pub fn maybe_work_example(mut self, value: Option<ApiReferenceWorkExample<S>>) -> Self {
+    pub fn maybe_work_example(
+        mut self,
+        value: Option<ApiReferenceWorkExample<S>>,
+    ) -> Self {
         self._fields.139 = value;
         self
     }
 }
 
-impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
+impl<St: api_reference_state::State, S: BosStr> ApiReferenceBuilder<St, S> {
     /// Set the `workTranslation` field (optional)
     pub fn work_translation(
         mut self,
@@ -7582,13 +8206,16 @@ impl<S: BosStr, St: api_reference_state::State> ApiReferenceBuilder<S, St> {
         self
     }
     /// Set the `workTranslation` field to an Option value (optional)
-    pub fn maybe_work_translation(mut self, value: Option<ApiReferenceWorkTranslation<S>>) -> Self {
+    pub fn maybe_work_translation(
+        mut self,
+        value: Option<ApiReferenceWorkTranslation<S>>,
+    ) -> Self {
         self._fields.140 = value;
         self
     }
 }
 
-impl<S: BosStr, St> ApiReferenceBuilder<S, St>
+impl<St, S: BosStr> ApiReferenceBuilder<St, S>
 where
     St: api_reference_state::State,
 {
@@ -7740,7 +8367,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ApiReference<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ApiReference<S> {
         ApiReference {
             about: self._fields.0,
             r#abstract: self._fields.1,

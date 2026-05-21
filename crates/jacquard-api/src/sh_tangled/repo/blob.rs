@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::repo::blob;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::repo::blob;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LastCommit<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<blob::Signature<S>>,
@@ -44,11 +41,9 @@ pub struct LastCommit<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Blob<S: BosStr = DefaultStr> {
     pub path: S,
     /// Defaults to `false`.
@@ -59,11 +54,9 @@ pub struct Blob<S: BosStr = DefaultStr> {
     pub repo: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlobOutput<S: BosStr = DefaultStr> {
     ///File content (base64 encoded for binary files)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -93,9 +86,18 @@ pub struct BlobOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum BlobError {
     /// Repository not found or access denied
@@ -112,10 +114,7 @@ pub enum BlobError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for BlobError {
@@ -160,11 +159,9 @@ impl core::fmt::Display for BlobError {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Signature<S: BosStr = DefaultStr> {
     ///Author email
     pub email: S,
@@ -176,11 +173,9 @@ pub struct Signature<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Submodule<S: BosStr = DefaultStr> {
     ///Branch to track in the submodule
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -264,7 +259,7 @@ impl<S: BosStr> LexiconSchema for Submodule<S> {
 
 pub mod last_commit_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -321,26 +316,28 @@ pub mod last_commit_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LastCommitBuilder<S: BosStr, St: last_commit_state::State> {
+pub struct LastCommitBuilder<St: last_commit_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<blob::Signature<S>>,
-        Option<S>,
-        Option<S>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<blob::Signature<S>>, Option<S>, Option<S>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> LastCommit<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LastCommitBuilder<S, last_commit_state::Empty> {
+impl LastCommit<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LastCommitBuilder<last_commit_state::Empty, DefaultStr> {
         LastCommitBuilder::new()
     }
 }
 
-impl<S: BosStr> LastCommitBuilder<S, last_commit_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> LastCommit<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LastCommitBuilder<last_commit_state::Empty, S> {
+        LastCommitBuilder::builder()
+    }
+}
+
+impl LastCommitBuilder<last_commit_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LastCommitBuilder {
             _state: PhantomData,
@@ -350,7 +347,18 @@ impl<S: BosStr> LastCommitBuilder<S, last_commit_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: last_commit_state::State> LastCommitBuilder<S, St> {
+impl<S: BosStr> LastCommitBuilder<last_commit_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LastCommitBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: last_commit_state::State, S: BosStr> LastCommitBuilder<St, S> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<blob::Signature<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -363,7 +371,7 @@ impl<S: BosStr, St: last_commit_state::State> LastCommitBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LastCommitBuilder<S, St>
+impl<St, S: BosStr> LastCommitBuilder<St, S>
 where
     St: last_commit_state::State,
     St::Hash: last_commit_state::IsUnset,
@@ -372,7 +380,7 @@ where
     pub fn hash(
         mut self,
         value: impl Into<S>,
-    ) -> LastCommitBuilder<S, last_commit_state::SetHash<St>> {
+    ) -> LastCommitBuilder<last_commit_state::SetHash<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LastCommitBuilder {
             _state: PhantomData,
@@ -382,7 +390,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LastCommitBuilder<S, St>
+impl<St, S: BosStr> LastCommitBuilder<St, S>
 where
     St: last_commit_state::State,
     St::Message: last_commit_state::IsUnset,
@@ -391,7 +399,7 @@ where
     pub fn message(
         mut self,
         value: impl Into<S>,
-    ) -> LastCommitBuilder<S, last_commit_state::SetMessage<St>> {
+    ) -> LastCommitBuilder<last_commit_state::SetMessage<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LastCommitBuilder {
             _state: PhantomData,
@@ -401,7 +409,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LastCommitBuilder<S, St>
+impl<St, S: BosStr> LastCommitBuilder<St, S>
 where
     St: last_commit_state::State,
     St::When: last_commit_state::IsUnset,
@@ -410,7 +418,7 @@ where
     pub fn when(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LastCommitBuilder<S, last_commit_state::SetWhen<St>> {
+    ) -> LastCommitBuilder<last_commit_state::SetWhen<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LastCommitBuilder {
             _state: PhantomData,
@@ -420,7 +428,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LastCommitBuilder<S, St>
+impl<St, S: BosStr> LastCommitBuilder<St, S>
 where
     St: last_commit_state::State,
     St::Hash: last_commit_state::IsSet,
@@ -438,7 +446,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LastCommit<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LastCommit<S> {
         LastCommit {
             author: self._fields.0,
             hash: self._fields.1.unwrap(),
@@ -450,10 +461,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_blob() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.blob"),
@@ -462,11 +473,12 @@ fn lexicon_doc_sh_tangled_repo_blob() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("lastCommit"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("hash"),
-                        SmolStr::new_static("message"),
-                        SmolStr::new_static("when"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("hash"), SmolStr::new_static("message"),
+                            SmolStr::new_static("when")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -507,63 +519,71 @@ fn lexicon_doc_sh_tangled_repo_blob() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![
-                            SmolStr::new_static("repo"),
-                            SmolStr::new_static("ref"),
-                            SmolStr::new_static("path"),
-                        ]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("path"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Path to the file within the repository",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("raw"),
-                                LexXrpcParametersProperty::Boolean(LexBoolean {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("ref"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Git reference (branch, tag, or commit SHA)",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("repo"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Repository identifier in format 'did:plc:.../repoName'",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(
+                                vec![
+                                    SmolStr::new_static("repo"), SmolStr::new_static("ref"),
+                                    SmolStr::new_static("path")
+                                ],
+                            ),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("path"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("Path to the file within the repository"),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("raw"),
+                                    LexXrpcParametersProperty::Boolean(LexBoolean {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("ref"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Git reference (branch, tag, or commit SHA)",
+                                            ),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("repo"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Repository identifier in format 'did:plc:.../repoName'",
+                                            ),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("signature"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("email"),
-                        SmolStr::new_static("when"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("name"), SmolStr::new_static("email"),
+                            SmolStr::new_static("when")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -597,19 +617,18 @@ fn lexicon_doc_sh_tangled_repo_blob() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("submodule"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("url"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("url")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("branch"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Branch to track in the submodule",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Branch to track in the submodule"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -623,7 +642,9 @@ fn lexicon_doc_sh_tangled_repo_blob() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Submodule repository URL")),
+                                description: Some(
+                                    CowStr::new_static("Submodule repository URL"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -644,7 +665,7 @@ fn _default_raw() -> Option<bool> {
 
 pub mod blob_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -701,21 +722,28 @@ pub mod blob_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BlobBuilder<S: BosStr, St: blob_state::State> {
+pub struct BlobBuilder<St: blob_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<bool>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Blob<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BlobBuilder<S, blob_state::Empty> {
+impl Blob<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BlobBuilder<blob_state::Empty, DefaultStr> {
         BlobBuilder::new()
     }
 }
 
-impl<S: BosStr> BlobBuilder<S, blob_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Blob<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BlobBuilder<blob_state::Empty, S> {
+        BlobBuilder::builder()
+    }
+}
+
+impl BlobBuilder<blob_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BlobBuilder {
             _state: PhantomData,
@@ -725,13 +753,27 @@ impl<S: BosStr> BlobBuilder<S, blob_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BlobBuilder<S, St>
+impl<S: BosStr> BlobBuilder<blob_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BlobBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BlobBuilder<St, S>
 where
     St: blob_state::State,
     St::Path: blob_state::IsUnset,
 {
     /// Set the `path` field (required)
-    pub fn path(mut self, value: impl Into<S>) -> BlobBuilder<S, blob_state::SetPath<St>> {
+    pub fn path(
+        mut self,
+        value: impl Into<S>,
+    ) -> BlobBuilder<blob_state::SetPath<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BlobBuilder {
             _state: PhantomData,
@@ -741,7 +783,7 @@ where
     }
 }
 
-impl<S: BosStr, St: blob_state::State> BlobBuilder<S, St> {
+impl<St: blob_state::State, S: BosStr> BlobBuilder<St, S> {
     /// Set the `raw` field (optional)
     pub fn raw(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -754,13 +796,16 @@ impl<S: BosStr, St: blob_state::State> BlobBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BlobBuilder<S, St>
+impl<St, S: BosStr> BlobBuilder<St, S>
 where
     St: blob_state::State,
     St::Ref: blob_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(mut self, value: impl Into<S>) -> BlobBuilder<S, blob_state::SetRef<St>> {
+    pub fn r#ref(
+        mut self,
+        value: impl Into<S>,
+    ) -> BlobBuilder<blob_state::SetRef<St>, S> {
         self._fields.2 = Option::Some(value.into());
         BlobBuilder {
             _state: PhantomData,
@@ -770,13 +815,16 @@ where
     }
 }
 
-impl<S: BosStr, St> BlobBuilder<S, St>
+impl<St, S: BosStr> BlobBuilder<St, S>
 where
     St: blob_state::State,
     St::Repo: blob_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(mut self, value: impl Into<S>) -> BlobBuilder<S, blob_state::SetRepo<St>> {
+    pub fn repo(
+        mut self,
+        value: impl Into<S>,
+    ) -> BlobBuilder<blob_state::SetRepo<St>, S> {
         self._fields.3 = Option::Some(value.into());
         BlobBuilder {
             _state: PhantomData,
@@ -786,7 +834,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BlobBuilder<S, St>
+impl<St, S: BosStr> BlobBuilder<St, S>
 where
     St: blob_state::State,
     St::Repo: blob_state::IsSet,
@@ -806,7 +854,7 @@ where
 
 pub mod signature_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -863,21 +911,28 @@ pub mod signature_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SignatureBuilder<S: BosStr, St: signature_state::State> {
+pub struct SignatureBuilder<St: signature_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Signature<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SignatureBuilder<S, signature_state::Empty> {
+impl Signature<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SignatureBuilder<signature_state::Empty, DefaultStr> {
         SignatureBuilder::new()
     }
 }
 
-impl<S: BosStr> SignatureBuilder<S, signature_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Signature<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SignatureBuilder<signature_state::Empty, S> {
+        SignatureBuilder::builder()
+    }
+}
+
+impl SignatureBuilder<signature_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SignatureBuilder {
             _state: PhantomData,
@@ -887,7 +942,18 @@ impl<S: BosStr> SignatureBuilder<S, signature_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SignatureBuilder<S, St>
+impl<S: BosStr> SignatureBuilder<signature_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SignatureBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
     St::Email: signature_state::IsUnset,
@@ -896,7 +962,7 @@ where
     pub fn email(
         mut self,
         value: impl Into<S>,
-    ) -> SignatureBuilder<S, signature_state::SetEmail<St>> {
+    ) -> SignatureBuilder<signature_state::SetEmail<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -906,7 +972,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SignatureBuilder<S, St>
+impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
     St::Name: signature_state::IsUnset,
@@ -915,7 +981,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> SignatureBuilder<S, signature_state::SetName<St>> {
+    ) -> SignatureBuilder<signature_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -925,7 +991,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SignatureBuilder<S, St>
+impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
     St::When: signature_state::IsUnset,
@@ -934,7 +1000,7 @@ where
     pub fn when(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SignatureBuilder<S, signature_state::SetWhen<St>> {
+    ) -> SignatureBuilder<signature_state::SetWhen<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -944,7 +1010,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SignatureBuilder<S, St>
+impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
     St::Name: signature_state::IsSet,
@@ -961,7 +1027,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Signature<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Signature<S> {
         Signature {
             email: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -118,7 +118,7 @@ impl<S: BosStr> LexiconSchema for PublicKey<S> {
 
 pub mod public_key_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -126,70 +126,77 @@ pub mod public_key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
         type Key;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = St::Name;
-        type Key = St::Key;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
         type Key = St::Key;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetKey<St> {}
     impl<St: State> State for SetKey<St> {
-        type CreatedAt = St::CreatedAt;
         type Name = St::Name;
         type Key = Set<members::key>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type Key = St::Key;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PublicKeyBuilder<S: BosStr, St: public_key_state::State> {
+pub struct PublicKeyBuilder<St: public_key_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PublicKey<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PublicKeyBuilder<S, public_key_state::Empty> {
+impl PublicKey<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PublicKeyBuilder<public_key_state::Empty, DefaultStr> {
         PublicKeyBuilder::new()
     }
 }
 
-impl<S: BosStr> PublicKeyBuilder<S, public_key_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PublicKey<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PublicKeyBuilder<public_key_state::Empty, S> {
+        PublicKeyBuilder::builder()
+    }
+}
+
+impl PublicKeyBuilder<public_key_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PublicKeyBuilder {
             _state: PhantomData,
@@ -199,7 +206,18 @@ impl<S: BosStr> PublicKeyBuilder<S, public_key_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PublicKeyBuilder<S, St>
+impl<S: BosStr> PublicKeyBuilder<public_key_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PublicKeyBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PublicKeyBuilder<St, S>
 where
     St: public_key_state::State,
     St::CreatedAt: public_key_state::IsUnset,
@@ -208,7 +226,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PublicKeyBuilder<S, public_key_state::SetCreatedAt<St>> {
+    ) -> PublicKeyBuilder<public_key_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PublicKeyBuilder {
             _state: PhantomData,
@@ -218,13 +236,16 @@ where
     }
 }
 
-impl<S: BosStr, St> PublicKeyBuilder<S, St>
+impl<St, S: BosStr> PublicKeyBuilder<St, S>
 where
     St: public_key_state::State,
     St::Key: public_key_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(mut self, value: impl Into<S>) -> PublicKeyBuilder<S, public_key_state::SetKey<St>> {
+    pub fn key(
+        mut self,
+        value: impl Into<S>,
+    ) -> PublicKeyBuilder<public_key_state::SetKey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PublicKeyBuilder {
             _state: PhantomData,
@@ -234,7 +255,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PublicKeyBuilder<S, St>
+impl<St, S: BosStr> PublicKeyBuilder<St, S>
 where
     St: public_key_state::State,
     St::Name: public_key_state::IsUnset,
@@ -243,7 +264,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> PublicKeyBuilder<S, public_key_state::SetName<St>> {
+    ) -> PublicKeyBuilder<public_key_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PublicKeyBuilder {
             _state: PhantomData,
@@ -253,12 +274,12 @@ where
     }
 }
 
-impl<S: BosStr, St> PublicKeyBuilder<S, St>
+impl<St, S: BosStr> PublicKeyBuilder<St, S>
 where
     St: public_key_state::State,
-    St::CreatedAt: public_key_state::IsSet,
     St::Name: public_key_state::IsSet,
     St::Key: public_key_state::IsSet,
+    St::CreatedAt: public_key_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PublicKey<S> {
@@ -270,7 +291,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PublicKey<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PublicKey<S> {
         PublicKey {
             created_at: self._fields.0.unwrap(),
             key: self._fields.1.unwrap(),
@@ -281,10 +305,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_publicKey() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.publicKey"),
@@ -295,18 +319,21 @@ fn lexicon_doc_sh_tangled_publicKey() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("key"),
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("key"), SmolStr::new_static("name"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("key upload timestamp")),
+                                    description: Some(
+                                        CowStr::new_static("key upload timestamp"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -314,7 +341,9 @@ fn lexicon_doc_sh_tangled_publicKey() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("key"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("public key contents")),
+                                    description: Some(
+                                        CowStr::new_static("public key contents"),
+                                    ),
                                     max_length: Some(4096usize),
                                     ..Default::default()
                                 }),
@@ -322,9 +351,9 @@ fn lexicon_doc_sh_tangled_publicKey() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "human-readable name for this key",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("human-readable name for this key"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

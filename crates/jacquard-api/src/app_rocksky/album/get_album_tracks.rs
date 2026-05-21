@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::song::SongViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::song::SongViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAlbumTracks<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAlbumTracksOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracks: Option<Vec<SongViewBasic<S>>>,
@@ -65,7 +60,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetAlbumTracksRequest {
 
 pub mod get_album_tracks_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -96,21 +91,31 @@ pub mod get_album_tracks_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetAlbumTracksBuilder<S: BosStr, St: get_album_tracks_state::State> {
+pub struct GetAlbumTracksBuilder<
+    St: get_album_tracks_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetAlbumTracks<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetAlbumTracksBuilder<S, get_album_tracks_state::Empty> {
+impl GetAlbumTracks<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetAlbumTracksBuilder<get_album_tracks_state::Empty, DefaultStr> {
         GetAlbumTracksBuilder::new()
     }
 }
 
-impl<S: BosStr> GetAlbumTracksBuilder<S, get_album_tracks_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetAlbumTracks<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetAlbumTracksBuilder<get_album_tracks_state::Empty, S> {
+        GetAlbumTracksBuilder::builder()
+    }
+}
+
+impl GetAlbumTracksBuilder<get_album_tracks_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetAlbumTracksBuilder {
             _state: PhantomData,
@@ -120,7 +125,18 @@ impl<S: BosStr> GetAlbumTracksBuilder<S, get_album_tracks_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetAlbumTracksBuilder<S, St>
+impl<S: BosStr> GetAlbumTracksBuilder<get_album_tracks_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetAlbumTracksBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetAlbumTracksBuilder<St, S>
 where
     St: get_album_tracks_state::State,
     St::Uri: get_album_tracks_state::IsUnset,
@@ -129,7 +145,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetAlbumTracksBuilder<S, get_album_tracks_state::SetUri<St>> {
+    ) -> GetAlbumTracksBuilder<get_album_tracks_state::SetUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetAlbumTracksBuilder {
             _state: PhantomData,
@@ -139,7 +155,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetAlbumTracksBuilder<S, St>
+impl<St, S: BosStr> GetAlbumTracksBuilder<St, S>
 where
     St: get_album_tracks_state::State,
     St::Uri: get_album_tracks_state::IsSet,

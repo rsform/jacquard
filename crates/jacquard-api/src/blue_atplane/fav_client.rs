@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A declaration of a favorite client.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -115,7 +115,7 @@ impl<S: BosStr> LexiconSchema for FavClient<S> {
 
 pub mod fav_client_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -146,21 +146,28 @@ pub mod fav_client_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FavClientBuilder<S: BosStr, St: fav_client_state::State> {
+pub struct FavClientBuilder<St: fav_client_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> FavClient<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FavClientBuilder<S, fav_client_state::Empty> {
+impl FavClient<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FavClientBuilder<fav_client_state::Empty, DefaultStr> {
         FavClientBuilder::new()
     }
 }
 
-impl<S: BosStr> FavClientBuilder<S, fav_client_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> FavClient<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FavClientBuilder<fav_client_state::Empty, S> {
+        FavClientBuilder::builder()
+    }
+}
+
+impl FavClientBuilder<fav_client_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FavClientBuilder {
             _state: PhantomData,
@@ -170,7 +177,18 @@ impl<S: BosStr> FavClientBuilder<S, fav_client_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FavClientBuilder<S, St>
+impl<S: BosStr> FavClientBuilder<fav_client_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FavClientBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FavClientBuilder<St, S>
 where
     St: fav_client_state::State,
     St::FavClient: fav_client_state::IsUnset,
@@ -179,7 +197,7 @@ where
     pub fn fav_client(
         mut self,
         value: impl Into<S>,
-    ) -> FavClientBuilder<S, fav_client_state::SetFavClient<St>> {
+    ) -> FavClientBuilder<fav_client_state::SetFavClient<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FavClientBuilder {
             _state: PhantomData,
@@ -189,7 +207,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FavClientBuilder<S, St>
+impl<St, S: BosStr> FavClientBuilder<St, S>
 where
     St: fav_client_state::State,
     St::FavClient: fav_client_state::IsSet,
@@ -202,7 +220,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FavClient<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FavClient<S> {
         FavClient {
             fav_client: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -211,10 +232,10 @@ where
 }
 
 fn lexicon_doc_blue_atplane_favClient() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.atplane.favClient"),
@@ -223,7 +244,9 @@ fn lexicon_doc_blue_atplane_favClient() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A declaration of a favorite client.")),
+                    description: Some(
+                        CowStr::new_static("A declaration of a favorite client."),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("favClient")]),
@@ -233,9 +256,9 @@ fn lexicon_doc_blue_atplane_favClient() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("favClient"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Set to your favorite client.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Set to your favorite client."),
+                                    ),
                                     max_length: Some(32usize),
                                     ..Default::default()
                                 }),

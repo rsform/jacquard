@@ -7,12 +7,13 @@
 
 pub mod activity;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,7 +25,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// The type of activity being recorded. List taken from Apple Health Activities mostly
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -241,10 +242,7 @@ where
 /// A split within an activity, like a mile split or kilometer split.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Split<S: BosStr = DefaultStr> {
     ///The distance covered in this split. Follows the units defined in the parent.
     pub distance: S,
@@ -273,7 +271,7 @@ impl<S: BosStr> LexiconSchema for Split<S> {
 
 pub mod split_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -330,21 +328,28 @@ pub mod split_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SplitBuilder<S: BosStr, St: split_state::State> {
+pub struct SplitBuilder<St: split_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Split<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SplitBuilder<S, split_state::Empty> {
+impl Split<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SplitBuilder<split_state::Empty, DefaultStr> {
         SplitBuilder::new()
     }
 }
 
-impl<S: BosStr> SplitBuilder<S, split_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Split<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SplitBuilder<split_state::Empty, S> {
+        SplitBuilder::builder()
+    }
+}
+
+impl SplitBuilder<split_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SplitBuilder {
             _state: PhantomData,
@@ -354,7 +359,18 @@ impl<S: BosStr> SplitBuilder<S, split_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SplitBuilder<S, St>
+impl<S: BosStr> SplitBuilder<split_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SplitBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SplitBuilder<St, S>
 where
     St: split_state::State,
     St::Distance: split_state::IsUnset,
@@ -363,7 +379,7 @@ where
     pub fn distance(
         mut self,
         value: impl Into<S>,
-    ) -> SplitBuilder<S, split_state::SetDistance<St>> {
+    ) -> SplitBuilder<split_state::SetDistance<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SplitBuilder {
             _state: PhantomData,
@@ -373,7 +389,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SplitBuilder<S, St>
+impl<St, S: BosStr> SplitBuilder<St, S>
 where
     St: split_state::State,
     St::Duration: split_state::IsUnset,
@@ -382,7 +398,7 @@ where
     pub fn duration(
         mut self,
         value: impl Into<i64>,
-    ) -> SplitBuilder<S, split_state::SetDuration<St>> {
+    ) -> SplitBuilder<split_state::SetDuration<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SplitBuilder {
             _state: PhantomData,
@@ -392,13 +408,16 @@ where
     }
 }
 
-impl<S: BosStr, St> SplitBuilder<S, St>
+impl<St, S: BosStr> SplitBuilder<St, S>
 where
     St: split_state::State,
     St::Order: split_state::IsUnset,
 {
     /// Set the `order` field (required)
-    pub fn order(mut self, value: impl Into<i64>) -> SplitBuilder<S, split_state::SetOrder<St>> {
+    pub fn order(
+        mut self,
+        value: impl Into<i64>,
+    ) -> SplitBuilder<split_state::SetOrder<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SplitBuilder {
             _state: PhantomData,
@@ -408,7 +427,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SplitBuilder<S, St>
+impl<St, S: BosStr> SplitBuilder<St, S>
 where
     St: split_state::State,
     St::Order: split_state::IsSet,
@@ -436,10 +455,10 @@ where
 }
 
 fn lexicon_doc_social_pace_feed_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.pace.feed.defs"),

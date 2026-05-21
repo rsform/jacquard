@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::feed::postgate;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::feed::postgate;
 /// Disables embedding of this post.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DisableRule<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -158,10 +155,10 @@ impl<S: BosStr> LexiconSchema for Postgate<S> {
 }
 
 fn lexicon_doc_app_bsky_feed_postgate() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.feed.postgate"),
@@ -170,7 +167,9 @@ fn lexicon_doc_app_bsky_feed_postgate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("disableRule"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Disables embedding of this post.")),
+                    description: Some(
+                        CowStr::new_static("Disables embedding of this post."),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -262,7 +261,7 @@ fn lexicon_doc_app_bsky_feed_postgate() -> LexiconDoc<'static> {
 
 pub mod postgate_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -270,42 +269,42 @@ pub mod postgate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Post;
         type CreatedAt;
+        type Post;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Post = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `post` field to Set
-    pub struct SetPost<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPost<St> {}
-    impl<St: State> State for SetPost<St> {
-        type Post = Set<members::post>;
-        type CreatedAt = St::CreatedAt;
+        type Post = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Post = St::Post;
         type CreatedAt = Set<members::created_at>;
+        type Post = St::Post;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPost<St> {}
+    impl<St: State> State for SetPost<St> {
+        type CreatedAt = St::CreatedAt;
+        type Post = Set<members::post>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `post` field
-        pub struct post(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `post` field
+        pub struct post(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PostgateBuilder<S: BosStr, St: postgate_state::State> {
+pub struct PostgateBuilder<St: postgate_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -316,15 +315,22 @@ pub struct PostgateBuilder<S: BosStr, St: postgate_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Postgate<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PostgateBuilder<S, postgate_state::Empty> {
+impl Postgate<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PostgateBuilder<postgate_state::Empty, DefaultStr> {
         PostgateBuilder::new()
     }
 }
 
-impl<S: BosStr> PostgateBuilder<S, postgate_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Postgate<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PostgateBuilder<postgate_state::Empty, S> {
+        PostgateBuilder::builder()
+    }
+}
+
+impl PostgateBuilder<postgate_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PostgateBuilder {
             _state: PhantomData,
@@ -334,7 +340,18 @@ impl<S: BosStr> PostgateBuilder<S, postgate_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PostgateBuilder<S, St>
+impl<S: BosStr> PostgateBuilder<postgate_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PostgateBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PostgateBuilder<St, S>
 where
     St: postgate_state::State,
     St::CreatedAt: postgate_state::IsUnset,
@@ -343,7 +360,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PostgateBuilder<S, postgate_state::SetCreatedAt<St>> {
+    ) -> PostgateBuilder<postgate_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PostgateBuilder {
             _state: PhantomData,
@@ -353,20 +370,26 @@ where
     }
 }
 
-impl<S: BosStr, St: postgate_state::State> PostgateBuilder<S, St> {
+impl<St: postgate_state::State, S: BosStr> PostgateBuilder<St, S> {
     /// Set the `detachedEmbeddingUris` field (optional)
-    pub fn detached_embedding_uris(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
+    pub fn detached_embedding_uris(
+        mut self,
+        value: impl Into<Option<Vec<AtUri<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `detachedEmbeddingUris` field to an Option value (optional)
-    pub fn maybe_detached_embedding_uris(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
+    pub fn maybe_detached_embedding_uris(
+        mut self,
+        value: Option<Vec<AtUri<S>>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<S: BosStr, St: postgate_state::State> PostgateBuilder<S, St> {
+impl<St: postgate_state::State, S: BosStr> PostgateBuilder<St, S> {
     /// Set the `embeddingRules` field (optional)
     pub fn embedding_rules(
         mut self,
@@ -376,13 +399,16 @@ impl<S: BosStr, St: postgate_state::State> PostgateBuilder<S, St> {
         self
     }
     /// Set the `embeddingRules` field to an Option value (optional)
-    pub fn maybe_embedding_rules(mut self, value: Option<Vec<postgate::DisableRule<S>>>) -> Self {
+    pub fn maybe_embedding_rules(
+        mut self,
+        value: Option<Vec<postgate::DisableRule<S>>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
 }
 
-impl<S: BosStr, St> PostgateBuilder<S, St>
+impl<St, S: BosStr> PostgateBuilder<St, S>
 where
     St: postgate_state::State,
     St::Post: postgate_state::IsUnset,
@@ -391,7 +417,7 @@ where
     pub fn post(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> PostgateBuilder<S, postgate_state::SetPost<St>> {
+    ) -> PostgateBuilder<postgate_state::SetPost<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PostgateBuilder {
             _state: PhantomData,
@@ -401,11 +427,11 @@ where
     }
 }
 
-impl<S: BosStr, St> PostgateBuilder<S, St>
+impl<St, S: BosStr> PostgateBuilder<St, S>
 where
     St: postgate_state::State,
-    St::Post: postgate_state::IsSet,
     St::CreatedAt: postgate_state::IsSet,
+    St::Post: postgate_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Postgate<S> {

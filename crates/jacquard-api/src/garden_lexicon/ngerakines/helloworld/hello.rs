@@ -10,28 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Hello<S: BosStr = DefaultStr> {
     ///(max length: 55)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HelloOutput<S: BosStr = DefaultStr> {
     pub message: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -64,7 +59,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for HelloRequest {
 
 pub mod hello_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -82,21 +77,28 @@ pub mod hello_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HelloBuilder<S: BosStr, St: hello_state::State> {
+pub struct HelloBuilder<St: hello_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Hello<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> HelloBuilder<S, hello_state::Empty> {
+impl Hello<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> HelloBuilder<hello_state::Empty, DefaultStr> {
         HelloBuilder::new()
     }
 }
 
-impl<S: BosStr> HelloBuilder<S, hello_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Hello<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> HelloBuilder<hello_state::Empty, S> {
+        HelloBuilder::builder()
+    }
+}
+
+impl HelloBuilder<hello_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         HelloBuilder {
             _state: PhantomData,
@@ -106,7 +108,18 @@ impl<S: BosStr> HelloBuilder<S, hello_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: hello_state::State> HelloBuilder<S, St> {
+impl<S: BosStr> HelloBuilder<hello_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        HelloBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: hello_state::State, S: BosStr> HelloBuilder<St, S> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -119,14 +132,12 @@ impl<S: BosStr, St: hello_state::State> HelloBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> HelloBuilder<S, St>
+impl<St, S: BosStr> HelloBuilder<St, S>
 where
     St: hello_state::State,
 {
     /// Build the final struct.
     pub fn build(self) -> Hello<S> {
-        Hello {
-            subject: self._fields.0,
-        }
+        Hello { subject: self._fields.0 }
     }
 }

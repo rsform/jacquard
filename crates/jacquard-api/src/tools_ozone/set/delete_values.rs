@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteValues<S: BosStr = DefaultStr> {
     ///Name of the set to delete values from
     pub name: S,
@@ -30,9 +27,18 @@ pub struct DeleteValues<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum DeleteValuesError {
     /// set with the given name does not exist
@@ -40,10 +46,7 @@ pub enum DeleteValuesError {
     SetNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for DeleteValuesError {
@@ -78,8 +81,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteValuesResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteValues<S> {
     const NSID: &'static str = "tools.ozone.set.deleteValues";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteValuesResponse;
 }
 
@@ -87,15 +91,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteValues<S> {
 pub struct DeleteValuesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteValuesRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.set.deleteValues";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeleteValues<S>;
     type Response = DeleteValuesResponse;
 }
 
 pub mod delete_values_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -103,56 +108,63 @@ pub mod delete_values_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Values;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Values = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Values = St::Values;
+        type Name = Unset;
     }
     ///State transition - sets the `values` field to Set
     pub struct SetValues<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValues<St> {}
     impl<St: State> State for SetValues<St> {
-        type Name = St::Name;
         type Values = Set<members::values>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Values = St::Values;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `values` field
         pub struct values(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeleteValuesBuilder<S: BosStr, St: delete_values_state::State> {
+pub struct DeleteValuesBuilder<St: delete_values_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DeleteValues<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DeleteValuesBuilder<S, delete_values_state::Empty> {
+impl DeleteValues<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DeleteValuesBuilder<delete_values_state::Empty, DefaultStr> {
         DeleteValuesBuilder::new()
     }
 }
 
-impl<S: BosStr> DeleteValuesBuilder<S, delete_values_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DeleteValues<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DeleteValuesBuilder<delete_values_state::Empty, S> {
+        DeleteValuesBuilder::builder()
+    }
+}
+
+impl DeleteValuesBuilder<delete_values_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DeleteValuesBuilder {
             _state: PhantomData,
@@ -162,7 +174,18 @@ impl<S: BosStr> DeleteValuesBuilder<S, delete_values_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DeleteValuesBuilder<S, St>
+impl<S: BosStr> DeleteValuesBuilder<delete_values_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DeleteValuesBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DeleteValuesBuilder<St, S>
 where
     St: delete_values_state::State,
     St::Name: delete_values_state::IsUnset,
@@ -171,7 +194,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> DeleteValuesBuilder<S, delete_values_state::SetName<St>> {
+    ) -> DeleteValuesBuilder<delete_values_state::SetName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DeleteValuesBuilder {
             _state: PhantomData,
@@ -181,7 +204,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeleteValuesBuilder<S, St>
+impl<St, S: BosStr> DeleteValuesBuilder<St, S>
 where
     St: delete_values_state::State,
     St::Values: delete_values_state::IsUnset,
@@ -190,7 +213,7 @@ where
     pub fn values(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> DeleteValuesBuilder<S, delete_values_state::SetValues<St>> {
+    ) -> DeleteValuesBuilder<delete_values_state::SetValues<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DeleteValuesBuilder {
             _state: PhantomData,
@@ -200,11 +223,11 @@ where
     }
 }
 
-impl<S: BosStr, St> DeleteValuesBuilder<S, St>
+impl<St, S: BosStr> DeleteValuesBuilder<St, S>
 where
     St: delete_values_state::State,
-    St::Name: delete_values_state::IsSet,
     St::Values: delete_values_state::IsSet,
+    St::Name: delete_values_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DeleteValues<S> {
@@ -215,7 +238,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeleteValues<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteValues<S> {
         DeleteValues {
             name: self._fields.0.unwrap(),
             values: self._fields.1.unwrap(),

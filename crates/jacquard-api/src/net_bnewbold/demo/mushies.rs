@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// it's a kind of fungus
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -153,7 +153,7 @@ impl<S: BosStr> LexiconSchema for Mushies<S> {
 
 pub mod mushies_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -184,21 +184,28 @@ pub mod mushies_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MushiesBuilder<S: BosStr, St: mushies_state::State> {
+pub struct MushiesBuilder<St: mushies_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<bool>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Mushies<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MushiesBuilder<S, mushies_state::Empty> {
+impl Mushies<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MushiesBuilder<mushies_state::Empty, DefaultStr> {
         MushiesBuilder::new()
     }
 }
 
-impl<S: BosStr> MushiesBuilder<S, mushies_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Mushies<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MushiesBuilder<mushies_state::Empty, S> {
+        MushiesBuilder::builder()
+    }
+}
+
+impl MushiesBuilder<mushies_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MushiesBuilder {
             _state: PhantomData,
@@ -208,7 +215,18 @@ impl<S: BosStr> MushiesBuilder<S, mushies_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MushiesBuilder<S, St>
+impl<S: BosStr> MushiesBuilder<mushies_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MushiesBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MushiesBuilder<St, S>
 where
     St: mushies_state::State,
     St::CommonName: mushies_state::IsUnset,
@@ -217,7 +235,7 @@ where
     pub fn common_name(
         mut self,
         value: impl Into<S>,
-    ) -> MushiesBuilder<S, mushies_state::SetCommonName<St>> {
+    ) -> MushiesBuilder<mushies_state::SetCommonName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MushiesBuilder {
             _state: PhantomData,
@@ -227,7 +245,7 @@ where
     }
 }
 
-impl<S: BosStr, St: mushies_state::State> MushiesBuilder<S, St> {
+impl<St: mushies_state::State, S: BosStr> MushiesBuilder<St, S> {
     /// Set the `edible` field (optional)
     pub fn edible(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -240,7 +258,7 @@ impl<S: BosStr, St: mushies_state::State> MushiesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: mushies_state::State> MushiesBuilder<S, St> {
+impl<St: mushies_state::State, S: BosStr> MushiesBuilder<St, S> {
     /// Set the `species` field (optional)
     pub fn species(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -253,7 +271,7 @@ impl<S: BosStr, St: mushies_state::State> MushiesBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MushiesBuilder<S, St>
+impl<St, S: BosStr> MushiesBuilder<St, S>
 where
     St: mushies_state::State,
     St::CommonName: mushies_state::IsSet,
@@ -279,10 +297,10 @@ where
 }
 
 fn lexicon_doc_net_bnewbold_demo_mushies() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.bnewbold.demo.mushies"),

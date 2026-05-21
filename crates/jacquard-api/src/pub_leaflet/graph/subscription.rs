@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Record declaring a subscription to a publication
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -103,7 +103,7 @@ impl<S: BosStr> LexiconSchema for Subscription<S> {
 
 pub mod subscription_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -134,21 +134,28 @@ pub mod subscription_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SubscriptionBuilder<S: BosStr, St: subscription_state::State> {
+pub struct SubscriptionBuilder<St: subscription_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Subscription<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SubscriptionBuilder<S, subscription_state::Empty> {
+impl Subscription<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SubscriptionBuilder<subscription_state::Empty, DefaultStr> {
         SubscriptionBuilder::new()
     }
 }
 
-impl<S: BosStr> SubscriptionBuilder<S, subscription_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Subscription<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SubscriptionBuilder<subscription_state::Empty, S> {
+        SubscriptionBuilder::builder()
+    }
+}
+
+impl SubscriptionBuilder<subscription_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SubscriptionBuilder {
             _state: PhantomData,
@@ -158,7 +165,18 @@ impl<S: BosStr> SubscriptionBuilder<S, subscription_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SubscriptionBuilder<S, St>
+impl<S: BosStr> SubscriptionBuilder<subscription_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SubscriptionBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SubscriptionBuilder<St, S>
 where
     St: subscription_state::State,
     St::Publication: subscription_state::IsUnset,
@@ -167,7 +185,7 @@ where
     pub fn publication(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SubscriptionBuilder<S, subscription_state::SetPublication<St>> {
+    ) -> SubscriptionBuilder<subscription_state::SetPublication<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SubscriptionBuilder {
             _state: PhantomData,
@@ -177,7 +195,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SubscriptionBuilder<S, St>
+impl<St, S: BosStr> SubscriptionBuilder<St, S>
 where
     St: subscription_state::State,
     St::Publication: subscription_state::IsSet,
@@ -190,7 +208,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Subscription<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Subscription<S> {
         Subscription {
             publication: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -199,10 +220,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_graph_subscription() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.graph.subscription"),
@@ -211,9 +232,11 @@ fn lexicon_doc_pub_leaflet_graph_subscription() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Record declaring a subscription to a publication",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Record declaring a subscription to a publication",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("publication")]),

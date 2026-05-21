@@ -10,29 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HydrateRecord<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HydrateRecordOutput<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -41,9 +36,18 @@ pub struct HydrateRecordOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum HydrateRecordError {
     /// The requested record does not exist
@@ -54,10 +58,7 @@ pub enum HydrateRecordError {
     RecordBlocked(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for HydrateRecordError {
@@ -114,7 +115,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for HydrateRecordRequest {
 
 pub mod hydrate_record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -145,21 +146,31 @@ pub mod hydrate_record_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HydrateRecordBuilder<S: BosStr, St: hydrate_record_state::State> {
+pub struct HydrateRecordBuilder<
+    St: hydrate_record_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> HydrateRecord<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> HydrateRecordBuilder<S, hydrate_record_state::Empty> {
+impl HydrateRecord<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> HydrateRecordBuilder<hydrate_record_state::Empty, DefaultStr> {
         HydrateRecordBuilder::new()
     }
 }
 
-impl<S: BosStr> HydrateRecordBuilder<S, hydrate_record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> HydrateRecord<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> HydrateRecordBuilder<hydrate_record_state::Empty, S> {
+        HydrateRecordBuilder::builder()
+    }
+}
+
+impl HydrateRecordBuilder<hydrate_record_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         HydrateRecordBuilder {
             _state: PhantomData,
@@ -169,7 +180,18 @@ impl<S: BosStr> HydrateRecordBuilder<S, hydrate_record_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: hydrate_record_state::State> HydrateRecordBuilder<S, St> {
+impl<S: BosStr> HydrateRecordBuilder<hydrate_record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        HydrateRecordBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: hydrate_record_state::State, S: BosStr> HydrateRecordBuilder<St, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -182,7 +204,7 @@ impl<S: BosStr, St: hydrate_record_state::State> HydrateRecordBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> HydrateRecordBuilder<S, St>
+impl<St, S: BosStr> HydrateRecordBuilder<St, S>
 where
     St: hydrate_record_state::State,
     St::Uri: hydrate_record_state::IsUnset,
@@ -191,7 +213,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> HydrateRecordBuilder<S, hydrate_record_state::SetUri<St>> {
+    ) -> HydrateRecordBuilder<hydrate_record_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         HydrateRecordBuilder {
             _state: PhantomData,
@@ -201,7 +223,7 @@ where
     }
 }
 
-impl<S: BosStr, St> HydrateRecordBuilder<S, St>
+impl<St, S: BosStr> HydrateRecordBuilder<St, S>
 where
     St: hydrate_record_state::State,
     St::Uri: hydrate_record_state::IsSet,

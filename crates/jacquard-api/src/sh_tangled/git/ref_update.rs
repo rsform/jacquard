@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,16 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::git::ref_update;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::git::ref_update;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CommitCountBreakdown<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub by_email: Option<Vec<ref_update::IndividualEmailCommitCount<S>>>,
@@ -41,11 +38,9 @@ pub struct CommitCountBreakdown<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct IndividualEmailCommitCount<S: BosStr = DefaultStr> {
     pub count: i64,
     pub email: S,
@@ -53,11 +48,9 @@ pub struct IndividualEmailCommitCount<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct IndividualLanguageSize<S: BosStr = DefaultStr> {
     pub lang: S,
     pub size: i64,
@@ -65,11 +58,9 @@ pub struct IndividualLanguageSize<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LangBreakdown<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inputs: Option<Vec<ref_update::IndividualLanguageSize<S>>>,
@@ -115,11 +106,9 @@ pub struct RefUpdateGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: RefUpdate<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Meta<S: BosStr = DefaultStr> {
     pub commit_count: ref_update::CommitCountBreakdown<S>,
     /// Defaults to `false`.
@@ -323,10 +312,10 @@ impl<S: BosStr> LexiconSchema for Meta<S> {
 }
 
 fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.git.refUpdate"),
@@ -357,10 +346,9 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("individualEmailCommitCount"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("email"),
-                        SmolStr::new_static("count"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("email"), SmolStr::new_static("count")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -372,9 +360,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("email"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -384,18 +370,15 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("individualLanguageSize"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("lang"),
-                        SmolStr::new_static("size"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("lang"), SmolStr::new_static("size")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("lang"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("size"),
@@ -432,29 +415,32 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "An update to a git repository, emitted by knots.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "An update to a git repository, emitted by knots.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("ref"),
-                            SmolStr::new_static("committerDid"),
-                            SmolStr::new_static("repoDid"),
-                            SmolStr::new_static("repoName"),
-                            SmolStr::new_static("oldSha"),
-                            SmolStr::new_static("newSha"),
-                            SmolStr::new_static("meta"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("ref"),
+                                SmolStr::new_static("committerDid"),
+                                SmolStr::new_static("repoDid"),
+                                SmolStr::new_static("repoName"),
+                                SmolStr::new_static("oldSha"),
+                                SmolStr::new_static("newSha"), SmolStr::new_static("meta")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("committerDid"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "did of the user that pushed this ref",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("did of the user that pushed this ref"),
+                                    ),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
@@ -469,7 +455,9 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("newSha"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("new SHA of this ref")),
+                                    description: Some(
+                                        CowStr::new_static("new SHA of this ref"),
+                                    ),
                                     min_length: Some(40usize),
                                     max_length: Some(40usize),
                                     ..Default::default()
@@ -478,7 +466,9 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("oldSha"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("old SHA of this ref")),
+                                    description: Some(
+                                        CowStr::new_static("old SHA of this ref"),
+                                    ),
                                     min_length: Some(40usize),
                                     max_length: Some(40usize),
                                     ..Default::default()
@@ -496,9 +486,9 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("repoDid"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "did of the owner of the repo",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("did of the owner of the repo"),
+                                    ),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
@@ -520,10 +510,12 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("meta"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("isDefaultRef"),
-                        SmolStr::new_static("commitCount"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("isDefaultRef"),
+                            SmolStr::new_static("commitCount")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -560,7 +552,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
 
 pub mod individual_email_commit_count_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -604,24 +596,39 @@ pub mod individual_email_commit_count_state {
 
 /// Builder for constructing an instance of this type.
 pub struct IndividualEmailCommitCountBuilder<
-    S: BosStr,
     St: individual_email_commit_count_state::State,
+    S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> IndividualEmailCommitCount<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> IndividualEmailCommitCountBuilder<S, individual_email_commit_count_state::Empty>
-    {
+impl IndividualEmailCommitCount<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> IndividualEmailCommitCountBuilder<
+        individual_email_commit_count_state::Empty,
+        DefaultStr,
+    > {
         IndividualEmailCommitCountBuilder::new()
     }
 }
 
-impl<S: BosStr> IndividualEmailCommitCountBuilder<S, individual_email_commit_count_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> IndividualEmailCommitCount<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> IndividualEmailCommitCountBuilder<
+        individual_email_commit_count_state::Empty,
+        S,
+    > {
+        IndividualEmailCommitCountBuilder::builder()
+    }
+}
+
+impl IndividualEmailCommitCountBuilder<
+    individual_email_commit_count_state::Empty,
+    DefaultStr,
+> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         IndividualEmailCommitCountBuilder {
             _state: PhantomData,
@@ -631,7 +638,20 @@ impl<S: BosStr> IndividualEmailCommitCountBuilder<S, individual_email_commit_cou
     }
 }
 
-impl<S: BosStr, St> IndividualEmailCommitCountBuilder<S, St>
+impl<
+    S: BosStr,
+> IndividualEmailCommitCountBuilder<individual_email_commit_count_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        IndividualEmailCommitCountBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> IndividualEmailCommitCountBuilder<St, S>
 where
     St: individual_email_commit_count_state::State,
     St::Count: individual_email_commit_count_state::IsUnset,
@@ -640,8 +660,10 @@ where
     pub fn count(
         mut self,
         value: impl Into<i64>,
-    ) -> IndividualEmailCommitCountBuilder<S, individual_email_commit_count_state::SetCount<St>>
-    {
+    ) -> IndividualEmailCommitCountBuilder<
+        individual_email_commit_count_state::SetCount<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         IndividualEmailCommitCountBuilder {
             _state: PhantomData,
@@ -651,7 +673,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IndividualEmailCommitCountBuilder<S, St>
+impl<St, S: BosStr> IndividualEmailCommitCountBuilder<St, S>
 where
     St: individual_email_commit_count_state::State,
     St::Email: individual_email_commit_count_state::IsUnset,
@@ -660,8 +682,10 @@ where
     pub fn email(
         mut self,
         value: impl Into<S>,
-    ) -> IndividualEmailCommitCountBuilder<S, individual_email_commit_count_state::SetEmail<St>>
-    {
+    ) -> IndividualEmailCommitCountBuilder<
+        individual_email_commit_count_state::SetEmail<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         IndividualEmailCommitCountBuilder {
             _state: PhantomData,
@@ -671,7 +695,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IndividualEmailCommitCountBuilder<S, St>
+impl<St, S: BosStr> IndividualEmailCommitCountBuilder<St, S>
 where
     St: individual_email_commit_count_state::State,
     St::Count: individual_email_commit_count_state::IsSet,
@@ -700,7 +724,7 @@ where
 
 pub mod individual_language_size_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -743,21 +767,37 @@ pub mod individual_language_size_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IndividualLanguageSizeBuilder<S: BosStr, St: individual_language_size_state::State> {
+pub struct IndividualLanguageSizeBuilder<
+    St: individual_language_size_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> IndividualLanguageSize<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> IndividualLanguageSizeBuilder<S, individual_language_size_state::Empty> {
+impl IndividualLanguageSize<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> IndividualLanguageSizeBuilder<
+        individual_language_size_state::Empty,
+        DefaultStr,
+    > {
         IndividualLanguageSizeBuilder::new()
     }
 }
 
-impl<S: BosStr> IndividualLanguageSizeBuilder<S, individual_language_size_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> IndividualLanguageSize<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> IndividualLanguageSizeBuilder<
+        individual_language_size_state::Empty,
+        S,
+    > {
+        IndividualLanguageSizeBuilder::builder()
+    }
+}
+
+impl IndividualLanguageSizeBuilder<individual_language_size_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         IndividualLanguageSizeBuilder {
             _state: PhantomData,
@@ -767,7 +807,18 @@ impl<S: BosStr> IndividualLanguageSizeBuilder<S, individual_language_size_state:
     }
 }
 
-impl<S: BosStr, St> IndividualLanguageSizeBuilder<S, St>
+impl<S: BosStr> IndividualLanguageSizeBuilder<individual_language_size_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        IndividualLanguageSizeBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> IndividualLanguageSizeBuilder<St, S>
 where
     St: individual_language_size_state::State,
     St::Lang: individual_language_size_state::IsUnset,
@@ -776,7 +827,7 @@ where
     pub fn lang(
         mut self,
         value: impl Into<S>,
-    ) -> IndividualLanguageSizeBuilder<S, individual_language_size_state::SetLang<St>> {
+    ) -> IndividualLanguageSizeBuilder<individual_language_size_state::SetLang<St>, S> {
         self._fields.0 = Option::Some(value.into());
         IndividualLanguageSizeBuilder {
             _state: PhantomData,
@@ -786,7 +837,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IndividualLanguageSizeBuilder<S, St>
+impl<St, S: BosStr> IndividualLanguageSizeBuilder<St, S>
 where
     St: individual_language_size_state::State,
     St::Size: individual_language_size_state::IsUnset,
@@ -795,7 +846,7 @@ where
     pub fn size(
         mut self,
         value: impl Into<i64>,
-    ) -> IndividualLanguageSizeBuilder<S, individual_language_size_state::SetSize<St>> {
+    ) -> IndividualLanguageSizeBuilder<individual_language_size_state::SetSize<St>, S> {
         self._fields.1 = Option::Some(value.into());
         IndividualLanguageSizeBuilder {
             _state: PhantomData,
@@ -805,7 +856,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IndividualLanguageSizeBuilder<S, St>
+impl<St, S: BosStr> IndividualLanguageSizeBuilder<St, S>
 where
     St: individual_language_size_state::State,
     St::Lang: individual_language_size_state::IsSet,
@@ -834,7 +885,7 @@ where
 
 pub mod ref_update_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -842,132 +893,132 @@ pub mod ref_update_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RepoDid;
         type RepoName;
-        type Meta;
-        type Ref;
-        type NewSha;
-        type CommitterDid;
         type OldSha;
+        type NewSha;
+        type Ref;
+        type RepoDid;
+        type CommitterDid;
+        type Meta;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RepoDid = Unset;
         type RepoName = Unset;
-        type Meta = Unset;
-        type Ref = Unset;
-        type NewSha = Unset;
-        type CommitterDid = Unset;
         type OldSha = Unset;
-    }
-    ///State transition - sets the `repo_did` field to Set
-    pub struct SetRepoDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepoDid<St> {}
-    impl<St: State> State for SetRepoDid<St> {
-        type RepoDid = Set<members::repo_did>;
-        type RepoName = St::RepoName;
-        type Meta = St::Meta;
-        type Ref = St::Ref;
-        type NewSha = St::NewSha;
-        type CommitterDid = St::CommitterDid;
-        type OldSha = St::OldSha;
+        type NewSha = Unset;
+        type Ref = Unset;
+        type RepoDid = Unset;
+        type CommitterDid = Unset;
+        type Meta = Unset;
     }
     ///State transition - sets the `repo_name` field to Set
     pub struct SetRepoName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepoName<St> {}
     impl<St: State> State for SetRepoName<St> {
-        type RepoDid = St::RepoDid;
         type RepoName = Set<members::repo_name>;
-        type Meta = St::Meta;
-        type Ref = St::Ref;
+        type OldSha = St::OldSha;
         type NewSha = St::NewSha;
-        type CommitterDid = St::CommitterDid;
-        type OldSha = St::OldSha;
-    }
-    ///State transition - sets the `meta` field to Set
-    pub struct SetMeta<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMeta<St> {}
-    impl<St: State> State for SetMeta<St> {
-        type RepoDid = St::RepoDid;
-        type RepoName = St::RepoName;
-        type Meta = Set<members::meta>;
         type Ref = St::Ref;
-        type NewSha = St::NewSha;
-        type CommitterDid = St::CommitterDid;
-        type OldSha = St::OldSha;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRef<St> {}
-    impl<St: State> State for SetRef<St> {
         type RepoDid = St::RepoDid;
-        type RepoName = St::RepoName;
-        type Meta = St::Meta;
-        type Ref = Set<members::r#ref>;
-        type NewSha = St::NewSha;
         type CommitterDid = St::CommitterDid;
-        type OldSha = St::OldSha;
-    }
-    ///State transition - sets the `new_sha` field to Set
-    pub struct SetNewSha<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNewSha<St> {}
-    impl<St: State> State for SetNewSha<St> {
-        type RepoDid = St::RepoDid;
-        type RepoName = St::RepoName;
         type Meta = St::Meta;
-        type Ref = St::Ref;
-        type NewSha = Set<members::new_sha>;
-        type CommitterDid = St::CommitterDid;
-        type OldSha = St::OldSha;
-    }
-    ///State transition - sets the `committer_did` field to Set
-    pub struct SetCommitterDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCommitterDid<St> {}
-    impl<St: State> State for SetCommitterDid<St> {
-        type RepoDid = St::RepoDid;
-        type RepoName = St::RepoName;
-        type Meta = St::Meta;
-        type Ref = St::Ref;
-        type NewSha = St::NewSha;
-        type CommitterDid = Set<members::committer_did>;
-        type OldSha = St::OldSha;
     }
     ///State transition - sets the `old_sha` field to Set
     pub struct SetOldSha<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOldSha<St> {}
     impl<St: State> State for SetOldSha<St> {
-        type RepoDid = St::RepoDid;
         type RepoName = St::RepoName;
-        type Meta = St::Meta;
-        type Ref = St::Ref;
-        type NewSha = St::NewSha;
-        type CommitterDid = St::CommitterDid;
         type OldSha = Set<members::old_sha>;
+        type NewSha = St::NewSha;
+        type Ref = St::Ref;
+        type RepoDid = St::RepoDid;
+        type CommitterDid = St::CommitterDid;
+        type Meta = St::Meta;
+    }
+    ///State transition - sets the `new_sha` field to Set
+    pub struct SetNewSha<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNewSha<St> {}
+    impl<St: State> State for SetNewSha<St> {
+        type RepoName = St::RepoName;
+        type OldSha = St::OldSha;
+        type NewSha = Set<members::new_sha>;
+        type Ref = St::Ref;
+        type RepoDid = St::RepoDid;
+        type CommitterDid = St::CommitterDid;
+        type Meta = St::Meta;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRef<St> {}
+    impl<St: State> State for SetRef<St> {
+        type RepoName = St::RepoName;
+        type OldSha = St::OldSha;
+        type NewSha = St::NewSha;
+        type Ref = Set<members::r#ref>;
+        type RepoDid = St::RepoDid;
+        type CommitterDid = St::CommitterDid;
+        type Meta = St::Meta;
+    }
+    ///State transition - sets the `repo_did` field to Set
+    pub struct SetRepoDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepoDid<St> {}
+    impl<St: State> State for SetRepoDid<St> {
+        type RepoName = St::RepoName;
+        type OldSha = St::OldSha;
+        type NewSha = St::NewSha;
+        type Ref = St::Ref;
+        type RepoDid = Set<members::repo_did>;
+        type CommitterDid = St::CommitterDid;
+        type Meta = St::Meta;
+    }
+    ///State transition - sets the `committer_did` field to Set
+    pub struct SetCommitterDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCommitterDid<St> {}
+    impl<St: State> State for SetCommitterDid<St> {
+        type RepoName = St::RepoName;
+        type OldSha = St::OldSha;
+        type NewSha = St::NewSha;
+        type Ref = St::Ref;
+        type RepoDid = St::RepoDid;
+        type CommitterDid = Set<members::committer_did>;
+        type Meta = St::Meta;
+    }
+    ///State transition - sets the `meta` field to Set
+    pub struct SetMeta<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMeta<St> {}
+    impl<St: State> State for SetMeta<St> {
+        type RepoName = St::RepoName;
+        type OldSha = St::OldSha;
+        type NewSha = St::NewSha;
+        type Ref = St::Ref;
+        type RepoDid = St::RepoDid;
+        type CommitterDid = St::CommitterDid;
+        type Meta = Set<members::meta>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo_did` field
-        pub struct repo_did(());
         ///Marker type for the `repo_name` field
         pub struct repo_name(());
-        ///Marker type for the `meta` field
-        pub struct meta(());
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
-        ///Marker type for the `new_sha` field
-        pub struct new_sha(());
-        ///Marker type for the `committer_did` field
-        pub struct committer_did(());
         ///Marker type for the `old_sha` field
         pub struct old_sha(());
+        ///Marker type for the `new_sha` field
+        pub struct new_sha(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
+        ///Marker type for the `repo_did` field
+        pub struct repo_did(());
+        ///Marker type for the `committer_did` field
+        pub struct committer_did(());
+        ///Marker type for the `meta` field
+        pub struct meta(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RefUpdateBuilder<S: BosStr, St: ref_update_state::State> {
+pub struct RefUpdateBuilder<St: ref_update_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -981,15 +1032,22 @@ pub struct RefUpdateBuilder<S: BosStr, St: ref_update_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RefUpdate<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RefUpdateBuilder<S, ref_update_state::Empty> {
+impl RefUpdate<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RefUpdateBuilder<ref_update_state::Empty, DefaultStr> {
         RefUpdateBuilder::new()
     }
 }
 
-impl<S: BosStr> RefUpdateBuilder<S, ref_update_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RefUpdate<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RefUpdateBuilder<ref_update_state::Empty, S> {
+        RefUpdateBuilder::builder()
+    }
+}
+
+impl RefUpdateBuilder<ref_update_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RefUpdateBuilder {
             _state: PhantomData,
@@ -999,7 +1057,18 @@ impl<S: BosStr> RefUpdateBuilder<S, ref_update_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RefUpdateBuilder<S, St>
+impl<S: BosStr> RefUpdateBuilder<ref_update_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RefUpdateBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RefUpdateBuilder<St, S>
 where
     St: ref_update_state::State,
     St::CommitterDid: ref_update_state::IsUnset,
@@ -1008,7 +1077,7 @@ where
     pub fn committer_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> RefUpdateBuilder<S, ref_update_state::SetCommitterDid<St>> {
+    ) -> RefUpdateBuilder<ref_update_state::SetCommitterDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RefUpdateBuilder {
             _state: PhantomData,
@@ -1018,7 +1087,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RefUpdateBuilder<S, St>
+impl<St, S: BosStr> RefUpdateBuilder<St, S>
 where
     St: ref_update_state::State,
     St::Meta: ref_update_state::IsUnset,
@@ -1027,7 +1096,7 @@ where
     pub fn meta(
         mut self,
         value: impl Into<ref_update::Meta<S>>,
-    ) -> RefUpdateBuilder<S, ref_update_state::SetMeta<St>> {
+    ) -> RefUpdateBuilder<ref_update_state::SetMeta<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RefUpdateBuilder {
             _state: PhantomData,
@@ -1037,7 +1106,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RefUpdateBuilder<S, St>
+impl<St, S: BosStr> RefUpdateBuilder<St, S>
 where
     St: ref_update_state::State,
     St::NewSha: ref_update_state::IsUnset,
@@ -1046,7 +1115,7 @@ where
     pub fn new_sha(
         mut self,
         value: impl Into<S>,
-    ) -> RefUpdateBuilder<S, ref_update_state::SetNewSha<St>> {
+    ) -> RefUpdateBuilder<ref_update_state::SetNewSha<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RefUpdateBuilder {
             _state: PhantomData,
@@ -1056,7 +1125,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RefUpdateBuilder<S, St>
+impl<St, S: BosStr> RefUpdateBuilder<St, S>
 where
     St: ref_update_state::State,
     St::OldSha: ref_update_state::IsUnset,
@@ -1065,7 +1134,7 @@ where
     pub fn old_sha(
         mut self,
         value: impl Into<S>,
-    ) -> RefUpdateBuilder<S, ref_update_state::SetOldSha<St>> {
+    ) -> RefUpdateBuilder<ref_update_state::SetOldSha<St>, S> {
         self._fields.3 = Option::Some(value.into());
         RefUpdateBuilder {
             _state: PhantomData,
@@ -1075,7 +1144,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RefUpdateBuilder<S, St>
+impl<St, S: BosStr> RefUpdateBuilder<St, S>
 where
     St: ref_update_state::State,
     St::Ref: ref_update_state::IsUnset,
@@ -1084,7 +1153,7 @@ where
     pub fn r#ref(
         mut self,
         value: impl Into<S>,
-    ) -> RefUpdateBuilder<S, ref_update_state::SetRef<St>> {
+    ) -> RefUpdateBuilder<ref_update_state::SetRef<St>, S> {
         self._fields.4 = Option::Some(value.into());
         RefUpdateBuilder {
             _state: PhantomData,
@@ -1094,7 +1163,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RefUpdateBuilder<S, St>
+impl<St, S: BosStr> RefUpdateBuilder<St, S>
 where
     St: ref_update_state::State,
     St::RepoDid: ref_update_state::IsUnset,
@@ -1103,7 +1172,7 @@ where
     pub fn repo_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> RefUpdateBuilder<S, ref_update_state::SetRepoDid<St>> {
+    ) -> RefUpdateBuilder<ref_update_state::SetRepoDid<St>, S> {
         self._fields.5 = Option::Some(value.into());
         RefUpdateBuilder {
             _state: PhantomData,
@@ -1113,7 +1182,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RefUpdateBuilder<S, St>
+impl<St, S: BosStr> RefUpdateBuilder<St, S>
 where
     St: ref_update_state::State,
     St::RepoName: ref_update_state::IsUnset,
@@ -1122,7 +1191,7 @@ where
     pub fn repo_name(
         mut self,
         value: impl Into<S>,
-    ) -> RefUpdateBuilder<S, ref_update_state::SetRepoName<St>> {
+    ) -> RefUpdateBuilder<ref_update_state::SetRepoName<St>, S> {
         self._fields.6 = Option::Some(value.into());
         RefUpdateBuilder {
             _state: PhantomData,
@@ -1132,16 +1201,16 @@ where
     }
 }
 
-impl<S: BosStr, St> RefUpdateBuilder<S, St>
+impl<St, S: BosStr> RefUpdateBuilder<St, S>
 where
     St: ref_update_state::State,
-    St::RepoDid: ref_update_state::IsSet,
     St::RepoName: ref_update_state::IsSet,
-    St::Meta: ref_update_state::IsSet,
-    St::Ref: ref_update_state::IsSet,
-    St::NewSha: ref_update_state::IsSet,
-    St::CommitterDid: ref_update_state::IsSet,
     St::OldSha: ref_update_state::IsSet,
+    St::NewSha: ref_update_state::IsSet,
+    St::Ref: ref_update_state::IsSet,
+    St::RepoDid: ref_update_state::IsSet,
+    St::CommitterDid: ref_update_state::IsSet,
+    St::Meta: ref_update_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RefUpdate<S> {
@@ -1157,7 +1226,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RefUpdate<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RefUpdate<S> {
         RefUpdate {
             committer_did: self._fields.0.unwrap(),
             meta: self._fields.1.unwrap(),
@@ -1177,7 +1249,7 @@ fn _default_meta_is_default_ref() -> bool {
 
 pub mod meta_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1220,7 +1292,7 @@ pub mod meta_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MetaBuilder<S: BosStr, St: meta_state::State> {
+pub struct MetaBuilder<St: meta_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ref_update::CommitCountBreakdown<S>>,
@@ -1230,15 +1302,22 @@ pub struct MetaBuilder<S: BosStr, St: meta_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Meta<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MetaBuilder<S, meta_state::Empty> {
+impl Meta<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MetaBuilder<meta_state::Empty, DefaultStr> {
         MetaBuilder::new()
     }
 }
 
-impl<S: BosStr> MetaBuilder<S, meta_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Meta<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MetaBuilder<meta_state::Empty, S> {
+        MetaBuilder::builder()
+    }
+}
+
+impl MetaBuilder<meta_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MetaBuilder {
             _state: PhantomData,
@@ -1248,7 +1327,18 @@ impl<S: BosStr> MetaBuilder<S, meta_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MetaBuilder<S, St>
+impl<S: BosStr> MetaBuilder<meta_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MetaBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MetaBuilder<St, S>
 where
     St: meta_state::State,
     St::CommitCount: meta_state::IsUnset,
@@ -1257,7 +1347,7 @@ where
     pub fn commit_count(
         mut self,
         value: impl Into<ref_update::CommitCountBreakdown<S>>,
-    ) -> MetaBuilder<S, meta_state::SetCommitCount<St>> {
+    ) -> MetaBuilder<meta_state::SetCommitCount<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MetaBuilder {
             _state: PhantomData,
@@ -1267,7 +1357,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MetaBuilder<S, St>
+impl<St, S: BosStr> MetaBuilder<St, S>
 where
     St: meta_state::State,
     St::IsDefaultRef: meta_state::IsUnset,
@@ -1276,7 +1366,7 @@ where
     pub fn is_default_ref(
         mut self,
         value: impl Into<bool>,
-    ) -> MetaBuilder<S, meta_state::SetIsDefaultRef<St>> {
+    ) -> MetaBuilder<meta_state::SetIsDefaultRef<St>, S> {
         self._fields.1 = Option::Some(value.into());
         MetaBuilder {
             _state: PhantomData,
@@ -1286,7 +1376,7 @@ where
     }
 }
 
-impl<S: BosStr, St: meta_state::State> MetaBuilder<S, St> {
+impl<St: meta_state::State, S: BosStr> MetaBuilder<St, S> {
     /// Set the `langBreakdown` field (optional)
     pub fn lang_breakdown(
         mut self,
@@ -1296,13 +1386,16 @@ impl<S: BosStr, St: meta_state::State> MetaBuilder<S, St> {
         self
     }
     /// Set the `langBreakdown` field to an Option value (optional)
-    pub fn maybe_lang_breakdown(mut self, value: Option<ref_update::LangBreakdown<S>>) -> Self {
+    pub fn maybe_lang_breakdown(
+        mut self,
+        value: Option<ref_update::LangBreakdown<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
 }
 
-impl<S: BosStr, St> MetaBuilder<S, St>
+impl<St, S: BosStr> MetaBuilder<St, S>
 where
     St: meta_state::State,
     St::CommitCount: meta_state::IsSet,

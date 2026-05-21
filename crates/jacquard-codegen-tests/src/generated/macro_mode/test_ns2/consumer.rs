@@ -97,7 +97,10 @@ pub mod consumer_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ConsumerBuilder<S: jacquard_common::BosStr, St: consumer_state::State> {
+pub struct ConsumerBuilder<
+    St: consumer_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
+> {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
         core::option::Option<S>,
@@ -107,15 +110,22 @@ pub struct ConsumerBuilder<S: jacquard_common::BosStr, St: consumer_state::State
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> Consumer<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ConsumerBuilder<S, consumer_state::Empty> {
+impl Consumer<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ConsumerBuilder<consumer_state::Empty, jacquard_common::DefaultStr> {
         ConsumerBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> ConsumerBuilder<S, consumer_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> Consumer<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ConsumerBuilder<consumer_state::Empty, S> {
+        ConsumerBuilder::builder()
+    }
+}
+
+impl ConsumerBuilder<consumer_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ConsumerBuilder {
             _state: ::core::marker::PhantomData,
@@ -125,7 +135,18 @@ impl<S: jacquard_common::BosStr> ConsumerBuilder<S, consumer_state::Empty> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St: consumer_state::State> ConsumerBuilder<S, St> {
+impl<S: jacquard_common::BosStr> ConsumerBuilder<consumer_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ConsumerBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None, None, None),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St: consumer_state::State, S: jacquard_common::BosStr> ConsumerBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -138,7 +159,7 @@ impl<S: jacquard_common::BosStr, St: consumer_state::State> ConsumerBuilder<S, S
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ConsumerBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> ConsumerBuilder<St, S>
 where
     St: consumer_state::State,
     St::Item: consumer_state::IsUnset,
@@ -147,7 +168,7 @@ where
     pub fn item(
         mut self,
         value: impl Into<crate::macro_mode::test_ns1::Foo<S>>,
-    ) -> ConsumerBuilder<S, consumer_state::SetItem<St>> {
+    ) -> ConsumerBuilder<consumer_state::SetItem<St>, S> {
         self._fields.1 = ::core::option::Option::Some(value.into());
         ConsumerBuilder {
             _state: ::core::marker::PhantomData,
@@ -157,7 +178,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St: consumer_state::State> ConsumerBuilder<S, St> {
+impl<St: consumer_state::State, S: jacquard_common::BosStr> ConsumerBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(
         mut self,
@@ -176,7 +197,7 @@ impl<S: jacquard_common::BosStr, St: consumer_state::State> ConsumerBuilder<S, S
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ConsumerBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> ConsumerBuilder<St, S>
 where
     St: consumer_state::State,
     St::Item: consumer_state::IsSet,

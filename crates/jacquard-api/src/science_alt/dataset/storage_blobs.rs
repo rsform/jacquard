@@ -21,18 +21,15 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::science_alt::dataset::entry::ShardChecksum;
-use crate::science_alt::dataset::storage_blobs;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::science_alt::dataset::entry::ShardChecksum;
+use crate::science_alt::dataset::storage_blobs;
 /// A single PDS blob shard with optional integrity checksum
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlobEntry<S: BosStr = DefaultStr> {
     ///Blob reference to a WebDataset tar archive
     pub blob: BlobRef<S>,
@@ -46,10 +43,7 @@ pub struct BlobEntry<S: BosStr = DefaultStr> {
 /// Storage via ATProto PDS blobs for WebDataset tar archives. Used in science.alt.dataset.entry storage union for maximum decentralization.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StorageBlobs<S: BosStr = DefaultStr> {
     ///Array of blob entries for WebDataset tar files
     pub blobs: Vec<storage_blobs::BlobEntry<S>>,
@@ -86,16 +80,19 @@ impl<S: BosStr> LexiconSchema for BlobEntry<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["application/x-tar"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
@@ -137,7 +134,7 @@ impl<S: BosStr> LexiconSchema for StorageBlobs<S> {
 
 pub mod blob_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -168,21 +165,28 @@ pub mod blob_entry_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BlobEntryBuilder<S: BosStr, St: blob_entry_state::State> {
+pub struct BlobEntryBuilder<St: blob_entry_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<ShardChecksum<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> BlobEntry<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BlobEntryBuilder<S, blob_entry_state::Empty> {
+impl BlobEntry<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BlobEntryBuilder<blob_entry_state::Empty, DefaultStr> {
         BlobEntryBuilder::new()
     }
 }
 
-impl<S: BosStr> BlobEntryBuilder<S, blob_entry_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> BlobEntry<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BlobEntryBuilder<blob_entry_state::Empty, S> {
+        BlobEntryBuilder::builder()
+    }
+}
+
+impl BlobEntryBuilder<blob_entry_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BlobEntryBuilder {
             _state: PhantomData,
@@ -192,7 +196,18 @@ impl<S: BosStr> BlobEntryBuilder<S, blob_entry_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BlobEntryBuilder<S, St>
+impl<S: BosStr> BlobEntryBuilder<blob_entry_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BlobEntryBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BlobEntryBuilder<St, S>
 where
     St: blob_entry_state::State,
     St::Blob: blob_entry_state::IsUnset,
@@ -201,7 +216,7 @@ where
     pub fn blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> BlobEntryBuilder<S, blob_entry_state::SetBlob<St>> {
+    ) -> BlobEntryBuilder<blob_entry_state::SetBlob<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BlobEntryBuilder {
             _state: PhantomData,
@@ -211,7 +226,7 @@ where
     }
 }
 
-impl<S: BosStr, St: blob_entry_state::State> BlobEntryBuilder<S, St> {
+impl<St: blob_entry_state::State, S: BosStr> BlobEntryBuilder<St, S> {
     /// Set the `checksum` field (optional)
     pub fn checksum(mut self, value: impl Into<Option<ShardChecksum<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -224,7 +239,7 @@ impl<S: BosStr, St: blob_entry_state::State> BlobEntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BlobEntryBuilder<S, St>
+impl<St, S: BosStr> BlobEntryBuilder<St, S>
 where
     St: blob_entry_state::State,
     St::Blob: blob_entry_state::IsSet,
@@ -238,7 +253,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BlobEntry<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BlobEntry<S> {
         BlobEntry {
             blob: self._fields.0.unwrap(),
             checksum: self._fields.1,
@@ -248,10 +266,10 @@ where
 }
 
 fn lexicon_doc_science_alt_dataset_storageBlobs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("science.alt.dataset.storageBlobs"),
@@ -260,18 +278,18 @@ fn lexicon_doc_science_alt_dataset_storageBlobs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("blobEntry"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A single PDS blob shard with optional integrity checksum",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A single PDS blob shard with optional integrity checksum",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("blob")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("blob"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("checksum"),
@@ -328,7 +346,7 @@ fn lexicon_doc_science_alt_dataset_storageBlobs() -> LexiconDoc<'static> {
 
 pub mod storage_blobs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -359,21 +377,28 @@ pub mod storage_blobs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StorageBlobsBuilder<S: BosStr, St: storage_blobs_state::State> {
+pub struct StorageBlobsBuilder<St: storage_blobs_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<storage_blobs::BlobEntry<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> StorageBlobs<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StorageBlobsBuilder<S, storage_blobs_state::Empty> {
+impl StorageBlobs<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StorageBlobsBuilder<storage_blobs_state::Empty, DefaultStr> {
         StorageBlobsBuilder::new()
     }
 }
 
-impl<S: BosStr> StorageBlobsBuilder<S, storage_blobs_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> StorageBlobs<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StorageBlobsBuilder<storage_blobs_state::Empty, S> {
+        StorageBlobsBuilder::builder()
+    }
+}
+
+impl StorageBlobsBuilder<storage_blobs_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StorageBlobsBuilder {
             _state: PhantomData,
@@ -383,7 +408,18 @@ impl<S: BosStr> StorageBlobsBuilder<S, storage_blobs_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StorageBlobsBuilder<S, St>
+impl<S: BosStr> StorageBlobsBuilder<storage_blobs_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StorageBlobsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StorageBlobsBuilder<St, S>
 where
     St: storage_blobs_state::State,
     St::Blobs: storage_blobs_state::IsUnset,
@@ -392,7 +428,7 @@ where
     pub fn blobs(
         mut self,
         value: impl Into<Vec<storage_blobs::BlobEntry<S>>>,
-    ) -> StorageBlobsBuilder<S, storage_blobs_state::SetBlobs<St>> {
+    ) -> StorageBlobsBuilder<storage_blobs_state::SetBlobs<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StorageBlobsBuilder {
             _state: PhantomData,
@@ -402,7 +438,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StorageBlobsBuilder<S, St>
+impl<St, S: BosStr> StorageBlobsBuilder<St, S>
 where
     St: storage_blobs_state::State,
     St::Blobs: storage_blobs_state::IsSet,
@@ -415,7 +451,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StorageBlobs<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StorageBlobs<S> {
         StorageBlobs {
             blobs: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

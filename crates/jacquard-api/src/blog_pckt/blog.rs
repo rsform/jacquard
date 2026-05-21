@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blog_pckt::blog;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blog_pckt::blog;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -66,11 +66,9 @@ pub struct BlogGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Blog<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Palette<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accent: Option<S>,
@@ -86,11 +84,9 @@ pub struct Palette<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Theme<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dark: Option<blog::Palette<S>>,
@@ -150,16 +146,19 @@ impl<S: BosStr> LexiconSchema for Blog<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("icon"),
@@ -205,7 +204,7 @@ impl<S: BosStr> LexiconSchema for Theme<S> {
 
 pub mod blog_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -236,7 +235,7 @@ pub mod blog_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BlogBuilder<S: BosStr, St: blog_state::State> {
+pub struct BlogBuilder<St: blog_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -250,15 +249,22 @@ pub struct BlogBuilder<S: BosStr, St: blog_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Blog<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BlogBuilder<S, blog_state::Empty> {
+impl Blog<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BlogBuilder<blog_state::Empty, DefaultStr> {
         BlogBuilder::new()
     }
 }
 
-impl<S: BosStr> BlogBuilder<S, blog_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Blog<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BlogBuilder<blog_state::Empty, S> {
+        BlogBuilder::builder()
+    }
+}
+
+impl BlogBuilder<blog_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BlogBuilder {
             _state: PhantomData,
@@ -268,7 +274,18 @@ impl<S: BosStr> BlogBuilder<S, blog_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: blog_state::State> BlogBuilder<S, St> {
+impl<S: BosStr> BlogBuilder<blog_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BlogBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: blog_state::State, S: BosStr> BlogBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -281,7 +298,7 @@ impl<S: BosStr, St: blog_state::State> BlogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: blog_state::State> BlogBuilder<S, St> {
+impl<St: blog_state::State, S: BosStr> BlogBuilder<St, S> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -294,13 +311,16 @@ impl<S: BosStr, St: blog_state::State> BlogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BlogBuilder<S, St>
+impl<St, S: BosStr> BlogBuilder<St, S>
 where
     St: blog_state::State,
     St::Name: blog_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> BlogBuilder<S, blog_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> BlogBuilder<blog_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         BlogBuilder {
             _state: PhantomData,
@@ -310,7 +330,7 @@ where
     }
 }
 
-impl<S: BosStr, St: blog_state::State> BlogBuilder<S, St> {
+impl<St: blog_state::State, S: BosStr> BlogBuilder<St, S> {
     /// Set the `rss` field (optional)
     pub fn rss(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -323,7 +343,7 @@ impl<S: BosStr, St: blog_state::State> BlogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: blog_state::State> BlogBuilder<S, St> {
+impl<St: blog_state::State, S: BosStr> BlogBuilder<St, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<blog::Theme<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -336,7 +356,7 @@ impl<S: BosStr, St: blog_state::State> BlogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: blog_state::State> BlogBuilder<S, St> {
+impl<St: blog_state::State, S: BosStr> BlogBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -349,7 +369,7 @@ impl<S: BosStr, St: blog_state::State> BlogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: blog_state::State> BlogBuilder<S, St> {
+impl<St: blog_state::State, S: BosStr> BlogBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -362,7 +382,7 @@ impl<S: BosStr, St: blog_state::State> BlogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BlogBuilder<S, St>
+impl<St, S: BosStr> BlogBuilder<St, S>
 where
     St: blog_state::State,
     St::Name: blog_state::IsSet,
@@ -396,10 +416,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_blog() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.blog"),
@@ -422,9 +442,7 @@ fn lexicon_doc_blog_pckt_blog() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("icon"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("name"),
@@ -475,33 +493,23 @@ fn lexicon_doc_blog_pckt_blog() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("accent"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("background"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("link"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("surfaceHover"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("text"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -523,9 +531,7 @@ fn lexicon_doc_blog_pckt_blog() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("font"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("light"),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A sampling or collecting event. Multiple dwc.occurrence records can reference the same event via eventRef, sharing location and protocol metadata.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -463,7 +463,7 @@ impl<S: BosStr> LexiconSchema for Event<S> {
 
 pub mod event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -471,56 +471,56 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EventId;
-        type EventDate;
         type CreatedAt;
+        type EventDate;
+        type EventId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EventId = Unset;
-        type EventDate = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `event_id` field to Set
-    pub struct SetEventId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEventId<St> {}
-    impl<St: State> State for SetEventId<St> {
-        type EventId = Set<members::event_id>;
-        type EventDate = St::EventDate;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `event_date` field to Set
-    pub struct SetEventDate<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEventDate<St> {}
-    impl<St: State> State for SetEventDate<St> {
-        type EventId = St::EventId;
-        type EventDate = Set<members::event_date>;
-        type CreatedAt = St::CreatedAt;
+        type EventDate = Unset;
+        type EventId = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type EventId = St::EventId;
-        type EventDate = St::EventDate;
         type CreatedAt = Set<members::created_at>;
+        type EventDate = St::EventDate;
+        type EventId = St::EventId;
+    }
+    ///State transition - sets the `event_date` field to Set
+    pub struct SetEventDate<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEventDate<St> {}
+    impl<St: State> State for SetEventDate<St> {
+        type CreatedAt = St::CreatedAt;
+        type EventDate = Set<members::event_date>;
+        type EventId = St::EventId;
+    }
+    ///State transition - sets the `event_id` field to Set
+    pub struct SetEventId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEventId<St> {}
+    impl<St: State> State for SetEventId<St> {
+        type CreatedAt = St::CreatedAt;
+        type EventDate = St::EventDate;
+        type EventId = Set<members::event_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `event_id` field
-        pub struct event_id(());
-        ///Marker type for the `event_date` field
-        pub struct event_date(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `event_date` field
+        pub struct event_date(());
+        ///Marker type for the `event_id` field
+        pub struct event_id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EventBuilder<S: BosStr, St: event_state::State> {
+pub struct EventBuilder<St: event_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
@@ -554,30 +554,104 @@ pub struct EventBuilder<S: BosStr, St: event_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Event<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EventBuilder<S, event_state::Empty> {
+impl Event<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EventBuilder<event_state::Empty, DefaultStr> {
         EventBuilder::new()
     }
 }
 
-impl<S: BosStr> EventBuilder<S, event_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Event<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EventBuilder<event_state::Empty, S> {
+        EventBuilder::builder()
+    }
+}
+
+impl EventBuilder<event_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<S: BosStr> EventBuilder<event_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EventBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `coordinateUncertaintyInMeters` field (optional)
-    pub fn coordinate_uncertainty_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
+    pub fn coordinate_uncertainty_in_meters(
+        mut self,
+        value: impl Into<Option<i64>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -588,7 +662,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `country` field (optional)
     pub fn country(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -601,7 +675,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `countryCode` field (optional)
     pub fn country_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -614,7 +688,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `county` field (optional)
     pub fn county(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -627,7 +701,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::CreatedAt: event_state::IsUnset,
@@ -636,7 +710,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventBuilder<S, event_state::SetCreatedAt<St>> {
+    ) -> EventBuilder<event_state::SetCreatedAt<St>, S> {
         self._fields.4 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -646,7 +720,7 @@ where
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `decimalLatitude` field (optional)
     pub fn decimal_latitude(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -659,7 +733,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `decimalLongitude` field (optional)
     pub fn decimal_longitude(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -672,7 +746,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::EventDate: event_state::IsUnset,
@@ -681,7 +755,7 @@ where
     pub fn event_date(
         mut self,
         value: impl Into<S>,
-    ) -> EventBuilder<S, event_state::SetEventDate<St>> {
+    ) -> EventBuilder<event_state::SetEventDate<St>, S> {
         self._fields.7 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -691,13 +765,16 @@ where
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::EventId: event_state::IsUnset,
 {
     /// Set the `eventID` field (required)
-    pub fn event_id(mut self, value: impl Into<S>) -> EventBuilder<S, event_state::SetEventId<St>> {
+    pub fn event_id(
+        mut self,
+        value: impl Into<S>,
+    ) -> EventBuilder<event_state::SetEventId<St>, S> {
         self._fields.8 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -707,7 +784,7 @@ where
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `eventRemarks` field (optional)
     pub fn event_remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -720,7 +797,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `eventTime` field (optional)
     pub fn event_time(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -733,7 +810,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `fieldNotes` field (optional)
     pub fn field_notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
@@ -746,7 +823,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `geodeticDatum` field (optional)
     pub fn geodetic_datum(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
@@ -759,7 +836,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `habitat` field (optional)
     pub fn habitat(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.13 = value.into();
@@ -772,7 +849,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `locality` field (optional)
     pub fn locality(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.14 = value.into();
@@ -785,7 +862,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `locationID` field (optional)
     pub fn location_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.15 = value.into();
@@ -798,7 +875,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `locationRemarks` field (optional)
     pub fn location_remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.16 = value.into();
@@ -811,7 +888,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `maximumElevationInMeters` field (optional)
     pub fn maximum_elevation_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.17 = value.into();
@@ -824,7 +901,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `minimumElevationInMeters` field (optional)
     pub fn minimum_elevation_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.18 = value.into();
@@ -837,7 +914,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `municipality` field (optional)
     pub fn municipality(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.19 = value.into();
@@ -850,7 +927,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `parentEventID` field (optional)
     pub fn parent_event_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.20 = value.into();
@@ -863,7 +940,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `parentEventRef` field (optional)
     pub fn parent_event_ref(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.21 = value.into();
@@ -876,7 +953,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `sampleSizeUnit` field (optional)
     pub fn sample_size_unit(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.22 = value.into();
@@ -889,7 +966,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `sampleSizeValue` field (optional)
     pub fn sample_size_value(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.23 = value.into();
@@ -902,7 +979,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `samplingEffort` field (optional)
     pub fn sampling_effort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.24 = value.into();
@@ -915,7 +992,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `samplingProtocol` field (optional)
     pub fn sampling_protocol(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.25 = value.into();
@@ -928,7 +1005,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `stateProvince` field (optional)
     pub fn state_province(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.26 = value.into();
@@ -941,12 +1018,12 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
-    St::EventId: event_state::IsSet,
-    St::EventDate: event_state::IsSet,
     St::CreatedAt: event_state::IsSet,
+    St::EventDate: event_state::IsSet,
+    St::EventId: event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Event<S> {
@@ -1017,10 +1094,10 @@ where
 }
 
 fn lexicon_doc_app_gainforest_dwc_event() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.gainforest.dwc.event"),

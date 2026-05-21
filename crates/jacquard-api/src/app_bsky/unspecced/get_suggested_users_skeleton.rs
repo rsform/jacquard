@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSuggestedUsersSkeleton<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<S>,
@@ -33,11 +30,9 @@ pub struct GetSuggestedUsersSkeleton<S: BosStr = DefaultStr> {
     pub viewer: Option<Did<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSuggestedUsersSkeletonOutput<S: BosStr = DefaultStr> {
     pub dids: Vec<Did<S>>,
     ///DEPRECATED: use recIdStr instead.
@@ -80,7 +75,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_suggested_users_skeleton_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -99,23 +94,39 @@ pub mod get_suggested_users_skeleton_state {
 
 /// Builder for constructing an instance of this type.
 pub struct GetSuggestedUsersSkeletonBuilder<
-    S: BosStr,
     St: get_suggested_users_skeleton_state::State,
+    S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetSuggestedUsersSkeleton<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetSuggestedUsersSkeletonBuilder<S, get_suggested_users_skeleton_state::Empty> {
+impl GetSuggestedUsersSkeleton<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetSuggestedUsersSkeletonBuilder<
+        get_suggested_users_skeleton_state::Empty,
+        DefaultStr,
+    > {
         GetSuggestedUsersSkeletonBuilder::new()
     }
 }
 
-impl<S: BosStr> GetSuggestedUsersSkeletonBuilder<S, get_suggested_users_skeleton_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetSuggestedUsersSkeleton<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetSuggestedUsersSkeletonBuilder<
+        get_suggested_users_skeleton_state::Empty,
+        S,
+    > {
+        GetSuggestedUsersSkeletonBuilder::builder()
+    }
+}
+
+impl GetSuggestedUsersSkeletonBuilder<
+    get_suggested_users_skeleton_state::Empty,
+    DefaultStr,
+> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetSuggestedUsersSkeletonBuilder {
             _state: PhantomData,
@@ -125,9 +136,23 @@ impl<S: BosStr> GetSuggestedUsersSkeletonBuilder<S, get_suggested_users_skeleton
     }
 }
 
-impl<S: BosStr, St: get_suggested_users_skeleton_state::State>
-    GetSuggestedUsersSkeletonBuilder<S, St>
-{
+impl<
+    S: BosStr,
+> GetSuggestedUsersSkeletonBuilder<get_suggested_users_skeleton_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetSuggestedUsersSkeletonBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<
+    St: get_suggested_users_skeleton_state::State,
+    S: BosStr,
+> GetSuggestedUsersSkeletonBuilder<St, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -140,9 +165,10 @@ impl<S: BosStr, St: get_suggested_users_skeleton_state::State>
     }
 }
 
-impl<S: BosStr, St: get_suggested_users_skeleton_state::State>
-    GetSuggestedUsersSkeletonBuilder<S, St>
-{
+impl<
+    St: get_suggested_users_skeleton_state::State,
+    S: BosStr,
+> GetSuggestedUsersSkeletonBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -155,9 +181,10 @@ impl<S: BosStr, St: get_suggested_users_skeleton_state::State>
     }
 }
 
-impl<S: BosStr, St: get_suggested_users_skeleton_state::State>
-    GetSuggestedUsersSkeletonBuilder<S, St>
-{
+impl<
+    St: get_suggested_users_skeleton_state::State,
+    S: BosStr,
+> GetSuggestedUsersSkeletonBuilder<St, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -170,7 +197,7 @@ impl<S: BosStr, St: get_suggested_users_skeleton_state::State>
     }
 }
 
-impl<S: BosStr, St> GetSuggestedUsersSkeletonBuilder<S, St>
+impl<St, S: BosStr> GetSuggestedUsersSkeletonBuilder<St, S>
 where
     St: get_suggested_users_skeleton_state::State,
 {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A cryptographic proof record that validates an endorsement by containing the CID of the endorsement content.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -104,7 +104,7 @@ impl<S: BosStr> LexiconSchema for EndorsementProof<S> {
 
 pub mod endorsement_proof_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -135,21 +135,31 @@ pub mod endorsement_proof_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EndorsementProofBuilder<S: BosStr, St: endorsement_proof_state::State> {
+pub struct EndorsementProofBuilder<
+    St: endorsement_proof_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> EndorsementProof<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EndorsementProofBuilder<S, endorsement_proof_state::Empty> {
+impl EndorsementProof<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EndorsementProofBuilder<endorsement_proof_state::Empty, DefaultStr> {
         EndorsementProofBuilder::new()
     }
 }
 
-impl<S: BosStr> EndorsementProofBuilder<S, endorsement_proof_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> EndorsementProof<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EndorsementProofBuilder<endorsement_proof_state::Empty, S> {
+        EndorsementProofBuilder::builder()
+    }
+}
+
+impl EndorsementProofBuilder<endorsement_proof_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EndorsementProofBuilder {
             _state: PhantomData,
@@ -159,7 +169,18 @@ impl<S: BosStr> EndorsementProofBuilder<S, endorsement_proof_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EndorsementProofBuilder<S, St>
+impl<S: BosStr> EndorsementProofBuilder<endorsement_proof_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EndorsementProofBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EndorsementProofBuilder<St, S>
 where
     St: endorsement_proof_state::State,
     St::Cid: endorsement_proof_state::IsUnset,
@@ -168,7 +189,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> EndorsementProofBuilder<S, endorsement_proof_state::SetCid<St>> {
+    ) -> EndorsementProofBuilder<endorsement_proof_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EndorsementProofBuilder {
             _state: PhantomData,
@@ -178,7 +199,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EndorsementProofBuilder<S, St>
+impl<St, S: BosStr> EndorsementProofBuilder<St, S>
 where
     St: endorsement_proof_state::State,
     St::Cid: endorsement_proof_state::IsSet,
@@ -191,7 +212,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EndorsementProof<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EndorsementProof<S> {
         EndorsementProof {
             cid: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -200,10 +224,10 @@ where
 }
 
 fn lexicon_doc_place_atwork_endorsementProof() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.atwork.endorsementProof"),

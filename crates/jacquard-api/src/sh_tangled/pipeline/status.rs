@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -115,7 +115,7 @@ impl<S: BosStr> LexiconSchema for Status<S> {
 
 pub mod status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -123,72 +123,72 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
-        type Pipeline;
-        type Workflow;
         type CreatedAt;
+        type Pipeline;
+        type Status;
+        type Workflow;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
-        type Pipeline = Unset;
-        type Workflow = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type Status = Set<members::status>;
-        type Pipeline = St::Pipeline;
-        type Workflow = St::Workflow;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `pipeline` field to Set
-    pub struct SetPipeline<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPipeline<St> {}
-    impl<St: State> State for SetPipeline<St> {
-        type Status = St::Status;
-        type Pipeline = Set<members::pipeline>;
-        type Workflow = St::Workflow;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `workflow` field to Set
-    pub struct SetWorkflow<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWorkflow<St> {}
-    impl<St: State> State for SetWorkflow<St> {
-        type Status = St::Status;
-        type Pipeline = St::Pipeline;
-        type Workflow = Set<members::workflow>;
-        type CreatedAt = St::CreatedAt;
+        type Pipeline = Unset;
+        type Status = Unset;
+        type Workflow = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Status = St::Status;
-        type Pipeline = St::Pipeline;
-        type Workflow = St::Workflow;
         type CreatedAt = Set<members::created_at>;
+        type Pipeline = St::Pipeline;
+        type Status = St::Status;
+        type Workflow = St::Workflow;
+    }
+    ///State transition - sets the `pipeline` field to Set
+    pub struct SetPipeline<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPipeline<St> {}
+    impl<St: State> State for SetPipeline<St> {
+        type CreatedAt = St::CreatedAt;
+        type Pipeline = Set<members::pipeline>;
+        type Status = St::Status;
+        type Workflow = St::Workflow;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type CreatedAt = St::CreatedAt;
+        type Pipeline = St::Pipeline;
+        type Status = Set<members::status>;
+        type Workflow = St::Workflow;
+    }
+    ///State transition - sets the `workflow` field to Set
+    pub struct SetWorkflow<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWorkflow<St> {}
+    impl<St: State> State for SetWorkflow<St> {
+        type CreatedAt = St::CreatedAt;
+        type Pipeline = St::Pipeline;
+        type Status = St::Status;
+        type Workflow = Set<members::workflow>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `pipeline` field
-        pub struct pipeline(());
-        ///Marker type for the `workflow` field
-        pub struct workflow(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `pipeline` field
+        pub struct pipeline(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `workflow` field
+        pub struct workflow(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StatusBuilder<S: BosStr, St: status_state::State> {
+pub struct StatusBuilder<St: status_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -201,15 +201,22 @@ pub struct StatusBuilder<S: BosStr, St: status_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Status<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StatusBuilder<S, status_state::Empty> {
+impl Status<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StatusBuilder<status_state::Empty, DefaultStr> {
         StatusBuilder::new()
     }
 }
 
-impl<S: BosStr> StatusBuilder<S, status_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Status<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StatusBuilder<status_state::Empty, S> {
+        StatusBuilder::builder()
+    }
+}
+
+impl StatusBuilder<status_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StatusBuilder {
             _state: PhantomData,
@@ -219,7 +226,18 @@ impl<S: BosStr> StatusBuilder<S, status_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StatusBuilder<S, St>
+impl<S: BosStr> StatusBuilder<status_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StatusBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StatusBuilder<St, S>
 where
     St: status_state::State,
     St::CreatedAt: status_state::IsUnset,
@@ -228,7 +246,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StatusBuilder<S, status_state::SetCreatedAt<St>> {
+    ) -> StatusBuilder<status_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
@@ -238,7 +256,7 @@ where
     }
 }
 
-impl<S: BosStr, St: status_state::State> StatusBuilder<S, St> {
+impl<St: status_state::State, S: BosStr> StatusBuilder<St, S> {
     /// Set the `error` field (optional)
     pub fn error(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -251,7 +269,7 @@ impl<S: BosStr, St: status_state::State> StatusBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: status_state::State> StatusBuilder<S, St> {
+impl<St: status_state::State, S: BosStr> StatusBuilder<St, S> {
     /// Set the `exitCode` field (optional)
     pub fn exit_code(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -264,7 +282,7 @@ impl<S: BosStr, St: status_state::State> StatusBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StatusBuilder<S, St>
+impl<St, S: BosStr> StatusBuilder<St, S>
 where
     St: status_state::State,
     St::Pipeline: status_state::IsUnset,
@@ -273,7 +291,7 @@ where
     pub fn pipeline(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StatusBuilder<S, status_state::SetPipeline<St>> {
+    ) -> StatusBuilder<status_state::SetPipeline<St>, S> {
         self._fields.3 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
@@ -283,13 +301,16 @@ where
     }
 }
 
-impl<S: BosStr, St> StatusBuilder<S, St>
+impl<St, S: BosStr> StatusBuilder<St, S>
 where
     St: status_state::State,
     St::Status: status_state::IsUnset,
 {
     /// Set the `status` field (required)
-    pub fn status(mut self, value: impl Into<S>) -> StatusBuilder<S, status_state::SetStatus<St>> {
+    pub fn status(
+        mut self,
+        value: impl Into<S>,
+    ) -> StatusBuilder<status_state::SetStatus<St>, S> {
         self._fields.4 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
@@ -299,7 +320,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatusBuilder<S, St>
+impl<St, S: BosStr> StatusBuilder<St, S>
 where
     St: status_state::State,
     St::Workflow: status_state::IsUnset,
@@ -308,7 +329,7 @@ where
     pub fn workflow(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StatusBuilder<S, status_state::SetWorkflow<St>> {
+    ) -> StatusBuilder<status_state::SetWorkflow<St>, S> {
         self._fields.5 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
@@ -318,13 +339,13 @@ where
     }
 }
 
-impl<S: BosStr, St> StatusBuilder<S, St>
+impl<St, S: BosStr> StatusBuilder<St, S>
 where
     St: status_state::State,
-    St::Status: status_state::IsSet,
-    St::Pipeline: status_state::IsSet,
-    St::Workflow: status_state::IsSet,
     St::CreatedAt: status_state::IsSet,
+    St::Pipeline: status_state::IsSet,
+    St::Status: status_state::IsSet,
+    St::Workflow: status_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Status<S> {
@@ -353,10 +374,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_pipeline_status() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.pipeline.status"),
@@ -367,21 +388,23 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("pipeline"),
-                            SmolStr::new_static("workflow"),
-                            SmolStr::new_static("status"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("pipeline"),
+                                SmolStr::new_static("workflow"),
+                                SmolStr::new_static("status"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "time of creation of this status update",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("time of creation of this status update"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -389,9 +412,9 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("error"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "error message if failed",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("error message if failed"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
@@ -404,7 +427,9 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("pipeline"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("ATURI of the pipeline")),
+                                    description: Some(
+                                        CowStr::new_static("ATURI of the pipeline"),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -412,16 +437,20 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("status"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("status of the workflow")),
+                                    description: Some(
+                                        CowStr::new_static("status of the workflow"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("workflow"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "name of the workflow within this pipeline",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "name of the workflow within this pipeline",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

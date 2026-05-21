@@ -7,12 +7,13 @@
 
 pub mod hello;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,7 +29,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Hi
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -109,7 +110,7 @@ impl<S: BosStr> LexiconSchema for Hi<S> {
 
 pub mod hi_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -127,21 +128,28 @@ pub mod hi_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HiBuilder<S: BosStr, St: hi_state::State> {
+pub struct HiBuilder<St: hi_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Hi<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> HiBuilder<S, hi_state::Empty> {
+impl Hi<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> HiBuilder<hi_state::Empty, DefaultStr> {
         HiBuilder::new()
     }
 }
 
-impl<S: BosStr> HiBuilder<S, hi_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Hi<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> HiBuilder<hi_state::Empty, S> {
+        HiBuilder::builder()
+    }
+}
+
+impl HiBuilder<hi_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         HiBuilder {
             _state: PhantomData,
@@ -151,7 +159,18 @@ impl<S: BosStr> HiBuilder<S, hi_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: hi_state::State> HiBuilder<S, St> {
+impl<S: BosStr> HiBuilder<hi_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        HiBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: hi_state::State, S: BosStr> HiBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -164,7 +183,7 @@ impl<S: BosStr, St: hi_state::State> HiBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: hi_state::State> HiBuilder<S, St> {
+impl<St: hi_state::State, S: BosStr> HiBuilder<St, S> {
     /// Set the `hello` field (optional)
     pub fn hello(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -177,7 +196,7 @@ impl<S: BosStr, St: hi_state::State> HiBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> HiBuilder<S, St>
+impl<St, S: BosStr> HiBuilder<St, S>
 where
     St: hi_state::State,
 {
@@ -200,10 +219,10 @@ where
 }
 
 fn lexicon_doc_lol_gayfamicom_hi() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("lol.gayfamicom.hi"),

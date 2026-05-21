@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -105,7 +105,7 @@ impl<S: BosStr> LexiconSchema for Member<S> {
 
 pub mod member_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -113,70 +113,77 @@ pub mod member_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Instance;
         type Subject;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Instance = Unset;
         type Subject = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `instance` field to Set
-    pub struct SetInstance<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetInstance<St> {}
-    impl<St: State> State for SetInstance<St> {
-        type Instance = Set<members::instance>;
-        type Subject = St::Subject;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Instance = St::Instance;
-        type Subject = Set<members::subject>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type Instance = St::Instance;
         type Subject = St::Subject;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `instance` field to Set
+    pub struct SetInstance<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetInstance<St> {}
+    impl<St: State> State for SetInstance<St> {
+        type CreatedAt = St::CreatedAt;
+        type Instance = Set<members::instance>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Instance = St::Instance;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `instance` field
         pub struct instance(());
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MemberBuilder<S: BosStr, St: member_state::State> {
+pub struct MemberBuilder<St: member_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Member<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MemberBuilder<S, member_state::Empty> {
+impl Member<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MemberBuilder<member_state::Empty, DefaultStr> {
         MemberBuilder::new()
     }
 }
 
-impl<S: BosStr> MemberBuilder<S, member_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Member<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MemberBuilder<member_state::Empty, S> {
+        MemberBuilder::builder()
+    }
+}
+
+impl MemberBuilder<member_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MemberBuilder {
             _state: PhantomData,
@@ -186,7 +193,18 @@ impl<S: BosStr> MemberBuilder<S, member_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MemberBuilder<S, St>
+impl<S: BosStr> MemberBuilder<member_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MemberBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MemberBuilder<St, S>
 where
     St: member_state::State,
     St::CreatedAt: member_state::IsUnset,
@@ -195,7 +213,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MemberBuilder<S, member_state::SetCreatedAt<St>> {
+    ) -> MemberBuilder<member_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MemberBuilder {
             _state: PhantomData,
@@ -205,7 +223,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MemberBuilder<S, St>
+impl<St, S: BosStr> MemberBuilder<St, S>
 where
     St: member_state::State,
     St::Instance: member_state::IsUnset,
@@ -214,7 +232,7 @@ where
     pub fn instance(
         mut self,
         value: impl Into<S>,
-    ) -> MemberBuilder<S, member_state::SetInstance<St>> {
+    ) -> MemberBuilder<member_state::SetInstance<St>, S> {
         self._fields.1 = Option::Some(value.into());
         MemberBuilder {
             _state: PhantomData,
@@ -224,7 +242,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MemberBuilder<S, St>
+impl<St, S: BosStr> MemberBuilder<St, S>
 where
     St: member_state::State,
     St::Subject: member_state::IsUnset,
@@ -233,7 +251,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> MemberBuilder<S, member_state::SetSubject<St>> {
+    ) -> MemberBuilder<member_state::SetSubject<St>, S> {
         self._fields.2 = Option::Some(value.into());
         MemberBuilder {
             _state: PhantomData,
@@ -243,12 +261,12 @@ where
     }
 }
 
-impl<S: BosStr, St> MemberBuilder<S, St>
+impl<St, S: BosStr> MemberBuilder<St, S>
 where
     St: member_state::State,
+    St::CreatedAt: member_state::IsSet,
     St::Instance: member_state::IsSet,
     St::Subject: member_state::IsSet,
-    St::CreatedAt: member_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Member<S> {
@@ -271,10 +289,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_spindle_member() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.spindle.member"),
@@ -285,11 +303,13 @@ fn lexicon_doc_sh_tangled_spindle_member() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("instance"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("subject"),
+                                SmolStr::new_static("instance"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -303,9 +323,11 @@ fn lexicon_doc_sh_tangled_spindle_member() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("instance"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "spindle instance that the subject is now a member of",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "spindle instance that the subject is now a member of",
+                                        ),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

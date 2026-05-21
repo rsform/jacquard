@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_clippr::feed::ClipView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_clippr::feed::ClipView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetProfileClips<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -37,11 +34,9 @@ pub struct GetProfileClips<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetProfileClipsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -84,7 +79,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_profile_clips_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -115,21 +110,31 @@ pub mod get_profile_clips_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetProfileClipsBuilder<S: BosStr, St: get_profile_clips_state::State> {
+pub struct GetProfileClipsBuilder<
+    St: get_profile_clips_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetProfileClips<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetProfileClipsBuilder<S, get_profile_clips_state::Empty> {
+impl GetProfileClips<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetProfileClipsBuilder<get_profile_clips_state::Empty, DefaultStr> {
         GetProfileClipsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetProfileClipsBuilder<S, get_profile_clips_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetProfileClips<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetProfileClipsBuilder<get_profile_clips_state::Empty, S> {
+        GetProfileClipsBuilder::builder()
+    }
+}
+
+impl GetProfileClipsBuilder<get_profile_clips_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetProfileClipsBuilder {
             _state: PhantomData,
@@ -139,7 +144,18 @@ impl<S: BosStr> GetProfileClipsBuilder<S, get_profile_clips_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetProfileClipsBuilder<S, St>
+impl<S: BosStr> GetProfileClipsBuilder<get_profile_clips_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetProfileClipsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetProfileClipsBuilder<St, S>
 where
     St: get_profile_clips_state::State,
     St::Actor: get_profile_clips_state::IsUnset,
@@ -148,7 +164,7 @@ where
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetProfileClipsBuilder<S, get_profile_clips_state::SetActor<St>> {
+    ) -> GetProfileClipsBuilder<get_profile_clips_state::SetActor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetProfileClipsBuilder {
             _state: PhantomData,
@@ -158,7 +174,7 @@ where
     }
 }
 
-impl<S: BosStr, St: get_profile_clips_state::State> GetProfileClipsBuilder<S, St> {
+impl<St: get_profile_clips_state::State, S: BosStr> GetProfileClipsBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -171,7 +187,7 @@ impl<S: BosStr, St: get_profile_clips_state::State> GetProfileClipsBuilder<S, St
     }
 }
 
-impl<S: BosStr, St: get_profile_clips_state::State> GetProfileClipsBuilder<S, St> {
+impl<St: get_profile_clips_state::State, S: BosStr> GetProfileClipsBuilder<St, S> {
     /// Set the `filter` field (optional)
     pub fn filter(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -184,7 +200,7 @@ impl<S: BosStr, St: get_profile_clips_state::State> GetProfileClipsBuilder<S, St
     }
 }
 
-impl<S: BosStr, St: get_profile_clips_state::State> GetProfileClipsBuilder<S, St> {
+impl<St: get_profile_clips_state::State, S: BosStr> GetProfileClipsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -197,7 +213,7 @@ impl<S: BosStr, St: get_profile_clips_state::State> GetProfileClipsBuilder<S, St
     }
 }
 
-impl<S: BosStr, St> GetProfileClipsBuilder<S, St>
+impl<St, S: BosStr> GetProfileClipsBuilder<St, S>
 where
     St: get_profile_clips_state::State,
     St::Actor: get_profile_clips_state::IsSet,

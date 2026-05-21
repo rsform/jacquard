@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A public statement signed by one of the user's own published public keys (dev.keytrace.userPublicKey).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -152,7 +152,7 @@ impl<S: BosStr> LexiconSchema for Statement<S> {
 
 pub mod statement_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -161,71 +161,71 @@ pub mod statement_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Sig;
-        type KeyRef;
-        type CreatedAt;
         type Content;
+        type CreatedAt;
+        type KeyRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Sig = Unset;
-        type KeyRef = Unset;
-        type CreatedAt = Unset;
         type Content = Unset;
+        type CreatedAt = Unset;
+        type KeyRef = Unset;
     }
     ///State transition - sets the `sig` field to Set
     pub struct SetSig<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSig<St> {}
     impl<St: State> State for SetSig<St> {
         type Sig = Set<members::sig>;
-        type KeyRef = St::KeyRef;
+        type Content = St::Content;
         type CreatedAt = St::CreatedAt;
-        type Content = St::Content;
-    }
-    ///State transition - sets the `key_ref` field to Set
-    pub struct SetKeyRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKeyRef<St> {}
-    impl<St: State> State for SetKeyRef<St> {
-        type Sig = St::Sig;
-        type KeyRef = Set<members::key_ref>;
-        type CreatedAt = St::CreatedAt;
-        type Content = St::Content;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Sig = St::Sig;
         type KeyRef = St::KeyRef;
-        type CreatedAt = Set<members::created_at>;
-        type Content = St::Content;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
         type Sig = St::Sig;
-        type KeyRef = St::KeyRef;
-        type CreatedAt = St::CreatedAt;
         type Content = Set<members::content>;
+        type CreatedAt = St::CreatedAt;
+        type KeyRef = St::KeyRef;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Sig = St::Sig;
+        type Content = St::Content;
+        type CreatedAt = Set<members::created_at>;
+        type KeyRef = St::KeyRef;
+    }
+    ///State transition - sets the `key_ref` field to Set
+    pub struct SetKeyRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKeyRef<St> {}
+    impl<St: State> State for SetKeyRef<St> {
+        type Sig = St::Sig;
+        type Content = St::Content;
+        type CreatedAt = St::CreatedAt;
+        type KeyRef = Set<members::key_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `sig` field
         pub struct sig(());
-        ///Marker type for the `key_ref` field
-        pub struct key_ref(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `key_ref` field
+        pub struct key_ref(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StatementBuilder<S: BosStr, St: statement_state::State> {
+pub struct StatementBuilder<St: statement_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -238,15 +238,22 @@ pub struct StatementBuilder<S: BosStr, St: statement_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Statement<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StatementBuilder<S, statement_state::Empty> {
+impl Statement<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StatementBuilder<statement_state::Empty, DefaultStr> {
         StatementBuilder::new()
     }
 }
 
-impl<S: BosStr> StatementBuilder<S, statement_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Statement<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StatementBuilder<statement_state::Empty, S> {
+        StatementBuilder::builder()
+    }
+}
+
+impl StatementBuilder<statement_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StatementBuilder {
             _state: PhantomData,
@@ -256,7 +263,18 @@ impl<S: BosStr> StatementBuilder<S, statement_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StatementBuilder<S, St>
+impl<S: BosStr> StatementBuilder<statement_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StatementBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StatementBuilder<St, S>
 where
     St: statement_state::State,
     St::Content: statement_state::IsUnset,
@@ -265,7 +283,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> StatementBuilder<S, statement_state::SetContent<St>> {
+    ) -> StatementBuilder<statement_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StatementBuilder {
             _state: PhantomData,
@@ -275,7 +293,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatementBuilder<S, St>
+impl<St, S: BosStr> StatementBuilder<St, S>
 where
     St: statement_state::State,
     St::CreatedAt: statement_state::IsUnset,
@@ -284,7 +302,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StatementBuilder<S, statement_state::SetCreatedAt<St>> {
+    ) -> StatementBuilder<statement_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StatementBuilder {
             _state: PhantomData,
@@ -294,7 +312,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StatementBuilder<S, St>
+impl<St, S: BosStr> StatementBuilder<St, S>
 where
     St: statement_state::State,
     St::KeyRef: statement_state::IsUnset,
@@ -303,7 +321,7 @@ where
     pub fn key_ref(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StatementBuilder<S, statement_state::SetKeyRef<St>> {
+    ) -> StatementBuilder<statement_state::SetKeyRef<St>, S> {
         self._fields.2 = Option::Some(value.into());
         StatementBuilder {
             _state: PhantomData,
@@ -313,7 +331,7 @@ where
     }
 }
 
-impl<S: BosStr, St: statement_state::State> StatementBuilder<S, St> {
+impl<St: statement_state::State, S: BosStr> StatementBuilder<St, S> {
     /// Set the `retractedAt` field (optional)
     pub fn retracted_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -326,13 +344,16 @@ impl<S: BosStr, St: statement_state::State> StatementBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StatementBuilder<S, St>
+impl<St, S: BosStr> StatementBuilder<St, S>
 where
     St: statement_state::State,
     St::Sig: statement_state::IsUnset,
 {
     /// Set the `sig` field (required)
-    pub fn sig(mut self, value: impl Into<S>) -> StatementBuilder<S, statement_state::SetSig<St>> {
+    pub fn sig(
+        mut self,
+        value: impl Into<S>,
+    ) -> StatementBuilder<statement_state::SetSig<St>, S> {
         self._fields.4 = Option::Some(value.into());
         StatementBuilder {
             _state: PhantomData,
@@ -342,7 +363,7 @@ where
     }
 }
 
-impl<S: BosStr, St: statement_state::State> StatementBuilder<S, St> {
+impl<St: statement_state::State, S: BosStr> StatementBuilder<St, S> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -355,13 +376,13 @@ impl<S: BosStr, St: statement_state::State> StatementBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StatementBuilder<S, St>
+impl<St, S: BosStr> StatementBuilder<St, S>
 where
     St: statement_state::State,
     St::Sig: statement_state::IsSet,
-    St::KeyRef: statement_state::IsSet,
-    St::CreatedAt: statement_state::IsSet,
     St::Content: statement_state::IsSet,
+    St::CreatedAt: statement_state::IsSet,
+    St::KeyRef: statement_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Statement<S> {
@@ -376,7 +397,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Statement<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Statement<S> {
         Statement {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -390,10 +414,10 @@ where
 }
 
 fn lexicon_doc_dev_keytrace_statement() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.keytrace.statement"),

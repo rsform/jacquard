@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::NotebookView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetNotebookFeed<S: BosStr = DefaultStr> {
     ///Defaults to `"chronological"`.
     #[serde(default = "_default_algorithm")]
@@ -40,11 +37,9 @@ pub struct GetNotebookFeed<S: BosStr = DefaultStr> {
     pub tags: Option<Vec<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetNotebookFeedOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -87,7 +82,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_notebook_feed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -105,27 +100,31 @@ pub mod get_notebook_feed_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetNotebookFeedBuilder<S: BosStr, St: get_notebook_feed_state::State> {
+pub struct GetNotebookFeedBuilder<
+    St: get_notebook_feed_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<S>,
-        Option<AtUri<S>>,
-        Option<i64>,
-        Option<Vec<S>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<AtUri<S>>, Option<i64>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetNotebookFeed<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetNotebookFeedBuilder<S, get_notebook_feed_state::Empty> {
+impl GetNotebookFeed<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetNotebookFeedBuilder<get_notebook_feed_state::Empty, DefaultStr> {
         GetNotebookFeedBuilder::new()
     }
 }
 
-impl<S: BosStr> GetNotebookFeedBuilder<S, get_notebook_feed_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetNotebookFeed<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetNotebookFeedBuilder<get_notebook_feed_state::Empty, S> {
+        GetNotebookFeedBuilder::builder()
+    }
+}
+
+impl GetNotebookFeedBuilder<get_notebook_feed_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetNotebookFeedBuilder {
             _state: PhantomData,
@@ -135,7 +134,18 @@ impl<S: BosStr> GetNotebookFeedBuilder<S, get_notebook_feed_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_notebook_feed_state::State> GetNotebookFeedBuilder<S, St> {
+impl<S: BosStr> GetNotebookFeedBuilder<get_notebook_feed_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetNotebookFeedBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_notebook_feed_state::State, S: BosStr> GetNotebookFeedBuilder<St, S> {
     /// Set the `algorithm` field (optional)
     pub fn algorithm(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -148,7 +158,7 @@ impl<S: BosStr, St: get_notebook_feed_state::State> GetNotebookFeedBuilder<S, St
     }
 }
 
-impl<S: BosStr, St: get_notebook_feed_state::State> GetNotebookFeedBuilder<S, St> {
+impl<St: get_notebook_feed_state::State, S: BosStr> GetNotebookFeedBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -161,7 +171,7 @@ impl<S: BosStr, St: get_notebook_feed_state::State> GetNotebookFeedBuilder<S, St
     }
 }
 
-impl<S: BosStr, St: get_notebook_feed_state::State> GetNotebookFeedBuilder<S, St> {
+impl<St: get_notebook_feed_state::State, S: BosStr> GetNotebookFeedBuilder<St, S> {
     /// Set the `feed` field (optional)
     pub fn feed(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -174,7 +184,7 @@ impl<S: BosStr, St: get_notebook_feed_state::State> GetNotebookFeedBuilder<S, St
     }
 }
 
-impl<S: BosStr, St: get_notebook_feed_state::State> GetNotebookFeedBuilder<S, St> {
+impl<St: get_notebook_feed_state::State, S: BosStr> GetNotebookFeedBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -187,7 +197,7 @@ impl<S: BosStr, St: get_notebook_feed_state::State> GetNotebookFeedBuilder<S, St
     }
 }
 
-impl<S: BosStr, St: get_notebook_feed_state::State> GetNotebookFeedBuilder<S, St> {
+impl<St: get_notebook_feed_state::State, S: BosStr> GetNotebookFeedBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -200,7 +210,7 @@ impl<S: BosStr, St: get_notebook_feed_state::State> GetNotebookFeedBuilder<S, St
     }
 }
 
-impl<S: BosStr, St> GetNotebookFeedBuilder<S, St>
+impl<St, S: BosStr> GetNotebookFeedBuilder<St, S>
 where
     St: get_notebook_feed_state::State,
 {

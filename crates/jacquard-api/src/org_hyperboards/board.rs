@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,22 +24,19 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::org_hyperboards::board;
 use crate::org_hypercerts::SmallImage;
 use crate::org_hypercerts::SmallVideo;
 use crate::org_hypercerts::Uri;
 use crate::org_hypercerts::claim::activity::ContributorIdentity;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use crate::org_hyperboards::board;
 /// Visual configuration for a hyperboard's background, colors, and layout.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BoardConfig<S: BosStr = DefaultStr> {
     ///Display aspect ratio of the board.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -153,10 +150,13 @@ where
             BoardConfigAspectRatio::_169 => BoardConfigAspectRatio::_169,
             BoardConfigAspectRatio::_43 => BoardConfigAspectRatio::_43,
             BoardConfigAspectRatio::_11 => BoardConfigAspectRatio::_11,
-            BoardConfigAspectRatio::Other(v) => BoardConfigAspectRatio::Other(v.into_static()),
+            BoardConfigAspectRatio::Other(v) => {
+                BoardConfigAspectRatio::Other(v.into_static())
+            }
         }
     }
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -216,7 +216,8 @@ impl<S: BosStr> Serialize for BoardConfigBackgroundType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for BoardConfigBackgroundType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for BoardConfigBackgroundType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -323,7 +324,9 @@ where
         match self {
             BoardConfigImageShape::Circular => BoardConfigImageShape::Circular,
             BoardConfigImageShape::Square => BoardConfigImageShape::Square,
-            BoardConfigImageShape::Other(v) => BoardConfigImageShape::Other(v.into_static()),
+            BoardConfigImageShape::Other(v) => {
+                BoardConfigImageShape::Other(v.into_static())
+            }
         }
     }
 }
@@ -331,10 +334,7 @@ where
 /// Configuration for a specific contributor within a board. Values serve as fallbacks when the contributor has not defined them on their profile. It can also be used to override contributor settings on this board without changing their global profile.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ContributorConfig<S: BosStr = DefaultStr> {
     ///Identifies the contributor being styled. A strong reference to an org.hypercerts.claim.contributorInformation record, or a contributorIdentity (DID or identifier string) for contributors without a dedicated record.
     pub contributor: ContributorConfigContributor<S>,
@@ -363,6 +363,7 @@ pub struct ContributorConfig<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -372,6 +373,7 @@ pub enum ContributorConfigContributor<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.claim.activity#contributorIdentity")]
     ActivityContributorIdentity(Box<ContributorIdentity<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -383,6 +385,7 @@ pub enum ContributorConfigHoverImage<S: BosStr = DefaultStr> {
     SmallImage(Box<SmallImage<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -392,6 +395,7 @@ pub enum ContributorConfigImage<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#smallImage")]
     SmallImage(Box<SmallImage<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -647,10 +651,10 @@ impl<S: BosStr> LexiconSchema for Board<S> {
 }
 
 fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hyperboards.board"),
@@ -659,18 +663,20 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("boardConfig"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Visual configuration for a hyperboard's background, colors, and layout.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Visual configuration for a hyperboard's background, colors, and layout.",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("aspectRatio"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Display aspect ratio of the board.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Display aspect ratio of the board."),
+                                ),
                                 max_length: Some(10usize),
                                 ..Default::default()
                             }),
@@ -678,9 +684,11 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("backgroundColor"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Background color as a hex string (e.g. '#ffffff').",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Background color as a hex string (e.g. '#ffffff').",
+                                    ),
+                                ),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -694,9 +702,9 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("backgroundIframeUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URI of the background iframe.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("URI of the background iframe."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 max_length: Some(2048usize),
                                 ..Default::default()
@@ -705,12 +713,14 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("backgroundImage"),
                             LexObjectProperty::Union(LexRefUnion {
-                                description: Some(CowStr::new_static(
-                                    "Background image as a URI or image blob.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Background image as a URI or image blob.",
+                                    ),
+                                ),
                                 refs: vec![
                                     CowStr::new_static("org.hypercerts.defs#uri"),
-                                    CowStr::new_static("org.hypercerts.defs#smallImage"),
+                                    CowStr::new_static("org.hypercerts.defs#smallImage")
                                 ],
                                 ..Default::default()
                             }),
@@ -726,9 +736,9 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("backgroundType"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Type of background content.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Type of background content."),
+                                ),
                                 max_length: Some(10usize),
                                 ..Default::default()
                             }),
@@ -736,9 +746,11 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("borderColor"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Border color as a hex string (e.g. '#000000').",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Border color as a hex string (e.g. '#000000').",
+                                    ),
+                                ),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -752,9 +764,11 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("imageShape"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Shape used to crop contributor images on this board.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Shape used to crop contributor images on this board.",
+                                    ),
+                                ),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -962,7 +976,7 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
 
 pub mod contributor_config_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -993,7 +1007,10 @@ pub mod contributor_config_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ContributorConfigBuilder<S: BosStr, St: contributor_config_state::State> {
+pub struct ContributorConfigBuilder<
+    St: contributor_config_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ContributorConfigContributor<S>>,
@@ -1008,15 +1025,25 @@ pub struct ContributorConfigBuilder<S: BosStr, St: contributor_config_state::Sta
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ContributorConfig<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ContributorConfigBuilder<S, contributor_config_state::Empty> {
+impl ContributorConfig<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ContributorConfigBuilder<
+        contributor_config_state::Empty,
+        DefaultStr,
+    > {
         ContributorConfigBuilder::new()
     }
 }
 
-impl<S: BosStr> ContributorConfigBuilder<S, contributor_config_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ContributorConfig<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ContributorConfigBuilder<contributor_config_state::Empty, S> {
+        ContributorConfigBuilder::builder()
+    }
+}
+
+impl ContributorConfigBuilder<contributor_config_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ContributorConfigBuilder {
             _state: PhantomData,
@@ -1026,7 +1053,18 @@ impl<S: BosStr> ContributorConfigBuilder<S, contributor_config_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ContributorConfigBuilder<S, St>
+impl<S: BosStr> ContributorConfigBuilder<contributor_config_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ContributorConfigBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ContributorConfigBuilder<St, S>
 where
     St: contributor_config_state::State,
     St::Contributor: contributor_config_state::IsUnset,
@@ -1035,7 +1073,7 @@ where
     pub fn contributor(
         mut self,
         value: impl Into<ContributorConfigContributor<S>>,
-    ) -> ContributorConfigBuilder<S, contributor_config_state::SetContributor<St>> {
+    ) -> ContributorConfigBuilder<contributor_config_state::SetContributor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ContributorConfigBuilder {
             _state: PhantomData,
@@ -1045,7 +1083,7 @@ where
     }
 }
 
-impl<S: BosStr, St: contributor_config_state::State> ContributorConfigBuilder<S, St> {
+impl<St: contributor_config_state::State, S: BosStr> ContributorConfigBuilder<St, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -1058,7 +1096,7 @@ impl<S: BosStr, St: contributor_config_state::State> ContributorConfigBuilder<S,
     }
 }
 
-impl<S: BosStr, St: contributor_config_state::State> ContributorConfigBuilder<S, St> {
+impl<St: contributor_config_state::State, S: BosStr> ContributorConfigBuilder<St, S> {
     /// Set the `hoverIframeUrl` field (optional)
     pub fn hover_iframe_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -1071,20 +1109,26 @@ impl<S: BosStr, St: contributor_config_state::State> ContributorConfigBuilder<S,
     }
 }
 
-impl<S: BosStr, St: contributor_config_state::State> ContributorConfigBuilder<S, St> {
+impl<St: contributor_config_state::State, S: BosStr> ContributorConfigBuilder<St, S> {
     /// Set the `hoverImage` field (optional)
-    pub fn hover_image(mut self, value: impl Into<Option<ContributorConfigHoverImage<S>>>) -> Self {
+    pub fn hover_image(
+        mut self,
+        value: impl Into<Option<ContributorConfigHoverImage<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `hoverImage` field to an Option value (optional)
-    pub fn maybe_hover_image(mut self, value: Option<ContributorConfigHoverImage<S>>) -> Self {
+    pub fn maybe_hover_image(
+        mut self,
+        value: Option<ContributorConfigHoverImage<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
 }
 
-impl<S: BosStr, St: contributor_config_state::State> ContributorConfigBuilder<S, St> {
+impl<St: contributor_config_state::State, S: BosStr> ContributorConfigBuilder<St, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<ContributorConfigImage<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -1097,7 +1141,7 @@ impl<S: BosStr, St: contributor_config_state::State> ContributorConfigBuilder<S,
     }
 }
 
-impl<S: BosStr, St: contributor_config_state::State> ContributorConfigBuilder<S, St> {
+impl<St: contributor_config_state::State, S: BosStr> ContributorConfigBuilder<St, S> {
     /// Set the `override` field (optional)
     pub fn r#override(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.5 = value.into();
@@ -1110,7 +1154,7 @@ impl<S: BosStr, St: contributor_config_state::State> ContributorConfigBuilder<S,
     }
 }
 
-impl<S: BosStr, St: contributor_config_state::State> ContributorConfigBuilder<S, St> {
+impl<St: contributor_config_state::State, S: BosStr> ContributorConfigBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -1123,7 +1167,7 @@ impl<S: BosStr, St: contributor_config_state::State> ContributorConfigBuilder<S,
     }
 }
 
-impl<S: BosStr, St: contributor_config_state::State> ContributorConfigBuilder<S, St> {
+impl<St: contributor_config_state::State, S: BosStr> ContributorConfigBuilder<St, S> {
     /// Set the `video` field (optional)
     pub fn video(mut self, value: impl Into<Option<ContributorConfigVideo<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -1136,7 +1180,7 @@ impl<S: BosStr, St: contributor_config_state::State> ContributorConfigBuilder<S,
     }
 }
 
-impl<S: BosStr, St> ContributorConfigBuilder<S, St>
+impl<St, S: BosStr> ContributorConfigBuilder<St, S>
 where
     St: contributor_config_state::State,
     St::Contributor: contributor_config_state::IsSet,
@@ -1156,7 +1200,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ContributorConfig<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ContributorConfig<S> {
         ContributorConfig {
             contributor: self._fields.0.unwrap(),
             display_name: self._fields.1,
@@ -1173,7 +1220,7 @@ where
 
 pub mod board_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1216,7 +1263,7 @@ pub mod board_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BoardBuilder<S: BosStr, St: board_state::State> {
+pub struct BoardBuilder<St: board_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<board::BoardConfig<S>>,
@@ -1227,15 +1274,22 @@ pub struct BoardBuilder<S: BosStr, St: board_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Board<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BoardBuilder<S, board_state::Empty> {
+impl Board<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BoardBuilder<board_state::Empty, DefaultStr> {
         BoardBuilder::new()
     }
 }
 
-impl<S: BosStr> BoardBuilder<S, board_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Board<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BoardBuilder<board_state::Empty, S> {
+        BoardBuilder::builder()
+    }
+}
+
+impl BoardBuilder<board_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BoardBuilder {
             _state: PhantomData,
@@ -1245,7 +1299,18 @@ impl<S: BosStr> BoardBuilder<S, board_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: board_state::State> BoardBuilder<S, St> {
+impl<S: BosStr> BoardBuilder<board_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BoardBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: board_state::State, S: BosStr> BoardBuilder<St, S> {
     /// Set the `config` field (optional)
     pub fn config(mut self, value: impl Into<Option<board::BoardConfig<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1258,7 +1323,7 @@ impl<S: BosStr, St: board_state::State> BoardBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: board_state::State> BoardBuilder<S, St> {
+impl<St: board_state::State, S: BosStr> BoardBuilder<St, S> {
     /// Set the `contributorConfigs` field (optional)
     pub fn contributor_configs(
         mut self,
@@ -1277,7 +1342,7 @@ impl<S: BosStr, St: board_state::State> BoardBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BoardBuilder<S, St>
+impl<St, S: BosStr> BoardBuilder<St, S>
 where
     St: board_state::State,
     St::CreatedAt: board_state::IsUnset,
@@ -1286,7 +1351,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BoardBuilder<S, board_state::SetCreatedAt<St>> {
+    ) -> BoardBuilder<board_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         BoardBuilder {
             _state: PhantomData,
@@ -1296,7 +1361,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BoardBuilder<S, St>
+impl<St, S: BosStr> BoardBuilder<St, S>
 where
     St: board_state::State,
     St::Subject: board_state::IsUnset,
@@ -1305,7 +1370,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> BoardBuilder<S, board_state::SetSubject<St>> {
+    ) -> BoardBuilder<board_state::SetSubject<St>, S> {
         self._fields.3 = Option::Some(value.into());
         BoardBuilder {
             _state: PhantomData,
@@ -1315,7 +1380,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BoardBuilder<S, St>
+impl<St, S: BosStr> BoardBuilder<St, S>
 where
     St: board_state::State,
     St::Subject: board_state::IsSet,

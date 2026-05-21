@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_germnetwork::declaration;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_germnetwork::declaration;
 /// A declaration of a Germ Network account
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -69,11 +69,9 @@ pub struct DeclarationGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Declaration<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageMe<S: BosStr = DefaultStr> {
     ///A URL to present to an account that does not have its own com.germnetwork.declaration record, must have an empty fragment component, where the app should fill in the fragment component with the DIDs of the two accounts who wish to message each other
     pub message_me_url: UriValue<S>,
@@ -161,7 +159,9 @@ where
             MessageMeShowButtonTo::None => MessageMeShowButtonTo::None,
             MessageMeShowButtonTo::UsersIFollow => MessageMeShowButtonTo::UsersIFollow,
             MessageMeShowButtonTo::Everyone => MessageMeShowButtonTo::Everyone,
-            MessageMeShowButtonTo::Other(v) => MessageMeShowButtonTo::Other(v.into_static()),
+            MessageMeShowButtonTo::Other(v) => {
+                MessageMeShowButtonTo::Other(v.into_static())
+            }
         }
     }
 }
@@ -307,7 +307,7 @@ impl<S: BosStr> LexiconSchema for MessageMe<S> {
 
 pub mod declaration_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -350,7 +350,7 @@ pub mod declaration_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeclarationBuilder<S: BosStr, St: declaration_state::State> {
+pub struct DeclarationBuilder<St: declaration_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<Bytes>>,
@@ -362,15 +362,22 @@ pub struct DeclarationBuilder<S: BosStr, St: declaration_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Declaration<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DeclarationBuilder<S, declaration_state::Empty> {
+impl Declaration<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DeclarationBuilder<declaration_state::Empty, DefaultStr> {
         DeclarationBuilder::new()
     }
 }
 
-impl<S: BosStr> DeclarationBuilder<S, declaration_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Declaration<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DeclarationBuilder<declaration_state::Empty, S> {
+        DeclarationBuilder::builder()
+    }
+}
+
+impl DeclarationBuilder<declaration_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DeclarationBuilder {
             _state: PhantomData,
@@ -380,7 +387,18 @@ impl<S: BosStr> DeclarationBuilder<S, declaration_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
+impl<S: BosStr> DeclarationBuilder<declaration_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DeclarationBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: declaration_state::State, S: BosStr> DeclarationBuilder<St, S> {
     /// Set the `continuityProofs` field (optional)
     pub fn continuity_proofs(mut self, value: impl Into<Option<Vec<Bytes>>>) -> Self {
         self._fields.0 = value.into();
@@ -393,7 +411,7 @@ impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DeclarationBuilder<S, St>
+impl<St, S: BosStr> DeclarationBuilder<St, S>
 where
     St: declaration_state::State,
     St::CurrentKey: declaration_state::IsUnset,
@@ -402,7 +420,7 @@ where
     pub fn current_key(
         mut self,
         value: impl Into<Bytes>,
-    ) -> DeclarationBuilder<S, declaration_state::SetCurrentKey<St>> {
+    ) -> DeclarationBuilder<declaration_state::SetCurrentKey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DeclarationBuilder {
             _state: PhantomData,
@@ -412,7 +430,7 @@ where
     }
 }
 
-impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
+impl<St: declaration_state::State, S: BosStr> DeclarationBuilder<St, S> {
     /// Set the `keyPackage` field (optional)
     pub fn key_package(mut self, value: impl Into<Option<Bytes>>) -> Self {
         self._fields.2 = value.into();
@@ -425,9 +443,12 @@ impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
+impl<St: declaration_state::State, S: BosStr> DeclarationBuilder<St, S> {
     /// Set the `messageMe` field (optional)
-    pub fn message_me(mut self, value: impl Into<Option<declaration::MessageMe<S>>>) -> Self {
+    pub fn message_me(
+        mut self,
+        value: impl Into<Option<declaration::MessageMe<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -438,7 +459,7 @@ impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DeclarationBuilder<S, St>
+impl<St, S: BosStr> DeclarationBuilder<St, S>
 where
     St: declaration_state::State,
     St::Version: declaration_state::IsUnset,
@@ -447,7 +468,7 @@ where
     pub fn version(
         mut self,
         value: impl Into<S>,
-    ) -> DeclarationBuilder<S, declaration_state::SetVersion<St>> {
+    ) -> DeclarationBuilder<declaration_state::SetVersion<St>, S> {
         self._fields.4 = Option::Some(value.into());
         DeclarationBuilder {
             _state: PhantomData,
@@ -457,7 +478,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeclarationBuilder<S, St>
+impl<St, S: BosStr> DeclarationBuilder<St, S>
 where
     St: declaration_state::State,
     St::Version: declaration_state::IsSet,
@@ -475,7 +496,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Declaration<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Declaration<S> {
         Declaration {
             continuity_proofs: self._fields.0,
             current_key: self._fields.1.unwrap(),
@@ -488,10 +512,10 @@ where
 }
 
 fn lexicon_doc_com_germnetwork_declaration() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.germnetwork.declaration"),
@@ -616,7 +640,7 @@ fn lexicon_doc_com_germnetwork_declaration() -> LexiconDoc<'static> {
 
 pub mod message_me_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -659,21 +683,28 @@ pub mod message_me_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MessageMeBuilder<S: BosStr, St: message_me_state::State> {
+pub struct MessageMeBuilder<St: message_me_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>, Option<MessageMeShowButtonTo<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> MessageMe<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MessageMeBuilder<S, message_me_state::Empty> {
+impl MessageMe<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MessageMeBuilder<message_me_state::Empty, DefaultStr> {
         MessageMeBuilder::new()
     }
 }
 
-impl<S: BosStr> MessageMeBuilder<S, message_me_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> MessageMe<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MessageMeBuilder<message_me_state::Empty, S> {
+        MessageMeBuilder::builder()
+    }
+}
+
+impl MessageMeBuilder<message_me_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MessageMeBuilder {
             _state: PhantomData,
@@ -683,7 +714,18 @@ impl<S: BosStr> MessageMeBuilder<S, message_me_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MessageMeBuilder<S, St>
+impl<S: BosStr> MessageMeBuilder<message_me_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MessageMeBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MessageMeBuilder<St, S>
 where
     St: message_me_state::State,
     St::MessageMeUrl: message_me_state::IsUnset,
@@ -692,7 +734,7 @@ where
     pub fn message_me_url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> MessageMeBuilder<S, message_me_state::SetMessageMeUrl<St>> {
+    ) -> MessageMeBuilder<message_me_state::SetMessageMeUrl<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MessageMeBuilder {
             _state: PhantomData,
@@ -702,7 +744,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageMeBuilder<S, St>
+impl<St, S: BosStr> MessageMeBuilder<St, S>
 where
     St: message_me_state::State,
     St::ShowButtonTo: message_me_state::IsUnset,
@@ -711,7 +753,7 @@ where
     pub fn show_button_to(
         mut self,
         value: impl Into<MessageMeShowButtonTo<S>>,
-    ) -> MessageMeBuilder<S, message_me_state::SetShowButtonTo<St>> {
+    ) -> MessageMeBuilder<message_me_state::SetShowButtonTo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         MessageMeBuilder {
             _state: PhantomData,
@@ -721,7 +763,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MessageMeBuilder<S, St>
+impl<St, S: BosStr> MessageMeBuilder<St, S>
 where
     St: message_me_state::State,
     St::MessageMeUrl: message_me_state::IsSet,
@@ -736,7 +778,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MessageMe<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MessageMe<S> {
         MessageMe {
             message_me_url: self._fields.0.unwrap(),
             show_button_to: self._fields.1.unwrap(),

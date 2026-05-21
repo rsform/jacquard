@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
 use crate::social_showcase::CollectionView;
 use crate::social_showcase::ItemView;
 use crate::social_showcase::ProfileView;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchPosts<S: BosStr = DefaultStr> {
     ///(max length: 512)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -38,11 +35,9 @@ pub struct SearchPosts<S: BosStr = DefaultStr> {
     pub r#type: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchPostsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -50,6 +45,7 @@ pub struct SearchPostsOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -93,7 +89,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_posts_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -124,21 +120,28 @@ pub mod search_posts_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchPostsBuilder<S: BosStr, St: search_posts_state::State> {
+pub struct SearchPostsBuilder<St: search_posts_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SearchPosts<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SearchPostsBuilder<S, search_posts_state::Empty> {
+impl SearchPosts<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SearchPostsBuilder<search_posts_state::Empty, DefaultStr> {
         SearchPostsBuilder::new()
     }
 }
 
-impl<S: BosStr> SearchPostsBuilder<S, search_posts_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SearchPosts<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SearchPostsBuilder<search_posts_state::Empty, S> {
+        SearchPostsBuilder::builder()
+    }
+}
+
+impl SearchPostsBuilder<search_posts_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SearchPostsBuilder {
             _state: PhantomData,
@@ -148,7 +151,18 @@ impl<S: BosStr> SearchPostsBuilder<S, search_posts_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
+impl<S: BosStr> SearchPostsBuilder<search_posts_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SearchPostsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -161,7 +175,7 @@ impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
+impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -174,13 +188,16 @@ impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SearchPostsBuilder<S, St>
+impl<St, S: BosStr> SearchPostsBuilder<St, S>
 where
     St: search_posts_state::State,
     St::Q: search_posts_state::IsUnset,
 {
     /// Set the `q` field (required)
-    pub fn q(mut self, value: impl Into<S>) -> SearchPostsBuilder<S, search_posts_state::SetQ<St>> {
+    pub fn q(
+        mut self,
+        value: impl Into<S>,
+    ) -> SearchPostsBuilder<search_posts_state::SetQ<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SearchPostsBuilder {
             _state: PhantomData,
@@ -190,7 +207,7 @@ where
     }
 }
 
-impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
+impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `type` field (optional)
     pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -203,7 +220,7 @@ impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SearchPostsBuilder<S, St>
+impl<St, S: BosStr> SearchPostsBuilder<St, S>
 where
     St: search_posts_state::State,
     St::Q: search_posts_state::IsSet,

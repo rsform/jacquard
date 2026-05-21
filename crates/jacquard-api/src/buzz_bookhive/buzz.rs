@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Record containing a Bookhive comment.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -133,7 +133,7 @@ impl<S: BosStr> LexiconSchema for Buzz<S> {
 
 pub mod buzz_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -142,90 +142,92 @@ pub mod buzz_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Comment;
-        type Book;
-        type CreatedAt;
         type Parent;
+        type CreatedAt;
+        type Book;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Comment = Unset;
-        type Book = Unset;
-        type CreatedAt = Unset;
         type Parent = Unset;
+        type CreatedAt = Unset;
+        type Book = Unset;
     }
     ///State transition - sets the `comment` field to Set
     pub struct SetComment<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetComment<St> {}
     impl<St: State> State for SetComment<St> {
         type Comment = Set<members::comment>;
-        type Book = St::Book;
+        type Parent = St::Parent;
         type CreatedAt = St::CreatedAt;
-        type Parent = St::Parent;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBook<St> {}
-    impl<St: State> State for SetBook<St> {
-        type Comment = St::Comment;
-        type Book = Set<members::book>;
-        type CreatedAt = St::CreatedAt;
-        type Parent = St::Parent;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Comment = St::Comment;
         type Book = St::Book;
-        type CreatedAt = Set<members::created_at>;
-        type Parent = St::Parent;
     }
     ///State transition - sets the `parent` field to Set
     pub struct SetParent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetParent<St> {}
     impl<St: State> State for SetParent<St> {
         type Comment = St::Comment;
-        type Book = St::Book;
-        type CreatedAt = St::CreatedAt;
         type Parent = Set<members::parent>;
+        type CreatedAt = St::CreatedAt;
+        type Book = St::Book;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Comment = St::Comment;
+        type Parent = St::Parent;
+        type CreatedAt = Set<members::created_at>;
+        type Book = St::Book;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBook<St> {}
+    impl<St: State> State for SetBook<St> {
+        type Comment = St::Comment;
+        type Parent = St::Parent;
+        type CreatedAt = St::CreatedAt;
+        type Book = Set<members::book>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `comment` field
         pub struct comment(());
-        ///Marker type for the `book` field
-        pub struct book(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `parent` field
         pub struct parent(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `book` field
+        pub struct book(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BuzzBuilder<S: BosStr, St: buzz_state::State> {
+pub struct BuzzBuilder<St: buzz_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<StrongRef<S>>,
-        Option<S>,
-        Option<Datetime>,
-        Option<StrongRef<S>>,
-    ),
+    _fields: (Option<StrongRef<S>>, Option<S>, Option<Datetime>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Buzz<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BuzzBuilder<S, buzz_state::Empty> {
+impl Buzz<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BuzzBuilder<buzz_state::Empty, DefaultStr> {
         BuzzBuilder::new()
     }
 }
 
-impl<S: BosStr> BuzzBuilder<S, buzz_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Buzz<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BuzzBuilder<buzz_state::Empty, S> {
+        BuzzBuilder::builder()
+    }
+}
+
+impl BuzzBuilder<buzz_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BuzzBuilder {
             _state: PhantomData,
@@ -235,7 +237,18 @@ impl<S: BosStr> BuzzBuilder<S, buzz_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BuzzBuilder<S, St>
+impl<S: BosStr> BuzzBuilder<buzz_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BuzzBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BuzzBuilder<St, S>
 where
     St: buzz_state::State,
     St::Book: buzz_state::IsUnset,
@@ -244,7 +257,7 @@ where
     pub fn book(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> BuzzBuilder<S, buzz_state::SetBook<St>> {
+    ) -> BuzzBuilder<buzz_state::SetBook<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BuzzBuilder {
             _state: PhantomData,
@@ -254,13 +267,16 @@ where
     }
 }
 
-impl<S: BosStr, St> BuzzBuilder<S, St>
+impl<St, S: BosStr> BuzzBuilder<St, S>
 where
     St: buzz_state::State,
     St::Comment: buzz_state::IsUnset,
 {
     /// Set the `comment` field (required)
-    pub fn comment(mut self, value: impl Into<S>) -> BuzzBuilder<S, buzz_state::SetComment<St>> {
+    pub fn comment(
+        mut self,
+        value: impl Into<S>,
+    ) -> BuzzBuilder<buzz_state::SetComment<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BuzzBuilder {
             _state: PhantomData,
@@ -270,7 +286,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BuzzBuilder<S, St>
+impl<St, S: BosStr> BuzzBuilder<St, S>
 where
     St: buzz_state::State,
     St::CreatedAt: buzz_state::IsUnset,
@@ -279,7 +295,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BuzzBuilder<S, buzz_state::SetCreatedAt<St>> {
+    ) -> BuzzBuilder<buzz_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         BuzzBuilder {
             _state: PhantomData,
@@ -289,7 +305,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BuzzBuilder<S, St>
+impl<St, S: BosStr> BuzzBuilder<St, S>
 where
     St: buzz_state::State,
     St::Parent: buzz_state::IsUnset,
@@ -298,7 +314,7 @@ where
     pub fn parent(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> BuzzBuilder<S, buzz_state::SetParent<St>> {
+    ) -> BuzzBuilder<buzz_state::SetParent<St>, S> {
         self._fields.3 = Option::Some(value.into());
         BuzzBuilder {
             _state: PhantomData,
@@ -308,13 +324,13 @@ where
     }
 }
 
-impl<S: BosStr, St> BuzzBuilder<S, St>
+impl<St, S: BosStr> BuzzBuilder<St, S>
 where
     St: buzz_state::State,
     St::Comment: buzz_state::IsSet,
-    St::Book: buzz_state::IsSet,
-    St::CreatedAt: buzz_state::IsSet,
     St::Parent: buzz_state::IsSet,
+    St::CreatedAt: buzz_state::IsSet,
+    St::Book: buzz_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Buzz<S> {
@@ -339,10 +355,10 @@ where
 }
 
 fn lexicon_doc_buzz_bookhive_buzz() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("buzz.bookhive.buzz"),

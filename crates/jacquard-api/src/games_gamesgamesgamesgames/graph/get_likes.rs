@@ -10,27 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetLikes<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetLikesOutput<S: BosStr = DefaultStr> {
     ///Total number of likes on this game.
     pub count: i64,
@@ -66,7 +61,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetLikesRequest {
 
 pub mod get_likes_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -97,21 +92,28 @@ pub mod get_likes_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetLikesBuilder<S: BosStr, St: get_likes_state::State> {
+pub struct GetLikesBuilder<St: get_likes_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetLikes<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetLikesBuilder<S, get_likes_state::Empty> {
+impl GetLikes<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetLikesBuilder<get_likes_state::Empty, DefaultStr> {
         GetLikesBuilder::new()
     }
 }
 
-impl<S: BosStr> GetLikesBuilder<S, get_likes_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetLikes<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetLikesBuilder<get_likes_state::Empty, S> {
+        GetLikesBuilder::builder()
+    }
+}
+
+impl GetLikesBuilder<get_likes_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetLikesBuilder {
             _state: PhantomData,
@@ -121,7 +123,18 @@ impl<S: BosStr> GetLikesBuilder<S, get_likes_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetLikesBuilder<S, St>
+impl<S: BosStr> GetLikesBuilder<get_likes_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetLikesBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetLikesBuilder<St, S>
 where
     St: get_likes_state::State,
     St::Uri: get_likes_state::IsUnset,
@@ -130,7 +143,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetLikesBuilder<S, get_likes_state::SetUri<St>> {
+    ) -> GetLikesBuilder<get_likes_state::SetUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetLikesBuilder {
             _state: PhantomData,
@@ -140,7 +153,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetLikesBuilder<S, St>
+impl<St, S: BosStr> GetLikesBuilder<St, S>
 where
     St: get_likes_state::State,
     St::Uri: get_likes_state::IsSet,

@@ -20,6 +20,9 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::fyi_questionable::richtext::blockquote::Blockquote;
 use crate::fyi_questionable::richtext::bsky_post::BskyPost;
 use crate::fyi_questionable::richtext::code::Code;
@@ -30,21 +33,16 @@ use crate::fyi_questionable::richtext::list::List;
 use crate::fyi_questionable::richtext::math::Math;
 use crate::fyi_questionable::richtext::text::Text;
 use crate::fyi_questionable::richtext::website::Website;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Content<S: BosStr = DefaultStr> {
     ///Array of content blocks
     pub items: Vec<ContentItemsItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -100,7 +98,7 @@ impl<S: BosStr> LexiconSchema for Content<S> {
 
 pub mod content_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -131,21 +129,28 @@ pub mod content_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ContentBuilder<S: BosStr, St: content_state::State> {
+pub struct ContentBuilder<St: content_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<ContentItemsItem<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Content<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ContentBuilder<S, content_state::Empty> {
+impl Content<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ContentBuilder<content_state::Empty, DefaultStr> {
         ContentBuilder::new()
     }
 }
 
-impl<S: BosStr> ContentBuilder<S, content_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Content<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ContentBuilder<content_state::Empty, S> {
+        ContentBuilder::builder()
+    }
+}
+
+impl ContentBuilder<content_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ContentBuilder {
             _state: PhantomData,
@@ -155,7 +160,18 @@ impl<S: BosStr> ContentBuilder<S, content_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ContentBuilder<S, St>
+impl<S: BosStr> ContentBuilder<content_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ContentBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ContentBuilder<St, S>
 where
     St: content_state::State,
     St::Items: content_state::IsUnset,
@@ -164,7 +180,7 @@ where
     pub fn items(
         mut self,
         value: impl Into<Vec<ContentItemsItem<S>>>,
-    ) -> ContentBuilder<S, content_state::SetItems<St>> {
+    ) -> ContentBuilder<content_state::SetItems<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ContentBuilder {
             _state: PhantomData,
@@ -174,7 +190,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ContentBuilder<S, St>
+impl<St, S: BosStr> ContentBuilder<St, S>
 where
     St: content_state::State,
     St::Items: content_state::IsSet,
@@ -196,10 +212,10 @@ where
 }
 
 fn lexicon_doc_fyi_questionable_richtext_content() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fyi.questionable.richtext.content"),
@@ -215,7 +231,9 @@ fn lexicon_doc_fyi_questionable_richtext_content() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("items"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static("Array of content blocks")),
+                                description: Some(
+                                    CowStr::new_static("Array of content blocks"),
+                                ),
                                 items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("fyi.questionable.richtext.text"),
@@ -223,14 +241,12 @@ fn lexicon_doc_fyi_questionable_richtext_content() -> LexiconDoc<'static> {
                                         CowStr::new_static("fyi.questionable.richtext.bskyPost"),
                                         CowStr::new_static("fyi.questionable.richtext.code"),
                                         CowStr::new_static("fyi.questionable.richtext.header"),
-                                        CowStr::new_static(
-                                            "fyi.questionable.richtext.horizontalRule",
-                                        ),
+                                        CowStr::new_static("fyi.questionable.richtext.horizontalRule"),
                                         CowStr::new_static("fyi.questionable.richtext.image"),
                                         CowStr::new_static("fyi.questionable.richtext.math"),
                                         CowStr::new_static("fyi.questionable.richtext.text"),
                                         CowStr::new_static("fyi.questionable.richtext.list"),
-                                        CowStr::new_static("fyi.questionable.richtext.website"),
+                                        CowStr::new_static("fyi.questionable.richtext.website")
                                     ],
                                     closed: Some(false),
                                     ..Default::default()

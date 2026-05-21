@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A KidLisp code snippet from Aesthetic Computer
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -143,7 +143,7 @@ impl<S: BosStr> LexiconSchema for Kidlisp<S> {
 
 pub mod kidlisp_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -152,85 +152,92 @@ pub mod kidlisp_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Source;
+        type Code;
         type Ref;
         type When;
-        type Code;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Source = Unset;
+        type Code = Unset;
         type Ref = Unset;
         type When = Unset;
-        type Code = Unset;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSource<St> {}
     impl<St: State> State for SetSource<St> {
         type Source = Set<members::source>;
+        type Code = St::Code;
         type Ref = St::Ref;
         type When = St::When;
-        type Code = St::Code;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRef<St> {}
-    impl<St: State> State for SetRef<St> {
-        type Source = St::Source;
-        type Ref = Set<members::r#ref>;
-        type When = St::When;
-        type Code = St::Code;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWhen<St> {}
-    impl<St: State> State for SetWhen<St> {
-        type Source = St::Source;
-        type Ref = St::Ref;
-        type When = Set<members::when>;
-        type Code = St::Code;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCode<St> {}
     impl<St: State> State for SetCode<St> {
         type Source = St::Source;
+        type Code = Set<members::code>;
         type Ref = St::Ref;
         type When = St::When;
-        type Code = Set<members::code>;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRef<St> {}
+    impl<St: State> State for SetRef<St> {
+        type Source = St::Source;
+        type Code = St::Code;
+        type Ref = Set<members::r#ref>;
+        type When = St::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWhen<St> {}
+    impl<St: State> State for SetWhen<St> {
+        type Source = St::Source;
+        type Code = St::Code;
+        type Ref = St::Ref;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `source` field
         pub struct source(());
+        ///Marker type for the `code` field
+        pub struct code(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
         ///Marker type for the `when` field
         pub struct when(());
-        ///Marker type for the `code` field
-        pub struct code(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct KidlispBuilder<S: BosStr, St: kidlisp_state::State> {
+pub struct KidlispBuilder<St: kidlisp_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Kidlisp<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> KidlispBuilder<S, kidlisp_state::Empty> {
+impl Kidlisp<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> KidlispBuilder<kidlisp_state::Empty, DefaultStr> {
         KidlispBuilder::new()
     }
 }
 
-impl<S: BosStr> KidlispBuilder<S, kidlisp_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Kidlisp<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> KidlispBuilder<kidlisp_state::Empty, S> {
+        KidlispBuilder::builder()
+    }
+}
+
+impl KidlispBuilder<kidlisp_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         KidlispBuilder {
             _state: PhantomData,
@@ -240,13 +247,27 @@ impl<S: BosStr> KidlispBuilder<S, kidlisp_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> KidlispBuilder<S, St>
+impl<S: BosStr> KidlispBuilder<kidlisp_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        KidlispBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> KidlispBuilder<St, S>
 where
     St: kidlisp_state::State,
     St::Code: kidlisp_state::IsUnset,
 {
     /// Set the `code` field (required)
-    pub fn code(mut self, value: impl Into<S>) -> KidlispBuilder<S, kidlisp_state::SetCode<St>> {
+    pub fn code(
+        mut self,
+        value: impl Into<S>,
+    ) -> KidlispBuilder<kidlisp_state::SetCode<St>, S> {
         self._fields.0 = Option::Some(value.into());
         KidlispBuilder {
             _state: PhantomData,
@@ -256,13 +277,16 @@ where
     }
 }
 
-impl<S: BosStr, St> KidlispBuilder<S, St>
+impl<St, S: BosStr> KidlispBuilder<St, S>
 where
     St: kidlisp_state::State,
     St::Ref: kidlisp_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(mut self, value: impl Into<S>) -> KidlispBuilder<S, kidlisp_state::SetRef<St>> {
+    pub fn r#ref(
+        mut self,
+        value: impl Into<S>,
+    ) -> KidlispBuilder<kidlisp_state::SetRef<St>, S> {
         self._fields.1 = Option::Some(value.into());
         KidlispBuilder {
             _state: PhantomData,
@@ -272,7 +296,7 @@ where
     }
 }
 
-impl<S: BosStr, St> KidlispBuilder<S, St>
+impl<St, S: BosStr> KidlispBuilder<St, S>
 where
     St: kidlisp_state::State,
     St::Source: kidlisp_state::IsUnset,
@@ -281,7 +305,7 @@ where
     pub fn source(
         mut self,
         value: impl Into<S>,
-    ) -> KidlispBuilder<S, kidlisp_state::SetSource<St>> {
+    ) -> KidlispBuilder<kidlisp_state::SetSource<St>, S> {
         self._fields.2 = Option::Some(value.into());
         KidlispBuilder {
             _state: PhantomData,
@@ -291,7 +315,7 @@ where
     }
 }
 
-impl<S: BosStr, St> KidlispBuilder<S, St>
+impl<St, S: BosStr> KidlispBuilder<St, S>
 where
     St: kidlisp_state::State,
     St::When: kidlisp_state::IsUnset,
@@ -300,7 +324,7 @@ where
     pub fn when(
         mut self,
         value: impl Into<Datetime>,
-    ) -> KidlispBuilder<S, kidlisp_state::SetWhen<St>> {
+    ) -> KidlispBuilder<kidlisp_state::SetWhen<St>, S> {
         self._fields.3 = Option::Some(value.into());
         KidlispBuilder {
             _state: PhantomData,
@@ -310,13 +334,13 @@ where
     }
 }
 
-impl<S: BosStr, St> KidlispBuilder<S, St>
+impl<St, S: BosStr> KidlispBuilder<St, S>
 where
     St: kidlisp_state::State,
     St::Source: kidlisp_state::IsSet,
+    St::Code: kidlisp_state::IsSet,
     St::Ref: kidlisp_state::IsSet,
     St::When: kidlisp_state::IsSet,
-    St::Code: kidlisp_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Kidlisp<S> {
@@ -341,10 +365,10 @@ where
 }
 
 fn lexicon_doc_computer_aesthetic_kidlisp() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("computer.aesthetic.kidlisp"),
@@ -353,26 +377,30 @@ fn lexicon_doc_computer_aesthetic_kidlisp() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A KidLisp code snippet from Aesthetic Computer",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A KidLisp code snippet from Aesthetic Computer",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("source"),
-                            SmolStr::new_static("code"),
-                            SmolStr::new_static("when"),
-                            SmolStr::new_static("ref"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("source"), SmolStr::new_static("code"),
+                                SmolStr::new_static("when"), SmolStr::new_static("ref")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("code"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Short alphanumeric code for easy lookup",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Short alphanumeric code for easy lookup",
+                                        ),
+                                    ),
                                     max_length: Some(10usize),
                                     ..Default::default()
                                 }),
@@ -380,9 +408,11 @@ fn lexicon_doc_computer_aesthetic_kidlisp() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("ref"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "MongoDB ObjectId reference for bidirectional sync",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "MongoDB ObjectId reference for bidirectional sync",
+                                        ),
+                                    ),
                                     max_length: Some(24usize),
                                     ..Default::default()
                                 }),
@@ -390,9 +420,9 @@ fn lexicon_doc_computer_aesthetic_kidlisp() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("source"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The KidLisp source code",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The KidLisp source code"),
+                                    ),
                                     max_length: Some(50000usize),
                                     ..Default::default()
                                 }),
@@ -400,9 +430,9 @@ fn lexicon_doc_computer_aesthetic_kidlisp() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("when"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Creation timestamp (ISO 8601)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Creation timestamp (ISO 8601)"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

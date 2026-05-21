@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::games_gamesgamesgamesgames::search_slugs;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::search_slugs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchSlugs<S: BosStr = DefaultStr> {
     ///Defaults to `10`. Max: 100.
     #[serde(default = "_default_limit")]
@@ -39,22 +36,18 @@ pub struct SearchSlugs<S: BosStr = DefaultStr> {
     pub slug: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchSlugsOutput<S: BosStr = DefaultStr> {
     pub slugs: Vec<search_slugs::SlugResult<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SlugResult<S: BosStr = DefaultStr> {
     pub r#ref: AtUri<S>,
     pub slug: S,
@@ -107,7 +100,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_slugs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -138,21 +131,28 @@ pub mod search_slugs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchSlugsBuilder<S: BosStr, St: search_slugs_state::State> {
+pub struct SearchSlugsBuilder<St: search_slugs_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SearchSlugs<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SearchSlugsBuilder<S, search_slugs_state::Empty> {
+impl SearchSlugs<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SearchSlugsBuilder<search_slugs_state::Empty, DefaultStr> {
         SearchSlugsBuilder::new()
     }
 }
 
-impl<S: BosStr> SearchSlugsBuilder<S, search_slugs_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SearchSlugs<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SearchSlugsBuilder<search_slugs_state::Empty, S> {
+        SearchSlugsBuilder::builder()
+    }
+}
+
+impl SearchSlugsBuilder<search_slugs_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SearchSlugsBuilder {
             _state: PhantomData,
@@ -162,7 +162,18 @@ impl<S: BosStr> SearchSlugsBuilder<S, search_slugs_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: search_slugs_state::State> SearchSlugsBuilder<S, St> {
+impl<S: BosStr> SearchSlugsBuilder<search_slugs_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SearchSlugsBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: search_slugs_state::State, S: BosStr> SearchSlugsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -175,7 +186,7 @@ impl<S: BosStr, St: search_slugs_state::State> SearchSlugsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SearchSlugsBuilder<S, St>
+impl<St, S: BosStr> SearchSlugsBuilder<St, S>
 where
     St: search_slugs_state::State,
     St::Slug: search_slugs_state::IsUnset,
@@ -184,7 +195,7 @@ where
     pub fn slug(
         mut self,
         value: impl Into<S>,
-    ) -> SearchSlugsBuilder<S, search_slugs_state::SetSlug<St>> {
+    ) -> SearchSlugsBuilder<search_slugs_state::SetSlug<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SearchSlugsBuilder {
             _state: PhantomData,
@@ -194,7 +205,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SearchSlugsBuilder<S, St>
+impl<St, S: BosStr> SearchSlugsBuilder<St, S>
 where
     St: search_slugs_state::State,
     St::Slug: search_slugs_state::IsSet,
@@ -210,7 +221,7 @@ where
 
 pub mod slug_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -218,56 +229,63 @@ pub mod slug_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
         type Ref;
+        type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSlug<St> {}
-    impl<St: State> State for SetSlug<St> {
-        type Slug = Set<members::slug>;
-        type Ref = St::Ref;
+        type Slug = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRef<St> {}
     impl<St: State> State for SetRef<St> {
-        type Slug = St::Slug;
         type Ref = Set<members::r#ref>;
+        type Slug = St::Slug;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlug<St> {}
+    impl<St: State> State for SetSlug<St> {
+        type Ref = St::Ref;
+        type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SlugResultBuilder<S: BosStr, St: slug_result_state::State> {
+pub struct SlugResultBuilder<St: slug_result_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SlugResult<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SlugResultBuilder<S, slug_result_state::Empty> {
+impl SlugResult<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SlugResultBuilder<slug_result_state::Empty, DefaultStr> {
         SlugResultBuilder::new()
     }
 }
 
-impl<S: BosStr> SlugResultBuilder<S, slug_result_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SlugResult<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SlugResultBuilder<slug_result_state::Empty, S> {
+        SlugResultBuilder::builder()
+    }
+}
+
+impl SlugResultBuilder<slug_result_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SlugResultBuilder {
             _state: PhantomData,
@@ -277,7 +295,18 @@ impl<S: BosStr> SlugResultBuilder<S, slug_result_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SlugResultBuilder<S, St>
+impl<S: BosStr> SlugResultBuilder<slug_result_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SlugResultBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SlugResultBuilder<St, S>
 where
     St: slug_result_state::State,
     St::Ref: slug_result_state::IsUnset,
@@ -286,7 +315,7 @@ where
     pub fn r#ref(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SlugResultBuilder<S, slug_result_state::SetRef<St>> {
+    ) -> SlugResultBuilder<slug_result_state::SetRef<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SlugResultBuilder {
             _state: PhantomData,
@@ -296,7 +325,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SlugResultBuilder<S, St>
+impl<St, S: BosStr> SlugResultBuilder<St, S>
 where
     St: slug_result_state::State,
     St::Slug: slug_result_state::IsUnset,
@@ -305,7 +334,7 @@ where
     pub fn slug(
         mut self,
         value: impl Into<S>,
-    ) -> SlugResultBuilder<S, slug_result_state::SetSlug<St>> {
+    ) -> SlugResultBuilder<slug_result_state::SetSlug<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SlugResultBuilder {
             _state: PhantomData,
@@ -315,11 +344,11 @@ where
     }
 }
 
-impl<S: BosStr, St> SlugResultBuilder<S, St>
+impl<St, S: BosStr> SlugResultBuilder<St, S>
 where
     St: slug_result_state::State,
-    St::Slug: slug_result_state::IsSet,
     St::Ref: slug_result_state::IsSet,
+    St::Slug: slug_result_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SlugResult<S> {
@@ -330,7 +359,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SlugResult<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SlugResult<S> {
         SlugResult {
             r#ref: self._fields.0.unwrap(),
             slug: self._fields.1.unwrap(),
@@ -340,10 +372,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_searchSlugs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.searchSlugs"),
@@ -352,42 +384,43 @@ fn lexicon_doc_games_gamesgamesgamesgames_searchSlugs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("slug")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("slug"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The slug value to search for.",
-                                    )),
-                                    min_length: Some(1usize),
-                                    max_length: Some(64usize),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("slug")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("slug"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("The slug value to search for."),
+                                        ),
+                                        min_length: Some(1usize),
+                                        max_length: Some(64usize),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("slugResult"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("slug"),
-                        SmolStr::new_static("ref"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("slug"), SmolStr::new_static("ref")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -400,9 +433,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_searchSlugs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("slug"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },

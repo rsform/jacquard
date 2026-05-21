@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,18 +24,15 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::at_margin::annotation;
-use crate::com_atproto::label::SelfLabels;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::label::SelfLabels;
+use crate::at_margin::annotation;
 /// Annotation body - the content of the annotation
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Body<S: BosStr = DefaultStr> {
     ///MIME type of the body content  Defaults to `"text/plain"`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -57,10 +54,7 @@ pub struct Body<S: BosStr = DefaultStr> {
 /// W3C CssSelector - select DOM elements by CSS selector
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CssSelector<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<S>,
@@ -73,10 +67,7 @@ pub struct CssSelector<S: BosStr = DefaultStr> {
 /// W3C FragmentSelector - select by URI fragment
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FragmentSelector<S: BosStr = DefaultStr> {
     ///Specification the fragment conforms to
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -92,10 +83,7 @@ pub struct FragmentSelector<S: BosStr = DefaultStr> {
 /// The client/agent that created this record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Generator<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub homepage: Option<UriValue<S>>,
@@ -248,7 +236,9 @@ where
             AnnotationMotivation::Editing => AnnotationMotivation::Editing,
             AnnotationMotivation::Questioning => AnnotationMotivation::Questioning,
             AnnotationMotivation::Assessing => AnnotationMotivation::Assessing,
-            AnnotationMotivation::Other(v) => AnnotationMotivation::Other(v.into_static()),
+            AnnotationMotivation::Other(v) => {
+                AnnotationMotivation::Other(v.into_static())
+            }
         }
     }
 }
@@ -267,10 +257,7 @@ pub struct AnnotationGetRecordOutput<S: BosStr = DefaultStr> {
 /// W3C RangeSelector - select range between two selectors
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RangeSelector<S: BosStr = DefaultStr> {
     ///Selector for range end
     pub end_selector: RangeSelectorEndSelector<S>,
@@ -281,6 +268,7 @@ pub struct RangeSelector<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -295,6 +283,7 @@ pub enum RangeSelectorEndSelector<S: BosStr = DefaultStr> {
     #[serde(rename = "at.margin.annotation#xpathSelector")]
     XpathSelector(Box<annotation::XpathSelector<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -313,10 +302,7 @@ pub enum RangeSelectorStartSelector<S: BosStr = DefaultStr> {
 /// W3C SpecificResource - the target with optional selector
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Target<S: BosStr = DefaultStr> {
     ///Selector to identify the specific segment
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -335,6 +321,7 @@ pub struct Target<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -357,10 +344,7 @@ pub enum TargetSelector<S: BosStr = DefaultStr> {
 /// W3C TextPositionSelector - select by character offsets
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TextPositionSelector<S: BosStr = DefaultStr> {
     ///Ending character position (exclusive)
     pub end: i64,
@@ -375,10 +359,7 @@ pub struct TextPositionSelector<S: BosStr = DefaultStr> {
 /// W3C TextQuoteSelector - select text by quoting it with context
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TextQuoteSelector<S: BosStr = DefaultStr> {
     ///The exact text to match
     pub exact: S,
@@ -397,10 +378,7 @@ pub struct TextQuoteSelector<S: BosStr = DefaultStr> {
 /// W3C TimeState - record when content was captured
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TimeState<S: BosStr = DefaultStr> {
     ///URL to cached/archived version
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -415,10 +393,7 @@ pub struct TimeState<S: BosStr = DefaultStr> {
 /// W3C XPathSelector - select by XPath expression
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct XpathSelector<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<S>,
@@ -806,10 +781,10 @@ impl Default for Body {
 }
 
 fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.margin.annotation"),
@@ -818,18 +793,20 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("body"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Annotation body - the content of the annotation",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Annotation body - the content of the annotation",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("format"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "MIME type of the body content",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("MIME type of the body content"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -843,9 +820,9 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Reference to external body content",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Reference to external body content"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -853,9 +830,9 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("value"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Text content of the annotation",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Text content of the annotation"),
+                                ),
                                 max_length: Some(10000usize),
                                 max_graphemes: Some(3000usize),
                                 ..Default::default()
@@ -869,23 +846,25 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("cssSelector"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "W3C CssSelector - select DOM elements by CSS selector",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "W3C CssSelector - select DOM elements by CSS selector",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("value")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("value"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("CSS selector string")),
+                                description: Some(
+                                    CowStr::new_static("CSS selector string"),
+                                ),
                                 max_length: Some(2000usize),
                                 ..Default::default()
                             }),
@@ -898,9 +877,11 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("fragmentSelector"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "W3C FragmentSelector - select by URI fragment",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "W3C FragmentSelector - select by URI fragment",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("value")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -908,23 +889,23 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("conformsTo"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Specification the fragment conforms to",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Specification the fragment conforms to"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("value"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Fragment identifier value")),
+                                description: Some(
+                                    CowStr::new_static("Fragment identifier value"),
+                                ),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
@@ -937,9 +918,9 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("generator"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "The client/agent that created this record",
-                    )),
+                    description: Some(
+                        CowStr::new_static("The client/agent that created this record"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -959,9 +940,7 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1070,25 +1049,31 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("rangeSelector"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "W3C RangeSelector - select range between two selectors",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("startSelector"),
-                        SmolStr::new_static("endSelector"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "W3C RangeSelector - select range between two selectors",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("startSelector"),
+                            SmolStr::new_static("endSelector")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("endSelector"),
                             LexObjectProperty::Union(LexRefUnion {
-                                description: Some(CowStr::new_static("Selector for range end")),
+                                description: Some(
+                                    CowStr::new_static("Selector for range end"),
+                                ),
                                 refs: vec![
                                     CowStr::new_static("#textQuoteSelector"),
                                     CowStr::new_static("#textPositionSelector"),
                                     CowStr::new_static("#cssSelector"),
-                                    CowStr::new_static("#xpathSelector"),
+                                    CowStr::new_static("#xpathSelector")
                                 ],
                                 ..Default::default()
                             }),
@@ -1096,21 +1081,21 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("startSelector"),
                             LexObjectProperty::Union(LexRefUnion {
-                                description: Some(CowStr::new_static("Selector for range start")),
+                                description: Some(
+                                    CowStr::new_static("Selector for range start"),
+                                ),
                                 refs: vec![
                                     CowStr::new_static("#textQuoteSelector"),
                                     CowStr::new_static("#textPositionSelector"),
                                     CowStr::new_static("#cssSelector"),
-                                    CowStr::new_static("#xpathSelector"),
+                                    CowStr::new_static("#xpathSelector")
                                 ],
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1120,9 +1105,11 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("target"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "W3C SpecificResource - the target with optional selector",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "W3C SpecificResource - the target with optional selector",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("source")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1130,16 +1117,18 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("selector"),
                             LexObjectProperty::Union(LexRefUnion {
-                                description: Some(CowStr::new_static(
-                                    "Selector to identify the specific segment",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Selector to identify the specific segment",
+                                    ),
+                                ),
                                 refs: vec![
                                     CowStr::new_static("#textQuoteSelector"),
                                     CowStr::new_static("#textPositionSelector"),
                                     CowStr::new_static("#cssSelector"),
                                     CowStr::new_static("#xpathSelector"),
                                     CowStr::new_static("#fragmentSelector"),
-                                    CowStr::new_static("#rangeSelector"),
+                                    CowStr::new_static("#rangeSelector")
                                 ],
                                 ..Default::default()
                             }),
@@ -1147,7 +1136,9 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("source"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URL being annotated")),
+                                description: Some(
+                                    CowStr::new_static("The URL being annotated"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -1155,9 +1146,11 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("sourceHash"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "SHA256 hash of normalized URL for indexing",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "SHA256 hash of normalized URL for indexing",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1171,9 +1164,9 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Page title at time of annotation",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Page title at time of annotation"),
+                                ),
                                 max_length: Some(500usize),
                                 ..Default::default()
                             }),
@@ -1186,13 +1179,14 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("textPositionSelector"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "W3C TextPositionSelector - select by character offsets",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("start"),
-                        SmolStr::new_static("end"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "W3C TextPositionSelector - select by character offsets",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("start"), SmolStr::new_static("end")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1212,9 +1206,7 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1224,9 +1216,11 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("textQuoteSelector"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "W3C TextQuoteSelector - select text by quoting it with context",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "W3C TextQuoteSelector - select text by quoting it with context",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("exact")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1234,7 +1228,9 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("exact"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The exact text to match")),
+                                description: Some(
+                                    CowStr::new_static("The exact text to match"),
+                                ),
                                 max_length: Some(5000usize),
                                 max_graphemes: Some(1500usize),
                                 ..Default::default()
@@ -1243,9 +1239,9 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("prefix"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Text immediately before the selection",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Text immediately before the selection"),
+                                ),
                                 max_length: Some(500usize),
                                 max_graphemes: Some(150usize),
                                 ..Default::default()
@@ -1254,9 +1250,9 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("suffix"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Text immediately after the selection",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Text immediately after the selection"),
+                                ),
                                 max_length: Some(500usize),
                                 max_graphemes: Some(150usize),
                                 ..Default::default()
@@ -1264,9 +1260,7 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1276,18 +1270,20 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("timeState"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "W3C TimeState - record when content was captured",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "W3C TimeState - record when content was captured",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cached"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URL to cached/archived version",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("URL to cached/archived version"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -1295,9 +1291,9 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("sourceDate"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the source was accessed",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When the source was accessed"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1310,18 +1306,18 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("xpathSelector"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "W3C XPathSelector - select by XPath expression",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "W3C XPathSelector - select by XPath expression",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("value")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("value"),
@@ -1344,7 +1340,7 @@ fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
 
 pub mod annotation_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1352,42 +1348,42 @@ pub mod annotation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Target;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Target = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Target = St::Target;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTarget<St> {}
     impl<St: State> State for SetTarget<St> {
-        type CreatedAt = St::CreatedAt;
         type Target = Set<members::target>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Target = St::Target;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `target` field
         pub struct target(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AnnotationBuilder<S: BosStr, St: annotation_state::State> {
+pub struct AnnotationBuilder<St: annotation_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<annotation::Body<S>>,
@@ -1402,15 +1398,22 @@ pub struct AnnotationBuilder<S: BosStr, St: annotation_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Annotation<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AnnotationBuilder<S, annotation_state::Empty> {
+impl Annotation<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AnnotationBuilder<annotation_state::Empty, DefaultStr> {
         AnnotationBuilder::new()
     }
 }
 
-impl<S: BosStr> AnnotationBuilder<S, annotation_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Annotation<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AnnotationBuilder<annotation_state::Empty, S> {
+        AnnotationBuilder::builder()
+    }
+}
+
+impl AnnotationBuilder<annotation_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AnnotationBuilder {
             _state: PhantomData,
@@ -1420,7 +1423,18 @@ impl<S: BosStr> AnnotationBuilder<S, annotation_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
+impl<S: BosStr> AnnotationBuilder<annotation_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AnnotationBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: annotation_state::State, S: BosStr> AnnotationBuilder<St, S> {
     /// Set the `body` field (optional)
     pub fn body(mut self, value: impl Into<Option<annotation::Body<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1433,7 +1447,7 @@ impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AnnotationBuilder<S, St>
+impl<St, S: BosStr> AnnotationBuilder<St, S>
 where
     St: annotation_state::State,
     St::CreatedAt: annotation_state::IsUnset,
@@ -1442,7 +1456,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AnnotationBuilder<S, annotation_state::SetCreatedAt<St>> {
+    ) -> AnnotationBuilder<annotation_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AnnotationBuilder {
             _state: PhantomData,
@@ -1452,9 +1466,12 @@ where
     }
 }
 
-impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
+impl<St: annotation_state::State, S: BosStr> AnnotationBuilder<St, S> {
     /// Set the `generator` field (optional)
-    pub fn generator(mut self, value: impl Into<Option<annotation::Generator<S>>>) -> Self {
+    pub fn generator(
+        mut self,
+        value: impl Into<Option<annotation::Generator<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -1465,7 +1482,7 @@ impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
+impl<St: annotation_state::State, S: BosStr> AnnotationBuilder<St, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -1478,9 +1495,12 @@ impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
+impl<St: annotation_state::State, S: BosStr> AnnotationBuilder<St, S> {
     /// Set the `motivation` field (optional)
-    pub fn motivation(mut self, value: impl Into<Option<AnnotationMotivation<S>>>) -> Self {
+    pub fn motivation(
+        mut self,
+        value: impl Into<Option<AnnotationMotivation<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -1491,7 +1511,7 @@ impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
+impl<St: annotation_state::State, S: BosStr> AnnotationBuilder<St, S> {
     /// Set the `rights` field (optional)
     pub fn rights(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -1504,7 +1524,7 @@ impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
+impl<St: annotation_state::State, S: BosStr> AnnotationBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -1517,7 +1537,7 @@ impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AnnotationBuilder<S, St>
+impl<St, S: BosStr> AnnotationBuilder<St, S>
 where
     St: annotation_state::State,
     St::Target: annotation_state::IsUnset,
@@ -1526,7 +1546,7 @@ where
     pub fn target(
         mut self,
         value: impl Into<annotation::Target<S>>,
-    ) -> AnnotationBuilder<S, annotation_state::SetTarget<St>> {
+    ) -> AnnotationBuilder<annotation_state::SetTarget<St>, S> {
         self._fields.7 = Option::Some(value.into());
         AnnotationBuilder {
             _state: PhantomData,
@@ -1536,11 +1556,11 @@ where
     }
 }
 
-impl<S: BosStr, St> AnnotationBuilder<S, St>
+impl<St, S: BosStr> AnnotationBuilder<St, S>
 where
     St: annotation_state::State,
-    St::CreatedAt: annotation_state::IsSet,
     St::Target: annotation_state::IsSet,
+    St::CreatedAt: annotation_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Annotation<S> {
@@ -1557,7 +1577,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Annotation<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Annotation<S> {
         Annotation {
             body: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -1574,7 +1597,7 @@ where
 
 pub mod range_selector_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1582,42 +1605,45 @@ pub mod range_selector_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartSelector;
         type EndSelector;
+        type StartSelector;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartSelector = Unset;
         type EndSelector = Unset;
-    }
-    ///State transition - sets the `start_selector` field to Set
-    pub struct SetStartSelector<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStartSelector<St> {}
-    impl<St: State> State for SetStartSelector<St> {
-        type StartSelector = Set<members::start_selector>;
-        type EndSelector = St::EndSelector;
+        type StartSelector = Unset;
     }
     ///State transition - sets the `end_selector` field to Set
     pub struct SetEndSelector<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEndSelector<St> {}
     impl<St: State> State for SetEndSelector<St> {
-        type StartSelector = St::StartSelector;
         type EndSelector = Set<members::end_selector>;
+        type StartSelector = St::StartSelector;
+    }
+    ///State transition - sets the `start_selector` field to Set
+    pub struct SetStartSelector<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartSelector<St> {}
+    impl<St: State> State for SetStartSelector<St> {
+        type EndSelector = St::EndSelector;
+        type StartSelector = Set<members::start_selector>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start_selector` field
-        pub struct start_selector(());
         ///Marker type for the `end_selector` field
         pub struct end_selector(());
+        ///Marker type for the `start_selector` field
+        pub struct start_selector(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RangeSelectorBuilder<S: BosStr, St: range_selector_state::State> {
+pub struct RangeSelectorBuilder<
+    St: range_selector_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<RangeSelectorEndSelector<S>>,
@@ -1627,15 +1653,22 @@ pub struct RangeSelectorBuilder<S: BosStr, St: range_selector_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RangeSelector<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RangeSelectorBuilder<S, range_selector_state::Empty> {
+impl RangeSelector<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RangeSelectorBuilder<range_selector_state::Empty, DefaultStr> {
         RangeSelectorBuilder::new()
     }
 }
 
-impl<S: BosStr> RangeSelectorBuilder<S, range_selector_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RangeSelector<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RangeSelectorBuilder<range_selector_state::Empty, S> {
+        RangeSelectorBuilder::builder()
+    }
+}
+
+impl RangeSelectorBuilder<range_selector_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RangeSelectorBuilder {
             _state: PhantomData,
@@ -1645,7 +1678,18 @@ impl<S: BosStr> RangeSelectorBuilder<S, range_selector_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RangeSelectorBuilder<S, St>
+impl<S: BosStr> RangeSelectorBuilder<range_selector_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RangeSelectorBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RangeSelectorBuilder<St, S>
 where
     St: range_selector_state::State,
     St::EndSelector: range_selector_state::IsUnset,
@@ -1654,7 +1698,7 @@ where
     pub fn end_selector(
         mut self,
         value: impl Into<RangeSelectorEndSelector<S>>,
-    ) -> RangeSelectorBuilder<S, range_selector_state::SetEndSelector<St>> {
+    ) -> RangeSelectorBuilder<range_selector_state::SetEndSelector<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RangeSelectorBuilder {
             _state: PhantomData,
@@ -1664,7 +1708,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RangeSelectorBuilder<S, St>
+impl<St, S: BosStr> RangeSelectorBuilder<St, S>
 where
     St: range_selector_state::State,
     St::StartSelector: range_selector_state::IsUnset,
@@ -1673,7 +1717,7 @@ where
     pub fn start_selector(
         mut self,
         value: impl Into<RangeSelectorStartSelector<S>>,
-    ) -> RangeSelectorBuilder<S, range_selector_state::SetStartSelector<St>> {
+    ) -> RangeSelectorBuilder<range_selector_state::SetStartSelector<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RangeSelectorBuilder {
             _state: PhantomData,
@@ -1683,7 +1727,7 @@ where
     }
 }
 
-impl<S: BosStr, St: range_selector_state::State> RangeSelectorBuilder<S, St> {
+impl<St: range_selector_state::State, S: BosStr> RangeSelectorBuilder<St, S> {
     /// Set the `type` field (optional)
     pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1696,11 +1740,11 @@ impl<S: BosStr, St: range_selector_state::State> RangeSelectorBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RangeSelectorBuilder<S, St>
+impl<St, S: BosStr> RangeSelectorBuilder<St, S>
 where
     St: range_selector_state::State,
-    St::StartSelector: range_selector_state::IsSet,
     St::EndSelector: range_selector_state::IsSet,
+    St::StartSelector: range_selector_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RangeSelector<S> {
@@ -1712,7 +1756,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RangeSelector<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RangeSelector<S> {
         RangeSelector {
             end_selector: self._fields.0.unwrap(),
             start_selector: self._fields.1.unwrap(),
@@ -1724,7 +1771,7 @@ where
 
 pub mod target_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1755,7 +1802,7 @@ pub mod target_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TargetBuilder<S: BosStr, St: target_state::State> {
+pub struct TargetBuilder<St: target_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<TargetSelector<S>>,
@@ -1767,15 +1814,22 @@ pub struct TargetBuilder<S: BosStr, St: target_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Target<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TargetBuilder<S, target_state::Empty> {
+impl Target<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TargetBuilder<target_state::Empty, DefaultStr> {
         TargetBuilder::new()
     }
 }
 
-impl<S: BosStr> TargetBuilder<S, target_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Target<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TargetBuilder<target_state::Empty, S> {
+        TargetBuilder::builder()
+    }
+}
+
+impl TargetBuilder<target_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TargetBuilder {
             _state: PhantomData,
@@ -1785,7 +1839,18 @@ impl<S: BosStr> TargetBuilder<S, target_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
+impl<S: BosStr> TargetBuilder<target_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TargetBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: target_state::State, S: BosStr> TargetBuilder<St, S> {
     /// Set the `selector` field (optional)
     pub fn selector(mut self, value: impl Into<Option<TargetSelector<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1798,7 +1863,7 @@ impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TargetBuilder<S, St>
+impl<St, S: BosStr> TargetBuilder<St, S>
 where
     St: target_state::State,
     St::Source: target_state::IsUnset,
@@ -1807,7 +1872,7 @@ where
     pub fn source(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> TargetBuilder<S, target_state::SetSource<St>> {
+    ) -> TargetBuilder<target_state::SetSource<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TargetBuilder {
             _state: PhantomData,
@@ -1817,7 +1882,7 @@ where
     }
 }
 
-impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
+impl<St: target_state::State, S: BosStr> TargetBuilder<St, S> {
     /// Set the `sourceHash` field (optional)
     pub fn source_hash(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1830,7 +1895,7 @@ impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
+impl<St: target_state::State, S: BosStr> TargetBuilder<St, S> {
     /// Set the `state` field (optional)
     pub fn state(mut self, value: impl Into<Option<annotation::TimeState<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -1843,7 +1908,7 @@ impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
+impl<St: target_state::State, S: BosStr> TargetBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -1856,7 +1921,7 @@ impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TargetBuilder<S, St>
+impl<St, S: BosStr> TargetBuilder<St, S>
 where
     St: target_state::State,
     St::Source: target_state::IsSet,
@@ -1887,7 +1952,7 @@ where
 
 pub mod text_position_selector_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1895,56 +1960,72 @@ pub mod text_position_selector_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Start;
         type End;
+        type Start;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Start = Unset;
         type End = Unset;
-    }
-    ///State transition - sets the `start` field to Set
-    pub struct SetStart<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStart<St> {}
-    impl<St: State> State for SetStart<St> {
-        type Start = Set<members::start>;
-        type End = St::End;
+        type Start = Unset;
     }
     ///State transition - sets the `end` field to Set
     pub struct SetEnd<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEnd<St> {}
     impl<St: State> State for SetEnd<St> {
-        type Start = St::Start;
         type End = Set<members::end>;
+        type Start = St::Start;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStart<St> {}
+    impl<St: State> State for SetStart<St> {
+        type End = St::End;
+        type Start = Set<members::start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start` field
-        pub struct start(());
         ///Marker type for the `end` field
         pub struct end(());
+        ///Marker type for the `start` field
+        pub struct start(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TextPositionSelectorBuilder<S: BosStr, St: text_position_selector_state::State> {
+pub struct TextPositionSelectorBuilder<
+    St: text_position_selector_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> TextPositionSelector<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TextPositionSelectorBuilder<S, text_position_selector_state::Empty> {
+impl TextPositionSelector<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TextPositionSelectorBuilder<
+        text_position_selector_state::Empty,
+        DefaultStr,
+    > {
         TextPositionSelectorBuilder::new()
     }
 }
 
-impl<S: BosStr> TextPositionSelectorBuilder<S, text_position_selector_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> TextPositionSelector<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TextPositionSelectorBuilder<
+        text_position_selector_state::Empty,
+        S,
+    > {
+        TextPositionSelectorBuilder::builder()
+    }
+}
+
+impl TextPositionSelectorBuilder<text_position_selector_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TextPositionSelectorBuilder {
             _state: PhantomData,
@@ -1954,7 +2035,18 @@ impl<S: BosStr> TextPositionSelectorBuilder<S, text_position_selector_state::Emp
     }
 }
 
-impl<S: BosStr, St> TextPositionSelectorBuilder<S, St>
+impl<S: BosStr> TextPositionSelectorBuilder<text_position_selector_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TextPositionSelectorBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> TextPositionSelectorBuilder<St, S>
 where
     St: text_position_selector_state::State,
     St::End: text_position_selector_state::IsUnset,
@@ -1963,7 +2055,7 @@ where
     pub fn end(
         mut self,
         value: impl Into<i64>,
-    ) -> TextPositionSelectorBuilder<S, text_position_selector_state::SetEnd<St>> {
+    ) -> TextPositionSelectorBuilder<text_position_selector_state::SetEnd<St>, S> {
         self._fields.0 = Option::Some(value.into());
         TextPositionSelectorBuilder {
             _state: PhantomData,
@@ -1973,7 +2065,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TextPositionSelectorBuilder<S, St>
+impl<St, S: BosStr> TextPositionSelectorBuilder<St, S>
 where
     St: text_position_selector_state::State,
     St::Start: text_position_selector_state::IsUnset,
@@ -1982,7 +2074,7 @@ where
     pub fn start(
         mut self,
         value: impl Into<i64>,
-    ) -> TextPositionSelectorBuilder<S, text_position_selector_state::SetStart<St>> {
+    ) -> TextPositionSelectorBuilder<text_position_selector_state::SetStart<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TextPositionSelectorBuilder {
             _state: PhantomData,
@@ -1992,7 +2084,10 @@ where
     }
 }
 
-impl<S: BosStr, St: text_position_selector_state::State> TextPositionSelectorBuilder<S, St> {
+impl<
+    St: text_position_selector_state::State,
+    S: BosStr,
+> TextPositionSelectorBuilder<St, S> {
     /// Set the `type` field (optional)
     pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -2005,11 +2100,11 @@ impl<S: BosStr, St: text_position_selector_state::State> TextPositionSelectorBui
     }
 }
 
-impl<S: BosStr, St> TextPositionSelectorBuilder<S, St>
+impl<St, S: BosStr> TextPositionSelectorBuilder<St, S>
 where
     St: text_position_selector_state::State,
-    St::Start: text_position_selector_state::IsSet,
     St::End: text_position_selector_state::IsSet,
+    St::Start: text_position_selector_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> TextPositionSelector<S> {

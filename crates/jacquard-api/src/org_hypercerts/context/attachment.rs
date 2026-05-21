@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,14 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::org_hypercerts::SmallBlob;
 use crate::org_hypercerts::Uri;
 use crate::pub_leaflet::pages::linear_document::LinearDocument;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// An attachment providing commentary, context, evidence, or documentary material related to a hypercert record (e.g. an activity, project, claim, or evaluation).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -70,6 +70,7 @@ pub struct Attachment<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -205,7 +206,7 @@ impl<S: BosStr> LexiconSchema for Attachment<S> {
 
 pub mod attachment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -248,7 +249,7 @@ pub mod attachment_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AttachmentBuilder<S: BosStr, St: attachment_state::State> {
+pub struct AttachmentBuilder<St: attachment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<AttachmentContentItem<S>>>,
@@ -264,15 +265,22 @@ pub struct AttachmentBuilder<S: BosStr, St: attachment_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Attachment<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AttachmentBuilder<S, attachment_state::Empty> {
+impl Attachment<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AttachmentBuilder<attachment_state::Empty, DefaultStr> {
         AttachmentBuilder::new()
     }
 }
 
-impl<S: BosStr> AttachmentBuilder<S, attachment_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Attachment<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AttachmentBuilder<attachment_state::Empty, S> {
+        AttachmentBuilder::builder()
+    }
+}
+
+impl AttachmentBuilder<attachment_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AttachmentBuilder {
             _state: PhantomData,
@@ -282,20 +290,37 @@ impl<S: BosStr> AttachmentBuilder<S, attachment_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: attachment_state::State> AttachmentBuilder<S, St> {
+impl<S: BosStr> AttachmentBuilder<attachment_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AttachmentBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: attachment_state::State, S: BosStr> AttachmentBuilder<St, S> {
     /// Set the `content` field (optional)
-    pub fn content(mut self, value: impl Into<Option<Vec<AttachmentContentItem<S>>>>) -> Self {
+    pub fn content(
+        mut self,
+        value: impl Into<Option<Vec<AttachmentContentItem<S>>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
-    pub fn maybe_content(mut self, value: Option<Vec<AttachmentContentItem<S>>>) -> Self {
+    pub fn maybe_content(
+        mut self,
+        value: Option<Vec<AttachmentContentItem<S>>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
 }
 
-impl<S: BosStr, St: attachment_state::State> AttachmentBuilder<S, St> {
+impl<St: attachment_state::State, S: BosStr> AttachmentBuilder<St, S> {
     /// Set the `contentType` field (optional)
     pub fn content_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -308,7 +333,7 @@ impl<S: BosStr, St: attachment_state::State> AttachmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AttachmentBuilder<S, St>
+impl<St, S: BosStr> AttachmentBuilder<St, S>
 where
     St: attachment_state::State,
     St::CreatedAt: attachment_state::IsUnset,
@@ -317,7 +342,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AttachmentBuilder<S, attachment_state::SetCreatedAt<St>> {
+    ) -> AttachmentBuilder<attachment_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AttachmentBuilder {
             _state: PhantomData,
@@ -327,7 +352,7 @@ where
     }
 }
 
-impl<S: BosStr, St: attachment_state::State> AttachmentBuilder<S, St> {
+impl<St: attachment_state::State, S: BosStr> AttachmentBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<LinearDocument<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -340,7 +365,7 @@ impl<S: BosStr, St: attachment_state::State> AttachmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: attachment_state::State> AttachmentBuilder<S, St> {
+impl<St: attachment_state::State, S: BosStr> AttachmentBuilder<St, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -353,7 +378,7 @@ impl<S: BosStr, St: attachment_state::State> AttachmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: attachment_state::State> AttachmentBuilder<S, St> {
+impl<St: attachment_state::State, S: BosStr> AttachmentBuilder<St, S> {
     /// Set the `shortDescription` field (optional)
     pub fn short_description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -366,20 +391,26 @@ impl<S: BosStr, St: attachment_state::State> AttachmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: attachment_state::State> AttachmentBuilder<S, St> {
+impl<St: attachment_state::State, S: BosStr> AttachmentBuilder<St, S> {
     /// Set the `shortDescriptionFacets` field (optional)
-    pub fn short_description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn short_description_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `shortDescriptionFacets` field to an Option value (optional)
-    pub fn maybe_short_description_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
+    pub fn maybe_short_description_facets(
+        mut self,
+        value: Option<Vec<Facet<S>>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
 }
 
-impl<S: BosStr, St: attachment_state::State> AttachmentBuilder<S, St> {
+impl<St: attachment_state::State, S: BosStr> AttachmentBuilder<St, S> {
     /// Set the `subjects` field (optional)
     pub fn subjects(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.7 = value.into();
@@ -392,7 +423,7 @@ impl<S: BosStr, St: attachment_state::State> AttachmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AttachmentBuilder<S, St>
+impl<St, S: BosStr> AttachmentBuilder<St, S>
 where
     St: attachment_state::State,
     St::Title: attachment_state::IsUnset,
@@ -401,7 +432,7 @@ where
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> AttachmentBuilder<S, attachment_state::SetTitle<St>> {
+    ) -> AttachmentBuilder<attachment_state::SetTitle<St>, S> {
         self._fields.8 = Option::Some(value.into());
         AttachmentBuilder {
             _state: PhantomData,
@@ -411,7 +442,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AttachmentBuilder<S, St>
+impl<St, S: BosStr> AttachmentBuilder<St, S>
 where
     St: attachment_state::State,
     St::Title: attachment_state::IsSet,
@@ -433,7 +464,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Attachment<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Attachment<S> {
         Attachment {
             content: self._fields.0,
             content_type: self._fields.1,
@@ -450,10 +484,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_context_attachment() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.context.attachment"),

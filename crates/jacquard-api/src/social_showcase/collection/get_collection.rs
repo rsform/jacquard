@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_showcase::CollectionView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_showcase::CollectionView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetCollection<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetCollectionOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: CollectionView<S>,
@@ -65,7 +60,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetCollectionRequest {
 
 pub mod get_collection_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -96,21 +91,31 @@ pub mod get_collection_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetCollectionBuilder<S: BosStr, St: get_collection_state::State> {
+pub struct GetCollectionBuilder<
+    St: get_collection_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetCollection<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetCollectionBuilder<S, get_collection_state::Empty> {
+impl GetCollection<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetCollectionBuilder<get_collection_state::Empty, DefaultStr> {
         GetCollectionBuilder::new()
     }
 }
 
-impl<S: BosStr> GetCollectionBuilder<S, get_collection_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetCollection<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetCollectionBuilder<get_collection_state::Empty, S> {
+        GetCollectionBuilder::builder()
+    }
+}
+
+impl GetCollectionBuilder<get_collection_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetCollectionBuilder {
             _state: PhantomData,
@@ -120,7 +125,18 @@ impl<S: BosStr> GetCollectionBuilder<S, get_collection_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetCollectionBuilder<S, St>
+impl<S: BosStr> GetCollectionBuilder<get_collection_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetCollectionBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetCollectionBuilder<St, S>
 where
     St: get_collection_state::State,
     St::Uri: get_collection_state::IsUnset,
@@ -129,7 +145,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetCollectionBuilder<S, get_collection_state::SetUri<St>> {
+    ) -> GetCollectionBuilder<get_collection_state::SetUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetCollectionBuilder {
             _state: PhantomData,
@@ -139,7 +155,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetCollectionBuilder<S, St>
+impl<St, S: BosStr> GetCollectionBuilder<St, S>
 where
     St: get_collection_state::State,
     St::Uri: get_collection_state::IsSet,

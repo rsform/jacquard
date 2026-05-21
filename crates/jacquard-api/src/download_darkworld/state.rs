@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,16 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::download_darkworld::state;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::download_darkworld::state;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Favorite<S: BosStr = DefaultStr> {
     pub album: Vec<S>,
     pub artist: Vec<S>,
@@ -72,11 +69,9 @@ pub struct StateGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: State<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Site<S: BosStr = DefaultStr> {
     ///Swap out Kris with Susie in the prophecy panel.
     pub susie_prophecy: bool,
@@ -254,7 +249,7 @@ impl<S: BosStr> LexiconSchema for Site<S> {
 
 pub mod favorite_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -263,8 +258,8 @@ pub mod favorite_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Artist;
-        type DeltaruneCharacter;
         type Game;
+        type DeltaruneCharacter;
         type Album;
     }
     /// Empty state - all required fields are unset
@@ -272,8 +267,8 @@ pub mod favorite_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Artist = Unset;
-        type DeltaruneCharacter = Unset;
         type Game = Unset;
+        type DeltaruneCharacter = Unset;
         type Album = Unset;
     }
     ///State transition - sets the `artist` field to Set
@@ -281,17 +276,8 @@ pub mod favorite_state {
     impl<St: State> sealed::Sealed for SetArtist<St> {}
     impl<St: State> State for SetArtist<St> {
         type Artist = Set<members::artist>;
+        type Game = St::Game;
         type DeltaruneCharacter = St::DeltaruneCharacter;
-        type Game = St::Game;
-        type Album = St::Album;
-    }
-    ///State transition - sets the `deltarune_character` field to Set
-    pub struct SetDeltaruneCharacter<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDeltaruneCharacter<St> {}
-    impl<St: State> State for SetDeltaruneCharacter<St> {
-        type Artist = St::Artist;
-        type DeltaruneCharacter = Set<members::deltarune_character>;
-        type Game = St::Game;
         type Album = St::Album;
     }
     ///State transition - sets the `game` field to Set
@@ -299,8 +285,17 @@ pub mod favorite_state {
     impl<St: State> sealed::Sealed for SetGame<St> {}
     impl<St: State> State for SetGame<St> {
         type Artist = St::Artist;
-        type DeltaruneCharacter = St::DeltaruneCharacter;
         type Game = Set<members::game>;
+        type DeltaruneCharacter = St::DeltaruneCharacter;
+        type Album = St::Album;
+    }
+    ///State transition - sets the `deltarune_character` field to Set
+    pub struct SetDeltaruneCharacter<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDeltaruneCharacter<St> {}
+    impl<St: State> State for SetDeltaruneCharacter<St> {
+        type Artist = St::Artist;
+        type Game = St::Game;
+        type DeltaruneCharacter = Set<members::deltarune_character>;
         type Album = St::Album;
     }
     ///State transition - sets the `album` field to Set
@@ -308,8 +303,8 @@ pub mod favorite_state {
     impl<St: State> sealed::Sealed for SetAlbum<St> {}
     impl<St: State> State for SetAlbum<St> {
         type Artist = St::Artist;
-        type DeltaruneCharacter = St::DeltaruneCharacter;
         type Game = St::Game;
+        type DeltaruneCharacter = St::DeltaruneCharacter;
         type Album = Set<members::album>;
     }
     /// Marker types for field names
@@ -317,36 +312,38 @@ pub mod favorite_state {
     pub mod members {
         ///Marker type for the `artist` field
         pub struct artist(());
-        ///Marker type for the `deltarune_character` field
-        pub struct deltarune_character(());
         ///Marker type for the `game` field
         pub struct game(());
+        ///Marker type for the `deltarune_character` field
+        pub struct deltarune_character(());
         ///Marker type for the `album` field
         pub struct album(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FavoriteBuilder<S: BosStr, St: favorite_state::State> {
+pub struct FavoriteBuilder<St: favorite_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Vec<S>>,
-        Option<Vec<S>>,
-        Option<Vec<S>>,
-        Option<Vec<S>>,
-    ),
+    _fields: (Option<Vec<S>>, Option<Vec<S>>, Option<Vec<S>>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Favorite<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FavoriteBuilder<S, favorite_state::Empty> {
+impl Favorite<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FavoriteBuilder<favorite_state::Empty, DefaultStr> {
         FavoriteBuilder::new()
     }
 }
 
-impl<S: BosStr> FavoriteBuilder<S, favorite_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Favorite<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FavoriteBuilder<favorite_state::Empty, S> {
+        FavoriteBuilder::builder()
+    }
+}
+
+impl FavoriteBuilder<favorite_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FavoriteBuilder {
             _state: PhantomData,
@@ -356,7 +353,18 @@ impl<S: BosStr> FavoriteBuilder<S, favorite_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FavoriteBuilder<S, St>
+impl<S: BosStr> FavoriteBuilder<favorite_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FavoriteBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FavoriteBuilder<St, S>
 where
     St: favorite_state::State,
     St::Album: favorite_state::IsUnset,
@@ -365,7 +373,7 @@ where
     pub fn album(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> FavoriteBuilder<S, favorite_state::SetAlbum<St>> {
+    ) -> FavoriteBuilder<favorite_state::SetAlbum<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FavoriteBuilder {
             _state: PhantomData,
@@ -375,7 +383,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FavoriteBuilder<S, St>
+impl<St, S: BosStr> FavoriteBuilder<St, S>
 where
     St: favorite_state::State,
     St::Artist: favorite_state::IsUnset,
@@ -384,7 +392,7 @@ where
     pub fn artist(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> FavoriteBuilder<S, favorite_state::SetArtist<St>> {
+    ) -> FavoriteBuilder<favorite_state::SetArtist<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FavoriteBuilder {
             _state: PhantomData,
@@ -394,7 +402,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FavoriteBuilder<S, St>
+impl<St, S: BosStr> FavoriteBuilder<St, S>
 where
     St: favorite_state::State,
     St::DeltaruneCharacter: favorite_state::IsUnset,
@@ -403,7 +411,7 @@ where
     pub fn deltarune_character(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> FavoriteBuilder<S, favorite_state::SetDeltaruneCharacter<St>> {
+    ) -> FavoriteBuilder<favorite_state::SetDeltaruneCharacter<St>, S> {
         self._fields.2 = Option::Some(value.into());
         FavoriteBuilder {
             _state: PhantomData,
@@ -413,7 +421,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FavoriteBuilder<S, St>
+impl<St, S: BosStr> FavoriteBuilder<St, S>
 where
     St: favorite_state::State,
     St::Game: favorite_state::IsUnset,
@@ -422,7 +430,7 @@ where
     pub fn game(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> FavoriteBuilder<S, favorite_state::SetGame<St>> {
+    ) -> FavoriteBuilder<favorite_state::SetGame<St>, S> {
         self._fields.3 = Option::Some(value.into());
         FavoriteBuilder {
             _state: PhantomData,
@@ -432,12 +440,12 @@ where
     }
 }
 
-impl<S: BosStr, St> FavoriteBuilder<S, St>
+impl<St, S: BosStr> FavoriteBuilder<St, S>
 where
     St: favorite_state::State,
     St::Artist: favorite_state::IsSet,
-    St::DeltaruneCharacter: favorite_state::IsSet,
     St::Game: favorite_state::IsSet,
+    St::DeltaruneCharacter: favorite_state::IsSet,
     St::Album: favorite_state::IsSet,
 {
     /// Build the final struct.
@@ -463,10 +471,10 @@ where
 }
 
 fn lexicon_doc_download_darkworld_state() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("download.darkworld.state"),
@@ -475,12 +483,13 @@ fn lexicon_doc_download_darkworld_state() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("favorite"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("game"),
-                        SmolStr::new_static("artist"),
-                        SmolStr::new_static("album"),
-                        SmolStr::new_static("deltaruneCharacter"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("game"), SmolStr::new_static("artist"),
+                            SmolStr::new_static("album"),
+                            SmolStr::new_static("deltaruneCharacter")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -528,24 +537,29 @@ fn lexicon_doc_download_darkworld_state() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "The record used by darkworld.download to determine the website's content.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "The record used by darkworld.download to determine the website's content.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("site"),
-                            SmolStr::new_static("favorite"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("site"), SmolStr::new_static("favorite")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("favorite"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(CowStr::new_static(
-                                        "The user's favorites/likes/preferences.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The user's favorites/likes/preferences.",
+                                        ),
+                                    ),
                                     refs: vec![CowStr::new_static("#favorite")],
                                     closed: Some(true),
                                     ..Default::default()
@@ -554,9 +568,9 @@ fn lexicon_doc_download_darkworld_state() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("site"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(CowStr::new_static(
-                                        "Describe the site's content/look.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Describe the site's content/look."),
+                                    ),
                                     refs: vec![CowStr::new_static("#site")],
                                     closed: Some(true),
                                     ..Default::default()
@@ -602,7 +616,7 @@ fn lexicon_doc_download_darkworld_state() -> LexiconDoc<'static> {
 
 pub mod state_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -610,56 +624,63 @@ pub mod state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Site;
         type Favorite;
+        type Site;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Site = Unset;
         type Favorite = Unset;
-    }
-    ///State transition - sets the `site` field to Set
-    pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSite<St> {}
-    impl<St: State> State for SetSite<St> {
-        type Site = Set<members::site>;
-        type Favorite = St::Favorite;
+        type Site = Unset;
     }
     ///State transition - sets the `favorite` field to Set
     pub struct SetFavorite<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetFavorite<St> {}
     impl<St: State> State for SetFavorite<St> {
-        type Site = St::Site;
         type Favorite = Set<members::favorite>;
+        type Site = St::Site;
+    }
+    ///State transition - sets the `site` field to Set
+    pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSite<St> {}
+    impl<St: State> State for SetSite<St> {
+        type Favorite = St::Favorite;
+        type Site = Set<members::site>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `site` field
-        pub struct site(());
         ///Marker type for the `favorite` field
         pub struct favorite(());
+        ///Marker type for the `site` field
+        pub struct site(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StateBuilder<S: BosStr, St: state_state::State> {
+pub struct StateBuilder<St: state_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<state::Favorite<S>>, Option<state::Site<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> State<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StateBuilder<S, state_state::Empty> {
+impl State<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StateBuilder<state_state::Empty, DefaultStr> {
         StateBuilder::new()
     }
 }
 
-impl<S: BosStr> StateBuilder<S, state_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> State<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StateBuilder<state_state::Empty, S> {
+        StateBuilder::builder()
+    }
+}
+
+impl StateBuilder<state_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StateBuilder {
             _state: PhantomData,
@@ -669,7 +690,18 @@ impl<S: BosStr> StateBuilder<S, state_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StateBuilder<S, St>
+impl<S: BosStr> StateBuilder<state_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StateBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StateBuilder<St, S>
 where
     St: state_state::State,
     St::Favorite: state_state::IsUnset,
@@ -678,7 +710,7 @@ where
     pub fn favorite(
         mut self,
         value: impl Into<state::Favorite<S>>,
-    ) -> StateBuilder<S, state_state::SetFavorite<St>> {
+    ) -> StateBuilder<state_state::SetFavorite<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
@@ -688,7 +720,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StateBuilder<S, St>
+impl<St, S: BosStr> StateBuilder<St, S>
 where
     St: state_state::State,
     St::Site: state_state::IsUnset,
@@ -697,7 +729,7 @@ where
     pub fn site(
         mut self,
         value: impl Into<state::Site<S>>,
-    ) -> StateBuilder<S, state_state::SetSite<St>> {
+    ) -> StateBuilder<state_state::SetSite<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
@@ -707,11 +739,11 @@ where
     }
 }
 
-impl<S: BosStr, St> StateBuilder<S, St>
+impl<St, S: BosStr> StateBuilder<St, S>
 where
     St: state_state::State,
-    St::Site: state_state::IsSet,
     St::Favorite: state_state::IsSet,
+    St::Site: state_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> State<S> {
@@ -733,7 +765,7 @@ where
 
 pub mod site_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -764,21 +796,28 @@ pub mod site_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SiteBuilder<S: BosStr, St: site_state::State> {
+pub struct SiteBuilder<St: site_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<SiteTitleColors<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Site<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SiteBuilder<S, site_state::Empty> {
+impl Site<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SiteBuilder<site_state::Empty, DefaultStr> {
         SiteBuilder::new()
     }
 }
 
-impl<S: BosStr> SiteBuilder<S, site_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Site<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SiteBuilder<site_state::Empty, S> {
+        SiteBuilder::builder()
+    }
+}
+
+impl SiteBuilder<site_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SiteBuilder {
             _state: PhantomData,
@@ -788,7 +827,18 @@ impl<S: BosStr> SiteBuilder<S, site_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SiteBuilder<S, St>
+impl<S: BosStr> SiteBuilder<site_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SiteBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SiteBuilder<St, S>
 where
     St: site_state::State,
     St::SusieProphecy: site_state::IsUnset,
@@ -797,7 +847,7 @@ where
     pub fn susie_prophecy(
         mut self,
         value: impl Into<bool>,
-    ) -> SiteBuilder<S, site_state::SetSusieProphecy<St>> {
+    ) -> SiteBuilder<site_state::SetSusieProphecy<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SiteBuilder {
             _state: PhantomData,
@@ -807,7 +857,7 @@ where
     }
 }
 
-impl<S: BosStr, St: site_state::State> SiteBuilder<S, St> {
+impl<St: site_state::State, S: BosStr> SiteBuilder<St, S> {
     /// Set the `titleColors` field (optional)
     pub fn title_colors(mut self, value: impl Into<Option<SiteTitleColors<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -820,7 +870,7 @@ impl<S: BosStr, St: site_state::State> SiteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SiteBuilder<S, St>
+impl<St, S: BosStr> SiteBuilder<St, S>
 where
     St: site_state::State,
     St::SusieProphecy: site_state::IsSet,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A record of completing a goal on a specific day.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -196,16 +196,19 @@ impl<S: BosStr> LexiconSchema for Completion<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("photo_blob"),
@@ -240,7 +243,7 @@ impl<S: BosStr> LexiconSchema for Completion<S> {
 
 pub mod completion_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -248,90 +251,90 @@ pub mod completion_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Day;
         type GoalId;
         type Year;
         type Month;
+        type Day;
         type CompletedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Day = Unset;
         type GoalId = Unset;
         type Year = Unset;
         type Month = Unset;
+        type Day = Unset;
         type CompletedAt = Unset;
-    }
-    ///State transition - sets the `day` field to Set
-    pub struct SetDay<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDay<St> {}
-    impl<St: State> State for SetDay<St> {
-        type Day = Set<members::day>;
-        type GoalId = St::GoalId;
-        type Year = St::Year;
-        type Month = St::Month;
-        type CompletedAt = St::CompletedAt;
     }
     ///State transition - sets the `goal_id` field to Set
     pub struct SetGoalId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGoalId<St> {}
     impl<St: State> State for SetGoalId<St> {
-        type Day = St::Day;
         type GoalId = Set<members::goal_id>;
         type Year = St::Year;
         type Month = St::Month;
+        type Day = St::Day;
         type CompletedAt = St::CompletedAt;
     }
     ///State transition - sets the `year` field to Set
     pub struct SetYear<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetYear<St> {}
     impl<St: State> State for SetYear<St> {
-        type Day = St::Day;
         type GoalId = St::GoalId;
         type Year = Set<members::year>;
         type Month = St::Month;
+        type Day = St::Day;
         type CompletedAt = St::CompletedAt;
     }
     ///State transition - sets the `month` field to Set
     pub struct SetMonth<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMonth<St> {}
     impl<St: State> State for SetMonth<St> {
-        type Day = St::Day;
         type GoalId = St::GoalId;
         type Year = St::Year;
         type Month = Set<members::month>;
+        type Day = St::Day;
+        type CompletedAt = St::CompletedAt;
+    }
+    ///State transition - sets the `day` field to Set
+    pub struct SetDay<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDay<St> {}
+    impl<St: State> State for SetDay<St> {
+        type GoalId = St::GoalId;
+        type Year = St::Year;
+        type Month = St::Month;
+        type Day = Set<members::day>;
         type CompletedAt = St::CompletedAt;
     }
     ///State transition - sets the `completed_at` field to Set
     pub struct SetCompletedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCompletedAt<St> {}
     impl<St: State> State for SetCompletedAt<St> {
-        type Day = St::Day;
         type GoalId = St::GoalId;
         type Year = St::Year;
         type Month = St::Month;
+        type Day = St::Day;
         type CompletedAt = Set<members::completed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `day` field
-        pub struct day(());
         ///Marker type for the `goal_id` field
         pub struct goal_id(());
         ///Marker type for the `year` field
         pub struct year(());
         ///Marker type for the `month` field
         pub struct month(());
+        ///Marker type for the `day` field
+        pub struct day(());
         ///Marker type for the `completed_at` field
         pub struct completed_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CompletionBuilder<S: BosStr, St: completion_state::State> {
+pub struct CompletionBuilder<St: completion_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -347,15 +350,22 @@ pub struct CompletionBuilder<S: BosStr, St: completion_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Completion<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CompletionBuilder<S, completion_state::Empty> {
+impl Completion<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CompletionBuilder<completion_state::Empty, DefaultStr> {
         CompletionBuilder::new()
     }
 }
 
-impl<S: BosStr> CompletionBuilder<S, completion_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Completion<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CompletionBuilder<completion_state::Empty, S> {
+        CompletionBuilder::builder()
+    }
+}
+
+impl CompletionBuilder<completion_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CompletionBuilder {
             _state: PhantomData,
@@ -365,7 +375,18 @@ impl<S: BosStr> CompletionBuilder<S, completion_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CompletionBuilder<S, St>
+impl<S: BosStr> CompletionBuilder<completion_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CompletionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CompletionBuilder<St, S>
 where
     St: completion_state::State,
     St::CompletedAt: completion_state::IsUnset,
@@ -374,7 +395,7 @@ where
     pub fn completed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CompletionBuilder<S, completion_state::SetCompletedAt<St>> {
+    ) -> CompletionBuilder<completion_state::SetCompletedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CompletionBuilder {
             _state: PhantomData,
@@ -384,7 +405,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CompletionBuilder<S, St>
+impl<St, S: BosStr> CompletionBuilder<St, S>
 where
     St: completion_state::State,
     St::Day: completion_state::IsUnset,
@@ -393,7 +414,7 @@ where
     pub fn day(
         mut self,
         value: impl Into<i64>,
-    ) -> CompletionBuilder<S, completion_state::SetDay<St>> {
+    ) -> CompletionBuilder<completion_state::SetDay<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CompletionBuilder {
             _state: PhantomData,
@@ -403,7 +424,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CompletionBuilder<S, St>
+impl<St, S: BosStr> CompletionBuilder<St, S>
 where
     St: completion_state::State,
     St::GoalId: completion_state::IsUnset,
@@ -412,7 +433,7 @@ where
     pub fn goal_id(
         mut self,
         value: impl Into<S>,
-    ) -> CompletionBuilder<S, completion_state::SetGoalId<St>> {
+    ) -> CompletionBuilder<completion_state::SetGoalId<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CompletionBuilder {
             _state: PhantomData,
@@ -422,7 +443,7 @@ where
     }
 }
 
-impl<S: BosStr, St: completion_state::State> CompletionBuilder<S, St> {
+impl<St: completion_state::State, S: BosStr> CompletionBuilder<St, S> {
     /// Set the `goalUri` field (optional)
     pub fn goal_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -435,7 +456,7 @@ impl<S: BosStr, St: completion_state::State> CompletionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CompletionBuilder<S, St>
+impl<St, S: BosStr> CompletionBuilder<St, S>
 where
     St: completion_state::State,
     St::Month: completion_state::IsUnset,
@@ -444,7 +465,7 @@ where
     pub fn month(
         mut self,
         value: impl Into<i64>,
-    ) -> CompletionBuilder<S, completion_state::SetMonth<St>> {
+    ) -> CompletionBuilder<completion_state::SetMonth<St>, S> {
         self._fields.4 = Option::Some(value.into());
         CompletionBuilder {
             _state: PhantomData,
@@ -454,7 +475,7 @@ where
     }
 }
 
-impl<S: BosStr, St: completion_state::State> CompletionBuilder<S, St> {
+impl<St: completion_state::State, S: BosStr> CompletionBuilder<St, S> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -467,7 +488,7 @@ impl<S: BosStr, St: completion_state::State> CompletionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: completion_state::State> CompletionBuilder<S, St> {
+impl<St: completion_state::State, S: BosStr> CompletionBuilder<St, S> {
     /// Set the `photoBlob` field (optional)
     pub fn photo_blob(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -480,7 +501,7 @@ impl<S: BosStr, St: completion_state::State> CompletionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: completion_state::State> CompletionBuilder<S, St> {
+impl<St: completion_state::State, S: BosStr> CompletionBuilder<St, S> {
     /// Set the `sequenceNum` field (optional)
     pub fn sequence_num(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.7 = value.into();
@@ -493,7 +514,7 @@ impl<S: BosStr, St: completion_state::State> CompletionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CompletionBuilder<S, St>
+impl<St, S: BosStr> CompletionBuilder<St, S>
 where
     St: completion_state::State,
     St::Year: completion_state::IsUnset,
@@ -502,7 +523,7 @@ where
     pub fn year(
         mut self,
         value: impl Into<i64>,
-    ) -> CompletionBuilder<S, completion_state::SetYear<St>> {
+    ) -> CompletionBuilder<completion_state::SetYear<St>, S> {
         self._fields.8 = Option::Some(value.into());
         CompletionBuilder {
             _state: PhantomData,
@@ -512,13 +533,13 @@ where
     }
 }
 
-impl<S: BosStr, St> CompletionBuilder<S, St>
+impl<St, S: BosStr> CompletionBuilder<St, S>
 where
     St: completion_state::State,
-    St::Day: completion_state::IsSet,
     St::GoalId: completion_state::IsSet,
     St::Year: completion_state::IsSet,
     St::Month: completion_state::IsSet,
+    St::Day: completion_state::IsSet,
     St::CompletedAt: completion_state::IsSet,
 {
     /// Build the final struct.
@@ -537,7 +558,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Completion<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Completion<S> {
         Completion {
             completed_at: self._fields.0.unwrap(),
             day: self._fields.1.unwrap(),
@@ -554,10 +578,10 @@ where
 }
 
 fn lexicon_doc_garden_goals_completion() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.goals.completion"),
@@ -566,27 +590,31 @@ fn lexicon_doc_garden_goals_completion() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A record of completing a goal on a specific day.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A record of completing a goal on a specific day.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("goalId"),
-                            SmolStr::new_static("year"),
-                            SmolStr::new_static("month"),
-                            SmolStr::new_static("day"),
-                            SmolStr::new_static("completedAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("goalId"), SmolStr::new_static("year"),
+                                SmolStr::new_static("month"), SmolStr::new_static("day"),
+                                SmolStr::new_static("completedAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("completedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the completion was recorded",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp when the completion was recorded",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -602,9 +630,11 @@ fn lexicon_doc_garden_goals_completion() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("goalId"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "UUID of the goal this completion belongs to",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "UUID of the goal this completion belongs to",
+                                        ),
+                                    ),
                                     max_length: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -612,9 +642,11 @@ fn lexicon_doc_garden_goals_completion() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("goalUri"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "AT Protocol URI reference to the goal record",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "AT Protocol URI reference to the goal record",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -630,18 +662,16 @@ fn lexicon_doc_garden_goals_completion() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("notes"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Optional notes for this completion",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Optional notes for this completion"),
+                                    ),
                                     max_length: Some(99usize),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("photoBlob"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("sequenceNum"),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::place_stream::chat::profile;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::chat::profile;
 /// Customizations for the color of a user's name in chat
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Color<S: BosStr = DefaultStr> {
     pub blue: i64,
     pub green: i64,
@@ -195,7 +192,7 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
 
 pub mod color_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -204,69 +201,76 @@ pub mod color_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Blue;
-        type Red;
         type Green;
+        type Red;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Blue = Unset;
-        type Red = Unset;
         type Green = Unset;
+        type Red = Unset;
     }
     ///State transition - sets the `blue` field to Set
     pub struct SetBlue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlue<St> {}
     impl<St: State> State for SetBlue<St> {
         type Blue = Set<members::blue>;
+        type Green = St::Green;
         type Red = St::Red;
-        type Green = St::Green;
-    }
-    ///State transition - sets the `red` field to Set
-    pub struct SetRed<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRed<St> {}
-    impl<St: State> State for SetRed<St> {
-        type Blue = St::Blue;
-        type Red = Set<members::red>;
-        type Green = St::Green;
     }
     ///State transition - sets the `green` field to Set
     pub struct SetGreen<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGreen<St> {}
     impl<St: State> State for SetGreen<St> {
         type Blue = St::Blue;
-        type Red = St::Red;
         type Green = Set<members::green>;
+        type Red = St::Red;
+    }
+    ///State transition - sets the `red` field to Set
+    pub struct SetRed<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRed<St> {}
+    impl<St: State> State for SetRed<St> {
+        type Blue = St::Blue;
+        type Green = St::Green;
+        type Red = Set<members::red>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `blue` field
         pub struct blue(());
-        ///Marker type for the `red` field
-        pub struct red(());
         ///Marker type for the `green` field
         pub struct green(());
+        ///Marker type for the `red` field
+        pub struct red(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ColorBuilder<S: BosStr, St: color_state::State> {
+pub struct ColorBuilder<St: color_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Color<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ColorBuilder<S, color_state::Empty> {
+impl Color<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ColorBuilder<color_state::Empty, DefaultStr> {
         ColorBuilder::new()
     }
 }
 
-impl<S: BosStr> ColorBuilder<S, color_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Color<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ColorBuilder<color_state::Empty, S> {
+        ColorBuilder::builder()
+    }
+}
+
+impl ColorBuilder<color_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ColorBuilder {
             _state: PhantomData,
@@ -276,13 +280,27 @@ impl<S: BosStr> ColorBuilder<S, color_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ColorBuilder<S, St>
+impl<S: BosStr> ColorBuilder<color_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ColorBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ColorBuilder<St, S>
 where
     St: color_state::State,
     St::Blue: color_state::IsUnset,
 {
     /// Set the `blue` field (required)
-    pub fn blue(mut self, value: impl Into<i64>) -> ColorBuilder<S, color_state::SetBlue<St>> {
+    pub fn blue(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ColorBuilder<color_state::SetBlue<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
@@ -292,13 +310,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ColorBuilder<S, St>
+impl<St, S: BosStr> ColorBuilder<St, S>
 where
     St: color_state::State,
     St::Green: color_state::IsUnset,
 {
     /// Set the `green` field (required)
-    pub fn green(mut self, value: impl Into<i64>) -> ColorBuilder<S, color_state::SetGreen<St>> {
+    pub fn green(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ColorBuilder<color_state::SetGreen<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
@@ -308,13 +329,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ColorBuilder<S, St>
+impl<St, S: BosStr> ColorBuilder<St, S>
 where
     St: color_state::State,
     St::Red: color_state::IsUnset,
 {
     /// Set the `red` field (required)
-    pub fn red(mut self, value: impl Into<i64>) -> ColorBuilder<S, color_state::SetRed<St>> {
+    pub fn red(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ColorBuilder<color_state::SetRed<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
@@ -324,12 +348,12 @@ where
     }
 }
 
-impl<S: BosStr, St> ColorBuilder<S, St>
+impl<St, S: BosStr> ColorBuilder<St, S>
 where
     St: color_state::State,
     St::Blue: color_state::IsSet,
-    St::Red: color_state::IsSet,
     St::Green: color_state::IsSet,
+    St::Red: color_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Color<S> {
@@ -352,10 +376,10 @@ where
 }
 
 fn lexicon_doc_place_stream_chat_profile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.chat.profile"),
@@ -364,14 +388,17 @@ fn lexicon_doc_place_stream_chat_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("color"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Customizations for the color of a user's name in chat",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("red"),
-                        SmolStr::new_static("green"),
-                        SmolStr::new_static("blue"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Customizations for the color of a user's name in chat",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("red"), SmolStr::new_static("green"),
+                            SmolStr::new_static("blue")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -407,9 +434,11 @@ fn lexicon_doc_place_stream_chat_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Record containing customizations for a user's chat profile.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Record containing customizations for a user's chat profile.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         properties: {
@@ -437,7 +466,7 @@ fn lexicon_doc_place_stream_chat_profile() -> LexiconDoc<'static> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -455,21 +484,28 @@ pub mod profile_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
+pub struct ProfileBuilder<St: profile_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<profile::Color<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Profile<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProfileBuilder<S, profile_state::Empty> {
+impl Profile<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProfileBuilder<profile_state::Empty, DefaultStr> {
         ProfileBuilder::new()
     }
 }
 
-impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Profile<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProfileBuilder<profile_state::Empty, S> {
+        ProfileBuilder::builder()
+    }
+}
+
+impl ProfileBuilder<profile_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
@@ -479,7 +515,18 @@ impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProfileBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `color` field (optional)
     pub fn color(mut self, value: impl Into<Option<profile::Color<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -492,7 +539,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
 {

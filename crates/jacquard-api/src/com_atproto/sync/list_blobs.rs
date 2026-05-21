@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Cid, Did, Tid};
+use jacquard_common::types::string::{Did, Tid, Cid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListBlobs<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -34,11 +31,9 @@ pub struct ListBlobs<S: BosStr = DefaultStr> {
     pub since: Option<Tid>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListBlobsOutput<S: BosStr = DefaultStr> {
     pub cids: Vec<Cid<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -47,9 +42,18 @@ pub struct ListBlobsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ListBlobsError {
     #[serde(rename = "RepoNotFound")]
@@ -62,10 +66,7 @@ pub enum ListBlobsError {
     RepoDeactivated(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ListBlobsError {
@@ -140,7 +141,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_blobs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -171,21 +172,28 @@ pub mod list_blobs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListBlobsBuilder<S: BosStr, St: list_blobs_state::State> {
+pub struct ListBlobsBuilder<St: list_blobs_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>, Option<i64>, Option<Tid>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListBlobs<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListBlobsBuilder<S, list_blobs_state::Empty> {
+impl ListBlobs<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListBlobsBuilder<list_blobs_state::Empty, DefaultStr> {
         ListBlobsBuilder::new()
     }
 }
 
-impl<S: BosStr> ListBlobsBuilder<S, list_blobs_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListBlobs<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListBlobsBuilder<list_blobs_state::Empty, S> {
+        ListBlobsBuilder::builder()
+    }
+}
+
+impl ListBlobsBuilder<list_blobs_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListBlobsBuilder {
             _state: PhantomData,
@@ -195,7 +203,18 @@ impl<S: BosStr> ListBlobsBuilder<S, list_blobs_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: list_blobs_state::State> ListBlobsBuilder<S, St> {
+impl<S: BosStr> ListBlobsBuilder<list_blobs_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListBlobsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: list_blobs_state::State, S: BosStr> ListBlobsBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -208,7 +227,7 @@ impl<S: BosStr, St: list_blobs_state::State> ListBlobsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListBlobsBuilder<S, St>
+impl<St, S: BosStr> ListBlobsBuilder<St, S>
 where
     St: list_blobs_state::State,
     St::Did: list_blobs_state::IsUnset,
@@ -217,7 +236,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ListBlobsBuilder<S, list_blobs_state::SetDid<St>> {
+    ) -> ListBlobsBuilder<list_blobs_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ListBlobsBuilder {
             _state: PhantomData,
@@ -227,7 +246,7 @@ where
     }
 }
 
-impl<S: BosStr, St: list_blobs_state::State> ListBlobsBuilder<S, St> {
+impl<St: list_blobs_state::State, S: BosStr> ListBlobsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -240,7 +259,7 @@ impl<S: BosStr, St: list_blobs_state::State> ListBlobsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: list_blobs_state::State> ListBlobsBuilder<S, St> {
+impl<St: list_blobs_state::State, S: BosStr> ListBlobsBuilder<St, S> {
     /// Set the `since` field (optional)
     pub fn since(mut self, value: impl Into<Option<Tid>>) -> Self {
         self._fields.3 = value.into();
@@ -253,7 +272,7 @@ impl<S: BosStr, St: list_blobs_state::State> ListBlobsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListBlobsBuilder<S, St>
+impl<St, S: BosStr> ListBlobsBuilder<St, S>
 where
     St: list_blobs_state::State,
     St::Did: list_blobs_state::IsSet,

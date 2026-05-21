@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::richtext::facet::Facet;
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::richtext::facet::Facet;
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A skill the sim possesses. A sim can have many skills.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -190,7 +190,7 @@ impl<S: BosStr> LexiconSchema for Skill<S> {
 
 pub mod skill_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -198,56 +198,56 @@ pub mod skill_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Name;
         type Sim;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Name = Unset;
         type Sim = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Sim = St::Sim;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `sim` field to Set
-    pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSim<St> {}
-    impl<St: State> State for SetSim<St> {
-        type Name = St::Name;
-        type Sim = Set<members::sim>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type Name = St::Name;
         type Sim = St::Sim;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
+        type Sim = St::Sim;
+    }
+    ///State transition - sets the `sim` field to Set
+    pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSim<St> {}
+    impl<St: State> State for SetSim<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Sim = Set<members::sim>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `sim` field
         pub struct sim(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SkillBuilder<S: BosStr, St: skill_state::State> {
+pub struct SkillBuilder<St: skill_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -262,15 +262,22 @@ pub struct SkillBuilder<S: BosStr, St: skill_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Skill<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SkillBuilder<S, skill_state::Empty> {
+impl Skill<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SkillBuilder<skill_state::Empty, DefaultStr> {
         SkillBuilder::new()
     }
 }
 
-impl<S: BosStr> SkillBuilder<S, skill_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Skill<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SkillBuilder<skill_state::Empty, S> {
+        SkillBuilder::builder()
+    }
+}
+
+impl SkillBuilder<skill_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SkillBuilder {
             _state: PhantomData,
@@ -280,7 +287,18 @@ impl<S: BosStr> SkillBuilder<S, skill_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SkillBuilder<S, St>
+impl<S: BosStr> SkillBuilder<skill_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SkillBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SkillBuilder<St, S>
 where
     St: skill_state::State,
     St::CreatedAt: skill_state::IsUnset,
@@ -289,7 +307,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SkillBuilder<S, skill_state::SetCreatedAt<St>> {
+    ) -> SkillBuilder<skill_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SkillBuilder {
             _state: PhantomData,
@@ -299,7 +317,7 @@ where
     }
 }
 
-impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
+impl<St: skill_state::State, S: BosStr> SkillBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -312,9 +330,12 @@ impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
+impl<St: skill_state::State, S: BosStr> SkillBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn description_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -325,7 +346,7 @@ impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
+impl<St: skill_state::State, S: BosStr> SkillBuilder<St, S> {
     /// Set the `instructions` field (optional)
     pub fn instructions(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -338,9 +359,12 @@ impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
+impl<St: skill_state::State, S: BosStr> SkillBuilder<St, S> {
     /// Set the `instructionsFacets` field (optional)
-    pub fn instructions_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn instructions_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -351,13 +375,16 @@ impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SkillBuilder<S, St>
+impl<St, S: BosStr> SkillBuilder<St, S>
 where
     St: skill_state::State,
     St::Name: skill_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> SkillBuilder<S, skill_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> SkillBuilder<skill_state::SetName<St>, S> {
         self._fields.5 = Option::Some(value.into());
         SkillBuilder {
             _state: PhantomData,
@@ -367,7 +394,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SkillBuilder<S, St>
+impl<St, S: BosStr> SkillBuilder<St, S>
 where
     St: skill_state::State,
     St::Sim: skill_state::IsUnset,
@@ -376,7 +403,7 @@ where
     pub fn sim(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> SkillBuilder<S, skill_state::SetSim<St>> {
+    ) -> SkillBuilder<skill_state::SetSim<St>, S> {
         self._fields.6 = Option::Some(value.into());
         SkillBuilder {
             _state: PhantomData,
@@ -386,7 +413,7 @@ where
     }
 }
 
-impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
+impl<St: skill_state::State, S: BosStr> SkillBuilder<St, S> {
     /// Set the `triggers` field (optional)
     pub fn triggers(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -399,12 +426,12 @@ impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SkillBuilder<S, St>
+impl<St, S: BosStr> SkillBuilder<St, S>
 where
     St: skill_state::State,
+    St::CreatedAt: skill_state::IsSet,
     St::Name: skill_state::IsSet,
     St::Sim: skill_state::IsSet,
-    St::CreatedAt: skill_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Skill<S> {
@@ -437,10 +464,10 @@ where
 }
 
 fn lexicon_doc_org_simocracy_skill() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.simocracy.skill"),

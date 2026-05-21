@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// The real-world feature that an Observation is about.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -142,7 +142,7 @@ impl<S: BosStr> LexiconSchema for FeatureOfInterest<S> {
 
 pub mod feature_of_interest_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -150,92 +150,99 @@ pub mod feature_of_interest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
         type EncodingType;
         type Feature;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
         type EncodingType = Unset;
         type Feature = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type CreatedAt = St::CreatedAt;
-        type EncodingType = St::EncodingType;
-        type Feature = St::Feature;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Name = St::Name;
         type CreatedAt = Set<members::created_at>;
         type EncodingType = St::EncodingType;
         type Feature = St::Feature;
+        type Name = St::Name;
     }
     ///State transition - sets the `encoding_type` field to Set
     pub struct SetEncodingType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEncodingType<St> {}
     impl<St: State> State for SetEncodingType<St> {
-        type Name = St::Name;
         type CreatedAt = St::CreatedAt;
         type EncodingType = Set<members::encoding_type>;
         type Feature = St::Feature;
+        type Name = St::Name;
     }
     ///State transition - sets the `feature` field to Set
     pub struct SetFeature<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetFeature<St> {}
     impl<St: State> State for SetFeature<St> {
-        type Name = St::Name;
         type CreatedAt = St::CreatedAt;
         type EncodingType = St::EncodingType;
         type Feature = Set<members::feature>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type EncodingType = St::EncodingType;
+        type Feature = St::Feature;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `encoding_type` field
         pub struct encoding_type(());
         ///Marker type for the `feature` field
         pub struct feature(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FeatureOfInterestBuilder<S: BosStr, St: feature_of_interest_state::State> {
+pub struct FeatureOfInterestBuilder<
+    St: feature_of_interest_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<S>,
-        Option<S>,
-        Option<Data<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<S>, Option<Data<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> FeatureOfInterest<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FeatureOfInterestBuilder<S, feature_of_interest_state::Empty> {
+impl FeatureOfInterest<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FeatureOfInterestBuilder<
+        feature_of_interest_state::Empty,
+        DefaultStr,
+    > {
         FeatureOfInterestBuilder::new()
     }
 }
 
-impl<S: BosStr> FeatureOfInterestBuilder<S, feature_of_interest_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> FeatureOfInterest<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FeatureOfInterestBuilder<feature_of_interest_state::Empty, S> {
+        FeatureOfInterestBuilder::builder()
+    }
+}
+
+impl FeatureOfInterestBuilder<feature_of_interest_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FeatureOfInterestBuilder {
             _state: PhantomData,
@@ -245,7 +252,18 @@ impl<S: BosStr> FeatureOfInterestBuilder<S, feature_of_interest_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FeatureOfInterestBuilder<S, St>
+impl<S: BosStr> FeatureOfInterestBuilder<feature_of_interest_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FeatureOfInterestBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FeatureOfInterestBuilder<St, S>
 where
     St: feature_of_interest_state::State,
     St::CreatedAt: feature_of_interest_state::IsUnset,
@@ -254,7 +272,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FeatureOfInterestBuilder<S, feature_of_interest_state::SetCreatedAt<St>> {
+    ) -> FeatureOfInterestBuilder<feature_of_interest_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FeatureOfInterestBuilder {
             _state: PhantomData,
@@ -264,7 +282,7 @@ where
     }
 }
 
-impl<S: BosStr, St: feature_of_interest_state::State> FeatureOfInterestBuilder<S, St> {
+impl<St: feature_of_interest_state::State, S: BosStr> FeatureOfInterestBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -277,7 +295,7 @@ impl<S: BosStr, St: feature_of_interest_state::State> FeatureOfInterestBuilder<S
     }
 }
 
-impl<S: BosStr, St> FeatureOfInterestBuilder<S, St>
+impl<St, S: BosStr> FeatureOfInterestBuilder<St, S>
 where
     St: feature_of_interest_state::State,
     St::EncodingType: feature_of_interest_state::IsUnset,
@@ -286,7 +304,7 @@ where
     pub fn encoding_type(
         mut self,
         value: impl Into<S>,
-    ) -> FeatureOfInterestBuilder<S, feature_of_interest_state::SetEncodingType<St>> {
+    ) -> FeatureOfInterestBuilder<feature_of_interest_state::SetEncodingType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         FeatureOfInterestBuilder {
             _state: PhantomData,
@@ -296,7 +314,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FeatureOfInterestBuilder<S, St>
+impl<St, S: BosStr> FeatureOfInterestBuilder<St, S>
 where
     St: feature_of_interest_state::State,
     St::Feature: feature_of_interest_state::IsUnset,
@@ -305,7 +323,7 @@ where
     pub fn feature(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> FeatureOfInterestBuilder<S, feature_of_interest_state::SetFeature<St>> {
+    ) -> FeatureOfInterestBuilder<feature_of_interest_state::SetFeature<St>, S> {
         self._fields.3 = Option::Some(value.into());
         FeatureOfInterestBuilder {
             _state: PhantomData,
@@ -315,7 +333,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FeatureOfInterestBuilder<S, St>
+impl<St, S: BosStr> FeatureOfInterestBuilder<St, S>
 where
     St: feature_of_interest_state::State,
     St::Name: feature_of_interest_state::IsUnset,
@@ -324,7 +342,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> FeatureOfInterestBuilder<S, feature_of_interest_state::SetName<St>> {
+    ) -> FeatureOfInterestBuilder<feature_of_interest_state::SetName<St>, S> {
         self._fields.4 = Option::Some(value.into());
         FeatureOfInterestBuilder {
             _state: PhantomData,
@@ -334,13 +352,13 @@ where
     }
 }
 
-impl<S: BosStr, St> FeatureOfInterestBuilder<S, St>
+impl<St, S: BosStr> FeatureOfInterestBuilder<St, S>
 where
     St: feature_of_interest_state::State,
-    St::Name: feature_of_interest_state::IsSet,
     St::CreatedAt: feature_of_interest_state::IsSet,
     St::EncodingType: feature_of_interest_state::IsSet,
     St::Feature: feature_of_interest_state::IsSet,
+    St::Name: feature_of_interest_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> FeatureOfInterest<S> {
@@ -354,7 +372,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FeatureOfInterest<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FeatureOfInterest<S> {
         FeatureOfInterest {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -367,10 +388,10 @@ where
 }
 
 fn lexicon_doc_dev_sensorthings_featureOfInterest() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.sensorthings.featureOfInterest"),

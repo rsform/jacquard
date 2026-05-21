@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,13 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::blue_backyard::feed::post::EmbedBlock;
 use crate::blue_backyard::feed::post::ImageBlock;
 use crate::blue_backyard::feed::post::TextBlock;
 use crate::com_atproto::repo::strong_ref::StrongRef;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A reblog of a Backyard post with optional additions.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -53,6 +53,7 @@ pub struct Reblog<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -147,7 +148,7 @@ impl<S: BosStr> LexiconSchema for Reblog<S> {
 
 pub mod reblog_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -190,7 +191,7 @@ pub mod reblog_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReblogBuilder<S: BosStr, St: reblog_state::State> {
+pub struct ReblogBuilder<St: reblog_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<ReblogContentItem<S>>>,
@@ -201,15 +202,22 @@ pub struct ReblogBuilder<S: BosStr, St: reblog_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Reblog<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ReblogBuilder<S, reblog_state::Empty> {
+impl Reblog<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReblogBuilder<reblog_state::Empty, DefaultStr> {
         ReblogBuilder::new()
     }
 }
 
-impl<S: BosStr> ReblogBuilder<S, reblog_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Reblog<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReblogBuilder<reblog_state::Empty, S> {
+        ReblogBuilder::builder()
+    }
+}
+
+impl ReblogBuilder<reblog_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ReblogBuilder {
             _state: PhantomData,
@@ -219,9 +227,23 @@ impl<S: BosStr> ReblogBuilder<S, reblog_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: reblog_state::State> ReblogBuilder<S, St> {
+impl<S: BosStr> ReblogBuilder<reblog_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReblogBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: reblog_state::State, S: BosStr> ReblogBuilder<St, S> {
     /// Set the `content` field (optional)
-    pub fn content(mut self, value: impl Into<Option<Vec<ReblogContentItem<S>>>>) -> Self {
+    pub fn content(
+        mut self,
+        value: impl Into<Option<Vec<ReblogContentItem<S>>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -232,7 +254,7 @@ impl<S: BosStr, St: reblog_state::State> ReblogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ReblogBuilder<S, St>
+impl<St, S: BosStr> ReblogBuilder<St, S>
 where
     St: reblog_state::State,
     St::CreatedAt: reblog_state::IsUnset,
@@ -241,7 +263,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReblogBuilder<S, reblog_state::SetCreatedAt<St>> {
+    ) -> ReblogBuilder<reblog_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ReblogBuilder {
             _state: PhantomData,
@@ -251,7 +273,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReblogBuilder<S, St>
+impl<St, S: BosStr> ReblogBuilder<St, S>
 where
     St: reblog_state::State,
     St::Subject: reblog_state::IsUnset,
@@ -260,7 +282,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ReblogBuilder<S, reblog_state::SetSubject<St>> {
+    ) -> ReblogBuilder<reblog_state::SetSubject<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ReblogBuilder {
             _state: PhantomData,
@@ -270,7 +292,7 @@ where
     }
 }
 
-impl<S: BosStr, St: reblog_state::State> ReblogBuilder<S, St> {
+impl<St: reblog_state::State, S: BosStr> ReblogBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -283,7 +305,7 @@ impl<S: BosStr, St: reblog_state::State> ReblogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ReblogBuilder<S, St>
+impl<St, S: BosStr> ReblogBuilder<St, S>
 where
     St: reblog_state::State,
     St::Subject: reblog_state::IsSet,
@@ -312,10 +334,10 @@ where
 }
 
 fn lexicon_doc_blue_backyard_feed_reblog() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.backyard.feed.reblog"),

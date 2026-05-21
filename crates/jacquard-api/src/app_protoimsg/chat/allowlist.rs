@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// An allowlist entry for a room. When the room has allowlistEnabled, only allowlisted users can send messages. Lives in the room owner/mod's repo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -108,7 +108,7 @@ impl<S: BosStr> LexiconSchema for Allowlist<S> {
 
 pub mod allowlist_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -116,70 +116,77 @@ pub mod allowlist_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type CreatedAt;
         type Room;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type CreatedAt = Unset;
         type Room = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = St::CreatedAt;
-        type Room = St::Room;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Subject = St::Subject;
         type CreatedAt = Set<members::created_at>;
         type Room = St::Room;
+        type Subject = St::Subject;
     }
     ///State transition - sets the `room` field to Set
     pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRoom<St> {}
     impl<St: State> State for SetRoom<St> {
-        type Subject = St::Subject;
         type CreatedAt = St::CreatedAt;
         type Room = Set<members::room>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Room = St::Room;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `room` field
         pub struct room(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AllowlistBuilder<S: BosStr, St: allowlist_state::State> {
+pub struct AllowlistBuilder<St: allowlist_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Allowlist<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AllowlistBuilder<S, allowlist_state::Empty> {
+impl Allowlist<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AllowlistBuilder<allowlist_state::Empty, DefaultStr> {
         AllowlistBuilder::new()
     }
 }
 
-impl<S: BosStr> AllowlistBuilder<S, allowlist_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Allowlist<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AllowlistBuilder<allowlist_state::Empty, S> {
+        AllowlistBuilder::builder()
+    }
+}
+
+impl AllowlistBuilder<allowlist_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AllowlistBuilder {
             _state: PhantomData,
@@ -189,7 +196,18 @@ impl<S: BosStr> AllowlistBuilder<S, allowlist_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AllowlistBuilder<S, St>
+impl<S: BosStr> AllowlistBuilder<allowlist_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AllowlistBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AllowlistBuilder<St, S>
 where
     St: allowlist_state::State,
     St::CreatedAt: allowlist_state::IsUnset,
@@ -198,7 +216,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AllowlistBuilder<S, allowlist_state::SetCreatedAt<St>> {
+    ) -> AllowlistBuilder<allowlist_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AllowlistBuilder {
             _state: PhantomData,
@@ -208,7 +226,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AllowlistBuilder<S, St>
+impl<St, S: BosStr> AllowlistBuilder<St, S>
 where
     St: allowlist_state::State,
     St::Room: allowlist_state::IsUnset,
@@ -217,7 +235,7 @@ where
     pub fn room(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> AllowlistBuilder<S, allowlist_state::SetRoom<St>> {
+    ) -> AllowlistBuilder<allowlist_state::SetRoom<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AllowlistBuilder {
             _state: PhantomData,
@@ -227,7 +245,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AllowlistBuilder<S, St>
+impl<St, S: BosStr> AllowlistBuilder<St, S>
 where
     St: allowlist_state::State,
     St::Subject: allowlist_state::IsUnset,
@@ -236,7 +254,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> AllowlistBuilder<S, allowlist_state::SetSubject<St>> {
+    ) -> AllowlistBuilder<allowlist_state::SetSubject<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AllowlistBuilder {
             _state: PhantomData,
@@ -246,12 +264,12 @@ where
     }
 }
 
-impl<S: BosStr, St> AllowlistBuilder<S, St>
+impl<St, S: BosStr> AllowlistBuilder<St, S>
 where
     St: allowlist_state::State,
-    St::Subject: allowlist_state::IsSet,
     St::CreatedAt: allowlist_state::IsSet,
     St::Room: allowlist_state::IsSet,
+    St::Subject: allowlist_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Allowlist<S> {
@@ -263,7 +281,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Allowlist<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Allowlist<S> {
         Allowlist {
             created_at: self._fields.0.unwrap(),
             room: self._fields.1.unwrap(),
@@ -274,10 +295,10 @@ where
 }
 
 fn lexicon_doc_app_protoimsg_chat_allowlist() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.protoimsg.chat.allowlist"),

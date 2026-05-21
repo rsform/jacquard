@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -25,19 +25,16 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::ch_indiemusi::alpha::actor::artist;
-use crate::ch_indiemusi::alpha::recording::Recording;
-use crate::ch_indiemusi::alpha::release;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::ch_indiemusi::alpha::recording::Recording;
+use crate::ch_indiemusi::alpha::actor::artist;
+use crate::ch_indiemusi::alpha::release;
 /// Information about an artist contributing to the release
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Artist<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artist: Option<artist::Artist<S>>,
@@ -202,10 +199,10 @@ impl<S: BosStr> LexiconSchema for Release<S> {
 }
 
 fn lexicon_doc_ch_indiemusi_alpha_release() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ch.indiemusi.alpha.release"),
@@ -214,9 +211,11 @@ fn lexicon_doc_ch_indiemusi_alpha_release() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("artist"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Information about an artist contributing to the release",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Information about an artist contributing to the release",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("name")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -224,7 +223,9 @@ fn lexicon_doc_ch_indiemusi_alpha_release() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artist"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("ch.indiemusi.alpha.actor.artist"),
+                                r#ref: CowStr::new_static(
+                                    "ch.indiemusi.alpha.actor.artist",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -339,7 +340,7 @@ fn lexicon_doc_ch_indiemusi_alpha_release() -> LexiconDoc<'static> {
 
 pub mod release_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -396,7 +397,7 @@ pub mod release_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReleaseBuilder<S: BosStr, St: release_state::State> {
+pub struct ReleaseBuilder<St: release_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<release::Artist<S>>>,
@@ -409,15 +410,22 @@ pub struct ReleaseBuilder<S: BosStr, St: release_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Release<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ReleaseBuilder<S, release_state::Empty> {
+impl Release<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReleaseBuilder<release_state::Empty, DefaultStr> {
         ReleaseBuilder::new()
     }
 }
 
-impl<S: BosStr> ReleaseBuilder<S, release_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Release<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReleaseBuilder<release_state::Empty, S> {
+        ReleaseBuilder::builder()
+    }
+}
+
+impl ReleaseBuilder<release_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ReleaseBuilder {
             _state: PhantomData,
@@ -427,7 +435,18 @@ impl<S: BosStr> ReleaseBuilder<S, release_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ReleaseBuilder<S, St>
+impl<S: BosStr> ReleaseBuilder<release_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReleaseBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReleaseBuilder<St, S>
 where
     St: release_state::State,
     St::Artists: release_state::IsUnset,
@@ -436,7 +455,7 @@ where
     pub fn artists(
         mut self,
         value: impl Into<Vec<release::Artist<S>>>,
-    ) -> ReleaseBuilder<S, release_state::SetArtists<St>> {
+    ) -> ReleaseBuilder<release_state::SetArtists<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ReleaseBuilder {
             _state: PhantomData,
@@ -446,7 +465,7 @@ where
     }
 }
 
-impl<S: BosStr, St: release_state::State> ReleaseBuilder<S, St> {
+impl<St: release_state::State, S: BosStr> ReleaseBuilder<St, S> {
     /// Set the `artworkImage` field (optional)
     pub fn artwork_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -459,7 +478,7 @@ impl<S: BosStr, St: release_state::State> ReleaseBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: release_state::State> ReleaseBuilder<S, St> {
+impl<St: release_state::State, S: BosStr> ReleaseBuilder<St, S> {
     /// Set the `gtin` field (optional)
     pub fn gtin(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -472,7 +491,7 @@ impl<S: BosStr, St: release_state::State> ReleaseBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ReleaseBuilder<S, St>
+impl<St, S: BosStr> ReleaseBuilder<St, S>
 where
     St: release_state::State,
     St::Recordings: release_state::IsUnset,
@@ -481,7 +500,7 @@ where
     pub fn recordings(
         mut self,
         value: impl Into<Vec<Recording<S>>>,
-    ) -> ReleaseBuilder<S, release_state::SetRecordings<St>> {
+    ) -> ReleaseBuilder<release_state::SetRecordings<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ReleaseBuilder {
             _state: PhantomData,
@@ -491,7 +510,7 @@ where
     }
 }
 
-impl<S: BosStr, St: release_state::State> ReleaseBuilder<S, St> {
+impl<St: release_state::State, S: BosStr> ReleaseBuilder<St, S> {
     /// Set the `releaseDate` field (optional)
     pub fn release_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -504,13 +523,16 @@ impl<S: BosStr, St: release_state::State> ReleaseBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ReleaseBuilder<S, St>
+impl<St, S: BosStr> ReleaseBuilder<St, S>
 where
     St: release_state::State,
     St::Title: release_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> ReleaseBuilder<S, release_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> ReleaseBuilder<release_state::SetTitle<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ReleaseBuilder {
             _state: PhantomData,
@@ -520,7 +542,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReleaseBuilder<S, St>
+impl<St, S: BosStr> ReleaseBuilder<St, S>
 where
     St: release_state::State,
     St::Title: release_state::IsSet,

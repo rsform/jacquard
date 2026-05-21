@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,26 +21,21 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_weaver::actor::ProfileViewBasic;
-use crate::sh_weaver::notebook::get_entry_notebooks;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::actor::ProfileViewBasic;
+use crate::sh_weaver::notebook::get_entry_notebooks;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntryNotebooks<S: BosStr = DefaultStr> {
     pub entry: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntryNotebooksOutput<S: BosStr = DefaultStr> {
     pub notebooks: Vec<get_entry_notebooks::NotebookRef<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -50,10 +45,7 @@ pub struct GetEntryNotebooksOutput<S: BosStr = DefaultStr> {
 /// Reference to a notebook containing this entry.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotebookRef<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -106,7 +98,7 @@ impl<S: BosStr> LexiconSchema for NotebookRef<S> {
 
 pub mod get_entry_notebooks_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -137,21 +129,34 @@ pub mod get_entry_notebooks_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetEntryNotebooksBuilder<S: BosStr, St: get_entry_notebooks_state::State> {
+pub struct GetEntryNotebooksBuilder<
+    St: get_entry_notebooks_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetEntryNotebooks<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetEntryNotebooksBuilder<S, get_entry_notebooks_state::Empty> {
+impl GetEntryNotebooks<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetEntryNotebooksBuilder<
+        get_entry_notebooks_state::Empty,
+        DefaultStr,
+    > {
         GetEntryNotebooksBuilder::new()
     }
 }
 
-impl<S: BosStr> GetEntryNotebooksBuilder<S, get_entry_notebooks_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetEntryNotebooks<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetEntryNotebooksBuilder<get_entry_notebooks_state::Empty, S> {
+        GetEntryNotebooksBuilder::builder()
+    }
+}
+
+impl GetEntryNotebooksBuilder<get_entry_notebooks_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetEntryNotebooksBuilder {
             _state: PhantomData,
@@ -161,7 +166,18 @@ impl<S: BosStr> GetEntryNotebooksBuilder<S, get_entry_notebooks_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetEntryNotebooksBuilder<S, St>
+impl<S: BosStr> GetEntryNotebooksBuilder<get_entry_notebooks_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetEntryNotebooksBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetEntryNotebooksBuilder<St, S>
 where
     St: get_entry_notebooks_state::State,
     St::Entry: get_entry_notebooks_state::IsUnset,
@@ -170,7 +186,7 @@ where
     pub fn entry(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetEntryNotebooksBuilder<S, get_entry_notebooks_state::SetEntry<St>> {
+    ) -> GetEntryNotebooksBuilder<get_entry_notebooks_state::SetEntry<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetEntryNotebooksBuilder {
             _state: PhantomData,
@@ -180,7 +196,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetEntryNotebooksBuilder<S, St>
+impl<St, S: BosStr> GetEntryNotebooksBuilder<St, S>
 where
     St: get_entry_notebooks_state::State,
     St::Entry: get_entry_notebooks_state::IsSet,
@@ -195,7 +211,7 @@ where
 
 pub mod notebook_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -238,26 +254,28 @@ pub mod notebook_ref_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NotebookRefBuilder<S: BosStr, St: notebook_ref_state::State> {
+pub struct NotebookRefBuilder<St: notebook_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Cid<S>>,
-        Option<ProfileViewBasic<S>>,
-        Option<S>,
-        Option<AtUri<S>>,
-    ),
+    _fields: (Option<Cid<S>>, Option<ProfileViewBasic<S>>, Option<S>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> NotebookRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> NotebookRefBuilder<S, notebook_ref_state::Empty> {
+impl NotebookRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> NotebookRefBuilder<notebook_ref_state::Empty, DefaultStr> {
         NotebookRefBuilder::new()
     }
 }
 
-impl<S: BosStr> NotebookRefBuilder<S, notebook_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> NotebookRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> NotebookRefBuilder<notebook_ref_state::Empty, S> {
+        NotebookRefBuilder::builder()
+    }
+}
+
+impl NotebookRefBuilder<notebook_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         NotebookRefBuilder {
             _state: PhantomData,
@@ -267,7 +285,18 @@ impl<S: BosStr> NotebookRefBuilder<S, notebook_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> NotebookRefBuilder<S, St>
+impl<S: BosStr> NotebookRefBuilder<notebook_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        NotebookRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> NotebookRefBuilder<St, S>
 where
     St: notebook_ref_state::State,
     St::Cid: notebook_ref_state::IsUnset,
@@ -276,7 +305,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> NotebookRefBuilder<S, notebook_ref_state::SetCid<St>> {
+    ) -> NotebookRefBuilder<notebook_ref_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         NotebookRefBuilder {
             _state: PhantomData,
@@ -286,7 +315,7 @@ where
     }
 }
 
-impl<S: BosStr, St: notebook_ref_state::State> NotebookRefBuilder<S, St> {
+impl<St: notebook_ref_state::State, S: BosStr> NotebookRefBuilder<St, S> {
     /// Set the `owner` field (optional)
     pub fn owner(mut self, value: impl Into<Option<ProfileViewBasic<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -299,7 +328,7 @@ impl<S: BosStr, St: notebook_ref_state::State> NotebookRefBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: notebook_ref_state::State> NotebookRefBuilder<S, St> {
+impl<St: notebook_ref_state::State, S: BosStr> NotebookRefBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -312,7 +341,7 @@ impl<S: BosStr, St: notebook_ref_state::State> NotebookRefBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> NotebookRefBuilder<S, St>
+impl<St, S: BosStr> NotebookRefBuilder<St, S>
 where
     St: notebook_ref_state::State,
     St::Uri: notebook_ref_state::IsUnset,
@@ -321,7 +350,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> NotebookRefBuilder<S, notebook_ref_state::SetUri<St>> {
+    ) -> NotebookRefBuilder<notebook_ref_state::SetUri<St>, S> {
         self._fields.3 = Option::Some(value.into());
         NotebookRefBuilder {
             _state: PhantomData,
@@ -331,7 +360,7 @@ where
     }
 }
 
-impl<S: BosStr, St> NotebookRefBuilder<S, St>
+impl<St, S: BosStr> NotebookRefBuilder<St, S>
 where
     St: notebook_ref_state::State,
     St::Cid: notebook_ref_state::IsSet,
@@ -348,7 +377,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NotebookRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> NotebookRef<S> {
         NotebookRef {
             cid: self._fields.0.unwrap(),
             owner: self._fields.1,
@@ -360,10 +392,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_notebook_getEntryNotebooks() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.notebook.getEntryNotebooks"),
@@ -372,33 +404,41 @@ fn lexicon_doc_sh_weaver_notebook_getEntryNotebooks() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("entry")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("entry"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static("AT URI of the entry")),
-                                    format: Some(LexStringFormat::AtUri),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("entry")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("entry"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("AT URI of the entry"),
+                                        ),
+                                        format: Some(LexStringFormat::AtUri),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("notebookRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Reference to a notebook containing this entry.",
-                    )),
-                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Reference to a notebook containing this entry.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -412,15 +452,15 @@ fn lexicon_doc_sh_weaver_notebook_getEntryNotebooks() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("owner"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "sh.weaver.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),

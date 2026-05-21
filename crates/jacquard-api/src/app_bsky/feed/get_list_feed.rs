@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::feed::FeedViewPost;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::feed::FeedViewPost;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetListFeed<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -33,11 +30,9 @@ pub struct GetListFeed<S: BosStr = DefaultStr> {
     pub list: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetListFeedOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -46,19 +41,25 @@ pub struct GetListFeedOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetListFeedError {
     #[serde(rename = "UnknownList")]
     UnknownList(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetListFeedError {
@@ -112,7 +113,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_list_feed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -143,21 +144,28 @@ pub mod get_list_feed_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetListFeedBuilder<S: BosStr, St: get_list_feed_state::State> {
+pub struct GetListFeedBuilder<St: get_list_feed_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetListFeed<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetListFeedBuilder<S, get_list_feed_state::Empty> {
+impl GetListFeed<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetListFeedBuilder<get_list_feed_state::Empty, DefaultStr> {
         GetListFeedBuilder::new()
     }
 }
 
-impl<S: BosStr> GetListFeedBuilder<S, get_list_feed_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetListFeed<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetListFeedBuilder<get_list_feed_state::Empty, S> {
+        GetListFeedBuilder::builder()
+    }
+}
+
+impl GetListFeedBuilder<get_list_feed_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetListFeedBuilder {
             _state: PhantomData,
@@ -167,7 +175,18 @@ impl<S: BosStr> GetListFeedBuilder<S, get_list_feed_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_list_feed_state::State> GetListFeedBuilder<S, St> {
+impl<S: BosStr> GetListFeedBuilder<get_list_feed_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetListFeedBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_list_feed_state::State, S: BosStr> GetListFeedBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -180,7 +199,7 @@ impl<S: BosStr, St: get_list_feed_state::State> GetListFeedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_list_feed_state::State> GetListFeedBuilder<S, St> {
+impl<St: get_list_feed_state::State, S: BosStr> GetListFeedBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -193,7 +212,7 @@ impl<S: BosStr, St: get_list_feed_state::State> GetListFeedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetListFeedBuilder<S, St>
+impl<St, S: BosStr> GetListFeedBuilder<St, S>
 where
     St: get_list_feed_state::State,
     St::List: get_list_feed_state::IsUnset,
@@ -202,7 +221,7 @@ where
     pub fn list(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetListFeedBuilder<S, get_list_feed_state::SetList<St>> {
+    ) -> GetListFeedBuilder<get_list_feed_state::SetList<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GetListFeedBuilder {
             _state: PhantomData,
@@ -212,7 +231,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetListFeedBuilder<S, St>
+impl<St, S: BosStr> GetListFeedBuilder<St, S>
 where
     St: get_list_feed_state::State,
     St::List: get_list_feed_state::IsSet,

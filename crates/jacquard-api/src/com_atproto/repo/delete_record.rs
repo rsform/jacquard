@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::com_atproto::repo::CommitMeta;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_common::types::string::{Cid, Nsid, RecordKey, Rkey};
+use jacquard_common::types::string::{Nsid, Cid, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::CommitMeta;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteRecord<S: BosStr = DefaultStr> {
     ///The NSID of the record collection.
     pub collection: Nsid<S>,
@@ -41,11 +38,9 @@ pub struct DeleteRecord<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub commit: Option<CommitMeta<S>>,
@@ -53,19 +48,25 @@ pub struct DeleteRecordOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum DeleteRecordError {
     #[serde(rename = "InvalidSwap")]
     InvalidSwap(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for DeleteRecordError {
@@ -100,8 +101,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteRecordResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteRecord<S> {
     const NSID: &'static str = "com.atproto.repo.deleteRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteRecordResponse;
 }
 
@@ -109,15 +111,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteRecord<S> {
 pub struct DeleteRecordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteRecordRequest {
     const PATH: &'static str = "/xrpc/com.atproto.repo.deleteRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeleteRecord<S>;
     type Response = DeleteRecordResponse;
 }
 
 pub mod delete_record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -125,56 +128,56 @@ pub mod delete_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rkey;
-        type Repo;
         type Collection;
+        type Repo;
+        type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rkey = Unset;
-        type Repo = Unset;
         type Collection = Unset;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRkey<St> {}
-    impl<St: State> State for SetRkey<St> {
-        type Rkey = Set<members::rkey>;
-        type Repo = St::Repo;
-        type Collection = St::Collection;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Rkey = St::Rkey;
-        type Repo = Set<members::repo>;
-        type Collection = St::Collection;
+        type Repo = Unset;
+        type Rkey = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
-        type Rkey = St::Rkey;
-        type Repo = St::Repo;
         type Collection = Set<members::collection>;
+        type Repo = St::Repo;
+        type Rkey = St::Rkey;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Collection = St::Collection;
+        type Repo = Set<members::repo>;
+        type Rkey = St::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRkey<St> {}
+    impl<St: State> State for SetRkey<St> {
+        type Collection = St::Collection;
+        type Repo = St::Repo;
+        type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeleteRecordBuilder<S: BosStr, St: delete_record_state::State> {
+pub struct DeleteRecordBuilder<St: delete_record_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Nsid<S>>,
@@ -186,15 +189,22 @@ pub struct DeleteRecordBuilder<S: BosStr, St: delete_record_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DeleteRecord<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DeleteRecordBuilder<S, delete_record_state::Empty> {
+impl DeleteRecord<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DeleteRecordBuilder<delete_record_state::Empty, DefaultStr> {
         DeleteRecordBuilder::new()
     }
 }
 
-impl<S: BosStr> DeleteRecordBuilder<S, delete_record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DeleteRecord<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DeleteRecordBuilder<delete_record_state::Empty, S> {
+        DeleteRecordBuilder::builder()
+    }
+}
+
+impl DeleteRecordBuilder<delete_record_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DeleteRecordBuilder {
             _state: PhantomData,
@@ -204,7 +214,18 @@ impl<S: BosStr> DeleteRecordBuilder<S, delete_record_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DeleteRecordBuilder<S, St>
+impl<S: BosStr> DeleteRecordBuilder<delete_record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DeleteRecordBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DeleteRecordBuilder<St, S>
 where
     St: delete_record_state::State,
     St::Collection: delete_record_state::IsUnset,
@@ -213,7 +234,7 @@ where
     pub fn collection(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> DeleteRecordBuilder<S, delete_record_state::SetCollection<St>> {
+    ) -> DeleteRecordBuilder<delete_record_state::SetCollection<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DeleteRecordBuilder {
             _state: PhantomData,
@@ -223,7 +244,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeleteRecordBuilder<S, St>
+impl<St, S: BosStr> DeleteRecordBuilder<St, S>
 where
     St: delete_record_state::State,
     St::Repo: delete_record_state::IsUnset,
@@ -232,7 +253,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> DeleteRecordBuilder<S, delete_record_state::SetRepo<St>> {
+    ) -> DeleteRecordBuilder<delete_record_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DeleteRecordBuilder {
             _state: PhantomData,
@@ -242,7 +263,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeleteRecordBuilder<S, St>
+impl<St, S: BosStr> DeleteRecordBuilder<St, S>
 where
     St: delete_record_state::State,
     St::Rkey: delete_record_state::IsUnset,
@@ -251,7 +272,7 @@ where
     pub fn rkey(
         mut self,
         value: impl Into<RecordKey<Rkey<S>>>,
-    ) -> DeleteRecordBuilder<S, delete_record_state::SetRkey<St>> {
+    ) -> DeleteRecordBuilder<delete_record_state::SetRkey<St>, S> {
         self._fields.2 = Option::Some(value.into());
         DeleteRecordBuilder {
             _state: PhantomData,
@@ -261,7 +282,7 @@ where
     }
 }
 
-impl<S: BosStr, St: delete_record_state::State> DeleteRecordBuilder<S, St> {
+impl<St: delete_record_state::State, S: BosStr> DeleteRecordBuilder<St, S> {
     /// Set the `swapCommit` field (optional)
     pub fn swap_commit(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -274,7 +295,7 @@ impl<S: BosStr, St: delete_record_state::State> DeleteRecordBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: delete_record_state::State> DeleteRecordBuilder<S, St> {
+impl<St: delete_record_state::State, S: BosStr> DeleteRecordBuilder<St, S> {
     /// Set the `swapRecord` field (optional)
     pub fn swap_record(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -287,12 +308,12 @@ impl<S: BosStr, St: delete_record_state::State> DeleteRecordBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DeleteRecordBuilder<S, St>
+impl<St, S: BosStr> DeleteRecordBuilder<St, S>
 where
     St: delete_record_state::State,
-    St::Rkey: delete_record_state::IsSet,
-    St::Repo: delete_record_state::IsSet,
     St::Collection: delete_record_state::IsSet,
+    St::Repo: delete_record_state::IsSet,
+    St::Rkey: delete_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DeleteRecord<S> {
@@ -306,7 +327,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeleteRecord<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteRecord<S> {
         DeleteRecord {
             collection: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),

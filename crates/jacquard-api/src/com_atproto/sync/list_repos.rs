@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Cid, Did, Tid};
+use jacquard_common::types::string::{Did, Tid, Cid};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::sync::list_repos;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::sync::list_repos;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListRepos<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -40,11 +37,9 @@ pub struct ListRepos<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListReposOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -53,11 +48,9 @@ pub struct ListReposOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Repo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
@@ -212,7 +205,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_repos_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -230,21 +223,28 @@ pub mod list_repos_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListReposBuilder<S: BosStr, St: list_repos_state::State> {
+pub struct ListReposBuilder<St: list_repos_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ListRepos<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListReposBuilder<S, list_repos_state::Empty> {
+impl ListRepos<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListReposBuilder<list_repos_state::Empty, DefaultStr> {
         ListReposBuilder::new()
     }
 }
 
-impl<S: BosStr> ListReposBuilder<S, list_repos_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ListRepos<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListReposBuilder<list_repos_state::Empty, S> {
+        ListReposBuilder::builder()
+    }
+}
+
+impl ListReposBuilder<list_repos_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListReposBuilder {
             _state: PhantomData,
@@ -254,7 +254,18 @@ impl<S: BosStr> ListReposBuilder<S, list_repos_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: list_repos_state::State> ListReposBuilder<S, St> {
+impl<S: BosStr> ListReposBuilder<list_repos_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListReposBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: list_repos_state::State, S: BosStr> ListReposBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -267,7 +278,7 @@ impl<S: BosStr, St: list_repos_state::State> ListReposBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: list_repos_state::State> ListReposBuilder<S, St> {
+impl<St: list_repos_state::State, S: BosStr> ListReposBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -280,7 +291,7 @@ impl<S: BosStr, St: list_repos_state::State> ListReposBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListReposBuilder<S, St>
+impl<St, S: BosStr> ListReposBuilder<St, S>
 where
     St: list_repos_state::State,
 {
@@ -295,7 +306,7 @@ where
 
 pub mod repo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -303,56 +314,56 @@ pub mod repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Head;
         type Rev;
         type Did;
-        type Head;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Head = Unset;
         type Rev = Unset;
         type Did = Unset;
-        type Head = Unset;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev<St> {}
-    impl<St: State> State for SetRev<St> {
-        type Rev = Set<members::rev>;
-        type Did = St::Did;
-        type Head = St::Head;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Rev = St::Rev;
-        type Did = Set<members::did>;
-        type Head = St::Head;
     }
     ///State transition - sets the `head` field to Set
     pub struct SetHead<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHead<St> {}
     impl<St: State> State for SetHead<St> {
+        type Head = Set<members::head>;
         type Rev = St::Rev;
         type Did = St::Did;
-        type Head = Set<members::head>;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev<St> {}
+    impl<St: State> State for SetRev<St> {
+        type Head = St::Head;
+        type Rev = Set<members::rev>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Head = St::Head;
+        type Rev = St::Rev;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `head` field
+        pub struct head(());
         ///Marker type for the `rev` field
         pub struct rev(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `head` field
-        pub struct head(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RepoBuilder<S: BosStr, St: repo_state::State> {
+pub struct RepoBuilder<St: repo_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -364,15 +375,22 @@ pub struct RepoBuilder<S: BosStr, St: repo_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Repo<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RepoBuilder<S, repo_state::Empty> {
+impl Repo<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RepoBuilder<repo_state::Empty, DefaultStr> {
         RepoBuilder::new()
     }
 }
 
-impl<S: BosStr> RepoBuilder<S, repo_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Repo<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RepoBuilder<repo_state::Empty, S> {
+        RepoBuilder::builder()
+    }
+}
+
+impl RepoBuilder<repo_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RepoBuilder {
             _state: PhantomData,
@@ -382,7 +400,18 @@ impl<S: BosStr> RepoBuilder<S, repo_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: repo_state::State> RepoBuilder<S, St> {
+impl<S: BosStr> RepoBuilder<repo_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RepoBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: repo_state::State, S: BosStr> RepoBuilder<St, S> {
     /// Set the `active` field (optional)
     pub fn active(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -395,13 +424,16 @@ impl<S: BosStr, St: repo_state::State> RepoBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RepoBuilder<S, St>
+impl<St, S: BosStr> RepoBuilder<St, S>
 where
     St: repo_state::State,
     St::Did: repo_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> RepoBuilder<S, repo_state::SetDid<St>> {
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> RepoBuilder<repo_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RepoBuilder {
             _state: PhantomData,
@@ -411,13 +443,16 @@ where
     }
 }
 
-impl<S: BosStr, St> RepoBuilder<S, St>
+impl<St, S: BosStr> RepoBuilder<St, S>
 where
     St: repo_state::State,
     St::Head: repo_state::IsUnset,
 {
     /// Set the `head` field (required)
-    pub fn head(mut self, value: impl Into<Cid<S>>) -> RepoBuilder<S, repo_state::SetHead<St>> {
+    pub fn head(
+        mut self,
+        value: impl Into<Cid<S>>,
+    ) -> RepoBuilder<repo_state::SetHead<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RepoBuilder {
             _state: PhantomData,
@@ -427,13 +462,16 @@ where
     }
 }
 
-impl<S: BosStr, St> RepoBuilder<S, St>
+impl<St, S: BosStr> RepoBuilder<St, S>
 where
     St: repo_state::State,
     St::Rev: repo_state::IsUnset,
 {
     /// Set the `rev` field (required)
-    pub fn rev(mut self, value: impl Into<Tid>) -> RepoBuilder<S, repo_state::SetRev<St>> {
+    pub fn rev(
+        mut self,
+        value: impl Into<Tid>,
+    ) -> RepoBuilder<repo_state::SetRev<St>, S> {
         self._fields.3 = Option::Some(value.into());
         RepoBuilder {
             _state: PhantomData,
@@ -443,7 +481,7 @@ where
     }
 }
 
-impl<S: BosStr, St: repo_state::State> RepoBuilder<S, St> {
+impl<St: repo_state::State, S: BosStr> RepoBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<RepoStatus<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -456,12 +494,12 @@ impl<S: BosStr, St: repo_state::State> RepoBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RepoBuilder<S, St>
+impl<St, S: BosStr> RepoBuilder<St, S>
 where
     St: repo_state::State,
+    St::Head: repo_state::IsSet,
     St::Rev: repo_state::IsSet,
     St::Did: repo_state::IsSet,
-    St::Head: repo_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Repo<S> {
@@ -488,10 +526,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_sync_listRepos() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.sync.listRepos"),
@@ -500,26 +538,28 @@ fn lexicon_doc_com_atproto_sync_listRepos() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,19 +22,16 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::embed::AspectRatio;
 use crate::sh_weaver::embed::PercentSize;
 use crate::sh_weaver::embed::PixelSize;
 use crate::sh_weaver::embed::images;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Image<S: BosStr = DefaultStr> {
     ///alt text description of the image
     pub alt: S,
@@ -50,6 +47,7 @@ pub struct Image<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -62,33 +60,27 @@ pub enum ImageDimensions<S: BosStr = DefaultStr> {
     PixelSize(Box<PixelSize<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Images<S: BosStr = DefaultStr> {
     pub images: Vec<images::Image<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct View<S: BosStr = DefaultStr> {
     pub images: Vec<images::ViewImage<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ViewImage<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     pub alt: S,
@@ -103,6 +95,7 @@ pub struct ViewImage<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -155,16 +148,19 @@ impl<S: BosStr> LexiconSchema for Image<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
@@ -267,7 +263,7 @@ impl<S: BosStr> LexiconSchema for ViewImage<S> {
 
 pub mod image_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -275,42 +271,42 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Image;
         type Alt;
+        type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Image = Unset;
         type Alt = Unset;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetImage<St> {}
-    impl<St: State> State for SetImage<St> {
-        type Image = Set<members::image>;
-        type Alt = St::Alt;
+        type Image = Unset;
     }
     ///State transition - sets the `alt` field to Set
     pub struct SetAlt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAlt<St> {}
     impl<St: State> State for SetAlt<St> {
-        type Image = St::Image;
         type Alt = Set<members::alt>;
+        type Image = St::Image;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
+        type Alt = St::Alt;
+        type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image` field
-        pub struct image(());
         ///Marker type for the `alt` field
         pub struct alt(());
+        ///Marker type for the `image` field
+        pub struct image(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ImageBuilder<S: BosStr, St: image_state::State> {
+pub struct ImageBuilder<St: image_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -322,15 +318,22 @@ pub struct ImageBuilder<S: BosStr, St: image_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Image<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ImageBuilder<S, image_state::Empty> {
+impl Image<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ImageBuilder<image_state::Empty, DefaultStr> {
         ImageBuilder::new()
     }
 }
 
-impl<S: BosStr> ImageBuilder<S, image_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Image<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ImageBuilder<image_state::Empty, S> {
+        ImageBuilder::builder()
+    }
+}
+
+impl ImageBuilder<image_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ImageBuilder {
             _state: PhantomData,
@@ -340,13 +343,27 @@ impl<S: BosStr> ImageBuilder<S, image_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ImageBuilder<S, St>
+impl<S: BosStr> ImageBuilder<image_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ImageBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
     St::Alt: image_state::IsUnset,
 {
     /// Set the `alt` field (required)
-    pub fn alt(mut self, value: impl Into<S>) -> ImageBuilder<S, image_state::SetAlt<St>> {
+    pub fn alt(
+        mut self,
+        value: impl Into<S>,
+    ) -> ImageBuilder<image_state::SetAlt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
@@ -356,7 +373,7 @@ where
     }
 }
 
-impl<S: BosStr, St: image_state::State> ImageBuilder<S, St> {
+impl<St: image_state::State, S: BosStr> ImageBuilder<St, S> {
     /// Set the `blurhash` field (optional)
     pub fn blurhash(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -369,7 +386,7 @@ impl<S: BosStr, St: image_state::State> ImageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: image_state::State> ImageBuilder<S, St> {
+impl<St: image_state::State, S: BosStr> ImageBuilder<St, S> {
     /// Set the `dimensions` field (optional)
     pub fn dimensions(mut self, value: impl Into<Option<ImageDimensions<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -382,7 +399,7 @@ impl<S: BosStr, St: image_state::State> ImageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ImageBuilder<S, St>
+impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
     St::Image: image_state::IsUnset,
@@ -391,7 +408,7 @@ where
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ImageBuilder<S, image_state::SetImage<St>> {
+    ) -> ImageBuilder<image_state::SetImage<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
@@ -401,7 +418,7 @@ where
     }
 }
 
-impl<S: BosStr, St: image_state::State> ImageBuilder<S, St> {
+impl<St: image_state::State, S: BosStr> ImageBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -414,11 +431,11 @@ impl<S: BosStr, St: image_state::State> ImageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ImageBuilder<S, St>
+impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
-    St::Image: image_state::IsSet,
     St::Alt: image_state::IsSet,
+    St::Image: image_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Image<S> {
@@ -445,10 +462,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_embed_images() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.embed.images"),
@@ -635,7 +652,7 @@ fn lexicon_doc_sh_weaver_embed_images() -> LexiconDoc<'static> {
 
 pub mod images_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -666,21 +683,28 @@ pub mod images_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ImagesBuilder<S: BosStr, St: images_state::State> {
+pub struct ImagesBuilder<St: images_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<images::Image<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Images<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ImagesBuilder<S, images_state::Empty> {
+impl Images<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ImagesBuilder<images_state::Empty, DefaultStr> {
         ImagesBuilder::new()
     }
 }
 
-impl<S: BosStr> ImagesBuilder<S, images_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Images<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ImagesBuilder<images_state::Empty, S> {
+        ImagesBuilder::builder()
+    }
+}
+
+impl ImagesBuilder<images_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ImagesBuilder {
             _state: PhantomData,
@@ -690,7 +714,18 @@ impl<S: BosStr> ImagesBuilder<S, images_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ImagesBuilder<S, St>
+impl<S: BosStr> ImagesBuilder<images_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ImagesBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ImagesBuilder<St, S>
 where
     St: images_state::State,
     St::Images: images_state::IsUnset,
@@ -699,7 +734,7 @@ where
     pub fn images(
         mut self,
         value: impl Into<Vec<images::Image<S>>>,
-    ) -> ImagesBuilder<S, images_state::SetImages<St>> {
+    ) -> ImagesBuilder<images_state::SetImages<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ImagesBuilder {
             _state: PhantomData,
@@ -709,7 +744,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ImagesBuilder<S, St>
+impl<St, S: BosStr> ImagesBuilder<St, S>
 where
     St: images_state::State,
     St::Images: images_state::IsSet,
@@ -732,7 +767,7 @@ where
 
 pub mod view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -763,21 +798,28 @@ pub mod view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ViewBuilder<S: BosStr, St: view_state::State> {
+pub struct ViewBuilder<St: view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<images::ViewImage<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> View<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ViewBuilder<S, view_state::Empty> {
+impl View<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ViewBuilder<view_state::Empty, DefaultStr> {
         ViewBuilder::new()
     }
 }
 
-impl<S: BosStr> ViewBuilder<S, view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> View<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ViewBuilder<view_state::Empty, S> {
+        ViewBuilder::builder()
+    }
+}
+
+impl ViewBuilder<view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ViewBuilder {
             _state: PhantomData,
@@ -787,7 +829,18 @@ impl<S: BosStr> ViewBuilder<S, view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<S: BosStr> ViewBuilder<view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ViewBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
     St::Images: view_state::IsUnset,
@@ -796,7 +849,7 @@ where
     pub fn images(
         mut self,
         value: impl Into<Vec<images::ViewImage<S>>>,
-    ) -> ViewBuilder<S, view_state::SetImages<St>> {
+    ) -> ViewBuilder<view_state::SetImages<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ViewBuilder {
             _state: PhantomData,
@@ -806,7 +859,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
     St::Images: view_state::IsSet,
@@ -829,7 +882,7 @@ where
 
 pub mod view_image_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -837,56 +890,56 @@ pub mod view_image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Fullsize;
         type Thumb;
+        type Fullsize;
         type Alt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Fullsize = Unset;
         type Thumb = Unset;
+        type Fullsize = Unset;
         type Alt = Unset;
-    }
-    ///State transition - sets the `fullsize` field to Set
-    pub struct SetFullsize<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFullsize<St> {}
-    impl<St: State> State for SetFullsize<St> {
-        type Fullsize = Set<members::fullsize>;
-        type Thumb = St::Thumb;
-        type Alt = St::Alt;
     }
     ///State transition - sets the `thumb` field to Set
     pub struct SetThumb<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetThumb<St> {}
     impl<St: State> State for SetThumb<St> {
-        type Fullsize = St::Fullsize;
         type Thumb = Set<members::thumb>;
+        type Fullsize = St::Fullsize;
+        type Alt = St::Alt;
+    }
+    ///State transition - sets the `fullsize` field to Set
+    pub struct SetFullsize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFullsize<St> {}
+    impl<St: State> State for SetFullsize<St> {
+        type Thumb = St::Thumb;
+        type Fullsize = Set<members::fullsize>;
         type Alt = St::Alt;
     }
     ///State transition - sets the `alt` field to Set
     pub struct SetAlt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAlt<St> {}
     impl<St: State> State for SetAlt<St> {
-        type Fullsize = St::Fullsize;
         type Thumb = St::Thumb;
+        type Fullsize = St::Fullsize;
         type Alt = Set<members::alt>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `fullsize` field
-        pub struct fullsize(());
         ///Marker type for the `thumb` field
         pub struct thumb(());
+        ///Marker type for the `fullsize` field
+        pub struct fullsize(());
         ///Marker type for the `alt` field
         pub struct alt(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ViewImageBuilder<S: BosStr, St: view_image_state::State> {
+pub struct ViewImageBuilder<St: view_image_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -898,15 +951,22 @@ pub struct ViewImageBuilder<S: BosStr, St: view_image_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ViewImage<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ViewImageBuilder<S, view_image_state::Empty> {
+impl ViewImage<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ViewImageBuilder<view_image_state::Empty, DefaultStr> {
         ViewImageBuilder::new()
     }
 }
 
-impl<S: BosStr> ViewImageBuilder<S, view_image_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ViewImage<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ViewImageBuilder<view_image_state::Empty, S> {
+        ViewImageBuilder::builder()
+    }
+}
+
+impl ViewImageBuilder<view_image_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ViewImageBuilder {
             _state: PhantomData,
@@ -916,13 +976,27 @@ impl<S: BosStr> ViewImageBuilder<S, view_image_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ViewImageBuilder<S, St>
+impl<S: BosStr> ViewImageBuilder<view_image_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ViewImageBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ViewImageBuilder<St, S>
 where
     St: view_image_state::State,
     St::Alt: view_image_state::IsUnset,
 {
     /// Set the `alt` field (required)
-    pub fn alt(mut self, value: impl Into<S>) -> ViewImageBuilder<S, view_image_state::SetAlt<St>> {
+    pub fn alt(
+        mut self,
+        value: impl Into<S>,
+    ) -> ViewImageBuilder<view_image_state::SetAlt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ViewImageBuilder {
             _state: PhantomData,
@@ -932,9 +1006,12 @@ where
     }
 }
 
-impl<S: BosStr, St: view_image_state::State> ViewImageBuilder<S, St> {
+impl<St: view_image_state::State, S: BosStr> ViewImageBuilder<St, S> {
     /// Set the `dimensions` field (optional)
-    pub fn dimensions(mut self, value: impl Into<Option<ViewImageDimensions<S>>>) -> Self {
+    pub fn dimensions(
+        mut self,
+        value: impl Into<Option<ViewImageDimensions<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -945,7 +1022,7 @@ impl<S: BosStr, St: view_image_state::State> ViewImageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ViewImageBuilder<S, St>
+impl<St, S: BosStr> ViewImageBuilder<St, S>
 where
     St: view_image_state::State,
     St::Fullsize: view_image_state::IsUnset,
@@ -954,7 +1031,7 @@ where
     pub fn fullsize(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ViewImageBuilder<S, view_image_state::SetFullsize<St>> {
+    ) -> ViewImageBuilder<view_image_state::SetFullsize<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ViewImageBuilder {
             _state: PhantomData,
@@ -964,7 +1041,7 @@ where
     }
 }
 
-impl<S: BosStr, St: view_image_state::State> ViewImageBuilder<S, St> {
+impl<St: view_image_state::State, S: BosStr> ViewImageBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -977,7 +1054,7 @@ impl<S: BosStr, St: view_image_state::State> ViewImageBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ViewImageBuilder<S, St>
+impl<St, S: BosStr> ViewImageBuilder<St, S>
 where
     St: view_image_state::State,
     St::Thumb: view_image_state::IsUnset,
@@ -986,7 +1063,7 @@ where
     pub fn thumb(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ViewImageBuilder<S, view_image_state::SetThumb<St>> {
+    ) -> ViewImageBuilder<view_image_state::SetThumb<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ViewImageBuilder {
             _state: PhantomData,
@@ -996,11 +1073,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ViewImageBuilder<S, St>
+impl<St, S: BosStr> ViewImageBuilder<St, S>
 where
     St: view_image_state::State,
-    St::Fullsize: view_image_state::IsSet,
     St::Thumb: view_image_state::IsSet,
+    St::Fullsize: view_image_state::IsSet,
     St::Alt: view_image_state::IsSet,
 {
     /// Build the final struct.
@@ -1015,7 +1092,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ViewImage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ViewImage<S> {
         ViewImage {
             alt: self._fields.0.unwrap(),
             dimensions: self._fields.1,

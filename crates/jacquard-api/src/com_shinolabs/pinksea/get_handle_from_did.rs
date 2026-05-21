@@ -10,28 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Handle;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetHandleFromDid<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetHandleFromDidOutput<S: BosStr = DefaultStr> {
     ///The handle.
     pub handle: Handle<S>,
@@ -65,7 +60,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetHandleFromDidRequest {
 
 pub mod get_handle_from_did_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -96,21 +91,34 @@ pub mod get_handle_from_did_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetHandleFromDidBuilder<S: BosStr, St: get_handle_from_did_state::State> {
+pub struct GetHandleFromDidBuilder<
+    St: get_handle_from_did_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetHandleFromDid<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetHandleFromDidBuilder<S, get_handle_from_did_state::Empty> {
+impl GetHandleFromDid<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetHandleFromDidBuilder<
+        get_handle_from_did_state::Empty,
+        DefaultStr,
+    > {
         GetHandleFromDidBuilder::new()
     }
 }
 
-impl<S: BosStr> GetHandleFromDidBuilder<S, get_handle_from_did_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetHandleFromDid<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetHandleFromDidBuilder<get_handle_from_did_state::Empty, S> {
+        GetHandleFromDidBuilder::builder()
+    }
+}
+
+impl GetHandleFromDidBuilder<get_handle_from_did_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetHandleFromDidBuilder {
             _state: PhantomData,
@@ -120,7 +128,18 @@ impl<S: BosStr> GetHandleFromDidBuilder<S, get_handle_from_did_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetHandleFromDidBuilder<S, St>
+impl<S: BosStr> GetHandleFromDidBuilder<get_handle_from_did_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetHandleFromDidBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetHandleFromDidBuilder<St, S>
 where
     St: get_handle_from_did_state::State,
     St::Did: get_handle_from_did_state::IsUnset,
@@ -129,7 +148,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetHandleFromDidBuilder<S, get_handle_from_did_state::SetDid<St>> {
+    ) -> GetHandleFromDidBuilder<get_handle_from_did_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetHandleFromDidBuilder {
             _state: PhantomData,
@@ -139,7 +158,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetHandleFromDidBuilder<S, St>
+impl<St, S: BosStr> GetHandleFromDidBuilder<St, S>
 where
     St: get_handle_from_did_state::State,
     St::Did: get_handle_from_did_state::IsSet,

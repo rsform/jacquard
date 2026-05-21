@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A boxing match program combined with a history book entry. Before the fight it is a schedule. After the fight it is a permanent record. Ptah-Seker-Osiris — creation, shadow, rebirth. The event holds all three phases simultaneously.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -270,8 +270,12 @@ pub enum EventLoreStatus<S: BosStr = DefaultStr> {
 impl<S: BosStr> EventLoreStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::CanonicalStatusOfficial => "world.ptah.temp.defs#canonicalStatusOfficial",
-            Self::CanonicalStatusCommunity => "world.ptah.temp.defs#canonicalStatusCommunity",
+            Self::CanonicalStatusOfficial => {
+                "world.ptah.temp.defs#canonicalStatusOfficial"
+            }
+            Self::CanonicalStatusCommunity => {
+                "world.ptah.temp.defs#canonicalStatusCommunity"
+            }
             Self::Pending => "pending",
             Self::Other(s) => s.as_ref(),
         }
@@ -279,8 +283,12 @@ impl<S: BosStr> EventLoreStatus<S> {
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "world.ptah.temp.defs#canonicalStatusOfficial" => Self::CanonicalStatusOfficial,
-            "world.ptah.temp.defs#canonicalStatusCommunity" => Self::CanonicalStatusCommunity,
+            "world.ptah.temp.defs#canonicalStatusOfficial" => {
+                Self::CanonicalStatusOfficial
+            }
+            "world.ptah.temp.defs#canonicalStatusCommunity" => {
+                Self::CanonicalStatusCommunity
+            }
             "pending" => Self::Pending,
             _ => Self::Other(s),
         }
@@ -332,8 +340,12 @@ where
     type Output = EventLoreStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            EventLoreStatus::CanonicalStatusOfficial => EventLoreStatus::CanonicalStatusOfficial,
-            EventLoreStatus::CanonicalStatusCommunity => EventLoreStatus::CanonicalStatusCommunity,
+            EventLoreStatus::CanonicalStatusOfficial => {
+                EventLoreStatus::CanonicalStatusOfficial
+            }
+            EventLoreStatus::CanonicalStatusCommunity => {
+                EventLoreStatus::CanonicalStatusCommunity
+            }
             EventLoreStatus::Pending => EventLoreStatus::Pending,
             EventLoreStatus::Other(v) => EventLoreStatus::Other(v.into_static()),
         }
@@ -596,7 +608,7 @@ impl<S: BosStr> LexiconSchema for Event<S> {
 
 pub mod event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -669,7 +681,7 @@ pub mod event_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EventBuilder<S: BosStr, St: event_state::State> {
+pub struct EventBuilder<St: event_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -690,27 +702,73 @@ pub struct EventBuilder<S: BosStr, St: event_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Event<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EventBuilder<S, event_state::Empty> {
+impl Event<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EventBuilder<event_state::Empty, DefaultStr> {
         EventBuilder::new()
     }
 }
 
-impl<S: BosStr> EventBuilder<S, event_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Event<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EventBuilder<event_state::Empty, S> {
+        EventBuilder::builder()
+    }
+}
+
+impl EventBuilder<event_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<S: BosStr> EventBuilder<event_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EventBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `completedAt` field (optional)
     pub fn completed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -723,7 +781,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::CreatedAt: event_state::IsUnset,
@@ -732,7 +790,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventBuilder<S, event_state::SetCreatedAt<St>> {
+    ) -> EventBuilder<event_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -742,7 +800,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::CreatorDid: event_state::IsUnset,
@@ -751,7 +809,7 @@ where
     pub fn creator_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventBuilder<S, event_state::SetCreatorDid<St>> {
+    ) -> EventBuilder<event_state::SetCreatorDid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -761,7 +819,7 @@ where
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `eventType` field (optional)
     pub fn event_type(mut self, value: impl Into<Option<EventEventType<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -774,7 +832,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `format` field (optional)
     pub fn format(mut self, value: impl Into<Option<EventFormat<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -787,7 +845,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `locationReference` field (optional)
     pub fn location_reference(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -800,7 +858,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `loreStatus` field (optional)
     pub fn lore_status(mut self, value: impl Into<Option<EventLoreStatus<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -813,13 +871,16 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::Name: event_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> EventBuilder<S, event_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> EventBuilder<event_state::SetName<St>, S> {
         self._fields.7 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -829,7 +890,7 @@ where
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `participants` field (optional)
     pub fn participants(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.8 = value.into();
@@ -842,7 +903,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `result` field (optional)
     pub fn result(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -855,7 +916,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `stakes` field (optional)
     pub fn stakes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -868,7 +929,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<EventStatus<S>>>) -> Self {
         self._fields.11 = value.into();
@@ -881,7 +942,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `witnesses` field (optional)
     pub fn witnesses(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.12 = value.into();
@@ -894,7 +955,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::WorldReference: event_state::IsUnset,
@@ -903,7 +964,7 @@ where
     pub fn world_reference(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> EventBuilder<S, event_state::SetWorldReference<St>> {
+    ) -> EventBuilder<event_state::SetWorldReference<St>, S> {
         self._fields.13 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -913,7 +974,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::CreatedAt: event_state::IsSet,
@@ -964,10 +1025,10 @@ where
 }
 
 fn lexicon_doc_world_ptah_temp_event() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("world.ptah.temp.event"),

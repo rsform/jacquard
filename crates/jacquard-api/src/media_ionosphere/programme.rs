@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,14 +25,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::media_ionosphere::Broadcast;
 use crate::media_ionosphere::Credit;
 use crate::media_ionosphere::Genre;
 use crate::media_ionosphere::Membership;
 use crate::media_ionosphere::Recording;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A programme represents an individual piece of media. It does not represent a long-running show.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -68,6 +68,7 @@ pub struct Programme<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -147,16 +148,19 @@ impl<S: BosStr> LexiconSchema for Programme<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("icon"),
@@ -196,7 +200,7 @@ impl<S: BosStr> LexiconSchema for Programme<S> {
 
 pub mod programme_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -253,7 +257,7 @@ pub mod programme_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProgrammeBuilder<S: BosStr, St: programme_state::State> {
+pub struct ProgrammeBuilder<St: programme_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<Credit<S>>>,
@@ -271,27 +275,43 @@ pub struct ProgrammeBuilder<S: BosStr, St: programme_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Programme<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProgrammeBuilder<S, programme_state::Empty> {
+impl Programme<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProgrammeBuilder<programme_state::Empty, DefaultStr> {
         ProgrammeBuilder::new()
     }
 }
 
-impl<S: BosStr> ProgrammeBuilder<S, programme_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Programme<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProgrammeBuilder<programme_state::Empty, S> {
+        ProgrammeBuilder::builder()
+    }
+}
+
+impl ProgrammeBuilder<programme_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProgrammeBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
+impl<S: BosStr> ProgrammeBuilder<programme_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProgrammeBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: programme_state::State, S: BosStr> ProgrammeBuilder<St, S> {
     /// Set the `credits` field (optional)
     pub fn credits(mut self, value: impl Into<Option<Vec<Credit<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -304,20 +324,26 @@ impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
+impl<St: programme_state::State, S: BosStr> ProgrammeBuilder<St, S> {
     /// Set the `delivery` field (optional)
-    pub fn delivery(mut self, value: impl Into<Option<Vec<ProgrammeDeliveryItem<S>>>>) -> Self {
+    pub fn delivery(
+        mut self,
+        value: impl Into<Option<Vec<ProgrammeDeliveryItem<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `delivery` field to an Option value (optional)
-    pub fn maybe_delivery(mut self, value: Option<Vec<ProgrammeDeliveryItem<S>>>) -> Self {
+    pub fn maybe_delivery(
+        mut self,
+        value: Option<Vec<ProgrammeDeliveryItem<S>>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
+impl<St: programme_state::State, S: BosStr> ProgrammeBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -330,7 +356,7 @@ impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
+impl<St: programme_state::State, S: BosStr> ProgrammeBuilder<St, S> {
     /// Set the `genres` field (optional)
     pub fn genres(mut self, value: impl Into<Option<Vec<Genre<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -343,7 +369,7 @@ impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
+impl<St: programme_state::State, S: BosStr> ProgrammeBuilder<St, S> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -356,7 +382,7 @@ impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProgrammeBuilder<S, St>
+impl<St, S: BosStr> ProgrammeBuilder<St, S>
 where
     St: programme_state::State,
     St::Ionosphere: programme_state::IsUnset,
@@ -365,7 +391,7 @@ where
     pub fn ionosphere(
         mut self,
         value: impl Into<S>,
-    ) -> ProgrammeBuilder<S, programme_state::SetIonosphere<St>> {
+    ) -> ProgrammeBuilder<programme_state::SetIonosphere<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ProgrammeBuilder {
             _state: PhantomData,
@@ -375,7 +401,7 @@ where
     }
 }
 
-impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
+impl<St: programme_state::State, S: BosStr> ProgrammeBuilder<St, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -388,7 +414,7 @@ impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProgrammeBuilder<S, St>
+impl<St, S: BosStr> ProgrammeBuilder<St, S>
 where
     St: programme_state::State,
     St::Language: programme_state::IsUnset,
@@ -397,7 +423,7 @@ where
     pub fn language(
         mut self,
         value: impl Into<Language>,
-    ) -> ProgrammeBuilder<S, programme_state::SetLanguage<St>> {
+    ) -> ProgrammeBuilder<programme_state::SetLanguage<St>, S> {
         self._fields.7 = Option::Some(value.into());
         ProgrammeBuilder {
             _state: PhantomData,
@@ -407,7 +433,7 @@ where
     }
 }
 
-impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
+impl<St: programme_state::State, S: BosStr> ProgrammeBuilder<St, S> {
     /// Set the `memberOf` field (optional)
     pub fn member_of(mut self, value: impl Into<Option<Vec<Membership<S>>>>) -> Self {
         self._fields.8 = value.into();
@@ -420,7 +446,7 @@ impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProgrammeBuilder<S, St>
+impl<St, S: BosStr> ProgrammeBuilder<St, S>
 where
     St: programme_state::State,
     St::Name: programme_state::IsUnset,
@@ -429,7 +455,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ProgrammeBuilder<S, programme_state::SetName<St>> {
+    ) -> ProgrammeBuilder<programme_state::SetName<St>, S> {
         self._fields.9 = Option::Some(value.into());
         ProgrammeBuilder {
             _state: PhantomData,
@@ -439,7 +465,7 @@ where
     }
 }
 
-impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
+impl<St: programme_state::State, S: BosStr> ProgrammeBuilder<St, S> {
     /// Set the `presentationLanguage` field (optional)
     pub fn presentation_language(mut self, value: impl Into<Option<Language>>) -> Self {
         self._fields.10 = value.into();
@@ -452,7 +478,7 @@ impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProgrammeBuilder<S, St>
+impl<St, S: BosStr> ProgrammeBuilder<St, S>
 where
     St: programme_state::State,
     St::Name: programme_state::IsSet,
@@ -477,7 +503,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Programme<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Programme<S> {
         Programme {
             credits: self._fields.0,
             delivery: self._fields.1,
@@ -496,10 +525,10 @@ where
 }
 
 fn lexicon_doc_media_ionosphere_programme() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("media.ionosphere.programme"),

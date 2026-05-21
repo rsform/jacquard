@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Did};
+use jacquard_common::types::string::{Did, AtUri};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ForkSync<S: BosStr = DefaultStr> {
     ///Branch to sync
     pub branch: S,
@@ -46,8 +43,9 @@ impl jacquard_common::xrpc::XrpcResp for ForkSyncResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ForkSync<S> {
     const NSID: &'static str = "sh.tangled.repo.forkSync";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ForkSyncResponse;
 }
 
@@ -55,15 +53,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ForkSync<S> {
 pub struct ForkSyncRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ForkSyncRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.forkSync";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ForkSync<S>;
     type Response = ForkSyncResponse;
 }
 
 pub mod fork_sync_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -71,86 +70,93 @@ pub mod fork_sync_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Branch;
         type Did;
+        type Name;
         type Source;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Branch = Unset;
         type Did = Unset;
+        type Name = Unset;
         type Source = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Branch = St::Branch;
-        type Did = St::Did;
-        type Source = St::Source;
     }
     ///State transition - sets the `branch` field to Set
     pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBranch<St> {}
     impl<St: State> State for SetBranch<St> {
-        type Name = St::Name;
         type Branch = Set<members::branch>;
         type Did = St::Did;
+        type Name = St::Name;
         type Source = St::Source;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Name = St::Name;
         type Branch = St::Branch;
         type Did = Set<members::did>;
+        type Name = St::Name;
+        type Source = St::Source;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Branch = St::Branch;
+        type Did = St::Did;
+        type Name = Set<members::name>;
         type Source = St::Source;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSource<St> {}
     impl<St: State> State for SetSource<St> {
-        type Name = St::Name;
         type Branch = St::Branch;
         type Did = St::Did;
+        type Name = St::Name;
         type Source = Set<members::source>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `branch` field
         pub struct branch(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `source` field
         pub struct source(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ForkSyncBuilder<S: BosStr, St: fork_sync_state::State> {
+pub struct ForkSyncBuilder<St: fork_sync_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>, Option<S>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ForkSync<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ForkSyncBuilder<S, fork_sync_state::Empty> {
+impl ForkSync<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ForkSyncBuilder<fork_sync_state::Empty, DefaultStr> {
         ForkSyncBuilder::new()
     }
 }
 
-impl<S: BosStr> ForkSyncBuilder<S, fork_sync_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ForkSync<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ForkSyncBuilder<fork_sync_state::Empty, S> {
+        ForkSyncBuilder::builder()
+    }
+}
+
+impl ForkSyncBuilder<fork_sync_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ForkSyncBuilder {
             _state: PhantomData,
@@ -160,7 +166,18 @@ impl<S: BosStr> ForkSyncBuilder<S, fork_sync_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ForkSyncBuilder<S, St>
+impl<S: BosStr> ForkSyncBuilder<fork_sync_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ForkSyncBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ForkSyncBuilder<St, S>
 where
     St: fork_sync_state::State,
     St::Branch: fork_sync_state::IsUnset,
@@ -169,7 +186,7 @@ where
     pub fn branch(
         mut self,
         value: impl Into<S>,
-    ) -> ForkSyncBuilder<S, fork_sync_state::SetBranch<St>> {
+    ) -> ForkSyncBuilder<fork_sync_state::SetBranch<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ForkSyncBuilder {
             _state: PhantomData,
@@ -179,7 +196,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ForkSyncBuilder<S, St>
+impl<St, S: BosStr> ForkSyncBuilder<St, S>
 where
     St: fork_sync_state::State,
     St::Did: fork_sync_state::IsUnset,
@@ -188,7 +205,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ForkSyncBuilder<S, fork_sync_state::SetDid<St>> {
+    ) -> ForkSyncBuilder<fork_sync_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ForkSyncBuilder {
             _state: PhantomData,
@@ -198,13 +215,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ForkSyncBuilder<S, St>
+impl<St, S: BosStr> ForkSyncBuilder<St, S>
 where
     St: fork_sync_state::State,
     St::Name: fork_sync_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> ForkSyncBuilder<S, fork_sync_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> ForkSyncBuilder<fork_sync_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ForkSyncBuilder {
             _state: PhantomData,
@@ -214,7 +234,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ForkSyncBuilder<S, St>
+impl<St, S: BosStr> ForkSyncBuilder<St, S>
 where
     St: fork_sync_state::State,
     St::Source: fork_sync_state::IsUnset,
@@ -223,7 +243,7 @@ where
     pub fn source(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ForkSyncBuilder<S, fork_sync_state::SetSource<St>> {
+    ) -> ForkSyncBuilder<fork_sync_state::SetSource<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ForkSyncBuilder {
             _state: PhantomData,
@@ -233,12 +253,12 @@ where
     }
 }
 
-impl<S: BosStr, St> ForkSyncBuilder<S, St>
+impl<St, S: BosStr> ForkSyncBuilder<St, S>
 where
     St: fork_sync_state::State,
-    St::Name: fork_sync_state::IsSet,
     St::Branch: fork_sync_state::IsSet,
     St::Did: fork_sync_state::IsSet,
+    St::Name: fork_sync_state::IsSet,
     St::Source: fork_sync_state::IsSet,
 {
     /// Build the final struct.

@@ -357,8 +357,8 @@ pub mod collection_record_state {
 
 /// Builder for constructing an instance of this type.
 pub struct CollectionRecordBuilder<
-    S: jacquard_common::BosStr,
     St: collection_record_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
 > {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
@@ -371,17 +371,28 @@ pub struct CollectionRecordBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> CollectionRecord<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CollectionRecordBuilder<S, collection_record_state::Empty> {
+impl CollectionRecord<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CollectionRecordBuilder<
+        collection_record_state::Empty,
+        jacquard_common::DefaultStr,
+    > {
         CollectionRecordBuilder::new()
     }
 }
 
-impl<
-    S: jacquard_common::BosStr,
-> CollectionRecordBuilder<S, collection_record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> CollectionRecord<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CollectionRecordBuilder<collection_record_state::Empty, S> {
+        CollectionRecordBuilder::builder()
+    }
+}
+
+impl CollectionRecordBuilder<
+    collection_record_state::Empty,
+    jacquard_common::DefaultStr,
+> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CollectionRecordBuilder {
             _state: ::core::marker::PhantomData,
@@ -393,8 +404,21 @@ impl<
 
 impl<
     S: jacquard_common::BosStr,
+> CollectionRecordBuilder<collection_record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CollectionRecordBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None, None, None),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<
     St: collection_record_state::State,
-> CollectionRecordBuilder<S, St> {
+    S: jacquard_common::BosStr,
+> CollectionRecordBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(
         mut self,
@@ -413,7 +437,7 @@ impl<
     }
 }
 
-impl<S: jacquard_common::BosStr, St> CollectionRecordBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> CollectionRecordBuilder<St, S>
 where
     St: collection_record_state::State,
     St::Items: collection_record_state::IsUnset,
@@ -424,7 +448,7 @@ where
         value: impl Into<
             Vec<crate::macro_mode::test_collision::collection::Collection<S>>,
         >,
-    ) -> CollectionRecordBuilder<S, collection_record_state::SetItems<St>> {
+    ) -> CollectionRecordBuilder<collection_record_state::SetItems<St>, S> {
         self._fields.1 = ::core::option::Option::Some(value.into());
         CollectionRecordBuilder {
             _state: ::core::marker::PhantomData,
@@ -434,7 +458,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> CollectionRecordBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> CollectionRecordBuilder<St, S>
 where
     St: collection_record_state::State,
     St::Name: collection_record_state::IsUnset,
@@ -443,7 +467,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> CollectionRecordBuilder<S, collection_record_state::SetName<St>> {
+    ) -> CollectionRecordBuilder<collection_record_state::SetName<St>, S> {
         self._fields.2 = ::core::option::Option::Some(value.into());
         CollectionRecordBuilder {
             _state: ::core::marker::PhantomData,
@@ -453,7 +477,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> CollectionRecordBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> CollectionRecordBuilder<St, S>
 where
     St: collection_record_state::State,
     St::Items: collection_record_state::IsSet,

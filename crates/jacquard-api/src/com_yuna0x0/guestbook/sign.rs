@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// a sign in the guestbook
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -117,7 +117,7 @@ impl<S: BosStr> LexiconSchema for Sign<S> {
 
 pub mod sign_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -126,69 +126,76 @@ pub mod sign_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Subject;
         type Message;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Subject = Unset;
         type Message = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Message = St::Message;
         type Subject = St::Subject;
-        type Message = St::Message;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type CreatedAt = St::CreatedAt;
-        type Subject = Set<members::subject>;
-        type Message = St::Message;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessage<St> {}
     impl<St: State> State for SetMessage<St> {
         type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
         type Message = Set<members::message>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Message = St::Message;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SignBuilder<S: BosStr, St: sign_state::State> {
+pub struct SignBuilder<St: sign_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<AtIdentifier<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Sign<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SignBuilder<S, sign_state::Empty> {
+impl Sign<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SignBuilder<sign_state::Empty, DefaultStr> {
         SignBuilder::new()
     }
 }
 
-impl<S: BosStr> SignBuilder<S, sign_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Sign<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SignBuilder<sign_state::Empty, S> {
+        SignBuilder::builder()
+    }
+}
+
+impl SignBuilder<sign_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SignBuilder {
             _state: PhantomData,
@@ -198,7 +205,18 @@ impl<S: BosStr> SignBuilder<S, sign_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SignBuilder<S, St>
+impl<S: BosStr> SignBuilder<sign_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SignBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SignBuilder<St, S>
 where
     St: sign_state::State,
     St::CreatedAt: sign_state::IsUnset,
@@ -207,7 +225,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SignBuilder<S, sign_state::SetCreatedAt<St>> {
+    ) -> SignBuilder<sign_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SignBuilder {
             _state: PhantomData,
@@ -217,13 +235,16 @@ where
     }
 }
 
-impl<S: BosStr, St> SignBuilder<S, St>
+impl<St, S: BosStr> SignBuilder<St, S>
 where
     St: sign_state::State,
     St::Message: sign_state::IsUnset,
 {
     /// Set the `message` field (required)
-    pub fn message(mut self, value: impl Into<S>) -> SignBuilder<S, sign_state::SetMessage<St>> {
+    pub fn message(
+        mut self,
+        value: impl Into<S>,
+    ) -> SignBuilder<sign_state::SetMessage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SignBuilder {
             _state: PhantomData,
@@ -233,7 +254,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SignBuilder<S, St>
+impl<St, S: BosStr> SignBuilder<St, S>
 where
     St: sign_state::State,
     St::Subject: sign_state::IsUnset,
@@ -242,7 +263,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> SignBuilder<S, sign_state::SetSubject<St>> {
+    ) -> SignBuilder<sign_state::SetSubject<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SignBuilder {
             _state: PhantomData,
@@ -252,12 +273,12 @@ where
     }
 }
 
-impl<S: BosStr, St> SignBuilder<S, St>
+impl<St, S: BosStr> SignBuilder<St, S>
 where
     St: sign_state::State,
     St::CreatedAt: sign_state::IsSet,
-    St::Subject: sign_state::IsSet,
     St::Message: sign_state::IsSet,
+    St::Subject: sign_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Sign<S> {
@@ -280,10 +301,10 @@ where
 }
 
 fn lexicon_doc_com_yuna0x0_guestbook_sign() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.yuna0x0.guestbook.sign"),
@@ -295,11 +316,13 @@ fn lexicon_doc_com_yuna0x0_guestbook_sign() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("a sign in the guestbook")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("message"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("subject"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("message")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

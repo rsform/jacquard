@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, Nsid};
+use jacquard_common::types::string::{Did, AtUri, Nsid, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,18 +24,15 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::at_inlay::ViaValtown;
-use crate::at_inlay::component;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::ViaValtown;
+use crate::at_inlay::component;
 /// Component rendered by calling a remote XRPC endpoint
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BodyExternal<S: BosStr = DefaultStr> {
     ///DID of the service hosting this component
     pub did: Did<S>,
@@ -46,10 +43,7 @@ pub struct BodyExternal<S: BosStr = DefaultStr> {
 /// Component rendered by the host from a serialized element tree
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BodyTemplate<S: BosStr = DefaultStr> {
     ///Serialized element tree with bindings
     pub node: Data<S>,
@@ -92,6 +86,7 @@ pub struct Component<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -116,10 +111,7 @@ pub struct ComponentGetRecordOutput<S: BosStr = DefaultStr> {
 /// Declares what data this component views and which prop receives it.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct View<S: BosStr = DefaultStr> {
     ///Data types this view accepts.
     pub accepts: Vec<ViewAcceptsItem<S>>,
@@ -128,6 +120,7 @@ pub struct View<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -142,10 +135,7 @@ pub enum ViewAcceptsItem<S: BosStr = DefaultStr> {
 /// View accepts a primitive value type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ViewPrimitive<S: BosStr = DefaultStr> {
     ///String format constraint. Only applies when type is 'string'.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -369,10 +359,7 @@ where
 /// View accepts individual records of a collection. Omit collection for a generic record view. When rkey is present, the component accepts bare DIDs (expanded to full AT URIs) and appears on identity pages.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ViewRecord<S: BosStr = DefaultStr> {
     ///The collection this component views. Omit for any-collection.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -584,7 +571,7 @@ impl<S: BosStr> LexiconSchema for ViewRecord<S> {
 
 pub mod body_external_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -615,21 +602,28 @@ pub mod body_external_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BodyExternalBuilder<S: BosStr, St: body_external_state::State> {
+pub struct BodyExternalBuilder<St: body_external_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> BodyExternal<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BodyExternalBuilder<S, body_external_state::Empty> {
+impl BodyExternal<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BodyExternalBuilder<body_external_state::Empty, DefaultStr> {
         BodyExternalBuilder::new()
     }
 }
 
-impl<S: BosStr> BodyExternalBuilder<S, body_external_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> BodyExternal<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BodyExternalBuilder<body_external_state::Empty, S> {
+        BodyExternalBuilder::builder()
+    }
+}
+
+impl BodyExternalBuilder<body_external_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BodyExternalBuilder {
             _state: PhantomData,
@@ -639,7 +633,18 @@ impl<S: BosStr> BodyExternalBuilder<S, body_external_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BodyExternalBuilder<S, St>
+impl<S: BosStr> BodyExternalBuilder<body_external_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BodyExternalBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BodyExternalBuilder<St, S>
 where
     St: body_external_state::State,
     St::Did: body_external_state::IsUnset,
@@ -648,7 +653,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> BodyExternalBuilder<S, body_external_state::SetDid<St>> {
+    ) -> BodyExternalBuilder<body_external_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BodyExternalBuilder {
             _state: PhantomData,
@@ -658,7 +663,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BodyExternalBuilder<S, St>
+impl<St, S: BosStr> BodyExternalBuilder<St, S>
 where
     St: body_external_state::State,
     St::Did: body_external_state::IsSet,
@@ -671,7 +676,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BodyExternal<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BodyExternal<S> {
         BodyExternal {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -680,10 +688,10 @@ where
 }
 
 fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.inlay.component"),
@@ -692,9 +700,11 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("bodyExternal"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Component rendered by calling a remote XRPC endpoint",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Component rendered by calling a remote XRPC endpoint",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -702,9 +712,11 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "DID of the service hosting this component",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "DID of the service hosting this component",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -717,9 +729,11 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("bodyTemplate"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Component rendered by the host from a serialized element tree",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Component rendered by the host from a serialized element tree",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("node")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -845,26 +859,27 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("view"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Declares what data this component views and which prop receives it.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("prop"),
-                        SmolStr::new_static("accepts"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Declares what data this component views and which prop receives it.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("prop"), SmolStr::new_static("accepts")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("accepts"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Data types this view accepts.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Data types this view accepts."),
+                                ),
                                 items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("#viewRecord"),
-                                        CowStr::new_static("#viewPrimitive"),
+                                        CowStr::new_static("#viewPrimitive")
                                     ],
                                     ..Default::default()
                                 }),
@@ -875,9 +890,11 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("prop"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Which component prop receives the view data.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Which component prop receives the view data.",
+                                    ),
+                                ),
                                 max_length: Some(256usize),
                                 ..Default::default()
                             }),
@@ -890,7 +907,9 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("viewPrimitive"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("View accepts a primitive value type.")),
+                    description: Some(
+                        CowStr::new_static("View accepts a primitive value type."),
+                    ),
                     required: Some(vec![SmolStr::new_static("type")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -898,9 +917,11 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("format"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "String format constraint. Only applies when type is 'string'.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "String format constraint. Only applies when type is 'string'.",
+                                    ),
+                                ),
                                 max_length: Some(64usize),
                                 ..Default::default()
                             }),
@@ -908,7 +929,9 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Lexicon primitive type.")),
+                                description: Some(
+                                    CowStr::new_static("Lexicon primitive type."),
+                                ),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),
@@ -966,7 +989,7 @@ fn lexicon_doc_at_inlay_component() -> LexiconDoc<'static> {
 
 pub mod body_template_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -997,21 +1020,28 @@ pub mod body_template_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BodyTemplateBuilder<S: BosStr, St: body_template_state::State> {
+pub struct BodyTemplateBuilder<St: body_template_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> BodyTemplate<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BodyTemplateBuilder<S, body_template_state::Empty> {
+impl BodyTemplate<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BodyTemplateBuilder<body_template_state::Empty, DefaultStr> {
         BodyTemplateBuilder::new()
     }
 }
 
-impl<S: BosStr> BodyTemplateBuilder<S, body_template_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> BodyTemplate<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BodyTemplateBuilder<body_template_state::Empty, S> {
+        BodyTemplateBuilder::builder()
+    }
+}
+
+impl BodyTemplateBuilder<body_template_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BodyTemplateBuilder {
             _state: PhantomData,
@@ -1021,7 +1051,18 @@ impl<S: BosStr> BodyTemplateBuilder<S, body_template_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BodyTemplateBuilder<S, St>
+impl<S: BosStr> BodyTemplateBuilder<body_template_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BodyTemplateBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BodyTemplateBuilder<St, S>
 where
     St: body_template_state::State,
     St::Node: body_template_state::IsUnset,
@@ -1030,7 +1071,7 @@ where
     pub fn node(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> BodyTemplateBuilder<S, body_template_state::SetNode<St>> {
+    ) -> BodyTemplateBuilder<body_template_state::SetNode<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BodyTemplateBuilder {
             _state: PhantomData,
@@ -1040,7 +1081,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BodyTemplateBuilder<S, St>
+impl<St, S: BosStr> BodyTemplateBuilder<St, S>
 where
     St: body_template_state::State,
     St::Node: body_template_state::IsSet,
@@ -1053,7 +1094,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BodyTemplate<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BodyTemplate<S> {
         BodyTemplate {
             node: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1063,7 +1107,7 @@ where
 
 pub mod component_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1094,7 +1138,7 @@ pub mod component_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ComponentBuilder<S: BosStr, St: component_state::State> {
+pub struct ComponentBuilder<St: component_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ComponentBody<S>>,
@@ -1109,15 +1153,22 @@ pub struct ComponentBuilder<S: BosStr, St: component_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Component<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ComponentBuilder<S, component_state::Empty> {
+impl Component<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ComponentBuilder<component_state::Empty, DefaultStr> {
         ComponentBuilder::new()
     }
 }
 
-impl<S: BosStr> ComponentBuilder<S, component_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Component<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ComponentBuilder<component_state::Empty, S> {
+        ComponentBuilder::builder()
+    }
+}
+
+impl ComponentBuilder<component_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ComponentBuilder {
             _state: PhantomData,
@@ -1127,7 +1178,18 @@ impl<S: BosStr> ComponentBuilder<S, component_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
+impl<S: BosStr> ComponentBuilder<component_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ComponentBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: component_state::State, S: BosStr> ComponentBuilder<St, S> {
     /// Set the `body` field (optional)
     pub fn body(mut self, value: impl Into<Option<ComponentBody<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1140,7 +1202,7 @@ impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
+impl<St: component_state::State, S: BosStr> ComponentBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -1153,7 +1215,7 @@ impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
+impl<St: component_state::State, S: BosStr> ComponentBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1166,7 +1228,7 @@ impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
+impl<St: component_state::State, S: BosStr> ComponentBuilder<St, S> {
     /// Set the `imports` field (optional)
     pub fn imports(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -1179,7 +1241,7 @@ impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ComponentBuilder<S, St>
+impl<St, S: BosStr> ComponentBuilder<St, S>
 where
     St: component_state::State,
     St::Type: component_state::IsUnset,
@@ -1188,7 +1250,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> ComponentBuilder<S, component_state::SetType<St>> {
+    ) -> ComponentBuilder<component_state::SetType<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ComponentBuilder {
             _state: PhantomData,
@@ -1198,7 +1260,7 @@ where
     }
 }
 
-impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
+impl<St: component_state::State, S: BosStr> ComponentBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -1211,7 +1273,7 @@ impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
+impl<St: component_state::State, S: BosStr> ComponentBuilder<St, S> {
     /// Set the `via` field (optional)
     pub fn via(mut self, value: impl Into<Option<ViaValtown<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -1224,7 +1286,7 @@ impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
+impl<St: component_state::State, S: BosStr> ComponentBuilder<St, S> {
     /// Set the `view` field (optional)
     pub fn view(mut self, value: impl Into<Option<component::View<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -1237,7 +1299,7 @@ impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ComponentBuilder<S, St>
+impl<St, S: BosStr> ComponentBuilder<St, S>
 where
     St: component_state::State,
     St::Type: component_state::IsSet,
@@ -1257,7 +1319,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Component<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Component<S> {
         Component {
             body: self._fields.0,
             created_at: self._fields.1,
@@ -1274,7 +1339,7 @@ where
 
 pub mod view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1282,56 +1347,63 @@ pub mod view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Accepts;
         type Prop;
+        type Accepts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Accepts = Unset;
         type Prop = Unset;
-    }
-    ///State transition - sets the `accepts` field to Set
-    pub struct SetAccepts<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAccepts<St> {}
-    impl<St: State> State for SetAccepts<St> {
-        type Accepts = Set<members::accepts>;
-        type Prop = St::Prop;
+        type Accepts = Unset;
     }
     ///State transition - sets the `prop` field to Set
     pub struct SetProp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetProp<St> {}
     impl<St: State> State for SetProp<St> {
-        type Accepts = St::Accepts;
         type Prop = Set<members::prop>;
+        type Accepts = St::Accepts;
+    }
+    ///State transition - sets the `accepts` field to Set
+    pub struct SetAccepts<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccepts<St> {}
+    impl<St: State> State for SetAccepts<St> {
+        type Prop = St::Prop;
+        type Accepts = Set<members::accepts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `accepts` field
-        pub struct accepts(());
         ///Marker type for the `prop` field
         pub struct prop(());
+        ///Marker type for the `accepts` field
+        pub struct accepts(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ViewBuilder<S: BosStr, St: view_state::State> {
+pub struct ViewBuilder<St: view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<ViewAcceptsItem<S>>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> View<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ViewBuilder<S, view_state::Empty> {
+impl View<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ViewBuilder<view_state::Empty, DefaultStr> {
         ViewBuilder::new()
     }
 }
 
-impl<S: BosStr> ViewBuilder<S, view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> View<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ViewBuilder<view_state::Empty, S> {
+        ViewBuilder::builder()
+    }
+}
+
+impl ViewBuilder<view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ViewBuilder {
             _state: PhantomData,
@@ -1341,7 +1413,18 @@ impl<S: BosStr> ViewBuilder<S, view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<S: BosStr> ViewBuilder<view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
     St::Accepts: view_state::IsUnset,
@@ -1350,7 +1433,7 @@ where
     pub fn accepts(
         mut self,
         value: impl Into<Vec<ViewAcceptsItem<S>>>,
-    ) -> ViewBuilder<S, view_state::SetAccepts<St>> {
+    ) -> ViewBuilder<view_state::SetAccepts<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ViewBuilder {
             _state: PhantomData,
@@ -1360,13 +1443,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
     St::Prop: view_state::IsUnset,
 {
     /// Set the `prop` field (required)
-    pub fn prop(mut self, value: impl Into<S>) -> ViewBuilder<S, view_state::SetProp<St>> {
+    pub fn prop(
+        mut self,
+        value: impl Into<S>,
+    ) -> ViewBuilder<view_state::SetProp<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ViewBuilder {
             _state: PhantomData,
@@ -1376,11 +1462,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
-    St::Accepts: view_state::IsSet,
     St::Prop: view_state::IsSet,
+    St::Accepts: view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> View<S> {

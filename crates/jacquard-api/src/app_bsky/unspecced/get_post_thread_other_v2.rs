@@ -21,26 +21,21 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::unspecced::ThreadItemPost;
-use crate::app_bsky::unspecced::get_post_thread_other_v2;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::unspecced::ThreadItemPost;
+use crate::app_bsky::unspecced::get_post_thread_other_v2;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPostThreadOtherV2<S: BosStr = DefaultStr> {
     pub anchor: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPostThreadOtherV2Output<S: BosStr = DefaultStr> {
     ///A flat list of other thread items. The depth of each item is indicated by the depth property inside the item.
     pub thread: Vec<get_post_thread_other_v2::ThreadItem<S>>,
@@ -48,11 +43,9 @@ pub struct GetPostThreadOtherV2Output<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ThreadItem<S: BosStr = DefaultStr> {
     ///The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
     pub depth: i64,
@@ -103,7 +96,7 @@ impl<S: BosStr> LexiconSchema for ThreadItem<S> {
 
 pub mod get_post_thread_other_v2_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -134,21 +127,37 @@ pub mod get_post_thread_other_v2_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetPostThreadOtherV2Builder<S: BosStr, St: get_post_thread_other_v2_state::State> {
+pub struct GetPostThreadOtherV2Builder<
+    St: get_post_thread_other_v2_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetPostThreadOtherV2<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetPostThreadOtherV2Builder<S, get_post_thread_other_v2_state::Empty> {
+impl GetPostThreadOtherV2<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetPostThreadOtherV2Builder<
+        get_post_thread_other_v2_state::Empty,
+        DefaultStr,
+    > {
         GetPostThreadOtherV2Builder::new()
     }
 }
 
-impl<S: BosStr> GetPostThreadOtherV2Builder<S, get_post_thread_other_v2_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetPostThreadOtherV2<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetPostThreadOtherV2Builder<
+        get_post_thread_other_v2_state::Empty,
+        S,
+    > {
+        GetPostThreadOtherV2Builder::builder()
+    }
+}
+
+impl GetPostThreadOtherV2Builder<get_post_thread_other_v2_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetPostThreadOtherV2Builder {
             _state: PhantomData,
@@ -158,7 +167,18 @@ impl<S: BosStr> GetPostThreadOtherV2Builder<S, get_post_thread_other_v2_state::E
     }
 }
 
-impl<S: BosStr, St> GetPostThreadOtherV2Builder<S, St>
+impl<S: BosStr> GetPostThreadOtherV2Builder<get_post_thread_other_v2_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetPostThreadOtherV2Builder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetPostThreadOtherV2Builder<St, S>
 where
     St: get_post_thread_other_v2_state::State,
     St::Anchor: get_post_thread_other_v2_state::IsUnset,
@@ -167,7 +187,7 @@ where
     pub fn anchor(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetPostThreadOtherV2Builder<S, get_post_thread_other_v2_state::SetAnchor<St>> {
+    ) -> GetPostThreadOtherV2Builder<get_post_thread_other_v2_state::SetAnchor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetPostThreadOtherV2Builder {
             _state: PhantomData,
@@ -177,7 +197,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetPostThreadOtherV2Builder<S, St>
+impl<St, S: BosStr> GetPostThreadOtherV2Builder<St, S>
 where
     St: get_post_thread_other_v2_state::State,
     St::Anchor: get_post_thread_other_v2_state::IsSet,
@@ -192,7 +212,7 @@ where
 
 pub mod thread_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -200,70 +220,77 @@ pub mod thread_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Depth;
         type Uri;
+        type Depth;
         type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Depth = Unset;
         type Uri = Unset;
+        type Depth = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `depth` field to Set
-    pub struct SetDepth<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDepth<St> {}
-    impl<St: State> State for SetDepth<St> {
-        type Depth = Set<members::depth>;
-        type Uri = St::Uri;
-        type Value = St::Value;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Depth = St::Depth;
         type Uri = Set<members::uri>;
+        type Depth = St::Depth;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `depth` field to Set
+    pub struct SetDepth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDepth<St> {}
+    impl<St: State> State for SetDepth<St> {
+        type Uri = St::Uri;
+        type Depth = Set<members::depth>;
         type Value = St::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
-        type Depth = St::Depth;
         type Uri = St::Uri;
+        type Depth = St::Depth;
         type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `depth` field
-        pub struct depth(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `depth` field
+        pub struct depth(());
         ///Marker type for the `value` field
         pub struct value(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ThreadItemBuilder<S: BosStr, St: thread_item_state::State> {
+pub struct ThreadItemBuilder<St: thread_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<AtUri<S>>, Option<ThreadItemPost<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ThreadItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ThreadItemBuilder<S, thread_item_state::Empty> {
+impl ThreadItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ThreadItemBuilder<thread_item_state::Empty, DefaultStr> {
         ThreadItemBuilder::new()
     }
 }
 
-impl<S: BosStr> ThreadItemBuilder<S, thread_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ThreadItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ThreadItemBuilder<thread_item_state::Empty, S> {
+        ThreadItemBuilder::builder()
+    }
+}
+
+impl ThreadItemBuilder<thread_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ThreadItemBuilder {
             _state: PhantomData,
@@ -273,7 +300,18 @@ impl<S: BosStr> ThreadItemBuilder<S, thread_item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ThreadItemBuilder<S, St>
+impl<S: BosStr> ThreadItemBuilder<thread_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ThreadItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ThreadItemBuilder<St, S>
 where
     St: thread_item_state::State,
     St::Depth: thread_item_state::IsUnset,
@@ -282,7 +320,7 @@ where
     pub fn depth(
         mut self,
         value: impl Into<i64>,
-    ) -> ThreadItemBuilder<S, thread_item_state::SetDepth<St>> {
+    ) -> ThreadItemBuilder<thread_item_state::SetDepth<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ThreadItemBuilder {
             _state: PhantomData,
@@ -292,7 +330,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ThreadItemBuilder<S, St>
+impl<St, S: BosStr> ThreadItemBuilder<St, S>
 where
     St: thread_item_state::State,
     St::Uri: thread_item_state::IsUnset,
@@ -301,7 +339,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ThreadItemBuilder<S, thread_item_state::SetUri<St>> {
+    ) -> ThreadItemBuilder<thread_item_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ThreadItemBuilder {
             _state: PhantomData,
@@ -311,7 +349,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ThreadItemBuilder<S, St>
+impl<St, S: BosStr> ThreadItemBuilder<St, S>
 where
     St: thread_item_state::State,
     St::Value: thread_item_state::IsUnset,
@@ -320,7 +358,7 @@ where
     pub fn value(
         mut self,
         value: impl Into<ThreadItemPost<S>>,
-    ) -> ThreadItemBuilder<S, thread_item_state::SetValue<St>> {
+    ) -> ThreadItemBuilder<thread_item_state::SetValue<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ThreadItemBuilder {
             _state: PhantomData,
@@ -330,11 +368,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ThreadItemBuilder<S, St>
+impl<St, S: BosStr> ThreadItemBuilder<St, S>
 where
     St: thread_item_state::State,
-    St::Depth: thread_item_state::IsSet,
     St::Uri: thread_item_state::IsSet,
+    St::Depth: thread_item_state::IsSet,
     St::Value: thread_item_state::IsSet,
 {
     /// Build the final struct.
@@ -347,7 +385,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ThreadItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ThreadItem<S> {
         ThreadItem {
             depth: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -358,10 +399,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.unspecced.getPostThreadOtherV2"),
@@ -399,11 +440,12 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("threadItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("depth"),
-                        SmolStr::new_static("value"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("depth"),
+                            SmolStr::new_static("value")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -423,9 +465,9 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> LexiconDoc<'static> 
                         map.insert(
                             SmolStr::new_static("value"),
                             LexObjectProperty::Union(LexRefUnion {
-                                refs: vec![CowStr::new_static(
-                                    "app.bsky.unspecced.defs#threadItemPost",
-                                )],
+                                refs: vec![
+                                    CowStr::new_static("app.bsky.unspecced.defs#threadItemPost")
+                                ],
                                 ..Default::default()
                             }),
                         );

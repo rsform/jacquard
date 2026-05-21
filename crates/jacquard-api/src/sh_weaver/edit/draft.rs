@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Stub record for unpublished drafts. Acts as an anchor for edit.root/diff records and enables draft discovery via listRecords.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -103,7 +103,7 @@ impl<S: BosStr> LexiconSchema for Draft<S> {
 
 pub mod draft_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -134,21 +134,28 @@ pub mod draft_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DraftBuilder<S: BosStr, St: draft_state::State> {
+pub struct DraftBuilder<St: draft_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Draft<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DraftBuilder<S, draft_state::Empty> {
+impl Draft<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DraftBuilder<draft_state::Empty, DefaultStr> {
         DraftBuilder::new()
     }
 }
 
-impl<S: BosStr> DraftBuilder<S, draft_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Draft<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DraftBuilder<draft_state::Empty, S> {
+        DraftBuilder::builder()
+    }
+}
+
+impl DraftBuilder<draft_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DraftBuilder {
             _state: PhantomData,
@@ -158,7 +165,18 @@ impl<S: BosStr> DraftBuilder<S, draft_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DraftBuilder<S, St>
+impl<S: BosStr> DraftBuilder<draft_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DraftBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DraftBuilder<St, S>
 where
     St: draft_state::State,
     St::CreatedAt: draft_state::IsUnset,
@@ -167,7 +185,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DraftBuilder<S, draft_state::SetCreatedAt<St>> {
+    ) -> DraftBuilder<draft_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DraftBuilder {
             _state: PhantomData,
@@ -177,7 +195,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DraftBuilder<S, St>
+impl<St, S: BosStr> DraftBuilder<St, S>
 where
     St: draft_state::State,
     St::CreatedAt: draft_state::IsSet,
@@ -199,10 +217,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_edit_draft() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.edit.draft"),

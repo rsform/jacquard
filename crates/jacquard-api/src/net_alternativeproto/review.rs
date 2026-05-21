@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A user review of an AlternativeProto project
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -154,7 +154,7 @@ impl<S: BosStr> LexiconSchema for Review<S> {
 
 pub mod review_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -162,86 +162,93 @@ pub mod review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rating;
-        type ProjectId;
         type CreatedAt;
+        type ProjectId;
+        type Rating;
         type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rating = Unset;
-        type ProjectId = Unset;
         type CreatedAt = Unset;
+        type ProjectId = Unset;
+        type Rating = Unset;
         type Text = Unset;
     }
-    ///State transition - sets the `rating` field to Set
-    pub struct SetRating<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRating<St> {}
-    impl<St: State> State for SetRating<St> {
-        type Rating = Set<members::rating>;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type ProjectId = St::ProjectId;
-        type CreatedAt = St::CreatedAt;
+        type Rating = St::Rating;
         type Text = St::Text;
     }
     ///State transition - sets the `project_id` field to Set
     pub struct SetProjectId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetProjectId<St> {}
     impl<St: State> State for SetProjectId<St> {
-        type Rating = St::Rating;
-        type ProjectId = Set<members::project_id>;
         type CreatedAt = St::CreatedAt;
+        type ProjectId = Set<members::project_id>;
+        type Rating = St::Rating;
         type Text = St::Text;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Rating = St::Rating;
+    ///State transition - sets the `rating` field to Set
+    pub struct SetRating<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRating<St> {}
+    impl<St: State> State for SetRating<St> {
+        type CreatedAt = St::CreatedAt;
         type ProjectId = St::ProjectId;
-        type CreatedAt = Set<members::created_at>;
+        type Rating = Set<members::rating>;
         type Text = St::Text;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetText<St> {}
     impl<St: State> State for SetText<St> {
-        type Rating = St::Rating;
-        type ProjectId = St::ProjectId;
         type CreatedAt = St::CreatedAt;
+        type ProjectId = St::ProjectId;
+        type Rating = St::Rating;
         type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rating` field
-        pub struct rating(());
-        ///Marker type for the `project_id` field
-        pub struct project_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `project_id` field
+        pub struct project_id(());
+        ///Marker type for the `rating` field
+        pub struct rating(());
         ///Marker type for the `text` field
         pub struct text(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReviewBuilder<S: BosStr, St: review_state::State> {
+pub struct ReviewBuilder<St: review_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Review<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ReviewBuilder<S, review_state::Empty> {
+impl Review<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReviewBuilder<review_state::Empty, DefaultStr> {
         ReviewBuilder::new()
     }
 }
 
-impl<S: BosStr> ReviewBuilder<S, review_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Review<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReviewBuilder<review_state::Empty, S> {
+        ReviewBuilder::builder()
+    }
+}
+
+impl ReviewBuilder<review_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ReviewBuilder {
             _state: PhantomData,
@@ -251,7 +258,18 @@ impl<S: BosStr> ReviewBuilder<S, review_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ReviewBuilder<S, St>
+impl<S: BosStr> ReviewBuilder<review_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReviewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReviewBuilder<St, S>
 where
     St: review_state::State,
     St::CreatedAt: review_state::IsUnset,
@@ -260,7 +278,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReviewBuilder<S, review_state::SetCreatedAt<St>> {
+    ) -> ReviewBuilder<review_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ReviewBuilder {
             _state: PhantomData,
@@ -270,7 +288,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReviewBuilder<S, St>
+impl<St, S: BosStr> ReviewBuilder<St, S>
 where
     St: review_state::State,
     St::ProjectId: review_state::IsUnset,
@@ -279,7 +297,7 @@ where
     pub fn project_id(
         mut self,
         value: impl Into<S>,
-    ) -> ReviewBuilder<S, review_state::SetProjectId<St>> {
+    ) -> ReviewBuilder<review_state::SetProjectId<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ReviewBuilder {
             _state: PhantomData,
@@ -289,7 +307,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReviewBuilder<S, St>
+impl<St, S: BosStr> ReviewBuilder<St, S>
 where
     St: review_state::State,
     St::Rating: review_state::IsUnset,
@@ -298,7 +316,7 @@ where
     pub fn rating(
         mut self,
         value: impl Into<i64>,
-    ) -> ReviewBuilder<S, review_state::SetRating<St>> {
+    ) -> ReviewBuilder<review_state::SetRating<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ReviewBuilder {
             _state: PhantomData,
@@ -308,13 +326,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ReviewBuilder<S, St>
+impl<St, S: BosStr> ReviewBuilder<St, S>
 where
     St: review_state::State,
     St::Text: review_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(mut self, value: impl Into<S>) -> ReviewBuilder<S, review_state::SetText<St>> {
+    pub fn text(
+        mut self,
+        value: impl Into<S>,
+    ) -> ReviewBuilder<review_state::SetText<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ReviewBuilder {
             _state: PhantomData,
@@ -324,12 +345,12 @@ where
     }
 }
 
-impl<S: BosStr, St> ReviewBuilder<S, St>
+impl<St, S: BosStr> ReviewBuilder<St, S>
 where
     St: review_state::State,
-    St::Rating: review_state::IsSet,
-    St::ProjectId: review_state::IsSet,
     St::CreatedAt: review_state::IsSet,
+    St::ProjectId: review_state::IsSet,
+    St::Rating: review_state::IsSet,
     St::Text: review_state::IsSet,
 {
     /// Build the final struct.
@@ -355,10 +376,10 @@ where
 }
 
 fn lexicon_doc_net_alternativeproto_review() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.alternativeproto.review"),

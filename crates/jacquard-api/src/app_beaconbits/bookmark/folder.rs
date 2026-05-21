@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A folder for organizing bookmarks
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -262,7 +262,7 @@ impl<S: BosStr> LexiconSchema for Folder<S> {
 
 pub mod folder_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -270,42 +270,42 @@ pub mod folder_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = St::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FolderBuilder<S: BosStr, St: folder_state::State> {
+pub struct FolderBuilder<St: folder_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -318,15 +318,22 @@ pub struct FolderBuilder<S: BosStr, St: folder_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Folder<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FolderBuilder<S, folder_state::Empty> {
+impl Folder<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FolderBuilder<folder_state::Empty, DefaultStr> {
         FolderBuilder::new()
     }
 }
 
-impl<S: BosStr> FolderBuilder<S, folder_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Folder<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FolderBuilder<folder_state::Empty, S> {
+        FolderBuilder::builder()
+    }
+}
+
+impl FolderBuilder<folder_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FolderBuilder {
             _state: PhantomData,
@@ -336,7 +343,18 @@ impl<S: BosStr> FolderBuilder<S, folder_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: folder_state::State> FolderBuilder<S, St> {
+impl<S: BosStr> FolderBuilder<folder_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FolderBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: folder_state::State, S: BosStr> FolderBuilder<St, S> {
     /// Set the `color` field (optional)
     pub fn color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -349,7 +367,7 @@ impl<S: BosStr, St: folder_state::State> FolderBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> FolderBuilder<S, St>
+impl<St, S: BosStr> FolderBuilder<St, S>
 where
     St: folder_state::State,
     St::CreatedAt: folder_state::IsUnset,
@@ -358,7 +376,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FolderBuilder<S, folder_state::SetCreatedAt<St>> {
+    ) -> FolderBuilder<folder_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FolderBuilder {
             _state: PhantomData,
@@ -368,7 +386,7 @@ where
     }
 }
 
-impl<S: BosStr, St: folder_state::State> FolderBuilder<S, St> {
+impl<St: folder_state::State, S: BosStr> FolderBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -381,7 +399,7 @@ impl<S: BosStr, St: folder_state::State> FolderBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: folder_state::State> FolderBuilder<S, St> {
+impl<St: folder_state::State, S: BosStr> FolderBuilder<St, S> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -394,13 +412,16 @@ impl<S: BosStr, St: folder_state::State> FolderBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> FolderBuilder<S, St>
+impl<St, S: BosStr> FolderBuilder<St, S>
 where
     St: folder_state::State,
     St::Name: folder_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> FolderBuilder<S, folder_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> FolderBuilder<folder_state::SetName<St>, S> {
         self._fields.4 = Option::Some(value.into());
         FolderBuilder {
             _state: PhantomData,
@@ -410,7 +431,7 @@ where
     }
 }
 
-impl<S: BosStr, St: folder_state::State> FolderBuilder<S, St> {
+impl<St: folder_state::State, S: BosStr> FolderBuilder<St, S> {
     /// Set the `visibility` field (optional)
     pub fn visibility(mut self, value: impl Into<Option<FolderVisibility<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -423,11 +444,11 @@ impl<S: BosStr, St: folder_state::State> FolderBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> FolderBuilder<S, St>
+impl<St, S: BosStr> FolderBuilder<St, S>
 where
     St: folder_state::State,
-    St::CreatedAt: folder_state::IsSet,
     St::Name: folder_state::IsSet,
+    St::CreatedAt: folder_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Folder<S> {
@@ -456,10 +477,10 @@ where
 }
 
 fn lexicon_doc_app_beaconbits_bookmark_folder() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.beaconbits.bookmark.folder"),
@@ -468,22 +489,28 @@ fn lexicon_doc_app_beaconbits_bookmark_folder() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A folder for organizing bookmarks")),
+                    description: Some(
+                        CowStr::new_static("A folder for organizing bookmarks"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("color"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Hex color code for the folder (e.g., #ff0000)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Hex color code for the folder (e.g., #ff0000)",
+                                        ),
+                                    ),
                                     max_graphemes: Some(7usize),
                                     ..Default::default()
                                 }),
@@ -491,9 +518,9 @@ fn lexicon_doc_app_beaconbits_bookmark_folder() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the folder was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp when the folder was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -501,9 +528,9 @@ fn lexicon_doc_app_beaconbits_bookmark_folder() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Description of the folder",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Description of the folder"),
+                                    ),
                                     max_graphemes: Some(280usize),
                                     ..Default::default()
                                 }),
@@ -519,9 +546,9 @@ fn lexicon_doc_app_beaconbits_bookmark_folder() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Display name of the folder",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Display name of the folder"),
+                                    ),
                                     max_graphemes: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -529,9 +556,9 @@ fn lexicon_doc_app_beaconbits_bookmark_folder() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("visibility"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Visibility setting for the folder",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Visibility setting for the folder"),
+                                    ),
                                     max_graphemes: Some(32usize),
                                     ..Default::default()
                                 }),

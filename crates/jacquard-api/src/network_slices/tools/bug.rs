@@ -9,12 +9,13 @@ pub mod comment;
 pub mod issue;
 pub mod response;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,11 +29,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::network_slices::tools::Images;
-use crate::network_slices::tools::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::tools::Images;
+use crate::network_slices::tools::richtext::facet::Facet;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -62,6 +63,7 @@ pub struct Bug<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BugSeverity<S: BosStr = DefaultStr> {
@@ -291,7 +293,7 @@ impl<S: BosStr> LexiconSchema for Bug<S> {
 
 pub mod bug_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -299,110 +301,110 @@ pub mod bug_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Namespace;
+        type StepsToReproduce;
         type Title;
         type Severity;
         type CreatedAt;
-        type StepsToReproduce;
+        type Namespace;
         type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Namespace = Unset;
+        type StepsToReproduce = Unset;
         type Title = Unset;
         type Severity = Unset;
         type CreatedAt = Unset;
-        type StepsToReproduce = Unset;
+        type Namespace = Unset;
         type Description = Unset;
     }
-    ///State transition - sets the `namespace` field to Set
-    pub struct SetNamespace<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNamespace<St> {}
-    impl<St: State> State for SetNamespace<St> {
-        type Namespace = Set<members::namespace>;
+    ///State transition - sets the `steps_to_reproduce` field to Set
+    pub struct SetStepsToReproduce<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStepsToReproduce<St> {}
+    impl<St: State> State for SetStepsToReproduce<St> {
+        type StepsToReproduce = Set<members::steps_to_reproduce>;
         type Title = St::Title;
         type Severity = St::Severity;
         type CreatedAt = St::CreatedAt;
-        type StepsToReproduce = St::StepsToReproduce;
+        type Namespace = St::Namespace;
         type Description = St::Description;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Namespace = St::Namespace;
+        type StepsToReproduce = St::StepsToReproduce;
         type Title = Set<members::title>;
         type Severity = St::Severity;
         type CreatedAt = St::CreatedAt;
-        type StepsToReproduce = St::StepsToReproduce;
+        type Namespace = St::Namespace;
         type Description = St::Description;
     }
     ///State transition - sets the `severity` field to Set
     pub struct SetSeverity<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSeverity<St> {}
     impl<St: State> State for SetSeverity<St> {
-        type Namespace = St::Namespace;
+        type StepsToReproduce = St::StepsToReproduce;
         type Title = St::Title;
         type Severity = Set<members::severity>;
         type CreatedAt = St::CreatedAt;
-        type StepsToReproduce = St::StepsToReproduce;
+        type Namespace = St::Namespace;
         type Description = St::Description;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Namespace = St::Namespace;
+        type StepsToReproduce = St::StepsToReproduce;
         type Title = St::Title;
         type Severity = St::Severity;
         type CreatedAt = Set<members::created_at>;
-        type StepsToReproduce = St::StepsToReproduce;
+        type Namespace = St::Namespace;
         type Description = St::Description;
     }
-    ///State transition - sets the `steps_to_reproduce` field to Set
-    pub struct SetStepsToReproduce<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStepsToReproduce<St> {}
-    impl<St: State> State for SetStepsToReproduce<St> {
-        type Namespace = St::Namespace;
+    ///State transition - sets the `namespace` field to Set
+    pub struct SetNamespace<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNamespace<St> {}
+    impl<St: State> State for SetNamespace<St> {
+        type StepsToReproduce = St::StepsToReproduce;
         type Title = St::Title;
         type Severity = St::Severity;
         type CreatedAt = St::CreatedAt;
-        type StepsToReproduce = Set<members::steps_to_reproduce>;
+        type Namespace = Set<members::namespace>;
         type Description = St::Description;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDescription<St> {}
     impl<St: State> State for SetDescription<St> {
-        type Namespace = St::Namespace;
+        type StepsToReproduce = St::StepsToReproduce;
         type Title = St::Title;
         type Severity = St::Severity;
         type CreatedAt = St::CreatedAt;
-        type StepsToReproduce = St::StepsToReproduce;
+        type Namespace = St::Namespace;
         type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `namespace` field
-        pub struct namespace(());
+        ///Marker type for the `steps_to_reproduce` field
+        pub struct steps_to_reproduce(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `severity` field
         pub struct severity(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `steps_to_reproduce` field
-        pub struct steps_to_reproduce(());
+        ///Marker type for the `namespace` field
+        pub struct namespace(());
         ///Marker type for the `description` field
         pub struct description(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BugBuilder<S: BosStr, St: bug_state::State> {
+pub struct BugBuilder<St: bug_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -419,15 +421,22 @@ pub struct BugBuilder<S: BosStr, St: bug_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Bug<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BugBuilder<S, bug_state::Empty> {
+impl Bug<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BugBuilder<bug_state::Empty, DefaultStr> {
         BugBuilder::new()
     }
 }
 
-impl<S: BosStr> BugBuilder<S, bug_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Bug<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BugBuilder<bug_state::Empty, S> {
+        BugBuilder::builder()
+    }
+}
+
+impl BugBuilder<bug_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BugBuilder {
             _state: PhantomData,
@@ -437,7 +446,18 @@ impl<S: BosStr> BugBuilder<S, bug_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: bug_state::State> BugBuilder<S, St> {
+impl<S: BosStr> BugBuilder<bug_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BugBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: bug_state::State, S: BosStr> BugBuilder<St, S> {
     /// Set the `appUsed` field (optional)
     pub fn app_used(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -450,7 +470,7 @@ impl<S: BosStr, St: bug_state::State> BugBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: bug_state::State> BugBuilder<S, St> {
+impl<St: bug_state::State, S: BosStr> BugBuilder<St, S> {
     /// Set the `attachments` field (optional)
     pub fn attachments(mut self, value: impl Into<Option<Images<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -463,7 +483,7 @@ impl<S: BosStr, St: bug_state::State> BugBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BugBuilder<S, St>
+impl<St, S: BosStr> BugBuilder<St, S>
 where
     St: bug_state::State,
     St::CreatedAt: bug_state::IsUnset,
@@ -472,7 +492,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BugBuilder<S, bug_state::SetCreatedAt<St>> {
+    ) -> BugBuilder<bug_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         BugBuilder {
             _state: PhantomData,
@@ -482,7 +502,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BugBuilder<S, St>
+impl<St, S: BosStr> BugBuilder<St, S>
 where
     St: bug_state::State,
     St::Description: bug_state::IsUnset,
@@ -491,7 +511,7 @@ where
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> BugBuilder<S, bug_state::SetDescription<St>> {
+    ) -> BugBuilder<bug_state::SetDescription<St>, S> {
         self._fields.3 = Option::Some(value.into());
         BugBuilder {
             _state: PhantomData,
@@ -501,9 +521,12 @@ where
     }
 }
 
-impl<S: BosStr, St: bug_state::State> BugBuilder<S, St> {
+impl<St: bug_state::State, S: BosStr> BugBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn description_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -514,13 +537,16 @@ impl<S: BosStr, St: bug_state::State> BugBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BugBuilder<S, St>
+impl<St, S: BosStr> BugBuilder<St, S>
 where
     St: bug_state::State,
     St::Namespace: bug_state::IsUnset,
 {
     /// Set the `namespace` field (required)
-    pub fn namespace(mut self, value: impl Into<S>) -> BugBuilder<S, bug_state::SetNamespace<St>> {
+    pub fn namespace(
+        mut self,
+        value: impl Into<S>,
+    ) -> BugBuilder<bug_state::SetNamespace<St>, S> {
         self._fields.5 = Option::Some(value.into());
         BugBuilder {
             _state: PhantomData,
@@ -530,7 +556,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BugBuilder<S, St>
+impl<St, S: BosStr> BugBuilder<St, S>
 where
     St: bug_state::State,
     St::Severity: bug_state::IsUnset,
@@ -539,7 +565,7 @@ where
     pub fn severity(
         mut self,
         value: impl Into<BugSeverity<S>>,
-    ) -> BugBuilder<S, bug_state::SetSeverity<St>> {
+    ) -> BugBuilder<bug_state::SetSeverity<St>, S> {
         self._fields.6 = Option::Some(value.into());
         BugBuilder {
             _state: PhantomData,
@@ -549,7 +575,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BugBuilder<S, St>
+impl<St, S: BosStr> BugBuilder<St, S>
 where
     St: bug_state::State,
     St::StepsToReproduce: bug_state::IsUnset,
@@ -558,7 +584,7 @@ where
     pub fn steps_to_reproduce(
         mut self,
         value: impl Into<S>,
-    ) -> BugBuilder<S, bug_state::SetStepsToReproduce<St>> {
+    ) -> BugBuilder<bug_state::SetStepsToReproduce<St>, S> {
         self._fields.7 = Option::Some(value.into());
         BugBuilder {
             _state: PhantomData,
@@ -568,26 +594,35 @@ where
     }
 }
 
-impl<S: BosStr, St: bug_state::State> BugBuilder<S, St> {
+impl<St: bug_state::State, S: BosStr> BugBuilder<St, S> {
     /// Set the `stepsToReproduceFacets` field (optional)
-    pub fn steps_to_reproduce_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn steps_to_reproduce_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `stepsToReproduceFacets` field to an Option value (optional)
-    pub fn maybe_steps_to_reproduce_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
+    pub fn maybe_steps_to_reproduce_facets(
+        mut self,
+        value: Option<Vec<Facet<S>>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
 }
 
-impl<S: BosStr, St> BugBuilder<S, St>
+impl<St, S: BosStr> BugBuilder<St, S>
 where
     St: bug_state::State,
     St::Title: bug_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> BugBuilder<S, bug_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> BugBuilder<bug_state::SetTitle<St>, S> {
         self._fields.9 = Option::Some(value.into());
         BugBuilder {
             _state: PhantomData,
@@ -597,14 +632,14 @@ where
     }
 }
 
-impl<S: BosStr, St> BugBuilder<S, St>
+impl<St, S: BosStr> BugBuilder<St, S>
 where
     St: bug_state::State,
-    St::Namespace: bug_state::IsSet,
+    St::StepsToReproduce: bug_state::IsSet,
     St::Title: bug_state::IsSet,
     St::Severity: bug_state::IsSet,
     St::CreatedAt: bug_state::IsSet,
-    St::StepsToReproduce: bug_state::IsSet,
+    St::Namespace: bug_state::IsSet,
     St::Description: bug_state::IsSet,
 {
     /// Build the final struct.
@@ -642,10 +677,10 @@ where
 }
 
 fn lexicon_doc_network_slices_tools_bug() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.tools.bug"),
@@ -656,14 +691,16 @@ fn lexicon_doc_network_slices_tools_bug() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("namespace"),
-                            SmolStr::new_static("description"),
-                            SmolStr::new_static("stepsToReproduce"),
-                            SmolStr::new_static("severity"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"),
+                                SmolStr::new_static("namespace"),
+                                SmolStr::new_static("description"),
+                                SmolStr::new_static("stepsToReproduce"),
+                                SmolStr::new_static("severity"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -677,9 +714,9 @@ fn lexicon_doc_network_slices_tools_bug() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("attachments"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    refs: vec![CowStr::new_static(
-                                        "network.slices.tools.defs#images",
-                                    )],
+                                    refs: vec![
+                                        CowStr::new_static("network.slices.tools.defs#images")
+                                    ],
                                     ..Default::default()
                                 }),
                             );
@@ -701,9 +738,11 @@ fn lexicon_doc_network_slices_tools_bug() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("descriptionFacets"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Annotations of description (mentions and links)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Annotations of description (mentions and links)",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static(
                                             "network.slices.tools.richtext.facet",
@@ -716,9 +755,11 @@ fn lexicon_doc_network_slices_tools_bug() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("namespace"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Target namespace like 'social.grain' or 'app.bsky'",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Target namespace like 'social.grain' or 'app.bsky'",
+                                        ),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
@@ -739,9 +780,11 @@ fn lexicon_doc_network_slices_tools_bug() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("stepsToReproduceFacets"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Annotations of steps to reproduce (mentions and links)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Annotations of steps to reproduce (mentions and links)",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static(
                                             "network.slices.tools.richtext.facet",

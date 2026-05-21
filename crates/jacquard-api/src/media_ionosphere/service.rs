@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,12 +25,12 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::media_ionosphere::Broadcast;
 use crate::media_ionosphere::Genre;
 use crate::media_ionosphere::Geocoordinates;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// Represents the service belonging to this PDS
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -134,16 +134,19 @@ impl<S: BosStr> LexiconSchema for Service<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("icon"),
@@ -183,7 +186,7 @@ impl<S: BosStr> LexiconSchema for Service<S> {
 
 pub mod service_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -191,56 +194,56 @@ pub mod service_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Language;
-        type Name;
         type Ionosphere;
+        type Name;
+        type Language;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Language = Unset;
-        type Name = Unset;
         type Ionosphere = Unset;
-    }
-    ///State transition - sets the `language` field to Set
-    pub struct SetLanguage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLanguage<St> {}
-    impl<St: State> State for SetLanguage<St> {
-        type Language = Set<members::language>;
-        type Name = St::Name;
-        type Ionosphere = St::Ionosphere;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Language = St::Language;
-        type Name = Set<members::name>;
-        type Ionosphere = St::Ionosphere;
+        type Name = Unset;
+        type Language = Unset;
     }
     ///State transition - sets the `ionosphere` field to Set
     pub struct SetIonosphere<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIonosphere<St> {}
     impl<St: State> State for SetIonosphere<St> {
-        type Language = St::Language;
-        type Name = St::Name;
         type Ionosphere = Set<members::ionosphere>;
+        type Name = St::Name;
+        type Language = St::Language;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Ionosphere = St::Ionosphere;
+        type Name = Set<members::name>;
+        type Language = St::Language;
+    }
+    ///State transition - sets the `language` field to Set
+    pub struct SetLanguage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLanguage<St> {}
+    impl<St: State> State for SetLanguage<St> {
+        type Ionosphere = St::Ionosphere;
+        type Name = St::Name;
+        type Language = Set<members::language>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `language` field
-        pub struct language(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `ionosphere` field
         pub struct ionosphere(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `language` field
+        pub struct language(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ServiceBuilder<S: BosStr, St: service_state::State> {
+pub struct ServiceBuilder<St: service_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<Broadcast<S>>>,
@@ -257,15 +260,22 @@ pub struct ServiceBuilder<S: BosStr, St: service_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Service<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ServiceBuilder<S, service_state::Empty> {
+impl Service<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ServiceBuilder<service_state::Empty, DefaultStr> {
         ServiceBuilder::new()
     }
 }
 
-impl<S: BosStr> ServiceBuilder<S, service_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Service<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ServiceBuilder<service_state::Empty, S> {
+        ServiceBuilder::builder()
+    }
+}
+
+impl ServiceBuilder<service_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ServiceBuilder {
             _state: PhantomData,
@@ -275,7 +285,18 @@ impl<S: BosStr> ServiceBuilder<S, service_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
+impl<S: BosStr> ServiceBuilder<service_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ServiceBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `broadcast` field (optional)
     pub fn broadcast(mut self, value: impl Into<Option<Vec<Broadcast<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -288,7 +309,7 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
+impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -301,7 +322,7 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
+impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `genres` field (optional)
     pub fn genres(mut self, value: impl Into<Option<Vec<Genre<S>>>>) -> Self {
         self._fields.2 = value.into();
@@ -314,7 +335,7 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
+impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `geolocation` field (optional)
     pub fn geolocation(mut self, value: impl Into<Option<Geocoordinates<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -327,7 +348,7 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
+impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -340,7 +361,7 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ServiceBuilder<S, St>
+impl<St, S: BosStr> ServiceBuilder<St, S>
 where
     St: service_state::State,
     St::Ionosphere: service_state::IsUnset,
@@ -349,7 +370,7 @@ where
     pub fn ionosphere(
         mut self,
         value: impl Into<S>,
-    ) -> ServiceBuilder<S, service_state::SetIonosphere<St>> {
+    ) -> ServiceBuilder<service_state::SetIonosphere<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ServiceBuilder {
             _state: PhantomData,
@@ -359,7 +380,7 @@ where
     }
 }
 
-impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
+impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -372,7 +393,7 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ServiceBuilder<S, St>
+impl<St, S: BosStr> ServiceBuilder<St, S>
 where
     St: service_state::State,
     St::Language: service_state::IsUnset,
@@ -381,7 +402,7 @@ where
     pub fn language(
         mut self,
         value: impl Into<Language>,
-    ) -> ServiceBuilder<S, service_state::SetLanguage<St>> {
+    ) -> ServiceBuilder<service_state::SetLanguage<St>, S> {
         self._fields.7 = Option::Some(value.into());
         ServiceBuilder {
             _state: PhantomData,
@@ -391,13 +412,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ServiceBuilder<S, St>
+impl<St, S: BosStr> ServiceBuilder<St, S>
 where
     St: service_state::State,
     St::Name: service_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> ServiceBuilder<S, service_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> ServiceBuilder<service_state::SetName<St>, S> {
         self._fields.8 = Option::Some(value.into());
         ServiceBuilder {
             _state: PhantomData,
@@ -407,7 +431,7 @@ where
     }
 }
 
-impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
+impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `presentationLanguage` field (optional)
     pub fn presentation_language(mut self, value: impl Into<Option<Language>>) -> Self {
         self._fields.9 = value.into();
@@ -420,12 +444,12 @@ impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ServiceBuilder<S, St>
+impl<St, S: BosStr> ServiceBuilder<St, S>
 where
     St: service_state::State,
-    St::Language: service_state::IsSet,
-    St::Name: service_state::IsSet,
     St::Ionosphere: service_state::IsSet,
+    St::Name: service_state::IsSet,
+    St::Language: service_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Service<S> {
@@ -462,10 +486,10 @@ where
 }
 
 fn lexicon_doc_media_ionosphere_service() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("media.ionosphere.service"),

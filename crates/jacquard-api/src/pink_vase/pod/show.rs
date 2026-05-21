@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A podcast show. A single user can have multiple shows.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -142,23 +142,25 @@ impl<S: BosStr> LexiconSchema for Show<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/jpeg", "image/png", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("cover_art"),
                         accepted: vec![
-                            "image/jpeg".to_string(),
-                            "image/png".to_string(),
-                            "image/webp".to_string(),
+                            "image/jpeg".to_string(), "image/png".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -192,7 +194,7 @@ impl<S: BosStr> LexiconSchema for Show<S> {
 
 pub mod show_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -235,7 +237,7 @@ pub mod show_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ShowBuilder<S: BosStr, St: show_state::State> {
+pub struct ShowBuilder<St: show_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
@@ -250,15 +252,22 @@ pub struct ShowBuilder<S: BosStr, St: show_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Show<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ShowBuilder<S, show_state::Empty> {
+impl Show<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ShowBuilder<show_state::Empty, DefaultStr> {
         ShowBuilder::new()
     }
 }
 
-impl<S: BosStr> ShowBuilder<S, show_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Show<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ShowBuilder<show_state::Empty, S> {
+        ShowBuilder::builder()
+    }
+}
+
+impl ShowBuilder<show_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ShowBuilder {
             _state: PhantomData,
@@ -268,7 +277,18 @@ impl<S: BosStr> ShowBuilder<S, show_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
+impl<S: BosStr> ShowBuilder<show_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ShowBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: show_state::State, S: BosStr> ShowBuilder<St, S> {
     /// Set the `categories` field (optional)
     pub fn categories(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -281,7 +301,7 @@ impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
+impl<St: show_state::State, S: BosStr> ShowBuilder<St, S> {
     /// Set the `coverArt` field (optional)
     pub fn cover_art(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -294,7 +314,7 @@ impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ShowBuilder<S, St>
+impl<St, S: BosStr> ShowBuilder<St, S>
 where
     St: show_state::State,
     St::CreatedAt: show_state::IsUnset,
@@ -303,7 +323,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ShowBuilder<S, show_state::SetCreatedAt<St>> {
+    ) -> ShowBuilder<show_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ShowBuilder {
             _state: PhantomData,
@@ -313,7 +333,7 @@ where
     }
 }
 
-impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
+impl<St: show_state::State, S: BosStr> ShowBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -326,7 +346,7 @@ impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
+impl<St: show_state::State, S: BosStr> ShowBuilder<St, S> {
     /// Set the `explicit` field (optional)
     pub fn explicit(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.4 = value.into();
@@ -339,7 +359,7 @@ impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
+impl<St: show_state::State, S: BosStr> ShowBuilder<St, S> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<Language>>) -> Self {
         self._fields.5 = value.into();
@@ -352,13 +372,16 @@ impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ShowBuilder<S, St>
+impl<St, S: BosStr> ShowBuilder<St, S>
 where
     St: show_state::State,
     St::Name: show_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> ShowBuilder<S, show_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> ShowBuilder<show_state::SetName<St>, S> {
         self._fields.6 = Option::Some(value.into());
         ShowBuilder {
             _state: PhantomData,
@@ -368,7 +391,7 @@ where
     }
 }
 
-impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
+impl<St: show_state::State, S: BosStr> ShowBuilder<St, S> {
     /// Set the `websiteUrl` field (optional)
     pub fn website_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -381,7 +404,7 @@ impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ShowBuilder<S, St>
+impl<St, S: BosStr> ShowBuilder<St, S>
 where
     St: show_state::State,
     St::Name: show_state::IsSet,
@@ -418,10 +441,10 @@ where
 }
 
 fn lexicon_doc_pink_vase_pod_show() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pink.vase.pod.show"),

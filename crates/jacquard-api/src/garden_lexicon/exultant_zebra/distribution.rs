@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,17 +25,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::garden_lexicon::exultant_zebra::distribution;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::garden_lexicon::exultant_zebra::distribution;
 /// A downloadable artifact within a distribution.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Artifact<S: BosStr = DefaultStr> {
     ///An optional description of this artifact.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -103,16 +100,19 @@ impl<S: BosStr> LexiconSchema for Artifact<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("download"),
@@ -170,7 +170,7 @@ impl<S: BosStr> LexiconSchema for Distribution<S> {
 
 pub mod artifact_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -201,21 +201,28 @@ pub mod artifact_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ArtifactBuilder<S: BosStr, St: artifact_state::State> {
+pub struct ArtifactBuilder<St: artifact_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Artifact<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ArtifactBuilder<S, artifact_state::Empty> {
+impl Artifact<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ArtifactBuilder<artifact_state::Empty, DefaultStr> {
         ArtifactBuilder::new()
     }
 }
 
-impl<S: BosStr> ArtifactBuilder<S, artifact_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Artifact<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ArtifactBuilder<artifact_state::Empty, S> {
+        ArtifactBuilder::builder()
+    }
+}
+
+impl ArtifactBuilder<artifact_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ArtifactBuilder {
             _state: PhantomData,
@@ -225,7 +232,18 @@ impl<S: BosStr> ArtifactBuilder<S, artifact_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: artifact_state::State> ArtifactBuilder<S, St> {
+impl<S: BosStr> ArtifactBuilder<artifact_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ArtifactBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: artifact_state::State, S: BosStr> ArtifactBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -238,7 +256,7 @@ impl<S: BosStr, St: artifact_state::State> ArtifactBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ArtifactBuilder<S, St>
+impl<St, S: BosStr> ArtifactBuilder<St, S>
 where
     St: artifact_state::State,
     St::Download: artifact_state::IsUnset,
@@ -247,7 +265,7 @@ where
     pub fn download(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ArtifactBuilder<S, artifact_state::SetDownload<St>> {
+    ) -> ArtifactBuilder<artifact_state::SetDownload<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ArtifactBuilder {
             _state: PhantomData,
@@ -257,7 +275,7 @@ where
     }
 }
 
-impl<S: BosStr, St: artifact_state::State> ArtifactBuilder<S, St> {
+impl<St: artifact_state::State, S: BosStr> ArtifactBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -270,7 +288,7 @@ impl<S: BosStr, St: artifact_state::State> ArtifactBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ArtifactBuilder<S, St>
+impl<St, S: BosStr> ArtifactBuilder<St, S>
 where
     St: artifact_state::State,
     St::Download: artifact_state::IsSet,
@@ -296,10 +314,10 @@ where
 }
 
 fn lexicon_doc_garden_lexicon_exultant_zebra_distribution() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.lexicon.exultant-zebra.distribution"),
@@ -354,22 +372,28 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_distribution() -> LexiconDoc<'stati
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A distribution of an application.")),
+                    description: Some(
+                        CowStr::new_static("A distribution of an application."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("version"),
-                            SmolStr::new_static("artifacts"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("version"),
+                                SmolStr::new_static("artifacts")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("artifacts"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "The list of downloadable artifacts for this distribution.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The list of downloadable artifacts for this distribution.",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#artifact"),
                                         ..Default::default()
@@ -380,18 +404,22 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_distribution() -> LexiconDoc<'stati
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "An optional description of this distribution.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "An optional description of this distribution.",
+                                        ),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("version"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The version of this distribution, e.g. '0.14.0'.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The version of this distribution, e.g. '0.14.0'.",
+                                        ),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
@@ -410,7 +438,7 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_distribution() -> LexiconDoc<'stati
 
 pub mod distribution_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -453,21 +481,28 @@ pub mod distribution_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DistributionBuilder<S: BosStr, St: distribution_state::State> {
+pub struct DistributionBuilder<St: distribution_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<distribution::Artifact<S>>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Distribution<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DistributionBuilder<S, distribution_state::Empty> {
+impl Distribution<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DistributionBuilder<distribution_state::Empty, DefaultStr> {
         DistributionBuilder::new()
     }
 }
 
-impl<S: BosStr> DistributionBuilder<S, distribution_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Distribution<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DistributionBuilder<distribution_state::Empty, S> {
+        DistributionBuilder::builder()
+    }
+}
+
+impl DistributionBuilder<distribution_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DistributionBuilder {
             _state: PhantomData,
@@ -477,7 +512,18 @@ impl<S: BosStr> DistributionBuilder<S, distribution_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DistributionBuilder<S, St>
+impl<S: BosStr> DistributionBuilder<distribution_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DistributionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DistributionBuilder<St, S>
 where
     St: distribution_state::State,
     St::Artifacts: distribution_state::IsUnset,
@@ -486,7 +532,7 @@ where
     pub fn artifacts(
         mut self,
         value: impl Into<Vec<distribution::Artifact<S>>>,
-    ) -> DistributionBuilder<S, distribution_state::SetArtifacts<St>> {
+    ) -> DistributionBuilder<distribution_state::SetArtifacts<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DistributionBuilder {
             _state: PhantomData,
@@ -496,7 +542,7 @@ where
     }
 }
 
-impl<S: BosStr, St: distribution_state::State> DistributionBuilder<S, St> {
+impl<St: distribution_state::State, S: BosStr> DistributionBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -509,7 +555,7 @@ impl<S: BosStr, St: distribution_state::State> DistributionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DistributionBuilder<S, St>
+impl<St, S: BosStr> DistributionBuilder<St, S>
 where
     St: distribution_state::State,
     St::Version: distribution_state::IsUnset,
@@ -518,7 +564,7 @@ where
     pub fn version(
         mut self,
         value: impl Into<S>,
-    ) -> DistributionBuilder<S, distribution_state::SetVersion<St>> {
+    ) -> DistributionBuilder<distribution_state::SetVersion<St>, S> {
         self._fields.2 = Option::Some(value.into());
         DistributionBuilder {
             _state: PhantomData,
@@ -528,7 +574,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DistributionBuilder<S, St>
+impl<St, S: BosStr> DistributionBuilder<St, S>
 where
     St: distribution_state::State,
     St::Version: distribution_state::IsSet,
@@ -544,7 +590,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Distribution<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Distribution<S> {
         Distribution {
             artifacts: self._fields.0.unwrap(),
             description: self._fields.1,

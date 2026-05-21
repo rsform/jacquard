@@ -9,12 +9,13 @@ pub mod bug;
 pub mod document;
 pub mod richtext;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,16 +26,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::network_slices::tools;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::tools;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Image<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility
     pub alt: S,
@@ -43,11 +41,9 @@ pub struct Image<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Images<S: BosStr = DefaultStr> {
     pub images: Vec<tools::Image<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -83,16 +79,19 @@ impl<S: BosStr> LexiconSchema for Image<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
@@ -134,7 +133,7 @@ impl<S: BosStr> LexiconSchema for Images<S> {
 
 pub mod image_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -177,21 +176,28 @@ pub mod image_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ImageBuilder<S: BosStr, St: image_state::State> {
+pub struct ImageBuilder<St: image_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Image<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ImageBuilder<S, image_state::Empty> {
+impl Image<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ImageBuilder<image_state::Empty, DefaultStr> {
         ImageBuilder::new()
     }
 }
 
-impl<S: BosStr> ImageBuilder<S, image_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Image<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ImageBuilder<image_state::Empty, S> {
+        ImageBuilder::builder()
+    }
+}
+
+impl ImageBuilder<image_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ImageBuilder {
             _state: PhantomData,
@@ -201,13 +207,27 @@ impl<S: BosStr> ImageBuilder<S, image_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ImageBuilder<S, St>
+impl<S: BosStr> ImageBuilder<image_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ImageBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
     St::Alt: image_state::IsUnset,
 {
     /// Set the `alt` field (required)
-    pub fn alt(mut self, value: impl Into<S>) -> ImageBuilder<S, image_state::SetAlt<St>> {
+    pub fn alt(
+        mut self,
+        value: impl Into<S>,
+    ) -> ImageBuilder<image_state::SetAlt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
@@ -217,7 +237,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ImageBuilder<S, St>
+impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
     St::Image: image_state::IsUnset,
@@ -226,7 +246,7 @@ where
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ImageBuilder<S, image_state::SetImage<St>> {
+    ) -> ImageBuilder<image_state::SetImage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
@@ -236,7 +256,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ImageBuilder<S, St>
+impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
     St::Alt: image_state::IsSet,
@@ -261,10 +281,10 @@ where
 }
 
 fn lexicon_doc_network_slices_tools_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.tools.defs"),
@@ -273,27 +293,26 @@ fn lexicon_doc_network_slices_tools_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("image"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("image"),
-                        SmolStr::new_static("alt"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("image"), SmolStr::new_static("alt")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Alt text description of the image, for accessibility",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Alt text description of the image, for accessibility",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("image"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -331,7 +350,7 @@ fn lexicon_doc_network_slices_tools_defs() -> LexiconDoc<'static> {
 
 pub mod images_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -362,21 +381,28 @@ pub mod images_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ImagesBuilder<S: BosStr, St: images_state::State> {
+pub struct ImagesBuilder<St: images_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<tools::Image<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Images<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ImagesBuilder<S, images_state::Empty> {
+impl Images<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ImagesBuilder<images_state::Empty, DefaultStr> {
         ImagesBuilder::new()
     }
 }
 
-impl<S: BosStr> ImagesBuilder<S, images_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Images<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ImagesBuilder<images_state::Empty, S> {
+        ImagesBuilder::builder()
+    }
+}
+
+impl ImagesBuilder<images_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ImagesBuilder {
             _state: PhantomData,
@@ -386,7 +412,18 @@ impl<S: BosStr> ImagesBuilder<S, images_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ImagesBuilder<S, St>
+impl<S: BosStr> ImagesBuilder<images_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ImagesBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ImagesBuilder<St, S>
 where
     St: images_state::State,
     St::Images: images_state::IsUnset,
@@ -395,7 +432,7 @@ where
     pub fn images(
         mut self,
         value: impl Into<Vec<tools::Image<S>>>,
-    ) -> ImagesBuilder<S, images_state::SetImages<St>> {
+    ) -> ImagesBuilder<images_state::SetImages<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ImagesBuilder {
             _state: PhantomData,
@@ -405,7 +442,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ImagesBuilder<S, St>
+impl<St, S: BosStr> ImagesBuilder<St, S>
 where
     St: images_state::State,
     St::Images: images_state::IsSet,

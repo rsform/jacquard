@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,13 +22,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Address<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub addr: Option<S>,
@@ -40,11 +37,9 @@ pub struct Address<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Coordinates<S: BosStr = DefaultStr> {
     pub lat: i64,
     pub lng: i64,
@@ -52,11 +47,9 @@ pub struct Coordinates<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventComponent<S: BosStr = DefaultStr> {
     pub data: Data<S>,
     pub r#type: S,
@@ -64,11 +57,9 @@ pub struct EventComponent<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventInstance<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end: Option<S>,
@@ -81,6 +72,7 @@ pub struct EventInstance<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EventStatus<S: BosStr = DefaultStr> {
@@ -165,11 +157,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct OnlineVenue<S: BosStr = DefaultStr> {
     pub id: S,
     pub name: Data<S>,
@@ -180,11 +170,9 @@ pub struct OnlineVenue<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PhysicalVenue<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub address: Option<Data<S>>,
@@ -197,11 +185,9 @@ pub struct PhysicalVenue<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UnknownVenue<S: BosStr = DefaultStr> {
     pub id: S,
     pub name: Data<S>,
@@ -210,11 +196,9 @@ pub struct UnknownVenue<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Event<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub components: Option<Vec<Data<S>>>,
@@ -231,6 +215,7 @@ pub struct Event<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -357,10 +342,10 @@ impl<S: BosStr> LexiconSchema for Event<S> {
 }
 
 fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("directory.evnt.event"),
@@ -374,21 +359,15 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("addr"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("countryCode"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("postalCode"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -398,7 +377,9 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("Coordinates"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("lat"), SmolStr::new_static("lng")]),
+                    required: Some(
+                        vec![SmolStr::new_static("lat"), SmolStr::new_static("lng")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -422,10 +403,9 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("EventComponent"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("data"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("type"), SmolStr::new_static("data")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -437,9 +417,7 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -454,15 +432,11 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("end"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("start"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("status"),
@@ -487,26 +461,23 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("EventStatus"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("OnlineVenue"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("name"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("type"),
+                            SmolStr::new_static("name")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
@@ -516,15 +487,11 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("url"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -534,11 +501,12 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("PhysicalVenue"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("name"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("type"),
+                            SmolStr::new_static("name")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -558,9 +526,7 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
@@ -570,9 +536,7 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -582,19 +546,18 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("UnknownVenue"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("name"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("type"),
+                            SmolStr::new_static("name")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
@@ -604,9 +567,7 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -616,7 +577,9 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("v"), SmolStr::new_static("name")]),
+                    required: Some(
+                        vec![SmolStr::new_static("v"), SmolStr::new_static("name")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -672,7 +635,7 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                                     refs: vec![
                                         CowStr::new_static("#physicalVenue"),
                                         CowStr::new_static("#onlineVenue"),
-                                        CowStr::new_static("#unknownVenue"),
+                                        CowStr::new_static("#unknownVenue")
                                     ],
                                     ..Default::default()
                                 }),
@@ -692,7 +655,7 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
 
 pub mod coordinates_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -700,56 +663,63 @@ pub mod coordinates_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lng;
         type Lat;
+        type Lng;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lng = Unset;
         type Lat = Unset;
-    }
-    ///State transition - sets the `lng` field to Set
-    pub struct SetLng<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLng<St> {}
-    impl<St: State> State for SetLng<St> {
-        type Lng = Set<members::lng>;
-        type Lat = St::Lat;
+        type Lng = Unset;
     }
     ///State transition - sets the `lat` field to Set
     pub struct SetLat<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLat<St> {}
     impl<St: State> State for SetLat<St> {
-        type Lng = St::Lng;
         type Lat = Set<members::lat>;
+        type Lng = St::Lng;
+    }
+    ///State transition - sets the `lng` field to Set
+    pub struct SetLng<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLng<St> {}
+    impl<St: State> State for SetLng<St> {
+        type Lat = St::Lat;
+        type Lng = Set<members::lng>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lng` field
-        pub struct lng(());
         ///Marker type for the `lat` field
         pub struct lat(());
+        ///Marker type for the `lng` field
+        pub struct lng(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CoordinatesBuilder<S: BosStr, St: coordinates_state::State> {
+pub struct CoordinatesBuilder<St: coordinates_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Coordinates<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CoordinatesBuilder<S, coordinates_state::Empty> {
+impl Coordinates<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CoordinatesBuilder<coordinates_state::Empty, DefaultStr> {
         CoordinatesBuilder::new()
     }
 }
 
-impl<S: BosStr> CoordinatesBuilder<S, coordinates_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Coordinates<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CoordinatesBuilder<coordinates_state::Empty, S> {
+        CoordinatesBuilder::builder()
+    }
+}
+
+impl CoordinatesBuilder<coordinates_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CoordinatesBuilder {
             _state: PhantomData,
@@ -759,7 +729,18 @@ impl<S: BosStr> CoordinatesBuilder<S, coordinates_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CoordinatesBuilder<S, St>
+impl<S: BosStr> CoordinatesBuilder<coordinates_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CoordinatesBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CoordinatesBuilder<St, S>
 where
     St: coordinates_state::State,
     St::Lat: coordinates_state::IsUnset,
@@ -768,7 +749,7 @@ where
     pub fn lat(
         mut self,
         value: impl Into<i64>,
-    ) -> CoordinatesBuilder<S, coordinates_state::SetLat<St>> {
+    ) -> CoordinatesBuilder<coordinates_state::SetLat<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CoordinatesBuilder {
             _state: PhantomData,
@@ -778,7 +759,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CoordinatesBuilder<S, St>
+impl<St, S: BosStr> CoordinatesBuilder<St, S>
 where
     St: coordinates_state::State,
     St::Lng: coordinates_state::IsUnset,
@@ -787,7 +768,7 @@ where
     pub fn lng(
         mut self,
         value: impl Into<i64>,
-    ) -> CoordinatesBuilder<S, coordinates_state::SetLng<St>> {
+    ) -> CoordinatesBuilder<coordinates_state::SetLng<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CoordinatesBuilder {
             _state: PhantomData,
@@ -797,11 +778,11 @@ where
     }
 }
 
-impl<S: BosStr, St> CoordinatesBuilder<S, St>
+impl<St, S: BosStr> CoordinatesBuilder<St, S>
 where
     St: coordinates_state::State,
-    St::Lng: coordinates_state::IsSet,
     St::Lat: coordinates_state::IsSet,
+    St::Lng: coordinates_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Coordinates<S> {
@@ -812,7 +793,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Coordinates<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Coordinates<S> {
         Coordinates {
             lat: self._fields.0.unwrap(),
             lng: self._fields.1.unwrap(),
@@ -823,7 +807,7 @@ where
 
 pub mod event_component_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -866,21 +850,31 @@ pub mod event_component_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EventComponentBuilder<S: BosStr, St: event_component_state::State> {
+pub struct EventComponentBuilder<
+    St: event_component_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> EventComponent<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EventComponentBuilder<S, event_component_state::Empty> {
+impl EventComponent<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EventComponentBuilder<event_component_state::Empty, DefaultStr> {
         EventComponentBuilder::new()
     }
 }
 
-impl<S: BosStr> EventComponentBuilder<S, event_component_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> EventComponent<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EventComponentBuilder<event_component_state::Empty, S> {
+        EventComponentBuilder::builder()
+    }
+}
+
+impl EventComponentBuilder<event_component_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventComponentBuilder {
             _state: PhantomData,
@@ -890,7 +884,18 @@ impl<S: BosStr> EventComponentBuilder<S, event_component_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EventComponentBuilder<S, St>
+impl<S: BosStr> EventComponentBuilder<event_component_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EventComponentBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EventComponentBuilder<St, S>
 where
     St: event_component_state::State,
     St::Data: event_component_state::IsUnset,
@@ -899,7 +904,7 @@ where
     pub fn data(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> EventComponentBuilder<S, event_component_state::SetData<St>> {
+    ) -> EventComponentBuilder<event_component_state::SetData<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EventComponentBuilder {
             _state: PhantomData,
@@ -909,7 +914,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EventComponentBuilder<S, St>
+impl<St, S: BosStr> EventComponentBuilder<St, S>
 where
     St: event_component_state::State,
     St::Type: event_component_state::IsUnset,
@@ -918,7 +923,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> EventComponentBuilder<S, event_component_state::SetType<St>> {
+    ) -> EventComponentBuilder<event_component_state::SetType<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EventComponentBuilder {
             _state: PhantomData,
@@ -928,7 +933,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EventComponentBuilder<S, St>
+impl<St, S: BosStr> EventComponentBuilder<St, S>
 where
     St: event_component_state::State,
     St::Data: event_component_state::IsSet,
@@ -943,7 +948,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EventComponent<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EventComponent<S> {
         EventComponent {
             data: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),
@@ -954,7 +962,7 @@ where
 
 pub mod online_venue_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -962,70 +970,77 @@ pub mod online_venue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
-        type Name;
         type Id;
+        type Name;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
-        type Name = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Type = Set<members::r#type>;
-        type Name = St::Name;
-        type Id = St::Id;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Type = St::Type;
-        type Name = Set<members::name>;
-        type Id = St::Id;
+        type Name = Unset;
+        type Type = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type Type = St::Type;
-        type Name = St::Name;
         type Id = Set<members::id>;
+        type Name = St::Name;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Id = St::Id;
+        type Name = Set<members::name>;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Id = St::Id;
+        type Name = St::Name;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct OnlineVenueBuilder<S: BosStr, St: online_venue_state::State> {
+pub struct OnlineVenueBuilder<St: online_venue_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Data<S>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> OnlineVenue<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> OnlineVenueBuilder<S, online_venue_state::Empty> {
+impl OnlineVenue<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> OnlineVenueBuilder<online_venue_state::Empty, DefaultStr> {
         OnlineVenueBuilder::new()
     }
 }
 
-impl<S: BosStr> OnlineVenueBuilder<S, online_venue_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> OnlineVenue<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> OnlineVenueBuilder<online_venue_state::Empty, S> {
+        OnlineVenueBuilder::builder()
+    }
+}
+
+impl OnlineVenueBuilder<online_venue_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         OnlineVenueBuilder {
             _state: PhantomData,
@@ -1035,7 +1050,18 @@ impl<S: BosStr> OnlineVenueBuilder<S, online_venue_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> OnlineVenueBuilder<S, St>
+impl<S: BosStr> OnlineVenueBuilder<online_venue_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        OnlineVenueBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> OnlineVenueBuilder<St, S>
 where
     St: online_venue_state::State,
     St::Id: online_venue_state::IsUnset,
@@ -1044,7 +1070,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> OnlineVenueBuilder<S, online_venue_state::SetId<St>> {
+    ) -> OnlineVenueBuilder<online_venue_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         OnlineVenueBuilder {
             _state: PhantomData,
@@ -1054,7 +1080,7 @@ where
     }
 }
 
-impl<S: BosStr, St> OnlineVenueBuilder<S, St>
+impl<St, S: BosStr> OnlineVenueBuilder<St, S>
 where
     St: online_venue_state::State,
     St::Name: online_venue_state::IsUnset,
@@ -1063,7 +1089,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> OnlineVenueBuilder<S, online_venue_state::SetName<St>> {
+    ) -> OnlineVenueBuilder<online_venue_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         OnlineVenueBuilder {
             _state: PhantomData,
@@ -1073,7 +1099,7 @@ where
     }
 }
 
-impl<S: BosStr, St> OnlineVenueBuilder<S, St>
+impl<St, S: BosStr> OnlineVenueBuilder<St, S>
 where
     St: online_venue_state::State,
     St::Type: online_venue_state::IsUnset,
@@ -1082,7 +1108,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> OnlineVenueBuilder<S, online_venue_state::SetType<St>> {
+    ) -> OnlineVenueBuilder<online_venue_state::SetType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         OnlineVenueBuilder {
             _state: PhantomData,
@@ -1092,7 +1118,7 @@ where
     }
 }
 
-impl<S: BosStr, St: online_venue_state::State> OnlineVenueBuilder<S, St> {
+impl<St: online_venue_state::State, S: BosStr> OnlineVenueBuilder<St, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -1105,12 +1131,12 @@ impl<S: BosStr, St: online_venue_state::State> OnlineVenueBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> OnlineVenueBuilder<S, St>
+impl<St, S: BosStr> OnlineVenueBuilder<St, S>
 where
     St: online_venue_state::State,
-    St::Type: online_venue_state::IsSet,
-    St::Name: online_venue_state::IsSet,
     St::Id: online_venue_state::IsSet,
+    St::Name: online_venue_state::IsSet,
+    St::Type: online_venue_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> OnlineVenue<S> {
@@ -1123,7 +1149,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> OnlineVenue<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> OnlineVenue<S> {
         OnlineVenue {
             id: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -1136,7 +1165,7 @@ where
 
 pub mod physical_venue_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1145,75 +1174,79 @@ pub mod physical_venue_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Id;
-        type Name;
         type Type;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Id = Unset;
-        type Name = Unset;
         type Type = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
+        type Type = St::Type;
         type Name = St::Name;
-        type Type = St::Type;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Id = St::Id;
-        type Name = Set<members::name>;
-        type Type = St::Type;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
         type Id = St::Id;
-        type Name = St::Name;
         type Type = Set<members::r#type>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Id = St::Id;
+        type Type = St::Type;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PhysicalVenueBuilder<S: BosStr, St: physical_venue_state::State> {
+pub struct PhysicalVenueBuilder<
+    St: physical_venue_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Data<S>>,
-        Option<Data<S>>,
-        Option<S>,
-        Option<Data<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<Data<S>>, Option<Data<S>>, Option<S>, Option<Data<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PhysicalVenue<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PhysicalVenueBuilder<S, physical_venue_state::Empty> {
+impl PhysicalVenue<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PhysicalVenueBuilder<physical_venue_state::Empty, DefaultStr> {
         PhysicalVenueBuilder::new()
     }
 }
 
-impl<S: BosStr> PhysicalVenueBuilder<S, physical_venue_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PhysicalVenue<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PhysicalVenueBuilder<physical_venue_state::Empty, S> {
+        PhysicalVenueBuilder::builder()
+    }
+}
+
+impl PhysicalVenueBuilder<physical_venue_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PhysicalVenueBuilder {
             _state: PhantomData,
@@ -1223,7 +1256,18 @@ impl<S: BosStr> PhysicalVenueBuilder<S, physical_venue_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: physical_venue_state::State> PhysicalVenueBuilder<S, St> {
+impl<S: BosStr> PhysicalVenueBuilder<physical_venue_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PhysicalVenueBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: physical_venue_state::State, S: BosStr> PhysicalVenueBuilder<St, S> {
     /// Set the `address` field (optional)
     pub fn address(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1236,7 +1280,7 @@ impl<S: BosStr, St: physical_venue_state::State> PhysicalVenueBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: physical_venue_state::State> PhysicalVenueBuilder<S, St> {
+impl<St: physical_venue_state::State, S: BosStr> PhysicalVenueBuilder<St, S> {
     /// Set the `coordinates` field (optional)
     pub fn coordinates(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -1249,7 +1293,7 @@ impl<S: BosStr, St: physical_venue_state::State> PhysicalVenueBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PhysicalVenueBuilder<S, St>
+impl<St, S: BosStr> PhysicalVenueBuilder<St, S>
 where
     St: physical_venue_state::State,
     St::Id: physical_venue_state::IsUnset,
@@ -1258,7 +1302,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> PhysicalVenueBuilder<S, physical_venue_state::SetId<St>> {
+    ) -> PhysicalVenueBuilder<physical_venue_state::SetId<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PhysicalVenueBuilder {
             _state: PhantomData,
@@ -1268,7 +1312,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PhysicalVenueBuilder<S, St>
+impl<St, S: BosStr> PhysicalVenueBuilder<St, S>
 where
     St: physical_venue_state::State,
     St::Name: physical_venue_state::IsUnset,
@@ -1277,7 +1321,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> PhysicalVenueBuilder<S, physical_venue_state::SetName<St>> {
+    ) -> PhysicalVenueBuilder<physical_venue_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PhysicalVenueBuilder {
             _state: PhantomData,
@@ -1287,7 +1331,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PhysicalVenueBuilder<S, St>
+impl<St, S: BosStr> PhysicalVenueBuilder<St, S>
 where
     St: physical_venue_state::State,
     St::Type: physical_venue_state::IsUnset,
@@ -1296,7 +1340,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> PhysicalVenueBuilder<S, physical_venue_state::SetType<St>> {
+    ) -> PhysicalVenueBuilder<physical_venue_state::SetType<St>, S> {
         self._fields.4 = Option::Some(value.into());
         PhysicalVenueBuilder {
             _state: PhantomData,
@@ -1306,12 +1350,12 @@ where
     }
 }
 
-impl<S: BosStr, St> PhysicalVenueBuilder<S, St>
+impl<St, S: BosStr> PhysicalVenueBuilder<St, S>
 where
     St: physical_venue_state::State,
     St::Id: physical_venue_state::IsSet,
-    St::Name: physical_venue_state::IsSet,
     St::Type: physical_venue_state::IsSet,
+    St::Name: physical_venue_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PhysicalVenue<S> {
@@ -1325,7 +1369,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PhysicalVenue<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PhysicalVenue<S> {
         PhysicalVenue {
             address: self._fields.0,
             coordinates: self._fields.1,
@@ -1339,7 +1386,7 @@ where
 
 pub mod unknown_venue_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1347,70 +1394,77 @@ pub mod unknown_venue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Id;
         type Type;
         type Name;
-        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Id = Unset;
         type Type = Unset;
         type Name = Unset;
-        type Id = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Type = Set<members::r#type>;
-        type Name = St::Name;
-        type Id = St::Id;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Type = St::Type;
-        type Name = Set<members::name>;
-        type Id = St::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
+        type Id = Set<members::id>;
         type Type = St::Type;
         type Name = St::Name;
-        type Id = Set<members::id>;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Id = St::Id;
+        type Type = Set<members::r#type>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Id = St::Id;
+        type Type = St::Type;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `id` field
-        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UnknownVenueBuilder<S: BosStr, St: unknown_venue_state::State> {
+pub struct UnknownVenueBuilder<St: unknown_venue_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Data<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UnknownVenue<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UnknownVenueBuilder<S, unknown_venue_state::Empty> {
+impl UnknownVenue<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UnknownVenueBuilder<unknown_venue_state::Empty, DefaultStr> {
         UnknownVenueBuilder::new()
     }
 }
 
-impl<S: BosStr> UnknownVenueBuilder<S, unknown_venue_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UnknownVenue<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UnknownVenueBuilder<unknown_venue_state::Empty, S> {
+        UnknownVenueBuilder::builder()
+    }
+}
+
+impl UnknownVenueBuilder<unknown_venue_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UnknownVenueBuilder {
             _state: PhantomData,
@@ -1420,7 +1474,18 @@ impl<S: BosStr> UnknownVenueBuilder<S, unknown_venue_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> UnknownVenueBuilder<S, St>
+impl<S: BosStr> UnknownVenueBuilder<unknown_venue_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UnknownVenueBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> UnknownVenueBuilder<St, S>
 where
     St: unknown_venue_state::State,
     St::Id: unknown_venue_state::IsUnset,
@@ -1429,7 +1494,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> UnknownVenueBuilder<S, unknown_venue_state::SetId<St>> {
+    ) -> UnknownVenueBuilder<unknown_venue_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         UnknownVenueBuilder {
             _state: PhantomData,
@@ -1439,7 +1504,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UnknownVenueBuilder<S, St>
+impl<St, S: BosStr> UnknownVenueBuilder<St, S>
 where
     St: unknown_venue_state::State,
     St::Name: unknown_venue_state::IsUnset,
@@ -1448,7 +1513,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> UnknownVenueBuilder<S, unknown_venue_state::SetName<St>> {
+    ) -> UnknownVenueBuilder<unknown_venue_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         UnknownVenueBuilder {
             _state: PhantomData,
@@ -1458,7 +1523,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UnknownVenueBuilder<S, St>
+impl<St, S: BosStr> UnknownVenueBuilder<St, S>
 where
     St: unknown_venue_state::State,
     St::Type: unknown_venue_state::IsUnset,
@@ -1467,7 +1532,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> UnknownVenueBuilder<S, unknown_venue_state::SetType<St>> {
+    ) -> UnknownVenueBuilder<unknown_venue_state::SetType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         UnknownVenueBuilder {
             _state: PhantomData,
@@ -1477,12 +1542,12 @@ where
     }
 }
 
-impl<S: BosStr, St> UnknownVenueBuilder<S, St>
+impl<St, S: BosStr> UnknownVenueBuilder<St, S>
 where
     St: unknown_venue_state::State,
+    St::Id: unknown_venue_state::IsSet,
     St::Type: unknown_venue_state::IsSet,
     St::Name: unknown_venue_state::IsSet,
-    St::Id: unknown_venue_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> UnknownVenue<S> {
@@ -1494,7 +1559,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UnknownVenue<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UnknownVenue<S> {
         UnknownVenue {
             id: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -1506,7 +1574,7 @@ where
 
 pub mod event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1514,42 +1582,42 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type V;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type V = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type V = St::V;
+        type Name = Unset;
     }
     ///State transition - sets the `v` field to Set
     pub struct SetV<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetV<St> {}
     impl<St: State> State for SetV<St> {
-        type Name = St::Name;
         type V = Set<members::v>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type V = St::V;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `v` field
         pub struct v(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EventBuilder<S: BosStr, St: event_state::State> {
+pub struct EventBuilder<St: event_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<Data<S>>>,
@@ -1563,15 +1631,22 @@ pub struct EventBuilder<S: BosStr, St: event_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Event<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EventBuilder<S, event_state::Empty> {
+impl Event<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EventBuilder<event_state::Empty, DefaultStr> {
         EventBuilder::new()
     }
 }
 
-impl<S: BosStr> EventBuilder<S, event_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Event<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EventBuilder<event_state::Empty, S> {
+        EventBuilder::builder()
+    }
+}
+
+impl EventBuilder<event_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventBuilder {
             _state: PhantomData,
@@ -1581,7 +1656,18 @@ impl<S: BosStr> EventBuilder<S, event_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<S: BosStr> EventBuilder<event_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EventBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `components` field (optional)
     pub fn components(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -1594,7 +1680,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `instances` field (optional)
     pub fn instances(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -1607,7 +1693,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `label` field (optional)
     pub fn label(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -1620,13 +1706,16 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::Name: event_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<Data<S>>) -> EventBuilder<S, event_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> EventBuilder<event_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -1636,7 +1725,7 @@ where
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -1649,13 +1738,13 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::V: event_state::IsUnset,
 {
     /// Set the `v` field (required)
-    pub fn v(mut self, value: impl Into<i64>) -> EventBuilder<S, event_state::SetV<St>> {
+    pub fn v(mut self, value: impl Into<i64>) -> EventBuilder<event_state::SetV<St>, S> {
         self._fields.5 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -1665,7 +1754,7 @@ where
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `venues` field (optional)
     pub fn venues(mut self, value: impl Into<Option<Vec<EventVenuesItem<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -1678,11 +1767,11 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
-    St::Name: event_state::IsSet,
     St::V: event_state::IsSet,
+    St::Name: event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Event<S> {

@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A cryptographically-verified professional endorsement between two identities.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -138,7 +138,7 @@ impl<S: BosStr> LexiconSchema for Endorsement<S> {
 
 pub mod endorsement_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -147,71 +147,71 @@ pub mod endorsement_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Text;
-        type CreatedAt;
         type Giver;
         type Receiver;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Text = Unset;
-        type CreatedAt = Unset;
         type Giver = Unset;
         type Receiver = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetText<St> {}
     impl<St: State> State for SetText<St> {
         type Text = Set<members::text>;
+        type Giver = St::Giver;
+        type Receiver = St::Receiver;
         type CreatedAt = St::CreatedAt;
-        type Giver = St::Giver;
-        type Receiver = St::Receiver;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Text = St::Text;
-        type CreatedAt = Set<members::created_at>;
-        type Giver = St::Giver;
-        type Receiver = St::Receiver;
     }
     ///State transition - sets the `giver` field to Set
     pub struct SetGiver<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGiver<St> {}
     impl<St: State> State for SetGiver<St> {
         type Text = St::Text;
-        type CreatedAt = St::CreatedAt;
         type Giver = Set<members::giver>;
         type Receiver = St::Receiver;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `receiver` field to Set
     pub struct SetReceiver<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetReceiver<St> {}
     impl<St: State> State for SetReceiver<St> {
         type Text = St::Text;
-        type CreatedAt = St::CreatedAt;
         type Giver = St::Giver;
         type Receiver = Set<members::receiver>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Text = St::Text;
+        type Giver = St::Giver;
+        type Receiver = St::Receiver;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `giver` field
         pub struct giver(());
         ///Marker type for the `receiver` field
         pub struct receiver(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EndorsementBuilder<S: BosStr, St: endorsement_state::State> {
+pub struct EndorsementBuilder<St: endorsement_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -223,15 +223,22 @@ pub struct EndorsementBuilder<S: BosStr, St: endorsement_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Endorsement<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EndorsementBuilder<S, endorsement_state::Empty> {
+impl Endorsement<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EndorsementBuilder<endorsement_state::Empty, DefaultStr> {
         EndorsementBuilder::new()
     }
 }
 
-impl<S: BosStr> EndorsementBuilder<S, endorsement_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Endorsement<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EndorsementBuilder<endorsement_state::Empty, S> {
+        EndorsementBuilder::builder()
+    }
+}
+
+impl EndorsementBuilder<endorsement_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EndorsementBuilder {
             _state: PhantomData,
@@ -241,7 +248,18 @@ impl<S: BosStr> EndorsementBuilder<S, endorsement_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EndorsementBuilder<S, St>
+impl<S: BosStr> EndorsementBuilder<endorsement_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EndorsementBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EndorsementBuilder<St, S>
 where
     St: endorsement_state::State,
     St::CreatedAt: endorsement_state::IsUnset,
@@ -250,7 +268,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EndorsementBuilder<S, endorsement_state::SetCreatedAt<St>> {
+    ) -> EndorsementBuilder<endorsement_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EndorsementBuilder {
             _state: PhantomData,
@@ -260,7 +278,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EndorsementBuilder<S, St>
+impl<St, S: BosStr> EndorsementBuilder<St, S>
 where
     St: endorsement_state::State,
     St::Giver: endorsement_state::IsUnset,
@@ -269,7 +287,7 @@ where
     pub fn giver(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EndorsementBuilder<S, endorsement_state::SetGiver<St>> {
+    ) -> EndorsementBuilder<endorsement_state::SetGiver<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EndorsementBuilder {
             _state: PhantomData,
@@ -279,7 +297,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EndorsementBuilder<S, St>
+impl<St, S: BosStr> EndorsementBuilder<St, S>
 where
     St: endorsement_state::State,
     St::Receiver: endorsement_state::IsUnset,
@@ -288,7 +306,7 @@ where
     pub fn receiver(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EndorsementBuilder<S, endorsement_state::SetReceiver<St>> {
+    ) -> EndorsementBuilder<endorsement_state::SetReceiver<St>, S> {
         self._fields.2 = Option::Some(value.into());
         EndorsementBuilder {
             _state: PhantomData,
@@ -298,7 +316,7 @@ where
     }
 }
 
-impl<S: BosStr, St: endorsement_state::State> EndorsementBuilder<S, St> {
+impl<St: endorsement_state::State, S: BosStr> EndorsementBuilder<St, S> {
     /// Set the `signatures` field (optional)
     pub fn signatures(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -311,7 +329,7 @@ impl<S: BosStr, St: endorsement_state::State> EndorsementBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EndorsementBuilder<S, St>
+impl<St, S: BosStr> EndorsementBuilder<St, S>
 where
     St: endorsement_state::State,
     St::Text: endorsement_state::IsUnset,
@@ -320,7 +338,7 @@ where
     pub fn text(
         mut self,
         value: impl Into<S>,
-    ) -> EndorsementBuilder<S, endorsement_state::SetText<St>> {
+    ) -> EndorsementBuilder<endorsement_state::SetText<St>, S> {
         self._fields.4 = Option::Some(value.into());
         EndorsementBuilder {
             _state: PhantomData,
@@ -330,13 +348,13 @@ where
     }
 }
 
-impl<S: BosStr, St> EndorsementBuilder<S, St>
+impl<St, S: BosStr> EndorsementBuilder<St, S>
 where
     St: endorsement_state::State,
     St::Text: endorsement_state::IsSet,
-    St::CreatedAt: endorsement_state::IsSet,
     St::Giver: endorsement_state::IsSet,
     St::Receiver: endorsement_state::IsSet,
+    St::CreatedAt: endorsement_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Endorsement<S> {
@@ -350,7 +368,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Endorsement<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Endorsement<S> {
         Endorsement {
             created_at: self._fields.0.unwrap(),
             giver: self._fields.1.unwrap(),
@@ -363,10 +384,10 @@ where
 }
 
 fn lexicon_doc_place_atwork_endorsement() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.atwork.endorsement"),

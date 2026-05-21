@@ -142,21 +142,28 @@ pub mod option_record_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct OptionRecordBuilder<S: BosStr, St: option_record_state::State> {
+pub struct OptionRecordBuilder<St: option_record_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<option::OptionRecordOption<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> OptionRecord<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> OptionRecordBuilder<S, option_record_state::Empty> {
+impl OptionRecord<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> OptionRecordBuilder<option_record_state::Empty, DefaultStr> {
         OptionRecordBuilder::new()
     }
 }
 
-impl<S: BosStr> OptionRecordBuilder<S, option_record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> OptionRecord<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> OptionRecordBuilder<option_record_state::Empty, S> {
+        OptionRecordBuilder::builder()
+    }
+}
+
+impl OptionRecordBuilder<option_record_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         OptionRecordBuilder {
             _state: PhantomData,
@@ -166,7 +173,18 @@ impl<S: BosStr> OptionRecordBuilder<S, option_record_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> OptionRecordBuilder<S, St>
+impl<S: BosStr> OptionRecordBuilder<option_record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        OptionRecordBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> OptionRecordBuilder<St, S>
 where
     St: option_record_state::State,
     St::Choice: option_record_state::IsUnset,
@@ -175,7 +193,7 @@ where
     pub fn choice(
         mut self,
         value: impl Into<option::OptionRecordOption<S>>,
-    ) -> OptionRecordBuilder<S, option_record_state::SetChoice<St>> {
+    ) -> OptionRecordBuilder<option_record_state::SetChoice<St>, S> {
         self._fields.0 = Option::Some(value.into());
         OptionRecordBuilder {
             _state: PhantomData,
@@ -185,7 +203,7 @@ where
     }
 }
 
-impl<S: BosStr, St: option_record_state::State> OptionRecordBuilder<S, St> {
+impl<St: option_record_state::State, S: BosStr> OptionRecordBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -198,7 +216,7 @@ impl<S: BosStr, St: option_record_state::State> OptionRecordBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> OptionRecordBuilder<S, St>
+impl<St, S: BosStr> OptionRecordBuilder<St, S>
 where
     St: option_record_state::State,
     St::Choice: option_record_state::IsSet,

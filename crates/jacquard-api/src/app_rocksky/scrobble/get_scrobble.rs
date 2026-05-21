@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::scrobble::ScrobbleViewDetailed;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::scrobble::ScrobbleViewDetailed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetScrobble<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetScrobbleOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: ScrobbleViewDetailed<S>,
@@ -65,7 +60,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetScrobbleRequest {
 
 pub mod get_scrobble_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -96,21 +91,28 @@ pub mod get_scrobble_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetScrobbleBuilder<S: BosStr, St: get_scrobble_state::State> {
+pub struct GetScrobbleBuilder<St: get_scrobble_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetScrobble<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetScrobbleBuilder<S, get_scrobble_state::Empty> {
+impl GetScrobble<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetScrobbleBuilder<get_scrobble_state::Empty, DefaultStr> {
         GetScrobbleBuilder::new()
     }
 }
 
-impl<S: BosStr> GetScrobbleBuilder<S, get_scrobble_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetScrobble<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetScrobbleBuilder<get_scrobble_state::Empty, S> {
+        GetScrobbleBuilder::builder()
+    }
+}
+
+impl GetScrobbleBuilder<get_scrobble_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetScrobbleBuilder {
             _state: PhantomData,
@@ -120,7 +122,18 @@ impl<S: BosStr> GetScrobbleBuilder<S, get_scrobble_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetScrobbleBuilder<S, St>
+impl<S: BosStr> GetScrobbleBuilder<get_scrobble_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetScrobbleBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetScrobbleBuilder<St, S>
 where
     St: get_scrobble_state::State,
     St::Uri: get_scrobble_state::IsUnset,
@@ -129,7 +142,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetScrobbleBuilder<S, get_scrobble_state::SetUri<St>> {
+    ) -> GetScrobbleBuilder<get_scrobble_state::SetUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetScrobbleBuilder {
             _state: PhantomData,
@@ -139,7 +152,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetScrobbleBuilder<S, St>
+impl<St, S: BosStr> GetScrobbleBuilder<St, S>
 where
     St: get_scrobble_state::State,
     St::Uri: get_scrobble_state::IsSet,

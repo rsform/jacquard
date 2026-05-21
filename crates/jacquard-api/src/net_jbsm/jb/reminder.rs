@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A reminder scheduled to trigger at a specific time
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -132,7 +132,7 @@ fn _default_reminder_occurred() -> Option<bool> {
 
 pub mod reminder_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -140,72 +140,72 @@ pub mod reminder_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
-        type CreatedAt;
         type TriggerAt;
+        type CreatedAt;
         type Requester;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
-        type CreatedAt = Unset;
         type TriggerAt = Unset;
+        type CreatedAt = Unset;
         type Requester = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = St::CreatedAt;
-        type TriggerAt = St::TriggerAt;
-        type Requester = St::Requester;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Subject = St::Subject;
-        type CreatedAt = Set<members::created_at>;
-        type TriggerAt = St::TriggerAt;
-        type Requester = St::Requester;
+        type Subject = Unset;
     }
     ///State transition - sets the `trigger_at` field to Set
     pub struct SetTriggerAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTriggerAt<St> {}
     impl<St: State> State for SetTriggerAt<St> {
-        type Subject = St::Subject;
-        type CreatedAt = St::CreatedAt;
         type TriggerAt = Set<members::trigger_at>;
+        type CreatedAt = St::CreatedAt;
         type Requester = St::Requester;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type TriggerAt = St::TriggerAt;
+        type CreatedAt = Set<members::created_at>;
+        type Requester = St::Requester;
+        type Subject = St::Subject;
     }
     ///State transition - sets the `requester` field to Set
     pub struct SetRequester<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRequester<St> {}
     impl<St: State> State for SetRequester<St> {
-        type Subject = St::Subject;
-        type CreatedAt = St::CreatedAt;
         type TriggerAt = St::TriggerAt;
+        type CreatedAt = St::CreatedAt;
         type Requester = Set<members::requester>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type TriggerAt = St::TriggerAt;
+        type CreatedAt = St::CreatedAt;
+        type Requester = St::Requester;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `trigger_at` field
         pub struct trigger_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `requester` field
         pub struct requester(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReminderBuilder<S: BosStr, St: reminder_state::State> {
+pub struct ReminderBuilder<St: reminder_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -218,15 +218,22 @@ pub struct ReminderBuilder<S: BosStr, St: reminder_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Reminder<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ReminderBuilder<S, reminder_state::Empty> {
+impl Reminder<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReminderBuilder<reminder_state::Empty, DefaultStr> {
         ReminderBuilder::new()
     }
 }
 
-impl<S: BosStr> ReminderBuilder<S, reminder_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Reminder<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReminderBuilder<reminder_state::Empty, S> {
+        ReminderBuilder::builder()
+    }
+}
+
+impl ReminderBuilder<reminder_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ReminderBuilder {
             _state: PhantomData,
@@ -236,7 +243,18 @@ impl<S: BosStr> ReminderBuilder<S, reminder_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ReminderBuilder<S, St>
+impl<S: BosStr> ReminderBuilder<reminder_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReminderBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReminderBuilder<St, S>
 where
     St: reminder_state::State,
     St::CreatedAt: reminder_state::IsUnset,
@@ -245,7 +263,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReminderBuilder<S, reminder_state::SetCreatedAt<St>> {
+    ) -> ReminderBuilder<reminder_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ReminderBuilder {
             _state: PhantomData,
@@ -255,7 +273,7 @@ where
     }
 }
 
-impl<S: BosStr, St: reminder_state::State> ReminderBuilder<S, St> {
+impl<St: reminder_state::State, S: BosStr> ReminderBuilder<St, S> {
     /// Set the `occurred` field (optional)
     pub fn occurred(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -268,7 +286,7 @@ impl<S: BosStr, St: reminder_state::State> ReminderBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: reminder_state::State> ReminderBuilder<S, St> {
+impl<St: reminder_state::State, S: BosStr> ReminderBuilder<St, S> {
     /// Set the `originUri` field (optional)
     pub fn origin_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -281,7 +299,7 @@ impl<S: BosStr, St: reminder_state::State> ReminderBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ReminderBuilder<S, St>
+impl<St, S: BosStr> ReminderBuilder<St, S>
 where
     St: reminder_state::State,
     St::Requester: reminder_state::IsUnset,
@@ -290,7 +308,7 @@ where
     pub fn requester(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ReminderBuilder<S, reminder_state::SetRequester<St>> {
+    ) -> ReminderBuilder<reminder_state::SetRequester<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ReminderBuilder {
             _state: PhantomData,
@@ -300,7 +318,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReminderBuilder<S, St>
+impl<St, S: BosStr> ReminderBuilder<St, S>
 where
     St: reminder_state::State,
     St::Subject: reminder_state::IsUnset,
@@ -309,7 +327,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<S>,
-    ) -> ReminderBuilder<S, reminder_state::SetSubject<St>> {
+    ) -> ReminderBuilder<reminder_state::SetSubject<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ReminderBuilder {
             _state: PhantomData,
@@ -319,7 +337,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReminderBuilder<S, St>
+impl<St, S: BosStr> ReminderBuilder<St, S>
 where
     St: reminder_state::State,
     St::TriggerAt: reminder_state::IsUnset,
@@ -328,7 +346,7 @@ where
     pub fn trigger_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReminderBuilder<S, reminder_state::SetTriggerAt<St>> {
+    ) -> ReminderBuilder<reminder_state::SetTriggerAt<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ReminderBuilder {
             _state: PhantomData,
@@ -338,13 +356,13 @@ where
     }
 }
 
-impl<S: BosStr, St> ReminderBuilder<S, St>
+impl<St, S: BosStr> ReminderBuilder<St, S>
 where
     St: reminder_state::State,
-    St::Subject: reminder_state::IsSet,
-    St::CreatedAt: reminder_state::IsSet,
     St::TriggerAt: reminder_state::IsSet,
+    St::CreatedAt: reminder_state::IsSet,
     St::Requester: reminder_state::IsSet,
+    St::Subject: reminder_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Reminder<S> {
@@ -373,10 +391,10 @@ where
 }
 
 fn lexicon_doc_net_jbsm_jb_reminder() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.jbsm.jb.reminder"),

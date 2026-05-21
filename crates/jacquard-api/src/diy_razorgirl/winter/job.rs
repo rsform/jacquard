@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,22 +24,20 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::diy_razorgirl::winter::job;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::diy_razorgirl::winter::job;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct IntervalSchedule<S: BosStr = DefaultStr> {
     pub seconds: i64,
     pub r#type: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -67,6 +65,7 @@ pub struct Job<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -76,6 +75,7 @@ pub enum JobSchedule<S: BosStr = DefaultStr> {
     #[serde(rename = "diy.razorgirl.winter.job#intervalSchedule")]
     IntervalSchedule(Box<job::IntervalSchedule<S>>),
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum JobStatus<S: BosStr = DefaultStr> {
@@ -173,11 +173,9 @@ pub struct JobGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Job<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct OnceSchedule<S: BosStr = DefaultStr> {
     pub run_at: Datetime,
     pub r#type: S,
@@ -287,7 +285,7 @@ impl<S: BosStr> LexiconSchema for OnceSchedule<S> {
 
 pub mod interval_schedule_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -295,56 +293,66 @@ pub mod interval_schedule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Seconds;
         type Type;
+        type Seconds;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Seconds = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `seconds` field to Set
-    pub struct SetSeconds<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSeconds<St> {}
-    impl<St: State> State for SetSeconds<St> {
-        type Seconds = Set<members::seconds>;
-        type Type = St::Type;
+        type Seconds = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type Seconds = St::Seconds;
         type Type = Set<members::r#type>;
+        type Seconds = St::Seconds;
+    }
+    ///State transition - sets the `seconds` field to Set
+    pub struct SetSeconds<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSeconds<St> {}
+    impl<St: State> State for SetSeconds<St> {
+        type Type = St::Type;
+        type Seconds = Set<members::seconds>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `seconds` field
-        pub struct seconds(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `seconds` field
+        pub struct seconds(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IntervalScheduleBuilder<S: BosStr, St: interval_schedule_state::State> {
+pub struct IntervalScheduleBuilder<
+    St: interval_schedule_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> IntervalSchedule<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> IntervalScheduleBuilder<S, interval_schedule_state::Empty> {
+impl IntervalSchedule<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> IntervalScheduleBuilder<interval_schedule_state::Empty, DefaultStr> {
         IntervalScheduleBuilder::new()
     }
 }
 
-impl<S: BosStr> IntervalScheduleBuilder<S, interval_schedule_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> IntervalSchedule<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> IntervalScheduleBuilder<interval_schedule_state::Empty, S> {
+        IntervalScheduleBuilder::builder()
+    }
+}
+
+impl IntervalScheduleBuilder<interval_schedule_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         IntervalScheduleBuilder {
             _state: PhantomData,
@@ -354,7 +362,18 @@ impl<S: BosStr> IntervalScheduleBuilder<S, interval_schedule_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> IntervalScheduleBuilder<S, St>
+impl<S: BosStr> IntervalScheduleBuilder<interval_schedule_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        IntervalScheduleBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> IntervalScheduleBuilder<St, S>
 where
     St: interval_schedule_state::State,
     St::Seconds: interval_schedule_state::IsUnset,
@@ -363,7 +382,7 @@ where
     pub fn seconds(
         mut self,
         value: impl Into<i64>,
-    ) -> IntervalScheduleBuilder<S, interval_schedule_state::SetSeconds<St>> {
+    ) -> IntervalScheduleBuilder<interval_schedule_state::SetSeconds<St>, S> {
         self._fields.0 = Option::Some(value.into());
         IntervalScheduleBuilder {
             _state: PhantomData,
@@ -373,7 +392,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IntervalScheduleBuilder<S, St>
+impl<St, S: BosStr> IntervalScheduleBuilder<St, S>
 where
     St: interval_schedule_state::State,
     St::Type: interval_schedule_state::IsUnset,
@@ -382,7 +401,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> IntervalScheduleBuilder<S, interval_schedule_state::SetType<St>> {
+    ) -> IntervalScheduleBuilder<interval_schedule_state::SetType<St>, S> {
         self._fields.1 = Option::Some(value.into());
         IntervalScheduleBuilder {
             _state: PhantomData,
@@ -392,11 +411,11 @@ where
     }
 }
 
-impl<S: BosStr, St> IntervalScheduleBuilder<S, St>
+impl<St, S: BosStr> IntervalScheduleBuilder<St, S>
 where
     St: interval_schedule_state::State,
-    St::Seconds: interval_schedule_state::IsSet,
     St::Type: interval_schedule_state::IsSet,
+    St::Seconds: interval_schedule_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> IntervalSchedule<S> {
@@ -407,7 +426,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> IntervalSchedule<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> IntervalSchedule<S> {
         IntervalSchedule {
             seconds: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),
@@ -417,10 +439,10 @@ where
 }
 
 fn lexicon_doc_diy_razorgirl_winter_job() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("diy.razorgirl.winter.job"),
@@ -429,10 +451,9 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("intervalSchedule"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("seconds"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("type"), SmolStr::new_static("seconds")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -444,9 +465,7 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -458,12 +477,14 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("instructions"),
-                            SmolStr::new_static("schedule"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("instructions"),
+                                SmolStr::new_static("schedule"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -513,7 +534,7 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> LexiconDoc<'static> {
                                 LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("#onceSchedule"),
-                                        CowStr::new_static("#intervalSchedule"),
+                                        CowStr::new_static("#intervalSchedule")
                                     ],
                                     ..Default::default()
                                 }),
@@ -534,10 +555,9 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("onceSchedule"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("runAt"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("type"), SmolStr::new_static("runAt")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -550,9 +570,7 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -571,7 +589,7 @@ fn _default_job_failure_count() -> Option<i64> {
 
 pub mod job_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -580,8 +598,8 @@ pub mod job_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Schedule;
-        type Instructions;
         type Name;
+        type Instructions;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -589,8 +607,8 @@ pub mod job_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Schedule = Unset;
-        type Instructions = Unset;
         type Name = Unset;
+        type Instructions = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `schedule` field to Set
@@ -598,17 +616,8 @@ pub mod job_state {
     impl<St: State> sealed::Sealed for SetSchedule<St> {}
     impl<St: State> State for SetSchedule<St> {
         type Schedule = Set<members::schedule>;
+        type Name = St::Name;
         type Instructions = St::Instructions;
-        type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `instructions` field to Set
-    pub struct SetInstructions<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetInstructions<St> {}
-    impl<St: State> State for SetInstructions<St> {
-        type Schedule = St::Schedule;
-        type Instructions = Set<members::instructions>;
-        type Name = St::Name;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `name` field to Set
@@ -616,8 +625,17 @@ pub mod job_state {
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
         type Schedule = St::Schedule;
-        type Instructions = St::Instructions;
         type Name = Set<members::name>;
+        type Instructions = St::Instructions;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `instructions` field to Set
+    pub struct SetInstructions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetInstructions<St> {}
+    impl<St: State> State for SetInstructions<St> {
+        type Schedule = St::Schedule;
+        type Name = St::Name;
+        type Instructions = Set<members::instructions>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
@@ -625,8 +643,8 @@ pub mod job_state {
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type Schedule = St::Schedule;
-        type Instructions = St::Instructions;
         type Name = St::Name;
+        type Instructions = St::Instructions;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -634,17 +652,17 @@ pub mod job_state {
     pub mod members {
         ///Marker type for the `schedule` field
         pub struct schedule(());
-        ///Marker type for the `instructions` field
-        pub struct instructions(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `instructions` field
+        pub struct instructions(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct JobBuilder<S: BosStr, St: job_state::State> {
+pub struct JobBuilder<St: job_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -659,15 +677,22 @@ pub struct JobBuilder<S: BosStr, St: job_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Job<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> JobBuilder<S, job_state::Empty> {
+impl Job<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> JobBuilder<job_state::Empty, DefaultStr> {
         JobBuilder::new()
     }
 }
 
-impl<S: BosStr> JobBuilder<S, job_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Job<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> JobBuilder<job_state::Empty, S> {
+        JobBuilder::builder()
+    }
+}
+
+impl JobBuilder<job_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         JobBuilder {
             _state: PhantomData,
@@ -677,7 +702,18 @@ impl<S: BosStr> JobBuilder<S, job_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> JobBuilder<S, St>
+impl<S: BosStr> JobBuilder<job_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        JobBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> JobBuilder<St, S>
 where
     St: job_state::State,
     St::CreatedAt: job_state::IsUnset,
@@ -686,7 +722,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> JobBuilder<S, job_state::SetCreatedAt<St>> {
+    ) -> JobBuilder<job_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         JobBuilder {
             _state: PhantomData,
@@ -696,7 +732,7 @@ where
     }
 }
 
-impl<S: BosStr, St: job_state::State> JobBuilder<S, St> {
+impl<St: job_state::State, S: BosStr> JobBuilder<St, S> {
     /// Set the `failureCount` field (optional)
     pub fn failure_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -709,7 +745,7 @@ impl<S: BosStr, St: job_state::State> JobBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> JobBuilder<S, St>
+impl<St, S: BosStr> JobBuilder<St, S>
 where
     St: job_state::State,
     St::Instructions: job_state::IsUnset,
@@ -718,7 +754,7 @@ where
     pub fn instructions(
         mut self,
         value: impl Into<S>,
-    ) -> JobBuilder<S, job_state::SetInstructions<St>> {
+    ) -> JobBuilder<job_state::SetInstructions<St>, S> {
         self._fields.2 = Option::Some(value.into());
         JobBuilder {
             _state: PhantomData,
@@ -728,7 +764,7 @@ where
     }
 }
 
-impl<S: BosStr, St: job_state::State> JobBuilder<S, St> {
+impl<St: job_state::State, S: BosStr> JobBuilder<St, S> {
     /// Set the `lastRun` field (optional)
     pub fn last_run(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -741,13 +777,13 @@ impl<S: BosStr, St: job_state::State> JobBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> JobBuilder<S, St>
+impl<St, S: BosStr> JobBuilder<St, S>
 where
     St: job_state::State,
     St::Name: job_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> JobBuilder<S, job_state::SetName<St>> {
+    pub fn name(mut self, value: impl Into<S>) -> JobBuilder<job_state::SetName<St>, S> {
         self._fields.4 = Option::Some(value.into());
         JobBuilder {
             _state: PhantomData,
@@ -757,7 +793,7 @@ where
     }
 }
 
-impl<S: BosStr, St: job_state::State> JobBuilder<S, St> {
+impl<St: job_state::State, S: BosStr> JobBuilder<St, S> {
     /// Set the `nextRun` field (optional)
     pub fn next_run(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -770,7 +806,7 @@ impl<S: BosStr, St: job_state::State> JobBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> JobBuilder<S, St>
+impl<St, S: BosStr> JobBuilder<St, S>
 where
     St: job_state::State,
     St::Schedule: job_state::IsUnset,
@@ -779,7 +815,7 @@ where
     pub fn schedule(
         mut self,
         value: impl Into<JobSchedule<S>>,
-    ) -> JobBuilder<S, job_state::SetSchedule<St>> {
+    ) -> JobBuilder<job_state::SetSchedule<St>, S> {
         self._fields.6 = Option::Some(value.into());
         JobBuilder {
             _state: PhantomData,
@@ -789,7 +825,7 @@ where
     }
 }
 
-impl<S: BosStr, St: job_state::State> JobBuilder<S, St> {
+impl<St: job_state::State, S: BosStr> JobBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<JobStatus<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -802,12 +838,12 @@ impl<S: BosStr, St: job_state::State> JobBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> JobBuilder<S, St>
+impl<St, S: BosStr> JobBuilder<St, S>
 where
     St: job_state::State,
     St::Schedule: job_state::IsSet,
-    St::Instructions: job_state::IsSet,
     St::Name: job_state::IsSet,
+    St::Instructions: job_state::IsSet,
     St::CreatedAt: job_state::IsSet,
 {
     /// Build the final struct.
@@ -842,7 +878,7 @@ where
 
 pub mod once_schedule_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -885,21 +921,28 @@ pub mod once_schedule_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct OnceScheduleBuilder<S: BosStr, St: once_schedule_state::State> {
+pub struct OnceScheduleBuilder<St: once_schedule_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> OnceSchedule<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> OnceScheduleBuilder<S, once_schedule_state::Empty> {
+impl OnceSchedule<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> OnceScheduleBuilder<once_schedule_state::Empty, DefaultStr> {
         OnceScheduleBuilder::new()
     }
 }
 
-impl<S: BosStr> OnceScheduleBuilder<S, once_schedule_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> OnceSchedule<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> OnceScheduleBuilder<once_schedule_state::Empty, S> {
+        OnceScheduleBuilder::builder()
+    }
+}
+
+impl OnceScheduleBuilder<once_schedule_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         OnceScheduleBuilder {
             _state: PhantomData,
@@ -909,7 +952,18 @@ impl<S: BosStr> OnceScheduleBuilder<S, once_schedule_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> OnceScheduleBuilder<S, St>
+impl<S: BosStr> OnceScheduleBuilder<once_schedule_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        OnceScheduleBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> OnceScheduleBuilder<St, S>
 where
     St: once_schedule_state::State,
     St::RunAt: once_schedule_state::IsUnset,
@@ -918,7 +972,7 @@ where
     pub fn run_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> OnceScheduleBuilder<S, once_schedule_state::SetRunAt<St>> {
+    ) -> OnceScheduleBuilder<once_schedule_state::SetRunAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         OnceScheduleBuilder {
             _state: PhantomData,
@@ -928,7 +982,7 @@ where
     }
 }
 
-impl<S: BosStr, St> OnceScheduleBuilder<S, St>
+impl<St, S: BosStr> OnceScheduleBuilder<St, S>
 where
     St: once_schedule_state::State,
     St::Type: once_schedule_state::IsUnset,
@@ -937,7 +991,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> OnceScheduleBuilder<S, once_schedule_state::SetType<St>> {
+    ) -> OnceScheduleBuilder<once_schedule_state::SetType<St>, S> {
         self._fields.1 = Option::Some(value.into());
         OnceScheduleBuilder {
             _state: PhantomData,
@@ -947,7 +1001,7 @@ where
     }
 }
 
-impl<S: BosStr, St> OnceScheduleBuilder<S, St>
+impl<St, S: BosStr> OnceScheduleBuilder<St, S>
 where
     St: once_schedule_state::State,
     St::RunAt: once_schedule_state::IsSet,
@@ -962,7 +1016,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> OnceSchedule<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> OnceSchedule<S> {
         OnceSchedule {
             run_at: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),

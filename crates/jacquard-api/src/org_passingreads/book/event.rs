@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -25,12 +25,12 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::community_lexicon::location::hthree::Hthree;
 use crate::org_passingreads::book::event;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// The status of a book has changed.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -137,13 +137,16 @@ where
     type Output = EventEvent<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            EventEvent::OrgPassingreadsBookCheckin => EventEvent::OrgPassingreadsBookCheckin,
+            EventEvent::OrgPassingreadsBookCheckin => {
+                EventEvent::OrgPassingreadsBookCheckin
+            }
             EventEvent::OrgPassingreadsBookDrop => EventEvent::OrgPassingreadsBookDrop,
             EventEvent::OrgPassingreadsBookFind => EventEvent::OrgPassingreadsBookFind,
             EventEvent::Other(v) => EventEvent::Other(v.into_static()),
         }
     }
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -171,10 +174,7 @@ pub struct EventGetRecordOutput<S: BosStr = DefaultStr> {
 /// A physical location from OpenStreetMap.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct OsmLocation<S: BosStr = DefaultStr> {
     ///The type of place (e.g., cafe, library, park).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -254,7 +254,7 @@ impl<S: BosStr> LexiconSchema for OsmLocation<S> {
 
 pub mod event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -262,110 +262,110 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Did;
         type BookPub;
+        type OccurredAt;
+        type BookSig;
         type Book;
         type Location;
-        type OccurredAt;
-        type Did;
-        type BookSig;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Did = Unset;
         type BookPub = Unset;
+        type OccurredAt = Unset;
+        type BookSig = Unset;
         type Book = Unset;
         type Location = Unset;
-        type OccurredAt = Unset;
-        type Did = Unset;
-        type BookSig = Unset;
-    }
-    ///State transition - sets the `book_pub` field to Set
-    pub struct SetBookPub<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBookPub<St> {}
-    impl<St: State> State for SetBookPub<St> {
-        type BookPub = Set<members::book_pub>;
-        type Book = St::Book;
-        type Location = St::Location;
-        type OccurredAt = St::OccurredAt;
-        type Did = St::Did;
-        type BookSig = St::BookSig;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBook<St> {}
-    impl<St: State> State for SetBook<St> {
-        type BookPub = St::BookPub;
-        type Book = Set<members::book>;
-        type Location = St::Location;
-        type OccurredAt = St::OccurredAt;
-        type Did = St::Did;
-        type BookSig = St::BookSig;
-    }
-    ///State transition - sets the `location` field to Set
-    pub struct SetLocation<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLocation<St> {}
-    impl<St: State> State for SetLocation<St> {
-        type BookPub = St::BookPub;
-        type Book = St::Book;
-        type Location = Set<members::location>;
-        type OccurredAt = St::OccurredAt;
-        type Did = St::Did;
-        type BookSig = St::BookSig;
-    }
-    ///State transition - sets the `occurred_at` field to Set
-    pub struct SetOccurredAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOccurredAt<St> {}
-    impl<St: State> State for SetOccurredAt<St> {
-        type BookPub = St::BookPub;
-        type Book = St::Book;
-        type Location = St::Location;
-        type OccurredAt = Set<members::occurred_at>;
-        type Did = St::Did;
-        type BookSig = St::BookSig;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
+        type Did = Set<members::did>;
         type BookPub = St::BookPub;
+        type OccurredAt = St::OccurredAt;
+        type BookSig = St::BookSig;
         type Book = St::Book;
         type Location = St::Location;
+    }
+    ///State transition - sets the `book_pub` field to Set
+    pub struct SetBookPub<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBookPub<St> {}
+    impl<St: State> State for SetBookPub<St> {
+        type Did = St::Did;
+        type BookPub = Set<members::book_pub>;
         type OccurredAt = St::OccurredAt;
-        type Did = Set<members::did>;
         type BookSig = St::BookSig;
+        type Book = St::Book;
+        type Location = St::Location;
+    }
+    ///State transition - sets the `occurred_at` field to Set
+    pub struct SetOccurredAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOccurredAt<St> {}
+    impl<St: State> State for SetOccurredAt<St> {
+        type Did = St::Did;
+        type BookPub = St::BookPub;
+        type OccurredAt = Set<members::occurred_at>;
+        type BookSig = St::BookSig;
+        type Book = St::Book;
+        type Location = St::Location;
     }
     ///State transition - sets the `book_sig` field to Set
     pub struct SetBookSig<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBookSig<St> {}
     impl<St: State> State for SetBookSig<St> {
+        type Did = St::Did;
         type BookPub = St::BookPub;
+        type OccurredAt = St::OccurredAt;
+        type BookSig = Set<members::book_sig>;
         type Book = St::Book;
         type Location = St::Location;
-        type OccurredAt = St::OccurredAt;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBook<St> {}
+    impl<St: State> State for SetBook<St> {
         type Did = St::Did;
-        type BookSig = Set<members::book_sig>;
+        type BookPub = St::BookPub;
+        type OccurredAt = St::OccurredAt;
+        type BookSig = St::BookSig;
+        type Book = Set<members::book>;
+        type Location = St::Location;
+    }
+    ///State transition - sets the `location` field to Set
+    pub struct SetLocation<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLocation<St> {}
+    impl<St: State> State for SetLocation<St> {
+        type Did = St::Did;
+        type BookPub = St::BookPub;
+        type OccurredAt = St::OccurredAt;
+        type BookSig = St::BookSig;
+        type Book = St::Book;
+        type Location = Set<members::location>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `book_pub` field
         pub struct book_pub(());
+        ///Marker type for the `occurred_at` field
+        pub struct occurred_at(());
+        ///Marker type for the `book_sig` field
+        pub struct book_sig(());
         ///Marker type for the `book` field
         pub struct book(());
         ///Marker type for the `location` field
         pub struct location(());
-        ///Marker type for the `occurred_at` field
-        pub struct occurred_at(());
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `book_sig` field
-        pub struct book_sig(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EventBuilder<S: BosStr, St: event_state::State> {
+pub struct EventBuilder<St: event_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<StrongRef<S>>,
@@ -379,15 +379,22 @@ pub struct EventBuilder<S: BosStr, St: event_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Event<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EventBuilder<S, event_state::Empty> {
+impl Event<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EventBuilder<event_state::Empty, DefaultStr> {
         EventBuilder::new()
     }
 }
 
-impl<S: BosStr> EventBuilder<S, event_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Event<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EventBuilder<event_state::Empty, S> {
+        EventBuilder::builder()
+    }
+}
+
+impl EventBuilder<event_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventBuilder {
             _state: PhantomData,
@@ -397,7 +404,18 @@ impl<S: BosStr> EventBuilder<S, event_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<S: BosStr> EventBuilder<event_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EventBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::Book: event_state::IsUnset,
@@ -406,7 +424,7 @@ where
     pub fn book(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> EventBuilder<S, event_state::SetBook<St>> {
+    ) -> EventBuilder<event_state::SetBook<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -416,7 +434,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::BookPub: event_state::IsUnset,
@@ -425,7 +443,7 @@ where
     pub fn book_pub(
         mut self,
         value: impl Into<Bytes>,
-    ) -> EventBuilder<S, event_state::SetBookPub<St>> {
+    ) -> EventBuilder<event_state::SetBookPub<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -435,7 +453,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::BookSig: event_state::IsUnset,
@@ -444,7 +462,7 @@ where
     pub fn book_sig(
         mut self,
         value: impl Into<Bytes>,
-    ) -> EventBuilder<S, event_state::SetBookSig<St>> {
+    ) -> EventBuilder<event_state::SetBookSig<St>, S> {
         self._fields.2 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -454,13 +472,16 @@ where
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::Did: event_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> EventBuilder<S, event_state::SetDid<St>> {
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> EventBuilder<event_state::SetDid<St>, S> {
         self._fields.3 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -470,7 +491,7 @@ where
     }
 }
 
-impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `event` field (optional)
     pub fn event(mut self, value: impl Into<Option<EventEvent<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -483,7 +504,7 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::Location: event_state::IsUnset,
@@ -492,7 +513,7 @@ where
     pub fn location(
         mut self,
         value: impl Into<EventLocation<S>>,
-    ) -> EventBuilder<S, event_state::SetLocation<St>> {
+    ) -> EventBuilder<event_state::SetLocation<St>, S> {
         self._fields.5 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -502,7 +523,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::OccurredAt: event_state::IsUnset,
@@ -511,7 +532,7 @@ where
     pub fn occurred_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventBuilder<S, event_state::SetOccurredAt<St>> {
+    ) -> EventBuilder<event_state::SetOccurredAt<St>, S> {
         self._fields.6 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -521,15 +542,15 @@ where
     }
 }
 
-impl<S: BosStr, St> EventBuilder<S, St>
+impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
+    St::Did: event_state::IsSet,
     St::BookPub: event_state::IsSet,
+    St::OccurredAt: event_state::IsSet,
+    St::BookSig: event_state::IsSet,
     St::Book: event_state::IsSet,
     St::Location: event_state::IsSet,
-    St::OccurredAt: event_state::IsSet,
-    St::Did: event_state::IsSet,
-    St::BookSig: event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Event<S> {
@@ -560,10 +581,10 @@ where
 }
 
 fn lexicon_doc_org_passingreads_book_event() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.passingreads.book.event"),

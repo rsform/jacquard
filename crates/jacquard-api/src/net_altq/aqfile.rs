@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,17 +26,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_altq::aqfile;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_altq::aqfile;
 /// Cryptographic checksum for integrity verification.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Checksum<S: BosStr = DefaultStr> {
     ///Hash algorithm name.
     pub algo: ChecksumAlgo<S>,
@@ -132,10 +129,7 @@ where
 /// File metadata describing the uploaded blob.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct File<S: BosStr = DefaultStr> {
     ///MIME type, e.g. 'video/mp4'.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -343,16 +337,19 @@ impl<S: BosStr> LexiconSchema for Aqfile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
@@ -367,10 +364,10 @@ impl<S: BosStr> LexiconSchema for Aqfile<S> {
 }
 
 fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.altq.aqfile"),
@@ -379,20 +376,23 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("checksum"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Cryptographic checksum for integrity verification.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("algo"),
-                        SmolStr::new_static("hash"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Cryptographic checksum for integrity verification.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("algo"), SmolStr::new_static("hash")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("algo"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Hash algorithm name.")),
+                                description: Some(
+                                    CowStr::new_static("Hash algorithm name."),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -400,9 +400,11 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("hash"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Hex or base64 encoded digest produced by the algorithm.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Hex or base64 encoded digest produced by the algorithm.",
+                                    ),
+                                ),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),
@@ -415,22 +417,21 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("file"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "File metadata describing the uploaded blob.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("size"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("File metadata describing the uploaded blob."),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("size")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("mimeType"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "MIME type, e.g. 'video/mp4'.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("MIME type, e.g. 'video/mp4'."),
+                                ),
                                 max_length: Some(255usize),
                                 ..Default::default()
                             }),
@@ -438,9 +439,9 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("modifiedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Client-side last-modified timestamp.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Client-side last-modified timestamp."),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -448,7 +449,9 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("User-visible filename.")),
+                                description: Some(
+                                    CowStr::new_static("User-visible filename."),
+                                ),
                                 max_length: Some(512usize),
                                 ..Default::default()
                             }),
@@ -469,34 +472,38 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A record representing an uploaded file blob with metadata.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A record representing an uploaded file blob with metadata.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("blob"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("file"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("blob"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("file")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("attribution"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Handle or DID of the account to attribute this upload to.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Handle or DID of the account to attribute this upload to.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtIdentifier),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("blob"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("checksum"),
@@ -508,9 +515,11 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when this record was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp when this record was created.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -537,7 +546,7 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
 
 pub mod file_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -580,21 +589,28 @@ pub mod file_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FileBuilder<S: BosStr, St: file_state::State> {
+pub struct FileBuilder<St: file_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>, Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> File<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FileBuilder<S, file_state::Empty> {
+impl File<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FileBuilder<file_state::Empty, DefaultStr> {
         FileBuilder::new()
     }
 }
 
-impl<S: BosStr> FileBuilder<S, file_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> File<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FileBuilder<file_state::Empty, S> {
+        FileBuilder::builder()
+    }
+}
+
+impl FileBuilder<file_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FileBuilder {
             _state: PhantomData,
@@ -604,7 +620,18 @@ impl<S: BosStr> FileBuilder<S, file_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
+impl<S: BosStr> FileBuilder<file_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FileBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: file_state::State, S: BosStr> FileBuilder<St, S> {
     /// Set the `mimeType` field (optional)
     pub fn mime_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -617,7 +644,7 @@ impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
+impl<St: file_state::State, S: BosStr> FileBuilder<St, S> {
     /// Set the `modifiedAt` field (optional)
     pub fn modified_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -630,13 +657,16 @@ impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> FileBuilder<S, St>
+impl<St, S: BosStr> FileBuilder<St, S>
 where
     St: file_state::State,
     St::Name: file_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> FileBuilder<S, file_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> FileBuilder<file_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
@@ -646,13 +676,16 @@ where
     }
 }
 
-impl<S: BosStr, St> FileBuilder<S, St>
+impl<St, S: BosStr> FileBuilder<St, S>
 where
     St: file_state::State,
     St::Size: file_state::IsUnset,
 {
     /// Set the `size` field (required)
-    pub fn size(mut self, value: impl Into<i64>) -> FileBuilder<S, file_state::SetSize<St>> {
+    pub fn size(
+        mut self,
+        value: impl Into<i64>,
+    ) -> FileBuilder<file_state::SetSize<St>, S> {
         self._fields.3 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
@@ -662,7 +695,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FileBuilder<S, St>
+impl<St, S: BosStr> FileBuilder<St, S>
 where
     St: file_state::State,
     St::Size: file_state::IsSet,
@@ -692,7 +725,7 @@ where
 
 pub mod aqfile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -700,56 +733,56 @@ pub mod aqfile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Blob;
+        type CreatedAt;
         type File;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Blob = Unset;
+        type CreatedAt = Unset;
         type File = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Blob = St::Blob;
-        type File = St::File;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlob<St> {}
     impl<St: State> State for SetBlob<St> {
-        type CreatedAt = St::CreatedAt;
         type Blob = Set<members::blob>;
+        type CreatedAt = St::CreatedAt;
+        type File = St::File;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Blob = St::Blob;
+        type CreatedAt = Set<members::created_at>;
         type File = St::File;
     }
     ///State transition - sets the `file` field to Set
     pub struct SetFile<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetFile<St> {}
     impl<St: State> State for SetFile<St> {
-        type CreatedAt = St::CreatedAt;
         type Blob = St::Blob;
+        type CreatedAt = St::CreatedAt;
         type File = Set<members::file>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `blob` field
         pub struct blob(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `file` field
         pub struct file(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AqfileBuilder<S: BosStr, St: aqfile_state::State> {
+pub struct AqfileBuilder<St: aqfile_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtIdentifier<S>>,
@@ -761,15 +794,22 @@ pub struct AqfileBuilder<S: BosStr, St: aqfile_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Aqfile<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AqfileBuilder<S, aqfile_state::Empty> {
+impl Aqfile<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AqfileBuilder<aqfile_state::Empty, DefaultStr> {
         AqfileBuilder::new()
     }
 }
 
-impl<S: BosStr> AqfileBuilder<S, aqfile_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Aqfile<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AqfileBuilder<aqfile_state::Empty, S> {
+        AqfileBuilder::builder()
+    }
+}
+
+impl AqfileBuilder<aqfile_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AqfileBuilder {
             _state: PhantomData,
@@ -779,7 +819,18 @@ impl<S: BosStr> AqfileBuilder<S, aqfile_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: aqfile_state::State> AqfileBuilder<S, St> {
+impl<S: BosStr> AqfileBuilder<aqfile_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AqfileBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: aqfile_state::State, S: BosStr> AqfileBuilder<St, S> {
     /// Set the `attribution` field (optional)
     pub fn attribution(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -792,7 +843,7 @@ impl<S: BosStr, St: aqfile_state::State> AqfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AqfileBuilder<S, St>
+impl<St, S: BosStr> AqfileBuilder<St, S>
 where
     St: aqfile_state::State,
     St::Blob: aqfile_state::IsUnset,
@@ -801,7 +852,7 @@ where
     pub fn blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> AqfileBuilder<S, aqfile_state::SetBlob<St>> {
+    ) -> AqfileBuilder<aqfile_state::SetBlob<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AqfileBuilder {
             _state: PhantomData,
@@ -811,7 +862,7 @@ where
     }
 }
 
-impl<S: BosStr, St: aqfile_state::State> AqfileBuilder<S, St> {
+impl<St: aqfile_state::State, S: BosStr> AqfileBuilder<St, S> {
     /// Set the `checksum` field (optional)
     pub fn checksum(mut self, value: impl Into<Option<aqfile::Checksum<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -824,7 +875,7 @@ impl<S: BosStr, St: aqfile_state::State> AqfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AqfileBuilder<S, St>
+impl<St, S: BosStr> AqfileBuilder<St, S>
 where
     St: aqfile_state::State,
     St::CreatedAt: aqfile_state::IsUnset,
@@ -833,7 +884,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AqfileBuilder<S, aqfile_state::SetCreatedAt<St>> {
+    ) -> AqfileBuilder<aqfile_state::SetCreatedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         AqfileBuilder {
             _state: PhantomData,
@@ -843,7 +894,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AqfileBuilder<S, St>
+impl<St, S: BosStr> AqfileBuilder<St, S>
 where
     St: aqfile_state::State,
     St::File: aqfile_state::IsUnset,
@@ -852,7 +903,7 @@ where
     pub fn file(
         mut self,
         value: impl Into<aqfile::File<S>>,
-    ) -> AqfileBuilder<S, aqfile_state::SetFile<St>> {
+    ) -> AqfileBuilder<aqfile_state::SetFile<St>, S> {
         self._fields.4 = Option::Some(value.into());
         AqfileBuilder {
             _state: PhantomData,
@@ -862,11 +913,11 @@ where
     }
 }
 
-impl<S: BosStr, St> AqfileBuilder<S, St>
+impl<St, S: BosStr> AqfileBuilder<St, S>
 where
     St: aqfile_state::State,
-    St::CreatedAt: aqfile_state::IsSet,
     St::Blob: aqfile_state::IsSet,
+    St::CreatedAt: aqfile_state::IsSet,
     St::File: aqfile_state::IsSet,
 {
     /// Build the final struct.

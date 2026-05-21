@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Normalized podping startup fields. Record TID timestamp should represent when the event was received, useful for global ordering.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -132,7 +132,7 @@ impl<S: BosStr> LexiconSchema for Startup<S> {
 
 pub mod startup_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -140,56 +140,56 @@ pub mod startup_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Message;
         type Timestamp;
         type ServerAccount;
-        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Message = Unset;
         type Timestamp = Unset;
         type ServerAccount = Unset;
-        type Message = Unset;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
-    impl<St: State> State for SetTimestamp<St> {
-        type Timestamp = Set<members::timestamp>;
-        type ServerAccount = St::ServerAccount;
-        type Message = St::Message;
-    }
-    ///State transition - sets the `server_account` field to Set
-    pub struct SetServerAccount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetServerAccount<St> {}
-    impl<St: State> State for SetServerAccount<St> {
-        type Timestamp = St::Timestamp;
-        type ServerAccount = Set<members::server_account>;
-        type Message = St::Message;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessage<St> {}
     impl<St: State> State for SetMessage<St> {
+        type Message = Set<members::message>;
         type Timestamp = St::Timestamp;
         type ServerAccount = St::ServerAccount;
-        type Message = Set<members::message>;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
+        type Message = St::Message;
+        type Timestamp = Set<members::timestamp>;
+        type ServerAccount = St::ServerAccount;
+    }
+    ///State transition - sets the `server_account` field to Set
+    pub struct SetServerAccount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetServerAccount<St> {}
+    impl<St: State> State for SetServerAccount<St> {
+        type Message = St::Message;
+        type Timestamp = St::Timestamp;
+        type ServerAccount = Set<members::server_account>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `message` field
+        pub struct message(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
         ///Marker type for the `server_account` field
         pub struct server_account(());
-        ///Marker type for the `message` field
-        pub struct message(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StartupBuilder<S: BosStr, St: startup_state::State> {
+pub struct StartupBuilder<St: startup_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -207,27 +207,43 @@ pub struct StartupBuilder<S: BosStr, St: startup_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Startup<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StartupBuilder<S, startup_state::Empty> {
+impl Startup<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StartupBuilder<startup_state::Empty, DefaultStr> {
         StartupBuilder::new()
     }
 }
 
-impl<S: BosStr> StartupBuilder<S, startup_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Startup<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StartupBuilder<startup_state::Empty, S> {
+        StartupBuilder::builder()
+    }
+}
+
+impl StartupBuilder<startup_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StartupBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
+impl<S: BosStr> StartupBuilder<startup_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StartupBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: startup_state::State, S: BosStr> StartupBuilder<St, S> {
     /// Set the `capacity` field (optional)
     pub fn capacity(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -240,7 +256,7 @@ impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
+impl<St: startup_state::State, S: BosStr> StartupBuilder<St, S> {
     /// Set the `hive` field (optional)
     pub fn hive(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -253,7 +269,7 @@ impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StartupBuilder<S, St>
+impl<St, S: BosStr> StartupBuilder<St, S>
 where
     St: startup_state::State,
     St::Message: startup_state::IsUnset,
@@ -262,7 +278,7 @@ where
     pub fn message(
         mut self,
         value: impl Into<S>,
-    ) -> StartupBuilder<S, startup_state::SetMessage<St>> {
+    ) -> StartupBuilder<startup_state::SetMessage<St>, S> {
         self._fields.2 = Option::Some(value.into());
         StartupBuilder {
             _state: PhantomData,
@@ -272,7 +288,7 @@ where
     }
 }
 
-impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
+impl<St: startup_state::State, S: BosStr> StartupBuilder<St, S> {
     /// Set the `pingingApp` field (optional)
     pub fn pinging_app(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -285,7 +301,7 @@ impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StartupBuilder<S, St>
+impl<St, S: BosStr> StartupBuilder<St, S>
 where
     St: startup_state::State,
     St::ServerAccount: startup_state::IsUnset,
@@ -294,7 +310,7 @@ where
     pub fn server_account(
         mut self,
         value: impl Into<S>,
-    ) -> StartupBuilder<S, startup_state::SetServerAccount<St>> {
+    ) -> StartupBuilder<startup_state::SetServerAccount<St>, S> {
         self._fields.4 = Option::Some(value.into());
         StartupBuilder {
             _state: PhantomData,
@@ -304,7 +320,7 @@ where
     }
 }
 
-impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
+impl<St: startup_state::State, S: BosStr> StartupBuilder<St, S> {
     /// Set the `sessionId` field (optional)
     pub fn session_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -317,7 +333,7 @@ impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
+impl<St: startup_state::State, S: BosStr> StartupBuilder<St, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -330,7 +346,7 @@ impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StartupBuilder<S, St>
+impl<St, S: BosStr> StartupBuilder<St, S>
 where
     St: startup_state::State,
     St::Timestamp: startup_state::IsUnset,
@@ -339,7 +355,7 @@ where
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StartupBuilder<S, startup_state::SetTimestamp<St>> {
+    ) -> StartupBuilder<startup_state::SetTimestamp<St>, S> {
         self._fields.7 = Option::Some(value.into());
         StartupBuilder {
             _state: PhantomData,
@@ -349,7 +365,7 @@ where
     }
 }
 
-impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
+impl<St: startup_state::State, S: BosStr> StartupBuilder<St, S> {
     /// Set the `useTestNode` field (optional)
     pub fn use_test_node(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.8 = value.into();
@@ -362,7 +378,7 @@ impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
+impl<St: startup_state::State, S: BosStr> StartupBuilder<St, S> {
     /// Set the `uuid` field (optional)
     pub fn uuid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -375,7 +391,7 @@ impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
+impl<St: startup_state::State, S: BosStr> StartupBuilder<St, S> {
     /// Set the `v` field (optional)
     pub fn v(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -388,12 +404,12 @@ impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StartupBuilder<S, St>
+impl<St, S: BosStr> StartupBuilder<St, S>
 where
     St: startup_state::State,
+    St::Message: startup_state::IsSet,
     St::Timestamp: startup_state::IsSet,
     St::ServerAccount: startup_state::IsSet,
-    St::Message: startup_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Startup<S> {
@@ -432,10 +448,10 @@ where
 }
 
 fn lexicon_doc_at_podping_records_startup() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.podping.records.startup"),

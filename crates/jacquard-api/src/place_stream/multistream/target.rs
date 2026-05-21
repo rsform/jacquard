@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// An external server for rebroadcasting a Streamplace stream
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -121,7 +121,7 @@ impl<S: BosStr> LexiconSchema for Target<S> {
 
 pub mod target_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -129,75 +129,77 @@ pub mod target_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Active;
         type CreatedAt;
         type Url;
-        type Active;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Active = Unset;
         type CreatedAt = Unset;
         type Url = Unset;
-        type Active = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Url = St::Url;
-        type Active = St::Active;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type CreatedAt = St::CreatedAt;
-        type Url = Set<members::url>;
-        type Active = St::Active;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetActive<St> {}
     impl<St: State> State for SetActive<St> {
+        type Active = Set<members::active>;
         type CreatedAt = St::CreatedAt;
         type Url = St::Url;
-        type Active = Set<members::active>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Active = St::Active;
+        type CreatedAt = Set<members::created_at>;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type Active = St::Active;
+        type CreatedAt = St::CreatedAt;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `active` field
+        pub struct active(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `url` field
         pub struct url(());
-        ///Marker type for the `active` field
-        pub struct active(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TargetBuilder<S: BosStr, St: target_state::State> {
+pub struct TargetBuilder<St: target_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<bool>,
-        Option<Datetime>,
-        Option<S>,
-        Option<UriValue<S>>,
-    ),
+    _fields: (Option<bool>, Option<Datetime>, Option<S>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Target<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TargetBuilder<S, target_state::Empty> {
+impl Target<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TargetBuilder<target_state::Empty, DefaultStr> {
         TargetBuilder::new()
     }
 }
 
-impl<S: BosStr> TargetBuilder<S, target_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Target<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TargetBuilder<target_state::Empty, S> {
+        TargetBuilder::builder()
+    }
+}
+
+impl TargetBuilder<target_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TargetBuilder {
             _state: PhantomData,
@@ -207,7 +209,18 @@ impl<S: BosStr> TargetBuilder<S, target_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> TargetBuilder<S, St>
+impl<S: BosStr> TargetBuilder<target_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TargetBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> TargetBuilder<St, S>
 where
     St: target_state::State,
     St::Active: target_state::IsUnset,
@@ -216,7 +229,7 @@ where
     pub fn active(
         mut self,
         value: impl Into<bool>,
-    ) -> TargetBuilder<S, target_state::SetActive<St>> {
+    ) -> TargetBuilder<target_state::SetActive<St>, S> {
         self._fields.0 = Option::Some(value.into());
         TargetBuilder {
             _state: PhantomData,
@@ -226,7 +239,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TargetBuilder<S, St>
+impl<St, S: BosStr> TargetBuilder<St, S>
 where
     St: target_state::State,
     St::CreatedAt: target_state::IsUnset,
@@ -235,7 +248,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TargetBuilder<S, target_state::SetCreatedAt<St>> {
+    ) -> TargetBuilder<target_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TargetBuilder {
             _state: PhantomData,
@@ -245,7 +258,7 @@ where
     }
 }
 
-impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
+impl<St: target_state::State, S: BosStr> TargetBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -258,7 +271,7 @@ impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TargetBuilder<S, St>
+impl<St, S: BosStr> TargetBuilder<St, S>
 where
     St: target_state::State,
     St::Url: target_state::IsUnset,
@@ -267,7 +280,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> TargetBuilder<S, target_state::SetUrl<St>> {
+    ) -> TargetBuilder<target_state::SetUrl<St>, S> {
         self._fields.3 = Option::Some(value.into());
         TargetBuilder {
             _state: PhantomData,
@@ -277,12 +290,12 @@ where
     }
 }
 
-impl<S: BosStr, St> TargetBuilder<S, St>
+impl<St, S: BosStr> TargetBuilder<St, S>
 where
     St: target_state::State,
+    St::Active: target_state::IsSet,
     St::CreatedAt: target_state::IsSet,
     St::Url: target_state::IsSet,
-    St::Active: target_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Target<S> {
@@ -307,10 +320,10 @@ where
 }
 
 fn lexicon_doc_place_stream_multistream_target() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.multistream.target"),
@@ -319,16 +332,19 @@ fn lexicon_doc_place_stream_multistream_target() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "An external server for rebroadcasting a Streamplace stream",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "An external server for rebroadcasting a Streamplace stream",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("url"),
-                            SmolStr::new_static("active"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("url"), SmolStr::new_static("active"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -341,9 +357,9 @@ fn lexicon_doc_place_stream_multistream_target() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When this target was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When this target was created."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -351,9 +367,9 @@ fn lexicon_doc_place_stream_multistream_target() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "A user-friendly name for this target.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("A user-friendly name for this target."),
+                                    ),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
@@ -361,9 +377,11 @@ fn lexicon_doc_place_stream_multistream_target() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("url"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The rtmp:// or rtmps:// url of the target server.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The rtmp:// or rtmps:// url of the target server.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),

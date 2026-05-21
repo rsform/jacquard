@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blue__2048::key::Key;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blue__2048::key::Key;
 /// A record that holds a did:key for verifying a players game. This is intended to be written at a verification authorities repo
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -106,7 +106,7 @@ impl<S: BosStr> LexiconSchema for Game<S> {
 
 pub mod game_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -114,56 +114,63 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type CreatedAt;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKey<St> {}
-    impl<St: State> State for SetKey<St> {
-        type Key = Set<members::key>;
-        type CreatedAt = St::CreatedAt;
+        type Key = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Key = St::Key;
         type CreatedAt = Set<members::created_at>;
+        type Key = St::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type CreatedAt = St::CreatedAt;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GameBuilder<S: BosStr, St: game_state::State> {
+pub struct GameBuilder<St: game_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Key<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Game<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GameBuilder<S, game_state::Empty> {
+impl Game<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GameBuilder<game_state::Empty, DefaultStr> {
         GameBuilder::new()
     }
 }
 
-impl<S: BosStr> GameBuilder<S, game_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Game<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GameBuilder<game_state::Empty, S> {
+        GameBuilder::builder()
+    }
+}
+
+impl GameBuilder<game_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GameBuilder {
             _state: PhantomData,
@@ -173,7 +180,18 @@ impl<S: BosStr> GameBuilder<S, game_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GameBuilder<S, St>
+impl<S: BosStr> GameBuilder<game_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GameBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GameBuilder<St, S>
 where
     St: game_state::State,
     St::CreatedAt: game_state::IsUnset,
@@ -182,7 +200,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GameBuilder<S, game_state::SetCreatedAt<St>> {
+    ) -> GameBuilder<game_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
@@ -192,13 +210,16 @@ where
     }
 }
 
-impl<S: BosStr, St> GameBuilder<S, St>
+impl<St, S: BosStr> GameBuilder<St, S>
 where
     St: game_state::State,
     St::Key: game_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(mut self, value: impl Into<Key<S>>) -> GameBuilder<S, game_state::SetKey<St>> {
+    pub fn key(
+        mut self,
+        value: impl Into<Key<S>>,
+    ) -> GameBuilder<game_state::SetKey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
@@ -208,11 +229,11 @@ where
     }
 }
 
-impl<S: BosStr, St> GameBuilder<S, St>
+impl<St, S: BosStr> GameBuilder<St, S>
 where
     St: game_state::State,
-    St::Key: game_state::IsSet,
     St::CreatedAt: game_state::IsSet,
+    St::Key: game_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Game<S> {
@@ -233,10 +254,10 @@ where
 }
 
 fn lexicon_doc_blue_2048_key_game() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.2048.key.game"),

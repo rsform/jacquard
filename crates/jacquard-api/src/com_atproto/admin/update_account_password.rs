@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateAccountPassword<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub password: S,
@@ -40,8 +37,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateAccountPasswordResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateAccountPassword<S> {
     const NSID: &'static str = "com.atproto.admin.updateAccountPassword";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateAccountPasswordResponse;
 }
 
@@ -49,15 +47,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateAccountPassword<S> 
 pub struct UpdateAccountPasswordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountPasswordRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountPassword";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateAccountPassword<S>;
     type Response = UpdateAccountPasswordResponse;
 }
 
 pub mod update_account_password_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -100,21 +99,37 @@ pub mod update_account_password_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateAccountPasswordBuilder<S: BosStr, St: update_account_password_state::State> {
+pub struct UpdateAccountPasswordBuilder<
+    St: update_account_password_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UpdateAccountPassword<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UpdateAccountPasswordBuilder<S, update_account_password_state::Empty> {
+impl UpdateAccountPassword<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UpdateAccountPasswordBuilder<
+        update_account_password_state::Empty,
+        DefaultStr,
+    > {
         UpdateAccountPasswordBuilder::new()
     }
 }
 
-impl<S: BosStr> UpdateAccountPasswordBuilder<S, update_account_password_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UpdateAccountPassword<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UpdateAccountPasswordBuilder<
+        update_account_password_state::Empty,
+        S,
+    > {
+        UpdateAccountPasswordBuilder::builder()
+    }
+}
+
+impl UpdateAccountPasswordBuilder<update_account_password_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UpdateAccountPasswordBuilder {
             _state: PhantomData,
@@ -124,7 +139,18 @@ impl<S: BosStr> UpdateAccountPasswordBuilder<S, update_account_password_state::E
     }
 }
 
-impl<S: BosStr, St> UpdateAccountPasswordBuilder<S, St>
+impl<S: BosStr> UpdateAccountPasswordBuilder<update_account_password_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UpdateAccountPasswordBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> UpdateAccountPasswordBuilder<St, S>
 where
     St: update_account_password_state::State,
     St::Did: update_account_password_state::IsUnset,
@@ -133,7 +159,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> UpdateAccountPasswordBuilder<S, update_account_password_state::SetDid<St>> {
+    ) -> UpdateAccountPasswordBuilder<update_account_password_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         UpdateAccountPasswordBuilder {
             _state: PhantomData,
@@ -143,7 +169,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UpdateAccountPasswordBuilder<S, St>
+impl<St, S: BosStr> UpdateAccountPasswordBuilder<St, S>
 where
     St: update_account_password_state::State,
     St::Password: update_account_password_state::IsUnset,
@@ -152,7 +178,10 @@ where
     pub fn password(
         mut self,
         value: impl Into<S>,
-    ) -> UpdateAccountPasswordBuilder<S, update_account_password_state::SetPassword<St>> {
+    ) -> UpdateAccountPasswordBuilder<
+        update_account_password_state::SetPassword<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         UpdateAccountPasswordBuilder {
             _state: PhantomData,
@@ -162,7 +191,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UpdateAccountPasswordBuilder<S, St>
+impl<St, S: BosStr> UpdateAccountPasswordBuilder<St, S>
 where
     St: update_account_password_state::State,
     St::Did: update_account_password_state::IsSet,

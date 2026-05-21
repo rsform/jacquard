@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,16 +20,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_offprint::block::image_grid::GridImage;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_offprint::block::image_grid::GridImage;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ImageDiff<S: BosStr = DefaultStr> {
     ///Horizontal alignment
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -108,7 +105,7 @@ impl<S: BosStr> LexiconSchema for ImageDiff<S> {
 
 pub mod image_diff_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -139,7 +136,7 @@ pub mod image_diff_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ImageDiffBuilder<S: BosStr, St: image_diff_state::State> {
+pub struct ImageDiffBuilder<St: image_diff_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -151,15 +148,22 @@ pub struct ImageDiffBuilder<S: BosStr, St: image_diff_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ImageDiff<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ImageDiffBuilder<S, image_diff_state::Empty> {
+impl ImageDiff<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ImageDiffBuilder<image_diff_state::Empty, DefaultStr> {
         ImageDiffBuilder::new()
     }
 }
 
-impl<S: BosStr> ImageDiffBuilder<S, image_diff_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ImageDiff<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ImageDiffBuilder<image_diff_state::Empty, S> {
+        ImageDiffBuilder::builder()
+    }
+}
+
+impl ImageDiffBuilder<image_diff_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ImageDiffBuilder {
             _state: PhantomData,
@@ -169,7 +173,18 @@ impl<S: BosStr> ImageDiffBuilder<S, image_diff_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: image_diff_state::State> ImageDiffBuilder<S, St> {
+impl<S: BosStr> ImageDiffBuilder<image_diff_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ImageDiffBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: image_diff_state::State, S: BosStr> ImageDiffBuilder<St, S> {
     /// Set the `alignment` field (optional)
     pub fn alignment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -182,7 +197,7 @@ impl<S: BosStr, St: image_diff_state::State> ImageDiffBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: image_diff_state::State> ImageDiffBuilder<S, St> {
+impl<St: image_diff_state::State, S: BosStr> ImageDiffBuilder<St, S> {
     /// Set the `caption` field (optional)
     pub fn caption(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -195,7 +210,7 @@ impl<S: BosStr, St: image_diff_state::State> ImageDiffBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ImageDiffBuilder<S, St>
+impl<St, S: BosStr> ImageDiffBuilder<St, S>
 where
     St: image_diff_state::State,
     St::Images: image_diff_state::IsUnset,
@@ -204,7 +219,7 @@ where
     pub fn images(
         mut self,
         value: impl Into<Vec<GridImage<S>>>,
-    ) -> ImageDiffBuilder<S, image_diff_state::SetImages<St>> {
+    ) -> ImageDiffBuilder<image_diff_state::SetImages<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ImageDiffBuilder {
             _state: PhantomData,
@@ -214,7 +229,7 @@ where
     }
 }
 
-impl<S: BosStr, St: image_diff_state::State> ImageDiffBuilder<S, St> {
+impl<St: image_diff_state::State, S: BosStr> ImageDiffBuilder<St, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -227,7 +242,7 @@ impl<S: BosStr, St: image_diff_state::State> ImageDiffBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: image_diff_state::State> ImageDiffBuilder<S, St> {
+impl<St: image_diff_state::State, S: BosStr> ImageDiffBuilder<St, S> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -240,7 +255,7 @@ impl<S: BosStr, St: image_diff_state::State> ImageDiffBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ImageDiffBuilder<S, St>
+impl<St, S: BosStr> ImageDiffBuilder<St, S>
 where
     St: image_diff_state::State,
     St::Images: image_diff_state::IsSet,
@@ -257,7 +272,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ImageDiff<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ImageDiff<S> {
         ImageDiff {
             alignment: self._fields.0,
             caption: self._fields.1,
@@ -270,10 +288,10 @@ where
 }
 
 fn lexicon_doc_app_offprint_block_imageDiff() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.offprint.block.imageDiff"),
@@ -289,7 +307,9 @@ fn lexicon_doc_app_offprint_block_imageDiff() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alignment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Horizontal alignment")),
+                                description: Some(
+                                    CowStr::new_static("Horizontal alignment"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -303,9 +323,11 @@ fn lexicon_doc_app_offprint_block_imageDiff() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("images"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Exactly 2 images for comparison [before, after]",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Exactly 2 images for comparison [before, after]",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static(
                                         "app.offprint.block.imageGrid#gridImage",
@@ -320,9 +342,11 @@ fn lexicon_doc_app_offprint_block_imageDiff() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("labels"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Labels for the images [before label, after label]",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Labels for the images [before label, after label]",
+                                    ),
+                                ),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),

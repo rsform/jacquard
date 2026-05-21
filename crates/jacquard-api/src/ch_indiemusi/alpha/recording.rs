@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -25,20 +25,17 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::ch_indiemusi::alpha::actor::artist;
-use crate::ch_indiemusi::alpha::actor::master_owner::MasterOwner;
-use crate::ch_indiemusi::alpha::recording;
-use crate::ch_indiemusi::alpha::song::Song;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::ch_indiemusi::alpha::actor::master_owner::MasterOwner;
+use crate::ch_indiemusi::alpha::song::Song;
+use crate::ch_indiemusi::alpha::actor::artist;
+use crate::ch_indiemusi::alpha::recording;
 /// Information about an artist contributing to the recording
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Artist<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artist: Option<artist::Artist<S>>,
@@ -91,10 +88,7 @@ pub struct RecordingGetRecordOutput<S: BosStr = DefaultStr> {
 /// Information about the master owner
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MasterOwnerInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
@@ -238,10 +232,10 @@ impl<S: BosStr> LexiconSchema for MasterOwnerInfo<S> {
 }
 
 fn lexicon_doc_ch_indiemusi_alpha_recording() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ch.indiemusi.alpha.recording"),
@@ -250,9 +244,11 @@ fn lexicon_doc_ch_indiemusi_alpha_recording() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("artist"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Information about an artist contributing to the recording",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Information about an artist contributing to the recording",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("name")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -260,7 +256,9 @@ fn lexicon_doc_ch_indiemusi_alpha_recording() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artist"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("ch.indiemusi.alpha.actor.artist"),
+                                r#ref: CowStr::new_static(
+                                    "ch.indiemusi.alpha.actor.artist",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -365,7 +363,9 @@ fn lexicon_doc_ch_indiemusi_alpha_recording() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("masterOwnerInfo"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Information about the master owner")),
+                    description: Some(
+                        CowStr::new_static("Information about the master owner"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -379,7 +379,9 @@ fn lexicon_doc_ch_indiemusi_alpha_recording() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("masterOwner"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("ch.indiemusi.alpha.actor.masterOwner"),
+                                r#ref: CowStr::new_static(
+                                    "ch.indiemusi.alpha.actor.masterOwner",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -403,7 +405,7 @@ fn lexicon_doc_ch_indiemusi_alpha_recording() -> LexiconDoc<'static> {
 
 pub mod recording_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -411,42 +413,42 @@ pub mod recording_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Artists;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Artists = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type Artists = St::Artists;
+        type Title = Unset;
     }
     ///State transition - sets the `artists` field to Set
     pub struct SetArtists<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetArtists<St> {}
     impl<St: State> State for SetArtists<St> {
-        type Title = St::Title;
         type Artists = Set<members::artists>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Artists = St::Artists;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `artists` field
         pub struct artists(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RecordingBuilder<S: BosStr, St: recording_state::State> {
+pub struct RecordingBuilder<St: recording_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<recording::Artist<S>>>,
@@ -460,15 +462,22 @@ pub struct RecordingBuilder<S: BosStr, St: recording_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Recording<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RecordingBuilder<S, recording_state::Empty> {
+impl Recording<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RecordingBuilder<recording_state::Empty, DefaultStr> {
         RecordingBuilder::new()
     }
 }
 
-impl<S: BosStr> RecordingBuilder<S, recording_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Recording<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RecordingBuilder<recording_state::Empty, S> {
+        RecordingBuilder::builder()
+    }
+}
+
+impl RecordingBuilder<recording_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RecordingBuilder {
             _state: PhantomData,
@@ -478,7 +487,18 @@ impl<S: BosStr> RecordingBuilder<S, recording_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RecordingBuilder<S, St>
+impl<S: BosStr> RecordingBuilder<recording_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RecordingBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RecordingBuilder<St, S>
 where
     St: recording_state::State,
     St::Artists: recording_state::IsUnset,
@@ -487,7 +507,7 @@ where
     pub fn artists(
         mut self,
         value: impl Into<Vec<recording::Artist<S>>>,
-    ) -> RecordingBuilder<S, recording_state::SetArtists<St>> {
+    ) -> RecordingBuilder<recording_state::SetArtists<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RecordingBuilder {
             _state: PhantomData,
@@ -497,7 +517,7 @@ where
     }
 }
 
-impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
+impl<St: recording_state::State, S: BosStr> RecordingBuilder<St, S> {
     /// Set the `audioFile` field (optional)
     pub fn audio_file(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -510,7 +530,7 @@ impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
+impl<St: recording_state::State, S: BosStr> RecordingBuilder<St, S> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -523,7 +543,7 @@ impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
+impl<St: recording_state::State, S: BosStr> RecordingBuilder<St, S> {
     /// Set the `isrc` field (optional)
     pub fn isrc(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -536,20 +556,26 @@ impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
+impl<St: recording_state::State, S: BosStr> RecordingBuilder<St, S> {
     /// Set the `masterOwner` field (optional)
-    pub fn master_owner(mut self, value: impl Into<Option<recording::MasterOwnerInfo<S>>>) -> Self {
+    pub fn master_owner(
+        mut self,
+        value: impl Into<Option<recording::MasterOwnerInfo<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `masterOwner` field to an Option value (optional)
-    pub fn maybe_master_owner(mut self, value: Option<recording::MasterOwnerInfo<S>>) -> Self {
+    pub fn maybe_master_owner(
+        mut self,
+        value: Option<recording::MasterOwnerInfo<S>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
 }
 
-impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
+impl<St: recording_state::State, S: BosStr> RecordingBuilder<St, S> {
     /// Set the `song` field (optional)
     pub fn song(mut self, value: impl Into<Option<Song<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -562,7 +588,7 @@ impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RecordingBuilder<S, St>
+impl<St, S: BosStr> RecordingBuilder<St, S>
 where
     St: recording_state::State,
     St::Title: recording_state::IsUnset,
@@ -571,7 +597,7 @@ where
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> RecordingBuilder<S, recording_state::SetTitle<St>> {
+    ) -> RecordingBuilder<recording_state::SetTitle<St>, S> {
         self._fields.6 = Option::Some(value.into());
         RecordingBuilder {
             _state: PhantomData,
@@ -581,11 +607,11 @@ where
     }
 }
 
-impl<S: BosStr, St> RecordingBuilder<S, St>
+impl<St, S: BosStr> RecordingBuilder<St, S>
 where
     St: recording_state::State,
-    St::Title: recording_state::IsSet,
     St::Artists: recording_state::IsSet,
+    St::Title: recording_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Recording<S> {
@@ -601,7 +627,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Recording<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Recording<S> {
         Recording {
             artists: self._fields.0.unwrap(),
             audio_file: self._fields.1,

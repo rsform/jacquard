@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Site layout for spores.garden, defining the order of sections.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -104,7 +104,7 @@ impl<S: BosStr> LexiconSchema for Layout<S> {
 
 pub mod layout_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -135,21 +135,28 @@ pub mod layout_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LayoutBuilder<S: BosStr, St: layout_state::State> {
+pub struct LayoutBuilder<St: layout_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Layout<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LayoutBuilder<S, layout_state::Empty> {
+impl Layout<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LayoutBuilder<layout_state::Empty, DefaultStr> {
         LayoutBuilder::new()
     }
 }
 
-impl<S: BosStr> LayoutBuilder<S, layout_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Layout<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LayoutBuilder<layout_state::Empty, S> {
+        LayoutBuilder::builder()
+    }
+}
+
+impl LayoutBuilder<layout_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LayoutBuilder {
             _state: PhantomData,
@@ -159,7 +166,18 @@ impl<S: BosStr> LayoutBuilder<S, layout_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LayoutBuilder<S, St>
+impl<S: BosStr> LayoutBuilder<layout_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LayoutBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LayoutBuilder<St, S>
 where
     St: layout_state::State,
     St::Sections: layout_state::IsUnset,
@@ -168,7 +186,7 @@ where
     pub fn sections(
         mut self,
         value: impl Into<Vec<AtUri<S>>>,
-    ) -> LayoutBuilder<S, layout_state::SetSections<St>> {
+    ) -> LayoutBuilder<layout_state::SetSections<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LayoutBuilder {
             _state: PhantomData,
@@ -178,7 +196,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LayoutBuilder<S, St>
+impl<St, S: BosStr> LayoutBuilder<St, S>
 where
     St: layout_state::State,
     St::Sections: layout_state::IsSet,
@@ -200,10 +218,10 @@ where
 }
 
 fn lexicon_doc_coop_hypha_spores_site_layout() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("coop.hypha.spores.site.layout"),
@@ -212,9 +230,11 @@ fn lexicon_doc_coop_hypha_spores_site_layout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Site layout for spores.garden, defining the order of sections.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Site layout for spores.garden, defining the order of sections.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("sections")]),
@@ -224,13 +244,17 @@ fn lexicon_doc_coop_hypha_spores_site_layout() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("sections"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Ordered list of section AT-URIs to display",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Ordered list of section AT-URIs to display",
+                                        ),
+                                    ),
                                     items: LexArrayItem::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "AT-URI of a coop.hypha.spores.site.section record",
-                                        )),
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "AT-URI of a coop.hypha.spores.site.section record",
+                                            ),
+                                        ),
                                         format: Some(LexStringFormat::AtUri),
                                         ..Default::default()
                                     }),

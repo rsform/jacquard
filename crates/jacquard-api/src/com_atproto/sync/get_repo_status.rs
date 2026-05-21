@@ -10,27 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Tid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRepoStatus<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRepoStatusOutput<S: BosStr = DefaultStr> {
     pub active: bool,
     pub did: Did<S>,
@@ -104,7 +99,8 @@ impl<S: BosStr> Serialize for GetRepoStatusOutputStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetRepoStatusOutputStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for GetRepoStatusOutputStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -131,8 +127,12 @@ where
             GetRepoStatusOutputStatus::Takendown => GetRepoStatusOutputStatus::Takendown,
             GetRepoStatusOutputStatus::Suspended => GetRepoStatusOutputStatus::Suspended,
             GetRepoStatusOutputStatus::Deleted => GetRepoStatusOutputStatus::Deleted,
-            GetRepoStatusOutputStatus::Deactivated => GetRepoStatusOutputStatus::Deactivated,
-            GetRepoStatusOutputStatus::Desynchronized => GetRepoStatusOutputStatus::Desynchronized,
+            GetRepoStatusOutputStatus::Deactivated => {
+                GetRepoStatusOutputStatus::Deactivated
+            }
+            GetRepoStatusOutputStatus::Desynchronized => {
+                GetRepoStatusOutputStatus::Desynchronized
+            }
             GetRepoStatusOutputStatus::Throttled => GetRepoStatusOutputStatus::Throttled,
             GetRepoStatusOutputStatus::Other(v) => {
                 GetRepoStatusOutputStatus::Other(v.into_static())
@@ -141,19 +141,25 @@ where
     }
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetRepoStatusError {
     #[serde(rename = "RepoNotFound")]
     RepoNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetRepoStatusError {
@@ -203,7 +209,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetRepoStatusRequest {
 
 pub mod get_repo_status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -234,21 +240,31 @@ pub mod get_repo_status_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetRepoStatusBuilder<S: BosStr, St: get_repo_status_state::State> {
+pub struct GetRepoStatusBuilder<
+    St: get_repo_status_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetRepoStatus<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetRepoStatusBuilder<S, get_repo_status_state::Empty> {
+impl GetRepoStatus<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetRepoStatusBuilder<get_repo_status_state::Empty, DefaultStr> {
         GetRepoStatusBuilder::new()
     }
 }
 
-impl<S: BosStr> GetRepoStatusBuilder<S, get_repo_status_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetRepoStatus<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetRepoStatusBuilder<get_repo_status_state::Empty, S> {
+        GetRepoStatusBuilder::builder()
+    }
+}
+
+impl GetRepoStatusBuilder<get_repo_status_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetRepoStatusBuilder {
             _state: PhantomData,
@@ -258,7 +274,18 @@ impl<S: BosStr> GetRepoStatusBuilder<S, get_repo_status_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetRepoStatusBuilder<S, St>
+impl<S: BosStr> GetRepoStatusBuilder<get_repo_status_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetRepoStatusBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetRepoStatusBuilder<St, S>
 where
     St: get_repo_status_state::State,
     St::Did: get_repo_status_state::IsUnset,
@@ -267,7 +294,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetRepoStatusBuilder<S, get_repo_status_state::SetDid<St>> {
+    ) -> GetRepoStatusBuilder<get_repo_status_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetRepoStatusBuilder {
             _state: PhantomData,
@@ -277,7 +304,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetRepoStatusBuilder<S, St>
+impl<St, S: BosStr> GetRepoStatusBuilder<St, S>
 where
     St: get_repo_status_state::State,
     St::Did: get_repo_status_state::IsSet,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// User preferences and settings for BeaconBits
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -213,7 +213,8 @@ impl<S: BosStr> Serialize for ProfileDefaultDelayedReveal<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ProfileDefaultDelayedReveal<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ProfileDefaultDelayedReveal<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -302,7 +303,8 @@ impl<S: BosStr> Serialize for ProfileDefaultVisibility<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ProfileDefaultVisibility<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ProfileDefaultVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -330,7 +332,9 @@ where
             ProfileDefaultVisibility::Followers => ProfileDefaultVisibility::Followers,
             ProfileDefaultVisibility::Mutuals => ProfileDefaultVisibility::Mutuals,
             ProfileDefaultVisibility::Hidden => ProfileDefaultVisibility::Hidden,
-            ProfileDefaultVisibility::Other(v) => ProfileDefaultVisibility::Other(v.into_static()),
+            ProfileDefaultVisibility::Other(v) => {
+                ProfileDefaultVisibility::Other(v.into_static())
+            }
         }
     }
 }
@@ -662,7 +666,7 @@ fn _default_profile_post_beacon_links() -> Option<bool> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -693,7 +697,7 @@ pub mod profile_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
+pub struct ProfileBuilder<St: profile_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileAllowTags<S>>,
@@ -710,15 +714,22 @@ pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Profile<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProfileBuilder<S, profile_state::Empty> {
+impl Profile<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProfileBuilder<profile_state::Empty, DefaultStr> {
         ProfileBuilder::new()
     }
 }
 
-impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Profile<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProfileBuilder<profile_state::Empty, S> {
+        ProfileBuilder::builder()
+    }
+}
+
+impl ProfileBuilder<profile_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
@@ -728,7 +739,18 @@ impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProfileBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `allowTags` field (optional)
     pub fn allow_tags(mut self, value: impl Into<Option<ProfileAllowTags<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -741,7 +763,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -754,7 +776,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `defaultDelayedReveal` field (optional)
     pub fn default_delayed_reveal(
         mut self,
@@ -773,7 +795,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `defaultVisibility` field (optional)
     pub fn default_visibility(
         mut self,
@@ -783,15 +805,21 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
         self
     }
     /// Set the `defaultVisibility` field to an Option value (optional)
-    pub fn maybe_default_visibility(mut self, value: Option<ProfileDefaultVisibility<S>>) -> Self {
+    pub fn maybe_default_visibility(
+        mut self,
+        value: Option<ProfileDefaultVisibility<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `distanceUnit` field (optional)
-    pub fn distance_unit(mut self, value: impl Into<Option<ProfileDistanceUnit<S>>>) -> Self {
+    pub fn distance_unit(
+        mut self,
+        value: impl Into<Option<ProfileDistanceUnit<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -802,7 +830,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `hidePastBeacons` field (optional)
     pub fn hide_past_beacons(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.5 = value.into();
@@ -815,7 +843,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<ProfileLanguage<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -828,7 +856,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `markerColor` field (optional)
     pub fn marker_color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -841,7 +869,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `postBeaconLinks` field (optional)
     pub fn post_beacon_links(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.8 = value.into();
@@ -854,7 +882,7 @@ impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::UpdatedAt: profile_state::IsUnset,
@@ -863,7 +891,7 @@ where
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ProfileBuilder<S, profile_state::SetUpdatedAt<St>> {
+    ) -> ProfileBuilder<profile_state::SetUpdatedAt<St>, S> {
         self._fields.9 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -873,7 +901,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileBuilder<S, St>
+impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
     St::UpdatedAt: profile_state::IsSet,
@@ -913,10 +941,10 @@ where
 }
 
 fn lexicon_doc_app_beaconbits_profile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.beaconbits.profile"),
@@ -925,9 +953,11 @@ fn lexicon_doc_app_beaconbits_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "User preferences and settings for BeaconBits",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "User preferences and settings for BeaconBits",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("updatedAt")]),
@@ -937,9 +967,9 @@ fn lexicon_doc_app_beaconbits_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("allowTags"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Who can tag this user in beacons",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Who can tag this user in beacons"),
+                                    ),
                                     max_graphemes: Some(32usize),
                                     ..Default::default()
                                 }),
@@ -947,9 +977,11 @@ fn lexicon_doc_app_beaconbits_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when settings were first created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp when settings were first created",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -957,9 +989,11 @@ fn lexicon_doc_app_beaconbits_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("defaultDelayedReveal"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Default delayed reveal setting for new beacons",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Default delayed reveal setting for new beacons",
+                                        ),
+                                    ),
                                     max_graphemes: Some(16usize),
                                     ..Default::default()
                                 }),
@@ -967,9 +1001,9 @@ fn lexicon_doc_app_beaconbits_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("defaultVisibility"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Default visibility for new beacons",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Default visibility for new beacons"),
+                                    ),
                                     max_graphemes: Some(32usize),
                                     ..Default::default()
                                 }),
@@ -977,9 +1011,9 @@ fn lexicon_doc_app_beaconbits_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("distanceUnit"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Preferred distance unit",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Preferred distance unit"),
+                                    ),
                                     max_graphemes: Some(16usize),
                                     ..Default::default()
                                 }),
@@ -993,9 +1027,9 @@ fn lexicon_doc_app_beaconbits_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("language"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Preferred language setting",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Preferred language setting"),
+                                    ),
                                     max_graphemes: Some(16usize),
                                     ..Default::default()
                                 }),
@@ -1003,9 +1037,11 @@ fn lexicon_doc_app_beaconbits_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("markerColor"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Hex color code for map marker (e.g., #e24630)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Hex color code for map marker (e.g., #e24630)",
+                                        ),
+                                    ),
                                     max_graphemes: Some(7usize),
                                     ..Default::default()
                                 }),
@@ -1019,9 +1055,11 @@ fn lexicon_doc_app_beaconbits_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("updatedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when settings were last updated",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp when settings were last updated",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

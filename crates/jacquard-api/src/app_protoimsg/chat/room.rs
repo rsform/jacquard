@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_protoimsg::chat::room;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_protoimsg::chat::room;
 /// Declares a chat room. Created by whoever starts the room.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -159,10 +159,7 @@ pub struct RoomGetRecordOutput<S: BosStr = DefaultStr> {
 /// Configurable room settings.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RoomSettings<S: BosStr = DefaultStr> {
     ///When true, only users on the room allowlist can send messages.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -261,7 +258,9 @@ where
             RoomSettingsVisibility::Public => RoomSettingsVisibility::Public,
             RoomSettingsVisibility::Unlisted => RoomSettingsVisibility::Unlisted,
             RoomSettingsVisibility::Private => RoomSettingsVisibility::Private,
-            RoomSettingsVisibility::Other(v) => RoomSettingsVisibility::Other(v.into_static()),
+            RoomSettingsVisibility::Other(v) => {
+                RoomSettingsVisibility::Other(v.into_static())
+            }
         }
     }
 }
@@ -391,7 +390,7 @@ impl<S: BosStr> LexiconSchema for RoomSettings<S> {
 
 pub mod room_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -399,72 +398,72 @@ pub mod room_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type Purpose;
         type CreatedAt;
+        type Purpose;
         type Topic;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type Purpose = Unset;
         type CreatedAt = Unset;
+        type Purpose = Unset;
         type Topic = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Purpose = St::Purpose;
-        type CreatedAt = St::CreatedAt;
-        type Topic = St::Topic;
-    }
-    ///State transition - sets the `purpose` field to Set
-    pub struct SetPurpose<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPurpose<St> {}
-    impl<St: State> State for SetPurpose<St> {
-        type Name = St::Name;
-        type Purpose = Set<members::purpose>;
-        type CreatedAt = St::CreatedAt;
-        type Topic = St::Topic;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Name = St::Name;
-        type Purpose = St::Purpose;
         type CreatedAt = Set<members::created_at>;
+        type Purpose = St::Purpose;
         type Topic = St::Topic;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `purpose` field to Set
+    pub struct SetPurpose<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPurpose<St> {}
+    impl<St: State> State for SetPurpose<St> {
+        type CreatedAt = St::CreatedAt;
+        type Purpose = Set<members::purpose>;
+        type Topic = St::Topic;
+        type Name = St::Name;
     }
     ///State transition - sets the `topic` field to Set
     pub struct SetTopic<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTopic<St> {}
     impl<St: State> State for SetTopic<St> {
-        type Name = St::Name;
-        type Purpose = St::Purpose;
         type CreatedAt = St::CreatedAt;
+        type Purpose = St::Purpose;
         type Topic = Set<members::topic>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Purpose = St::Purpose;
+        type Topic = St::Topic;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `purpose` field
-        pub struct purpose(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `purpose` field
+        pub struct purpose(());
         ///Marker type for the `topic` field
         pub struct topic(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RoomBuilder<S: BosStr, St: room_state::State> {
+pub struct RoomBuilder<St: room_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -478,15 +477,22 @@ pub struct RoomBuilder<S: BosStr, St: room_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Room<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RoomBuilder<S, room_state::Empty> {
+impl Room<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RoomBuilder<room_state::Empty, DefaultStr> {
         RoomBuilder::new()
     }
 }
 
-impl<S: BosStr> RoomBuilder<S, room_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Room<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RoomBuilder<room_state::Empty, S> {
+        RoomBuilder::builder()
+    }
+}
+
+impl RoomBuilder<room_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RoomBuilder {
             _state: PhantomData,
@@ -496,7 +502,18 @@ impl<S: BosStr> RoomBuilder<S, room_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
+impl<S: BosStr> RoomBuilder<room_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RoomBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: room_state::State, S: BosStr> RoomBuilder<St, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -509,7 +526,7 @@ impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RoomBuilder<S, St>
+impl<St, S: BosStr> RoomBuilder<St, S>
 where
     St: room_state::State,
     St::CreatedAt: room_state::IsUnset,
@@ -518,7 +535,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RoomBuilder<S, room_state::SetCreatedAt<St>> {
+    ) -> RoomBuilder<room_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RoomBuilder {
             _state: PhantomData,
@@ -528,7 +545,7 @@ where
     }
 }
 
-impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
+impl<St: room_state::State, S: BosStr> RoomBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -541,13 +558,16 @@ impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RoomBuilder<S, St>
+impl<St, S: BosStr> RoomBuilder<St, S>
 where
     St: room_state::State,
     St::Name: room_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> RoomBuilder<S, room_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> RoomBuilder<room_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         RoomBuilder {
             _state: PhantomData,
@@ -557,7 +577,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RoomBuilder<S, St>
+impl<St, S: BosStr> RoomBuilder<St, S>
 where
     St: room_state::State,
     St::Purpose: room_state::IsUnset,
@@ -566,7 +586,7 @@ where
     pub fn purpose(
         mut self,
         value: impl Into<RoomPurpose<S>>,
-    ) -> RoomBuilder<S, room_state::SetPurpose<St>> {
+    ) -> RoomBuilder<room_state::SetPurpose<St>, S> {
         self._fields.4 = Option::Some(value.into());
         RoomBuilder {
             _state: PhantomData,
@@ -576,7 +596,7 @@ where
     }
 }
 
-impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
+impl<St: room_state::State, S: BosStr> RoomBuilder<St, S> {
     /// Set the `settings` field (optional)
     pub fn settings(mut self, value: impl Into<Option<room::RoomSettings<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -589,13 +609,16 @@ impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RoomBuilder<S, St>
+impl<St, S: BosStr> RoomBuilder<St, S>
 where
     St: room_state::State,
     St::Topic: room_state::IsUnset,
 {
     /// Set the `topic` field (required)
-    pub fn topic(mut self, value: impl Into<S>) -> RoomBuilder<S, room_state::SetTopic<St>> {
+    pub fn topic(
+        mut self,
+        value: impl Into<S>,
+    ) -> RoomBuilder<room_state::SetTopic<St>, S> {
         self._fields.6 = Option::Some(value.into());
         RoomBuilder {
             _state: PhantomData,
@@ -605,13 +628,13 @@ where
     }
 }
 
-impl<S: BosStr, St> RoomBuilder<S, St>
+impl<St, S: BosStr> RoomBuilder<St, S>
 where
     St: room_state::State,
-    St::Name: room_state::IsSet,
-    St::Purpose: room_state::IsSet,
     St::CreatedAt: room_state::IsSet,
+    St::Purpose: room_state::IsSet,
     St::Topic: room_state::IsSet,
+    St::Name: room_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Room<S> {
@@ -642,10 +665,10 @@ where
 }
 
 fn lexicon_doc_app_protoimsg_chat_room() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.protoimsg.chat.room"),

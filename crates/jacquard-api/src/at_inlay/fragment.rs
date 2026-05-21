@@ -8,31 +8,26 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Fragment<S: BosStr = DefaultStr> {
     pub children: Data<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FragmentOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -51,8 +46,9 @@ impl jacquard_common::xrpc::XrpcResp for FragmentResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Fragment<S> {
     const NSID: &'static str = "at.inlay.Fragment";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = FragmentResponse;
 }
 
@@ -60,15 +56,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Fragment<S> {
 pub struct FragmentRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for FragmentRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Fragment";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Fragment<S>;
     type Response = FragmentResponse;
 }
 
 pub mod fragment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -99,21 +96,28 @@ pub mod fragment_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FragmentBuilder<S: BosStr, St: fragment_state::State> {
+pub struct FragmentBuilder<St: fragment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Fragment<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FragmentBuilder<S, fragment_state::Empty> {
+impl Fragment<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FragmentBuilder<fragment_state::Empty, DefaultStr> {
         FragmentBuilder::new()
     }
 }
 
-impl<S: BosStr> FragmentBuilder<S, fragment_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Fragment<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FragmentBuilder<fragment_state::Empty, S> {
+        FragmentBuilder::builder()
+    }
+}
+
+impl FragmentBuilder<fragment_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FragmentBuilder {
             _state: PhantomData,
@@ -123,7 +127,18 @@ impl<S: BosStr> FragmentBuilder<S, fragment_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FragmentBuilder<S, St>
+impl<S: BosStr> FragmentBuilder<fragment_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FragmentBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FragmentBuilder<St, S>
 where
     St: fragment_state::State,
     St::Children: fragment_state::IsUnset,
@@ -132,7 +147,7 @@ where
     pub fn children(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> FragmentBuilder<S, fragment_state::SetChildren<St>> {
+    ) -> FragmentBuilder<fragment_state::SetChildren<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FragmentBuilder {
             _state: PhantomData,
@@ -142,7 +157,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FragmentBuilder<S, St>
+impl<St, S: BosStr> FragmentBuilder<St, S>
 where
     St: fragment_state::State,
     St::Children: fragment_state::IsSet,

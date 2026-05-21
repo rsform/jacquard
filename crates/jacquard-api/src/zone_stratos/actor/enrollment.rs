@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,11 +25,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::zone_stratos::actor::enrollment;
-use crate::zone_stratos::boundary::Domain;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::zone_stratos::boundary::Domain;
+use crate::zone_stratos::actor::enrollment;
 /// A record indicating the user is enrolled in a Stratos service. Published to the user's PDS during OAuth enrollment for endpoint discovery by AppViews. Multiple enrollment records are supported — one per Stratos service.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -69,10 +69,7 @@ pub struct EnrollmentGetRecordOutput<S: BosStr = DefaultStr> {
 /// An attestation signed by the Stratos service key. The signed payload is DAG-CBOR encoded {boundaries, did, signingKey} with sorted keys.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ServiceAttestation<S: BosStr = DefaultStr> {
     ///Raw signature bytes of the DAG-CBOR encoded attestation payload, signed by the service key.
     #[serde(with = "jacquard_common::serde_bytes_helper")]
@@ -158,7 +155,7 @@ impl<S: BosStr> LexiconSchema for ServiceAttestation<S> {
 
 pub mod enrollment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -167,71 +164,71 @@ pub mod enrollment_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Service;
+        type SigningKey;
         type Attestation;
         type CreatedAt;
-        type SigningKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Service = Unset;
+        type SigningKey = Unset;
         type Attestation = Unset;
         type CreatedAt = Unset;
-        type SigningKey = Unset;
     }
     ///State transition - sets the `service` field to Set
     pub struct SetService<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetService<St> {}
     impl<St: State> State for SetService<St> {
         type Service = Set<members::service>;
+        type SigningKey = St::SigningKey;
         type Attestation = St::Attestation;
         type CreatedAt = St::CreatedAt;
-        type SigningKey = St::SigningKey;
-    }
-    ///State transition - sets the `attestation` field to Set
-    pub struct SetAttestation<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAttestation<St> {}
-    impl<St: State> State for SetAttestation<St> {
-        type Service = St::Service;
-        type Attestation = Set<members::attestation>;
-        type CreatedAt = St::CreatedAt;
-        type SigningKey = St::SigningKey;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Service = St::Service;
-        type Attestation = St::Attestation;
-        type CreatedAt = Set<members::created_at>;
-        type SigningKey = St::SigningKey;
     }
     ///State transition - sets the `signing_key` field to Set
     pub struct SetSigningKey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSigningKey<St> {}
     impl<St: State> State for SetSigningKey<St> {
         type Service = St::Service;
+        type SigningKey = Set<members::signing_key>;
         type Attestation = St::Attestation;
         type CreatedAt = St::CreatedAt;
-        type SigningKey = Set<members::signing_key>;
+    }
+    ///State transition - sets the `attestation` field to Set
+    pub struct SetAttestation<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAttestation<St> {}
+    impl<St: State> State for SetAttestation<St> {
+        type Service = St::Service;
+        type SigningKey = St::SigningKey;
+        type Attestation = Set<members::attestation>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Service = St::Service;
+        type SigningKey = St::SigningKey;
+        type Attestation = St::Attestation;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `service` field
         pub struct service(());
+        ///Marker type for the `signing_key` field
+        pub struct signing_key(());
         ///Marker type for the `attestation` field
         pub struct attestation(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `signing_key` field
-        pub struct signing_key(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EnrollmentBuilder<S: BosStr, St: enrollment_state::State> {
+pub struct EnrollmentBuilder<St: enrollment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<enrollment::ServiceAttestation<S>>,
@@ -243,15 +240,22 @@ pub struct EnrollmentBuilder<S: BosStr, St: enrollment_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Enrollment<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EnrollmentBuilder<S, enrollment_state::Empty> {
+impl Enrollment<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EnrollmentBuilder<enrollment_state::Empty, DefaultStr> {
         EnrollmentBuilder::new()
     }
 }
 
-impl<S: BosStr> EnrollmentBuilder<S, enrollment_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Enrollment<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EnrollmentBuilder<enrollment_state::Empty, S> {
+        EnrollmentBuilder::builder()
+    }
+}
+
+impl EnrollmentBuilder<enrollment_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EnrollmentBuilder {
             _state: PhantomData,
@@ -261,7 +265,18 @@ impl<S: BosStr> EnrollmentBuilder<S, enrollment_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EnrollmentBuilder<S, St>
+impl<S: BosStr> EnrollmentBuilder<enrollment_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EnrollmentBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EnrollmentBuilder<St, S>
 where
     St: enrollment_state::State,
     St::Attestation: enrollment_state::IsUnset,
@@ -270,7 +285,7 @@ where
     pub fn attestation(
         mut self,
         value: impl Into<enrollment::ServiceAttestation<S>>,
-    ) -> EnrollmentBuilder<S, enrollment_state::SetAttestation<St>> {
+    ) -> EnrollmentBuilder<enrollment_state::SetAttestation<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EnrollmentBuilder {
             _state: PhantomData,
@@ -280,7 +295,7 @@ where
     }
 }
 
-impl<S: BosStr, St: enrollment_state::State> EnrollmentBuilder<S, St> {
+impl<St: enrollment_state::State, S: BosStr> EnrollmentBuilder<St, S> {
     /// Set the `boundaries` field (optional)
     pub fn boundaries(mut self, value: impl Into<Option<Vec<Domain<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -293,7 +308,7 @@ impl<S: BosStr, St: enrollment_state::State> EnrollmentBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EnrollmentBuilder<S, St>
+impl<St, S: BosStr> EnrollmentBuilder<St, S>
 where
     St: enrollment_state::State,
     St::CreatedAt: enrollment_state::IsUnset,
@@ -302,7 +317,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EnrollmentBuilder<S, enrollment_state::SetCreatedAt<St>> {
+    ) -> EnrollmentBuilder<enrollment_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         EnrollmentBuilder {
             _state: PhantomData,
@@ -312,7 +327,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EnrollmentBuilder<S, St>
+impl<St, S: BosStr> EnrollmentBuilder<St, S>
 where
     St: enrollment_state::State,
     St::Service: enrollment_state::IsUnset,
@@ -321,7 +336,7 @@ where
     pub fn service(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> EnrollmentBuilder<S, enrollment_state::SetService<St>> {
+    ) -> EnrollmentBuilder<enrollment_state::SetService<St>, S> {
         self._fields.3 = Option::Some(value.into());
         EnrollmentBuilder {
             _state: PhantomData,
@@ -331,7 +346,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EnrollmentBuilder<S, St>
+impl<St, S: BosStr> EnrollmentBuilder<St, S>
 where
     St: enrollment_state::State,
     St::SigningKey: enrollment_state::IsUnset,
@@ -340,7 +355,7 @@ where
     pub fn signing_key(
         mut self,
         value: impl Into<S>,
-    ) -> EnrollmentBuilder<S, enrollment_state::SetSigningKey<St>> {
+    ) -> EnrollmentBuilder<enrollment_state::SetSigningKey<St>, S> {
         self._fields.4 = Option::Some(value.into());
         EnrollmentBuilder {
             _state: PhantomData,
@@ -350,13 +365,13 @@ where
     }
 }
 
-impl<S: BosStr, St> EnrollmentBuilder<S, St>
+impl<St, S: BosStr> EnrollmentBuilder<St, S>
 where
     St: enrollment_state::State,
     St::Service: enrollment_state::IsSet,
+    St::SigningKey: enrollment_state::IsSet,
     St::Attestation: enrollment_state::IsSet,
     St::CreatedAt: enrollment_state::IsSet,
-    St::SigningKey: enrollment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Enrollment<S> {
@@ -370,7 +385,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Enrollment<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Enrollment<S> {
         Enrollment {
             attestation: self._fields.0.unwrap(),
             boundaries: self._fields.1,
@@ -383,10 +401,10 @@ where
 }
 
 fn lexicon_doc_zone_stratos_actor_enrollment() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("zone.stratos.actor.enrollment"),
@@ -524,7 +542,7 @@ fn lexicon_doc_zone_stratos_actor_enrollment() -> LexiconDoc<'static> {
 
 pub mod service_attestation_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -532,56 +550,69 @@ pub mod service_attestation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SigningKey;
         type Sig;
+        type SigningKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SigningKey = Unset;
         type Sig = Unset;
-    }
-    ///State transition - sets the `signing_key` field to Set
-    pub struct SetSigningKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSigningKey<St> {}
-    impl<St: State> State for SetSigningKey<St> {
-        type SigningKey = Set<members::signing_key>;
-        type Sig = St::Sig;
+        type SigningKey = Unset;
     }
     ///State transition - sets the `sig` field to Set
     pub struct SetSig<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSig<St> {}
     impl<St: State> State for SetSig<St> {
-        type SigningKey = St::SigningKey;
         type Sig = Set<members::sig>;
+        type SigningKey = St::SigningKey;
+    }
+    ///State transition - sets the `signing_key` field to Set
+    pub struct SetSigningKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSigningKey<St> {}
+    impl<St: State> State for SetSigningKey<St> {
+        type Sig = St::Sig;
+        type SigningKey = Set<members::signing_key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signing_key` field
-        pub struct signing_key(());
         ///Marker type for the `sig` field
         pub struct sig(());
+        ///Marker type for the `signing_key` field
+        pub struct signing_key(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ServiceAttestationBuilder<S: BosStr, St: service_attestation_state::State> {
+pub struct ServiceAttestationBuilder<
+    St: service_attestation_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Bytes>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ServiceAttestation<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ServiceAttestationBuilder<S, service_attestation_state::Empty> {
+impl ServiceAttestation<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ServiceAttestationBuilder<
+        service_attestation_state::Empty,
+        DefaultStr,
+    > {
         ServiceAttestationBuilder::new()
     }
 }
 
-impl<S: BosStr> ServiceAttestationBuilder<S, service_attestation_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ServiceAttestation<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ServiceAttestationBuilder<service_attestation_state::Empty, S> {
+        ServiceAttestationBuilder::builder()
+    }
+}
+
+impl ServiceAttestationBuilder<service_attestation_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ServiceAttestationBuilder {
             _state: PhantomData,
@@ -591,7 +622,18 @@ impl<S: BosStr> ServiceAttestationBuilder<S, service_attestation_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ServiceAttestationBuilder<S, St>
+impl<S: BosStr> ServiceAttestationBuilder<service_attestation_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ServiceAttestationBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ServiceAttestationBuilder<St, S>
 where
     St: service_attestation_state::State,
     St::Sig: service_attestation_state::IsUnset,
@@ -600,7 +642,7 @@ where
     pub fn sig(
         mut self,
         value: impl Into<Bytes>,
-    ) -> ServiceAttestationBuilder<S, service_attestation_state::SetSig<St>> {
+    ) -> ServiceAttestationBuilder<service_attestation_state::SetSig<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ServiceAttestationBuilder {
             _state: PhantomData,
@@ -610,7 +652,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ServiceAttestationBuilder<S, St>
+impl<St, S: BosStr> ServiceAttestationBuilder<St, S>
 where
     St: service_attestation_state::State,
     St::SigningKey: service_attestation_state::IsUnset,
@@ -619,7 +661,7 @@ where
     pub fn signing_key(
         mut self,
         value: impl Into<S>,
-    ) -> ServiceAttestationBuilder<S, service_attestation_state::SetSigningKey<St>> {
+    ) -> ServiceAttestationBuilder<service_attestation_state::SetSigningKey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ServiceAttestationBuilder {
             _state: PhantomData,
@@ -629,11 +671,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ServiceAttestationBuilder<S, St>
+impl<St, S: BosStr> ServiceAttestationBuilder<St, S>
 where
     St: service_attestation_state::State,
-    St::SigningKey: service_attestation_state::IsSet,
     St::Sig: service_attestation_state::IsSet,
+    St::SigningKey: service_attestation_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ServiceAttestation<S> {
@@ -644,7 +686,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ServiceAttestation<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ServiceAttestation<S> {
         ServiceAttestation {
             sig: self._fields.0.unwrap(),
             signing_key: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,16 +25,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_fitsky::trend;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_fitsky::trend;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DataPoint<S: BosStr = DefaultStr> {
     pub date: Datetime,
     ///Value in base units (meters, seconds, calories, count, bpm)
@@ -69,6 +66,7 @@ pub struct Trend<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TrendChartStyle<S: BosStr = DefaultStr> {
@@ -146,6 +144,7 @@ where
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TrendMetric<S: BosStr = DefaultStr> {
@@ -244,6 +243,7 @@ where
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TrendPeriod<S: BosStr = DefaultStr> {
     _1d,
@@ -332,6 +332,7 @@ where
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TrendWidgetType<S: BosStr = DefaultStr> {
@@ -433,11 +434,9 @@ pub struct TrendGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Trend<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TrendSummary<S: BosStr = DefaultStr> {
     ///Average value in base units
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -552,20 +551,25 @@ impl<S: BosStr> LexiconSchema for Trend<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -625,7 +629,7 @@ impl<S: BosStr> LexiconSchema for TrendSummary<S> {
 
 pub mod data_point_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -633,56 +637,63 @@ pub mod data_point_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Date;
         type Value;
+        type Date;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Date = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `date` field to Set
-    pub struct SetDate<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDate<St> {}
-    impl<St: State> State for SetDate<St> {
-        type Date = Set<members::date>;
-        type Value = St::Value;
+        type Date = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
-        type Date = St::Date;
         type Value = Set<members::value>;
+        type Date = St::Date;
+    }
+    ///State transition - sets the `date` field to Set
+    pub struct SetDate<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDate<St> {}
+    impl<St: State> State for SetDate<St> {
+        type Value = St::Value;
+        type Date = Set<members::date>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `date` field
-        pub struct date(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `date` field
+        pub struct date(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DataPointBuilder<S: BosStr, St: data_point_state::State> {
+pub struct DataPointBuilder<St: data_point_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DataPoint<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DataPointBuilder<S, data_point_state::Empty> {
+impl DataPoint<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DataPointBuilder<data_point_state::Empty, DefaultStr> {
         DataPointBuilder::new()
     }
 }
 
-impl<S: BosStr> DataPointBuilder<S, data_point_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DataPoint<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DataPointBuilder<data_point_state::Empty, S> {
+        DataPointBuilder::builder()
+    }
+}
+
+impl DataPointBuilder<data_point_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DataPointBuilder {
             _state: PhantomData,
@@ -692,7 +703,18 @@ impl<S: BosStr> DataPointBuilder<S, data_point_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DataPointBuilder<S, St>
+impl<S: BosStr> DataPointBuilder<data_point_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DataPointBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DataPointBuilder<St, S>
 where
     St: data_point_state::State,
     St::Date: data_point_state::IsUnset,
@@ -701,7 +723,7 @@ where
     pub fn date(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DataPointBuilder<S, data_point_state::SetDate<St>> {
+    ) -> DataPointBuilder<data_point_state::SetDate<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DataPointBuilder {
             _state: PhantomData,
@@ -711,7 +733,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DataPointBuilder<S, St>
+impl<St, S: BosStr> DataPointBuilder<St, S>
 where
     St: data_point_state::State,
     St::Value: data_point_state::IsUnset,
@@ -720,7 +742,7 @@ where
     pub fn value(
         mut self,
         value: impl Into<i64>,
-    ) -> DataPointBuilder<S, data_point_state::SetValue<St>> {
+    ) -> DataPointBuilder<data_point_state::SetValue<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DataPointBuilder {
             _state: PhantomData,
@@ -730,11 +752,11 @@ where
     }
 }
 
-impl<S: BosStr, St> DataPointBuilder<S, St>
+impl<St, S: BosStr> DataPointBuilder<St, S>
 where
     St: data_point_state::State,
-    St::Date: data_point_state::IsSet,
     St::Value: data_point_state::IsSet,
+    St::Date: data_point_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DataPoint<S> {
@@ -745,7 +767,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DataPoint<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DataPoint<S> {
         DataPoint {
             date: self._fields.0.unwrap(),
             value: self._fields.1.unwrap(),
@@ -755,10 +780,10 @@ where
 }
 
 fn lexicon_doc_app_fitsky_trend() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.fitsky.trend"),
@@ -767,10 +792,9 @@ fn lexicon_doc_app_fitsky_trend() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dataPoint"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("date"),
-                        SmolStr::new_static("value"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("date"), SmolStr::new_static("value")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -795,18 +819,22 @@ fn lexicon_doc_app_fitsky_trend() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A shared fitness trend or dashboard snapshot",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A shared fitness trend or dashboard snapshot",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("widgetType"),
-                            SmolStr::new_static("metric"),
-                            SmolStr::new_static("period"),
-                            SmolStr::new_static("summary"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("widgetType"),
+                                SmolStr::new_static("metric"),
+                                SmolStr::new_static("period"),
+                                SmolStr::new_static("summary"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -843,9 +871,7 @@ fn lexicon_doc_app_fitsky_trend() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("image"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("metric"),
@@ -931,7 +957,7 @@ fn lexicon_doc_app_fitsky_trend() -> LexiconDoc<'static> {
 
 pub mod trend_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -939,90 +965,90 @@ pub mod trend_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WidgetType;
-        type Period;
         type Summary;
         type CreatedAt;
+        type Period;
         type Metric;
+        type WidgetType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WidgetType = Unset;
-        type Period = Unset;
         type Summary = Unset;
         type CreatedAt = Unset;
+        type Period = Unset;
         type Metric = Unset;
-    }
-    ///State transition - sets the `widget_type` field to Set
-    pub struct SetWidgetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWidgetType<St> {}
-    impl<St: State> State for SetWidgetType<St> {
-        type WidgetType = Set<members::widget_type>;
-        type Period = St::Period;
-        type Summary = St::Summary;
-        type CreatedAt = St::CreatedAt;
-        type Metric = St::Metric;
-    }
-    ///State transition - sets the `period` field to Set
-    pub struct SetPeriod<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPeriod<St> {}
-    impl<St: State> State for SetPeriod<St> {
-        type WidgetType = St::WidgetType;
-        type Period = Set<members::period>;
-        type Summary = St::Summary;
-        type CreatedAt = St::CreatedAt;
-        type Metric = St::Metric;
+        type WidgetType = Unset;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSummary<St> {}
     impl<St: State> State for SetSummary<St> {
-        type WidgetType = St::WidgetType;
-        type Period = St::Period;
         type Summary = Set<members::summary>;
         type CreatedAt = St::CreatedAt;
+        type Period = St::Period;
         type Metric = St::Metric;
+        type WidgetType = St::WidgetType;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type WidgetType = St::WidgetType;
-        type Period = St::Period;
         type Summary = St::Summary;
         type CreatedAt = Set<members::created_at>;
+        type Period = St::Period;
         type Metric = St::Metric;
+        type WidgetType = St::WidgetType;
+    }
+    ///State transition - sets the `period` field to Set
+    pub struct SetPeriod<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPeriod<St> {}
+    impl<St: State> State for SetPeriod<St> {
+        type Summary = St::Summary;
+        type CreatedAt = St::CreatedAt;
+        type Period = Set<members::period>;
+        type Metric = St::Metric;
+        type WidgetType = St::WidgetType;
     }
     ///State transition - sets the `metric` field to Set
     pub struct SetMetric<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMetric<St> {}
     impl<St: State> State for SetMetric<St> {
-        type WidgetType = St::WidgetType;
-        type Period = St::Period;
         type Summary = St::Summary;
         type CreatedAt = St::CreatedAt;
+        type Period = St::Period;
         type Metric = Set<members::metric>;
+        type WidgetType = St::WidgetType;
+    }
+    ///State transition - sets the `widget_type` field to Set
+    pub struct SetWidgetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWidgetType<St> {}
+    impl<St: State> State for SetWidgetType<St> {
+        type Summary = St::Summary;
+        type CreatedAt = St::CreatedAt;
+        type Period = St::Period;
+        type Metric = St::Metric;
+        type WidgetType = Set<members::widget_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `widget_type` field
-        pub struct widget_type(());
-        ///Marker type for the `period` field
-        pub struct period(());
         ///Marker type for the `summary` field
         pub struct summary(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `period` field
+        pub struct period(());
         ///Marker type for the `metric` field
         pub struct metric(());
+        ///Marker type for the `widget_type` field
+        pub struct widget_type(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TrendBuilder<S: BosStr, St: trend_state::State> {
+pub struct TrendBuilder<St: trend_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -1038,15 +1064,22 @@ pub struct TrendBuilder<S: BosStr, St: trend_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Trend<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TrendBuilder<S, trend_state::Empty> {
+impl Trend<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TrendBuilder<trend_state::Empty, DefaultStr> {
         TrendBuilder::new()
     }
 }
 
-impl<S: BosStr> TrendBuilder<S, trend_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Trend<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TrendBuilder<trend_state::Empty, S> {
+        TrendBuilder::builder()
+    }
+}
+
+impl TrendBuilder<trend_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TrendBuilder {
             _state: PhantomData,
@@ -1056,7 +1089,18 @@ impl<S: BosStr> TrendBuilder<S, trend_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: trend_state::State> TrendBuilder<S, St> {
+impl<S: BosStr> TrendBuilder<trend_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TrendBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: trend_state::State, S: BosStr> TrendBuilder<St, S> {
     /// Set the `caption` field (optional)
     pub fn caption(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -1069,7 +1113,7 @@ impl<S: BosStr, St: trend_state::State> TrendBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: trend_state::State> TrendBuilder<S, St> {
+impl<St: trend_state::State, S: BosStr> TrendBuilder<St, S> {
     /// Set the `chartStyle` field (optional)
     pub fn chart_style(mut self, value: impl Into<Option<TrendChartStyle<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -1082,7 +1126,7 @@ impl<S: BosStr, St: trend_state::State> TrendBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TrendBuilder<S, St>
+impl<St, S: BosStr> TrendBuilder<St, S>
 where
     St: trend_state::State,
     St::CreatedAt: trend_state::IsUnset,
@@ -1091,7 +1135,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TrendBuilder<S, trend_state::SetCreatedAt<St>> {
+    ) -> TrendBuilder<trend_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         TrendBuilder {
             _state: PhantomData,
@@ -1101,9 +1145,12 @@ where
     }
 }
 
-impl<S: BosStr, St: trend_state::State> TrendBuilder<S, St> {
+impl<St: trend_state::State, S: BosStr> TrendBuilder<St, S> {
     /// Set the `dataPoints` field (optional)
-    pub fn data_points(mut self, value: impl Into<Option<Vec<trend::DataPoint<S>>>>) -> Self {
+    pub fn data_points(
+        mut self,
+        value: impl Into<Option<Vec<trend::DataPoint<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -1114,7 +1161,7 @@ impl<S: BosStr, St: trend_state::State> TrendBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: trend_state::State> TrendBuilder<S, St> {
+impl<St: trend_state::State, S: BosStr> TrendBuilder<St, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -1127,7 +1174,7 @@ impl<S: BosStr, St: trend_state::State> TrendBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TrendBuilder<S, St>
+impl<St, S: BosStr> TrendBuilder<St, S>
 where
     St: trend_state::State,
     St::Metric: trend_state::IsUnset,
@@ -1136,7 +1183,7 @@ where
     pub fn metric(
         mut self,
         value: impl Into<TrendMetric<S>>,
-    ) -> TrendBuilder<S, trend_state::SetMetric<St>> {
+    ) -> TrendBuilder<trend_state::SetMetric<St>, S> {
         self._fields.5 = Option::Some(value.into());
         TrendBuilder {
             _state: PhantomData,
@@ -1146,7 +1193,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TrendBuilder<S, St>
+impl<St, S: BosStr> TrendBuilder<St, S>
 where
     St: trend_state::State,
     St::Period: trend_state::IsUnset,
@@ -1155,7 +1202,7 @@ where
     pub fn period(
         mut self,
         value: impl Into<TrendPeriod<S>>,
-    ) -> TrendBuilder<S, trend_state::SetPeriod<St>> {
+    ) -> TrendBuilder<trend_state::SetPeriod<St>, S> {
         self._fields.6 = Option::Some(value.into());
         TrendBuilder {
             _state: PhantomData,
@@ -1165,7 +1212,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TrendBuilder<S, St>
+impl<St, S: BosStr> TrendBuilder<St, S>
 where
     St: trend_state::State,
     St::Summary: trend_state::IsUnset,
@@ -1174,7 +1221,7 @@ where
     pub fn summary(
         mut self,
         value: impl Into<trend::TrendSummary<S>>,
-    ) -> TrendBuilder<S, trend_state::SetSummary<St>> {
+    ) -> TrendBuilder<trend_state::SetSummary<St>, S> {
         self._fields.7 = Option::Some(value.into());
         TrendBuilder {
             _state: PhantomData,
@@ -1184,7 +1231,7 @@ where
     }
 }
 
-impl<S: BosStr, St> TrendBuilder<S, St>
+impl<St, S: BosStr> TrendBuilder<St, S>
 where
     St: trend_state::State,
     St::WidgetType: trend_state::IsUnset,
@@ -1193,7 +1240,7 @@ where
     pub fn widget_type(
         mut self,
         value: impl Into<TrendWidgetType<S>>,
-    ) -> TrendBuilder<S, trend_state::SetWidgetType<St>> {
+    ) -> TrendBuilder<trend_state::SetWidgetType<St>, S> {
         self._fields.8 = Option::Some(value.into());
         TrendBuilder {
             _state: PhantomData,
@@ -1203,14 +1250,14 @@ where
     }
 }
 
-impl<S: BosStr, St> TrendBuilder<S, St>
+impl<St, S: BosStr> TrendBuilder<St, S>
 where
     St: trend_state::State,
-    St::WidgetType: trend_state::IsSet,
-    St::Period: trend_state::IsSet,
     St::Summary: trend_state::IsSet,
     St::CreatedAt: trend_state::IsSet,
+    St::Period: trend_state::IsSet,
     St::Metric: trend_state::IsSet,
+    St::WidgetType: trend_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Trend<S> {

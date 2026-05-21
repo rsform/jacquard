@@ -10,27 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateFolderParams<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateFolder<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
@@ -40,11 +35,9 @@ pub struct UpdateFolder<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateFolderOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cuid: Option<S>,
@@ -67,8 +60,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateFolderResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateFolder<S> {
     const NSID: &'static str = "app.blebbit.authr.folder.updateFolder";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateFolderResponse;
 }
 
@@ -76,15 +70,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateFolder<S> {
 pub struct UpdateFolderRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateFolderRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.folder.updateFolder";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateFolder<S>;
     type Response = UpdateFolderResponse;
 }
 
 pub mod update_folder_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -102,21 +97,34 @@ pub mod update_folder_params_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateFolderParamsBuilder<S: BosStr, St: update_folder_params_state::State> {
+pub struct UpdateFolderParamsBuilder<
+    St: update_folder_params_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UpdateFolderParams<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UpdateFolderParamsBuilder<S, update_folder_params_state::Empty> {
+impl UpdateFolderParams<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UpdateFolderParamsBuilder<
+        update_folder_params_state::Empty,
+        DefaultStr,
+    > {
         UpdateFolderParamsBuilder::new()
     }
 }
 
-impl<S: BosStr> UpdateFolderParamsBuilder<S, update_folder_params_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UpdateFolderParams<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UpdateFolderParamsBuilder<update_folder_params_state::Empty, S> {
+        UpdateFolderParamsBuilder::builder()
+    }
+}
+
+impl UpdateFolderParamsBuilder<update_folder_params_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UpdateFolderParamsBuilder {
             _state: PhantomData,
@@ -126,7 +134,18 @@ impl<S: BosStr> UpdateFolderParamsBuilder<S, update_folder_params_state::Empty> 
     }
 }
 
-impl<S: BosStr, St: update_folder_params_state::State> UpdateFolderParamsBuilder<S, St> {
+impl<S: BosStr> UpdateFolderParamsBuilder<update_folder_params_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UpdateFolderParamsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: update_folder_params_state::State, S: BosStr> UpdateFolderParamsBuilder<St, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -139,12 +158,14 @@ impl<S: BosStr, St: update_folder_params_state::State> UpdateFolderParamsBuilder
     }
 }
 
-impl<S: BosStr, St> UpdateFolderParamsBuilder<S, St>
+impl<St, S: BosStr> UpdateFolderParamsBuilder<St, S>
 where
     St: update_folder_params_state::State,
 {
     /// Build the final struct.
     pub fn build(self) -> UpdateFolderParams<S> {
-        UpdateFolderParams { id: self._fields.0 }
+        UpdateFolderParams {
+            id: self._fields.0,
+        }
     }
 }

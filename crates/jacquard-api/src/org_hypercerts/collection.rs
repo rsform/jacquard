@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,21 +24,18 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::org_hypercerts::LargeImage;
 use crate::org_hypercerts::SmallImage;
 use crate::org_hypercerts::Uri;
-use crate::org_hypercerts::collection;
 use crate::pub_leaflet::pages::linear_document::LinearDocument;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use crate::org_hypercerts::collection;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Item<S: BosStr = DefaultStr> {
     ///Strong reference to an item in this collection. Items can be activities (org.hypercerts.claim.activity) and/or other collections (org.hypercerts.collection).
     pub item_identifier: StrongRef<S>,
@@ -88,6 +85,7 @@ pub struct Collection<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -97,6 +95,7 @@ pub enum CollectionAvatar<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#smallImage")]
     SmallImage(Box<SmallImage<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -260,7 +259,7 @@ impl<S: BosStr> LexiconSchema for Collection<S> {
 
 pub mod item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -291,21 +290,28 @@ pub mod item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ItemBuilder<S: BosStr, St: item_state::State> {
+pub struct ItemBuilder<St: item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Item<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ItemBuilder<S, item_state::Empty> {
+impl Item<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ItemBuilder<item_state::Empty, DefaultStr> {
         ItemBuilder::new()
     }
 }
 
-impl<S: BosStr> ItemBuilder<S, item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Item<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ItemBuilder<item_state::Empty, S> {
+        ItemBuilder::builder()
+    }
+}
+
+impl ItemBuilder<item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ItemBuilder {
             _state: PhantomData,
@@ -315,7 +321,18 @@ impl<S: BosStr> ItemBuilder<S, item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ItemBuilder<S, St>
+impl<S: BosStr> ItemBuilder<item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ItemBuilder<St, S>
 where
     St: item_state::State,
     St::ItemIdentifier: item_state::IsUnset,
@@ -324,7 +341,7 @@ where
     pub fn item_identifier(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ItemBuilder<S, item_state::SetItemIdentifier<St>> {
+    ) -> ItemBuilder<item_state::SetItemIdentifier<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ItemBuilder {
             _state: PhantomData,
@@ -334,7 +351,7 @@ where
     }
 }
 
-impl<S: BosStr, St: item_state::State> ItemBuilder<S, St> {
+impl<St: item_state::State, S: BosStr> ItemBuilder<St, S> {
     /// Set the `itemWeight` field (optional)
     pub fn item_weight(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -347,7 +364,7 @@ impl<S: BosStr, St: item_state::State> ItemBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ItemBuilder<S, St>
+impl<St, S: BosStr> ItemBuilder<St, S>
 where
     St: item_state::State,
     St::ItemIdentifier: item_state::IsSet,
@@ -371,10 +388,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_collection() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.collection"),
@@ -557,7 +574,7 @@ fn lexicon_doc_org_hypercerts_collection() -> LexiconDoc<'static> {
 
 pub mod collection_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -600,7 +617,7 @@ pub mod collection_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionBuilder<S: BosStr, St: collection_state::State> {
+pub struct CollectionBuilder<St: collection_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<CollectionAvatar<S>>,
@@ -616,15 +633,22 @@ pub struct CollectionBuilder<S: BosStr, St: collection_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Collection<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CollectionBuilder<S, collection_state::Empty> {
+impl Collection<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CollectionBuilder<collection_state::Empty, DefaultStr> {
         CollectionBuilder::new()
     }
 }
 
-impl<S: BosStr> CollectionBuilder<S, collection_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Collection<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CollectionBuilder<collection_state::Empty, S> {
+        CollectionBuilder::builder()
+    }
+}
+
+impl CollectionBuilder<collection_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CollectionBuilder {
             _state: PhantomData,
@@ -634,7 +658,18 @@ impl<S: BosStr> CollectionBuilder<S, collection_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<S: BosStr> CollectionBuilder<collection_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CollectionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<CollectionAvatar<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -647,7 +682,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `banner` field (optional)
     pub fn banner(mut self, value: impl Into<Option<CollectionBanner<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -660,7 +695,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CollectionBuilder<S, St>
+impl<St, S: BosStr> CollectionBuilder<St, S>
 where
     St: collection_state::State,
     St::CreatedAt: collection_state::IsUnset,
@@ -669,7 +704,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CollectionBuilder<S, collection_state::SetCreatedAt<St>> {
+    ) -> CollectionBuilder<collection_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CollectionBuilder {
             _state: PhantomData,
@@ -679,7 +714,7 @@ where
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<LinearDocument<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -692,7 +727,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `items` field (optional)
     pub fn items(mut self, value: impl Into<Option<Vec<collection::Item<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -705,7 +740,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -718,7 +753,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `shortDescription` field (optional)
     pub fn short_description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -731,7 +766,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CollectionBuilder<S, St>
+impl<St, S: BosStr> CollectionBuilder<St, S>
 where
     St: collection_state::State,
     St::Title: collection_state::IsUnset,
@@ -740,7 +775,7 @@ where
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> CollectionBuilder<S, collection_state::SetTitle<St>> {
+    ) -> CollectionBuilder<collection_state::SetTitle<St>, S> {
         self._fields.7 = Option::Some(value.into());
         CollectionBuilder {
             _state: PhantomData,
@@ -750,7 +785,7 @@ where
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `type` field (optional)
     pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -763,7 +798,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CollectionBuilder<S, St>
+impl<St, S: BosStr> CollectionBuilder<St, S>
 where
     St: collection_state::State,
     St::Title: collection_state::IsSet,
@@ -785,7 +820,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Collection<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Collection<S> {
         Collection {
             avatar: self._fields.0,
             banner: self._fields.1,

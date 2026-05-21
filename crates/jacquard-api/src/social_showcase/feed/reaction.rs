@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::social_showcase::ReactionSubject;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_showcase::ReactionSubject;
 /// Reaction record - emoji reactions to items/collections
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -118,7 +118,7 @@ impl<S: BosStr> LexiconSchema for Reaction<S> {
 
 pub mod reaction_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -126,70 +126,77 @@ pub mod reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Subject;
         type Type;
         type CreatedAt;
-        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Subject = Unset;
         type Type = Unset;
         type CreatedAt = Unset;
-        type Subject = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Type = Set<members::r#type>;
-        type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Type = St::Type;
-        type CreatedAt = Set<members::created_at>;
-        type Subject = St::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
+        type Subject = Set<members::subject>;
         type Type = St::Type;
         type CreatedAt = St::CreatedAt;
-        type Subject = Set<members::subject>;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Subject = St::Subject;
+        type Type = Set<members::r#type>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
+        type Type = St::Type;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReactionBuilder<S: BosStr, St: reaction_state::State> {
+pub struct ReactionBuilder<St: reaction_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<ReactionSubject<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Reaction<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ReactionBuilder<S, reaction_state::Empty> {
+impl Reaction<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReactionBuilder<reaction_state::Empty, DefaultStr> {
         ReactionBuilder::new()
     }
 }
 
-impl<S: BosStr> ReactionBuilder<S, reaction_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Reaction<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReactionBuilder<reaction_state::Empty, S> {
+        ReactionBuilder::builder()
+    }
+}
+
+impl ReactionBuilder<reaction_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ReactionBuilder {
             _state: PhantomData,
@@ -199,7 +206,18 @@ impl<S: BosStr> ReactionBuilder<S, reaction_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ReactionBuilder<S, St>
+impl<S: BosStr> ReactionBuilder<reaction_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReactionBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReactionBuilder<St, S>
 where
     St: reaction_state::State,
     St::CreatedAt: reaction_state::IsUnset,
@@ -208,7 +226,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReactionBuilder<S, reaction_state::SetCreatedAt<St>> {
+    ) -> ReactionBuilder<reaction_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ReactionBuilder {
             _state: PhantomData,
@@ -218,7 +236,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReactionBuilder<S, St>
+impl<St, S: BosStr> ReactionBuilder<St, S>
 where
     St: reaction_state::State,
     St::Subject: reaction_state::IsUnset,
@@ -227,7 +245,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<ReactionSubject<S>>,
-    ) -> ReactionBuilder<S, reaction_state::SetSubject<St>> {
+    ) -> ReactionBuilder<reaction_state::SetSubject<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ReactionBuilder {
             _state: PhantomData,
@@ -237,7 +255,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReactionBuilder<S, St>
+impl<St, S: BosStr> ReactionBuilder<St, S>
 where
     St: reaction_state::State,
     St::Type: reaction_state::IsUnset,
@@ -246,7 +264,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> ReactionBuilder<S, reaction_state::SetType<St>> {
+    ) -> ReactionBuilder<reaction_state::SetType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ReactionBuilder {
             _state: PhantomData,
@@ -256,12 +274,12 @@ where
     }
 }
 
-impl<S: BosStr, St> ReactionBuilder<S, St>
+impl<St, S: BosStr> ReactionBuilder<St, S>
 where
     St: reaction_state::State,
+    St::Subject: reaction_state::IsSet,
     St::Type: reaction_state::IsSet,
     St::CreatedAt: reaction_state::IsSet,
-    St::Subject: reaction_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Reaction<S> {
@@ -284,10 +302,10 @@ where
 }
 
 fn lexicon_doc_social_showcase_feed_reaction() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.showcase.feed.reaction"),
@@ -296,16 +314,19 @@ fn lexicon_doc_social_showcase_feed_reaction() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Reaction record - emoji reactions to items/collections",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Reaction record - emoji reactions to items/collections",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("type"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("subject"), SmolStr::new_static("type"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -328,9 +349,11 @@ fn lexicon_doc_social_showcase_feed_reaction() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("type"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Emoji reaction shortcode (e.g., :heart:, :fire:, :star:)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Emoji reaction shortcode (e.g., :heart:, :fire:, :star:)",
+                                        ),
+                                    ),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),

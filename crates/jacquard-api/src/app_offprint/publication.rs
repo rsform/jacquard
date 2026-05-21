@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -103,7 +103,7 @@ impl<S: BosStr> LexiconSchema for Publication<S> {
 
 pub mod publication_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -134,21 +134,28 @@ pub mod publication_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PublicationBuilder<S: BosStr, St: publication_state::State> {
+pub struct PublicationBuilder<St: publication_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Publication<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PublicationBuilder<S, publication_state::Empty> {
+impl Publication<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PublicationBuilder<publication_state::Empty, DefaultStr> {
         PublicationBuilder::new()
     }
 }
 
-impl<S: BosStr> PublicationBuilder<S, publication_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Publication<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PublicationBuilder<publication_state::Empty, S> {
+        PublicationBuilder::builder()
+    }
+}
+
+impl PublicationBuilder<publication_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PublicationBuilder {
             _state: PhantomData,
@@ -158,7 +165,18 @@ impl<S: BosStr> PublicationBuilder<S, publication_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PublicationBuilder<S, St>
+impl<S: BosStr> PublicationBuilder<publication_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PublicationBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PublicationBuilder<St, S>
 where
     St: publication_state::State,
     St::Publication: publication_state::IsUnset,
@@ -167,7 +185,7 @@ where
     pub fn publication(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> PublicationBuilder<S, publication_state::SetPublication<St>> {
+    ) -> PublicationBuilder<publication_state::SetPublication<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
@@ -177,7 +195,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PublicationBuilder<S, St>
+impl<St, S: BosStr> PublicationBuilder<St, S>
 where
     St: publication_state::State,
     St::Publication: publication_state::IsSet,
@@ -190,7 +208,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Publication<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Publication<S> {
         Publication {
             publication: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -199,10 +220,10 @@ where
 }
 
 fn lexicon_doc_app_offprint_publication() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.offprint.publication"),

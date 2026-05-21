@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Did, Language};
+use jacquard_common::types::string::{Did, AtUri, Cid, Language};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::social_psky::chat::room;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_psky::chat::room;
 /// A Picosky room belonging to the user.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -67,11 +67,9 @@ pub struct RoomGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Room<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModlistRef<S: BosStr = DefaultStr> {
     /// Defaults to `false`.
     #[serde(default = "_default_modlist_ref_active")]
@@ -212,7 +210,7 @@ impl<S: BosStr> LexiconSchema for ModlistRef<S> {
 
 pub mod room_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -243,7 +241,7 @@ pub mod room_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RoomBuilder<S: BosStr, St: room_state::State> {
+pub struct RoomBuilder<St: room_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<room::ModlistRef<S>>,
@@ -256,15 +254,22 @@ pub struct RoomBuilder<S: BosStr, St: room_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Room<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RoomBuilder<S, room_state::Empty> {
+impl Room<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RoomBuilder<room_state::Empty, DefaultStr> {
         RoomBuilder::new()
     }
 }
 
-impl<S: BosStr> RoomBuilder<S, room_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Room<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RoomBuilder<room_state::Empty, S> {
+        RoomBuilder::builder()
+    }
+}
+
+impl RoomBuilder<room_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RoomBuilder {
             _state: PhantomData,
@@ -274,7 +279,18 @@ impl<S: BosStr> RoomBuilder<S, room_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
+impl<S: BosStr> RoomBuilder<room_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RoomBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: room_state::State, S: BosStr> RoomBuilder<St, S> {
     /// Set the `allowlist` field (optional)
     pub fn allowlist(mut self, value: impl Into<Option<room::ModlistRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -287,7 +303,7 @@ impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
+impl<St: room_state::State, S: BosStr> RoomBuilder<St, S> {
     /// Set the `denylist` field (optional)
     pub fn denylist(mut self, value: impl Into<Option<room::ModlistRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -300,7 +316,7 @@ impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
+impl<St: room_state::State, S: BosStr> RoomBuilder<St, S> {
     /// Set the `languages` field (optional)
     pub fn languages(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
         self._fields.2 = value.into();
@@ -313,13 +329,16 @@ impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RoomBuilder<S, St>
+impl<St, S: BosStr> RoomBuilder<St, S>
 where
     St: room_state::State,
     St::Name: room_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> RoomBuilder<S, room_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> RoomBuilder<room_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         RoomBuilder {
             _state: PhantomData,
@@ -329,7 +348,7 @@ where
     }
 }
 
-impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
+impl<St: room_state::State, S: BosStr> RoomBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -342,7 +361,7 @@ impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
+impl<St: room_state::State, S: BosStr> RoomBuilder<St, S> {
     /// Set the `topic` field (optional)
     pub fn topic(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -355,7 +374,7 @@ impl<S: BosStr, St: room_state::State> RoomBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RoomBuilder<S, St>
+impl<St, S: BosStr> RoomBuilder<St, S>
 where
     St: room_state::State,
     St::Name: room_state::IsSet,
@@ -387,10 +406,10 @@ where
 }
 
 fn lexicon_doc_social_psky_chat_room() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.psky.chat.room"),
@@ -399,7 +418,9 @@ fn lexicon_doc_social_psky_chat_room() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A Picosky room belonging to the user.")),
+                    description: Some(
+                        CowStr::new_static("A Picosky room belonging to the user."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("name")]),
@@ -452,9 +473,9 @@ fn lexicon_doc_social_psky_chat_room() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("topic"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Topic title of the room.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Topic title of the room."),
+                                    ),
                                     max_length: Some(2560usize),
                                     max_graphemes: Some(256usize),
                                     ..Default::default()
@@ -470,10 +491,9 @@ fn lexicon_doc_social_psky_chat_room() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("modlistRef"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("active"),
-                        SmolStr::new_static("users"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("active"), SmolStr::new_static("users")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -510,7 +530,7 @@ fn _default_modlist_ref_active() -> bool {
 
 pub mod modlist_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -518,56 +538,63 @@ pub mod modlist_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Users;
         type Active;
+        type Users;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Users = Unset;
         type Active = Unset;
-    }
-    ///State transition - sets the `users` field to Set
-    pub struct SetUsers<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUsers<St> {}
-    impl<St: State> State for SetUsers<St> {
-        type Users = Set<members::users>;
-        type Active = St::Active;
+        type Users = Unset;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetActive<St> {}
     impl<St: State> State for SetActive<St> {
-        type Users = St::Users;
         type Active = Set<members::active>;
+        type Users = St::Users;
+    }
+    ///State transition - sets the `users` field to Set
+    pub struct SetUsers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUsers<St> {}
+    impl<St: State> State for SetUsers<St> {
+        type Active = St::Active;
+        type Users = Set<members::users>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `users` field
-        pub struct users(());
         ///Marker type for the `active` field
         pub struct active(());
+        ///Marker type for the `users` field
+        pub struct users(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ModlistRefBuilder<S: BosStr, St: modlist_ref_state::State> {
+pub struct ModlistRefBuilder<St: modlist_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<Vec<Did<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ModlistRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ModlistRefBuilder<S, modlist_ref_state::Empty> {
+impl ModlistRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ModlistRefBuilder<modlist_ref_state::Empty, DefaultStr> {
         ModlistRefBuilder::new()
     }
 }
 
-impl<S: BosStr> ModlistRefBuilder<S, modlist_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ModlistRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ModlistRefBuilder<modlist_ref_state::Empty, S> {
+        ModlistRefBuilder::builder()
+    }
+}
+
+impl ModlistRefBuilder<modlist_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ModlistRefBuilder {
             _state: PhantomData,
@@ -577,7 +604,18 @@ impl<S: BosStr> ModlistRefBuilder<S, modlist_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ModlistRefBuilder<S, St>
+impl<S: BosStr> ModlistRefBuilder<modlist_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ModlistRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ModlistRefBuilder<St, S>
 where
     St: modlist_ref_state::State,
     St::Active: modlist_ref_state::IsUnset,
@@ -586,7 +624,7 @@ where
     pub fn active(
         mut self,
         value: impl Into<bool>,
-    ) -> ModlistRefBuilder<S, modlist_ref_state::SetActive<St>> {
+    ) -> ModlistRefBuilder<modlist_ref_state::SetActive<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ModlistRefBuilder {
             _state: PhantomData,
@@ -596,7 +634,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ModlistRefBuilder<S, St>
+impl<St, S: BosStr> ModlistRefBuilder<St, S>
 where
     St: modlist_ref_state::State,
     St::Users: modlist_ref_state::IsUnset,
@@ -605,7 +643,7 @@ where
     pub fn users(
         mut self,
         value: impl Into<Vec<Did<S>>>,
-    ) -> ModlistRefBuilder<S, modlist_ref_state::SetUsers<St>> {
+    ) -> ModlistRefBuilder<modlist_ref_state::SetUsers<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ModlistRefBuilder {
             _state: PhantomData,
@@ -615,11 +653,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ModlistRefBuilder<S, St>
+impl<St, S: BosStr> ModlistRefBuilder<St, S>
 where
     St: modlist_ref_state::State,
-    St::Users: modlist_ref_state::IsSet,
     St::Active: modlist_ref_state::IsSet,
+    St::Users: modlist_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ModlistRef<S> {
@@ -630,7 +668,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ModlistRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ModlistRef<S> {
         ModlistRef {
             active: self._fields.0.unwrap(),
             users: self._fields.1.unwrap(),

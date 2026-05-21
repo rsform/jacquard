@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,20 +24,17 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::com_deckbelcher::CardRef;
-use crate::com_deckbelcher::deck::list;
-use crate::com_deckbelcher::richtext::Document;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::com_deckbelcher::CardRef;
+use crate::com_deckbelcher::richtext::Document;
+use crate::com_deckbelcher::deck::list;
 /// A card entry in a decklist.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Card<S: BosStr = DefaultStr> {
     ///Number of copies in the deck.
     pub quantity: i64,
@@ -238,6 +235,7 @@ pub struct List<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -264,10 +262,7 @@ pub struct ListGetRecordOutput<S: BosStr = DefaultStr> {
 /// Primer in a separate ATProto record. For use with any longform writing lexicon.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PrimerRef<S: BosStr = DefaultStr> {
     pub r#ref: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -277,10 +272,7 @@ pub struct PrimerRef<S: BosStr = DefaultStr> {
 /// External primer content. Typically a URL, but any valid URI scheme.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PrimerUri<S: BosStr = DefaultStr> {
     pub uri: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -531,7 +523,7 @@ impl<S: BosStr> LexiconSchema for PrimerUri<S> {
 
 pub mod card_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -539,75 +531,77 @@ pub mod card_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Quantity;
         type Ref;
         type Section;
-        type Quantity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Quantity = Unset;
         type Ref = Unset;
         type Section = Unset;
-        type Quantity = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRef<St> {}
-    impl<St: State> State for SetRef<St> {
-        type Ref = Set<members::r#ref>;
-        type Section = St::Section;
-        type Quantity = St::Quantity;
-    }
-    ///State transition - sets the `section` field to Set
-    pub struct SetSection<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSection<St> {}
-    impl<St: State> State for SetSection<St> {
-        type Ref = St::Ref;
-        type Section = Set<members::section>;
-        type Quantity = St::Quantity;
     }
     ///State transition - sets the `quantity` field to Set
     pub struct SetQuantity<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetQuantity<St> {}
     impl<St: State> State for SetQuantity<St> {
+        type Quantity = Set<members::quantity>;
         type Ref = St::Ref;
         type Section = St::Section;
-        type Quantity = Set<members::quantity>;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRef<St> {}
+    impl<St: State> State for SetRef<St> {
+        type Quantity = St::Quantity;
+        type Ref = Set<members::r#ref>;
+        type Section = St::Section;
+    }
+    ///State transition - sets the `section` field to Set
+    pub struct SetSection<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSection<St> {}
+    impl<St: State> State for SetSection<St> {
+        type Quantity = St::Quantity;
+        type Ref = St::Ref;
+        type Section = Set<members::section>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `quantity` field
+        pub struct quantity(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
         ///Marker type for the `section` field
         pub struct section(());
-        ///Marker type for the `quantity` field
-        pub struct quantity(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CardBuilder<S: BosStr, St: card_state::State> {
+pub struct CardBuilder<St: card_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<i64>,
-        Option<CardRef<S>>,
-        Option<list::Section<S>>,
-        Option<Vec<S>>,
-    ),
+    _fields: (Option<i64>, Option<CardRef<S>>, Option<list::Section<S>>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Card<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CardBuilder<S, card_state::Empty> {
+impl Card<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CardBuilder<card_state::Empty, DefaultStr> {
         CardBuilder::new()
     }
 }
 
-impl<S: BosStr> CardBuilder<S, card_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Card<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CardBuilder<card_state::Empty, S> {
+        CardBuilder::builder()
+    }
+}
+
+impl CardBuilder<card_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CardBuilder {
             _state: PhantomData,
@@ -617,7 +611,18 @@ impl<S: BosStr> CardBuilder<S, card_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CardBuilder<S, St>
+impl<S: BosStr> CardBuilder<card_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CardBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CardBuilder<St, S>
 where
     St: card_state::State,
     St::Quantity: card_state::IsUnset,
@@ -626,7 +631,7 @@ where
     pub fn quantity(
         mut self,
         value: impl Into<i64>,
-    ) -> CardBuilder<S, card_state::SetQuantity<St>> {
+    ) -> CardBuilder<card_state::SetQuantity<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CardBuilder {
             _state: PhantomData,
@@ -636,13 +641,16 @@ where
     }
 }
 
-impl<S: BosStr, St> CardBuilder<S, St>
+impl<St, S: BosStr> CardBuilder<St, S>
 where
     St: card_state::State,
     St::Ref: card_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(mut self, value: impl Into<CardRef<S>>) -> CardBuilder<S, card_state::SetRef<St>> {
+    pub fn r#ref(
+        mut self,
+        value: impl Into<CardRef<S>>,
+    ) -> CardBuilder<card_state::SetRef<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CardBuilder {
             _state: PhantomData,
@@ -652,7 +660,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CardBuilder<S, St>
+impl<St, S: BosStr> CardBuilder<St, S>
 where
     St: card_state::State,
     St::Section: card_state::IsUnset,
@@ -661,7 +669,7 @@ where
     pub fn section(
         mut self,
         value: impl Into<list::Section<S>>,
-    ) -> CardBuilder<S, card_state::SetSection<St>> {
+    ) -> CardBuilder<card_state::SetSection<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CardBuilder {
             _state: PhantomData,
@@ -671,7 +679,7 @@ where
     }
 }
 
-impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
+impl<St: card_state::State, S: BosStr> CardBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -684,12 +692,12 @@ impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CardBuilder<S, St>
+impl<St, S: BosStr> CardBuilder<St, S>
 where
     St: card_state::State,
+    St::Quantity: card_state::IsSet,
     St::Ref: card_state::IsSet,
     St::Section: card_state::IsSet,
-    St::Quantity: card_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Card<S> {
@@ -714,10 +722,10 @@ where
 }
 
 fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.deckbelcher.deck.list"),
@@ -794,23 +802,26 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A Magic: The Gathering decklist.")),
+                    description: Some(
+                        CowStr::new_static("A Magic: The Gathering decklist."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("cards"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"), SmolStr::new_static("cards"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("cards"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Array of cards in the decklist.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Array of cards in the decklist."),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#card"),
                                         ..Default::default()
@@ -821,9 +832,11 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the decklist was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp when the decklist was created.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -838,7 +851,9 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Name of the decklist.")),
+                                    description: Some(
+                                        CowStr::new_static("Name of the decklist."),
+                                    ),
                                     max_length: Some(1280usize),
                                     max_graphemes: Some(128usize),
                                     ..Default::default()
@@ -847,13 +862,15 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("primer"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(CowStr::new_static(
-                                        "Deck primer with strategy, combos, and card choices.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Deck primer with strategy, combos, and card choices.",
+                                        ),
+                                    ),
                                     refs: vec![
                                         CowStr::new_static("com.deckbelcher.richtext#document"),
                                         CowStr::new_static("#primerUri"),
-                                        CowStr::new_static("#primerRef"),
+                                        CowStr::new_static("#primerRef")
                                     ],
                                     ..Default::default()
                                 }),
@@ -861,9 +878,11 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("updatedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the decklist was last updated.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp when the decklist was last updated.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -902,9 +921,11 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("primerUri"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "External primer content. Typically a URL, but any valid URI scheme.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "External primer content. Typically a URL, but any valid URI scheme.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -943,7 +964,7 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
 
 pub mod list_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -951,56 +972,56 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
         type Cards;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
+        type Name = Unset;
         type Cards = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type CreatedAt = St::CreatedAt;
-        type Cards = St::Cards;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Name = St::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+        type Cards = St::Cards;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
         type Cards = St::Cards;
     }
     ///State transition - sets the `cards` field to Set
     pub struct SetCards<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCards<St> {}
     impl<St: State> State for SetCards<St> {
-        type Name = St::Name;
         type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
         type Cards = Set<members::cards>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `cards` field
         pub struct cards(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListBuilder<S: BosStr, St: list_state::State> {
+pub struct ListBuilder<St: list_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<list::Card<S>>>,
@@ -1013,15 +1034,22 @@ pub struct ListBuilder<S: BosStr, St: list_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> List<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListBuilder<S, list_state::Empty> {
+impl List<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListBuilder<list_state::Empty, DefaultStr> {
         ListBuilder::new()
     }
 }
 
-impl<S: BosStr> ListBuilder<S, list_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> List<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListBuilder<list_state::Empty, S> {
+        ListBuilder::builder()
+    }
+}
+
+impl ListBuilder<list_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListBuilder {
             _state: PhantomData,
@@ -1031,7 +1059,18 @@ impl<S: BosStr> ListBuilder<S, list_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<S: BosStr> ListBuilder<list_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
     St::Cards: list_state::IsUnset,
@@ -1040,7 +1079,7 @@ where
     pub fn cards(
         mut self,
         value: impl Into<Vec<list::Card<S>>>,
-    ) -> ListBuilder<S, list_state::SetCards<St>> {
+    ) -> ListBuilder<list_state::SetCards<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -1050,7 +1089,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
     St::CreatedAt: list_state::IsUnset,
@@ -1059,7 +1098,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ListBuilder<S, list_state::SetCreatedAt<St>> {
+    ) -> ListBuilder<list_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -1069,7 +1108,7 @@ where
     }
 }
 
-impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
+impl<St: list_state::State, S: BosStr> ListBuilder<St, S> {
     /// Set the `format` field (optional)
     pub fn format(mut self, value: impl Into<Option<list::Format<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -1082,13 +1121,16 @@ impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
     St::Name: list_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> ListBuilder<S, list_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> ListBuilder<list_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -1098,7 +1140,7 @@ where
     }
 }
 
-impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
+impl<St: list_state::State, S: BosStr> ListBuilder<St, S> {
     /// Set the `primer` field (optional)
     pub fn primer(mut self, value: impl Into<Option<ListPrimer<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -1111,7 +1153,7 @@ impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
+impl<St: list_state::State, S: BosStr> ListBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -1124,11 +1166,11 @@ impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
-    St::Name: list_state::IsSet,
     St::CreatedAt: list_state::IsSet,
+    St::Name: list_state::IsSet,
     St::Cards: list_state::IsSet,
 {
     /// Build the final struct.
@@ -1159,7 +1201,7 @@ where
 
 pub mod primer_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1190,21 +1232,28 @@ pub mod primer_ref_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PrimerRefBuilder<S: BosStr, St: primer_ref_state::State> {
+pub struct PrimerRefBuilder<St: primer_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PrimerRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PrimerRefBuilder<S, primer_ref_state::Empty> {
+impl PrimerRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PrimerRefBuilder<primer_ref_state::Empty, DefaultStr> {
         PrimerRefBuilder::new()
     }
 }
 
-impl<S: BosStr> PrimerRefBuilder<S, primer_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PrimerRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PrimerRefBuilder<primer_ref_state::Empty, S> {
+        PrimerRefBuilder::builder()
+    }
+}
+
+impl PrimerRefBuilder<primer_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PrimerRefBuilder {
             _state: PhantomData,
@@ -1214,7 +1263,18 @@ impl<S: BosStr> PrimerRefBuilder<S, primer_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PrimerRefBuilder<S, St>
+impl<S: BosStr> PrimerRefBuilder<primer_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PrimerRefBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PrimerRefBuilder<St, S>
 where
     St: primer_ref_state::State,
     St::Ref: primer_ref_state::IsUnset,
@@ -1223,7 +1283,7 @@ where
     pub fn r#ref(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> PrimerRefBuilder<S, primer_ref_state::SetRef<St>> {
+    ) -> PrimerRefBuilder<primer_ref_state::SetRef<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PrimerRefBuilder {
             _state: PhantomData,
@@ -1233,7 +1293,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PrimerRefBuilder<S, St>
+impl<St, S: BosStr> PrimerRefBuilder<St, S>
 where
     St: primer_ref_state::State,
     St::Ref: primer_ref_state::IsSet,
@@ -1246,7 +1306,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PrimerRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PrimerRef<S> {
         PrimerRef {
             r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

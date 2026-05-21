@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::richtext::facet::Facet;
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::richtext::facet::Facet;
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Speaking and reply style for a sim — describes how the sim communicates.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -134,7 +134,7 @@ impl<S: BosStr> LexiconSchema for Style<S> {
 
 pub mod style_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -142,75 +142,77 @@ pub mod style_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Description;
+        type CreatedAt;
         type Sim;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Description = Unset;
+        type CreatedAt = Unset;
         type Sim = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Description = St::Description;
-        type Sim = St::Sim;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDescription<St> {}
     impl<St: State> State for SetDescription<St> {
-        type CreatedAt = St::CreatedAt;
         type Description = Set<members::description>;
+        type CreatedAt = St::CreatedAt;
+        type Sim = St::Sim;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Description = St::Description;
+        type CreatedAt = Set<members::created_at>;
         type Sim = St::Sim;
     }
     ///State transition - sets the `sim` field to Set
     pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSim<St> {}
     impl<St: State> State for SetSim<St> {
-        type CreatedAt = St::CreatedAt;
         type Description = St::Description;
+        type CreatedAt = St::CreatedAt;
         type Sim = Set<members::sim>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `sim` field
         pub struct sim(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StyleBuilder<S: BosStr, St: style_state::State> {
+pub struct StyleBuilder<St: style_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<S>,
-        Option<Vec<Facet<S>>>,
-        Option<StrongRef<S>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<Vec<Facet<S>>>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Style<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StyleBuilder<S, style_state::Empty> {
+impl Style<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StyleBuilder<style_state::Empty, DefaultStr> {
         StyleBuilder::new()
     }
 }
 
-impl<S: BosStr> StyleBuilder<S, style_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Style<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StyleBuilder<style_state::Empty, S> {
+        StyleBuilder::builder()
+    }
+}
+
+impl StyleBuilder<style_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StyleBuilder {
             _state: PhantomData,
@@ -220,7 +222,18 @@ impl<S: BosStr> StyleBuilder<S, style_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StyleBuilder<S, St>
+impl<S: BosStr> StyleBuilder<style_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StyleBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StyleBuilder<St, S>
 where
     St: style_state::State,
     St::CreatedAt: style_state::IsUnset,
@@ -229,7 +242,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StyleBuilder<S, style_state::SetCreatedAt<St>> {
+    ) -> StyleBuilder<style_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StyleBuilder {
             _state: PhantomData,
@@ -239,7 +252,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StyleBuilder<S, St>
+impl<St, S: BosStr> StyleBuilder<St, S>
 where
     St: style_state::State,
     St::Description: style_state::IsUnset,
@@ -248,7 +261,7 @@ where
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> StyleBuilder<S, style_state::SetDescription<St>> {
+    ) -> StyleBuilder<style_state::SetDescription<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StyleBuilder {
             _state: PhantomData,
@@ -258,9 +271,12 @@ where
     }
 }
 
-impl<S: BosStr, St: style_state::State> StyleBuilder<S, St> {
+impl<St: style_state::State, S: BosStr> StyleBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn description_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -271,7 +287,7 @@ impl<S: BosStr, St: style_state::State> StyleBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> StyleBuilder<S, St>
+impl<St, S: BosStr> StyleBuilder<St, S>
 where
     St: style_state::State,
     St::Sim: style_state::IsUnset,
@@ -280,7 +296,7 @@ where
     pub fn sim(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> StyleBuilder<S, style_state::SetSim<St>> {
+    ) -> StyleBuilder<style_state::SetSim<St>, S> {
         self._fields.3 = Option::Some(value.into());
         StyleBuilder {
             _state: PhantomData,
@@ -290,11 +306,11 @@ where
     }
 }
 
-impl<S: BosStr, St> StyleBuilder<S, St>
+impl<St, S: BosStr> StyleBuilder<St, S>
 where
     St: style_state::State,
-    St::CreatedAt: style_state::IsSet,
     St::Description: style_state::IsSet,
+    St::CreatedAt: style_state::IsSet,
     St::Sim: style_state::IsSet,
 {
     /// Build the final struct.
@@ -320,10 +336,10 @@ where
 }
 
 fn lexicon_doc_org_simocracy_style() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.simocracy.style"),
@@ -332,16 +348,20 @@ fn lexicon_doc_org_simocracy_style() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Speaking and reply style for a sim — describes how the sim communicates.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Speaking and reply style for a sim — describes how the sim communicates.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("sim"),
-                            SmolStr::new_static("description"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("sim"),
+                                SmolStr::new_static("description"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -355,9 +375,11 @@ fn lexicon_doc_org_simocracy_style() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "A description of the sim's speaking and reply style.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "A description of the sim's speaking and reply style.",
+                                        ),
+                                    ),
                                     max_length: Some(30000usize),
                                     max_graphemes: Some(3000usize),
                                     ..Default::default()

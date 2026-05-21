@@ -10,27 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetToken<S: BosStr = DefaultStr> {
     pub aud: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTokenOutput<S: BosStr = DefaultStr> {
     pub token: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -63,7 +58,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetTokenRequest {
 
 pub mod get_token_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -94,21 +89,28 @@ pub mod get_token_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetTokenBuilder<S: BosStr, St: get_token_state::State> {
+pub struct GetTokenBuilder<St: get_token_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetToken<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetTokenBuilder<S, get_token_state::Empty> {
+impl GetToken<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetTokenBuilder<get_token_state::Empty, DefaultStr> {
         GetTokenBuilder::new()
     }
 }
 
-impl<S: BosStr> GetTokenBuilder<S, get_token_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetToken<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetTokenBuilder<get_token_state::Empty, S> {
+        GetTokenBuilder::builder()
+    }
+}
+
+impl GetTokenBuilder<get_token_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetTokenBuilder {
             _state: PhantomData,
@@ -118,7 +120,18 @@ impl<S: BosStr> GetTokenBuilder<S, get_token_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetTokenBuilder<S, St>
+impl<S: BosStr> GetTokenBuilder<get_token_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetTokenBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetTokenBuilder<St, S>
 where
     St: get_token_state::State,
     St::Aud: get_token_state::IsUnset,
@@ -127,7 +140,7 @@ where
     pub fn aud(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetTokenBuilder<S, get_token_state::SetAud<St>> {
+    ) -> GetTokenBuilder<get_token_state::SetAud<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetTokenBuilder {
             _state: PhantomData,
@@ -137,7 +150,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetTokenBuilder<S, St>
+impl<St, S: BosStr> GetTokenBuilder<St, S>
 where
     St: get_token_state::State,
     St::Aud: get_token_state::IsSet,

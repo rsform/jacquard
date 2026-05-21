@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,16 +25,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blue_atroom::room::object;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blue_atroom::room::object;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LocalizedName<S: BosStr = DefaultStr> {
     pub lang: S,
     pub value: S,
@@ -172,16 +169,19 @@ impl<S: BosStr> LexiconSchema for Object<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["model/gltf-binary"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("model"),
@@ -227,10 +227,10 @@ impl<S: BosStr> LexiconSchema for Object<S> {
 }
 
 fn lexicon_doc_blue_atroom_room_object() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.atroom.room.object"),
@@ -239,10 +239,9 @@ fn lexicon_doc_blue_atroom_room_object() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("localizedName"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("lang"),
-                        SmolStr::new_static("value"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("lang"), SmolStr::new_static("value")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -268,17 +267,18 @@ fn lexicon_doc_blue_atroom_room_object() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A 3D object that can be placed in a room.",
-                    )),
+                    description: Some(
+                        CowStr::new_static("A 3D object that can be placed in a room."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("model"),
-                            SmolStr::new_static("scale"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"), SmolStr::new_static("model"),
+                                SmolStr::new_static("scale"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -291,9 +291,7 @@ fn lexicon_doc_blue_atroom_room_object() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("model"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("name"),
@@ -335,7 +333,7 @@ fn lexicon_doc_blue_atroom_room_object() -> LexiconDoc<'static> {
 
 pub mod object_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -343,72 +341,72 @@ pub mod object_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Scale;
-        type Name;
-        type CreatedAt;
         type Model;
+        type CreatedAt;
+        type Name;
+        type Scale;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Scale = Unset;
-        type Name = Unset;
-        type CreatedAt = Unset;
         type Model = Unset;
-    }
-    ///State transition - sets the `scale` field to Set
-    pub struct SetScale<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScale<St> {}
-    impl<St: State> State for SetScale<St> {
-        type Scale = Set<members::scale>;
-        type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
-        type Model = St::Model;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Scale = St::Scale;
-        type Name = Set<members::name>;
-        type CreatedAt = St::CreatedAt;
-        type Model = St::Model;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Scale = St::Scale;
-        type Name = St::Name;
-        type CreatedAt = Set<members::created_at>;
-        type Model = St::Model;
+        type CreatedAt = Unset;
+        type Name = Unset;
+        type Scale = Unset;
     }
     ///State transition - sets the `model` field to Set
     pub struct SetModel<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetModel<St> {}
     impl<St: State> State for SetModel<St> {
-        type Scale = St::Scale;
-        type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
         type Model = Set<members::model>;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Scale = St::Scale;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Model = St::Model;
+        type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+        type Scale = St::Scale;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Model = St::Model;
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
+        type Scale = St::Scale;
+    }
+    ///State transition - sets the `scale` field to Set
+    pub struct SetScale<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScale<St> {}
+    impl<St: State> State for SetScale<St> {
+        type Model = St::Model;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Scale = Set<members::scale>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scale` field
-        pub struct scale(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `model` field
         pub struct model(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `scale` field
+        pub struct scale(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ObjectBuilder<S: BosStr, St: object_state::State> {
+pub struct ObjectBuilder<St: object_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -420,15 +418,22 @@ pub struct ObjectBuilder<S: BosStr, St: object_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Object<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ObjectBuilder<S, object_state::Empty> {
+impl Object<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ObjectBuilder<object_state::Empty, DefaultStr> {
         ObjectBuilder::new()
     }
 }
 
-impl<S: BosStr> ObjectBuilder<S, object_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Object<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ObjectBuilder<object_state::Empty, S> {
+        ObjectBuilder::builder()
+    }
+}
+
+impl ObjectBuilder<object_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ObjectBuilder {
             _state: PhantomData,
@@ -438,7 +443,18 @@ impl<S: BosStr> ObjectBuilder<S, object_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ObjectBuilder<S, St>
+impl<S: BosStr> ObjectBuilder<object_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ObjectBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ObjectBuilder<St, S>
 where
     St: object_state::State,
     St::CreatedAt: object_state::IsUnset,
@@ -447,7 +463,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ObjectBuilder<S, object_state::SetCreatedAt<St>> {
+    ) -> ObjectBuilder<object_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ObjectBuilder {
             _state: PhantomData,
@@ -457,7 +473,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ObjectBuilder<S, St>
+impl<St, S: BosStr> ObjectBuilder<St, S>
 where
     St: object_state::State,
     St::Model: object_state::IsUnset,
@@ -466,7 +482,7 @@ where
     pub fn model(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ObjectBuilder<S, object_state::SetModel<St>> {
+    ) -> ObjectBuilder<object_state::SetModel<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ObjectBuilder {
             _state: PhantomData,
@@ -476,13 +492,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ObjectBuilder<S, St>
+impl<St, S: BosStr> ObjectBuilder<St, S>
 where
     St: object_state::State,
     St::Name: object_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> ObjectBuilder<S, object_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> ObjectBuilder<object_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ObjectBuilder {
             _state: PhantomData,
@@ -492,26 +511,35 @@ where
     }
 }
 
-impl<S: BosStr, St: object_state::State> ObjectBuilder<S, St> {
+impl<St: object_state::State, S: BosStr> ObjectBuilder<St, S> {
     /// Set the `nameLangs` field (optional)
-    pub fn name_langs(mut self, value: impl Into<Option<Vec<object::LocalizedName<S>>>>) -> Self {
+    pub fn name_langs(
+        mut self,
+        value: impl Into<Option<Vec<object::LocalizedName<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `nameLangs` field to an Option value (optional)
-    pub fn maybe_name_langs(mut self, value: Option<Vec<object::LocalizedName<S>>>) -> Self {
+    pub fn maybe_name_langs(
+        mut self,
+        value: Option<Vec<object::LocalizedName<S>>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
 }
 
-impl<S: BosStr, St> ObjectBuilder<S, St>
+impl<St, S: BosStr> ObjectBuilder<St, S>
 where
     St: object_state::State,
     St::Scale: object_state::IsUnset,
 {
     /// Set the `scale` field (required)
-    pub fn scale(mut self, value: impl Into<i64>) -> ObjectBuilder<S, object_state::SetScale<St>> {
+    pub fn scale(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ObjectBuilder<object_state::SetScale<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ObjectBuilder {
             _state: PhantomData,
@@ -521,13 +549,13 @@ where
     }
 }
 
-impl<S: BosStr, St> ObjectBuilder<S, St>
+impl<St, S: BosStr> ObjectBuilder<St, S>
 where
     St: object_state::State,
-    St::Scale: object_state::IsSet,
-    St::Name: object_state::IsSet,
-    St::CreatedAt: object_state::IsSet,
     St::Model: object_state::IsSet,
+    St::CreatedAt: object_state::IsSet,
+    St::Name: object_state::IsSet,
+    St::Scale: object_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Object<S> {

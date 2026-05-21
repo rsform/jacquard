@@ -20,29 +20,27 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_weaver::embed::external;
-use crate::sh_weaver::embed::external::External;
-use crate::sh_weaver::embed::images;
-use crate::sh_weaver::embed::images::Images;
-use crate::sh_weaver::embed::records;
-use crate::sh_weaver::embed::records::Records;
-use crate::sh_weaver::embed::video;
-use crate::sh_weaver::embed::video::VideoRecord;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::embed::external::External;
+use crate::sh_weaver::embed::images::Images;
+use crate::sh_weaver::embed::records::Records;
+use crate::sh_weaver::embed::video::VideoRecord;
+use crate::sh_weaver::embed::external;
+use crate::sh_weaver::embed::images;
+use crate::sh_weaver::embed::records;
+use crate::sh_weaver::embed::video;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordWithMedia<S: BosStr = DefaultStr> {
     pub media: RecordWithMediaMedia<S>,
     pub records: Records<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -56,11 +54,9 @@ pub enum RecordWithMediaMedia<S: BosStr = DefaultStr> {
     Video(Box<VideoRecord<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct View<S: BosStr = DefaultStr> {
     pub media: ViewMedia<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -68,6 +64,7 @@ pub struct View<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -113,7 +110,7 @@ impl<S: BosStr> LexiconSchema for View<S> {
 
 pub mod record_with_media_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -121,56 +118,66 @@ pub mod record_with_media_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Media;
         type Records;
+        type Media;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Media = Unset;
         type Records = Unset;
-    }
-    ///State transition - sets the `media` field to Set
-    pub struct SetMedia<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMedia<St> {}
-    impl<St: State> State for SetMedia<St> {
-        type Media = Set<members::media>;
-        type Records = St::Records;
+        type Media = Unset;
     }
     ///State transition - sets the `records` field to Set
     pub struct SetRecords<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecords<St> {}
     impl<St: State> State for SetRecords<St> {
-        type Media = St::Media;
         type Records = Set<members::records>;
+        type Media = St::Media;
+    }
+    ///State transition - sets the `media` field to Set
+    pub struct SetMedia<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMedia<St> {}
+    impl<St: State> State for SetMedia<St> {
+        type Records = St::Records;
+        type Media = Set<members::media>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `media` field
-        pub struct media(());
         ///Marker type for the `records` field
         pub struct records(());
+        ///Marker type for the `media` field
+        pub struct media(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RecordWithMediaBuilder<S: BosStr, St: record_with_media_state::State> {
+pub struct RecordWithMediaBuilder<
+    St: record_with_media_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<RecordWithMediaMedia<S>>, Option<Records<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RecordWithMedia<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RecordWithMediaBuilder<S, record_with_media_state::Empty> {
+impl RecordWithMedia<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RecordWithMediaBuilder<record_with_media_state::Empty, DefaultStr> {
         RecordWithMediaBuilder::new()
     }
 }
 
-impl<S: BosStr> RecordWithMediaBuilder<S, record_with_media_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RecordWithMedia<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RecordWithMediaBuilder<record_with_media_state::Empty, S> {
+        RecordWithMediaBuilder::builder()
+    }
+}
+
+impl RecordWithMediaBuilder<record_with_media_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RecordWithMediaBuilder {
             _state: PhantomData,
@@ -180,7 +187,18 @@ impl<S: BosStr> RecordWithMediaBuilder<S, record_with_media_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RecordWithMediaBuilder<S, St>
+impl<S: BosStr> RecordWithMediaBuilder<record_with_media_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RecordWithMediaBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RecordWithMediaBuilder<St, S>
 where
     St: record_with_media_state::State,
     St::Media: record_with_media_state::IsUnset,
@@ -189,7 +207,7 @@ where
     pub fn media(
         mut self,
         value: impl Into<RecordWithMediaMedia<S>>,
-    ) -> RecordWithMediaBuilder<S, record_with_media_state::SetMedia<St>> {
+    ) -> RecordWithMediaBuilder<record_with_media_state::SetMedia<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RecordWithMediaBuilder {
             _state: PhantomData,
@@ -199,7 +217,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RecordWithMediaBuilder<S, St>
+impl<St, S: BosStr> RecordWithMediaBuilder<St, S>
 where
     St: record_with_media_state::State,
     St::Records: record_with_media_state::IsUnset,
@@ -208,7 +226,7 @@ where
     pub fn records(
         mut self,
         value: impl Into<Records<S>>,
-    ) -> RecordWithMediaBuilder<S, record_with_media_state::SetRecords<St>> {
+    ) -> RecordWithMediaBuilder<record_with_media_state::SetRecords<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RecordWithMediaBuilder {
             _state: PhantomData,
@@ -218,11 +236,11 @@ where
     }
 }
 
-impl<S: BosStr, St> RecordWithMediaBuilder<S, St>
+impl<St, S: BosStr> RecordWithMediaBuilder<St, S>
 where
     St: record_with_media_state::State,
-    St::Media: record_with_media_state::IsSet,
     St::Records: record_with_media_state::IsSet,
+    St::Media: record_with_media_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RecordWithMedia<S> {
@@ -233,7 +251,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordWithMedia<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RecordWithMedia<S> {
         RecordWithMedia {
             media: self._fields.0.unwrap(),
             records: self._fields.1.unwrap(),
@@ -243,10 +264,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_embed_recordWithMedia() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.embed.recordWithMedia"),
@@ -255,10 +276,11 @@ fn lexicon_doc_sh_weaver_embed_recordWithMedia() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("records"),
-                        SmolStr::new_static("media"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("records"), SmolStr::new_static("media")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -268,7 +290,7 @@ fn lexicon_doc_sh_weaver_embed_recordWithMedia() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("sh.weaver.embed.images"),
                                     CowStr::new_static("sh.weaver.embed.external"),
-                                    CowStr::new_static("sh.weaver.embed.video"),
+                                    CowStr::new_static("sh.weaver.embed.video")
                                 ],
                                 ..Default::default()
                             }),
@@ -288,10 +310,9 @@ fn lexicon_doc_sh_weaver_embed_recordWithMedia() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("view"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("record"),
-                        SmolStr::new_static("media"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("record"), SmolStr::new_static("media")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -301,7 +322,7 @@ fn lexicon_doc_sh_weaver_embed_recordWithMedia() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("sh.weaver.embed.images#view"),
                                     CowStr::new_static("sh.weaver.embed.external#view"),
-                                    CowStr::new_static("sh.weaver.embed.video#view"),
+                                    CowStr::new_static("sh.weaver.embed.video#view")
                                 ],
                                 ..Default::default()
                             }),
@@ -326,7 +347,7 @@ fn lexicon_doc_sh_weaver_embed_recordWithMedia() -> LexiconDoc<'static> {
 
 pub mod view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -334,56 +355,63 @@ pub mod view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Media;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Media = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
-        type Record = Set<members::record>;
-        type Media = St::Media;
+        type Record = Unset;
     }
     ///State transition - sets the `media` field to Set
     pub struct SetMedia<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMedia<St> {}
     impl<St: State> State for SetMedia<St> {
-        type Record = St::Record;
         type Media = Set<members::media>;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Media = St::Media;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `media` field
         pub struct media(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ViewBuilder<S: BosStr, St: view_state::State> {
+pub struct ViewBuilder<St: view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<ViewMedia<S>>, Option<records::View<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> View<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ViewBuilder<S, view_state::Empty> {
+impl View<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ViewBuilder<view_state::Empty, DefaultStr> {
         ViewBuilder::new()
     }
 }
 
-impl<S: BosStr> ViewBuilder<S, view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> View<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ViewBuilder<view_state::Empty, S> {
+        ViewBuilder::builder()
+    }
+}
+
+impl ViewBuilder<view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ViewBuilder {
             _state: PhantomData,
@@ -393,7 +421,18 @@ impl<S: BosStr> ViewBuilder<S, view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<S: BosStr> ViewBuilder<view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
     St::Media: view_state::IsUnset,
@@ -402,7 +441,7 @@ where
     pub fn media(
         mut self,
         value: impl Into<ViewMedia<S>>,
-    ) -> ViewBuilder<S, view_state::SetMedia<St>> {
+    ) -> ViewBuilder<view_state::SetMedia<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ViewBuilder {
             _state: PhantomData,
@@ -412,7 +451,7 @@ where
     }
 }
 
-impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
+impl<St: view_state::State, S: BosStr> ViewBuilder<St, S> {
     /// Set the `records` field (optional)
     pub fn records(mut self, value: impl Into<Option<records::View<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -425,11 +464,11 @@ impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ViewBuilder<S, St>
+impl<St, S: BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
-    St::Record: view_state::IsSet,
     St::Media: view_state::IsSet,
+    St::Record: view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> View<S> {

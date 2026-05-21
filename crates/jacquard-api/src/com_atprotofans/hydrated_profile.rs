@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,17 +22,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::richtext::facet::Facet;
 /// A hydrated identity profile with computed fields.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HydratedProfile<S: BosStr = DefaultStr> {
     ///Whether the identity is currently accepting new supporters.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -91,23 +88,25 @@ impl<S: BosStr> LexiconSchema for HydratedProfile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/webp".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -130,23 +129,25 @@ impl<S: BosStr> LexiconSchema for HydratedProfile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("banner"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/webp".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -203,7 +204,7 @@ impl<S: BosStr> LexiconSchema for HydratedProfile<S> {
 
 pub mod hydrated_profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -234,7 +235,10 @@ pub mod hydrated_profile_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HydratedProfileBuilder<S: BosStr, St: hydrated_profile_state::State> {
+pub struct HydratedProfileBuilder<
+    St: hydrated_profile_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -250,15 +254,22 @@ pub struct HydratedProfileBuilder<S: BosStr, St: hydrated_profile_state::State> 
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> HydratedProfile<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> HydratedProfileBuilder<S, hydrated_profile_state::Empty> {
+impl HydratedProfile<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> HydratedProfileBuilder<hydrated_profile_state::Empty, DefaultStr> {
         HydratedProfileBuilder::new()
     }
 }
 
-impl<S: BosStr> HydratedProfileBuilder<S, hydrated_profile_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> HydratedProfile<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> HydratedProfileBuilder<hydrated_profile_state::Empty, S> {
+        HydratedProfileBuilder::builder()
+    }
+}
+
+impl HydratedProfileBuilder<hydrated_profile_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         HydratedProfileBuilder {
             _state: PhantomData,
@@ -268,7 +279,18 @@ impl<S: BosStr> HydratedProfileBuilder<S, hydrated_profile_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St> {
+impl<S: BosStr> HydratedProfileBuilder<hydrated_profile_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        HydratedProfileBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: hydrated_profile_state::State, S: BosStr> HydratedProfileBuilder<St, S> {
     /// Set the `acceptingSupporters` field (optional)
     pub fn accepting_supporters(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -281,7 +303,7 @@ impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St> {
+impl<St: hydrated_profile_state::State, S: BosStr> HydratedProfileBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -294,7 +316,7 @@ impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St> {
+impl<St: hydrated_profile_state::State, S: BosStr> HydratedProfileBuilder<St, S> {
     /// Set the `banner` field (optional)
     pub fn banner(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -307,7 +329,7 @@ impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St> {
+impl<St: hydrated_profile_state::State, S: BosStr> HydratedProfileBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -320,7 +342,7 @@ impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St> HydratedProfileBuilder<S, St>
+impl<St, S: BosStr> HydratedProfileBuilder<St, S>
 where
     St: hydrated_profile_state::State,
     St::Did: hydrated_profile_state::IsUnset,
@@ -329,7 +351,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> HydratedProfileBuilder<S, hydrated_profile_state::SetDid<St>> {
+    ) -> HydratedProfileBuilder<hydrated_profile_state::SetDid<St>, S> {
         self._fields.4 = Option::Some(value.into());
         HydratedProfileBuilder {
             _state: PhantomData,
@@ -339,7 +361,7 @@ where
     }
 }
 
-impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St> {
+impl<St: hydrated_profile_state::State, S: BosStr> HydratedProfileBuilder<St, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -352,7 +374,7 @@ impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St> {
+impl<St: hydrated_profile_state::State, S: BosStr> HydratedProfileBuilder<St, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -365,7 +387,7 @@ impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St> {
+impl<St: hydrated_profile_state::State, S: BosStr> HydratedProfileBuilder<St, S> {
     /// Set the `handle` field (optional)
     pub fn handle(mut self, value: impl Into<Option<Handle<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -378,7 +400,7 @@ impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St> {
+impl<St: hydrated_profile_state::State, S: BosStr> HydratedProfileBuilder<St, S> {
     /// Set the `supporterCount` field (optional)
     pub fn supporter_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.8 = value.into();
@@ -391,7 +413,7 @@ impl<S: BosStr, St: hydrated_profile_state::State> HydratedProfileBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St> HydratedProfileBuilder<S, St>
+impl<St, S: BosStr> HydratedProfileBuilder<St, S>
 where
     St: hydrated_profile_state::State,
     St::Did: hydrated_profile_state::IsSet,
@@ -412,7 +434,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> HydratedProfile<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> HydratedProfile<S> {
         HydratedProfile {
             accepting_supporters: self._fields.0,
             avatar: self._fields.1,
@@ -429,10 +454,10 @@ where
 }
 
 fn lexicon_doc_com_atprotofans_hydratedProfile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atprotofans.hydratedProfile"),
@@ -441,9 +466,11 @@ fn lexicon_doc_com_atprotofans_hydratedProfile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A hydrated identity profile with computed fields.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A hydrated identity profile with computed fields.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -456,22 +483,20 @@ fn lexicon_doc_com_atprotofans_hydratedProfile() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("avatar"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("banner"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Profile bio/description with optional rich text.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Profile bio/description with optional rich text.",
+                                    ),
+                                ),
                                 max_length: Some(2560usize),
                                 max_graphemes: Some(256usize),
                                 ..Default::default()
@@ -480,7 +505,9 @@ fn lexicon_doc_com_atprotofans_hydratedProfile() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("DID of the profile owner.")),
+                                description: Some(
+                                    CowStr::new_static("DID of the profile owner."),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -488,9 +515,9 @@ fn lexicon_doc_com_atprotofans_hydratedProfile() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("displayName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Display name for the profile.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Display name for the profile."),
+                                ),
                                 max_length: Some(640usize),
                                 max_graphemes: Some(64usize),
                                 ..Default::default()
@@ -499,9 +526,11 @@ fn lexicon_doc_com_atprotofans_hydratedProfile() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Rich text facets for description annotations.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Rich text facets for description annotations.",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("app.bsky.richtext.facet"),
                                     ..Default::default()
@@ -512,9 +541,9 @@ fn lexicon_doc_com_atprotofans_hydratedProfile() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("handle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Handle of the profile owner.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Handle of the profile owner."),
+                                ),
                                 format: Some(LexStringFormat::Handle),
                                 ..Default::default()
                             }),

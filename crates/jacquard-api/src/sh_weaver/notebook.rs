@@ -37,36 +37,34 @@ pub mod search_notebooks;
 pub mod theme;
 pub mod update_reading_progress;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::actor::ProfileDataView;
 use crate::sh_weaver::actor::ProfileViewBasic;
 use crate::sh_weaver::notebook;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AuthorListView<S: BosStr = DefaultStr> {
     pub index: i64,
     pub record: ProfileDataView<S>,
@@ -76,11 +74,9 @@ pub struct AuthorListView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BookEntryRef<S: BosStr = DefaultStr> {
     pub entry: notebook::EntryView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -90,10 +86,7 @@ pub struct BookEntryRef<S: BosStr = DefaultStr> {
 /// An ordered entry in a Weaver notebook.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BookEntryView<S: BosStr = DefaultStr> {
     pub entry: notebook::EntryView<S>,
     pub index: i64,
@@ -108,10 +101,7 @@ pub struct BookEntryView<S: BosStr = DefaultStr> {
 /// An entry within a chapter context.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ChapterEntryView<S: BosStr = DefaultStr> {
     pub entry: notebook::EntryView<S>,
     pub index: i64,
@@ -126,10 +116,7 @@ pub struct ChapterEntryView<S: BosStr = DefaultStr> {
 /// Hydrated view of a chapter.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ChapterView<S: BosStr = DefaultStr> {
     pub authors: Vec<notebook::AuthorListView<S>>,
     pub cid: Cid<S>,
@@ -150,10 +137,7 @@ pub struct ChapterView<S: BosStr = DefaultStr> {
 /// The format of the content. This is used to determine how to render the content.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ContentFormat<S: BosStr = DefaultStr> {
     ///The format of the content. This is used to determine how to render the content.  Defaults to `"weaver"`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -342,7 +326,9 @@ where
             ContentWarning::Death => ContentWarning::Death,
             ContentWarning::MajorCharacterDeath => ContentWarning::MajorCharacterDeath,
             ContentWarning::SexualContent => ContentWarning::SexualContent,
-            ContentWarning::ExplicitSexualContent => ContentWarning::ExplicitSexualContent,
+            ContentWarning::ExplicitSexualContent => {
+                ContentWarning::ExplicitSexualContent
+            }
             ContentWarning::Language => ContentWarning::Language,
             ContentWarning::SubstanceUse => ContentWarning::SubstanceUse,
             ContentWarning::SelfHarm => ContentWarning::SelfHarm,
@@ -357,10 +343,7 @@ where
 pub type ContentWarnings<S = DefaultStr> = Vec<notebook::ContentWarning<S>>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EntryView<S: BosStr = DefaultStr> {
     pub authors: Vec<notebook::AuthorListView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -394,10 +377,7 @@ pub struct EntryView<S: BosStr = DefaultStr> {
 /// Entry with feed-specific context (discovery reason, notebook context).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FeedEntryView<S: BosStr = DefaultStr> {
     pub entry: notebook::EntryView<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -411,10 +391,7 @@ pub struct FeedEntryView<S: BosStr = DefaultStr> {
 /// Minimal notebook context for feed display.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FeedNotebookContext<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub path: Option<S>,
@@ -438,11 +415,9 @@ pub enum FeedReason<S: BosStr = DefaultStr> {
     ReasonSubscription(Box<notebook::ReasonSubscription<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotebookView<S: BosStr = DefaultStr> {
     pub authors: Vec<notebook::AuthorListView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -480,10 +455,7 @@ pub struct NotebookView<S: BosStr = DefaultStr> {
 /// Hydrated view of a page (entries displayed together).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PageView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -505,10 +477,7 @@ pub type Path<S = DefaultStr> = S;
 /// A single permission grant. For resource authority: source=resource URI, grantedAt=createdAt. For invitees: source=invite URI, grantedAt=accept createdAt.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PermissionGrant<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     ///For authority: record createdAt. For invitees: accept createdAt
@@ -595,7 +564,9 @@ where
         match self {
             PermissionGrantScope::Direct => PermissionGrantScope::Direct,
             PermissionGrantScope::Inherited => PermissionGrantScope::Inherited,
-            PermissionGrantScope::Other(v) => PermissionGrantScope::Other(v.into_static()),
+            PermissionGrantScope::Other(v) => {
+                PermissionGrantScope::Other(v.into_static())
+            }
         }
     }
 }
@@ -603,10 +574,7 @@ where
 /// ACL-style permissions for a resource. Separate from authors (who contributed).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PermissionsState<S: BosStr = DefaultStr> {
     ///DIDs that can edit this resource
     pub editors: Vec<notebook::PermissionGrant<S>>,
@@ -620,10 +588,7 @@ pub struct PermissionsState<S: BosStr = DefaultStr> {
 /// A published version of an entry in a collaborator's repo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PublishedVersionView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     ///If content differs, the version it diverged from
@@ -644,10 +609,7 @@ pub struct PublishedVersionView<S: BosStr = DefaultStr> {
 /// Viewer's reading progress (appview-side state, not a record).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReadingProgress<S: BosStr = DefaultStr> {
     ///Last entry the viewer was reading.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -665,6 +627,7 @@ pub struct ReadingProgress<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReadingProgressStatus<S: BosStr = DefaultStr> {
@@ -746,16 +709,16 @@ where
             ReadingProgressStatus::Finished => ReadingProgressStatus::Finished,
             ReadingProgressStatus::Abandoned => ReadingProgressStatus::Abandoned,
             ReadingProgressStatus::WantToRead => ReadingProgressStatus::WantToRead,
-            ReadingProgressStatus::Other(v) => ReadingProgressStatus::Other(v.into_static()),
+            ReadingProgressStatus::Other(v) => {
+                ReadingProgressStatus::Other(v.into_static())
+            }
         }
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReasonBookmark<S: BosStr = DefaultStr> {
     pub by: ProfileViewBasic<S>,
     pub indexed_at: Datetime,
@@ -763,11 +726,9 @@ pub struct ReasonBookmark<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReasonLike<S: BosStr = DefaultStr> {
     pub by: ProfileViewBasic<S>,
     pub indexed_at: Datetime,
@@ -775,11 +736,9 @@ pub struct ReasonLike<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReasonSubscription<S: BosStr = DefaultStr> {
     pub indexed_at: Datetime,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -789,10 +748,7 @@ pub struct ReasonSubscription<S: BosStr = DefaultStr> {
 /// View of a rendered and cached notebook entry
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RenderedView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub css: Option<BlobRef<S>>,
@@ -1120,16 +1076,19 @@ impl<S: BosStr> LexiconSchema for RenderedView<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["text/css"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("css"),
@@ -1157,16 +1116,19 @@ impl<S: BosStr> LexiconSchema for RenderedView<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["text/html"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("html"),
@@ -1182,7 +1144,7 @@ impl<S: BosStr> LexiconSchema for RenderedView<S> {
 
 pub mod author_list_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1225,21 +1187,31 @@ pub mod author_list_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AuthorListViewBuilder<S: BosStr, St: author_list_view_state::State> {
+pub struct AuthorListViewBuilder<
+    St: author_list_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<ProfileDataView<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> AuthorListView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AuthorListViewBuilder<S, author_list_view_state::Empty> {
+impl AuthorListView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AuthorListViewBuilder<author_list_view_state::Empty, DefaultStr> {
         AuthorListViewBuilder::new()
     }
 }
 
-impl<S: BosStr> AuthorListViewBuilder<S, author_list_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> AuthorListView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AuthorListViewBuilder<author_list_view_state::Empty, S> {
+        AuthorListViewBuilder::builder()
+    }
+}
+
+impl AuthorListViewBuilder<author_list_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AuthorListViewBuilder {
             _state: PhantomData,
@@ -1249,7 +1221,18 @@ impl<S: BosStr> AuthorListViewBuilder<S, author_list_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AuthorListViewBuilder<S, St>
+impl<S: BosStr> AuthorListViewBuilder<author_list_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AuthorListViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AuthorListViewBuilder<St, S>
 where
     St: author_list_view_state::State,
     St::Index: author_list_view_state::IsUnset,
@@ -1258,7 +1241,7 @@ where
     pub fn index(
         mut self,
         value: impl Into<i64>,
-    ) -> AuthorListViewBuilder<S, author_list_view_state::SetIndex<St>> {
+    ) -> AuthorListViewBuilder<author_list_view_state::SetIndex<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AuthorListViewBuilder {
             _state: PhantomData,
@@ -1268,7 +1251,7 @@ where
     }
 }
 
-impl<S: BosStr, St> AuthorListViewBuilder<S, St>
+impl<St, S: BosStr> AuthorListViewBuilder<St, S>
 where
     St: author_list_view_state::State,
     St::Record: author_list_view_state::IsUnset,
@@ -1277,7 +1260,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<ProfileDataView<S>>,
-    ) -> AuthorListViewBuilder<S, author_list_view_state::SetRecord<St>> {
+    ) -> AuthorListViewBuilder<author_list_view_state::SetRecord<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AuthorListViewBuilder {
             _state: PhantomData,
@@ -1287,7 +1270,7 @@ where
     }
 }
 
-impl<S: BosStr, St: author_list_view_state::State> AuthorListViewBuilder<S, St> {
+impl<St: author_list_view_state::State, S: BosStr> AuthorListViewBuilder<St, S> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -1300,7 +1283,7 @@ impl<S: BosStr, St: author_list_view_state::State> AuthorListViewBuilder<S, St> 
     }
 }
 
-impl<S: BosStr, St> AuthorListViewBuilder<S, St>
+impl<St, S: BosStr> AuthorListViewBuilder<St, S>
 where
     St: author_list_view_state::State,
     St::Record: author_list_view_state::IsSet,
@@ -1316,7 +1299,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AuthorListView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AuthorListView<S> {
         AuthorListView {
             index: self._fields.0.unwrap(),
             record: self._fields.1.unwrap(),
@@ -1327,10 +1313,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.notebook.defs"),
@@ -1339,10 +1325,9 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("authorListView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("record"),
-                        SmolStr::new_static("index"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("record"), SmolStr::new_static("index")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1355,7 +1340,9 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("record"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileDataView"),
+                                r#ref: CowStr::new_static(
+                                    "sh.weaver.actor.defs#profileDataView",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1393,11 +1380,12 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("bookEntryView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("An ordered entry in a Weaver notebook.")),
-                    required: Some(vec![
-                        SmolStr::new_static("entry"),
-                        SmolStr::new_static("index"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("An ordered entry in a Weaver notebook."),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("entry"), SmolStr::new_static("index")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1436,11 +1424,12 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("chapterEntryView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("An entry within a chapter context.")),
-                    required: Some(vec![
-                        SmolStr::new_static("entry"),
-                        SmolStr::new_static("index"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("An entry within a chapter context."),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("entry"), SmolStr::new_static("index")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1480,14 +1469,15 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
                 SmolStr::new_static("chapterView"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Hydrated view of a chapter.")),
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("notebook"),
-                        SmolStr::new_static("authors"),
-                        SmolStr::new_static("record"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("notebook"),
+                            SmolStr::new_static("authors"),
+                            SmolStr::new_static("record"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1590,14 +1580,18 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("contentRating"),
                 LexUserType::String(LexString {
-                    description: Some(CowStr::new_static("Author-applied content rating.")),
+                    description: Some(
+                        CowStr::new_static("Author-applied content rating."),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("contentWarning"),
                 LexUserType::String(LexString {
-                    description: Some(CowStr::new_static("Author-applied content warning.")),
+                    description: Some(
+                        CowStr::new_static("Author-applied content warning."),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -1615,13 +1609,14 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("entryView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("authors"),
-                        SmolStr::new_static("record"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("authors"),
+                            SmolStr::new_static("record"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1738,9 +1733,11 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("feedEntryView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Entry with feed-specific context (discovery reason, notebook context).",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Entry with feed-specific context (discovery reason, notebook context).",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("entry")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1774,27 +1771,22 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("feedNotebookContext"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Minimal notebook context for feed display.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("title"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Minimal notebook context for feed display."),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("title")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("path"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -1814,7 +1806,7 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
                     refs: vec![
                         CowStr::new_static("#reasonLike"),
                         CowStr::new_static("#reasonBookmark"),
-                        CowStr::new_static("#reasonSubscription"),
+                        CowStr::new_static("#reasonSubscription")
                     ],
                     ..Default::default()
                 }),
@@ -1822,13 +1814,14 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("notebookView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("authors"),
-                        SmolStr::new_static("record"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("authors"),
+                            SmolStr::new_static("record"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1957,16 +1950,19 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("pageView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Hydrated view of a page (entries displayed together).",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("notebook"),
-                        SmolStr::new_static("record"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Hydrated view of a page (entries displayed together).",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("notebook"),
+                            SmolStr::new_static("record"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2148,15 +2144,18 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("publishedVersionView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A published version of an entry in a collaborator's repo.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("publisher"),
-                        SmolStr::new_static("publishedAt"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A published version of an entry in a collaborator's repo.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("publisher"),
+                            SmolStr::new_static("publishedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2190,7 +2189,9 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("publisher"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "sh.weaver.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2216,18 +2217,20 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("readingProgress"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Viewer's reading progress (appview-side state, not a record).",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Viewer's reading progress (appview-side state, not a record).",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("currentEntry"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Last entry the viewer was reading.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Last entry the viewer was reading."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -2263,9 +2266,7 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -2275,17 +2276,18 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reasonBookmark"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("by"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("by"), SmolStr::new_static("indexedAt")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("by"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "sh.weaver.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2304,17 +2306,18 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reasonLike"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("by"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("by"), SmolStr::new_static("indexedAt")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("by"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "sh.weaver.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2352,24 +2355,22 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("renderedView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "View of a rendered and cached notebook entry",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "View of a rendered and cached notebook entry",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("html")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("css"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("html"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -2390,7 +2391,9 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("title"),
                 LexUserType::String(LexString {
-                    description: Some(CowStr::new_static("The title of the notebook entry.")),
+                    description: Some(
+                        CowStr::new_static("The title of the notebook entry."),
+                    ),
                     max_length: Some(300usize),
                     ..Default::default()
                 }),
@@ -2403,7 +2406,7 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
 
 pub mod book_entry_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2434,21 +2437,28 @@ pub mod book_entry_ref_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BookEntryRefBuilder<S: BosStr, St: book_entry_ref_state::State> {
+pub struct BookEntryRefBuilder<St: book_entry_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<notebook::EntryView<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> BookEntryRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BookEntryRefBuilder<S, book_entry_ref_state::Empty> {
+impl BookEntryRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BookEntryRefBuilder<book_entry_ref_state::Empty, DefaultStr> {
         BookEntryRefBuilder::new()
     }
 }
 
-impl<S: BosStr> BookEntryRefBuilder<S, book_entry_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> BookEntryRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BookEntryRefBuilder<book_entry_ref_state::Empty, S> {
+        BookEntryRefBuilder::builder()
+    }
+}
+
+impl BookEntryRefBuilder<book_entry_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BookEntryRefBuilder {
             _state: PhantomData,
@@ -2458,7 +2468,18 @@ impl<S: BosStr> BookEntryRefBuilder<S, book_entry_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BookEntryRefBuilder<S, St>
+impl<S: BosStr> BookEntryRefBuilder<book_entry_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BookEntryRefBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BookEntryRefBuilder<St, S>
 where
     St: book_entry_ref_state::State,
     St::Entry: book_entry_ref_state::IsUnset,
@@ -2467,7 +2488,7 @@ where
     pub fn entry(
         mut self,
         value: impl Into<notebook::EntryView<S>>,
-    ) -> BookEntryRefBuilder<S, book_entry_ref_state::SetEntry<St>> {
+    ) -> BookEntryRefBuilder<book_entry_ref_state::SetEntry<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BookEntryRefBuilder {
             _state: PhantomData,
@@ -2477,7 +2498,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BookEntryRefBuilder<S, St>
+impl<St, S: BosStr> BookEntryRefBuilder<St, S>
 where
     St: book_entry_ref_state::State,
     St::Entry: book_entry_ref_state::IsSet,
@@ -2490,7 +2511,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BookEntryRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BookEntryRef<S> {
         BookEntryRef {
             entry: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -2500,7 +2524,7 @@ where
 
 pub mod book_entry_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2543,7 +2567,10 @@ pub mod book_entry_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BookEntryViewBuilder<S: BosStr, St: book_entry_view_state::State> {
+pub struct BookEntryViewBuilder<
+    St: book_entry_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<notebook::EntryView<S>>,
@@ -2554,15 +2581,22 @@ pub struct BookEntryViewBuilder<S: BosStr, St: book_entry_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> BookEntryView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BookEntryViewBuilder<S, book_entry_view_state::Empty> {
+impl BookEntryView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BookEntryViewBuilder<book_entry_view_state::Empty, DefaultStr> {
         BookEntryViewBuilder::new()
     }
 }
 
-impl<S: BosStr> BookEntryViewBuilder<S, book_entry_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> BookEntryView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BookEntryViewBuilder<book_entry_view_state::Empty, S> {
+        BookEntryViewBuilder::builder()
+    }
+}
+
+impl BookEntryViewBuilder<book_entry_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BookEntryViewBuilder {
             _state: PhantomData,
@@ -2572,7 +2606,18 @@ impl<S: BosStr> BookEntryViewBuilder<S, book_entry_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BookEntryViewBuilder<S, St>
+impl<S: BosStr> BookEntryViewBuilder<book_entry_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BookEntryViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BookEntryViewBuilder<St, S>
 where
     St: book_entry_view_state::State,
     St::Entry: book_entry_view_state::IsUnset,
@@ -2581,7 +2626,7 @@ where
     pub fn entry(
         mut self,
         value: impl Into<notebook::EntryView<S>>,
-    ) -> BookEntryViewBuilder<S, book_entry_view_state::SetEntry<St>> {
+    ) -> BookEntryViewBuilder<book_entry_view_state::SetEntry<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BookEntryViewBuilder {
             _state: PhantomData,
@@ -2591,7 +2636,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BookEntryViewBuilder<S, St>
+impl<St, S: BosStr> BookEntryViewBuilder<St, S>
 where
     St: book_entry_view_state::State,
     St::Index: book_entry_view_state::IsUnset,
@@ -2600,7 +2645,7 @@ where
     pub fn index(
         mut self,
         value: impl Into<i64>,
-    ) -> BookEntryViewBuilder<S, book_entry_view_state::SetIndex<St>> {
+    ) -> BookEntryViewBuilder<book_entry_view_state::SetIndex<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BookEntryViewBuilder {
             _state: PhantomData,
@@ -2610,7 +2655,7 @@ where
     }
 }
 
-impl<S: BosStr, St: book_entry_view_state::State> BookEntryViewBuilder<S, St> {
+impl<St: book_entry_view_state::State, S: BosStr> BookEntryViewBuilder<St, S> {
     /// Set the `next` field (optional)
     pub fn next(mut self, value: impl Into<Option<notebook::BookEntryRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -2623,7 +2668,7 @@ impl<S: BosStr, St: book_entry_view_state::State> BookEntryViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: book_entry_view_state::State> BookEntryViewBuilder<S, St> {
+impl<St: book_entry_view_state::State, S: BosStr> BookEntryViewBuilder<St, S> {
     /// Set the `prev` field (optional)
     pub fn prev(mut self, value: impl Into<Option<notebook::BookEntryRef<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -2636,7 +2681,7 @@ impl<S: BosStr, St: book_entry_view_state::State> BookEntryViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BookEntryViewBuilder<S, St>
+impl<St, S: BosStr> BookEntryViewBuilder<St, S>
 where
     St: book_entry_view_state::State,
     St::Entry: book_entry_view_state::IsSet,
@@ -2653,7 +2698,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BookEntryView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BookEntryView<S> {
         BookEntryView {
             entry: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),
@@ -2666,7 +2714,7 @@ where
 
 pub mod chapter_entry_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2674,42 +2722,45 @@ pub mod chapter_entry_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Index;
         type Entry;
+        type Index;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Index = Unset;
         type Entry = Unset;
-    }
-    ///State transition - sets the `index` field to Set
-    pub struct SetIndex<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndex<St> {}
-    impl<St: State> State for SetIndex<St> {
-        type Index = Set<members::index>;
-        type Entry = St::Entry;
+        type Index = Unset;
     }
     ///State transition - sets the `entry` field to Set
     pub struct SetEntry<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEntry<St> {}
     impl<St: State> State for SetEntry<St> {
-        type Index = St::Index;
         type Entry = Set<members::entry>;
+        type Index = St::Index;
+    }
+    ///State transition - sets the `index` field to Set
+    pub struct SetIndex<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndex<St> {}
+    impl<St: State> State for SetIndex<St> {
+        type Entry = St::Entry;
+        type Index = Set<members::index>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `index` field
-        pub struct index(());
         ///Marker type for the `entry` field
         pub struct entry(());
+        ///Marker type for the `index` field
+        pub struct index(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ChapterEntryViewBuilder<S: BosStr, St: chapter_entry_view_state::State> {
+pub struct ChapterEntryViewBuilder<
+    St: chapter_entry_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<notebook::EntryView<S>>,
@@ -2720,15 +2771,25 @@ pub struct ChapterEntryViewBuilder<S: BosStr, St: chapter_entry_view_state::Stat
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ChapterEntryView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ChapterEntryViewBuilder<S, chapter_entry_view_state::Empty> {
+impl ChapterEntryView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ChapterEntryViewBuilder<
+        chapter_entry_view_state::Empty,
+        DefaultStr,
+    > {
         ChapterEntryViewBuilder::new()
     }
 }
 
-impl<S: BosStr> ChapterEntryViewBuilder<S, chapter_entry_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ChapterEntryView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ChapterEntryViewBuilder<chapter_entry_view_state::Empty, S> {
+        ChapterEntryViewBuilder::builder()
+    }
+}
+
+impl ChapterEntryViewBuilder<chapter_entry_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ChapterEntryViewBuilder {
             _state: PhantomData,
@@ -2738,7 +2799,18 @@ impl<S: BosStr> ChapterEntryViewBuilder<S, chapter_entry_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ChapterEntryViewBuilder<S, St>
+impl<S: BosStr> ChapterEntryViewBuilder<chapter_entry_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ChapterEntryViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ChapterEntryViewBuilder<St, S>
 where
     St: chapter_entry_view_state::State,
     St::Entry: chapter_entry_view_state::IsUnset,
@@ -2747,7 +2819,7 @@ where
     pub fn entry(
         mut self,
         value: impl Into<notebook::EntryView<S>>,
-    ) -> ChapterEntryViewBuilder<S, chapter_entry_view_state::SetEntry<St>> {
+    ) -> ChapterEntryViewBuilder<chapter_entry_view_state::SetEntry<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ChapterEntryViewBuilder {
             _state: PhantomData,
@@ -2757,7 +2829,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ChapterEntryViewBuilder<S, St>
+impl<St, S: BosStr> ChapterEntryViewBuilder<St, S>
 where
     St: chapter_entry_view_state::State,
     St::Index: chapter_entry_view_state::IsUnset,
@@ -2766,7 +2838,7 @@ where
     pub fn index(
         mut self,
         value: impl Into<i64>,
-    ) -> ChapterEntryViewBuilder<S, chapter_entry_view_state::SetIndex<St>> {
+    ) -> ChapterEntryViewBuilder<chapter_entry_view_state::SetIndex<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ChapterEntryViewBuilder {
             _state: PhantomData,
@@ -2776,7 +2848,7 @@ where
     }
 }
 
-impl<S: BosStr, St: chapter_entry_view_state::State> ChapterEntryViewBuilder<S, St> {
+impl<St: chapter_entry_view_state::State, S: BosStr> ChapterEntryViewBuilder<St, S> {
     /// Set the `next` field (optional)
     pub fn next(mut self, value: impl Into<Option<notebook::BookEntryRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -2789,7 +2861,7 @@ impl<S: BosStr, St: chapter_entry_view_state::State> ChapterEntryViewBuilder<S, 
     }
 }
 
-impl<S: BosStr, St: chapter_entry_view_state::State> ChapterEntryViewBuilder<S, St> {
+impl<St: chapter_entry_view_state::State, S: BosStr> ChapterEntryViewBuilder<St, S> {
     /// Set the `prev` field (optional)
     pub fn prev(mut self, value: impl Into<Option<notebook::BookEntryRef<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -2802,11 +2874,11 @@ impl<S: BosStr, St: chapter_entry_view_state::State> ChapterEntryViewBuilder<S, 
     }
 }
 
-impl<S: BosStr, St> ChapterEntryViewBuilder<S, St>
+impl<St, S: BosStr> ChapterEntryViewBuilder<St, S>
 where
     St: chapter_entry_view_state::State,
-    St::Index: chapter_entry_view_state::IsSet,
     St::Entry: chapter_entry_view_state::IsSet,
+    St::Index: chapter_entry_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ChapterEntryView<S> {
@@ -2819,7 +2891,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChapterEntryView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ChapterEntryView<S> {
         ChapterEntryView {
             entry: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),
@@ -2832,7 +2907,7 @@ where
 
 pub mod chapter_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2840,110 +2915,110 @@ pub mod chapter_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Cid;
-        type Notebook;
-        type Record;
         type Authors;
+        type Record;
         type IndexedAt;
+        type Cid;
+        type Uri;
+        type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Cid = Unset;
-        type Notebook = Unset;
-        type Record = Unset;
         type Authors = Unset;
+        type Record = Unset;
         type IndexedAt = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Cid = St::Cid;
-        type Notebook = St::Notebook;
-        type Record = St::Record;
-        type Authors = St::Authors;
-        type IndexedAt = St::IndexedAt;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
-        type Cid = Set<members::cid>;
-        type Notebook = St::Notebook;
-        type Record = St::Record;
-        type Authors = St::Authors;
-        type IndexedAt = St::IndexedAt;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNotebook<St> {}
-    impl<St: State> State for SetNotebook<St> {
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-        type Notebook = Set<members::notebook>;
-        type Record = St::Record;
-        type Authors = St::Authors;
-        type IndexedAt = St::IndexedAt;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-        type Notebook = St::Notebook;
-        type Record = Set<members::record>;
-        type Authors = St::Authors;
-        type IndexedAt = St::IndexedAt;
+        type Cid = Unset;
+        type Uri = Unset;
+        type Notebook = Unset;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthors<St> {}
     impl<St: State> State for SetAuthors<St> {
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-        type Notebook = St::Notebook;
-        type Record = St::Record;
         type Authors = Set<members::authors>;
+        type Record = St::Record;
         type IndexedAt = St::IndexedAt;
+        type Cid = St::Cid;
+        type Uri = St::Uri;
+        type Notebook = St::Notebook;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Authors = St::Authors;
+        type Record = Set<members::record>;
+        type IndexedAt = St::IndexedAt;
+        type Cid = St::Cid;
+        type Uri = St::Uri;
+        type Notebook = St::Notebook;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
     impl<St: State> State for SetIndexedAt<St> {
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-        type Notebook = St::Notebook;
-        type Record = St::Record;
         type Authors = St::Authors;
+        type Record = St::Record;
         type IndexedAt = Set<members::indexed_at>;
+        type Cid = St::Cid;
+        type Uri = St::Uri;
+        type Notebook = St::Notebook;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Authors = St::Authors;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+        type Cid = Set<members::cid>;
+        type Uri = St::Uri;
+        type Notebook = St::Notebook;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Authors = St::Authors;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+        type Cid = St::Cid;
+        type Uri = Set<members::uri>;
+        type Notebook = St::Notebook;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
+        type Authors = St::Authors;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+        type Cid = St::Cid;
+        type Uri = St::Uri;
+        type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `authors` field
         pub struct authors(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ChapterViewBuilder<S: BosStr, St: chapter_view_state::State> {
+pub struct ChapterViewBuilder<St: chapter_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<notebook::AuthorListView<S>>>,
@@ -2959,15 +3034,22 @@ pub struct ChapterViewBuilder<S: BosStr, St: chapter_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ChapterView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ChapterViewBuilder<S, chapter_view_state::Empty> {
+impl ChapterView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ChapterViewBuilder<chapter_view_state::Empty, DefaultStr> {
         ChapterViewBuilder::new()
     }
 }
 
-impl<S: BosStr> ChapterViewBuilder<S, chapter_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ChapterView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ChapterViewBuilder<chapter_view_state::Empty, S> {
+        ChapterViewBuilder::builder()
+    }
+}
+
+impl ChapterViewBuilder<chapter_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ChapterViewBuilder {
             _state: PhantomData,
@@ -2977,7 +3059,18 @@ impl<S: BosStr> ChapterViewBuilder<S, chapter_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ChapterViewBuilder<S, St>
+impl<S: BosStr> ChapterViewBuilder<chapter_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ChapterViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ChapterViewBuilder<St, S>
 where
     St: chapter_view_state::State,
     St::Authors: chapter_view_state::IsUnset,
@@ -2986,7 +3079,7 @@ where
     pub fn authors(
         mut self,
         value: impl Into<Vec<notebook::AuthorListView<S>>>,
-    ) -> ChapterViewBuilder<S, chapter_view_state::SetAuthors<St>> {
+    ) -> ChapterViewBuilder<chapter_view_state::SetAuthors<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ChapterViewBuilder {
             _state: PhantomData,
@@ -2996,7 +3089,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ChapterViewBuilder<S, St>
+impl<St, S: BosStr> ChapterViewBuilder<St, S>
 where
     St: chapter_view_state::State,
     St::Cid: chapter_view_state::IsUnset,
@@ -3005,7 +3098,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> ChapterViewBuilder<S, chapter_view_state::SetCid<St>> {
+    ) -> ChapterViewBuilder<chapter_view_state::SetCid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ChapterViewBuilder {
             _state: PhantomData,
@@ -3015,7 +3108,7 @@ where
     }
 }
 
-impl<S: BosStr, St: chapter_view_state::State> ChapterViewBuilder<S, St> {
+impl<St: chapter_view_state::State, S: BosStr> ChapterViewBuilder<St, S> {
     /// Set the `entryCount` field (optional)
     pub fn entry_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -3028,7 +3121,7 @@ impl<S: BosStr, St: chapter_view_state::State> ChapterViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ChapterViewBuilder<S, St>
+impl<St, S: BosStr> ChapterViewBuilder<St, S>
 where
     St: chapter_view_state::State,
     St::IndexedAt: chapter_view_state::IsUnset,
@@ -3037,7 +3130,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ChapterViewBuilder<S, chapter_view_state::SetIndexedAt<St>> {
+    ) -> ChapterViewBuilder<chapter_view_state::SetIndexedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ChapterViewBuilder {
             _state: PhantomData,
@@ -3047,7 +3140,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ChapterViewBuilder<S, St>
+impl<St, S: BosStr> ChapterViewBuilder<St, S>
 where
     St: chapter_view_state::State,
     St::Notebook: chapter_view_state::IsUnset,
@@ -3056,7 +3149,7 @@ where
     pub fn notebook(
         mut self,
         value: impl Into<notebook::NotebookView<S>>,
-    ) -> ChapterViewBuilder<S, chapter_view_state::SetNotebook<St>> {
+    ) -> ChapterViewBuilder<chapter_view_state::SetNotebook<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ChapterViewBuilder {
             _state: PhantomData,
@@ -3066,7 +3159,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ChapterViewBuilder<S, St>
+impl<St, S: BosStr> ChapterViewBuilder<St, S>
 where
     St: chapter_view_state::State,
     St::Record: chapter_view_state::IsUnset,
@@ -3075,7 +3168,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> ChapterViewBuilder<S, chapter_view_state::SetRecord<St>> {
+    ) -> ChapterViewBuilder<chapter_view_state::SetRecord<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ChapterViewBuilder {
             _state: PhantomData,
@@ -3085,7 +3178,7 @@ where
     }
 }
 
-impl<S: BosStr, St: chapter_view_state::State> ChapterViewBuilder<S, St> {
+impl<St: chapter_view_state::State, S: BosStr> ChapterViewBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<notebook::Tags<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -3098,7 +3191,7 @@ impl<S: BosStr, St: chapter_view_state::State> ChapterViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: chapter_view_state::State> ChapterViewBuilder<S, St> {
+impl<St: chapter_view_state::State, S: BosStr> ChapterViewBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<notebook::Title<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -3111,7 +3204,7 @@ impl<S: BosStr, St: chapter_view_state::State> ChapterViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ChapterViewBuilder<S, St>
+impl<St, S: BosStr> ChapterViewBuilder<St, S>
 where
     St: chapter_view_state::State,
     St::Uri: chapter_view_state::IsUnset,
@@ -3120,7 +3213,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ChapterViewBuilder<S, chapter_view_state::SetUri<St>> {
+    ) -> ChapterViewBuilder<chapter_view_state::SetUri<St>, S> {
         self._fields.8 = Option::Some(value.into());
         ChapterViewBuilder {
             _state: PhantomData,
@@ -3130,15 +3223,15 @@ where
     }
 }
 
-impl<S: BosStr, St> ChapterViewBuilder<S, St>
+impl<St, S: BosStr> ChapterViewBuilder<St, S>
 where
     St: chapter_view_state::State,
-    St::Uri: chapter_view_state::IsSet,
-    St::Cid: chapter_view_state::IsSet,
-    St::Notebook: chapter_view_state::IsSet,
-    St::Record: chapter_view_state::IsSet,
     St::Authors: chapter_view_state::IsSet,
+    St::Record: chapter_view_state::IsSet,
     St::IndexedAt: chapter_view_state::IsSet,
+    St::Cid: chapter_view_state::IsSet,
+    St::Uri: chapter_view_state::IsSet,
+    St::Notebook: chapter_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ChapterView<S> {
@@ -3156,7 +3249,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChapterView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ChapterView<S> {
         ChapterView {
             authors: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -3187,7 +3283,7 @@ impl Default for ContentFormat {
 
 pub mod entry_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3195,90 +3291,90 @@ pub mod entry_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
+        type Authors;
+        type Record;
         type IndexedAt;
         type Uri;
-        type Record;
-        type Authors;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
+        type Authors = Unset;
+        type Record = Unset;
         type IndexedAt = Unset;
         type Uri = Unset;
-        type Record = Unset;
-        type Authors = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Cid = Set<members::cid>;
-        type IndexedAt = St::IndexedAt;
-        type Uri = St::Uri;
-        type Record = St::Record;
-        type Authors = St::Authors;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
-        type Cid = St::Cid;
-        type IndexedAt = Set<members::indexed_at>;
-        type Uri = St::Uri;
-        type Record = St::Record;
-        type Authors = St::Authors;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Cid = St::Cid;
-        type IndexedAt = St::IndexedAt;
-        type Uri = Set<members::uri>;
-        type Record = St::Record;
-        type Authors = St::Authors;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
-        type Cid = St::Cid;
-        type IndexedAt = St::IndexedAt;
-        type Uri = St::Uri;
-        type Record = Set<members::record>;
-        type Authors = St::Authors;
+        type Cid = Unset;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthors<St> {}
     impl<St: State> State for SetAuthors<St> {
-        type Cid = St::Cid;
+        type Authors = Set<members::authors>;
+        type Record = St::Record;
         type IndexedAt = St::IndexedAt;
         type Uri = St::Uri;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Authors = St::Authors;
+        type Record = Set<members::record>;
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Authors = St::Authors;
         type Record = St::Record;
-        type Authors = Set<members::authors>;
+        type IndexedAt = Set<members::indexed_at>;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Authors = St::Authors;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+        type Uri = Set<members::uri>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Authors = St::Authors;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `record` field
-        pub struct record(());
-        ///Marker type for the `authors` field
-        pub struct authors(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EntryViewBuilder<S: BosStr, St: entry_view_state::State> {
+pub struct EntryViewBuilder<St: entry_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<notebook::AuthorListView<S>>>,
@@ -3300,20 +3396,40 @@ pub struct EntryViewBuilder<S: BosStr, St: entry_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> EntryView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EntryViewBuilder<S, entry_view_state::Empty> {
+impl EntryView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EntryViewBuilder<entry_view_state::Empty, DefaultStr> {
         EntryViewBuilder::new()
     }
 }
 
-impl<S: BosStr> EntryViewBuilder<S, entry_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> EntryView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EntryViewBuilder<entry_view_state::Empty, S> {
+        EntryViewBuilder::builder()
+    }
+}
+
+impl EntryViewBuilder<entry_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EntryViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -3321,7 +3437,34 @@ impl<S: BosStr> EntryViewBuilder<S, entry_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> EntryViewBuilder<S, St>
+impl<S: BosStr> EntryViewBuilder<entry_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EntryViewBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> EntryViewBuilder<St, S>
 where
     St: entry_view_state::State,
     St::Authors: entry_view_state::IsUnset,
@@ -3330,7 +3473,7 @@ where
     pub fn authors(
         mut self,
         value: impl Into<Vec<notebook::AuthorListView<S>>>,
-    ) -> EntryViewBuilder<S, entry_view_state::SetAuthors<St>> {
+    ) -> EntryViewBuilder<entry_view_state::SetAuthors<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EntryViewBuilder {
             _state: PhantomData,
@@ -3340,7 +3483,7 @@ where
     }
 }
 
-impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
+impl<St: entry_view_state::State, S: BosStr> EntryViewBuilder<St, S> {
     /// Set the `bookmarkCount` field (optional)
     pub fn bookmark_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -3353,7 +3496,7 @@ impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EntryViewBuilder<S, St>
+impl<St, S: BosStr> EntryViewBuilder<St, S>
 where
     St: entry_view_state::State,
     St::Cid: entry_view_state::IsUnset,
@@ -3362,7 +3505,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> EntryViewBuilder<S, entry_view_state::SetCid<St>> {
+    ) -> EntryViewBuilder<entry_view_state::SetCid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         EntryViewBuilder {
             _state: PhantomData,
@@ -3372,7 +3515,7 @@ where
     }
 }
 
-impl<S: BosStr, St> EntryViewBuilder<S, St>
+impl<St, S: BosStr> EntryViewBuilder<St, S>
 where
     St: entry_view_state::State,
     St::IndexedAt: entry_view_state::IsUnset,
@@ -3381,7 +3524,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EntryViewBuilder<S, entry_view_state::SetIndexedAt<St>> {
+    ) -> EntryViewBuilder<entry_view_state::SetIndexedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         EntryViewBuilder {
             _state: PhantomData,
@@ -3391,7 +3534,7 @@ where
     }
 }
 
-impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
+impl<St: entry_view_state::State, S: BosStr> EntryViewBuilder<St, S> {
     /// Set the `likeCount` field (optional)
     pub fn like_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -3404,7 +3547,7 @@ impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
+impl<St: entry_view_state::State, S: BosStr> EntryViewBuilder<St, S> {
     /// Set the `path` field (optional)
     pub fn path(mut self, value: impl Into<Option<notebook::Path<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -3417,20 +3560,26 @@ impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
+impl<St: entry_view_state::State, S: BosStr> EntryViewBuilder<St, S> {
     /// Set the `permissions` field (optional)
-    pub fn permissions(mut self, value: impl Into<Option<notebook::PermissionsState<S>>>) -> Self {
+    pub fn permissions(
+        mut self,
+        value: impl Into<Option<notebook::PermissionsState<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `permissions` field to an Option value (optional)
-    pub fn maybe_permissions(mut self, value: Option<notebook::PermissionsState<S>>) -> Self {
+    pub fn maybe_permissions(
+        mut self,
+        value: Option<notebook::PermissionsState<S>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
 }
 
-impl<S: BosStr, St> EntryViewBuilder<S, St>
+impl<St, S: BosStr> EntryViewBuilder<St, S>
 where
     St: entry_view_state::State,
     St::Record: entry_view_state::IsUnset,
@@ -3439,7 +3588,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> EntryViewBuilder<S, entry_view_state::SetRecord<St>> {
+    ) -> EntryViewBuilder<entry_view_state::SetRecord<St>, S> {
         self._fields.7 = Option::Some(value.into());
         EntryViewBuilder {
             _state: PhantomData,
@@ -3449,20 +3598,26 @@ where
     }
 }
 
-impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
+impl<St: entry_view_state::State, S: BosStr> EntryViewBuilder<St, S> {
     /// Set the `renderedView` field (optional)
-    pub fn rendered_view(mut self, value: impl Into<Option<notebook::RenderedView<S>>>) -> Self {
+    pub fn rendered_view(
+        mut self,
+        value: impl Into<Option<notebook::RenderedView<S>>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `renderedView` field to an Option value (optional)
-    pub fn maybe_rendered_view(mut self, value: Option<notebook::RenderedView<S>>) -> Self {
+    pub fn maybe_rendered_view(
+        mut self,
+        value: Option<notebook::RenderedView<S>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
 }
 
-impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
+impl<St: entry_view_state::State, S: BosStr> EntryViewBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<notebook::Tags<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -3475,7 +3630,7 @@ impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
+impl<St: entry_view_state::State, S: BosStr> EntryViewBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<notebook::Title<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -3488,7 +3643,7 @@ impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EntryViewBuilder<S, St>
+impl<St, S: BosStr> EntryViewBuilder<St, S>
 where
     St: entry_view_state::State,
     St::Uri: entry_view_state::IsUnset,
@@ -3497,7 +3652,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> EntryViewBuilder<S, entry_view_state::SetUri<St>> {
+    ) -> EntryViewBuilder<entry_view_state::SetUri<St>, S> {
         self._fields.11 = Option::Some(value.into());
         EntryViewBuilder {
             _state: PhantomData,
@@ -3507,7 +3662,7 @@ where
     }
 }
 
-impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
+impl<St: entry_view_state::State, S: BosStr> EntryViewBuilder<St, S> {
     /// Set the `viewerBookmark` field (optional)
     pub fn viewer_bookmark(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.12 = value.into();
@@ -3520,7 +3675,7 @@ impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
+impl<St: entry_view_state::State, S: BosStr> EntryViewBuilder<St, S> {
     /// Set the `viewerLike` field (optional)
     pub fn viewer_like(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.13 = value.into();
@@ -3533,7 +3688,7 @@ impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
+impl<St: entry_view_state::State, S: BosStr> EntryViewBuilder<St, S> {
     /// Set the `viewerReadingProgress` field (optional)
     pub fn viewer_reading_progress(
         mut self,
@@ -3552,14 +3707,14 @@ impl<S: BosStr, St: entry_view_state::State> EntryViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EntryViewBuilder<S, St>
+impl<St, S: BosStr> EntryViewBuilder<St, S>
 where
     St: entry_view_state::State,
-    St::Cid: entry_view_state::IsSet,
+    St::Authors: entry_view_state::IsSet,
+    St::Record: entry_view_state::IsSet,
     St::IndexedAt: entry_view_state::IsSet,
     St::Uri: entry_view_state::IsSet,
-    St::Record: entry_view_state::IsSet,
-    St::Authors: entry_view_state::IsSet,
+    St::Cid: entry_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> EntryView<S> {
@@ -3583,7 +3738,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EntryView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EntryView<S> {
         EntryView {
             authors: self._fields.0.unwrap(),
             bookmark_count: self._fields.1,
@@ -3607,7 +3765,7 @@ where
 
 pub mod feed_entry_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3638,7 +3796,10 @@ pub mod feed_entry_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FeedEntryViewBuilder<S: BosStr, St: feed_entry_view_state::State> {
+pub struct FeedEntryViewBuilder<
+    St: feed_entry_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<notebook::EntryView<S>>,
@@ -3648,15 +3809,22 @@ pub struct FeedEntryViewBuilder<S: BosStr, St: feed_entry_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> FeedEntryView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FeedEntryViewBuilder<S, feed_entry_view_state::Empty> {
+impl FeedEntryView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FeedEntryViewBuilder<feed_entry_view_state::Empty, DefaultStr> {
         FeedEntryViewBuilder::new()
     }
 }
 
-impl<S: BosStr> FeedEntryViewBuilder<S, feed_entry_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> FeedEntryView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FeedEntryViewBuilder<feed_entry_view_state::Empty, S> {
+        FeedEntryViewBuilder::builder()
+    }
+}
+
+impl FeedEntryViewBuilder<feed_entry_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FeedEntryViewBuilder {
             _state: PhantomData,
@@ -3666,7 +3834,18 @@ impl<S: BosStr> FeedEntryViewBuilder<S, feed_entry_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FeedEntryViewBuilder<S, St>
+impl<S: BosStr> FeedEntryViewBuilder<feed_entry_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FeedEntryViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FeedEntryViewBuilder<St, S>
 where
     St: feed_entry_view_state::State,
     St::Entry: feed_entry_view_state::IsUnset,
@@ -3675,7 +3854,7 @@ where
     pub fn entry(
         mut self,
         value: impl Into<notebook::EntryView<S>>,
-    ) -> FeedEntryViewBuilder<S, feed_entry_view_state::SetEntry<St>> {
+    ) -> FeedEntryViewBuilder<feed_entry_view_state::SetEntry<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FeedEntryViewBuilder {
             _state: PhantomData,
@@ -3685,7 +3864,7 @@ where
     }
 }
 
-impl<S: BosStr, St: feed_entry_view_state::State> FeedEntryViewBuilder<S, St> {
+impl<St: feed_entry_view_state::State, S: BosStr> FeedEntryViewBuilder<St, S> {
     /// Set the `notebookContext` field (optional)
     pub fn notebook_context(
         mut self,
@@ -3704,7 +3883,7 @@ impl<S: BosStr, St: feed_entry_view_state::State> FeedEntryViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: feed_entry_view_state::State> FeedEntryViewBuilder<S, St> {
+impl<St: feed_entry_view_state::State, S: BosStr> FeedEntryViewBuilder<St, S> {
     /// Set the `reason` field (optional)
     pub fn reason(mut self, value: impl Into<Option<notebook::FeedReason<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -3717,7 +3896,7 @@ impl<S: BosStr, St: feed_entry_view_state::State> FeedEntryViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> FeedEntryViewBuilder<S, St>
+impl<St, S: BosStr> FeedEntryViewBuilder<St, S>
 where
     St: feed_entry_view_state::State,
     St::Entry: feed_entry_view_state::IsSet,
@@ -3732,7 +3911,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FeedEntryView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FeedEntryView<S> {
         FeedEntryView {
             entry: self._fields.0.unwrap(),
             notebook_context: self._fields.1,
@@ -3744,7 +3926,7 @@ where
 
 pub mod feed_notebook_context_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3752,56 +3934,72 @@ pub mod feed_notebook_context_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Uri;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type Uri = St::Uri;
+        type Title = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Title = St::Title;
         type Uri = Set<members::uri>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Uri = St::Uri;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FeedNotebookContextBuilder<S: BosStr, St: feed_notebook_context_state::State> {
+pub struct FeedNotebookContextBuilder<
+    St: feed_notebook_context_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> FeedNotebookContext<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FeedNotebookContextBuilder<S, feed_notebook_context_state::Empty> {
+impl FeedNotebookContext<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FeedNotebookContextBuilder<
+        feed_notebook_context_state::Empty,
+        DefaultStr,
+    > {
         FeedNotebookContextBuilder::new()
     }
 }
 
-impl<S: BosStr> FeedNotebookContextBuilder<S, feed_notebook_context_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> FeedNotebookContext<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FeedNotebookContextBuilder<
+        feed_notebook_context_state::Empty,
+        S,
+    > {
+        FeedNotebookContextBuilder::builder()
+    }
+}
+
+impl FeedNotebookContextBuilder<feed_notebook_context_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FeedNotebookContextBuilder {
             _state: PhantomData,
@@ -3811,7 +4009,21 @@ impl<S: BosStr> FeedNotebookContextBuilder<S, feed_notebook_context_state::Empty
     }
 }
 
-impl<S: BosStr, St: feed_notebook_context_state::State> FeedNotebookContextBuilder<S, St> {
+impl<S: BosStr> FeedNotebookContextBuilder<feed_notebook_context_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FeedNotebookContextBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<
+    St: feed_notebook_context_state::State,
+    S: BosStr,
+> FeedNotebookContextBuilder<St, S> {
     /// Set the `path` field (optional)
     pub fn path(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -3824,7 +4036,7 @@ impl<S: BosStr, St: feed_notebook_context_state::State> FeedNotebookContextBuild
     }
 }
 
-impl<S: BosStr, St> FeedNotebookContextBuilder<S, St>
+impl<St, S: BosStr> FeedNotebookContextBuilder<St, S>
 where
     St: feed_notebook_context_state::State,
     St::Title: feed_notebook_context_state::IsUnset,
@@ -3833,7 +4045,7 @@ where
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> FeedNotebookContextBuilder<S, feed_notebook_context_state::SetTitle<St>> {
+    ) -> FeedNotebookContextBuilder<feed_notebook_context_state::SetTitle<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FeedNotebookContextBuilder {
             _state: PhantomData,
@@ -3843,7 +4055,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FeedNotebookContextBuilder<S, St>
+impl<St, S: BosStr> FeedNotebookContextBuilder<St, S>
 where
     St: feed_notebook_context_state::State,
     St::Uri: feed_notebook_context_state::IsUnset,
@@ -3852,7 +4064,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> FeedNotebookContextBuilder<S, feed_notebook_context_state::SetUri<St>> {
+    ) -> FeedNotebookContextBuilder<feed_notebook_context_state::SetUri<St>, S> {
         self._fields.2 = Option::Some(value.into());
         FeedNotebookContextBuilder {
             _state: PhantomData,
@@ -3862,11 +4074,11 @@ where
     }
 }
 
-impl<S: BosStr, St> FeedNotebookContextBuilder<S, St>
+impl<St, S: BosStr> FeedNotebookContextBuilder<St, S>
 where
     St: feed_notebook_context_state::State,
-    St::Title: feed_notebook_context_state::IsSet,
     St::Uri: feed_notebook_context_state::IsSet,
+    St::Title: feed_notebook_context_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> FeedNotebookContext<S> {
@@ -3878,7 +4090,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FeedNotebookContext<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FeedNotebookContext<S> {
         FeedNotebookContext {
             path: self._fields.0,
             title: self._fields.1.unwrap(),
@@ -3890,7 +4105,7 @@ where
 
 pub mod notebook_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3898,90 +4113,90 @@ pub mod notebook_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
-        type IndexedAt;
-        type Uri;
         type Cid;
+        type Uri;
         type Authors;
+        type IndexedAt;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
-        type IndexedAt = Unset;
-        type Uri = Unset;
         type Cid = Unset;
+        type Uri = Unset;
         type Authors = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
-        type Record = Set<members::record>;
-        type IndexedAt = St::IndexedAt;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-        type Authors = St::Authors;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
-        type Record = St::Record;
-        type IndexedAt = Set<members::indexed_at>;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-        type Authors = St::Authors;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Record = St::Record;
-        type IndexedAt = St::IndexedAt;
-        type Uri = Set<members::uri>;
-        type Cid = St::Cid;
-        type Authors = St::Authors;
+        type IndexedAt = Unset;
+        type Record = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Record = St::Record;
-        type IndexedAt = St::IndexedAt;
-        type Uri = St::Uri;
         type Cid = Set<members::cid>;
+        type Uri = St::Uri;
         type Authors = St::Authors;
+        type IndexedAt = St::IndexedAt;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type Uri = Set<members::uri>;
+        type Authors = St::Authors;
+        type IndexedAt = St::IndexedAt;
+        type Record = St::Record;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthors<St> {}
     impl<St: State> State for SetAuthors<St> {
-        type Record = St::Record;
-        type IndexedAt = St::IndexedAt;
-        type Uri = St::Uri;
         type Cid = St::Cid;
+        type Uri = St::Uri;
         type Authors = Set<members::authors>;
+        type IndexedAt = St::IndexedAt;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Cid = St::Cid;
+        type Uri = St::Uri;
+        type Authors = St::Authors;
+        type IndexedAt = Set<members::indexed_at>;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Cid = St::Cid;
+        type Uri = St::Uri;
+        type Authors = St::Authors;
+        type IndexedAt = St::IndexedAt;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `authors` field
         pub struct authors(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NotebookViewBuilder<S: BosStr, St: notebook_view_state::State> {
+pub struct NotebookViewBuilder<St: notebook_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<notebook::AuthorListView<S>>>,
@@ -4005,28 +4220,79 @@ pub struct NotebookViewBuilder<S: BosStr, St: notebook_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> NotebookView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> NotebookViewBuilder<S, notebook_view_state::Empty> {
+impl NotebookView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> NotebookViewBuilder<notebook_view_state::Empty, DefaultStr> {
         NotebookViewBuilder::new()
     }
 }
 
-impl<S: BosStr> NotebookViewBuilder<S, notebook_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> NotebookView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> NotebookViewBuilder<notebook_view_state::Empty, S> {
+        NotebookViewBuilder::builder()
+    }
+}
+
+impl NotebookViewBuilder<notebook_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         NotebookViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St> NotebookViewBuilder<S, St>
+impl<S: BosStr> NotebookViewBuilder<notebook_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        NotebookViewBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> NotebookViewBuilder<St, S>
 where
     St: notebook_view_state::State,
     St::Authors: notebook_view_state::IsUnset,
@@ -4035,7 +4301,7 @@ where
     pub fn authors(
         mut self,
         value: impl Into<Vec<notebook::AuthorListView<S>>>,
-    ) -> NotebookViewBuilder<S, notebook_view_state::SetAuthors<St>> {
+    ) -> NotebookViewBuilder<notebook_view_state::SetAuthors<St>, S> {
         self._fields.0 = Option::Some(value.into());
         NotebookViewBuilder {
             _state: PhantomData,
@@ -4045,7 +4311,7 @@ where
     }
 }
 
-impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
+impl<St: notebook_view_state::State, S: BosStr> NotebookViewBuilder<St, S> {
     /// Set the `bookmarkCount` field (optional)
     pub fn bookmark_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -4058,7 +4324,7 @@ impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> NotebookViewBuilder<S, St>
+impl<St, S: BosStr> NotebookViewBuilder<St, S>
 where
     St: notebook_view_state::State,
     St::Cid: notebook_view_state::IsUnset,
@@ -4067,7 +4333,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> NotebookViewBuilder<S, notebook_view_state::SetCid<St>> {
+    ) -> NotebookViewBuilder<notebook_view_state::SetCid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         NotebookViewBuilder {
             _state: PhantomData,
@@ -4077,7 +4343,7 @@ where
     }
 }
 
-impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
+impl<St: notebook_view_state::State, S: BosStr> NotebookViewBuilder<St, S> {
     /// Set the `entryCount` field (optional)
     pub fn entry_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -4090,7 +4356,7 @@ impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> NotebookViewBuilder<S, St>
+impl<St, S: BosStr> NotebookViewBuilder<St, S>
 where
     St: notebook_view_state::State,
     St::IndexedAt: notebook_view_state::IsUnset,
@@ -4099,7 +4365,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> NotebookViewBuilder<S, notebook_view_state::SetIndexedAt<St>> {
+    ) -> NotebookViewBuilder<notebook_view_state::SetIndexedAt<St>, S> {
         self._fields.4 = Option::Some(value.into());
         NotebookViewBuilder {
             _state: PhantomData,
@@ -4109,7 +4375,7 @@ where
     }
 }
 
-impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
+impl<St: notebook_view_state::State, S: BosStr> NotebookViewBuilder<St, S> {
     /// Set the `likeCount` field (optional)
     pub fn like_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -4122,7 +4388,7 @@ impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
+impl<St: notebook_view_state::State, S: BosStr> NotebookViewBuilder<St, S> {
     /// Set the `path` field (optional)
     pub fn path(mut self, value: impl Into<Option<notebook::Path<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -4135,20 +4401,26 @@ impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
+impl<St: notebook_view_state::State, S: BosStr> NotebookViewBuilder<St, S> {
     /// Set the `permissions` field (optional)
-    pub fn permissions(mut self, value: impl Into<Option<notebook::PermissionsState<S>>>) -> Self {
+    pub fn permissions(
+        mut self,
+        value: impl Into<Option<notebook::PermissionsState<S>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `permissions` field to an Option value (optional)
-    pub fn maybe_permissions(mut self, value: Option<notebook::PermissionsState<S>>) -> Self {
+    pub fn maybe_permissions(
+        mut self,
+        value: Option<notebook::PermissionsState<S>>,
+    ) -> Self {
         self._fields.7 = value;
         self
     }
 }
 
-impl<S: BosStr, St> NotebookViewBuilder<S, St>
+impl<St, S: BosStr> NotebookViewBuilder<St, S>
 where
     St: notebook_view_state::State,
     St::Record: notebook_view_state::IsUnset,
@@ -4157,7 +4429,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> NotebookViewBuilder<S, notebook_view_state::SetRecord<St>> {
+    ) -> NotebookViewBuilder<notebook_view_state::SetRecord<St>, S> {
         self._fields.8 = Option::Some(value.into());
         NotebookViewBuilder {
             _state: PhantomData,
@@ -4167,7 +4439,7 @@ where
     }
 }
 
-impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
+impl<St: notebook_view_state::State, S: BosStr> NotebookViewBuilder<St, S> {
     /// Set the `subscriberCount` field (optional)
     pub fn subscriber_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.9 = value.into();
@@ -4180,7 +4452,7 @@ impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
+impl<St: notebook_view_state::State, S: BosStr> NotebookViewBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<notebook::Tags<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -4193,7 +4465,7 @@ impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
+impl<St: notebook_view_state::State, S: BosStr> NotebookViewBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<notebook::Title<S>>>) -> Self {
         self._fields.11 = value.into();
@@ -4206,7 +4478,7 @@ impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> NotebookViewBuilder<S, St>
+impl<St, S: BosStr> NotebookViewBuilder<St, S>
 where
     St: notebook_view_state::State,
     St::Uri: notebook_view_state::IsUnset,
@@ -4215,7 +4487,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> NotebookViewBuilder<S, notebook_view_state::SetUri<St>> {
+    ) -> NotebookViewBuilder<notebook_view_state::SetUri<St>, S> {
         self._fields.12 = Option::Some(value.into());
         NotebookViewBuilder {
             _state: PhantomData,
@@ -4225,7 +4497,7 @@ where
     }
 }
 
-impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
+impl<St: notebook_view_state::State, S: BosStr> NotebookViewBuilder<St, S> {
     /// Set the `viewerBookmark` field (optional)
     pub fn viewer_bookmark(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.13 = value.into();
@@ -4238,7 +4510,7 @@ impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
+impl<St: notebook_view_state::State, S: BosStr> NotebookViewBuilder<St, S> {
     /// Set the `viewerLike` field (optional)
     pub fn viewer_like(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.14 = value.into();
@@ -4251,7 +4523,7 @@ impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
+impl<St: notebook_view_state::State, S: BosStr> NotebookViewBuilder<St, S> {
     /// Set the `viewerReadingProgress` field (optional)
     pub fn viewer_reading_progress(
         mut self,
@@ -4270,7 +4542,7 @@ impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
+impl<St: notebook_view_state::State, S: BosStr> NotebookViewBuilder<St, S> {
     /// Set the `viewerSubscription` field (optional)
     pub fn viewer_subscription(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.16 = value.into();
@@ -4283,14 +4555,14 @@ impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> NotebookViewBuilder<S, St>
+impl<St, S: BosStr> NotebookViewBuilder<St, S>
 where
     St: notebook_view_state::State,
-    St::Record: notebook_view_state::IsSet,
-    St::IndexedAt: notebook_view_state::IsSet,
-    St::Uri: notebook_view_state::IsSet,
     St::Cid: notebook_view_state::IsSet,
+    St::Uri: notebook_view_state::IsSet,
     St::Authors: notebook_view_state::IsSet,
+    St::IndexedAt: notebook_view_state::IsSet,
+    St::Record: notebook_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> NotebookView<S> {
@@ -4316,7 +4588,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NotebookView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> NotebookView<S> {
         NotebookView {
             authors: self._fields.0.unwrap(),
             bookmark_count: self._fields.1,
@@ -4342,7 +4617,7 @@ where
 
 pub mod page_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4352,8 +4627,8 @@ pub mod page_view_state {
     pub trait State: sealed::Sealed {
         type Uri;
         type Cid;
-        type Notebook;
         type Record;
+        type Notebook;
         type IndexedAt;
     }
     /// Empty state - all required fields are unset
@@ -4362,8 +4637,8 @@ pub mod page_view_state {
     impl State for Empty {
         type Uri = Unset;
         type Cid = Unset;
-        type Notebook = Unset;
         type Record = Unset;
+        type Notebook = Unset;
         type IndexedAt = Unset;
     }
     ///State transition - sets the `uri` field to Set
@@ -4372,8 +4647,8 @@ pub mod page_view_state {
     impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
         type Cid = St::Cid;
-        type Notebook = St::Notebook;
         type Record = St::Record;
+        type Notebook = St::Notebook;
         type IndexedAt = St::IndexedAt;
     }
     ///State transition - sets the `cid` field to Set
@@ -4382,18 +4657,8 @@ pub mod page_view_state {
     impl<St: State> State for SetCid<St> {
         type Uri = St::Uri;
         type Cid = Set<members::cid>;
+        type Record = St::Record;
         type Notebook = St::Notebook;
-        type Record = St::Record;
-        type IndexedAt = St::IndexedAt;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNotebook<St> {}
-    impl<St: State> State for SetNotebook<St> {
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-        type Notebook = Set<members::notebook>;
-        type Record = St::Record;
         type IndexedAt = St::IndexedAt;
     }
     ///State transition - sets the `record` field to Set
@@ -4402,8 +4667,18 @@ pub mod page_view_state {
     impl<St: State> State for SetRecord<St> {
         type Uri = St::Uri;
         type Cid = St::Cid;
-        type Notebook = St::Notebook;
         type Record = Set<members::record>;
+        type Notebook = St::Notebook;
+        type IndexedAt = St::IndexedAt;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type Record = St::Record;
+        type Notebook = Set<members::notebook>;
         type IndexedAt = St::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
@@ -4412,8 +4687,8 @@ pub mod page_view_state {
     impl<St: State> State for SetIndexedAt<St> {
         type Uri = St::Uri;
         type Cid = St::Cid;
-        type Notebook = St::Notebook;
         type Record = St::Record;
+        type Notebook = St::Notebook;
         type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
@@ -4423,17 +4698,17 @@ pub mod page_view_state {
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PageViewBuilder<S: BosStr, St: page_view_state::State> {
+pub struct PageViewBuilder<St: page_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
@@ -4448,15 +4723,22 @@ pub struct PageViewBuilder<S: BosStr, St: page_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PageView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PageViewBuilder<S, page_view_state::Empty> {
+impl PageView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PageViewBuilder<page_view_state::Empty, DefaultStr> {
         PageViewBuilder::new()
     }
 }
 
-impl<S: BosStr> PageViewBuilder<S, page_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PageView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PageViewBuilder<page_view_state::Empty, S> {
+        PageViewBuilder::builder()
+    }
+}
+
+impl PageViewBuilder<page_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PageViewBuilder {
             _state: PhantomData,
@@ -4466,7 +4748,18 @@ impl<S: BosStr> PageViewBuilder<S, page_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PageViewBuilder<S, St>
+impl<S: BosStr> PageViewBuilder<page_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PageViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PageViewBuilder<St, S>
 where
     St: page_view_state::State,
     St::Cid: page_view_state::IsUnset,
@@ -4475,7 +4768,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> PageViewBuilder<S, page_view_state::SetCid<St>> {
+    ) -> PageViewBuilder<page_view_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PageViewBuilder {
             _state: PhantomData,
@@ -4485,7 +4778,7 @@ where
     }
 }
 
-impl<S: BosStr, St: page_view_state::State> PageViewBuilder<S, St> {
+impl<St: page_view_state::State, S: BosStr> PageViewBuilder<St, S> {
     /// Set the `entryCount` field (optional)
     pub fn entry_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -4498,7 +4791,7 @@ impl<S: BosStr, St: page_view_state::State> PageViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PageViewBuilder<S, St>
+impl<St, S: BosStr> PageViewBuilder<St, S>
 where
     St: page_view_state::State,
     St::IndexedAt: page_view_state::IsUnset,
@@ -4507,7 +4800,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PageViewBuilder<S, page_view_state::SetIndexedAt<St>> {
+    ) -> PageViewBuilder<page_view_state::SetIndexedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PageViewBuilder {
             _state: PhantomData,
@@ -4517,7 +4810,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PageViewBuilder<S, St>
+impl<St, S: BosStr> PageViewBuilder<St, S>
 where
     St: page_view_state::State,
     St::Notebook: page_view_state::IsUnset,
@@ -4526,7 +4819,7 @@ where
     pub fn notebook(
         mut self,
         value: impl Into<notebook::NotebookView<S>>,
-    ) -> PageViewBuilder<S, page_view_state::SetNotebook<St>> {
+    ) -> PageViewBuilder<page_view_state::SetNotebook<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PageViewBuilder {
             _state: PhantomData,
@@ -4536,7 +4829,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PageViewBuilder<S, St>
+impl<St, S: BosStr> PageViewBuilder<St, S>
 where
     St: page_view_state::State,
     St::Record: page_view_state::IsUnset,
@@ -4545,7 +4838,7 @@ where
     pub fn record(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> PageViewBuilder<S, page_view_state::SetRecord<St>> {
+    ) -> PageViewBuilder<page_view_state::SetRecord<St>, S> {
         self._fields.4 = Option::Some(value.into());
         PageViewBuilder {
             _state: PhantomData,
@@ -4555,7 +4848,7 @@ where
     }
 }
 
-impl<S: BosStr, St: page_view_state::State> PageViewBuilder<S, St> {
+impl<St: page_view_state::State, S: BosStr> PageViewBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<notebook::Tags<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -4568,7 +4861,7 @@ impl<S: BosStr, St: page_view_state::State> PageViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: page_view_state::State> PageViewBuilder<S, St> {
+impl<St: page_view_state::State, S: BosStr> PageViewBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<notebook::Title<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -4581,7 +4874,7 @@ impl<S: BosStr, St: page_view_state::State> PageViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PageViewBuilder<S, St>
+impl<St, S: BosStr> PageViewBuilder<St, S>
 where
     St: page_view_state::State,
     St::Uri: page_view_state::IsUnset,
@@ -4590,7 +4883,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> PageViewBuilder<S, page_view_state::SetUri<St>> {
+    ) -> PageViewBuilder<page_view_state::SetUri<St>, S> {
         self._fields.7 = Option::Some(value.into());
         PageViewBuilder {
             _state: PhantomData,
@@ -4600,13 +4893,13 @@ where
     }
 }
 
-impl<S: BosStr, St> PageViewBuilder<S, St>
+impl<St, S: BosStr> PageViewBuilder<St, S>
 where
     St: page_view_state::State,
     St::Uri: page_view_state::IsSet,
     St::Cid: page_view_state::IsSet,
-    St::Notebook: page_view_state::IsSet,
     St::Record: page_view_state::IsSet,
+    St::Notebook: page_view_state::IsSet,
     St::IndexedAt: page_view_state::IsSet,
 {
     /// Build the final struct.
@@ -4641,7 +4934,7 @@ where
 
 pub mod permission_grant_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4650,71 +4943,74 @@ pub mod permission_grant_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
-        type Scope;
         type Source;
         type GrantedAt;
+        type Scope;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
-        type Scope = Unset;
         type Source = Unset;
         type GrantedAt = Unset;
+        type Scope = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
+        type Source = St::Source;
+        type GrantedAt = St::GrantedAt;
         type Scope = St::Scope;
-        type Source = St::Source;
-        type GrantedAt = St::GrantedAt;
-    }
-    ///State transition - sets the `scope` field to Set
-    pub struct SetScope<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScope<St> {}
-    impl<St: State> State for SetScope<St> {
-        type Did = St::Did;
-        type Scope = Set<members::scope>;
-        type Source = St::Source;
-        type GrantedAt = St::GrantedAt;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSource<St> {}
     impl<St: State> State for SetSource<St> {
         type Did = St::Did;
-        type Scope = St::Scope;
         type Source = Set<members::source>;
         type GrantedAt = St::GrantedAt;
+        type Scope = St::Scope;
     }
     ///State transition - sets the `granted_at` field to Set
     pub struct SetGrantedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGrantedAt<St> {}
     impl<St: State> State for SetGrantedAt<St> {
         type Did = St::Did;
-        type Scope = St::Scope;
         type Source = St::Source;
         type GrantedAt = Set<members::granted_at>;
+        type Scope = St::Scope;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScope<St> {}
+    impl<St: State> State for SetScope<St> {
+        type Did = St::Did;
+        type Source = St::Source;
+        type GrantedAt = St::GrantedAt;
+        type Scope = Set<members::scope>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `scope` field
-        pub struct scope(());
         ///Marker type for the `source` field
         pub struct source(());
         ///Marker type for the `granted_at` field
         pub struct granted_at(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PermissionGrantBuilder<S: BosStr, St: permission_grant_state::State> {
+pub struct PermissionGrantBuilder<
+    St: permission_grant_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -4725,15 +5021,22 @@ pub struct PermissionGrantBuilder<S: BosStr, St: permission_grant_state::State> 
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PermissionGrant<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PermissionGrantBuilder<S, permission_grant_state::Empty> {
+impl PermissionGrant<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PermissionGrantBuilder<permission_grant_state::Empty, DefaultStr> {
         PermissionGrantBuilder::new()
     }
 }
 
-impl<S: BosStr> PermissionGrantBuilder<S, permission_grant_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PermissionGrant<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PermissionGrantBuilder<permission_grant_state::Empty, S> {
+        PermissionGrantBuilder::builder()
+    }
+}
+
+impl PermissionGrantBuilder<permission_grant_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PermissionGrantBuilder {
             _state: PhantomData,
@@ -4743,7 +5046,18 @@ impl<S: BosStr> PermissionGrantBuilder<S, permission_grant_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PermissionGrantBuilder<S, St>
+impl<S: BosStr> PermissionGrantBuilder<permission_grant_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PermissionGrantBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PermissionGrantBuilder<St, S>
 where
     St: permission_grant_state::State,
     St::Did: permission_grant_state::IsUnset,
@@ -4752,7 +5066,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> PermissionGrantBuilder<S, permission_grant_state::SetDid<St>> {
+    ) -> PermissionGrantBuilder<permission_grant_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PermissionGrantBuilder {
             _state: PhantomData,
@@ -4762,7 +5076,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PermissionGrantBuilder<S, St>
+impl<St, S: BosStr> PermissionGrantBuilder<St, S>
 where
     St: permission_grant_state::State,
     St::GrantedAt: permission_grant_state::IsUnset,
@@ -4771,7 +5085,7 @@ where
     pub fn granted_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PermissionGrantBuilder<S, permission_grant_state::SetGrantedAt<St>> {
+    ) -> PermissionGrantBuilder<permission_grant_state::SetGrantedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PermissionGrantBuilder {
             _state: PhantomData,
@@ -4781,7 +5095,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PermissionGrantBuilder<S, St>
+impl<St, S: BosStr> PermissionGrantBuilder<St, S>
 where
     St: permission_grant_state::State,
     St::Scope: permission_grant_state::IsUnset,
@@ -4790,7 +5104,7 @@ where
     pub fn scope(
         mut self,
         value: impl Into<PermissionGrantScope<S>>,
-    ) -> PermissionGrantBuilder<S, permission_grant_state::SetScope<St>> {
+    ) -> PermissionGrantBuilder<permission_grant_state::SetScope<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PermissionGrantBuilder {
             _state: PhantomData,
@@ -4800,7 +5114,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PermissionGrantBuilder<S, St>
+impl<St, S: BosStr> PermissionGrantBuilder<St, S>
 where
     St: permission_grant_state::State,
     St::Source: permission_grant_state::IsUnset,
@@ -4809,7 +5123,7 @@ where
     pub fn source(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> PermissionGrantBuilder<S, permission_grant_state::SetSource<St>> {
+    ) -> PermissionGrantBuilder<permission_grant_state::SetSource<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PermissionGrantBuilder {
             _state: PhantomData,
@@ -4819,13 +5133,13 @@ where
     }
 }
 
-impl<S: BosStr, St> PermissionGrantBuilder<S, St>
+impl<St, S: BosStr> PermissionGrantBuilder<St, S>
 where
     St: permission_grant_state::State,
     St::Did: permission_grant_state::IsSet,
-    St::Scope: permission_grant_state::IsSet,
     St::Source: permission_grant_state::IsSet,
     St::GrantedAt: permission_grant_state::IsSet,
+    St::Scope: permission_grant_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PermissionGrant<S> {
@@ -4838,7 +5152,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PermissionGrant<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PermissionGrant<S> {
         PermissionGrant {
             did: self._fields.0.unwrap(),
             granted_at: self._fields.1.unwrap(),
@@ -4851,7 +5168,7 @@ where
 
 pub mod permissions_state_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4882,7 +5199,10 @@ pub mod permissions_state_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PermissionsStateBuilder<S: BosStr, St: permissions_state_state::State> {
+pub struct PermissionsStateBuilder<
+    St: permissions_state_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<notebook::PermissionGrant<S>>>,
@@ -4891,15 +5211,22 @@ pub struct PermissionsStateBuilder<S: BosStr, St: permissions_state_state::State
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PermissionsState<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PermissionsStateBuilder<S, permissions_state_state::Empty> {
+impl PermissionsState<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PermissionsStateBuilder<permissions_state_state::Empty, DefaultStr> {
         PermissionsStateBuilder::new()
     }
 }
 
-impl<S: BosStr> PermissionsStateBuilder<S, permissions_state_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PermissionsState<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PermissionsStateBuilder<permissions_state_state::Empty, S> {
+        PermissionsStateBuilder::builder()
+    }
+}
+
+impl PermissionsStateBuilder<permissions_state_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PermissionsStateBuilder {
             _state: PhantomData,
@@ -4909,7 +5236,18 @@ impl<S: BosStr> PermissionsStateBuilder<S, permissions_state_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PermissionsStateBuilder<S, St>
+impl<S: BosStr> PermissionsStateBuilder<permissions_state_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PermissionsStateBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PermissionsStateBuilder<St, S>
 where
     St: permissions_state_state::State,
     St::Editors: permissions_state_state::IsUnset,
@@ -4918,7 +5256,7 @@ where
     pub fn editors(
         mut self,
         value: impl Into<Vec<notebook::PermissionGrant<S>>>,
-    ) -> PermissionsStateBuilder<S, permissions_state_state::SetEditors<St>> {
+    ) -> PermissionsStateBuilder<permissions_state_state::SetEditors<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PermissionsStateBuilder {
             _state: PhantomData,
@@ -4928,20 +5266,26 @@ where
     }
 }
 
-impl<S: BosStr, St: permissions_state_state::State> PermissionsStateBuilder<S, St> {
+impl<St: permissions_state_state::State, S: BosStr> PermissionsStateBuilder<St, S> {
     /// Set the `viewers` field (optional)
-    pub fn viewers(mut self, value: impl Into<Option<Vec<notebook::PermissionGrant<S>>>>) -> Self {
+    pub fn viewers(
+        mut self,
+        value: impl Into<Option<Vec<notebook::PermissionGrant<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `viewers` field to an Option value (optional)
-    pub fn maybe_viewers(mut self, value: Option<Vec<notebook::PermissionGrant<S>>>) -> Self {
+    pub fn maybe_viewers(
+        mut self,
+        value: Option<Vec<notebook::PermissionGrant<S>>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<S: BosStr, St> PermissionsStateBuilder<S, St>
+impl<St, S: BosStr> PermissionsStateBuilder<St, S>
 where
     St: permissions_state_state::State,
     St::Editors: permissions_state_state::IsSet,
@@ -4955,7 +5299,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PermissionsState<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PermissionsState<S> {
         PermissionsState {
             editors: self._fields.0.unwrap(),
             viewers: self._fields.1,
@@ -4966,7 +5313,7 @@ where
 
 pub mod published_version_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4974,72 +5321,75 @@ pub mod published_version_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Publisher;
         type PublishedAt;
         type Cid;
-        type Publisher;
         type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Publisher = Unset;
         type PublishedAt = Unset;
         type Cid = Unset;
-        type Publisher = Unset;
         type Uri = Unset;
+    }
+    ///State transition - sets the `publisher` field to Set
+    pub struct SetPublisher<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPublisher<St> {}
+    impl<St: State> State for SetPublisher<St> {
+        type Publisher = Set<members::publisher>;
+        type PublishedAt = St::PublishedAt;
+        type Cid = St::Cid;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `published_at` field to Set
     pub struct SetPublishedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPublishedAt<St> {}
     impl<St: State> State for SetPublishedAt<St> {
+        type Publisher = St::Publisher;
         type PublishedAt = Set<members::published_at>;
         type Cid = St::Cid;
-        type Publisher = St::Publisher;
         type Uri = St::Uri;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
+        type Publisher = St::Publisher;
         type PublishedAt = St::PublishedAt;
         type Cid = Set<members::cid>;
-        type Publisher = St::Publisher;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `publisher` field to Set
-    pub struct SetPublisher<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPublisher<St> {}
-    impl<St: State> State for SetPublisher<St> {
-        type PublishedAt = St::PublishedAt;
-        type Cid = St::Cid;
-        type Publisher = Set<members::publisher>;
         type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
+        type Publisher = St::Publisher;
         type PublishedAt = St::PublishedAt;
         type Cid = St::Cid;
-        type Publisher = St::Publisher;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `publisher` field
+        pub struct publisher(());
         ///Marker type for the `published_at` field
         pub struct published_at(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `publisher` field
-        pub struct publisher(());
         ///Marker type for the `uri` field
         pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PublishedVersionViewBuilder<S: BosStr, St: published_version_view_state::State> {
+pub struct PublishedVersionViewBuilder<
+    St: published_version_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
@@ -5053,15 +5403,28 @@ pub struct PublishedVersionViewBuilder<S: BosStr, St: published_version_view_sta
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PublishedVersionView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PublishedVersionViewBuilder<S, published_version_view_state::Empty> {
+impl PublishedVersionView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PublishedVersionViewBuilder<
+        published_version_view_state::Empty,
+        DefaultStr,
+    > {
         PublishedVersionViewBuilder::new()
     }
 }
 
-impl<S: BosStr> PublishedVersionViewBuilder<S, published_version_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PublishedVersionView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PublishedVersionViewBuilder<
+        published_version_view_state::Empty,
+        S,
+    > {
+        PublishedVersionViewBuilder::builder()
+    }
+}
+
+impl PublishedVersionViewBuilder<published_version_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PublishedVersionViewBuilder {
             _state: PhantomData,
@@ -5071,7 +5434,18 @@ impl<S: BosStr> PublishedVersionViewBuilder<S, published_version_view_state::Emp
     }
 }
 
-impl<S: BosStr, St> PublishedVersionViewBuilder<S, St>
+impl<S: BosStr> PublishedVersionViewBuilder<published_version_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PublishedVersionViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PublishedVersionViewBuilder<St, S>
 where
     St: published_version_view_state::State,
     St::Cid: published_version_view_state::IsUnset,
@@ -5080,7 +5454,7 @@ where
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> PublishedVersionViewBuilder<S, published_version_view_state::SetCid<St>> {
+    ) -> PublishedVersionViewBuilder<published_version_view_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PublishedVersionViewBuilder {
             _state: PhantomData,
@@ -5090,7 +5464,10 @@ where
     }
 }
 
-impl<S: BosStr, St: published_version_view_state::State> PublishedVersionViewBuilder<S, St> {
+impl<
+    St: published_version_view_state::State,
+    S: BosStr,
+> PublishedVersionViewBuilder<St, S> {
     /// Set the `divergedFrom` field (optional)
     pub fn diverged_from(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -5103,7 +5480,10 @@ impl<S: BosStr, St: published_version_view_state::State> PublishedVersionViewBui
     }
 }
 
-impl<S: BosStr, St: published_version_view_state::State> PublishedVersionViewBuilder<S, St> {
+impl<
+    St: published_version_view_state::State,
+    S: BosStr,
+> PublishedVersionViewBuilder<St, S> {
     /// Set the `isCanonical` field (optional)
     pub fn is_canonical(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -5116,7 +5496,7 @@ impl<S: BosStr, St: published_version_view_state::State> PublishedVersionViewBui
     }
 }
 
-impl<S: BosStr, St> PublishedVersionViewBuilder<S, St>
+impl<St, S: BosStr> PublishedVersionViewBuilder<St, S>
 where
     St: published_version_view_state::State,
     St::PublishedAt: published_version_view_state::IsUnset,
@@ -5125,7 +5505,10 @@ where
     pub fn published_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PublishedVersionViewBuilder<S, published_version_view_state::SetPublishedAt<St>> {
+    ) -> PublishedVersionViewBuilder<
+        published_version_view_state::SetPublishedAt<St>,
+        S,
+    > {
         self._fields.3 = Option::Some(value.into());
         PublishedVersionViewBuilder {
             _state: PhantomData,
@@ -5135,7 +5518,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PublishedVersionViewBuilder<S, St>
+impl<St, S: BosStr> PublishedVersionViewBuilder<St, S>
 where
     St: published_version_view_state::State,
     St::Publisher: published_version_view_state::IsUnset,
@@ -5144,7 +5527,7 @@ where
     pub fn publisher(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> PublishedVersionViewBuilder<S, published_version_view_state::SetPublisher<St>> {
+    ) -> PublishedVersionViewBuilder<published_version_view_state::SetPublisher<St>, S> {
         self._fields.4 = Option::Some(value.into());
         PublishedVersionViewBuilder {
             _state: PhantomData,
@@ -5154,7 +5537,10 @@ where
     }
 }
 
-impl<S: BosStr, St: published_version_view_state::State> PublishedVersionViewBuilder<S, St> {
+impl<
+    St: published_version_view_state::State,
+    S: BosStr,
+> PublishedVersionViewBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -5167,7 +5553,7 @@ impl<S: BosStr, St: published_version_view_state::State> PublishedVersionViewBui
     }
 }
 
-impl<S: BosStr, St> PublishedVersionViewBuilder<S, St>
+impl<St, S: BosStr> PublishedVersionViewBuilder<St, S>
 where
     St: published_version_view_state::State,
     St::Uri: published_version_view_state::IsUnset,
@@ -5176,7 +5562,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> PublishedVersionViewBuilder<S, published_version_view_state::SetUri<St>> {
+    ) -> PublishedVersionViewBuilder<published_version_view_state::SetUri<St>, S> {
         self._fields.6 = Option::Some(value.into());
         PublishedVersionViewBuilder {
             _state: PhantomData,
@@ -5186,12 +5572,12 @@ where
     }
 }
 
-impl<S: BosStr, St> PublishedVersionViewBuilder<S, St>
+impl<St, S: BosStr> PublishedVersionViewBuilder<St, S>
 where
     St: published_version_view_state::State,
+    St::Publisher: published_version_view_state::IsSet,
     St::PublishedAt: published_version_view_state::IsSet,
     St::Cid: published_version_view_state::IsSet,
-    St::Publisher: published_version_view_state::IsSet,
     St::Uri: published_version_view_state::IsSet,
 {
     /// Build the final struct.
@@ -5227,7 +5613,7 @@ where
 
 pub mod reason_bookmark_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5270,21 +5656,31 @@ pub mod reason_bookmark_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReasonBookmarkBuilder<S: BosStr, St: reason_bookmark_state::State> {
+pub struct ReasonBookmarkBuilder<
+    St: reason_bookmark_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<ProfileViewBasic<S>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ReasonBookmark<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ReasonBookmarkBuilder<S, reason_bookmark_state::Empty> {
+impl ReasonBookmark<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReasonBookmarkBuilder<reason_bookmark_state::Empty, DefaultStr> {
         ReasonBookmarkBuilder::new()
     }
 }
 
-impl<S: BosStr> ReasonBookmarkBuilder<S, reason_bookmark_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ReasonBookmark<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReasonBookmarkBuilder<reason_bookmark_state::Empty, S> {
+        ReasonBookmarkBuilder::builder()
+    }
+}
+
+impl ReasonBookmarkBuilder<reason_bookmark_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ReasonBookmarkBuilder {
             _state: PhantomData,
@@ -5294,7 +5690,18 @@ impl<S: BosStr> ReasonBookmarkBuilder<S, reason_bookmark_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ReasonBookmarkBuilder<S, St>
+impl<S: BosStr> ReasonBookmarkBuilder<reason_bookmark_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReasonBookmarkBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReasonBookmarkBuilder<St, S>
 where
     St: reason_bookmark_state::State,
     St::By: reason_bookmark_state::IsUnset,
@@ -5303,7 +5710,7 @@ where
     pub fn by(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> ReasonBookmarkBuilder<S, reason_bookmark_state::SetBy<St>> {
+    ) -> ReasonBookmarkBuilder<reason_bookmark_state::SetBy<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ReasonBookmarkBuilder {
             _state: PhantomData,
@@ -5313,7 +5720,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReasonBookmarkBuilder<S, St>
+impl<St, S: BosStr> ReasonBookmarkBuilder<St, S>
 where
     St: reason_bookmark_state::State,
     St::IndexedAt: reason_bookmark_state::IsUnset,
@@ -5322,7 +5729,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReasonBookmarkBuilder<S, reason_bookmark_state::SetIndexedAt<St>> {
+    ) -> ReasonBookmarkBuilder<reason_bookmark_state::SetIndexedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ReasonBookmarkBuilder {
             _state: PhantomData,
@@ -5332,7 +5739,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReasonBookmarkBuilder<S, St>
+impl<St, S: BosStr> ReasonBookmarkBuilder<St, S>
 where
     St: reason_bookmark_state::State,
     St::By: reason_bookmark_state::IsSet,
@@ -5347,7 +5754,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReasonBookmark<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReasonBookmark<S> {
         ReasonBookmark {
             by: self._fields.0.unwrap(),
             indexed_at: self._fields.1.unwrap(),
@@ -5358,7 +5768,7 @@ where
 
 pub mod reason_like_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5366,56 +5776,63 @@ pub mod reason_like_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type By;
         type IndexedAt;
+        type By;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type By = Unset;
         type IndexedAt = Unset;
-    }
-    ///State transition - sets the `by` field to Set
-    pub struct SetBy<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBy<St> {}
-    impl<St: State> State for SetBy<St> {
-        type By = Set<members::by>;
-        type IndexedAt = St::IndexedAt;
+        type By = Unset;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
     impl<St: State> State for SetIndexedAt<St> {
-        type By = St::By;
         type IndexedAt = Set<members::indexed_at>;
+        type By = St::By;
+    }
+    ///State transition - sets the `by` field to Set
+    pub struct SetBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBy<St> {}
+    impl<St: State> State for SetBy<St> {
+        type IndexedAt = St::IndexedAt;
+        type By = Set<members::by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `by` field
-        pub struct by(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `by` field
+        pub struct by(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReasonLikeBuilder<S: BosStr, St: reason_like_state::State> {
+pub struct ReasonLikeBuilder<St: reason_like_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<ProfileViewBasic<S>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ReasonLike<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ReasonLikeBuilder<S, reason_like_state::Empty> {
+impl ReasonLike<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReasonLikeBuilder<reason_like_state::Empty, DefaultStr> {
         ReasonLikeBuilder::new()
     }
 }
 
-impl<S: BosStr> ReasonLikeBuilder<S, reason_like_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ReasonLike<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReasonLikeBuilder<reason_like_state::Empty, S> {
+        ReasonLikeBuilder::builder()
+    }
+}
+
+impl ReasonLikeBuilder<reason_like_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ReasonLikeBuilder {
             _state: PhantomData,
@@ -5425,7 +5842,18 @@ impl<S: BosStr> ReasonLikeBuilder<S, reason_like_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ReasonLikeBuilder<S, St>
+impl<S: BosStr> ReasonLikeBuilder<reason_like_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReasonLikeBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReasonLikeBuilder<St, S>
 where
     St: reason_like_state::State,
     St::By: reason_like_state::IsUnset,
@@ -5434,7 +5862,7 @@ where
     pub fn by(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> ReasonLikeBuilder<S, reason_like_state::SetBy<St>> {
+    ) -> ReasonLikeBuilder<reason_like_state::SetBy<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ReasonLikeBuilder {
             _state: PhantomData,
@@ -5444,7 +5872,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReasonLikeBuilder<S, St>
+impl<St, S: BosStr> ReasonLikeBuilder<St, S>
 where
     St: reason_like_state::State,
     St::IndexedAt: reason_like_state::IsUnset,
@@ -5453,7 +5881,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReasonLikeBuilder<S, reason_like_state::SetIndexedAt<St>> {
+    ) -> ReasonLikeBuilder<reason_like_state::SetIndexedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ReasonLikeBuilder {
             _state: PhantomData,
@@ -5463,11 +5891,11 @@ where
     }
 }
 
-impl<S: BosStr, St> ReasonLikeBuilder<S, St>
+impl<St, S: BosStr> ReasonLikeBuilder<St, S>
 where
     St: reason_like_state::State,
-    St::By: reason_like_state::IsSet,
     St::IndexedAt: reason_like_state::IsSet,
+    St::By: reason_like_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ReasonLike<S> {
@@ -5478,7 +5906,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReasonLike<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReasonLike<S> {
         ReasonLike {
             by: self._fields.0.unwrap(),
             indexed_at: self._fields.1.unwrap(),
@@ -5489,7 +5920,7 @@ where
 
 pub mod reason_subscription_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5520,21 +5951,34 @@ pub mod reason_subscription_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReasonSubscriptionBuilder<S: BosStr, St: reason_subscription_state::State> {
+pub struct ReasonSubscriptionBuilder<
+    St: reason_subscription_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ReasonSubscription<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ReasonSubscriptionBuilder<S, reason_subscription_state::Empty> {
+impl ReasonSubscription<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReasonSubscriptionBuilder<
+        reason_subscription_state::Empty,
+        DefaultStr,
+    > {
         ReasonSubscriptionBuilder::new()
     }
 }
 
-impl<S: BosStr> ReasonSubscriptionBuilder<S, reason_subscription_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ReasonSubscription<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReasonSubscriptionBuilder<reason_subscription_state::Empty, S> {
+        ReasonSubscriptionBuilder::builder()
+    }
+}
+
+impl ReasonSubscriptionBuilder<reason_subscription_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ReasonSubscriptionBuilder {
             _state: PhantomData,
@@ -5544,7 +5988,18 @@ impl<S: BosStr> ReasonSubscriptionBuilder<S, reason_subscription_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ReasonSubscriptionBuilder<S, St>
+impl<S: BosStr> ReasonSubscriptionBuilder<reason_subscription_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReasonSubscriptionBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReasonSubscriptionBuilder<St, S>
 where
     St: reason_subscription_state::State,
     St::IndexedAt: reason_subscription_state::IsUnset,
@@ -5553,7 +6008,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReasonSubscriptionBuilder<S, reason_subscription_state::SetIndexedAt<St>> {
+    ) -> ReasonSubscriptionBuilder<reason_subscription_state::SetIndexedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ReasonSubscriptionBuilder {
             _state: PhantomData,
@@ -5563,7 +6018,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ReasonSubscriptionBuilder<S, St>
+impl<St, S: BosStr> ReasonSubscriptionBuilder<St, S>
 where
     St: reason_subscription_state::State,
     St::IndexedAt: reason_subscription_state::IsSet,
@@ -5576,7 +6031,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReasonSubscription<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReasonSubscription<S> {
         ReasonSubscription {
             indexed_at: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -5586,7 +6044,7 @@ where
 
 pub mod rendered_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5617,21 +6075,28 @@ pub mod rendered_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RenderedViewBuilder<S: BosStr, St: rendered_view_state::State> {
+pub struct RenderedViewBuilder<St: rendered_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<BlobRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RenderedView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RenderedViewBuilder<S, rendered_view_state::Empty> {
+impl RenderedView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RenderedViewBuilder<rendered_view_state::Empty, DefaultStr> {
         RenderedViewBuilder::new()
     }
 }
 
-impl<S: BosStr> RenderedViewBuilder<S, rendered_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RenderedView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RenderedViewBuilder<rendered_view_state::Empty, S> {
+        RenderedViewBuilder::builder()
+    }
+}
+
+impl RenderedViewBuilder<rendered_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RenderedViewBuilder {
             _state: PhantomData,
@@ -5641,7 +6106,18 @@ impl<S: BosStr> RenderedViewBuilder<S, rendered_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: rendered_view_state::State> RenderedViewBuilder<S, St> {
+impl<S: BosStr> RenderedViewBuilder<rendered_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RenderedViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: rendered_view_state::State, S: BosStr> RenderedViewBuilder<St, S> {
     /// Set the `css` field (optional)
     pub fn css(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -5654,7 +6130,7 @@ impl<S: BosStr, St: rendered_view_state::State> RenderedViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> RenderedViewBuilder<S, St>
+impl<St, S: BosStr> RenderedViewBuilder<St, S>
 where
     St: rendered_view_state::State,
     St::Html: rendered_view_state::IsUnset,
@@ -5663,7 +6139,7 @@ where
     pub fn html(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> RenderedViewBuilder<S, rendered_view_state::SetHtml<St>> {
+    ) -> RenderedViewBuilder<rendered_view_state::SetHtml<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RenderedViewBuilder {
             _state: PhantomData,
@@ -5673,7 +6149,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RenderedViewBuilder<S, St>
+impl<St, S: BosStr> RenderedViewBuilder<St, S>
 where
     St: rendered_view_state::State,
     St::Html: rendered_view_state::IsSet,
@@ -5687,7 +6163,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RenderedView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RenderedView<S> {
         RenderedView {
             css: self._fields.0,
             html: self._fields.1.unwrap(),

@@ -8,24 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::admin::RepoBlobRef;
 use crate::com_atproto::admin::RepoRef;
 use crate::com_atproto::admin::StatusAttr;
 use crate::com_atproto::repo::strong_ref::StrongRef;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Cid, Did};
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSubjectStatus<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blob: Option<Cid<S>>,
@@ -35,11 +32,9 @@ pub struct GetSubjectStatus<S: BosStr = DefaultStr> {
     pub uri: Option<AtUri<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSubjectStatusOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deactivated: Option<StatusAttr<S>>,
@@ -49,6 +44,7 @@ pub struct GetSubjectStatusOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -88,7 +84,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSubjectStatusRequest {
 
 pub mod get_subject_status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -106,21 +102,34 @@ pub mod get_subject_status_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetSubjectStatusBuilder<S: BosStr, St: get_subject_status_state::State> {
+pub struct GetSubjectStatusBuilder<
+    St: get_subject_status_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<Did<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetSubjectStatus<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetSubjectStatusBuilder<S, get_subject_status_state::Empty> {
+impl GetSubjectStatus<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetSubjectStatusBuilder<
+        get_subject_status_state::Empty,
+        DefaultStr,
+    > {
         GetSubjectStatusBuilder::new()
     }
 }
 
-impl<S: BosStr> GetSubjectStatusBuilder<S, get_subject_status_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetSubjectStatus<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetSubjectStatusBuilder<get_subject_status_state::Empty, S> {
+        GetSubjectStatusBuilder::builder()
+    }
+}
+
+impl GetSubjectStatusBuilder<get_subject_status_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetSubjectStatusBuilder {
             _state: PhantomData,
@@ -130,7 +139,18 @@ impl<S: BosStr> GetSubjectStatusBuilder<S, get_subject_status_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_subject_status_state::State> GetSubjectStatusBuilder<S, St> {
+impl<S: BosStr> GetSubjectStatusBuilder<get_subject_status_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetSubjectStatusBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_subject_status_state::State, S: BosStr> GetSubjectStatusBuilder<St, S> {
     /// Set the `blob` field (optional)
     pub fn blob(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -143,7 +163,7 @@ impl<S: BosStr, St: get_subject_status_state::State> GetSubjectStatusBuilder<S, 
     }
 }
 
-impl<S: BosStr, St: get_subject_status_state::State> GetSubjectStatusBuilder<S, St> {
+impl<St: get_subject_status_state::State, S: BosStr> GetSubjectStatusBuilder<St, S> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -156,7 +176,7 @@ impl<S: BosStr, St: get_subject_status_state::State> GetSubjectStatusBuilder<S, 
     }
 }
 
-impl<S: BosStr, St: get_subject_status_state::State> GetSubjectStatusBuilder<S, St> {
+impl<St: get_subject_status_state::State, S: BosStr> GetSubjectStatusBuilder<St, S> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -169,7 +189,7 @@ impl<S: BosStr, St: get_subject_status_state::State> GetSubjectStatusBuilder<S, 
     }
 }
 
-impl<S: BosStr, St> GetSubjectStatusBuilder<S, St>
+impl<St, S: BosStr> GetSubjectStatusBuilder<St, S>
 where
     St: get_subject_status_state::State,
 {

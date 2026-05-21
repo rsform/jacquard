@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Enrichment data and optional user note for a bookmark
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -146,7 +146,7 @@ impl<S: BosStr> LexiconSchema for Annotation<S> {
 
 pub mod annotation_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -189,7 +189,7 @@ pub mod annotation_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AnnotationBuilder<S: BosStr, St: annotation_state::State> {
+pub struct AnnotationBuilder<St: annotation_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -203,15 +203,22 @@ pub struct AnnotationBuilder<S: BosStr, St: annotation_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Annotation<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> AnnotationBuilder<S, annotation_state::Empty> {
+impl Annotation<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AnnotationBuilder<annotation_state::Empty, DefaultStr> {
         AnnotationBuilder::new()
     }
 }
 
-impl<S: BosStr> AnnotationBuilder<S, annotation_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Annotation<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AnnotationBuilder<annotation_state::Empty, S> {
+        AnnotationBuilder::builder()
+    }
+}
+
+impl AnnotationBuilder<annotation_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         AnnotationBuilder {
             _state: PhantomData,
@@ -221,7 +228,18 @@ impl<S: BosStr> AnnotationBuilder<S, annotation_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> AnnotationBuilder<S, St>
+impl<S: BosStr> AnnotationBuilder<annotation_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AnnotationBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AnnotationBuilder<St, S>
 where
     St: annotation_state::State,
     St::CreatedAt: annotation_state::IsUnset,
@@ -230,7 +248,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AnnotationBuilder<S, annotation_state::SetCreatedAt<St>> {
+    ) -> AnnotationBuilder<annotation_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AnnotationBuilder {
             _state: PhantomData,
@@ -240,7 +258,7 @@ where
     }
 }
 
-impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
+impl<St: annotation_state::State, S: BosStr> AnnotationBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -253,7 +271,7 @@ impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
+impl<St: annotation_state::State, S: BosStr> AnnotationBuilder<St, S> {
     /// Set the `favicon` field (optional)
     pub fn favicon(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -266,7 +284,7 @@ impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
+impl<St: annotation_state::State, S: BosStr> AnnotationBuilder<St, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -279,7 +297,7 @@ impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
+impl<St: annotation_state::State, S: BosStr> AnnotationBuilder<St, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -292,7 +310,7 @@ impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AnnotationBuilder<S, St>
+impl<St, S: BosStr> AnnotationBuilder<St, S>
 where
     St: annotation_state::State,
     St::Subject: annotation_state::IsUnset,
@@ -301,7 +319,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> AnnotationBuilder<S, annotation_state::SetSubject<St>> {
+    ) -> AnnotationBuilder<annotation_state::SetSubject<St>, S> {
         self._fields.5 = Option::Some(value.into());
         AnnotationBuilder {
             _state: PhantomData,
@@ -311,7 +329,7 @@ where
     }
 }
 
-impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
+impl<St: annotation_state::State, S: BosStr> AnnotationBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -324,7 +342,7 @@ impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> AnnotationBuilder<S, St>
+impl<St, S: BosStr> AnnotationBuilder<St, S>
 where
     St: annotation_state::State,
     St::CreatedAt: annotation_state::IsSet,
@@ -344,7 +362,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Annotation<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Annotation<S> {
         Annotation {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -359,10 +380,10 @@ where
 }
 
 fn lexicon_doc_com_kipclip_annotation() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.kipclip.annotation"),
@@ -371,15 +392,19 @@ fn lexicon_doc_com_kipclip_annotation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Enrichment data and optional user note for a bookmark",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Enrichment data and optional user note for a bookmark",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("subject"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -414,9 +439,9 @@ fn lexicon_doc_com_kipclip_annotation() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("note"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "User note for this bookmark",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("User note for this bookmark"),
+                                    ),
                                     max_length: Some(10000usize),
                                     ..Default::default()
                                 }),
@@ -424,9 +449,9 @@ fn lexicon_doc_com_kipclip_annotation() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("subject"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "AT URI of the bookmark this annotates",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("AT URI of the bookmark this annotates"),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

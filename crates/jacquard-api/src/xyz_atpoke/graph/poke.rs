@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Record declaring you poked another did, there can be multiple pokes per did
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -104,7 +104,7 @@ impl<S: BosStr> LexiconSchema for Poke<S> {
 
 pub mod poke_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -147,21 +147,28 @@ pub mod poke_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PokeBuilder<S: BosStr, St: poke_state::State> {
+pub struct PokeBuilder<St: poke_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Poke<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PokeBuilder<S, poke_state::Empty> {
+impl Poke<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PokeBuilder<poke_state::Empty, DefaultStr> {
         PokeBuilder::new()
     }
 }
 
-impl<S: BosStr> PokeBuilder<S, poke_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Poke<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PokeBuilder<poke_state::Empty, S> {
+        PokeBuilder::builder()
+    }
+}
+
+impl PokeBuilder<poke_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PokeBuilder {
             _state: PhantomData,
@@ -171,7 +178,18 @@ impl<S: BosStr> PokeBuilder<S, poke_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PokeBuilder<S, St>
+impl<S: BosStr> PokeBuilder<poke_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PokeBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PokeBuilder<St, S>
 where
     St: poke_state::State,
     St::CreatedAt: poke_state::IsUnset,
@@ -180,7 +198,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PokeBuilder<S, poke_state::SetCreatedAt<St>> {
+    ) -> PokeBuilder<poke_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PokeBuilder {
             _state: PhantomData,
@@ -190,7 +208,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PokeBuilder<S, St>
+impl<St, S: BosStr> PokeBuilder<St, S>
 where
     St: poke_state::State,
     St::Subject: poke_state::IsUnset,
@@ -199,7 +217,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> PokeBuilder<S, poke_state::SetSubject<St>> {
+    ) -> PokeBuilder<poke_state::SetSubject<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PokeBuilder {
             _state: PhantomData,
@@ -209,7 +227,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PokeBuilder<S, St>
+impl<St, S: BosStr> PokeBuilder<St, S>
 where
     St: poke_state::State,
     St::Subject: poke_state::IsSet,
@@ -234,10 +252,10 @@ where
 }
 
 fn lexicon_doc_xyz_atpoke_graph_poke() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("xyz.atpoke.graph.poke"),

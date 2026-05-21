@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Did};
+use jacquard_common::types::string::{Did, AtUri};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteGate<S: BosStr = DefaultStr> {
     ///The AT-URI of the gate record to delete.
     pub gate_uri: AtUri<S>,
@@ -31,19 +28,26 @@ pub struct DeleteGate<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteGateOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum DeleteGateError {
     /// The request lacks valid authentication credentials.
@@ -57,10 +61,7 @@ pub enum DeleteGateError {
     SessionNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for DeleteGateError {
@@ -109,8 +110,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteGateResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteGate<S> {
     const NSID: &'static str = "place.stream.moderation.deleteGate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteGateResponse;
 }
 
@@ -118,15 +120,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteGate<S> {
 pub struct DeleteGateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteGateRequest {
     const PATH: &'static str = "/xrpc/place.stream.moderation.deleteGate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeleteGate<S>;
     type Response = DeleteGateResponse;
 }
 
 pub mod delete_gate_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -169,21 +172,28 @@ pub mod delete_gate_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeleteGateBuilder<S: BosStr, St: delete_gate_state::State> {
+pub struct DeleteGateBuilder<St: delete_gate_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DeleteGate<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DeleteGateBuilder<S, delete_gate_state::Empty> {
+impl DeleteGate<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DeleteGateBuilder<delete_gate_state::Empty, DefaultStr> {
         DeleteGateBuilder::new()
     }
 }
 
-impl<S: BosStr> DeleteGateBuilder<S, delete_gate_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DeleteGate<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DeleteGateBuilder<delete_gate_state::Empty, S> {
+        DeleteGateBuilder::builder()
+    }
+}
+
+impl DeleteGateBuilder<delete_gate_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DeleteGateBuilder {
             _state: PhantomData,
@@ -193,7 +203,18 @@ impl<S: BosStr> DeleteGateBuilder<S, delete_gate_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DeleteGateBuilder<S, St>
+impl<S: BosStr> DeleteGateBuilder<delete_gate_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DeleteGateBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DeleteGateBuilder<St, S>
 where
     St: delete_gate_state::State,
     St::GateUri: delete_gate_state::IsUnset,
@@ -202,7 +223,7 @@ where
     pub fn gate_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> DeleteGateBuilder<S, delete_gate_state::SetGateUri<St>> {
+    ) -> DeleteGateBuilder<delete_gate_state::SetGateUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DeleteGateBuilder {
             _state: PhantomData,
@@ -212,7 +233,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeleteGateBuilder<S, St>
+impl<St, S: BosStr> DeleteGateBuilder<St, S>
 where
     St: delete_gate_state::State,
     St::Streamer: delete_gate_state::IsUnset,
@@ -221,7 +242,7 @@ where
     pub fn streamer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> DeleteGateBuilder<S, delete_gate_state::SetStreamer<St>> {
+    ) -> DeleteGateBuilder<delete_gate_state::SetStreamer<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DeleteGateBuilder {
             _state: PhantomData,
@@ -231,7 +252,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeleteGateBuilder<S, St>
+impl<St, S: BosStr> DeleteGateBuilder<St, S>
 where
     St: delete_gate_state::State,
     St::GateUri: delete_gate_state::IsSet,
@@ -246,7 +267,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeleteGate<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteGate<S> {
         DeleteGate {
             gate_uri: self._fields.0.unwrap(),
             streamer: self._fields.1.unwrap(),

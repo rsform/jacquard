@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,20 +24,17 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::com_deckbelcher::CardRef;
-use crate::com_deckbelcher::collection::list;
-use crate::com_deckbelcher::richtext::Document;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::com_deckbelcher::CardRef;
+use crate::com_deckbelcher::richtext::Document;
+use crate::com_deckbelcher::collection::list;
 /// A card saved to the list.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CardItem<S: BosStr = DefaultStr> {
     ///Timestamp when this item was added to the list.
     pub added_at: Datetime,
@@ -50,10 +47,7 @@ pub struct CardItem<S: BosStr = DefaultStr> {
 /// A deck saved to the list.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeckItem<S: BosStr = DefaultStr> {
     ///Timestamp when this item was added to the list.
     pub added_at: Datetime,
@@ -88,6 +82,7 @@ pub struct List<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -214,7 +209,7 @@ impl<S: BosStr> LexiconSchema for List<S> {
 
 pub mod card_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -257,21 +252,28 @@ pub mod card_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CardItemBuilder<S: BosStr, St: card_item_state::State> {
+pub struct CardItemBuilder<St: card_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<CardRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> CardItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CardItemBuilder<S, card_item_state::Empty> {
+impl CardItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CardItemBuilder<card_item_state::Empty, DefaultStr> {
         CardItemBuilder::new()
     }
 }
 
-impl<S: BosStr> CardItemBuilder<S, card_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> CardItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CardItemBuilder<card_item_state::Empty, S> {
+        CardItemBuilder::builder()
+    }
+}
+
+impl CardItemBuilder<card_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CardItemBuilder {
             _state: PhantomData,
@@ -281,7 +283,18 @@ impl<S: BosStr> CardItemBuilder<S, card_item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> CardItemBuilder<S, St>
+impl<S: BosStr> CardItemBuilder<card_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CardItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CardItemBuilder<St, S>
 where
     St: card_item_state::State,
     St::AddedAt: card_item_state::IsUnset,
@@ -290,7 +303,7 @@ where
     pub fn added_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CardItemBuilder<S, card_item_state::SetAddedAt<St>> {
+    ) -> CardItemBuilder<card_item_state::SetAddedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CardItemBuilder {
             _state: PhantomData,
@@ -300,7 +313,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CardItemBuilder<S, St>
+impl<St, S: BosStr> CardItemBuilder<St, S>
 where
     St: card_item_state::State,
     St::Ref: card_item_state::IsUnset,
@@ -309,7 +322,7 @@ where
     pub fn r#ref(
         mut self,
         value: impl Into<CardRef<S>>,
-    ) -> CardItemBuilder<S, card_item_state::SetRef<St>> {
+    ) -> CardItemBuilder<card_item_state::SetRef<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CardItemBuilder {
             _state: PhantomData,
@@ -319,7 +332,7 @@ where
     }
 }
 
-impl<S: BosStr, St> CardItemBuilder<S, St>
+impl<St, S: BosStr> CardItemBuilder<St, S>
 where
     St: card_item_state::State,
     St::Ref: card_item_state::IsSet,
@@ -344,10 +357,10 @@ where
 }
 
 fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.deckbelcher.collection.list"),
@@ -357,19 +370,20 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
                 SmolStr::new_static("cardItem"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("A card saved to the list.")),
-                    required: Some(vec![
-                        SmolStr::new_static("ref"),
-                        SmolStr::new_static("addedAt"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("ref"), SmolStr::new_static("addedAt")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("addedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Timestamp when this item was added to the list.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Timestamp when this item was added to the list.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -390,19 +404,20 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
                 SmolStr::new_static("deckItem"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("A deck saved to the list.")),
-                    required: Some(vec![
-                        SmolStr::new_static("ref"),
-                        SmolStr::new_static("addedAt"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("ref"), SmolStr::new_static("addedAt")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("addedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Timestamp when this item was added to the list.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Timestamp when this item was added to the list.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -422,23 +437,26 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A curated list of cards and/or decks.")),
+                    description: Some(
+                        CowStr::new_static("A curated list of cards and/or decks."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("items"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"), SmolStr::new_static("items"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the list was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp when the list was created."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -446,7 +464,9 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::Ref(LexRef {
-                                    r#ref: CowStr::new_static("com.deckbelcher.richtext#document"),
+                                    r#ref: CowStr::new_static(
+                                        "com.deckbelcher.richtext#document",
+                                    ),
                                     ..Default::default()
                                 }),
                             );
@@ -457,7 +477,7 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
                                     items: LexArrayItem::Union(LexRefUnion {
                                         refs: vec![
                                             CowStr::new_static("#cardItem"),
-                                            CowStr::new_static("#deckItem"),
+                                            CowStr::new_static("#deckItem")
                                         ],
                                         ..Default::default()
                                     }),
@@ -476,9 +496,11 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("updatedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the list was last updated.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp when the list was last updated.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -498,7 +520,7 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
 
 pub mod deck_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -541,21 +563,28 @@ pub mod deck_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeckItemBuilder<S: BosStr, St: deck_item_state::State> {
+pub struct DeckItemBuilder<St: deck_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DeckItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DeckItemBuilder<S, deck_item_state::Empty> {
+impl DeckItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DeckItemBuilder<deck_item_state::Empty, DefaultStr> {
         DeckItemBuilder::new()
     }
 }
 
-impl<S: BosStr> DeckItemBuilder<S, deck_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DeckItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DeckItemBuilder<deck_item_state::Empty, S> {
+        DeckItemBuilder::builder()
+    }
+}
+
+impl DeckItemBuilder<deck_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DeckItemBuilder {
             _state: PhantomData,
@@ -565,7 +594,18 @@ impl<S: BosStr> DeckItemBuilder<S, deck_item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DeckItemBuilder<S, St>
+impl<S: BosStr> DeckItemBuilder<deck_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DeckItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DeckItemBuilder<St, S>
 where
     St: deck_item_state::State,
     St::AddedAt: deck_item_state::IsUnset,
@@ -574,7 +614,7 @@ where
     pub fn added_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DeckItemBuilder<S, deck_item_state::SetAddedAt<St>> {
+    ) -> DeckItemBuilder<deck_item_state::SetAddedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DeckItemBuilder {
             _state: PhantomData,
@@ -584,7 +624,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeckItemBuilder<S, St>
+impl<St, S: BosStr> DeckItemBuilder<St, S>
 where
     St: deck_item_state::State,
     St::Ref: deck_item_state::IsUnset,
@@ -593,7 +633,7 @@ where
     pub fn r#ref(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> DeckItemBuilder<S, deck_item_state::SetRef<St>> {
+    ) -> DeckItemBuilder<deck_item_state::SetRef<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DeckItemBuilder {
             _state: PhantomData,
@@ -603,7 +643,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeckItemBuilder<S, St>
+impl<St, S: BosStr> DeckItemBuilder<St, S>
 where
     St: deck_item_state::State,
     St::Ref: deck_item_state::IsSet,
@@ -629,7 +669,7 @@ where
 
 pub mod list_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -686,7 +726,7 @@ pub mod list_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListBuilder<S: BosStr, St: list_state::State> {
+pub struct ListBuilder<St: list_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -698,15 +738,22 @@ pub struct ListBuilder<S: BosStr, St: list_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> List<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ListBuilder<S, list_state::Empty> {
+impl List<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListBuilder<list_state::Empty, DefaultStr> {
         ListBuilder::new()
     }
 }
 
-impl<S: BosStr> ListBuilder<S, list_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> List<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListBuilder<list_state::Empty, S> {
+        ListBuilder::builder()
+    }
+}
+
+impl ListBuilder<list_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ListBuilder {
             _state: PhantomData,
@@ -716,7 +763,18 @@ impl<S: BosStr> ListBuilder<S, list_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<S: BosStr> ListBuilder<list_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
     St::CreatedAt: list_state::IsUnset,
@@ -725,7 +783,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ListBuilder<S, list_state::SetCreatedAt<St>> {
+    ) -> ListBuilder<list_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -735,7 +793,7 @@ where
     }
 }
 
-impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
+impl<St: list_state::State, S: BosStr> ListBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<Document<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -748,7 +806,7 @@ impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
     St::Items: list_state::IsUnset,
@@ -757,7 +815,7 @@ where
     pub fn items(
         mut self,
         value: impl Into<Vec<ListItemsItem<S>>>,
-    ) -> ListBuilder<S, list_state::SetItems<St>> {
+    ) -> ListBuilder<list_state::SetItems<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -767,13 +825,16 @@ where
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
     St::Name: list_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> ListBuilder<S, list_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> ListBuilder<list_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -783,7 +844,7 @@ where
     }
 }
 
-impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
+impl<St: list_state::State, S: BosStr> ListBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -796,7 +857,7 @@ impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ListBuilder<S, St>
+impl<St, S: BosStr> ListBuilder<St, S>
 where
     St: list_state::State,
     St::Items: list_state::IsSet,

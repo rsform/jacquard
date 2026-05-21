@@ -10,12 +10,12 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -24,11 +24,9 @@ pub struct GetUnreadCount {
     pub seen_at: Option<Datetime>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetUnreadCountOutput<S: BosStr = DefaultStr> {
     pub count: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -61,7 +59,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetUnreadCountRequest {
 
 pub mod get_unread_count_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -92,8 +90,18 @@ impl GetUnreadCount {
 }
 
 impl GetUnreadCountBuilder<get_unread_count_state::Empty> {
-    /// Create a new builder with all fields unset.
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
+        GetUnreadCountBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+        }
+    }
+}
+
+impl GetUnreadCountBuilder<get_unread_count_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
         GetUnreadCountBuilder {
             _state: PhantomData,
             _fields: (None,),

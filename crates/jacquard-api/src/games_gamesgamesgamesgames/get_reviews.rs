@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::games_gamesgamesgamesgames::get_reviews;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::get_reviews;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetReviews<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -41,11 +38,9 @@ pub struct GetReviews<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetReviewsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -54,11 +49,9 @@ pub struct GetReviewsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PopfeedReview<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contains_spoilers: Option<bool>,
@@ -143,7 +136,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_reviews_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -174,21 +167,28 @@ pub mod get_reviews_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetReviewsBuilder<S: BosStr, St: get_reviews_state::State> {
+pub struct GetReviewsBuilder<St: get_reviews_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetReviews<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetReviewsBuilder<S, get_reviews_state::Empty> {
+impl GetReviews<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetReviewsBuilder<get_reviews_state::Empty, DefaultStr> {
         GetReviewsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetReviewsBuilder<S, get_reviews_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetReviews<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetReviewsBuilder<get_reviews_state::Empty, S> {
+        GetReviewsBuilder::builder()
+    }
+}
+
+impl GetReviewsBuilder<get_reviews_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetReviewsBuilder {
             _state: PhantomData,
@@ -198,7 +198,18 @@ impl<S: BosStr> GetReviewsBuilder<S, get_reviews_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_reviews_state::State> GetReviewsBuilder<S, St> {
+impl<S: BosStr> GetReviewsBuilder<get_reviews_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetReviewsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_reviews_state::State, S: BosStr> GetReviewsBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -211,7 +222,7 @@ impl<S: BosStr, St: get_reviews_state::State> GetReviewsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_reviews_state::State> GetReviewsBuilder<S, St> {
+impl<St: get_reviews_state::State, S: BosStr> GetReviewsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -224,7 +235,7 @@ impl<S: BosStr, St: get_reviews_state::State> GetReviewsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetReviewsBuilder<S, St>
+impl<St, S: BosStr> GetReviewsBuilder<St, S>
 where
     St: get_reviews_state::State,
     St::Uri: get_reviews_state::IsUnset,
@@ -233,7 +244,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetReviewsBuilder<S, get_reviews_state::SetUri<St>> {
+    ) -> GetReviewsBuilder<get_reviews_state::SetUri<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GetReviewsBuilder {
             _state: PhantomData,
@@ -243,7 +254,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetReviewsBuilder<S, St>
+impl<St, S: BosStr> GetReviewsBuilder<St, S>
 where
     St: get_reviews_state::State,
     St::Uri: get_reviews_state::IsSet,
@@ -260,7 +271,7 @@ where
 
 pub mod popfeed_review_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -268,72 +279,75 @@ pub mod popfeed_review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Did;
-        type CreatedAt;
         type Rating;
+        type CreatedAt;
+        type Did;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Did = Unset;
-        type CreatedAt = Unset;
         type Rating = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Did = St::Did;
-        type CreatedAt = St::CreatedAt;
-        type Rating = St::Rating;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Uri = St::Uri;
-        type Did = Set<members::did>;
-        type CreatedAt = St::CreatedAt;
-        type Rating = St::Rating;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Uri = St::Uri;
-        type Did = St::Did;
-        type CreatedAt = Set<members::created_at>;
-        type Rating = St::Rating;
+        type CreatedAt = Unset;
+        type Did = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `rating` field to Set
     pub struct SetRating<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRating<St> {}
     impl<St: State> State for SetRating<St> {
-        type Uri = St::Uri;
-        type Did = St::Did;
-        type CreatedAt = St::CreatedAt;
         type Rating = Set<members::rating>;
+        type CreatedAt = St::CreatedAt;
+        type Did = St::Did;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Rating = St::Rating;
+        type CreatedAt = Set<members::created_at>;
+        type Did = St::Did;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Rating = St::Rating;
+        type CreatedAt = St::CreatedAt;
+        type Did = Set<members::did>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Rating = St::Rating;
+        type CreatedAt = St::CreatedAt;
+        type Did = St::Did;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `rating` field
         pub struct rating(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PopfeedReviewBuilder<S: BosStr, St: popfeed_review_state::State> {
+pub struct PopfeedReviewBuilder<
+    St: popfeed_review_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -349,15 +363,22 @@ pub struct PopfeedReviewBuilder<S: BosStr, St: popfeed_review_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PopfeedReview<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PopfeedReviewBuilder<S, popfeed_review_state::Empty> {
+impl PopfeedReview<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PopfeedReviewBuilder<popfeed_review_state::Empty, DefaultStr> {
         PopfeedReviewBuilder::new()
     }
 }
 
-impl<S: BosStr> PopfeedReviewBuilder<S, popfeed_review_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PopfeedReview<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PopfeedReviewBuilder<popfeed_review_state::Empty, S> {
+        PopfeedReviewBuilder::builder()
+    }
+}
+
+impl PopfeedReviewBuilder<popfeed_review_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PopfeedReviewBuilder {
             _state: PhantomData,
@@ -367,7 +388,18 @@ impl<S: BosStr> PopfeedReviewBuilder<S, popfeed_review_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
+impl<S: BosStr> PopfeedReviewBuilder<popfeed_review_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PopfeedReviewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: popfeed_review_state::State, S: BosStr> PopfeedReviewBuilder<St, S> {
     /// Set the `containsSpoilers` field (optional)
     pub fn contains_spoilers(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -380,7 +412,7 @@ impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PopfeedReviewBuilder<S, St>
+impl<St, S: BosStr> PopfeedReviewBuilder<St, S>
 where
     St: popfeed_review_state::State,
     St::CreatedAt: popfeed_review_state::IsUnset,
@@ -389,7 +421,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PopfeedReviewBuilder<S, popfeed_review_state::SetCreatedAt<St>> {
+    ) -> PopfeedReviewBuilder<popfeed_review_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PopfeedReviewBuilder {
             _state: PhantomData,
@@ -399,7 +431,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PopfeedReviewBuilder<S, St>
+impl<St, S: BosStr> PopfeedReviewBuilder<St, S>
 where
     St: popfeed_review_state::State,
     St::Did: popfeed_review_state::IsUnset,
@@ -408,7 +440,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> PopfeedReviewBuilder<S, popfeed_review_state::SetDid<St>> {
+    ) -> PopfeedReviewBuilder<popfeed_review_state::SetDid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PopfeedReviewBuilder {
             _state: PhantomData,
@@ -418,7 +450,7 @@ where
     }
 }
 
-impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
+impl<St: popfeed_review_state::State, S: BosStr> PopfeedReviewBuilder<St, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -431,7 +463,7 @@ impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PopfeedReviewBuilder<S, St>
+impl<St, S: BosStr> PopfeedReviewBuilder<St, S>
 where
     St: popfeed_review_state::State,
     St::Rating: popfeed_review_state::IsUnset,
@@ -440,7 +472,7 @@ where
     pub fn rating(
         mut self,
         value: impl Into<i64>,
-    ) -> PopfeedReviewBuilder<S, popfeed_review_state::SetRating<St>> {
+    ) -> PopfeedReviewBuilder<popfeed_review_state::SetRating<St>, S> {
         self._fields.4 = Option::Some(value.into());
         PopfeedReviewBuilder {
             _state: PhantomData,
@@ -450,7 +482,7 @@ where
     }
 }
 
-impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
+impl<St: popfeed_review_state::State, S: BosStr> PopfeedReviewBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -463,7 +495,7 @@ impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
+impl<St: popfeed_review_state::State, S: BosStr> PopfeedReviewBuilder<St, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -476,7 +508,7 @@ impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
+impl<St: popfeed_review_state::State, S: BosStr> PopfeedReviewBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -489,7 +521,7 @@ impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PopfeedReviewBuilder<S, St>
+impl<St, S: BosStr> PopfeedReviewBuilder<St, S>
 where
     St: popfeed_review_state::State,
     St::Uri: popfeed_review_state::IsUnset,
@@ -498,7 +530,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> PopfeedReviewBuilder<S, popfeed_review_state::SetUri<St>> {
+    ) -> PopfeedReviewBuilder<popfeed_review_state::SetUri<St>, S> {
         self._fields.8 = Option::Some(value.into());
         PopfeedReviewBuilder {
             _state: PhantomData,
@@ -508,13 +540,13 @@ where
     }
 }
 
-impl<S: BosStr, St> PopfeedReviewBuilder<S, St>
+impl<St, S: BosStr> PopfeedReviewBuilder<St, S>
 where
     St: popfeed_review_state::State,
-    St::Uri: popfeed_review_state::IsSet,
-    St::Did: popfeed_review_state::IsSet,
-    St::CreatedAt: popfeed_review_state::IsSet,
     St::Rating: popfeed_review_state::IsSet,
+    St::CreatedAt: popfeed_review_state::IsSet,
+    St::Did: popfeed_review_state::IsSet,
+    St::Uri: popfeed_review_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PopfeedReview<S> {
@@ -532,7 +564,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PopfeedReview<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PopfeedReview<S> {
         PopfeedReview {
             contains_spoilers: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -549,10 +584,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.getReviews"),
@@ -561,52 +596,55 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("uri")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Pagination cursor (offset).",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("uri"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "AT URI of the game record.",
-                                    )),
-                                    format: Some(LexStringFormat::AtUri),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("uri")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("Pagination cursor (offset)."),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("uri"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("AT URI of the game record."),
+                                        ),
+                                        format: Some(LexStringFormat::AtUri),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("popfeedReview"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("rating"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("did"),
+                            SmolStr::new_static("rating"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -659,15 +697,11 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("text"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),

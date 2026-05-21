@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::song::SongViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::song::SongViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorLovedSongs<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
     ///(min: 1)
@@ -33,11 +30,9 @@ pub struct GetActorLovedSongs<S: BosStr = DefaultStr> {
     pub offset: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorLovedSongsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracks: Option<Vec<SongViewBasic<S>>>,
@@ -71,7 +66,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorLovedSongsRequest {
 
 pub mod get_actor_loved_songs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -102,21 +97,37 @@ pub mod get_actor_loved_songs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetActorLovedSongsBuilder<S: BosStr, St: get_actor_loved_songs_state::State> {
+pub struct GetActorLovedSongsBuilder<
+    St: get_actor_loved_songs_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetActorLovedSongs<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetActorLovedSongsBuilder<S, get_actor_loved_songs_state::Empty> {
+impl GetActorLovedSongs<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetActorLovedSongsBuilder<
+        get_actor_loved_songs_state::Empty,
+        DefaultStr,
+    > {
         GetActorLovedSongsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetActorLovedSongsBuilder<S, get_actor_loved_songs_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetActorLovedSongs<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetActorLovedSongsBuilder<
+        get_actor_loved_songs_state::Empty,
+        S,
+    > {
+        GetActorLovedSongsBuilder::builder()
+    }
+}
+
+impl GetActorLovedSongsBuilder<get_actor_loved_songs_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetActorLovedSongsBuilder {
             _state: PhantomData,
@@ -126,7 +137,18 @@ impl<S: BosStr> GetActorLovedSongsBuilder<S, get_actor_loved_songs_state::Empty>
     }
 }
 
-impl<S: BosStr, St> GetActorLovedSongsBuilder<S, St>
+impl<S: BosStr> GetActorLovedSongsBuilder<get_actor_loved_songs_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetActorLovedSongsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetActorLovedSongsBuilder<St, S>
 where
     St: get_actor_loved_songs_state::State,
     St::Did: get_actor_loved_songs_state::IsUnset,
@@ -135,7 +157,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetActorLovedSongsBuilder<S, get_actor_loved_songs_state::SetDid<St>> {
+    ) -> GetActorLovedSongsBuilder<get_actor_loved_songs_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetActorLovedSongsBuilder {
             _state: PhantomData,
@@ -145,7 +167,10 @@ where
     }
 }
 
-impl<S: BosStr, St: get_actor_loved_songs_state::State> GetActorLovedSongsBuilder<S, St> {
+impl<
+    St: get_actor_loved_songs_state::State,
+    S: BosStr,
+> GetActorLovedSongsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -158,7 +183,10 @@ impl<S: BosStr, St: get_actor_loved_songs_state::State> GetActorLovedSongsBuilde
     }
 }
 
-impl<S: BosStr, St: get_actor_loved_songs_state::State> GetActorLovedSongsBuilder<S, St> {
+impl<
+    St: get_actor_loved_songs_state::State,
+    S: BosStr,
+> GetActorLovedSongsBuilder<St, S> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -171,7 +199,7 @@ impl<S: BosStr, St: get_actor_loved_songs_state::State> GetActorLovedSongsBuilde
     }
 }
 
-impl<S: BosStr, St> GetActorLovedSongsBuilder<S, St>
+impl<St, S: BosStr> GetActorLovedSongsBuilder<St, S>
 where
     St: get_actor_loved_songs_state::State,
     St::Did: get_actor_loved_songs_state::IsSet,

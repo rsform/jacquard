@@ -226,42 +226,42 @@ pub mod did_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Owner;
         type Identifier;
+        type Owner;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Owner = Unset;
         type Identifier = Unset;
-    }
-    ///State transition - sets the `owner` field to Set
-    pub struct SetOwner<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOwner<St> {}
-    impl<St: State> State for SetOwner<St> {
-        type Owner = Set<members::owner>;
-        type Identifier = St::Identifier;
+        type Owner = Unset;
     }
     ///State transition - sets the `identifier` field to Set
     pub struct SetIdentifier<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIdentifier<St> {}
     impl<St: State> State for SetIdentifier<St> {
-        type Owner = St::Owner;
         type Identifier = Set<members::identifier>;
+        type Owner = St::Owner;
+    }
+    ///State transition - sets the `owner` field to Set
+    pub struct SetOwner<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOwner<St> {}
+    impl<St: State> State for SetOwner<St> {
+        type Identifier = St::Identifier;
+        type Owner = Set<members::owner>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `owner` field
-        pub struct owner(());
         ///Marker type for the `identifier` field
         pub struct identifier(());
+        ///Marker type for the `owner` field
+        pub struct owner(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DidRecordBuilder<S: BosStr, St: did_record_state::State> {
+pub struct DidRecordBuilder<St: did_record_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<did::Did<S>>,
@@ -271,15 +271,22 @@ pub struct DidRecordBuilder<S: BosStr, St: did_record_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DidRecord<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DidRecordBuilder<S, did_record_state::Empty> {
+impl DidRecord<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DidRecordBuilder<did_record_state::Empty, DefaultStr> {
         DidRecordBuilder::new()
     }
 }
 
-impl<S: BosStr> DidRecordBuilder<S, did_record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DidRecord<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DidRecordBuilder<did_record_state::Empty, S> {
+        DidRecordBuilder::builder()
+    }
+}
+
+impl DidRecordBuilder<did_record_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DidRecordBuilder {
             _state: PhantomData,
@@ -289,7 +296,18 @@ impl<S: BosStr> DidRecordBuilder<S, did_record_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DidRecordBuilder<S, St>
+impl<S: BosStr> DidRecordBuilder<did_record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DidRecordBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DidRecordBuilder<St, S>
 where
     St: did_record_state::State,
     St::Identifier: did_record_state::IsUnset,
@@ -298,7 +316,7 @@ where
     pub fn identifier(
         mut self,
         value: impl Into<did::Did<S>>,
-    ) -> DidRecordBuilder<S, did_record_state::SetIdentifier<St>> {
+    ) -> DidRecordBuilder<did_record_state::SetIdentifier<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DidRecordBuilder {
             _state: PhantomData,
@@ -308,7 +326,7 @@ where
     }
 }
 
-impl<S: BosStr, St: did_record_state::State> DidRecordBuilder<S, St> {
+impl<St: did_record_state::State, S: BosStr> DidRecordBuilder<St, S> {
     /// Set the `label` field (optional)
     pub fn label(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -321,7 +339,7 @@ impl<S: BosStr, St: did_record_state::State> DidRecordBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> DidRecordBuilder<S, St>
+impl<St, S: BosStr> DidRecordBuilder<St, S>
 where
     St: did_record_state::State,
     St::Owner: did_record_state::IsUnset,
@@ -330,7 +348,7 @@ where
     pub fn owner(
         mut self,
         value: impl Into<jacquard_common::types::string::Did<S>>,
-    ) -> DidRecordBuilder<S, did_record_state::SetOwner<St>> {
+    ) -> DidRecordBuilder<did_record_state::SetOwner<St>, S> {
         self._fields.2 = Option::Some(value.into());
         DidRecordBuilder {
             _state: PhantomData,
@@ -340,11 +358,11 @@ where
     }
 }
 
-impl<S: BosStr, St> DidRecordBuilder<S, St>
+impl<St, S: BosStr> DidRecordBuilder<St, S>
 where
     St: did_record_state::State,
-    St::Owner: did_record_state::IsSet,
     St::Identifier: did_record_state::IsSet,
+    St::Owner: did_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DidRecord<S> {

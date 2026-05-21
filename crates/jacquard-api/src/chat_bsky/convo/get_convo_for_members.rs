@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::chat_bsky::convo::ConvoView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::ConvoView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetConvoForMembers<S: BosStr = DefaultStr> {
     pub members: Vec<Did<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetConvoForMembersOutput<S: BosStr = DefaultStr> {
     pub convo: ConvoView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -64,7 +59,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetConvoForMembersRequest {
 
 pub mod get_convo_for_members_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,21 +90,37 @@ pub mod get_convo_for_members_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetConvoForMembersBuilder<S: BosStr, St: get_convo_for_members_state::State> {
+pub struct GetConvoForMembersBuilder<
+    St: get_convo_for_members_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Did<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetConvoForMembers<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetConvoForMembersBuilder<S, get_convo_for_members_state::Empty> {
+impl GetConvoForMembers<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetConvoForMembersBuilder<
+        get_convo_for_members_state::Empty,
+        DefaultStr,
+    > {
         GetConvoForMembersBuilder::new()
     }
 }
 
-impl<S: BosStr> GetConvoForMembersBuilder<S, get_convo_for_members_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetConvoForMembers<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetConvoForMembersBuilder<
+        get_convo_for_members_state::Empty,
+        S,
+    > {
+        GetConvoForMembersBuilder::builder()
+    }
+}
+
+impl GetConvoForMembersBuilder<get_convo_for_members_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetConvoForMembersBuilder {
             _state: PhantomData,
@@ -119,7 +130,18 @@ impl<S: BosStr> GetConvoForMembersBuilder<S, get_convo_for_members_state::Empty>
     }
 }
 
-impl<S: BosStr, St> GetConvoForMembersBuilder<S, St>
+impl<S: BosStr> GetConvoForMembersBuilder<get_convo_for_members_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetConvoForMembersBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetConvoForMembersBuilder<St, S>
 where
     St: get_convo_for_members_state::State,
     St::Members: get_convo_for_members_state::IsUnset,
@@ -128,7 +150,7 @@ where
     pub fn members(
         mut self,
         value: impl Into<Vec<Did<S>>>,
-    ) -> GetConvoForMembersBuilder<S, get_convo_for_members_state::SetMembers<St>> {
+    ) -> GetConvoForMembersBuilder<get_convo_for_members_state::SetMembers<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetConvoForMembersBuilder {
             _state: PhantomData,
@@ -138,7 +160,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetConvoForMembersBuilder<S, St>
+impl<St, S: BosStr> GetConvoForMembersBuilder<St, S>
 where
     St: get_convo_for_members_state::State,
     St::Members: get_convo_for_members_state::IsSet,

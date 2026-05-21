@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_clippr::feed::ClipView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_clippr::feed::ClipView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchClips<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor: Option<AtIdentifier<S>>,
@@ -35,11 +32,9 @@ pub struct SearchClips<S: BosStr = DefaultStr> {
     pub q: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchClipsOutput<S: BosStr = DefaultStr> {
     ///A list of clips and their associated details
     pub clips: Vec<ClipView<S>>,
@@ -80,7 +75,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_clips_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -111,21 +106,28 @@ pub mod search_clips_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchClipsBuilder<S: BosStr, St: search_clips_state::State> {
+pub struct SearchClipsBuilder<St: search_clips_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SearchClips<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SearchClipsBuilder<S, search_clips_state::Empty> {
+impl SearchClips<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SearchClipsBuilder<search_clips_state::Empty, DefaultStr> {
         SearchClipsBuilder::new()
     }
 }
 
-impl<S: BosStr> SearchClipsBuilder<S, search_clips_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SearchClips<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SearchClipsBuilder<search_clips_state::Empty, S> {
+        SearchClipsBuilder::builder()
+    }
+}
+
+impl SearchClipsBuilder<search_clips_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SearchClipsBuilder {
             _state: PhantomData,
@@ -135,7 +137,18 @@ impl<S: BosStr> SearchClipsBuilder<S, search_clips_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: search_clips_state::State> SearchClipsBuilder<S, St> {
+impl<S: BosStr> SearchClipsBuilder<search_clips_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SearchClipsBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: search_clips_state::State, S: BosStr> SearchClipsBuilder<St, S> {
     /// Set the `actor` field (optional)
     pub fn actor(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -148,7 +161,7 @@ impl<S: BosStr, St: search_clips_state::State> SearchClipsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_clips_state::State> SearchClipsBuilder<S, St> {
+impl<St: search_clips_state::State, S: BosStr> SearchClipsBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -161,7 +174,7 @@ impl<S: BosStr, St: search_clips_state::State> SearchClipsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: search_clips_state::State> SearchClipsBuilder<S, St> {
+impl<St: search_clips_state::State, S: BosStr> SearchClipsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -174,13 +187,16 @@ impl<S: BosStr, St: search_clips_state::State> SearchClipsBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SearchClipsBuilder<S, St>
+impl<St, S: BosStr> SearchClipsBuilder<St, S>
 where
     St: search_clips_state::State,
     St::Q: search_clips_state::IsUnset,
 {
     /// Set the `q` field (required)
-    pub fn q(mut self, value: impl Into<S>) -> SearchClipsBuilder<S, search_clips_state::SetQ<St>> {
+    pub fn q(
+        mut self,
+        value: impl Into<S>,
+    ) -> SearchClipsBuilder<search_clips_state::SetQ<St>, S> {
         self._fields.3 = Option::Some(value.into());
         SearchClipsBuilder {
             _state: PhantomData,
@@ -190,7 +206,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SearchClipsBuilder<S, St>
+impl<St, S: BosStr> SearchClipsBuilder<St, S>
 where
     St: search_clips_state::State,
     St::Q: search_clips_state::IsSet,

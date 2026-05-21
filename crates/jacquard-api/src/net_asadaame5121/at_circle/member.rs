@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_asadaame5121::at_circle::RingRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_asadaame5121::at_circle::RingRef;
 /// Membership in an at-circle (Sidecar Record)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -182,7 +182,7 @@ impl<S: BosStr> LexiconSchema for Member<S> {
 
 pub mod member_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -190,72 +190,72 @@ pub mod member_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Ring;
         type Url;
         type Title;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Ring = Unset;
         type Url = Unset;
         type Title = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `ring` field to Set
-    pub struct SetRing<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRing<St> {}
-    impl<St: State> State for SetRing<St> {
-        type Ring = Set<members::ring>;
-        type Url = St::Url;
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type Ring = St::Ring;
-        type Url = Set<members::url>;
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Ring = St::Ring;
-        type Url = St::Url;
-        type Title = Set<members::title>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type Ring = St::Ring;
         type Url = St::Url;
         type Title = St::Title;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `ring` field to Set
+    pub struct SetRing<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRing<St> {}
+    impl<St: State> State for SetRing<St> {
+        type CreatedAt = St::CreatedAt;
+        type Ring = Set<members::ring>;
+        type Url = St::Url;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type CreatedAt = St::CreatedAt;
+        type Ring = St::Ring;
+        type Url = Set<members::url>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type Ring = St::Ring;
+        type Url = St::Url;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `ring` field
         pub struct ring(());
         ///Marker type for the `url` field
         pub struct url(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MemberBuilder<S: BosStr, St: member_state::State> {
+pub struct MemberBuilder<St: member_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -268,15 +268,22 @@ pub struct MemberBuilder<S: BosStr, St: member_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Member<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MemberBuilder<S, member_state::Empty> {
+impl Member<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MemberBuilder<member_state::Empty, DefaultStr> {
         MemberBuilder::new()
     }
 }
 
-impl<S: BosStr> MemberBuilder<S, member_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Member<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MemberBuilder<member_state::Empty, S> {
+        MemberBuilder::builder()
+    }
+}
+
+impl MemberBuilder<member_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MemberBuilder {
             _state: PhantomData,
@@ -286,7 +293,18 @@ impl<S: BosStr> MemberBuilder<S, member_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MemberBuilder<S, St>
+impl<S: BosStr> MemberBuilder<member_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MemberBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MemberBuilder<St, S>
 where
     St: member_state::State,
     St::CreatedAt: member_state::IsUnset,
@@ -295,7 +313,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MemberBuilder<S, member_state::SetCreatedAt<St>> {
+    ) -> MemberBuilder<member_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MemberBuilder {
             _state: PhantomData,
@@ -305,7 +323,7 @@ where
     }
 }
 
-impl<S: BosStr, St: member_state::State> MemberBuilder<S, St> {
+impl<St: member_state::State, S: BosStr> MemberBuilder<St, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -318,7 +336,7 @@ impl<S: BosStr, St: member_state::State> MemberBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MemberBuilder<S, St>
+impl<St, S: BosStr> MemberBuilder<St, S>
 where
     St: member_state::State,
     St::Ring: member_state::IsUnset,
@@ -327,7 +345,7 @@ where
     pub fn ring(
         mut self,
         value: impl Into<RingRef<S>>,
-    ) -> MemberBuilder<S, member_state::SetRing<St>> {
+    ) -> MemberBuilder<member_state::SetRing<St>, S> {
         self._fields.2 = Option::Some(value.into());
         MemberBuilder {
             _state: PhantomData,
@@ -337,7 +355,7 @@ where
     }
 }
 
-impl<S: BosStr, St: member_state::State> MemberBuilder<S, St> {
+impl<St: member_state::State, S: BosStr> MemberBuilder<St, S> {
     /// Set the `rss` field (optional)
     pub fn rss(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -350,13 +368,16 @@ impl<S: BosStr, St: member_state::State> MemberBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MemberBuilder<S, St>
+impl<St, S: BosStr> MemberBuilder<St, S>
 where
     St: member_state::State,
     St::Title: member_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> MemberBuilder<S, member_state::SetTitle<St>> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> MemberBuilder<member_state::SetTitle<St>, S> {
         self._fields.4 = Option::Some(value.into());
         MemberBuilder {
             _state: PhantomData,
@@ -366,7 +387,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MemberBuilder<S, St>
+impl<St, S: BosStr> MemberBuilder<St, S>
 where
     St: member_state::State,
     St::Url: member_state::IsUnset,
@@ -375,7 +396,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> MemberBuilder<S, member_state::SetUrl<St>> {
+    ) -> MemberBuilder<member_state::SetUrl<St>, S> {
         self._fields.5 = Option::Some(value.into());
         MemberBuilder {
             _state: PhantomData,
@@ -385,13 +406,13 @@ where
     }
 }
 
-impl<S: BosStr, St> MemberBuilder<S, St>
+impl<St, S: BosStr> MemberBuilder<St, S>
 where
     St: member_state::State,
+    St::CreatedAt: member_state::IsSet,
     St::Ring: member_state::IsSet,
     St::Url: member_state::IsSet,
     St::Title: member_state::IsSet,
-    St::CreatedAt: member_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Member<S> {
@@ -420,10 +441,10 @@ where
 }
 
 fn lexicon_doc_net_asadaame5121_at_circle_member() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.asadaame5121.at-circle.member"),
@@ -432,17 +453,18 @@ fn lexicon_doc_net_asadaame5121_at_circle_member() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Membership in an at-circle (Sidecar Record)",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Membership in an at-circle (Sidecar Record)"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("ring"),
-                            SmolStr::new_static("url"),
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("ring"), SmolStr::new_static("url"),
+                                SmolStr::new_static("title"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -483,9 +505,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_member() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("title"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Title of the participant's site",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Title of the participant's site"),
+                                    ),
                                     max_length: Some(1000usize),
                                     max_graphemes: Some(100usize),
                                     ..Default::default()
@@ -494,9 +516,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_member() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("url"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "URL of the participant's site",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("URL of the participant's site"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     max_length: Some(2000usize),
                                     ..Default::default()

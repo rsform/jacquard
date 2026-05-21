@@ -8,29 +8,24 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::dropbox::TemporaryLinkView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::dropbox::TemporaryLinkView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTemporaryLink<S: BosStr = DefaultStr> {
     pub path: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTemporaryLinkOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: TemporaryLinkView<S>,
@@ -64,7 +59,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetTemporaryLinkRequest {
 
 pub mod get_temporary_link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,21 +90,34 @@ pub mod get_temporary_link_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetTemporaryLinkBuilder<S: BosStr, St: get_temporary_link_state::State> {
+pub struct GetTemporaryLinkBuilder<
+    St: get_temporary_link_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetTemporaryLink<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetTemporaryLinkBuilder<S, get_temporary_link_state::Empty> {
+impl GetTemporaryLink<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetTemporaryLinkBuilder<
+        get_temporary_link_state::Empty,
+        DefaultStr,
+    > {
         GetTemporaryLinkBuilder::new()
     }
 }
 
-impl<S: BosStr> GetTemporaryLinkBuilder<S, get_temporary_link_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetTemporaryLink<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetTemporaryLinkBuilder<get_temporary_link_state::Empty, S> {
+        GetTemporaryLinkBuilder::builder()
+    }
+}
+
+impl GetTemporaryLinkBuilder<get_temporary_link_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetTemporaryLinkBuilder {
             _state: PhantomData,
@@ -119,7 +127,18 @@ impl<S: BosStr> GetTemporaryLinkBuilder<S, get_temporary_link_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetTemporaryLinkBuilder<S, St>
+impl<S: BosStr> GetTemporaryLinkBuilder<get_temporary_link_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetTemporaryLinkBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetTemporaryLinkBuilder<St, S>
 where
     St: get_temporary_link_state::State,
     St::Path: get_temporary_link_state::IsUnset,
@@ -128,7 +147,7 @@ where
     pub fn path(
         mut self,
         value: impl Into<S>,
-    ) -> GetTemporaryLinkBuilder<S, get_temporary_link_state::SetPath<St>> {
+    ) -> GetTemporaryLinkBuilder<get_temporary_link_state::SetPath<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetTemporaryLinkBuilder {
             _state: PhantomData,
@@ -138,7 +157,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetTemporaryLinkBuilder<S, St>
+impl<St, S: BosStr> GetTemporaryLinkBuilder<St, S>
 where
     St: get_temporary_link_state::State,
     St::Path: get_temporary_link_state::IsSet,

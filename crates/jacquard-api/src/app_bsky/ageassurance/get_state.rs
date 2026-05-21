@@ -8,32 +8,27 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::ageassurance::State;
-use crate::app_bsky::ageassurance::StateMetadata;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::ageassurance::State;
+use crate::app_bsky::ageassurance::StateMetadata;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetState<S: BosStr = DefaultStr> {
     pub country_code: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub region_code: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetStateOutput<S: BosStr = DefaultStr> {
     pub metadata: StateMetadata<S>,
     pub state: State<S>,
@@ -67,7 +62,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetStateRequest {
 
 pub mod get_state_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -98,21 +93,28 @@ pub mod get_state_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetStateBuilder<S: BosStr, St: get_state_state::State> {
+pub struct GetStateBuilder<St: get_state_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetState<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetStateBuilder<S, get_state_state::Empty> {
+impl GetState<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetStateBuilder<get_state_state::Empty, DefaultStr> {
         GetStateBuilder::new()
     }
 }
 
-impl<S: BosStr> GetStateBuilder<S, get_state_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetState<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetStateBuilder<get_state_state::Empty, S> {
+        GetStateBuilder::builder()
+    }
+}
+
+impl GetStateBuilder<get_state_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetStateBuilder {
             _state: PhantomData,
@@ -122,7 +124,18 @@ impl<S: BosStr> GetStateBuilder<S, get_state_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetStateBuilder<S, St>
+impl<S: BosStr> GetStateBuilder<get_state_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetStateBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetStateBuilder<St, S>
 where
     St: get_state_state::State,
     St::CountryCode: get_state_state::IsUnset,
@@ -131,7 +144,7 @@ where
     pub fn country_code(
         mut self,
         value: impl Into<S>,
-    ) -> GetStateBuilder<S, get_state_state::SetCountryCode<St>> {
+    ) -> GetStateBuilder<get_state_state::SetCountryCode<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetStateBuilder {
             _state: PhantomData,
@@ -141,7 +154,7 @@ where
     }
 }
 
-impl<S: BosStr, St: get_state_state::State> GetStateBuilder<S, St> {
+impl<St: get_state_state::State, S: BosStr> GetStateBuilder<St, S> {
     /// Set the `regionCode` field (optional)
     pub fn region_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -154,7 +167,7 @@ impl<S: BosStr, St: get_state_state::State> GetStateBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetStateBuilder<S, St>
+impl<St, S: BosStr> GetStateBuilder<St, S>
 where
     St: get_state_state::State,
     St::CountryCode: get_state_state::IsSet,

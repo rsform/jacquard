@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::beta::game::collection;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::beta::game::collection;
 /// Beta version: Record representing a collected specimen in a player's collection
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -101,10 +101,7 @@ pub struct CollectionGetRecordOutput<S: BosStr = DefaultStr> {
 /// Additional details about how the specimen was acquired
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SourceDetails<S: BosStr = DefaultStr> {
     ///Number of attempts before successful capture
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -125,10 +122,7 @@ pub struct SourceDetails<S: BosStr = DefaultStr> {
 /// Complete specimen information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SpecimenData<S: BosStr = DefaultStr> {
     ///Scientific authorship of the species
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -291,7 +285,7 @@ impl<S: BosStr> LexiconSchema for SpecimenData<S> {
 
 pub mod collection_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -300,8 +294,8 @@ pub mod collection_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type AcquiredAt;
-        type SpecimenId;
         type Quantity;
+        type SpecimenId;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -309,8 +303,8 @@ pub mod collection_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type AcquiredAt = Unset;
-        type SpecimenId = Unset;
         type Quantity = Unset;
+        type SpecimenId = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `acquired_at` field to Set
@@ -318,17 +312,8 @@ pub mod collection_state {
     impl<St: State> sealed::Sealed for SetAcquiredAt<St> {}
     impl<St: State> State for SetAcquiredAt<St> {
         type AcquiredAt = Set<members::acquired_at>;
+        type Quantity = St::Quantity;
         type SpecimenId = St::SpecimenId;
-        type Quantity = St::Quantity;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `specimen_id` field to Set
-    pub struct SetSpecimenId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSpecimenId<St> {}
-    impl<St: State> State for SetSpecimenId<St> {
-        type AcquiredAt = St::AcquiredAt;
-        type SpecimenId = Set<members::specimen_id>;
-        type Quantity = St::Quantity;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `quantity` field to Set
@@ -336,8 +321,17 @@ pub mod collection_state {
     impl<St: State> sealed::Sealed for SetQuantity<St> {}
     impl<St: State> State for SetQuantity<St> {
         type AcquiredAt = St::AcquiredAt;
-        type SpecimenId = St::SpecimenId;
         type Quantity = Set<members::quantity>;
+        type SpecimenId = St::SpecimenId;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `specimen_id` field to Set
+    pub struct SetSpecimenId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSpecimenId<St> {}
+    impl<St: State> State for SetSpecimenId<St> {
+        type AcquiredAt = St::AcquiredAt;
+        type Quantity = St::Quantity;
+        type SpecimenId = Set<members::specimen_id>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
@@ -345,8 +339,8 @@ pub mod collection_state {
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type AcquiredAt = St::AcquiredAt;
-        type SpecimenId = St::SpecimenId;
         type Quantity = St::Quantity;
+        type SpecimenId = St::SpecimenId;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -354,17 +348,17 @@ pub mod collection_state {
     pub mod members {
         ///Marker type for the `acquired_at` field
         pub struct acquired_at(());
-        ///Marker type for the `specimen_id` field
-        pub struct specimen_id(());
         ///Marker type for the `quantity` field
         pub struct quantity(());
+        ///Marker type for the `specimen_id` field
+        pub struct specimen_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionBuilder<S: BosStr, St: collection_state::State> {
+pub struct CollectionBuilder<St: collection_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -388,28 +382,79 @@ pub struct CollectionBuilder<S: BosStr, St: collection_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Collection<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> CollectionBuilder<S, collection_state::Empty> {
+impl Collection<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CollectionBuilder<collection_state::Empty, DefaultStr> {
         CollectionBuilder::new()
     }
 }
 
-impl<S: BosStr> CollectionBuilder<S, collection_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Collection<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CollectionBuilder<collection_state::Empty, S> {
+        CollectionBuilder::builder()
+    }
+}
+
+impl CollectionBuilder<collection_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CollectionBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St> CollectionBuilder<S, St>
+impl<S: BosStr> CollectionBuilder<collection_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CollectionBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CollectionBuilder<St, S>
 where
     St: collection_state::State,
     St::AcquiredAt: collection_state::IsUnset,
@@ -418,7 +463,7 @@ where
     pub fn acquired_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CollectionBuilder<S, collection_state::SetAcquiredAt<St>> {
+    ) -> CollectionBuilder<collection_state::SetAcquiredAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CollectionBuilder {
             _state: PhantomData,
@@ -428,7 +473,7 @@ where
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `commonName` field (optional)
     pub fn common_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -441,7 +486,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CollectionBuilder<S, St>
+impl<St, S: BosStr> CollectionBuilder<St, S>
 where
     St: collection_state::State,
     St::CreatedAt: collection_state::IsUnset,
@@ -450,7 +495,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CollectionBuilder<S, collection_state::SetCreatedAt<St>> {
+    ) -> CollectionBuilder<collection_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CollectionBuilder {
             _state: PhantomData,
@@ -460,7 +505,7 @@ where
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `family` field (optional)
     pub fn family(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -473,7 +518,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `genus` field (optional)
     pub fn genus(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -486,7 +531,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `lastModified` field (optional)
     pub fn last_modified(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -499,7 +544,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `lastSeen` field (optional)
     pub fn last_seen(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -512,7 +557,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `logRecordUri` field (optional)
     pub fn log_record_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -525,7 +570,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CollectionBuilder<S, St>
+impl<St, S: BosStr> CollectionBuilder<St, S>
 where
     St: collection_state::State,
     St::Quantity: collection_state::IsUnset,
@@ -534,7 +579,7 @@ where
     pub fn quantity(
         mut self,
         value: impl Into<i64>,
-    ) -> CollectionBuilder<S, collection_state::SetQuantity<St>> {
+    ) -> CollectionBuilder<collection_state::SetQuantity<St>, S> {
         self._fields.8 = Option::Some(value.into());
         CollectionBuilder {
             _state: PhantomData,
@@ -544,7 +589,7 @@ where
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `rarity` field (optional)
     pub fn rarity(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -557,7 +602,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `scientificName` field (optional)
     pub fn scientific_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -570,7 +615,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
@@ -583,7 +628,7 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `sourceDetails` field (optional)
     pub fn source_details(
         mut self,
@@ -593,13 +638,16 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
         self
     }
     /// Set the `sourceDetails` field to an Option value (optional)
-    pub fn maybe_source_details(mut self, value: Option<collection::SourceDetails<S>>) -> Self {
+    pub fn maybe_source_details(
+        mut self,
+        value: Option<collection::SourceDetails<S>>,
+    ) -> Self {
         self._fields.12 = value;
         self
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `species` field (optional)
     pub fn species(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.13 = value.into();
@@ -612,20 +660,26 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `specimenData` field (optional)
-    pub fn specimen_data(mut self, value: impl Into<Option<collection::SpecimenData<S>>>) -> Self {
+    pub fn specimen_data(
+        mut self,
+        value: impl Into<Option<collection::SpecimenData<S>>>,
+    ) -> Self {
         self._fields.14 = value.into();
         self
     }
     /// Set the `specimenData` field to an Option value (optional)
-    pub fn maybe_specimen_data(mut self, value: Option<collection::SpecimenData<S>>) -> Self {
+    pub fn maybe_specimen_data(
+        mut self,
+        value: Option<collection::SpecimenData<S>>,
+    ) -> Self {
         self._fields.14 = value;
         self
     }
 }
 
-impl<S: BosStr, St> CollectionBuilder<S, St>
+impl<St, S: BosStr> CollectionBuilder<St, S>
 where
     St: collection_state::State,
     St::SpecimenId: collection_state::IsUnset,
@@ -634,7 +688,7 @@ where
     pub fn specimen_id(
         mut self,
         value: impl Into<S>,
-    ) -> CollectionBuilder<S, collection_state::SetSpecimenId<St>> {
+    ) -> CollectionBuilder<collection_state::SetSpecimenId<St>, S> {
         self._fields.15 = Option::Some(value.into());
         CollectionBuilder {
             _state: PhantomData,
@@ -644,7 +698,7 @@ where
     }
 }
 
-impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
+impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.16 = value.into();
@@ -657,12 +711,12 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> CollectionBuilder<S, St>
+impl<St, S: BosStr> CollectionBuilder<St, S>
 where
     St: collection_state::State,
     St::AcquiredAt: collection_state::IsSet,
-    St::SpecimenId: collection_state::IsSet,
     St::Quantity: collection_state::IsSet,
+    St::SpecimenId: collection_state::IsSet,
     St::CreatedAt: collection_state::IsSet,
 {
     /// Build the final struct.
@@ -689,7 +743,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Collection<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Collection<S> {
         Collection {
             acquired_at: self._fields.0.unwrap(),
             common_name: self._fields.1,
@@ -714,10 +771,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_beta_game_collection() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.beta.game.collection"),
@@ -962,25 +1019,27 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("specimenData"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Complete specimen information")),
+                    description: Some(
+                        CowStr::new_static("Complete specimen information"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("authorship"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Scientific authorship of the species",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Scientific authorship of the species"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Detailed description of the specimen",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Detailed description of the specimen"),
+                                ),
                                 ..Default::default()
                             }),
                         );

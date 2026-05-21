@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// An invite granting a DID access, created by the slice owner
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -111,7 +111,7 @@ impl<S: BosStr> LexiconSchema for Invite<S> {
 
 pub mod invite_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -119,75 +119,77 @@ pub mod invite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Did;
+        type CreatedAt;
         type Slice;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Did = Unset;
+        type CreatedAt = Unset;
         type Slice = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Did = St::Did;
-        type Slice = St::Slice;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type CreatedAt = St::CreatedAt;
         type Did = Set<members::did>;
+        type CreatedAt = St::CreatedAt;
+        type Slice = St::Slice;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Did = St::Did;
+        type CreatedAt = Set<members::created_at>;
         type Slice = St::Slice;
     }
     ///State transition - sets the `slice` field to Set
     pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSlice<St> {}
     impl<St: State> State for SetSlice<St> {
-        type CreatedAt = St::CreatedAt;
         type Did = St::Did;
+        type CreatedAt = St::CreatedAt;
         type Slice = Set<members::slice>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `slice` field
         pub struct slice(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct InviteBuilder<S: BosStr, St: invite_state::State> {
+pub struct InviteBuilder<St: invite_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<Did<S>>,
-        Option<Datetime>,
-        Option<AtUri<S>>,
-    ),
+    _fields: (Option<Datetime>, Option<Did<S>>, Option<Datetime>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Invite<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> InviteBuilder<S, invite_state::Empty> {
+impl Invite<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> InviteBuilder<invite_state::Empty, DefaultStr> {
         InviteBuilder::new()
     }
 }
 
-impl<S: BosStr> InviteBuilder<S, invite_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Invite<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> InviteBuilder<invite_state::Empty, S> {
+        InviteBuilder::builder()
+    }
+}
+
+impl InviteBuilder<invite_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         InviteBuilder {
             _state: PhantomData,
@@ -197,7 +199,18 @@ impl<S: BosStr> InviteBuilder<S, invite_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> InviteBuilder<S, St>
+impl<S: BosStr> InviteBuilder<invite_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        InviteBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> InviteBuilder<St, S>
 where
     St: invite_state::State,
     St::CreatedAt: invite_state::IsUnset,
@@ -206,7 +219,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> InviteBuilder<S, invite_state::SetCreatedAt<St>> {
+    ) -> InviteBuilder<invite_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         InviteBuilder {
             _state: PhantomData,
@@ -216,13 +229,16 @@ where
     }
 }
 
-impl<S: BosStr, St> InviteBuilder<S, St>
+impl<St, S: BosStr> InviteBuilder<St, S>
 where
     St: invite_state::State,
     St::Did: invite_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> InviteBuilder<S, invite_state::SetDid<St>> {
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> InviteBuilder<invite_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         InviteBuilder {
             _state: PhantomData,
@@ -232,7 +248,7 @@ where
     }
 }
 
-impl<S: BosStr, St: invite_state::State> InviteBuilder<S, St> {
+impl<St: invite_state::State, S: BosStr> InviteBuilder<St, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -245,7 +261,7 @@ impl<S: BosStr, St: invite_state::State> InviteBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> InviteBuilder<S, St>
+impl<St, S: BosStr> InviteBuilder<St, S>
 where
     St: invite_state::State,
     St::Slice: invite_state::IsUnset,
@@ -254,7 +270,7 @@ where
     pub fn slice(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> InviteBuilder<S, invite_state::SetSlice<St>> {
+    ) -> InviteBuilder<invite_state::SetSlice<St>, S> {
         self._fields.3 = Option::Some(value.into());
         InviteBuilder {
             _state: PhantomData,
@@ -264,11 +280,11 @@ where
     }
 }
 
-impl<S: BosStr, St> InviteBuilder<S, St>
+impl<St, S: BosStr> InviteBuilder<St, S>
 where
     St: invite_state::State,
-    St::CreatedAt: invite_state::IsSet,
     St::Did: invite_state::IsSet,
+    St::CreatedAt: invite_state::IsSet,
     St::Slice: invite_state::IsSet,
 {
     /// Build the final struct.
@@ -294,10 +310,10 @@ where
 }
 
 fn lexicon_doc_network_slices_waitlist_invite() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.waitlist.invite"),
@@ -306,25 +322,28 @@ fn lexicon_doc_network_slices_waitlist_invite() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "An invite granting a DID access, created by the slice owner",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "An invite granting a DID access, created by the slice owner",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("did"),
-                            SmolStr::new_static("slice"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("did"), SmolStr::new_static("slice"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When this invitation was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When this invitation was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -332,7 +351,9 @@ fn lexicon_doc_network_slices_waitlist_invite() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("did"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("The DID being invited")),
+                                    description: Some(
+                                        CowStr::new_static("The DID being invited"),
+                                    ),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
@@ -340,9 +361,11 @@ fn lexicon_doc_network_slices_waitlist_invite() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("expiresAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Optional expiration date for this invitation",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Optional expiration date for this invitation",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -350,9 +373,11 @@ fn lexicon_doc_network_slices_waitlist_invite() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("slice"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The AT URI of the slice this invite is for",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The AT URI of the slice this invite is for",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

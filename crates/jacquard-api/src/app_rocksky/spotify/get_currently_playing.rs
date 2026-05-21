@@ -8,31 +8,26 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::player::CurrentlyPlayingViewDetailed;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::player::CurrentlyPlayingViewDetailed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetCurrentlyPlaying<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor: Option<AtIdentifier<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetCurrentlyPlayingOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: CurrentlyPlayingViewDetailed<S>,
@@ -66,7 +61,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetCurrentlyPlayingRequest {
 
 pub mod get_currently_playing_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -84,21 +79,37 @@ pub mod get_currently_playing_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetCurrentlyPlayingBuilder<S: BosStr, St: get_currently_playing_state::State> {
+pub struct GetCurrentlyPlayingBuilder<
+    St: get_currently_playing_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetCurrentlyPlaying<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetCurrentlyPlayingBuilder<S, get_currently_playing_state::Empty> {
+impl GetCurrentlyPlaying<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetCurrentlyPlayingBuilder<
+        get_currently_playing_state::Empty,
+        DefaultStr,
+    > {
         GetCurrentlyPlayingBuilder::new()
     }
 }
 
-impl<S: BosStr> GetCurrentlyPlayingBuilder<S, get_currently_playing_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetCurrentlyPlaying<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetCurrentlyPlayingBuilder<
+        get_currently_playing_state::Empty,
+        S,
+    > {
+        GetCurrentlyPlayingBuilder::builder()
+    }
+}
+
+impl GetCurrentlyPlayingBuilder<get_currently_playing_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetCurrentlyPlayingBuilder {
             _state: PhantomData,
@@ -108,7 +119,21 @@ impl<S: BosStr> GetCurrentlyPlayingBuilder<S, get_currently_playing_state::Empty
     }
 }
 
-impl<S: BosStr, St: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<S, St> {
+impl<S: BosStr> GetCurrentlyPlayingBuilder<get_currently_playing_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetCurrentlyPlayingBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<
+    St: get_currently_playing_state::State,
+    S: BosStr,
+> GetCurrentlyPlayingBuilder<St, S> {
     /// Set the `actor` field (optional)
     pub fn actor(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -121,7 +146,7 @@ impl<S: BosStr, St: get_currently_playing_state::State> GetCurrentlyPlayingBuild
     }
 }
 
-impl<S: BosStr, St> GetCurrentlyPlayingBuilder<S, St>
+impl<St, S: BosStr> GetCurrentlyPlayingBuilder<St, S>
 where
     St: get_currently_playing_state::State,
 {

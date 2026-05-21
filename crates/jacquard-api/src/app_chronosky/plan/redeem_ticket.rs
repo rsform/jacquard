@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_chronosky::plan::redeem_ticket;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_chronosky::plan::redeem_ticket;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RedeemTicket<S: BosStr = DefaultStr> {
     ///Ticket redemption code
     pub code: S,
@@ -38,11 +35,9 @@ pub struct RedeemTicket<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RedeemTicketOutput<S: BosStr = DefaultStr> {
     pub assignment: redeem_ticket::RedeemedAssignment<S>,
     ///Success message
@@ -51,9 +46,18 @@ pub struct RedeemTicketOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum RedeemTicketError {
     /// Ticket code not found
@@ -67,10 +71,7 @@ pub enum RedeemTicketError {
     TicketExpired(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for RedeemTicketError {
@@ -111,10 +112,7 @@ impl core::fmt::Display for RedeemTicketError {
 /// Redeemed plan assignment.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RedeemedAssignment<S: BosStr = DefaultStr> {
     ///Plan activation timestamp
     pub activated_at: Datetime,
@@ -141,8 +139,9 @@ impl jacquard_common::xrpc::XrpcResp for RedeemTicketResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RedeemTicket<S> {
     const NSID: &'static str = "app.chronosky.plan.redeemTicket";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RedeemTicketResponse;
 }
 
@@ -150,8 +149,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RedeemTicket<S> {
 pub struct RedeemTicketRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RedeemTicketRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.plan.redeemTicket";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = RedeemTicket<S>;
     type Response = RedeemTicketResponse;
 }
@@ -206,7 +206,7 @@ impl<S: BosStr> LexiconSchema for RedeemedAssignment<S> {
 
 pub mod redeemed_assignment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -214,110 +214,117 @@ pub mod redeemed_assignment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
-        type Id;
-        type PlanId;
-        type ActivatedAt;
         type ExpiresAt;
+        type ActivatedAt;
+        type Id;
+        type Status;
+        type PlanId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
-        type Id = Unset;
-        type PlanId = Unset;
-        type ActivatedAt = Unset;
         type ExpiresAt = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type Status = Set<members::status>;
-        type Id = St::Id;
-        type PlanId = St::PlanId;
-        type ActivatedAt = St::ActivatedAt;
-        type ExpiresAt = St::ExpiresAt;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Status = St::Status;
-        type Id = Set<members::id>;
-        type PlanId = St::PlanId;
-        type ActivatedAt = St::ActivatedAt;
-        type ExpiresAt = St::ExpiresAt;
-    }
-    ///State transition - sets the `plan_id` field to Set
-    pub struct SetPlanId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlanId<St> {}
-    impl<St: State> State for SetPlanId<St> {
-        type Status = St::Status;
-        type Id = St::Id;
-        type PlanId = Set<members::plan_id>;
-        type ActivatedAt = St::ActivatedAt;
-        type ExpiresAt = St::ExpiresAt;
-    }
-    ///State transition - sets the `activated_at` field to Set
-    pub struct SetActivatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetActivatedAt<St> {}
-    impl<St: State> State for SetActivatedAt<St> {
-        type Status = St::Status;
-        type Id = St::Id;
-        type PlanId = St::PlanId;
-        type ActivatedAt = Set<members::activated_at>;
-        type ExpiresAt = St::ExpiresAt;
+        type ActivatedAt = Unset;
+        type Id = Unset;
+        type Status = Unset;
+        type PlanId = Unset;
     }
     ///State transition - sets the `expires_at` field to Set
     pub struct SetExpiresAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetExpiresAt<St> {}
     impl<St: State> State for SetExpiresAt<St> {
-        type Status = St::Status;
-        type Id = St::Id;
-        type PlanId = St::PlanId;
-        type ActivatedAt = St::ActivatedAt;
         type ExpiresAt = Set<members::expires_at>;
+        type ActivatedAt = St::ActivatedAt;
+        type Id = St::Id;
+        type Status = St::Status;
+        type PlanId = St::PlanId;
+    }
+    ///State transition - sets the `activated_at` field to Set
+    pub struct SetActivatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActivatedAt<St> {}
+    impl<St: State> State for SetActivatedAt<St> {
+        type ExpiresAt = St::ExpiresAt;
+        type ActivatedAt = Set<members::activated_at>;
+        type Id = St::Id;
+        type Status = St::Status;
+        type PlanId = St::PlanId;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type ExpiresAt = St::ExpiresAt;
+        type ActivatedAt = St::ActivatedAt;
+        type Id = Set<members::id>;
+        type Status = St::Status;
+        type PlanId = St::PlanId;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type ExpiresAt = St::ExpiresAt;
+        type ActivatedAt = St::ActivatedAt;
+        type Id = St::Id;
+        type Status = Set<members::status>;
+        type PlanId = St::PlanId;
+    }
+    ///State transition - sets the `plan_id` field to Set
+    pub struct SetPlanId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlanId<St> {}
+    impl<St: State> State for SetPlanId<St> {
+        type ExpiresAt = St::ExpiresAt;
+        type ActivatedAt = St::ActivatedAt;
+        type Id = St::Id;
+        type Status = St::Status;
+        type PlanId = Set<members::plan_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `plan_id` field
-        pub struct plan_id(());
-        ///Marker type for the `activated_at` field
-        pub struct activated_at(());
         ///Marker type for the `expires_at` field
         pub struct expires_at(());
+        ///Marker type for the `activated_at` field
+        pub struct activated_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `plan_id` field
+        pub struct plan_id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RedeemedAssignmentBuilder<S: BosStr, St: redeemed_assignment_state::State> {
+pub struct RedeemedAssignmentBuilder<
+    St: redeemed_assignment_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<Datetime>,
-        Option<S>,
-        Option<S>,
-        Option<S>,
-    ),
+    _fields: (Option<Datetime>, Option<Datetime>, Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RedeemedAssignment<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RedeemedAssignmentBuilder<S, redeemed_assignment_state::Empty> {
+impl RedeemedAssignment<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RedeemedAssignmentBuilder<
+        redeemed_assignment_state::Empty,
+        DefaultStr,
+    > {
         RedeemedAssignmentBuilder::new()
     }
 }
 
-impl<S: BosStr> RedeemedAssignmentBuilder<S, redeemed_assignment_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RedeemedAssignment<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RedeemedAssignmentBuilder<redeemed_assignment_state::Empty, S> {
+        RedeemedAssignmentBuilder::builder()
+    }
+}
+
+impl RedeemedAssignmentBuilder<redeemed_assignment_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RedeemedAssignmentBuilder {
             _state: PhantomData,
@@ -327,7 +334,18 @@ impl<S: BosStr> RedeemedAssignmentBuilder<S, redeemed_assignment_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> RedeemedAssignmentBuilder<S, St>
+impl<S: BosStr> RedeemedAssignmentBuilder<redeemed_assignment_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RedeemedAssignmentBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RedeemedAssignmentBuilder<St, S>
 where
     St: redeemed_assignment_state::State,
     St::ActivatedAt: redeemed_assignment_state::IsUnset,
@@ -336,7 +354,7 @@ where
     pub fn activated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RedeemedAssignmentBuilder<S, redeemed_assignment_state::SetActivatedAt<St>> {
+    ) -> RedeemedAssignmentBuilder<redeemed_assignment_state::SetActivatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RedeemedAssignmentBuilder {
             _state: PhantomData,
@@ -346,7 +364,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RedeemedAssignmentBuilder<S, St>
+impl<St, S: BosStr> RedeemedAssignmentBuilder<St, S>
 where
     St: redeemed_assignment_state::State,
     St::ExpiresAt: redeemed_assignment_state::IsUnset,
@@ -355,7 +373,7 @@ where
     pub fn expires_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RedeemedAssignmentBuilder<S, redeemed_assignment_state::SetExpiresAt<St>> {
+    ) -> RedeemedAssignmentBuilder<redeemed_assignment_state::SetExpiresAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RedeemedAssignmentBuilder {
             _state: PhantomData,
@@ -365,7 +383,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RedeemedAssignmentBuilder<S, St>
+impl<St, S: BosStr> RedeemedAssignmentBuilder<St, S>
 where
     St: redeemed_assignment_state::State,
     St::Id: redeemed_assignment_state::IsUnset,
@@ -374,7 +392,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> RedeemedAssignmentBuilder<S, redeemed_assignment_state::SetId<St>> {
+    ) -> RedeemedAssignmentBuilder<redeemed_assignment_state::SetId<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RedeemedAssignmentBuilder {
             _state: PhantomData,
@@ -384,7 +402,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RedeemedAssignmentBuilder<S, St>
+impl<St, S: BosStr> RedeemedAssignmentBuilder<St, S>
 where
     St: redeemed_assignment_state::State,
     St::PlanId: redeemed_assignment_state::IsUnset,
@@ -393,7 +411,7 @@ where
     pub fn plan_id(
         mut self,
         value: impl Into<S>,
-    ) -> RedeemedAssignmentBuilder<S, redeemed_assignment_state::SetPlanId<St>> {
+    ) -> RedeemedAssignmentBuilder<redeemed_assignment_state::SetPlanId<St>, S> {
         self._fields.3 = Option::Some(value.into());
         RedeemedAssignmentBuilder {
             _state: PhantomData,
@@ -403,7 +421,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RedeemedAssignmentBuilder<S, St>
+impl<St, S: BosStr> RedeemedAssignmentBuilder<St, S>
 where
     St: redeemed_assignment_state::State,
     St::Status: redeemed_assignment_state::IsUnset,
@@ -412,7 +430,7 @@ where
     pub fn status(
         mut self,
         value: impl Into<S>,
-    ) -> RedeemedAssignmentBuilder<S, redeemed_assignment_state::SetStatus<St>> {
+    ) -> RedeemedAssignmentBuilder<redeemed_assignment_state::SetStatus<St>, S> {
         self._fields.4 = Option::Some(value.into());
         RedeemedAssignmentBuilder {
             _state: PhantomData,
@@ -422,14 +440,14 @@ where
     }
 }
 
-impl<S: BosStr, St> RedeemedAssignmentBuilder<S, St>
+impl<St, S: BosStr> RedeemedAssignmentBuilder<St, S>
 where
     St: redeemed_assignment_state::State,
-    St::Status: redeemed_assignment_state::IsSet,
-    St::Id: redeemed_assignment_state::IsSet,
-    St::PlanId: redeemed_assignment_state::IsSet,
-    St::ActivatedAt: redeemed_assignment_state::IsSet,
     St::ExpiresAt: redeemed_assignment_state::IsSet,
+    St::ActivatedAt: redeemed_assignment_state::IsSet,
+    St::Id: redeemed_assignment_state::IsSet,
+    St::Status: redeemed_assignment_state::IsSet,
+    St::PlanId: redeemed_assignment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RedeemedAssignment<S> {
@@ -443,7 +461,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RedeemedAssignment<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RedeemedAssignment<S> {
         RedeemedAssignment {
             activated_at: self._fields.0.unwrap(),
             expires_at: self._fields.1.unwrap(),
@@ -456,10 +477,10 @@ where
 }
 
 fn lexicon_doc_app_chronosky_plan_redeemTicket() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chronosky.plan.redeemTicket"),
@@ -470,26 +491,28 @@ fn lexicon_doc_app_chronosky_plan_redeemTicket() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![SmolStr::new_static("code")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("code"),
-                                    LexObjectProperty::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "Ticket redemption code",
-                                        )),
-                                        min_length: Some(1usize),
-                                        max_length: Some(100usize),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(vec![SmolStr::new_static("code")]),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("code"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static("Ticket redemption code"),
+                                            ),
+                                            min_length: Some(1usize),
+                                            max_length: Some(100usize),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -499,20 +522,23 @@ fn lexicon_doc_app_chronosky_plan_redeemTicket() -> LexiconDoc<'static> {
                 SmolStr::new_static("redeemedAssignment"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Redeemed plan assignment.")),
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("planId"),
-                        SmolStr::new_static("activatedAt"),
-                        SmolStr::new_static("expiresAt"),
-                        SmolStr::new_static("status"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("planId"),
+                            SmolStr::new_static("activatedAt"),
+                            SmolStr::new_static("expiresAt"),
+                            SmolStr::new_static("status")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("activatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Plan activation timestamp")),
+                                description: Some(
+                                    CowStr::new_static("Plan activation timestamp"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -521,7 +547,9 @@ fn lexicon_doc_app_chronosky_plan_redeemTicket() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("expiresAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Plan expiration timestamp")),
+                                description: Some(
+                                    CowStr::new_static("Plan expiration timestamp"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -546,7 +574,9 @@ fn lexicon_doc_app_chronosky_plan_redeemTicket() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("status"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Plan assignment status")),
+                                description: Some(
+                                    CowStr::new_static("Plan assignment status"),
+                                ),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),

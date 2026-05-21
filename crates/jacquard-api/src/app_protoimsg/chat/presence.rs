@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// User's current presence status. Lives in their repo, updated by their client. IMPORTANT: visibleTo is intentionally excluded — it is a privacy preference and must remain server-side only. Writing it to the PDS would publicly expose who the user is hiding from.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -210,7 +210,7 @@ impl<S: BosStr> LexiconSchema for Presence<S> {
 
 pub mod presence_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -253,21 +253,28 @@ pub mod presence_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PresenceBuilder<S: BosStr, St: presence_state::State> {
+pub struct PresenceBuilder<St: presence_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<PresenceStatus<S>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Presence<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PresenceBuilder<S, presence_state::Empty> {
+impl Presence<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PresenceBuilder<presence_state::Empty, DefaultStr> {
         PresenceBuilder::new()
     }
 }
 
-impl<S: BosStr> PresenceBuilder<S, presence_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Presence<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PresenceBuilder<presence_state::Empty, S> {
+        PresenceBuilder::builder()
+    }
+}
+
+impl PresenceBuilder<presence_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PresenceBuilder {
             _state: PhantomData,
@@ -277,7 +284,18 @@ impl<S: BosStr> PresenceBuilder<S, presence_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: presence_state::State> PresenceBuilder<S, St> {
+impl<S: BosStr> PresenceBuilder<presence_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PresenceBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: presence_state::State, S: BosStr> PresenceBuilder<St, S> {
     /// Set the `awayMessage` field (optional)
     pub fn away_message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -290,7 +308,7 @@ impl<S: BosStr, St: presence_state::State> PresenceBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PresenceBuilder<S, St>
+impl<St, S: BosStr> PresenceBuilder<St, S>
 where
     St: presence_state::State,
     St::Status: presence_state::IsUnset,
@@ -299,7 +317,7 @@ where
     pub fn status(
         mut self,
         value: impl Into<PresenceStatus<S>>,
-    ) -> PresenceBuilder<S, presence_state::SetStatus<St>> {
+    ) -> PresenceBuilder<presence_state::SetStatus<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PresenceBuilder {
             _state: PhantomData,
@@ -309,7 +327,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PresenceBuilder<S, St>
+impl<St, S: BosStr> PresenceBuilder<St, S>
 where
     St: presence_state::State,
     St::UpdatedAt: presence_state::IsUnset,
@@ -318,7 +336,7 @@ where
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PresenceBuilder<S, presence_state::SetUpdatedAt<St>> {
+    ) -> PresenceBuilder<presence_state::SetUpdatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PresenceBuilder {
             _state: PhantomData,
@@ -328,7 +346,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PresenceBuilder<S, St>
+impl<St, S: BosStr> PresenceBuilder<St, S>
 where
     St: presence_state::State,
     St::UpdatedAt: presence_state::IsSet,
@@ -355,10 +373,10 @@ where
 }
 
 fn lexicon_doc_app_protoimsg_chat_presence() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.protoimsg.chat.presence"),

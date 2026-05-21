@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,6 +24,9 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::AgeRating;
 use crate::games_gamesgamesgamesgames::AlternativeName;
 use crate::games_gamesgamesgamesgames::ApplicationType;
@@ -42,9 +45,6 @@ use crate::games_gamesgamesgamesgames::Theme;
 use crate::games_gamesgamesgamesgames::TimeToBeat;
 use crate::games_gamesgamesgamesgames::Website;
 use crate::games_gamesgamesgamesgames::richtext::facet::Facet;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A video game.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -177,7 +177,7 @@ impl<S: BosStr> LexiconSchema for Game<S> {
 
 pub mod game_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -186,55 +186,55 @@ pub mod game_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Name;
         type ApplicationType;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Name = Unset;
         type ApplicationType = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type ApplicationType = St::ApplicationType;
         type Name = St::Name;
-        type ApplicationType = St::ApplicationType;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type CreatedAt = St::CreatedAt;
-        type Name = Set<members::name>;
-        type ApplicationType = St::ApplicationType;
     }
     ///State transition - sets the `application_type` field to Set
     pub struct SetApplicationType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetApplicationType<St> {}
     impl<St: State> State for SetApplicationType<St> {
         type CreatedAt = St::CreatedAt;
-        type Name = St::Name;
         type ApplicationType = Set<members::application_type>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type ApplicationType = St::ApplicationType;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `application_type` field
         pub struct application_type(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GameBuilder<S: BosStr, St: game_state::State> {
+pub struct GameBuilder<St: game_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<AgeRating<S>>>,
@@ -268,28 +268,99 @@ pub struct GameBuilder<S: BosStr, St: game_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Game<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GameBuilder<S, game_state::Empty> {
+impl Game<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GameBuilder<game_state::Empty, DefaultStr> {
         GameBuilder::new()
     }
 }
 
-impl<S: BosStr> GameBuilder<S, game_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Game<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GameBuilder<game_state::Empty, S> {
+        GameBuilder::builder()
+    }
+}
+
+impl GameBuilder<game_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GameBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<S: BosStr> GameBuilder<game_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GameBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `ageRatings` field (optional)
     pub fn age_ratings(mut self, value: impl Into<Option<Vec<AgeRating<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -302,20 +373,26 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `alternativeNames` field (optional)
-    pub fn alternative_names(mut self, value: impl Into<Option<Vec<AlternativeName<S>>>>) -> Self {
+    pub fn alternative_names(
+        mut self,
+        value: impl Into<Option<Vec<AlternativeName<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `alternativeNames` field to an Option value (optional)
-    pub fn maybe_alternative_names(mut self, value: Option<Vec<AlternativeName<S>>>) -> Self {
+    pub fn maybe_alternative_names(
+        mut self,
+        value: Option<Vec<AlternativeName<S>>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<S: BosStr, St> GameBuilder<S, St>
+impl<St, S: BosStr> GameBuilder<St, S>
 where
     St: game_state::State,
     St::ApplicationType: game_state::IsUnset,
@@ -324,7 +401,7 @@ where
     pub fn application_type(
         mut self,
         value: impl Into<ApplicationType<S>>,
-    ) -> GameBuilder<S, game_state::SetApplicationType<St>> {
+    ) -> GameBuilder<game_state::SetApplicationType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
@@ -334,7 +411,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GameBuilder<S, St>
+impl<St, S: BosStr> GameBuilder<St, S>
 where
     St: game_state::State,
     St::CreatedAt: game_state::IsUnset,
@@ -343,7 +420,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GameBuilder<S, game_state::SetCreatedAt<St>> {
+    ) -> GameBuilder<game_state::SetCreatedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
@@ -353,7 +430,7 @@ where
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -366,9 +443,12 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn description_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -379,7 +459,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `engines` field (optional)
     pub fn engines(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -392,7 +472,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `externalIds` field (optional)
     pub fn external_ids(mut self, value: impl Into<Option<ExternalIds<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -405,7 +485,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `genres` field (optional)
     pub fn genres(mut self, value: impl Into<Option<Vec<Genre<S>>>>) -> Self {
         self._fields.8 = value.into();
@@ -418,7 +498,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -431,20 +511,26 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `languageSupports` field (optional)
-    pub fn language_supports(mut self, value: impl Into<Option<Vec<LanguageSupport<S>>>>) -> Self {
+    pub fn language_supports(
+        mut self,
+        value: impl Into<Option<Vec<LanguageSupport<S>>>>,
+    ) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `languageSupports` field to an Option value (optional)
-    pub fn maybe_language_supports(mut self, value: Option<Vec<LanguageSupport<S>>>) -> Self {
+    pub fn maybe_language_supports(
+        mut self,
+        value: Option<Vec<LanguageSupport<S>>>,
+    ) -> Self {
         self._fields.10 = value;
         self
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `media` field (optional)
     pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<S>>>>) -> Self {
         self._fields.11 = value.into();
@@ -457,7 +543,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `modes` field (optional)
     pub fn modes(mut self, value: impl Into<Option<Vec<Mode<S>>>>) -> Self {
         self._fields.12 = value.into();
@@ -470,26 +556,35 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `multiplayerModes` field (optional)
-    pub fn multiplayer_modes(mut self, value: impl Into<Option<Vec<MultiplayerMode<S>>>>) -> Self {
+    pub fn multiplayer_modes(
+        mut self,
+        value: impl Into<Option<Vec<MultiplayerMode<S>>>>,
+    ) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `multiplayerModes` field to an Option value (optional)
-    pub fn maybe_multiplayer_modes(mut self, value: Option<Vec<MultiplayerMode<S>>>) -> Self {
+    pub fn maybe_multiplayer_modes(
+        mut self,
+        value: Option<Vec<MultiplayerMode<S>>>,
+    ) -> Self {
         self._fields.13 = value;
         self
     }
 }
 
-impl<S: BosStr, St> GameBuilder<S, St>
+impl<St, S: BosStr> GameBuilder<St, S>
 where
     St: game_state::State,
     St::Name: game_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> GameBuilder<S, game_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> GameBuilder<game_state::SetName<St>, S> {
         self._fields.14 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
@@ -499,7 +594,7 @@ where
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.15 = value.into();
@@ -512,20 +607,26 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `platformFeatures` field (optional)
-    pub fn platform_features(mut self, value: impl Into<Option<Vec<PlatformFeatures<S>>>>) -> Self {
+    pub fn platform_features(
+        mut self,
+        value: impl Into<Option<Vec<PlatformFeatures<S>>>>,
+    ) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `platformFeatures` field to an Option value (optional)
-    pub fn maybe_platform_features(mut self, value: Option<Vec<PlatformFeatures<S>>>) -> Self {
+    pub fn maybe_platform_features(
+        mut self,
+        value: Option<Vec<PlatformFeatures<S>>>,
+    ) -> Self {
         self._fields.16 = value;
         self
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `playerPerspectives` field (optional)
     pub fn player_perspectives(
         mut self,
@@ -535,13 +636,16 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
         self
     }
     /// Set the `playerPerspectives` field to an Option value (optional)
-    pub fn maybe_player_perspectives(mut self, value: Option<Vec<PlayerPerspective<S>>>) -> Self {
+    pub fn maybe_player_perspectives(
+        mut self,
+        value: Option<Vec<PlayerPerspective<S>>>,
+    ) -> Self {
         self._fields.17 = value;
         self
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `publishedAt` field (optional)
     pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.18 = value.into();
@@ -554,7 +658,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `releases` field (optional)
     pub fn releases(mut self, value: impl Into<Option<Vec<Release<S>>>>) -> Self {
         self._fields.19 = value.into();
@@ -567,7 +671,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `storyline` field (optional)
     pub fn storyline(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.20 = value.into();
@@ -580,7 +684,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `summary` field (optional)
     pub fn summary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.21 = value.into();
@@ -593,7 +697,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `systemRequirements` field (optional)
     pub fn system_requirements(
         mut self,
@@ -603,13 +707,16 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
         self
     }
     /// Set the `systemRequirements` field to an Option value (optional)
-    pub fn maybe_system_requirements(mut self, value: Option<Vec<SystemRequirements<S>>>) -> Self {
+    pub fn maybe_system_requirements(
+        mut self,
+        value: Option<Vec<SystemRequirements<S>>>,
+    ) -> Self {
         self._fields.22 = value;
         self
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `themes` field (optional)
     pub fn themes(mut self, value: impl Into<Option<Vec<Theme<S>>>>) -> Self {
         self._fields.23 = value.into();
@@ -622,7 +729,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `timeToBeat` field (optional)
     pub fn time_to_beat(mut self, value: impl Into<Option<TimeToBeat<S>>>) -> Self {
         self._fields.24 = value.into();
@@ -635,7 +742,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `videos` field (optional)
     pub fn videos(mut self, value: impl Into<Option<Vec<ExternalVideo<S>>>>) -> Self {
         self._fields.25 = value.into();
@@ -648,7 +755,7 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
+impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `websites` field (optional)
     pub fn websites(mut self, value: impl Into<Option<Vec<Website<S>>>>) -> Self {
         self._fields.26 = value.into();
@@ -661,12 +768,12 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GameBuilder<S, St>
+impl<St, S: BosStr> GameBuilder<St, S>
 where
     St: game_state::State,
     St::CreatedAt: game_state::IsSet,
-    St::Name: game_state::IsSet,
     St::ApplicationType: game_state::IsSet,
+    St::Name: game_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Game<S> {
@@ -737,10 +844,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_game() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.game"),

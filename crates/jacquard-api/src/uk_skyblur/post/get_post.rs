@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPost<S: BosStr = DefaultStr> {
     ///If the specified uri is password-protected, please provide the password. If no password is specified, the non-protected content will be returned.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -32,11 +29,9 @@ pub struct GetPost<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPostOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional: Option<S>,
@@ -70,8 +65,9 @@ impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetPost<S> {
     const NSID: &'static str = "uk.skyblur.post.getPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = GetPostResponse;
 }
 
@@ -79,15 +75,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetPost<S> {
 pub struct GetPostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {
     const PATH: &'static str = "/xrpc/uk.skyblur.post.getPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = GetPost<S>;
     type Response = GetPostResponse;
 }
 
 pub mod get_post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -118,21 +115,28 @@ pub mod get_post_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetPostBuilder<S: BosStr, St: get_post_state::State> {
+pub struct GetPostBuilder<St: get_post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetPost<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetPostBuilder<S, get_post_state::Empty> {
+impl GetPost<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetPostBuilder<get_post_state::Empty, DefaultStr> {
         GetPostBuilder::new()
     }
 }
 
-impl<S: BosStr> GetPostBuilder<S, get_post_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetPost<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetPostBuilder<get_post_state::Empty, S> {
+        GetPostBuilder::builder()
+    }
+}
+
+impl GetPostBuilder<get_post_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetPostBuilder {
             _state: PhantomData,
@@ -142,7 +146,18 @@ impl<S: BosStr> GetPostBuilder<S, get_post_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_post_state::State> GetPostBuilder<S, St> {
+impl<S: BosStr> GetPostBuilder<get_post_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetPostBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_post_state::State, S: BosStr> GetPostBuilder<St, S> {
     /// Set the `password` field (optional)
     pub fn password(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -155,7 +170,7 @@ impl<S: BosStr, St: get_post_state::State> GetPostBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetPostBuilder<S, St>
+impl<St, S: BosStr> GetPostBuilder<St, S>
 where
     St: get_post_state::State,
     St::Uri: get_post_state::IsUnset,
@@ -164,7 +179,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetPostBuilder<S, get_post_state::SetUri<St>> {
+    ) -> GetPostBuilder<get_post_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetPostBuilder {
             _state: PhantomData,
@@ -174,7 +189,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetPostBuilder<S, St>
+impl<St, S: BosStr> GetPostBuilder<St, S>
 where
     St: get_post_state::State,
     St::Uri: get_post_state::IsSet,

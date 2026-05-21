@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Sign that you want to join a social listing experience of a specific song
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -104,7 +104,7 @@ impl<S: BosStr> LexiconSchema for Join<S> {
 
 pub mod join_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -135,21 +135,28 @@ pub mod join_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct JoinBuilder<S: BosStr, St: join_state::State> {
+pub struct JoinBuilder<St: join_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Join<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> JoinBuilder<S, join_state::Empty> {
+impl Join<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> JoinBuilder<join_state::Empty, DefaultStr> {
         JoinBuilder::new()
     }
 }
 
-impl<S: BosStr> JoinBuilder<S, join_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Join<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> JoinBuilder<join_state::Empty, S> {
+        JoinBuilder::builder()
+    }
+}
+
+impl JoinBuilder<join_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         JoinBuilder {
             _state: PhantomData,
@@ -159,13 +166,27 @@ impl<S: BosStr> JoinBuilder<S, join_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> JoinBuilder<S, St>
+impl<S: BosStr> JoinBuilder<join_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        JoinBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> JoinBuilder<St, S>
 where
     St: join_state::State,
     St::Song: join_state::IsUnset,
 {
     /// Set the `song` field (required)
-    pub fn song(mut self, value: impl Into<AtUri<S>>) -> JoinBuilder<S, join_state::SetSong<St>> {
+    pub fn song(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> JoinBuilder<join_state::SetSong<St>, S> {
         self._fields.0 = Option::Some(value.into());
         JoinBuilder {
             _state: PhantomData,
@@ -175,7 +196,7 @@ where
     }
 }
 
-impl<S: BosStr, St> JoinBuilder<S, St>
+impl<St, S: BosStr> JoinBuilder<St, S>
 where
     St: join_state::State,
     St::Song: join_state::IsSet,
@@ -197,10 +218,10 @@ where
 }
 
 fn lexicon_doc_ch_indiemusi_social_join() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ch.indiemusi.social.join"),

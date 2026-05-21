@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::org_hypercerts::SmallBlob;
 use crate::org_hypercerts::Uri;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A reusable scope atom for work scope logic expressions. Scopes can represent topics, languages, domains, deliverables, methods, regions, tags, or other categorical labels. Tags are composed into structured expressions via CEL (Common Expression Language) on activity records.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -160,6 +160,7 @@ where
         }
     }
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -399,7 +400,7 @@ impl<S: BosStr> LexiconSchema for Tag<S> {
 
 pub mod tag_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -407,56 +408,56 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Name;
         type Key;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Name = Unset;
         type Key = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Key = St::Key;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKey<St> {}
-    impl<St: State> State for SetKey<St> {
-        type Name = St::Name;
-        type Key = Set<members::key>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type Name = St::Name;
         type Key = St::Key;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
+        type Key = St::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `key` field
         pub struct key(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TagBuilder<S: BosStr, St: tag_state::State> {
+pub struct TagBuilder<St: tag_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
@@ -474,27 +475,43 @@ pub struct TagBuilder<S: BosStr, St: tag_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Tag<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> TagBuilder<S, tag_state::Empty> {
+impl Tag<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TagBuilder<tag_state::Empty, DefaultStr> {
         TagBuilder::new()
     }
 }
 
-impl<S: BosStr> TagBuilder<S, tag_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Tag<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TagBuilder<tag_state::Empty, S> {
+        TagBuilder::builder()
+    }
+}
+
+impl TagBuilder<tag_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         TagBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
+impl<S: BosStr> TagBuilder<tag_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TagBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: tag_state::State, S: BosStr> TagBuilder<St, S> {
     /// Set the `aliases` field (optional)
     pub fn aliases(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -507,7 +524,7 @@ impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
+impl<St: tag_state::State, S: BosStr> TagBuilder<St, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<TagCategory<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -520,7 +537,7 @@ impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TagBuilder<S, St>
+impl<St, S: BosStr> TagBuilder<St, S>
 where
     St: tag_state::State,
     St::CreatedAt: tag_state::IsUnset,
@@ -529,7 +546,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TagBuilder<S, tag_state::SetCreatedAt<St>> {
+    ) -> TagBuilder<tag_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
@@ -539,7 +556,7 @@ where
     }
 }
 
-impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
+impl<St: tag_state::State, S: BosStr> TagBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -552,13 +569,13 @@ impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TagBuilder<S, St>
+impl<St, S: BosStr> TagBuilder<St, S>
 where
     St: tag_state::State,
     St::Key: tag_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(mut self, value: impl Into<S>) -> TagBuilder<S, tag_state::SetKey<St>> {
+    pub fn key(mut self, value: impl Into<S>) -> TagBuilder<tag_state::SetKey<St>, S> {
         self._fields.4 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
@@ -568,13 +585,13 @@ where
     }
 }
 
-impl<S: BosStr, St> TagBuilder<S, St>
+impl<St, S: BosStr> TagBuilder<St, S>
 where
     St: tag_state::State,
     St::Name: tag_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> TagBuilder<S, tag_state::SetName<St>> {
+    pub fn name(mut self, value: impl Into<S>) -> TagBuilder<tag_state::SetName<St>, S> {
         self._fields.5 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
@@ -584,7 +601,7 @@ where
     }
 }
 
-impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
+impl<St: tag_state::State, S: BosStr> TagBuilder<St, S> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -597,20 +614,26 @@ impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
+impl<St: tag_state::State, S: BosStr> TagBuilder<St, S> {
     /// Set the `referenceDocument` field (optional)
-    pub fn reference_document(mut self, value: impl Into<Option<TagReferenceDocument<S>>>) -> Self {
+    pub fn reference_document(
+        mut self,
+        value: impl Into<Option<TagReferenceDocument<S>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `referenceDocument` field to an Option value (optional)
-    pub fn maybe_reference_document(mut self, value: Option<TagReferenceDocument<S>>) -> Self {
+    pub fn maybe_reference_document(
+        mut self,
+        value: Option<TagReferenceDocument<S>>,
+    ) -> Self {
         self._fields.7 = value;
         self
     }
 }
 
-impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
+impl<St: tag_state::State, S: BosStr> TagBuilder<St, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<Vec<UriValue<S>>>>) -> Self {
         self._fields.8 = value.into();
@@ -623,7 +646,7 @@ impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
+impl<St: tag_state::State, S: BosStr> TagBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<TagStatus<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -636,7 +659,7 @@ impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
+impl<St: tag_state::State, S: BosStr> TagBuilder<St, S> {
     /// Set the `supersededBy` field (optional)
     pub fn superseded_by(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -649,12 +672,12 @@ impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> TagBuilder<S, St>
+impl<St, S: BosStr> TagBuilder<St, S>
 where
     St: tag_state::State,
+    St::CreatedAt: tag_state::IsSet,
     St::Name: tag_state::IsSet,
     St::Key: tag_state::IsSet,
-    St::CreatedAt: tag_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Tag<S> {
@@ -693,10 +716,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_workscope_tag() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.workscope.tag"),

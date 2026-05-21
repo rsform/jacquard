@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::tech_tokimeki::takibi::log;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::tech_tokimeki::takibi::log;
 /// A log record - adding wood to the fire. Implicitly records visible sparks as a form of 'silent appreciation'.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -61,10 +61,7 @@ pub struct LogGetRecordOutput<S: BosStr = DefaultStr> {
 /// Reference to a visible spark with timing information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SparkRef<S: BosStr = DefaultStr> {
     ///Milliseconds since the spark appeared on screen (0-10000)
     pub elapsed: i64,
@@ -169,7 +166,7 @@ impl<S: BosStr> LexiconSchema for SparkRef<S> {
 
 pub mod log_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -200,21 +197,28 @@ pub mod log_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogBuilder<S: BosStr, St: log_state::State> {
+pub struct LogBuilder<St: log_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Vec<log::SparkRef<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Log<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LogBuilder<S, log_state::Empty> {
+impl Log<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LogBuilder<log_state::Empty, DefaultStr> {
         LogBuilder::new()
     }
 }
 
-impl<S: BosStr> LogBuilder<S, log_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Log<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LogBuilder<log_state::Empty, S> {
+        LogBuilder::builder()
+    }
+}
+
+impl LogBuilder<log_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LogBuilder {
             _state: PhantomData,
@@ -224,7 +228,18 @@ impl<S: BosStr> LogBuilder<S, log_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LogBuilder<S, St>
+impl<S: BosStr> LogBuilder<log_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LogBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LogBuilder<St, S>
 where
     St: log_state::State,
     St::CreatedAt: log_state::IsUnset,
@@ -233,7 +248,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LogBuilder<S, log_state::SetCreatedAt<St>> {
+    ) -> LogBuilder<log_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
@@ -243,9 +258,12 @@ where
     }
 }
 
-impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
+impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `visibleSparks` field (optional)
-    pub fn visible_sparks(mut self, value: impl Into<Option<Vec<log::SparkRef<S>>>>) -> Self {
+    pub fn visible_sparks(
+        mut self,
+        value: impl Into<Option<Vec<log::SparkRef<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -256,7 +274,7 @@ impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> LogBuilder<S, St>
+impl<St, S: BosStr> LogBuilder<St, S>
 where
     St: log_state::State,
     St::CreatedAt: log_state::IsSet,
@@ -280,10 +298,10 @@ where
 }
 
 fn lexicon_doc_tech_tokimeki_takibi_log() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tech.tokimeki.takibi.log"),
@@ -336,13 +354,16 @@ fn lexicon_doc_tech_tokimeki_takibi_log() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("sparkRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Reference to a visible spark with timing information",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("spark"),
-                        SmolStr::new_static("elapsed"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Reference to a visible spark with timing information",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("spark"), SmolStr::new_static("elapsed")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -374,7 +395,7 @@ fn lexicon_doc_tech_tokimeki_takibi_log() -> LexiconDoc<'static> {
 
 pub mod spark_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -382,56 +403,63 @@ pub mod spark_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Elapsed;
         type Spark;
+        type Elapsed;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Elapsed = Unset;
         type Spark = Unset;
-    }
-    ///State transition - sets the `elapsed` field to Set
-    pub struct SetElapsed<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetElapsed<St> {}
-    impl<St: State> State for SetElapsed<St> {
-        type Elapsed = Set<members::elapsed>;
-        type Spark = St::Spark;
+        type Elapsed = Unset;
     }
     ///State transition - sets the `spark` field to Set
     pub struct SetSpark<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSpark<St> {}
     impl<St: State> State for SetSpark<St> {
-        type Elapsed = St::Elapsed;
         type Spark = Set<members::spark>;
+        type Elapsed = St::Elapsed;
+    }
+    ///State transition - sets the `elapsed` field to Set
+    pub struct SetElapsed<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetElapsed<St> {}
+    impl<St: State> State for SetElapsed<St> {
+        type Spark = St::Spark;
+        type Elapsed = Set<members::elapsed>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `elapsed` field
-        pub struct elapsed(());
         ///Marker type for the `spark` field
         pub struct spark(());
+        ///Marker type for the `elapsed` field
+        pub struct elapsed(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SparkRefBuilder<S: BosStr, St: spark_ref_state::State> {
+pub struct SparkRefBuilder<St: spark_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> SparkRef<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SparkRefBuilder<S, spark_ref_state::Empty> {
+impl SparkRef<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SparkRefBuilder<spark_ref_state::Empty, DefaultStr> {
         SparkRefBuilder::new()
     }
 }
 
-impl<S: BosStr> SparkRefBuilder<S, spark_ref_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> SparkRef<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SparkRefBuilder<spark_ref_state::Empty, S> {
+        SparkRefBuilder::builder()
+    }
+}
+
+impl SparkRefBuilder<spark_ref_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SparkRefBuilder {
             _state: PhantomData,
@@ -441,7 +469,18 @@ impl<S: BosStr> SparkRefBuilder<S, spark_ref_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SparkRefBuilder<S, St>
+impl<S: BosStr> SparkRefBuilder<spark_ref_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SparkRefBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SparkRefBuilder<St, S>
 where
     St: spark_ref_state::State,
     St::Elapsed: spark_ref_state::IsUnset,
@@ -450,7 +489,7 @@ where
     pub fn elapsed(
         mut self,
         value: impl Into<i64>,
-    ) -> SparkRefBuilder<S, spark_ref_state::SetElapsed<St>> {
+    ) -> SparkRefBuilder<spark_ref_state::SetElapsed<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SparkRefBuilder {
             _state: PhantomData,
@@ -460,7 +499,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SparkRefBuilder<S, St>
+impl<St, S: BosStr> SparkRefBuilder<St, S>
 where
     St: spark_ref_state::State,
     St::Spark: spark_ref_state::IsUnset,
@@ -469,7 +508,7 @@ where
     pub fn spark(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> SparkRefBuilder<S, spark_ref_state::SetSpark<St>> {
+    ) -> SparkRefBuilder<spark_ref_state::SetSpark<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SparkRefBuilder {
             _state: PhantomData,
@@ -479,11 +518,11 @@ where
     }
 }
 
-impl<S: BosStr, St> SparkRefBuilder<S, St>
+impl<St, S: BosStr> SparkRefBuilder<St, S>
 where
     St: spark_ref_state::State,
-    St::Elapsed: spark_ref_state::IsSet,
     St::Spark: spark_ref_state::IsSet,
+    St::Elapsed: spark_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SparkRef<S> {

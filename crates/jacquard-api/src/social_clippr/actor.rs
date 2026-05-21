@@ -13,26 +13,27 @@ pub mod search_clips;
 pub mod search_profiles;
 pub mod search_tags;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did, Handle, UriValue};
+use jacquard_common::types::string::{Did, Handle, Datetime, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::social_clippr::actor;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_clippr::actor;
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -47,10 +48,7 @@ pub type Preferences<S = DefaultStr> = Vec<PreferencesItem<S>>;
 /// A view of an actor's profile.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileView<S: BosStr = DefaultStr> {
     ///A link to the profile's avatar
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -74,10 +72,7 @@ pub struct ProfileView<S: BosStr = DefaultStr> {
 /// Preferences for an user's publishing scopes.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PublishingScopesPref<S: BosStr = DefaultStr> {
     ///What publishing scope to mark a clip as by default
     pub default_scope: PublishingScopesPrefDefaultScope<S>,
@@ -133,7 +128,8 @@ impl<S: BosStr> Serialize for PublishingScopesPrefDefaultScope<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PublishingScopesPrefDefaultScope<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for PublishingScopesPrefDefaultScope<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -157,7 +153,9 @@ where
     type Output = PublishingScopesPrefDefaultScope<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            PublishingScopesPrefDefaultScope::Public => PublishingScopesPrefDefaultScope::Public,
+            PublishingScopesPrefDefaultScope::Public => {
+                PublishingScopesPrefDefaultScope::Public
+            }
             PublishingScopesPrefDefaultScope::Unlisted => {
                 PublishingScopesPrefDefaultScope::Unlisted
             }
@@ -246,7 +244,7 @@ impl<S: BosStr> LexiconSchema for PublishingScopesPref<S> {
 
 pub mod profile_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -254,56 +252,56 @@ pub mod profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DisplayName;
-        type Handle;
         type Did;
+        type Handle;
+        type DisplayName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DisplayName = Unset;
-        type Handle = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
-    impl<St: State> State for SetDisplayName<St> {
-        type DisplayName = Set<members::display_name>;
-        type Handle = St::Handle;
-        type Did = St::Did;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHandle<St> {}
-    impl<St: State> State for SetHandle<St> {
-        type DisplayName = St::DisplayName;
-        type Handle = Set<members::handle>;
-        type Did = St::Did;
+        type Handle = Unset;
+        type DisplayName = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type DisplayName = St::DisplayName;
-        type Handle = St::Handle;
         type Did = Set<members::did>;
+        type Handle = St::Handle;
+        type DisplayName = St::DisplayName;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Did = St::Did;
+        type Handle = Set<members::handle>;
+        type DisplayName = St::DisplayName;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
+    impl<St: State> State for SetDisplayName<St> {
+        type Did = St::Did;
+        type Handle = St::Handle;
+        type DisplayName = Set<members::display_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileViewBuilder<S: BosStr, St: profile_view_state::State> {
+pub struct ProfileViewBuilder<St: profile_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<UriValue<S>>,
@@ -316,15 +314,22 @@ pub struct ProfileViewBuilder<S: BosStr, St: profile_view_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ProfileView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProfileViewBuilder<S, profile_view_state::Empty> {
+impl ProfileView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProfileViewBuilder<profile_view_state::Empty, DefaultStr> {
         ProfileViewBuilder::new()
     }
 }
 
-impl<S: BosStr> ProfileViewBuilder<S, profile_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ProfileView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProfileViewBuilder<profile_view_state::Empty, S> {
+        ProfileViewBuilder::builder()
+    }
+}
+
+impl ProfileViewBuilder<profile_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProfileViewBuilder {
             _state: PhantomData,
@@ -334,7 +339,18 @@ impl<S: BosStr> ProfileViewBuilder<S, profile_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: profile_view_state::State> ProfileViewBuilder<S, St> {
+impl<S: BosStr> ProfileViewBuilder<profile_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProfileViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: profile_view_state::State, S: BosStr> ProfileViewBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -347,7 +363,7 @@ impl<S: BosStr, St: profile_view_state::State> ProfileViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_view_state::State> ProfileViewBuilder<S, St> {
+impl<St: profile_view_state::State, S: BosStr> ProfileViewBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -360,7 +376,7 @@ impl<S: BosStr, St: profile_view_state::State> ProfileViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: profile_view_state::State> ProfileViewBuilder<S, St> {
+impl<St: profile_view_state::State, S: BosStr> ProfileViewBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -373,7 +389,7 @@ impl<S: BosStr, St: profile_view_state::State> ProfileViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProfileViewBuilder<S, St>
+impl<St, S: BosStr> ProfileViewBuilder<St, S>
 where
     St: profile_view_state::State,
     St::Did: profile_view_state::IsUnset,
@@ -382,7 +398,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ProfileViewBuilder<S, profile_view_state::SetDid<St>> {
+    ) -> ProfileViewBuilder<profile_view_state::SetDid<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ProfileViewBuilder {
             _state: PhantomData,
@@ -392,7 +408,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileViewBuilder<S, St>
+impl<St, S: BosStr> ProfileViewBuilder<St, S>
 where
     St: profile_view_state::State,
     St::DisplayName: profile_view_state::IsUnset,
@@ -401,7 +417,7 @@ where
     pub fn display_name(
         mut self,
         value: impl Into<S>,
-    ) -> ProfileViewBuilder<S, profile_view_state::SetDisplayName<St>> {
+    ) -> ProfileViewBuilder<profile_view_state::SetDisplayName<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ProfileViewBuilder {
             _state: PhantomData,
@@ -411,7 +427,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileViewBuilder<S, St>
+impl<St, S: BosStr> ProfileViewBuilder<St, S>
 where
     St: profile_view_state::State,
     St::Handle: profile_view_state::IsUnset,
@@ -420,7 +436,7 @@ where
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> ProfileViewBuilder<S, profile_view_state::SetHandle<St>> {
+    ) -> ProfileViewBuilder<profile_view_state::SetHandle<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ProfileViewBuilder {
             _state: PhantomData,
@@ -430,12 +446,12 @@ where
     }
 }
 
-impl<S: BosStr, St> ProfileViewBuilder<S, St>
+impl<St, S: BosStr> ProfileViewBuilder<St, S>
 where
     St: profile_view_state::State,
-    St::DisplayName: profile_view_state::IsSet,
-    St::Handle: profile_view_state::IsSet,
     St::Did: profile_view_state::IsSet,
+    St::Handle: profile_view_state::IsSet,
+    St::DisplayName: profile_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ProfileView<S> {
@@ -450,7 +466,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProfileView<S> {
         ProfileView {
             avatar: self._fields.0,
             created_at: self._fields.1,
@@ -464,10 +483,10 @@ where
 }
 
 fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.clippr.actor.defs"),
@@ -486,21 +505,24 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("profileView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A view of an actor's profile.")),
-                    required: Some(vec![
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("handle"),
-                        SmolStr::new_static("displayName"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A view of an actor's profile."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("did"), SmolStr::new_static("handle"),
+                            SmolStr::new_static("displayName")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("avatar"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "A link to the profile's avatar",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("A link to the profile's avatar"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -508,9 +530,11 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the profile record was first created",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "When the profile record was first created",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -518,9 +542,11 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The biography associated to the profile",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The biography associated to the profile",
+                                    ),
+                                ),
                                 max_length: Some(5000usize),
                                 max_graphemes: Some(500usize),
                                 ..Default::default()
@@ -529,7 +555,9 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The DID of the profile")),
+                                description: Some(
+                                    CowStr::new_static("The DID of the profile"),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -537,9 +565,11 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("displayName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The display name associated to the profile",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The display name associated to the profile",
+                                    ),
+                                ),
                                 max_length: Some(640usize),
                                 max_graphemes: Some(64usize),
                                 ..Default::default()
@@ -548,7 +578,9 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("handle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The handle of the profile")),
+                                description: Some(
+                                    CowStr::new_static("The handle of the profile"),
+                                ),
                                 format: Some(LexStringFormat::Handle),
                                 ..Default::default()
                             }),
@@ -561,9 +593,11 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("publishingScopesPref"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Preferences for an user's publishing scopes.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Preferences for an user's publishing scopes.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("defaultScope")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -571,9 +605,11 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("defaultScope"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "What publishing scope to mark a clip as by default",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "What publishing scope to mark a clip as by default",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );

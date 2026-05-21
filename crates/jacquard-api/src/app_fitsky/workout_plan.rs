@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_fitsky::workout_plan;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_fitsky::workout_plan;
 /// A reusable workout plan template
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -49,6 +49,7 @@ pub struct WorkoutPlan<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum WorkoutPlanType<S: BosStr = DefaultStr> {
@@ -146,11 +147,9 @@ pub struct WorkoutPlanGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: WorkoutPlan<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlanExercise<S: BosStr = DefaultStr> {
     pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -232,23 +231,25 @@ impl<S: BosStr> LexiconSchema for WorkoutPlan<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("og_image"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/webp".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -328,7 +329,7 @@ impl<S: BosStr> LexiconSchema for PlanExercise<S> {
 
 pub mod workout_plan_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -337,71 +338,71 @@ pub mod workout_plan_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Exercises;
-        type CreatedAt;
-        type Type;
         type Name;
+        type Type;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Exercises = Unset;
-        type CreatedAt = Unset;
-        type Type = Unset;
         type Name = Unset;
+        type Type = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `exercises` field to Set
     pub struct SetExercises<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetExercises<St> {}
     impl<St: State> State for SetExercises<St> {
         type Exercises = Set<members::exercises>;
-        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
         type Type = St::Type;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Exercises = St::Exercises;
-        type CreatedAt = Set<members::created_at>;
-        type Type = St::Type;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Exercises = St::Exercises;
         type CreatedAt = St::CreatedAt;
-        type Type = Set<members::r#type>;
-        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
         type Exercises = St::Exercises;
-        type CreatedAt = St::CreatedAt;
-        type Type = St::Type;
         type Name = Set<members::name>;
+        type Type = St::Type;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Exercises = St::Exercises;
+        type Name = St::Name;
+        type Type = Set<members::r#type>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Exercises = St::Exercises;
+        type Name = St::Name;
+        type Type = St::Type;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `exercises` field
         pub struct exercises(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WorkoutPlanBuilder<S: BosStr, St: workout_plan_state::State> {
+pub struct WorkoutPlanBuilder<St: workout_plan_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -413,15 +414,22 @@ pub struct WorkoutPlanBuilder<S: BosStr, St: workout_plan_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> WorkoutPlan<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> WorkoutPlanBuilder<S, workout_plan_state::Empty> {
+impl WorkoutPlan<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> WorkoutPlanBuilder<workout_plan_state::Empty, DefaultStr> {
         WorkoutPlanBuilder::new()
     }
 }
 
-impl<S: BosStr> WorkoutPlanBuilder<S, workout_plan_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> WorkoutPlan<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> WorkoutPlanBuilder<workout_plan_state::Empty, S> {
+        WorkoutPlanBuilder::builder()
+    }
+}
+
+impl WorkoutPlanBuilder<workout_plan_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         WorkoutPlanBuilder {
             _state: PhantomData,
@@ -431,7 +439,18 @@ impl<S: BosStr> WorkoutPlanBuilder<S, workout_plan_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> WorkoutPlanBuilder<S, St>
+impl<S: BosStr> WorkoutPlanBuilder<workout_plan_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        WorkoutPlanBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> WorkoutPlanBuilder<St, S>
 where
     St: workout_plan_state::State,
     St::CreatedAt: workout_plan_state::IsUnset,
@@ -440,7 +459,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WorkoutPlanBuilder<S, workout_plan_state::SetCreatedAt<St>> {
+    ) -> WorkoutPlanBuilder<workout_plan_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         WorkoutPlanBuilder {
             _state: PhantomData,
@@ -450,7 +469,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WorkoutPlanBuilder<S, St>
+impl<St, S: BosStr> WorkoutPlanBuilder<St, S>
 where
     St: workout_plan_state::State,
     St::Exercises: workout_plan_state::IsUnset,
@@ -459,7 +478,7 @@ where
     pub fn exercises(
         mut self,
         value: impl Into<Vec<workout_plan::PlanExercise<S>>>,
-    ) -> WorkoutPlanBuilder<S, workout_plan_state::SetExercises<St>> {
+    ) -> WorkoutPlanBuilder<workout_plan_state::SetExercises<St>, S> {
         self._fields.1 = Option::Some(value.into());
         WorkoutPlanBuilder {
             _state: PhantomData,
@@ -469,7 +488,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WorkoutPlanBuilder<S, St>
+impl<St, S: BosStr> WorkoutPlanBuilder<St, S>
 where
     St: workout_plan_state::State,
     St::Name: workout_plan_state::IsUnset,
@@ -478,7 +497,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> WorkoutPlanBuilder<S, workout_plan_state::SetName<St>> {
+    ) -> WorkoutPlanBuilder<workout_plan_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         WorkoutPlanBuilder {
             _state: PhantomData,
@@ -488,7 +507,7 @@ where
     }
 }
 
-impl<S: BosStr, St: workout_plan_state::State> WorkoutPlanBuilder<S, St> {
+impl<St: workout_plan_state::State, S: BosStr> WorkoutPlanBuilder<St, S> {
     /// Set the `ogImage` field (optional)
     pub fn og_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -501,7 +520,7 @@ impl<S: BosStr, St: workout_plan_state::State> WorkoutPlanBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WorkoutPlanBuilder<S, St>
+impl<St, S: BosStr> WorkoutPlanBuilder<St, S>
 where
     St: workout_plan_state::State,
     St::Type: workout_plan_state::IsUnset,
@@ -510,7 +529,7 @@ where
     pub fn r#type(
         mut self,
         value: impl Into<WorkoutPlanType<S>>,
-    ) -> WorkoutPlanBuilder<S, workout_plan_state::SetType<St>> {
+    ) -> WorkoutPlanBuilder<workout_plan_state::SetType<St>, S> {
         self._fields.4 = Option::Some(value.into());
         WorkoutPlanBuilder {
             _state: PhantomData,
@@ -520,13 +539,13 @@ where
     }
 }
 
-impl<S: BosStr, St> WorkoutPlanBuilder<S, St>
+impl<St, S: BosStr> WorkoutPlanBuilder<St, S>
 where
     St: workout_plan_state::State,
     St::Exercises: workout_plan_state::IsSet,
-    St::CreatedAt: workout_plan_state::IsSet,
-    St::Type: workout_plan_state::IsSet,
     St::Name: workout_plan_state::IsSet,
+    St::Type: workout_plan_state::IsSet,
+    St::CreatedAt: workout_plan_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> WorkoutPlan<S> {
@@ -540,7 +559,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> WorkoutPlan<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> WorkoutPlan<S> {
         WorkoutPlan {
             created_at: self._fields.0.unwrap(),
             exercises: self._fields.1.unwrap(),
@@ -553,10 +575,10 @@ where
 }
 
 fn lexicon_doc_app_fitsky_workoutPlan() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.fitsky.workoutPlan"),
@@ -565,15 +587,18 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A reusable workout plan template")),
+                    description: Some(
+                        CowStr::new_static("A reusable workout plan template"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("type"),
-                            SmolStr::new_static("exercises"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"), SmolStr::new_static("type"),
+                                SmolStr::new_static("exercises"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -603,9 +628,7 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("ogImage"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("type"),
@@ -624,11 +647,13 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("planExercise"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("targetSets"),
-                        SmolStr::new_static("targetReps"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("targetSets"),
+                            SmolStr::new_static("targetReps")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -673,7 +698,7 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> LexiconDoc<'static> {
 
 pub mod plan_exercise_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -681,70 +706,77 @@ pub mod plan_exercise_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type TargetReps;
         type TargetSets;
+        type TargetReps;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type TargetReps = Unset;
         type TargetSets = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type TargetReps = St::TargetReps;
-        type TargetSets = St::TargetSets;
-    }
-    ///State transition - sets the `target_reps` field to Set
-    pub struct SetTargetReps<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTargetReps<St> {}
-    impl<St: State> State for SetTargetReps<St> {
-        type Name = St::Name;
-        type TargetReps = Set<members::target_reps>;
-        type TargetSets = St::TargetSets;
+        type TargetReps = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `target_sets` field to Set
     pub struct SetTargetSets<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTargetSets<St> {}
     impl<St: State> State for SetTargetSets<St> {
-        type Name = St::Name;
-        type TargetReps = St::TargetReps;
         type TargetSets = Set<members::target_sets>;
+        type TargetReps = St::TargetReps;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `target_reps` field to Set
+    pub struct SetTargetReps<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTargetReps<St> {}
+    impl<St: State> State for SetTargetReps<St> {
+        type TargetSets = St::TargetSets;
+        type TargetReps = Set<members::target_reps>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type TargetSets = St::TargetSets;
+        type TargetReps = St::TargetReps;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `target_reps` field
-        pub struct target_reps(());
         ///Marker type for the `target_sets` field
         pub struct target_sets(());
+        ///Marker type for the `target_reps` field
+        pub struct target_reps(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PlanExerciseBuilder<S: BosStr, St: plan_exercise_state::State> {
+pub struct PlanExerciseBuilder<St: plan_exercise_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> PlanExercise<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> PlanExerciseBuilder<S, plan_exercise_state::Empty> {
+impl PlanExercise<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PlanExerciseBuilder<plan_exercise_state::Empty, DefaultStr> {
         PlanExerciseBuilder::new()
     }
 }
 
-impl<S: BosStr> PlanExerciseBuilder<S, plan_exercise_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> PlanExercise<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PlanExerciseBuilder<plan_exercise_state::Empty, S> {
+        PlanExerciseBuilder::builder()
+    }
+}
+
+impl PlanExerciseBuilder<plan_exercise_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         PlanExerciseBuilder {
             _state: PhantomData,
@@ -754,7 +786,18 @@ impl<S: BosStr> PlanExerciseBuilder<S, plan_exercise_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> PlanExerciseBuilder<S, St>
+impl<S: BosStr> PlanExerciseBuilder<plan_exercise_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PlanExerciseBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PlanExerciseBuilder<St, S>
 where
     St: plan_exercise_state::State,
     St::Name: plan_exercise_state::IsUnset,
@@ -763,7 +806,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> PlanExerciseBuilder<S, plan_exercise_state::SetName<St>> {
+    ) -> PlanExerciseBuilder<plan_exercise_state::SetName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PlanExerciseBuilder {
             _state: PhantomData,
@@ -773,7 +816,7 @@ where
     }
 }
 
-impl<S: BosStr, St: plan_exercise_state::State> PlanExerciseBuilder<S, St> {
+impl<St: plan_exercise_state::State, S: BosStr> PlanExerciseBuilder<St, S> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -786,7 +829,7 @@ impl<S: BosStr, St: plan_exercise_state::State> PlanExerciseBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> PlanExerciseBuilder<S, St>
+impl<St, S: BosStr> PlanExerciseBuilder<St, S>
 where
     St: plan_exercise_state::State,
     St::TargetReps: plan_exercise_state::IsUnset,
@@ -795,7 +838,7 @@ where
     pub fn target_reps(
         mut self,
         value: impl Into<i64>,
-    ) -> PlanExerciseBuilder<S, plan_exercise_state::SetTargetReps<St>> {
+    ) -> PlanExerciseBuilder<plan_exercise_state::SetTargetReps<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PlanExerciseBuilder {
             _state: PhantomData,
@@ -805,7 +848,7 @@ where
     }
 }
 
-impl<S: BosStr, St> PlanExerciseBuilder<S, St>
+impl<St, S: BosStr> PlanExerciseBuilder<St, S>
 where
     St: plan_exercise_state::State,
     St::TargetSets: plan_exercise_state::IsUnset,
@@ -814,7 +857,7 @@ where
     pub fn target_sets(
         mut self,
         value: impl Into<i64>,
-    ) -> PlanExerciseBuilder<S, plan_exercise_state::SetTargetSets<St>> {
+    ) -> PlanExerciseBuilder<plan_exercise_state::SetTargetSets<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PlanExerciseBuilder {
             _state: PhantomData,
@@ -824,12 +867,12 @@ where
     }
 }
 
-impl<S: BosStr, St> PlanExerciseBuilder<S, St>
+impl<St, S: BosStr> PlanExerciseBuilder<St, S>
 where
     St: plan_exercise_state::State,
-    St::Name: plan_exercise_state::IsSet,
-    St::TargetReps: plan_exercise_state::IsSet,
     St::TargetSets: plan_exercise_state::IsSet,
+    St::TargetReps: plan_exercise_state::IsSet,
+    St::Name: plan_exercise_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PlanExercise<S> {
@@ -842,7 +885,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PlanExercise<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PlanExercise<S> {
         PlanExercise {
             name: self._fields.0.unwrap(),
             notes: self._fields.1,

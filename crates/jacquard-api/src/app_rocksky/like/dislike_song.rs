@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::song::SongViewDetailed;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::song::SongViewDetailed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DislikeSong<S: BosStr = DefaultStr> {
     ///The unique identifier of the song to dislike
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -31,11 +28,9 @@ pub struct DislikeSong<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DislikeSongOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: SongViewDetailed<S>,
@@ -54,8 +49,9 @@ impl jacquard_common::xrpc::XrpcResp for DislikeSongResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DislikeSong<S> {
     const NSID: &'static str = "app.rocksky.like.dislikeSong";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DislikeSongResponse;
 }
 
@@ -63,8 +59,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DislikeSong<S> {
 pub struct DislikeSongRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DislikeSongRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.like.dislikeSong";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DislikeSong<S>;
     type Response = DislikeSongResponse;
 }

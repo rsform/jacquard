@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::games_gamesgamesgamesgames::migrate_claim;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::migrate_claim;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MigrateClaim<S: BosStr = DefaultStr> {
     pub claim: AtUri<S>,
     pub claim_review: AtUri<S>,
@@ -38,22 +35,18 @@ pub struct MigrateClaim<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MigrateClaimOutput<S: BosStr = DefaultStr> {
     pub results: Vec<migrate_claim::MigrationResult<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MigrationResult<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<S>,
@@ -64,6 +57,7 @@ pub struct MigrationResult<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MigrationResultStatus<S: BosStr = DefaultStr> {
@@ -141,7 +135,9 @@ where
             MigrationResultStatus::Success => MigrationResultStatus::Success,
             MigrationResultStatus::Failed => MigrationResultStatus::Failed,
             MigrationResultStatus::Skipped => MigrationResultStatus::Skipped,
-            MigrationResultStatus::Other(v) => MigrationResultStatus::Other(v.into_static()),
+            MigrationResultStatus::Other(v) => {
+                MigrationResultStatus::Other(v.into_static())
+            }
         }
     }
 }
@@ -157,8 +153,9 @@ impl jacquard_common::xrpc::XrpcResp for MigrateClaimResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for MigrateClaim<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.migrateClaim";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = MigrateClaimResponse;
 }
 
@@ -166,8 +163,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for MigrateClaim<S> {
 pub struct MigrateClaimRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MigrateClaimRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.migrateClaim";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = MigrateClaim<S>;
     type Response = MigrateClaimResponse;
 }
@@ -189,7 +187,7 @@ impl<S: BosStr> LexiconSchema for MigrationResult<S> {
 
 pub mod migrate_claim_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -197,56 +195,63 @@ pub mod migrate_claim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Claim;
         type ClaimReview;
+        type Claim;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Claim = Unset;
         type ClaimReview = Unset;
-    }
-    ///State transition - sets the `claim` field to Set
-    pub struct SetClaim<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetClaim<St> {}
-    impl<St: State> State for SetClaim<St> {
-        type Claim = Set<members::claim>;
-        type ClaimReview = St::ClaimReview;
+        type Claim = Unset;
     }
     ///State transition - sets the `claim_review` field to Set
     pub struct SetClaimReview<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetClaimReview<St> {}
     impl<St: State> State for SetClaimReview<St> {
-        type Claim = St::Claim;
         type ClaimReview = Set<members::claim_review>;
+        type Claim = St::Claim;
+    }
+    ///State transition - sets the `claim` field to Set
+    pub struct SetClaim<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetClaim<St> {}
+    impl<St: State> State for SetClaim<St> {
+        type ClaimReview = St::ClaimReview;
+        type Claim = Set<members::claim>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `claim` field
-        pub struct claim(());
         ///Marker type for the `claim_review` field
         pub struct claim_review(());
+        ///Marker type for the `claim` field
+        pub struct claim(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MigrateClaimBuilder<S: BosStr, St: migrate_claim_state::State> {
+pub struct MigrateClaimBuilder<St: migrate_claim_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> MigrateClaim<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MigrateClaimBuilder<S, migrate_claim_state::Empty> {
+impl MigrateClaim<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MigrateClaimBuilder<migrate_claim_state::Empty, DefaultStr> {
         MigrateClaimBuilder::new()
     }
 }
 
-impl<S: BosStr> MigrateClaimBuilder<S, migrate_claim_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> MigrateClaim<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MigrateClaimBuilder<migrate_claim_state::Empty, S> {
+        MigrateClaimBuilder::builder()
+    }
+}
+
+impl MigrateClaimBuilder<migrate_claim_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MigrateClaimBuilder {
             _state: PhantomData,
@@ -256,7 +261,18 @@ impl<S: BosStr> MigrateClaimBuilder<S, migrate_claim_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> MigrateClaimBuilder<S, St>
+impl<S: BosStr> MigrateClaimBuilder<migrate_claim_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MigrateClaimBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MigrateClaimBuilder<St, S>
 where
     St: migrate_claim_state::State,
     St::Claim: migrate_claim_state::IsUnset,
@@ -265,7 +281,7 @@ where
     pub fn claim(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> MigrateClaimBuilder<S, migrate_claim_state::SetClaim<St>> {
+    ) -> MigrateClaimBuilder<migrate_claim_state::SetClaim<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MigrateClaimBuilder {
             _state: PhantomData,
@@ -275,7 +291,7 @@ where
     }
 }
 
-impl<S: BosStr, St> MigrateClaimBuilder<S, St>
+impl<St, S: BosStr> MigrateClaimBuilder<St, S>
 where
     St: migrate_claim_state::State,
     St::ClaimReview: migrate_claim_state::IsUnset,
@@ -284,7 +300,7 @@ where
     pub fn claim_review(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> MigrateClaimBuilder<S, migrate_claim_state::SetClaimReview<St>> {
+    ) -> MigrateClaimBuilder<migrate_claim_state::SetClaimReview<St>, S> {
         self._fields.1 = Option::Some(value.into());
         MigrateClaimBuilder {
             _state: PhantomData,
@@ -294,11 +310,11 @@ where
     }
 }
 
-impl<S: BosStr, St> MigrateClaimBuilder<S, St>
+impl<St, S: BosStr> MigrateClaimBuilder<St, S>
 where
     St: migrate_claim_state::State,
-    St::Claim: migrate_claim_state::IsSet,
     St::ClaimReview: migrate_claim_state::IsSet,
+    St::Claim: migrate_claim_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MigrateClaim<S> {
@@ -309,7 +325,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MigrateClaim<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MigrateClaim<S> {
         MigrateClaim {
             claim: self._fields.0.unwrap(),
             claim_review: self._fields.1.unwrap(),
@@ -320,7 +339,7 @@ where
 
 pub mod migration_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -328,42 +347,45 @@ pub mod migration_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type GameUri;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type GameUri = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type Status = Set<members::status>;
-        type GameUri = St::GameUri;
+        type Status = Unset;
     }
     ///State transition - sets the `game_uri` field to Set
     pub struct SetGameUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGameUri<St> {}
     impl<St: State> State for SetGameUri<St> {
-        type Status = St::Status;
         type GameUri = Set<members::game_uri>;
+        type Status = St::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type GameUri = St::GameUri;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `game_uri` field
         pub struct game_uri(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MigrationResultBuilder<S: BosStr, St: migration_result_state::State> {
+pub struct MigrationResultBuilder<
+    St: migration_result_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -374,15 +396,22 @@ pub struct MigrationResultBuilder<S: BosStr, St: migration_result_state::State> 
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> MigrationResult<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MigrationResultBuilder<S, migration_result_state::Empty> {
+impl MigrationResult<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MigrationResultBuilder<migration_result_state::Empty, DefaultStr> {
         MigrationResultBuilder::new()
     }
 }
 
-impl<S: BosStr> MigrationResultBuilder<S, migration_result_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> MigrationResult<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MigrationResultBuilder<migration_result_state::Empty, S> {
+        MigrationResultBuilder::builder()
+    }
+}
+
+impl MigrationResultBuilder<migration_result_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MigrationResultBuilder {
             _state: PhantomData,
@@ -392,7 +421,18 @@ impl<S: BosStr> MigrationResultBuilder<S, migration_result_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: migration_result_state::State> MigrationResultBuilder<S, St> {
+impl<S: BosStr> MigrationResultBuilder<migration_result_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MigrationResultBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: migration_result_state::State, S: BosStr> MigrationResultBuilder<St, S> {
     /// Set the `error` field (optional)
     pub fn error(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -405,7 +445,7 @@ impl<S: BosStr, St: migration_result_state::State> MigrationResultBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St> MigrationResultBuilder<S, St>
+impl<St, S: BosStr> MigrationResultBuilder<St, S>
 where
     St: migration_result_state::State,
     St::GameUri: migration_result_state::IsUnset,
@@ -414,7 +454,7 @@ where
     pub fn game_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> MigrationResultBuilder<S, migration_result_state::SetGameUri<St>> {
+    ) -> MigrationResultBuilder<migration_result_state::SetGameUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         MigrationResultBuilder {
             _state: PhantomData,
@@ -424,7 +464,7 @@ where
     }
 }
 
-impl<S: BosStr, St: migration_result_state::State> MigrationResultBuilder<S, St> {
+impl<St: migration_result_state::State, S: BosStr> MigrationResultBuilder<St, S> {
     /// Set the `newUri` field (optional)
     pub fn new_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -437,7 +477,7 @@ impl<S: BosStr, St: migration_result_state::State> MigrationResultBuilder<S, St>
     }
 }
 
-impl<S: BosStr, St> MigrationResultBuilder<S, St>
+impl<St, S: BosStr> MigrationResultBuilder<St, S>
 where
     St: migration_result_state::State,
     St::Status: migration_result_state::IsUnset,
@@ -446,7 +486,7 @@ where
     pub fn status(
         mut self,
         value: impl Into<MigrationResultStatus<S>>,
-    ) -> MigrationResultBuilder<S, migration_result_state::SetStatus<St>> {
+    ) -> MigrationResultBuilder<migration_result_state::SetStatus<St>, S> {
         self._fields.3 = Option::Some(value.into());
         MigrationResultBuilder {
             _state: PhantomData,
@@ -456,11 +496,11 @@ where
     }
 }
 
-impl<S: BosStr, St> MigrationResultBuilder<S, St>
+impl<St, S: BosStr> MigrationResultBuilder<St, S>
 where
     St: migration_result_state::State,
-    St::Status: migration_result_state::IsSet,
     St::GameUri: migration_result_state::IsSet,
+    St::Status: migration_result_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MigrationResult<S> {
@@ -473,7 +513,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MigrationResult<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MigrationResult<S> {
         MigrationResult {
             error: self._fields.0,
             game_uri: self._fields.1.unwrap(),
@@ -485,10 +528,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_migrateClaim() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.migrateClaim"),
@@ -499,32 +542,36 @@ fn lexicon_doc_games_gamesgamesgamesgames_migrateClaim() -> LexiconDoc<'static> 
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![
-                                SmolStr::new_static("claim"),
-                                SmolStr::new_static("claimReview"),
-                            ]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("claim"),
-                                    LexObjectProperty::String(LexString {
-                                        format: Some(LexStringFormat::AtUri),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("claimReview"),
-                                    LexObjectProperty::String(LexString {
-                                        format: Some(LexStringFormat::AtUri),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(
+                                    vec![
+                                        SmolStr::new_static("claim"),
+                                        SmolStr::new_static("claimReview")
+                                    ],
+                                ),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("claim"),
+                                        LexObjectProperty::String(LexString {
+                                            format: Some(LexStringFormat::AtUri),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("claimReview"),
+                                        LexObjectProperty::String(LexString {
+                                            format: Some(LexStringFormat::AtUri),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -533,18 +580,17 @@ fn lexicon_doc_games_gamesgamesgamesgames_migrateClaim() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("migrationResult"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("gameUri"),
-                        SmolStr::new_static("status"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("gameUri"), SmolStr::new_static("status")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("error"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("gameUri"),
@@ -562,9 +608,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_migrateClaim() -> LexiconDoc<'static> 
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },

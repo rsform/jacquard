@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Record declaring a social 'follow' relationship of another account. Duplicate follows will be ignored by the AppView.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -107,7 +107,7 @@ impl<S: BosStr> LexiconSchema for Follow<S> {
 
 pub mod follow_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -115,56 +115,63 @@ pub mod follow_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type CreatedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = St::CreatedAt;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Subject = St::Subject;
         type CreatedAt = Set<members::created_at>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FollowBuilder<S: BosStr, St: follow_state::State> {
+pub struct FollowBuilder<St: follow_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Did<S>>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Follow<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> FollowBuilder<S, follow_state::Empty> {
+impl Follow<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FollowBuilder<follow_state::Empty, DefaultStr> {
         FollowBuilder::new()
     }
 }
 
-impl<S: BosStr> FollowBuilder<S, follow_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Follow<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FollowBuilder<follow_state::Empty, S> {
+        FollowBuilder::builder()
+    }
+}
+
+impl FollowBuilder<follow_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         FollowBuilder {
             _state: PhantomData,
@@ -174,7 +181,18 @@ impl<S: BosStr> FollowBuilder<S, follow_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> FollowBuilder<S, St>
+impl<S: BosStr> FollowBuilder<follow_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FollowBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FollowBuilder<St, S>
 where
     St: follow_state::State,
     St::CreatedAt: follow_state::IsUnset,
@@ -183,7 +201,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FollowBuilder<S, follow_state::SetCreatedAt<St>> {
+    ) -> FollowBuilder<follow_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FollowBuilder {
             _state: PhantomData,
@@ -193,7 +211,7 @@ where
     }
 }
 
-impl<S: BosStr, St> FollowBuilder<S, St>
+impl<St, S: BosStr> FollowBuilder<St, S>
 where
     St: follow_state::State,
     St::Subject: follow_state::IsUnset,
@@ -202,7 +220,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> FollowBuilder<S, follow_state::SetSubject<St>> {
+    ) -> FollowBuilder<follow_state::SetSubject<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FollowBuilder {
             _state: PhantomData,
@@ -212,7 +230,7 @@ where
     }
 }
 
-impl<S: BosStr, St: follow_state::State> FollowBuilder<S, St> {
+impl<St: follow_state::State, S: BosStr> FollowBuilder<St, S> {
     /// Set the `via` field (optional)
     pub fn via(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -225,11 +243,11 @@ impl<S: BosStr, St: follow_state::State> FollowBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> FollowBuilder<S, St>
+impl<St, S: BosStr> FollowBuilder<St, S>
 where
     St: follow_state::State,
-    St::Subject: follow_state::IsSet,
     St::CreatedAt: follow_state::IsSet,
+    St::Subject: follow_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Follow<S> {
@@ -252,10 +270,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_graph_follow() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.graph.follow"),

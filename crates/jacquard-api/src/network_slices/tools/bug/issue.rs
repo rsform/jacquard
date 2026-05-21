@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -106,7 +106,7 @@ impl<S: BosStr> LexiconSchema for Issue<S> {
 
 pub mod issue_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -114,70 +114,77 @@ pub mod issue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Bug;
         type Issue;
+        type Bug;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Bug = Unset;
         type Issue = Unset;
+        type Bug = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `bug` field to Set
-    pub struct SetBug<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBug<St> {}
-    impl<St: State> State for SetBug<St> {
-        type Bug = Set<members::bug>;
-        type Issue = St::Issue;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `issue` field to Set
     pub struct SetIssue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIssue<St> {}
     impl<St: State> State for SetIssue<St> {
-        type Bug = St::Bug;
         type Issue = Set<members::issue>;
+        type Bug = St::Bug;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `bug` field to Set
+    pub struct SetBug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBug<St> {}
+    impl<St: State> State for SetBug<St> {
+        type Issue = St::Issue;
+        type Bug = Set<members::bug>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Bug = St::Bug;
         type Issue = St::Issue;
+        type Bug = St::Bug;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bug` field
-        pub struct bug(());
         ///Marker type for the `issue` field
         pub struct issue(());
+        ///Marker type for the `bug` field
+        pub struct bug(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IssueBuilder<S: BosStr, St: issue_state::State> {
+pub struct IssueBuilder<St: issue_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Datetime>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Issue<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> IssueBuilder<S, issue_state::Empty> {
+impl Issue<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> IssueBuilder<issue_state::Empty, DefaultStr> {
         IssueBuilder::new()
     }
 }
 
-impl<S: BosStr> IssueBuilder<S, issue_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Issue<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> IssueBuilder<issue_state::Empty, S> {
+        IssueBuilder::builder()
+    }
+}
+
+impl IssueBuilder<issue_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         IssueBuilder {
             _state: PhantomData,
@@ -187,13 +194,27 @@ impl<S: BosStr> IssueBuilder<S, issue_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> IssueBuilder<S, St>
+impl<S: BosStr> IssueBuilder<issue_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        IssueBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> IssueBuilder<St, S>
 where
     St: issue_state::State,
     St::Bug: issue_state::IsUnset,
 {
     /// Set the `bug` field (required)
-    pub fn bug(mut self, value: impl Into<AtUri<S>>) -> IssueBuilder<S, issue_state::SetBug<St>> {
+    pub fn bug(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> IssueBuilder<issue_state::SetBug<St>, S> {
         self._fields.0 = Option::Some(value.into());
         IssueBuilder {
             _state: PhantomData,
@@ -203,7 +224,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IssueBuilder<S, St>
+impl<St, S: BosStr> IssueBuilder<St, S>
 where
     St: issue_state::State,
     St::CreatedAt: issue_state::IsUnset,
@@ -212,7 +233,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> IssueBuilder<S, issue_state::SetCreatedAt<St>> {
+    ) -> IssueBuilder<issue_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         IssueBuilder {
             _state: PhantomData,
@@ -222,7 +243,7 @@ where
     }
 }
 
-impl<S: BosStr, St> IssueBuilder<S, St>
+impl<St, S: BosStr> IssueBuilder<St, S>
 where
     St: issue_state::State,
     St::Issue: issue_state::IsUnset,
@@ -231,7 +252,7 @@ where
     pub fn issue(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> IssueBuilder<S, issue_state::SetIssue<St>> {
+    ) -> IssueBuilder<issue_state::SetIssue<St>, S> {
         self._fields.2 = Option::Some(value.into());
         IssueBuilder {
             _state: PhantomData,
@@ -241,11 +262,11 @@ where
     }
 }
 
-impl<S: BosStr, St> IssueBuilder<S, St>
+impl<St, S: BosStr> IssueBuilder<St, S>
 where
     St: issue_state::State,
-    St::Bug: issue_state::IsSet,
     St::Issue: issue_state::IsSet,
+    St::Bug: issue_state::IsSet,
     St::CreatedAt: issue_state::IsSet,
 {
     /// Build the final struct.
@@ -269,10 +290,10 @@ where
 }
 
 fn lexicon_doc_network_slices_tools_bug_issue() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.tools.bug.issue"),
@@ -283,20 +304,21 @@ fn lexicon_doc_network_slices_tools_bug_issue() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("bug"),
-                            SmolStr::new_static("issue"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("bug"), SmolStr::new_static("issue"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("bug"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Reference to the bug report",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Reference to the bug report"),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -311,9 +333,9 @@ fn lexicon_doc_network_slices_tools_bug_issue() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("issue"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Reference to the linked issue",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Reference to the linked issue"),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

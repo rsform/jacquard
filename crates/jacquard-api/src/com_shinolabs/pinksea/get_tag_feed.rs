@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTagFeed<S: BosStr = DefaultStr> {
     ///Defaults to `50`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
@@ -33,11 +30,9 @@ pub struct GetTagFeed<S: BosStr = DefaultStr> {
     pub tag: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTagFeedOutput<S: BosStr = DefaultStr> {
     pub oekaki: Vec<HydratedOekaki<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -74,7 +69,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_tag_feed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -105,21 +100,28 @@ pub mod get_tag_feed_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetTagFeedBuilder<S: BosStr, St: get_tag_feed_state::State> {
+pub struct GetTagFeedBuilder<St: get_tag_feed_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Datetime>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetTagFeed<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetTagFeedBuilder<S, get_tag_feed_state::Empty> {
+impl GetTagFeed<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetTagFeedBuilder<get_tag_feed_state::Empty, DefaultStr> {
         GetTagFeedBuilder::new()
     }
 }
 
-impl<S: BosStr> GetTagFeedBuilder<S, get_tag_feed_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetTagFeed<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetTagFeedBuilder<get_tag_feed_state::Empty, S> {
+        GetTagFeedBuilder::builder()
+    }
+}
+
+impl GetTagFeedBuilder<get_tag_feed_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetTagFeedBuilder {
             _state: PhantomData,
@@ -129,7 +131,18 @@ impl<S: BosStr> GetTagFeedBuilder<S, get_tag_feed_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_tag_feed_state::State> GetTagFeedBuilder<S, St> {
+impl<S: BosStr> GetTagFeedBuilder<get_tag_feed_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetTagFeedBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_tag_feed_state::State, S: BosStr> GetTagFeedBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -142,7 +155,7 @@ impl<S: BosStr, St: get_tag_feed_state::State> GetTagFeedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_tag_feed_state::State> GetTagFeedBuilder<S, St> {
+impl<St: get_tag_feed_state::State, S: BosStr> GetTagFeedBuilder<St, S> {
     /// Set the `since` field (optional)
     pub fn since(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -155,7 +168,7 @@ impl<S: BosStr, St: get_tag_feed_state::State> GetTagFeedBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetTagFeedBuilder<S, St>
+impl<St, S: BosStr> GetTagFeedBuilder<St, S>
 where
     St: get_tag_feed_state::State,
     St::Tag: get_tag_feed_state::IsUnset,
@@ -164,7 +177,7 @@ where
     pub fn tag(
         mut self,
         value: impl Into<S>,
-    ) -> GetTagFeedBuilder<S, get_tag_feed_state::SetTag<St>> {
+    ) -> GetTagFeedBuilder<get_tag_feed_state::SetTag<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GetTagFeedBuilder {
             _state: PhantomData,
@@ -174,7 +187,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetTagFeedBuilder<S, St>
+impl<St, S: BosStr> GetTagFeedBuilder<St, S>
 where
     St: get_tag_feed_state::State,
     St::Tag: get_tag_feed_state::IsSet,

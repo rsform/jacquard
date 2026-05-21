@@ -10,40 +10,35 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{Did, Handle, UriValue};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveMiniDoc<S: BosStr = DefaultStr> {
     pub identifier: AtIdentifier<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveMiniDocOutput<S: BosStr = DefaultStr> {
     ///DID, bi-directionally verified if a handle was provided in the query.
     pub did: Did<S>,
     /**The validated handle of the account or `handle.invalid` if the handle
-    did not bi-directionally match the DID document.*/
+did not bi-directionally match the DID document.*/
     pub handle: Handle<S>,
     ///The identity's PDS URL
     pub pds: UriValue<S>,
     /**The atproto signing key publicKeyMultibase
 
-    Legacy key encoding not supported. the key is returned directly; `id`,
-    `type`, and `controller` are omitted.*/
+Legacy key encoding not supported. the key is returned directly; `id`,
+`type`, and `controller` are omitted.*/
     pub signing_key: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -75,7 +70,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ResolveMiniDocRequest {
 
 pub mod resolve_mini_doc_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -106,21 +101,31 @@ pub mod resolve_mini_doc_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ResolveMiniDocBuilder<S: BosStr, St: resolve_mini_doc_state::State> {
+pub struct ResolveMiniDocBuilder<
+    St: resolve_mini_doc_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ResolveMiniDoc<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ResolveMiniDocBuilder<S, resolve_mini_doc_state::Empty> {
+impl ResolveMiniDoc<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ResolveMiniDocBuilder<resolve_mini_doc_state::Empty, DefaultStr> {
         ResolveMiniDocBuilder::new()
     }
 }
 
-impl<S: BosStr> ResolveMiniDocBuilder<S, resolve_mini_doc_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ResolveMiniDoc<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ResolveMiniDocBuilder<resolve_mini_doc_state::Empty, S> {
+        ResolveMiniDocBuilder::builder()
+    }
+}
+
+impl ResolveMiniDocBuilder<resolve_mini_doc_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ResolveMiniDocBuilder {
             _state: PhantomData,
@@ -130,7 +135,18 @@ impl<S: BosStr> ResolveMiniDocBuilder<S, resolve_mini_doc_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ResolveMiniDocBuilder<S, St>
+impl<S: BosStr> ResolveMiniDocBuilder<resolve_mini_doc_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ResolveMiniDocBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ResolveMiniDocBuilder<St, S>
 where
     St: resolve_mini_doc_state::State,
     St::Identifier: resolve_mini_doc_state::IsUnset,
@@ -139,7 +155,7 @@ where
     pub fn identifier(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> ResolveMiniDocBuilder<S, resolve_mini_doc_state::SetIdentifier<St>> {
+    ) -> ResolveMiniDocBuilder<resolve_mini_doc_state::SetIdentifier<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ResolveMiniDocBuilder {
             _state: PhantomData,
@@ -149,7 +165,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ResolveMiniDocBuilder<S, St>
+impl<St, S: BosStr> ResolveMiniDocBuilder<St, S>
 where
     St: resolve_mini_doc_state::State,
     St::Identifier: resolve_mini_doc_state::IsSet,

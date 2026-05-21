@@ -9,12 +9,13 @@ pub mod declaration;
 pub mod delete_account;
 pub mod export_account_data;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,19 +26,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileAssociated;
 use crate::app_bsky::actor::VerificationState;
 use crate::app_bsky::actor::ViewerState;
 use crate::com_atproto::label::Label;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileViewBasic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated: Option<ProfileAssociated<S>>,
@@ -99,7 +97,7 @@ impl<S: BosStr> LexiconSchema for ProfileViewBasic<S> {
 
 pub mod profile_view_basic_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -142,7 +140,10 @@ pub mod profile_view_basic_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileViewBasicBuilder<S: BosStr, St: profile_view_basic_state::State> {
+pub struct ProfileViewBasicBuilder<
+    St: profile_view_basic_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileAssociated<S>>,
@@ -158,15 +159,25 @@ pub struct ProfileViewBasicBuilder<S: BosStr, St: profile_view_basic_state::Stat
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ProfileViewBasic<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProfileViewBasicBuilder<S, profile_view_basic_state::Empty> {
+impl ProfileViewBasic<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProfileViewBasicBuilder<
+        profile_view_basic_state::Empty,
+        DefaultStr,
+    > {
         ProfileViewBasicBuilder::new()
     }
 }
 
-impl<S: BosStr> ProfileViewBasicBuilder<S, profile_view_basic_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ProfileViewBasic<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProfileViewBasicBuilder<profile_view_basic_state::Empty, S> {
+        ProfileViewBasicBuilder::builder()
+    }
+}
+
+impl ProfileViewBasicBuilder<profile_view_basic_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProfileViewBasicBuilder {
             _state: PhantomData,
@@ -176,7 +187,18 @@ impl<S: BosStr> ProfileViewBasicBuilder<S, profile_view_basic_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
+impl<S: BosStr> ProfileViewBasicBuilder<profile_view_basic_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProfileViewBasicBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: profile_view_basic_state::State, S: BosStr> ProfileViewBasicBuilder<St, S> {
     /// Set the `associated` field (optional)
     pub fn associated(mut self, value: impl Into<Option<ProfileAssociated<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -189,7 +211,7 @@ impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, 
     }
 }
 
-impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
+impl<St: profile_view_basic_state::State, S: BosStr> ProfileViewBasicBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -202,7 +224,7 @@ impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, 
     }
 }
 
-impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
+impl<St: profile_view_basic_state::State, S: BosStr> ProfileViewBasicBuilder<St, S> {
     /// Set the `chatDisabled` field (optional)
     pub fn chat_disabled(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -215,7 +237,7 @@ impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, 
     }
 }
 
-impl<S: BosStr, St> ProfileViewBasicBuilder<S, St>
+impl<St, S: BosStr> ProfileViewBasicBuilder<St, S>
 where
     St: profile_view_basic_state::State,
     St::Did: profile_view_basic_state::IsUnset,
@@ -224,7 +246,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ProfileViewBasicBuilder<S, profile_view_basic_state::SetDid<St>> {
+    ) -> ProfileViewBasicBuilder<profile_view_basic_state::SetDid<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ProfileViewBasicBuilder {
             _state: PhantomData,
@@ -234,7 +256,7 @@ where
     }
 }
 
-impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
+impl<St: profile_view_basic_state::State, S: BosStr> ProfileViewBasicBuilder<St, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -247,7 +269,7 @@ impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, 
     }
 }
 
-impl<S: BosStr, St> ProfileViewBasicBuilder<S, St>
+impl<St, S: BosStr> ProfileViewBasicBuilder<St, S>
 where
     St: profile_view_basic_state::State,
     St::Handle: profile_view_basic_state::IsUnset,
@@ -256,7 +278,7 @@ where
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> ProfileViewBasicBuilder<S, profile_view_basic_state::SetHandle<St>> {
+    ) -> ProfileViewBasicBuilder<profile_view_basic_state::SetHandle<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ProfileViewBasicBuilder {
             _state: PhantomData,
@@ -266,7 +288,7 @@ where
     }
 }
 
-impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
+impl<St: profile_view_basic_state::State, S: BosStr> ProfileViewBasicBuilder<St, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -279,9 +301,12 @@ impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, 
     }
 }
 
-impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
+impl<St: profile_view_basic_state::State, S: BosStr> ProfileViewBasicBuilder<St, S> {
     /// Set the `verification` field (optional)
-    pub fn verification(mut self, value: impl Into<Option<VerificationState<S>>>) -> Self {
+    pub fn verification(
+        mut self,
+        value: impl Into<Option<VerificationState<S>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
@@ -292,7 +317,7 @@ impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, 
     }
 }
 
-impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
+impl<St: profile_view_basic_state::State, S: BosStr> ProfileViewBasicBuilder<St, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<ViewerState<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -305,7 +330,7 @@ impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, 
     }
 }
 
-impl<S: BosStr, St> ProfileViewBasicBuilder<S, St>
+impl<St, S: BosStr> ProfileViewBasicBuilder<St, S>
 where
     St: profile_view_basic_state::State,
     St::Did: profile_view_basic_state::IsSet,
@@ -327,7 +352,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileViewBasic<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProfileViewBasic<S> {
         ProfileViewBasic {
             associated: self._fields.0,
             avatar: self._fields.1,
@@ -344,10 +372,10 @@ where
 }
 
 fn lexicon_doc_chat_bsky_actor_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.actor.defs"),
@@ -356,17 +384,18 @@ fn lexicon_doc_chat_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("profileViewBasic"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("handle"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("did"), SmolStr::new_static("handle")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("associated"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileAssociated"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#profileAssociated",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -418,14 +447,18 @@ fn lexicon_doc_chat_bsky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("verification"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#verificationState"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#verificationState",
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("viewer"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#viewerState"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#viewerState",
+                                ),
                                 ..Default::default()
                             }),
                         );

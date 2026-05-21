@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -23,13 +23,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftView<S: BosStr = DefaultStr> {
     pub content: S,
     pub created_at: Datetime,
@@ -39,11 +36,9 @@ pub struct DraftView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PutDraft<S: BosStr = DefaultStr> {
     ///Markdown content of the draft.
     pub content: S,
@@ -54,11 +49,9 @@ pub struct PutDraft<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PutDraftOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -66,19 +59,25 @@ pub struct PutDraftOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum PutDraftError {
     #[serde(rename = "DraftNotFound")]
     DraftNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for PutDraftError {
@@ -128,8 +127,9 @@ impl jacquard_common::xrpc::XrpcResp for PutDraftResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutDraft<S> {
     const NSID: &'static str = "at.unthread.document.putDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PutDraftResponse;
 }
 
@@ -137,15 +137,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutDraft<S> {
 pub struct PutDraftRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutDraftRequest {
     const PATH: &'static str = "/xrpc/at.unthread.document.putDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = PutDraft<S>;
     type Response = PutDraftResponse;
 }
 
 pub mod draft_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -218,21 +219,28 @@ pub mod draft_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DraftViewBuilder<S: BosStr, St: draft_view_state::State> {
+pub struct DraftViewBuilder<St: draft_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>, Option<S>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DraftView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DraftViewBuilder<S, draft_view_state::Empty> {
+impl DraftView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DraftViewBuilder<draft_view_state::Empty, DefaultStr> {
         DraftViewBuilder::new()
     }
 }
 
-impl<S: BosStr> DraftViewBuilder<S, draft_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DraftView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DraftViewBuilder<draft_view_state::Empty, S> {
+        DraftViewBuilder::builder()
+    }
+}
+
+impl DraftViewBuilder<draft_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DraftViewBuilder {
             _state: PhantomData,
@@ -242,7 +250,18 @@ impl<S: BosStr> DraftViewBuilder<S, draft_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DraftViewBuilder<S, St>
+impl<S: BosStr> DraftViewBuilder<draft_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DraftViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DraftViewBuilder<St, S>
 where
     St: draft_view_state::State,
     St::Content: draft_view_state::IsUnset,
@@ -251,7 +270,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> DraftViewBuilder<S, draft_view_state::SetContent<St>> {
+    ) -> DraftViewBuilder<draft_view_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DraftViewBuilder {
             _state: PhantomData,
@@ -261,7 +280,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DraftViewBuilder<S, St>
+impl<St, S: BosStr> DraftViewBuilder<St, S>
 where
     St: draft_view_state::State,
     St::CreatedAt: draft_view_state::IsUnset,
@@ -270,7 +289,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DraftViewBuilder<S, draft_view_state::SetCreatedAt<St>> {
+    ) -> DraftViewBuilder<draft_view_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DraftViewBuilder {
             _state: PhantomData,
@@ -280,13 +299,16 @@ where
     }
 }
 
-impl<S: BosStr, St> DraftViewBuilder<S, St>
+impl<St, S: BosStr> DraftViewBuilder<St, S>
 where
     St: draft_view_state::State,
     St::Tid: draft_view_state::IsUnset,
 {
     /// Set the `tid` field (required)
-    pub fn tid(mut self, value: impl Into<S>) -> DraftViewBuilder<S, draft_view_state::SetTid<St>> {
+    pub fn tid(
+        mut self,
+        value: impl Into<S>,
+    ) -> DraftViewBuilder<draft_view_state::SetTid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         DraftViewBuilder {
             _state: PhantomData,
@@ -296,7 +318,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DraftViewBuilder<S, St>
+impl<St, S: BosStr> DraftViewBuilder<St, S>
 where
     St: draft_view_state::State,
     St::UpdatedAt: draft_view_state::IsUnset,
@@ -305,7 +327,7 @@ where
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DraftViewBuilder<S, draft_view_state::SetUpdatedAt<St>> {
+    ) -> DraftViewBuilder<draft_view_state::SetUpdatedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         DraftViewBuilder {
             _state: PhantomData,
@@ -315,7 +337,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DraftViewBuilder<S, St>
+impl<St, S: BosStr> DraftViewBuilder<St, S>
 where
     St: draft_view_state::State,
     St::Content: draft_view_state::IsSet,
@@ -334,7 +356,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DraftView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DraftView<S> {
         DraftView {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -346,10 +371,10 @@ where
 }
 
 fn lexicon_doc_at_unthread_document_putDraft() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.unthread.document.putDraft"),
@@ -358,20 +383,19 @@ fn lexicon_doc_at_unthread_document_putDraft() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("draftView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("tid"),
-                        SmolStr::new_static("content"),
-                        SmolStr::new_static("createdAt"),
-                        SmolStr::new_static("updatedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("tid"), SmolStr::new_static("content"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("updatedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("content"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("createdAt"),
@@ -382,9 +406,7 @@ fn lexicon_doc_at_unthread_document_putDraft() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("tid"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("updatedAt"),

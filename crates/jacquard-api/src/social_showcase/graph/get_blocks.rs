@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_showcase::ProfileView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_showcase::ProfileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBlocks<S: BosStr = DefaultStr> {
     ///(max length: 512)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -32,11 +29,9 @@ pub struct GetBlocks<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBlocksOutput<S: BosStr = DefaultStr> {
     pub blocks: Vec<ProfileView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -75,7 +70,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_blocks_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -93,21 +88,28 @@ pub mod get_blocks_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetBlocksBuilder<S: BosStr, St: get_blocks_state::State> {
+pub struct GetBlocksBuilder<St: get_blocks_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetBlocks<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetBlocksBuilder<S, get_blocks_state::Empty> {
+impl GetBlocks<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetBlocksBuilder<get_blocks_state::Empty, DefaultStr> {
         GetBlocksBuilder::new()
     }
 }
 
-impl<S: BosStr> GetBlocksBuilder<S, get_blocks_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetBlocks<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetBlocksBuilder<get_blocks_state::Empty, S> {
+        GetBlocksBuilder::builder()
+    }
+}
+
+impl GetBlocksBuilder<get_blocks_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetBlocksBuilder {
             _state: PhantomData,
@@ -117,7 +119,18 @@ impl<S: BosStr> GetBlocksBuilder<S, get_blocks_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_blocks_state::State> GetBlocksBuilder<S, St> {
+impl<S: BosStr> GetBlocksBuilder<get_blocks_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetBlocksBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_blocks_state::State, S: BosStr> GetBlocksBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -130,7 +143,7 @@ impl<S: BosStr, St: get_blocks_state::State> GetBlocksBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_blocks_state::State> GetBlocksBuilder<S, St> {
+impl<St: get_blocks_state::State, S: BosStr> GetBlocksBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -143,7 +156,7 @@ impl<S: BosStr, St: get_blocks_state::State> GetBlocksBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetBlocksBuilder<S, St>
+impl<St, S: BosStr> GetBlocksBuilder<St, S>
 where
     St: get_blocks_state::State,
 {

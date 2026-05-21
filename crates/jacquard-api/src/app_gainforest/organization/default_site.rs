@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A declaration of the default site for an organization
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -106,7 +106,7 @@ impl<S: BosStr> LexiconSchema for DefaultSite<S> {
 
 pub mod default_site_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -149,21 +149,28 @@ pub mod default_site_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DefaultSiteBuilder<S: BosStr, St: default_site_state::State> {
+pub struct DefaultSiteBuilder<St: default_site_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DefaultSite<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DefaultSiteBuilder<S, default_site_state::Empty> {
+impl DefaultSite<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DefaultSiteBuilder<default_site_state::Empty, DefaultStr> {
         DefaultSiteBuilder::new()
     }
 }
 
-impl<S: BosStr> DefaultSiteBuilder<S, default_site_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DefaultSite<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DefaultSiteBuilder<default_site_state::Empty, S> {
+        DefaultSiteBuilder::builder()
+    }
+}
+
+impl DefaultSiteBuilder<default_site_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DefaultSiteBuilder {
             _state: PhantomData,
@@ -173,7 +180,18 @@ impl<S: BosStr> DefaultSiteBuilder<S, default_site_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DefaultSiteBuilder<S, St>
+impl<S: BosStr> DefaultSiteBuilder<default_site_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DefaultSiteBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DefaultSiteBuilder<St, S>
 where
     St: default_site_state::State,
     St::CreatedAt: default_site_state::IsUnset,
@@ -182,7 +200,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DefaultSiteBuilder<S, default_site_state::SetCreatedAt<St>> {
+    ) -> DefaultSiteBuilder<default_site_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DefaultSiteBuilder {
             _state: PhantomData,
@@ -192,7 +210,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DefaultSiteBuilder<S, St>
+impl<St, S: BosStr> DefaultSiteBuilder<St, S>
 where
     St: default_site_state::State,
     St::Site: default_site_state::IsUnset,
@@ -201,7 +219,7 @@ where
     pub fn site(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> DefaultSiteBuilder<S, default_site_state::SetSite<St>> {
+    ) -> DefaultSiteBuilder<default_site_state::SetSite<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DefaultSiteBuilder {
             _state: PhantomData,
@@ -211,7 +229,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DefaultSiteBuilder<S, St>
+impl<St, S: BosStr> DefaultSiteBuilder<St, S>
 where
     St: default_site_state::State,
     St::CreatedAt: default_site_state::IsSet,
@@ -226,7 +244,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DefaultSite<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DefaultSite<S> {
         DefaultSite {
             created_at: self._fields.0.unwrap(),
             site: self._fields.1.unwrap(),
@@ -236,10 +257,10 @@ where
 }
 
 fn lexicon_doc_app_gainforest_organization_defaultSite() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.gainforest.organization.defaultSite"),
@@ -248,24 +269,30 @@ fn lexicon_doc_app_gainforest_organization_defaultSite() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A declaration of the default site for an organization",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A declaration of the default site for an organization",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("site"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("site"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The date and time of the creation of the record",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The date and time of the creation of the record",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -273,9 +300,11 @@ fn lexicon_doc_app_gainforest_organization_defaultSite() -> LexiconDoc<'static> 
                             map.insert(
                                 SmolStr::new_static("site"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The reference to the default site record in the PDS",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The reference to the default site record in the PDS",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

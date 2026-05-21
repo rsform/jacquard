@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_clippr::feed::TagView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_clippr::feed::TagView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTags<S: BosStr = DefaultStr> {
     pub uris: Vec<AtUri<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTagsOutput<S: BosStr = DefaultStr> {
     ///An array of hydrated tag views
     pub tags: Vec<TagView<S>>,
@@ -65,7 +60,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetTagsRequest {
 
 pub mod get_tags_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -96,21 +91,28 @@ pub mod get_tags_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetTagsBuilder<S: BosStr, St: get_tags_state::State> {
+pub struct GetTagsBuilder<St: get_tags_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetTags<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetTagsBuilder<S, get_tags_state::Empty> {
+impl GetTags<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetTagsBuilder<get_tags_state::Empty, DefaultStr> {
         GetTagsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetTagsBuilder<S, get_tags_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetTags<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetTagsBuilder<get_tags_state::Empty, S> {
+        GetTagsBuilder::builder()
+    }
+}
+
+impl GetTagsBuilder<get_tags_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetTagsBuilder {
             _state: PhantomData,
@@ -120,7 +122,18 @@ impl<S: BosStr> GetTagsBuilder<S, get_tags_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetTagsBuilder<S, St>
+impl<S: BosStr> GetTagsBuilder<get_tags_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetTagsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetTagsBuilder<St, S>
 where
     St: get_tags_state::State,
     St::Uris: get_tags_state::IsUnset,
@@ -129,7 +142,7 @@ where
     pub fn uris(
         mut self,
         value: impl Into<Vec<AtUri<S>>>,
-    ) -> GetTagsBuilder<S, get_tags_state::SetUris<St>> {
+    ) -> GetTagsBuilder<get_tags_state::SetUris<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetTagsBuilder {
             _state: PhantomData,
@@ -139,7 +152,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetTagsBuilder<S, St>
+impl<St, S: BosStr> GetTagsBuilder<St, S>
 where
     St: get_tags_state::State,
     St::Uris: get_tags_state::IsSet,

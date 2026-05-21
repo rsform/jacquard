@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::link_bridgebeats::lookup;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::link_bridgebeats::lookup;
 /// Result of parsing and looking up media links across supported music streaming providers.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -60,10 +60,7 @@ pub struct LookupGetRecordOutput<S: BosStr = DefaultStr> {
 /// Music metadata from a specific provider's API query.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProviderResult<S: BosStr = DefaultStr> {
     ///URL to the cover artwork image.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -240,7 +237,7 @@ impl<S: BosStr> LexiconSchema for ProviderResult<S> {
 
 pub mod lookup_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -248,56 +245,63 @@ pub mod lookup_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LookedUpAt;
         type Results;
+        type LookedUpAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LookedUpAt = Unset;
         type Results = Unset;
-    }
-    ///State transition - sets the `looked_up_at` field to Set
-    pub struct SetLookedUpAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLookedUpAt<St> {}
-    impl<St: State> State for SetLookedUpAt<St> {
-        type LookedUpAt = Set<members::looked_up_at>;
-        type Results = St::Results;
+        type LookedUpAt = Unset;
     }
     ///State transition - sets the `results` field to Set
     pub struct SetResults<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetResults<St> {}
     impl<St: State> State for SetResults<St> {
-        type LookedUpAt = St::LookedUpAt;
         type Results = Set<members::results>;
+        type LookedUpAt = St::LookedUpAt;
+    }
+    ///State transition - sets the `looked_up_at` field to Set
+    pub struct SetLookedUpAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLookedUpAt<St> {}
+    impl<St: State> State for SetLookedUpAt<St> {
+        type Results = St::Results;
+        type LookedUpAt = Set<members::looked_up_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `looked_up_at` field
-        pub struct looked_up_at(());
         ///Marker type for the `results` field
         pub struct results(());
+        ///Marker type for the `looked_up_at` field
+        pub struct looked_up_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LookupBuilder<S: BosStr, St: lookup_state::State> {
+pub struct LookupBuilder<St: lookup_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Vec<lookup::ProviderResult<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Lookup<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> LookupBuilder<S, lookup_state::Empty> {
+impl Lookup<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> LookupBuilder<lookup_state::Empty, DefaultStr> {
         LookupBuilder::new()
     }
 }
 
-impl<S: BosStr> LookupBuilder<S, lookup_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Lookup<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> LookupBuilder<lookup_state::Empty, S> {
+        LookupBuilder::builder()
+    }
+}
+
+impl LookupBuilder<lookup_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LookupBuilder {
             _state: PhantomData,
@@ -307,7 +311,18 @@ impl<S: BosStr> LookupBuilder<S, lookup_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> LookupBuilder<S, St>
+impl<S: BosStr> LookupBuilder<lookup_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        LookupBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> LookupBuilder<St, S>
 where
     St: lookup_state::State,
     St::LookedUpAt: lookup_state::IsUnset,
@@ -316,7 +331,7 @@ where
     pub fn looked_up_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LookupBuilder<S, lookup_state::SetLookedUpAt<St>> {
+    ) -> LookupBuilder<lookup_state::SetLookedUpAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LookupBuilder {
             _state: PhantomData,
@@ -326,7 +341,7 @@ where
     }
 }
 
-impl<S: BosStr, St> LookupBuilder<S, St>
+impl<St, S: BosStr> LookupBuilder<St, S>
 where
     St: lookup_state::State,
     St::Results: lookup_state::IsUnset,
@@ -335,7 +350,7 @@ where
     pub fn results(
         mut self,
         value: impl Into<Vec<lookup::ProviderResult<S>>>,
-    ) -> LookupBuilder<S, lookup_state::SetResults<St>> {
+    ) -> LookupBuilder<lookup_state::SetResults<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LookupBuilder {
             _state: PhantomData,
@@ -345,11 +360,11 @@ where
     }
 }
 
-impl<S: BosStr, St> LookupBuilder<S, St>
+impl<St, S: BosStr> LookupBuilder<St, S>
 where
     St: lookup_state::State,
-    St::LookedUpAt: lookup_state::IsSet,
     St::Results: lookup_state::IsSet,
+    St::LookedUpAt: lookup_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Lookup<S> {
@@ -370,10 +385,10 @@ where
 }
 
 fn lexicon_doc_link_bridgebeats_lookup() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("link.bridgebeats.lookup"),
@@ -557,7 +572,7 @@ fn _default_provider_result_market_region<S: FromStaticStr>() -> S {
 
 pub mod provider_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -565,90 +580,93 @@ pub mod provider_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Provider;
+        type Title;
+        type Artist;
         type MarketRegion;
         type Url;
-        type Artist;
-        type Title;
+        type Provider;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Provider = Unset;
+        type Title = Unset;
+        type Artist = Unset;
         type MarketRegion = Unset;
         type Url = Unset;
-        type Artist = Unset;
-        type Title = Unset;
-    }
-    ///State transition - sets the `provider` field to Set
-    pub struct SetProvider<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetProvider<St> {}
-    impl<St: State> State for SetProvider<St> {
-        type Provider = Set<members::provider>;
-        type MarketRegion = St::MarketRegion;
-        type Url = St::Url;
-        type Artist = St::Artist;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `market_region` field to Set
-    pub struct SetMarketRegion<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMarketRegion<St> {}
-    impl<St: State> State for SetMarketRegion<St> {
-        type Provider = St::Provider;
-        type MarketRegion = Set<members::market_region>;
-        type Url = St::Url;
-        type Artist = St::Artist;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type Provider = St::Provider;
-        type MarketRegion = St::MarketRegion;
-        type Url = Set<members::url>;
-        type Artist = St::Artist;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetArtist<St> {}
-    impl<St: State> State for SetArtist<St> {
-        type Provider = St::Provider;
-        type MarketRegion = St::MarketRegion;
-        type Url = St::Url;
-        type Artist = Set<members::artist>;
-        type Title = St::Title;
+        type Provider = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Provider = St::Provider;
+        type Title = Set<members::title>;
+        type Artist = St::Artist;
         type MarketRegion = St::MarketRegion;
         type Url = St::Url;
+        type Provider = St::Provider;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtist<St> {}
+    impl<St: State> State for SetArtist<St> {
+        type Title = St::Title;
+        type Artist = Set<members::artist>;
+        type MarketRegion = St::MarketRegion;
+        type Url = St::Url;
+        type Provider = St::Provider;
+    }
+    ///State transition - sets the `market_region` field to Set
+    pub struct SetMarketRegion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMarketRegion<St> {}
+    impl<St: State> State for SetMarketRegion<St> {
+        type Title = St::Title;
         type Artist = St::Artist;
-        type Title = Set<members::title>;
+        type MarketRegion = Set<members::market_region>;
+        type Url = St::Url;
+        type Provider = St::Provider;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type Title = St::Title;
+        type Artist = St::Artist;
+        type MarketRegion = St::MarketRegion;
+        type Url = Set<members::url>;
+        type Provider = St::Provider;
+    }
+    ///State transition - sets the `provider` field to Set
+    pub struct SetProvider<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetProvider<St> {}
+    impl<St: State> State for SetProvider<St> {
+        type Title = St::Title;
+        type Artist = St::Artist;
+        type MarketRegion = St::MarketRegion;
+        type Url = St::Url;
+        type Provider = Set<members::provider>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `provider` field
-        pub struct provider(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
         ///Marker type for the `market_region` field
         pub struct market_region(());
         ///Marker type for the `url` field
         pub struct url(());
-        ///Marker type for the `artist` field
-        pub struct artist(());
-        ///Marker type for the `title` field
-        pub struct title(());
+        ///Marker type for the `provider` field
+        pub struct provider(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProviderResultBuilder<S: BosStr, St: provider_result_state::State> {
+pub struct ProviderResultBuilder<
+    St: provider_result_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<UriValue<S>>,
@@ -663,15 +681,22 @@ pub struct ProviderResultBuilder<S: BosStr, St: provider_result_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> ProviderResult<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ProviderResultBuilder<S, provider_result_state::Empty> {
+impl ProviderResult<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ProviderResultBuilder<provider_result_state::Empty, DefaultStr> {
         ProviderResultBuilder::new()
     }
 }
 
-impl<S: BosStr> ProviderResultBuilder<S, provider_result_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> ProviderResult<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ProviderResultBuilder<provider_result_state::Empty, S> {
+        ProviderResultBuilder::builder()
+    }
+}
+
+impl ProviderResultBuilder<provider_result_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ProviderResultBuilder {
             _state: PhantomData,
@@ -681,7 +706,18 @@ impl<S: BosStr> ProviderResultBuilder<S, provider_result_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: provider_result_state::State> ProviderResultBuilder<S, St> {
+impl<S: BosStr> ProviderResultBuilder<provider_result_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ProviderResultBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: provider_result_state::State, S: BosStr> ProviderResultBuilder<St, S> {
     /// Set the `artUrl` field (optional)
     pub fn art_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -694,7 +730,7 @@ impl<S: BosStr, St: provider_result_state::State> ProviderResultBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProviderResultBuilder<S, St>
+impl<St, S: BosStr> ProviderResultBuilder<St, S>
 where
     St: provider_result_state::State,
     St::Artist: provider_result_state::IsUnset,
@@ -703,7 +739,7 @@ where
     pub fn artist(
         mut self,
         value: impl Into<S>,
-    ) -> ProviderResultBuilder<S, provider_result_state::SetArtist<St>> {
+    ) -> ProviderResultBuilder<provider_result_state::SetArtist<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ProviderResultBuilder {
             _state: PhantomData,
@@ -713,7 +749,7 @@ where
     }
 }
 
-impl<S: BosStr, St: provider_result_state::State> ProviderResultBuilder<S, St> {
+impl<St: provider_result_state::State, S: BosStr> ProviderResultBuilder<St, S> {
     /// Set the `externalId` field (optional)
     pub fn external_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -726,7 +762,7 @@ impl<S: BosStr, St: provider_result_state::State> ProviderResultBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: provider_result_state::State> ProviderResultBuilder<S, St> {
+impl<St: provider_result_state::State, S: BosStr> ProviderResultBuilder<St, S> {
     /// Set the `isAlbum` field (optional)
     pub fn is_album(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -739,7 +775,7 @@ impl<S: BosStr, St: provider_result_state::State> ProviderResultBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ProviderResultBuilder<S, St>
+impl<St, S: BosStr> ProviderResultBuilder<St, S>
 where
     St: provider_result_state::State,
     St::MarketRegion: provider_result_state::IsUnset,
@@ -748,7 +784,7 @@ where
     pub fn market_region(
         mut self,
         value: impl Into<S>,
-    ) -> ProviderResultBuilder<S, provider_result_state::SetMarketRegion<St>> {
+    ) -> ProviderResultBuilder<provider_result_state::SetMarketRegion<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ProviderResultBuilder {
             _state: PhantomData,
@@ -758,7 +794,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProviderResultBuilder<S, St>
+impl<St, S: BosStr> ProviderResultBuilder<St, S>
 where
     St: provider_result_state::State,
     St::Provider: provider_result_state::IsUnset,
@@ -767,7 +803,7 @@ where
     pub fn provider(
         mut self,
         value: impl Into<S>,
-    ) -> ProviderResultBuilder<S, provider_result_state::SetProvider<St>> {
+    ) -> ProviderResultBuilder<provider_result_state::SetProvider<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ProviderResultBuilder {
             _state: PhantomData,
@@ -777,7 +813,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProviderResultBuilder<S, St>
+impl<St, S: BosStr> ProviderResultBuilder<St, S>
 where
     St: provider_result_state::State,
     St::Title: provider_result_state::IsUnset,
@@ -786,7 +822,7 @@ where
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ProviderResultBuilder<S, provider_result_state::SetTitle<St>> {
+    ) -> ProviderResultBuilder<provider_result_state::SetTitle<St>, S> {
         self._fields.6 = Option::Some(value.into());
         ProviderResultBuilder {
             _state: PhantomData,
@@ -796,7 +832,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ProviderResultBuilder<S, St>
+impl<St, S: BosStr> ProviderResultBuilder<St, S>
 where
     St: provider_result_state::State,
     St::Url: provider_result_state::IsUnset,
@@ -805,7 +841,7 @@ where
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ProviderResultBuilder<S, provider_result_state::SetUrl<St>> {
+    ) -> ProviderResultBuilder<provider_result_state::SetUrl<St>, S> {
         self._fields.7 = Option::Some(value.into());
         ProviderResultBuilder {
             _state: PhantomData,
@@ -815,14 +851,14 @@ where
     }
 }
 
-impl<S: BosStr, St> ProviderResultBuilder<S, St>
+impl<St, S: BosStr> ProviderResultBuilder<St, S>
 where
     St: provider_result_state::State,
-    St::Provider: provider_result_state::IsSet,
+    St::Title: provider_result_state::IsSet,
+    St::Artist: provider_result_state::IsSet,
     St::MarketRegion: provider_result_state::IsSet,
     St::Url: provider_result_state::IsSet,
-    St::Artist: provider_result_state::IsSet,
-    St::Title: provider_result_state::IsSet,
+    St::Provider: provider_result_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ProviderResult<S> {
@@ -839,7 +875,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProviderResult<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProviderResult<S> {
         ProviderResult {
             art_url: self._fields.0,
             artist: self._fields.1.unwrap(),

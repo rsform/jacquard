@@ -8,24 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::feed::BlockedPost;
 use crate::app_bsky::feed::NotFoundPost;
 use crate::app_bsky::feed::ThreadViewPost;
 use crate::app_bsky::feed::ThreadgateView;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::AtUri;
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPostThread<S: BosStr = DefaultStr> {
     ///Defaults to `6`. Min: 0. Max: 1000.
     #[serde(default = "_default_depth")]
@@ -38,11 +35,9 @@ pub struct GetPostThread<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPostThreadOutput<S: BosStr = DefaultStr> {
     pub thread: GetPostThreadOutputThread<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,6 +45,7 @@ pub struct GetPostThreadOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -63,19 +59,25 @@ pub enum GetPostThreadOutputThread<S: BosStr = DefaultStr> {
     BlockedPost(Box<BlockedPost<S>>),
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetPostThreadError {
     #[serde(rename = "NotFound")]
     NotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetPostThreadError {
@@ -133,7 +135,7 @@ fn _default_parent_height() -> Option<i64> {
 
 pub mod get_post_thread_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -164,21 +166,31 @@ pub mod get_post_thread_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetPostThreadBuilder<S: BosStr, St: get_post_thread_state::State> {
+pub struct GetPostThreadBuilder<
+    St: get_post_thread_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetPostThread<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetPostThreadBuilder<S, get_post_thread_state::Empty> {
+impl GetPostThread<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetPostThreadBuilder<get_post_thread_state::Empty, DefaultStr> {
         GetPostThreadBuilder::new()
     }
 }
 
-impl<S: BosStr> GetPostThreadBuilder<S, get_post_thread_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetPostThread<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetPostThreadBuilder<get_post_thread_state::Empty, S> {
+        GetPostThreadBuilder::builder()
+    }
+}
+
+impl GetPostThreadBuilder<get_post_thread_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetPostThreadBuilder {
             _state: PhantomData,
@@ -188,7 +200,18 @@ impl<S: BosStr> GetPostThreadBuilder<S, get_post_thread_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_post_thread_state::State> GetPostThreadBuilder<S, St> {
+impl<S: BosStr> GetPostThreadBuilder<get_post_thread_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetPostThreadBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_post_thread_state::State, S: BosStr> GetPostThreadBuilder<St, S> {
     /// Set the `depth` field (optional)
     pub fn depth(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -201,7 +224,7 @@ impl<S: BosStr, St: get_post_thread_state::State> GetPostThreadBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_post_thread_state::State> GetPostThreadBuilder<S, St> {
+impl<St: get_post_thread_state::State, S: BosStr> GetPostThreadBuilder<St, S> {
     /// Set the `parentHeight` field (optional)
     pub fn parent_height(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -214,7 +237,7 @@ impl<S: BosStr, St: get_post_thread_state::State> GetPostThreadBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetPostThreadBuilder<S, St>
+impl<St, S: BosStr> GetPostThreadBuilder<St, S>
 where
     St: get_post_thread_state::State,
     St::Uri: get_post_thread_state::IsUnset,
@@ -223,7 +246,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetPostThreadBuilder<S, get_post_thread_state::SetUri<St>> {
+    ) -> GetPostThreadBuilder<get_post_thread_state::SetUri<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GetPostThreadBuilder {
             _state: PhantomData,
@@ -233,7 +256,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetPostThreadBuilder<S, St>
+impl<St, S: BosStr> GetPostThreadBuilder<St, S>
 where
     St: get_post_thread_state::State,
     St::Uri: get_post_thread_state::IsSet,

@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Cid, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateLivestream<S: BosStr = DefaultStr> {
     ///The AT-URI of the livestream record to update.
     pub livestream_uri: AtUri<S>,
@@ -34,11 +31,9 @@ pub struct UpdateLivestream<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateLivestreamOutput<S: BosStr = DefaultStr> {
     ///The CID of the updated livestream record.
     pub cid: Cid<S>,
@@ -48,9 +43,18 @@ pub struct UpdateLivestreamOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum UpdateLivestreamError {
     /// The request lacks valid authentication credentials.
@@ -67,10 +71,7 @@ pub enum UpdateLivestreamError {
     RecordNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for UpdateLivestreamError {
@@ -126,8 +127,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateLivestreamResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateLivestream<S> {
     const NSID: &'static str = "place.stream.moderation.updateLivestream";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateLivestreamResponse;
 }
 
@@ -135,15 +137,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateLivestream<S> {
 pub struct UpdateLivestreamRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateLivestreamRequest {
     const PATH: &'static str = "/xrpc/place.stream.moderation.updateLivestream";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateLivestream<S>;
     type Response = UpdateLivestreamResponse;
 }
 
 pub mod update_livestream_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -186,21 +189,31 @@ pub mod update_livestream_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateLivestreamBuilder<S: BosStr, St: update_livestream_state::State> {
+pub struct UpdateLivestreamBuilder<
+    St: update_livestream_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Did<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> UpdateLivestream<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> UpdateLivestreamBuilder<S, update_livestream_state::Empty> {
+impl UpdateLivestream<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> UpdateLivestreamBuilder<update_livestream_state::Empty, DefaultStr> {
         UpdateLivestreamBuilder::new()
     }
 }
 
-impl<S: BosStr> UpdateLivestreamBuilder<S, update_livestream_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> UpdateLivestream<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> UpdateLivestreamBuilder<update_livestream_state::Empty, S> {
+        UpdateLivestreamBuilder::builder()
+    }
+}
+
+impl UpdateLivestreamBuilder<update_livestream_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         UpdateLivestreamBuilder {
             _state: PhantomData,
@@ -210,7 +223,18 @@ impl<S: BosStr> UpdateLivestreamBuilder<S, update_livestream_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> UpdateLivestreamBuilder<S, St>
+impl<S: BosStr> UpdateLivestreamBuilder<update_livestream_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        UpdateLivestreamBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> UpdateLivestreamBuilder<St, S>
 where
     St: update_livestream_state::State,
     St::LivestreamUri: update_livestream_state::IsUnset,
@@ -219,7 +243,7 @@ where
     pub fn livestream_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> UpdateLivestreamBuilder<S, update_livestream_state::SetLivestreamUri<St>> {
+    ) -> UpdateLivestreamBuilder<update_livestream_state::SetLivestreamUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         UpdateLivestreamBuilder {
             _state: PhantomData,
@@ -229,7 +253,7 @@ where
     }
 }
 
-impl<S: BosStr, St> UpdateLivestreamBuilder<S, St>
+impl<St, S: BosStr> UpdateLivestreamBuilder<St, S>
 where
     St: update_livestream_state::State,
     St::Streamer: update_livestream_state::IsUnset,
@@ -238,7 +262,7 @@ where
     pub fn streamer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> UpdateLivestreamBuilder<S, update_livestream_state::SetStreamer<St>> {
+    ) -> UpdateLivestreamBuilder<update_livestream_state::SetStreamer<St>, S> {
         self._fields.1 = Option::Some(value.into());
         UpdateLivestreamBuilder {
             _state: PhantomData,
@@ -248,7 +272,7 @@ where
     }
 }
 
-impl<S: BosStr, St: update_livestream_state::State> UpdateLivestreamBuilder<S, St> {
+impl<St: update_livestream_state::State, S: BosStr> UpdateLivestreamBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -261,7 +285,7 @@ impl<S: BosStr, St: update_livestream_state::State> UpdateLivestreamBuilder<S, S
     }
 }
 
-impl<S: BosStr, St> UpdateLivestreamBuilder<S, St>
+impl<St, S: BosStr> UpdateLivestreamBuilder<St, S>
 where
     St: update_livestream_state::State,
     St::LivestreamUri: update_livestream_state::IsSet,
@@ -277,7 +301,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateLivestream<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateLivestream<S> {
         UpdateLivestream {
             livestream_uri: self._fields.0.unwrap(),
             streamer: self._fields.1.unwrap(),

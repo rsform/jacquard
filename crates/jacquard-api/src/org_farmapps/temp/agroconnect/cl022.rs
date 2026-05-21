@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::org_farmapps::temp::ecrop::CodeType;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_farmapps::temp::ecrop::CodeType;
 /// Fertilizer codelist
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -170,7 +170,7 @@ impl<S: BosStr> LexiconSchema for Cl022<S> {
 
 pub mod cl022_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -178,42 +178,42 @@ pub mod cl022_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Description;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Description = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type Description = St::Description;
+        type Id = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDescription<St> {}
     impl<St: State> State for SetDescription<St> {
-        type Id = St::Id;
         type Description = Set<members::description>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Description = St::Description;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct Cl022Builder<S: BosStr, St: cl022_state::State> {
+pub struct Cl022Builder<St: cl022_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -231,27 +231,43 @@ pub struct Cl022Builder<S: BosStr, St: cl022_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Cl022<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> Cl022Builder<S, cl022_state::Empty> {
+impl Cl022<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> Cl022Builder<cl022_state::Empty, DefaultStr> {
         Cl022Builder::new()
     }
 }
 
-impl<S: BosStr> Cl022Builder<S, cl022_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Cl022<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> Cl022Builder<cl022_state::Empty, S> {
+        Cl022Builder::builder()
+    }
+}
+
+impl Cl022Builder<cl022_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         Cl022Builder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
+impl<S: BosStr> Cl022Builder<cl022_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        Cl022Builder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: cl022_state::State, S: BosStr> Cl022Builder<St, S> {
     /// Set the `added` field (optional)
     pub fn added(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -264,7 +280,7 @@ impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     }
 }
 
-impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
+impl<St: cl022_state::State, S: BosStr> Cl022Builder<St, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -277,7 +293,7 @@ impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     }
 }
 
-impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
+impl<St: cl022_state::State, S: BosStr> Cl022Builder<St, S> {
     /// Set the `denominator` field (optional)
     pub fn denominator(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -290,7 +306,7 @@ impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     }
 }
 
-impl<S: BosStr, St> Cl022Builder<S, St>
+impl<St, S: BosStr> Cl022Builder<St, S>
 where
     St: cl022_state::State,
     St::Description: cl022_state::IsUnset,
@@ -299,7 +315,7 @@ where
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> Cl022Builder<S, cl022_state::SetDescription<St>> {
+    ) -> Cl022Builder<cl022_state::SetDescription<St>, S> {
         self._fields.3 = Option::Some(value.into());
         Cl022Builder {
             _state: PhantomData,
@@ -309,13 +325,16 @@ where
     }
 }
 
-impl<S: BosStr, St> Cl022Builder<S, St>
+impl<St, S: BosStr> Cl022Builder<St, S>
 where
     St: cl022_state::State,
     St::Id: cl022_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<CodeType<S>>) -> Cl022Builder<S, cl022_state::SetId<St>> {
+    pub fn id(
+        mut self,
+        value: impl Into<CodeType<S>>,
+    ) -> Cl022Builder<cl022_state::SetId<St>, S> {
         self._fields.4 = Option::Some(value.into());
         Cl022Builder {
             _state: PhantomData,
@@ -325,7 +344,7 @@ where
     }
 }
 
-impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
+impl<St: cl022_state::State, S: BosStr> Cl022Builder<St, S> {
     /// Set the `k2o` field (optional)
     pub fn k2o(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -338,7 +357,7 @@ impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     }
 }
 
-impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
+impl<St: cl022_state::State, S: BosStr> Cl022Builder<St, S> {
     /// Set the `n` field (optional)
     pub fn n(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -351,7 +370,7 @@ impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     }
 }
 
-impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
+impl<St: cl022_state::State, S: BosStr> Cl022Builder<St, S> {
     /// Set the `p2o5` field (optional)
     pub fn p2o5(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.7 = value.into();
@@ -364,7 +383,7 @@ impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     }
 }
 
-impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
+impl<St: cl022_state::State, S: BosStr> Cl022Builder<St, S> {
     /// Set the `type` field (optional)
     pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -377,7 +396,7 @@ impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     }
 }
 
-impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
+impl<St: cl022_state::State, S: BosStr> Cl022Builder<St, S> {
     /// Set the `unit` field (optional)
     pub fn unit(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -390,7 +409,7 @@ impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     }
 }
 
-impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
+impl<St: cl022_state::State, S: BosStr> Cl022Builder<St, S> {
     /// Set the `updated` field (optional)
     pub fn updated(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.10 = value.into();
@@ -403,11 +422,11 @@ impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     }
 }
 
-impl<S: BosStr, St> Cl022Builder<S, St>
+impl<St, S: BosStr> Cl022Builder<St, S>
 where
     St: cl022_state::State,
-    St::Id: cl022_state::IsSet,
     St::Description: cl022_state::IsSet,
+    St::Id: cl022_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Cl022<S> {
@@ -446,10 +465,10 @@ where
 }
 
 fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.farmapps.temp.agroconnect.cl022"),
@@ -462,19 +481,21 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> LexiconDoc<'static> {
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
                         description: Some(CowStr::new_static("Codelist ferilizers")),
-                        required: Some(vec![
-                            SmolStr::new_static("id"),
-                            SmolStr::new_static("description"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("id"),
+                                SmolStr::new_static("description")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("added"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Date when added to the list",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Date when added to the list"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -496,9 +517,9 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Description / name of the fertilizer",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Description / name of the fertilizer"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

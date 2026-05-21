@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Did};
-use jacquard_common::types::value::Data;
 use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::{Did, AtUri};
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetOnboardingSuggestedStarterPacksSkeleton<S: BosStr = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 25.
     #[serde(default = "_default_limit")]
@@ -31,11 +28,9 @@ pub struct GetOnboardingSuggestedStarterPacksSkeleton<S: BosStr = DefaultStr> {
     pub viewer: Option<Did<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetOnboardingSuggestedStarterPacksSkeletonOutput<S: BosStr = DefaultStr> {
     pub starter_packs: Vec<AtUri<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -44,7 +39,8 @@ pub struct GetOnboardingSuggestedStarterPacksSkeletonOutput<S: BosStr = DefaultS
 
 /// Response type for app.bsky.unspecced.getOnboardingSuggestedStarterPacksSkeleton
 pub struct GetOnboardingSuggestedStarterPacksSkeletonResponse;
-impl jacquard_common::xrpc::XrpcResp for GetOnboardingSuggestedStarterPacksSkeletonResponse {
+impl jacquard_common::xrpc::XrpcResp
+for GetOnboardingSuggestedStarterPacksSkeletonResponse {
     const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedStarterPacksSkeleton";
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = GetOnboardingSuggestedStarterPacksSkeletonOutput<S>;
@@ -52,8 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for GetOnboardingSuggestedStarterPacksSkele
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest
-    for GetOnboardingSuggestedStarterPacksSkeleton<S>
-{
+for GetOnboardingSuggestedStarterPacksSkeleton<S> {
     const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedStarterPacksSkeleton";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetOnboardingSuggestedStarterPacksSkeletonResponse;
@@ -61,9 +56,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest
 
 /// Endpoint type for app.bsky.unspecced.getOnboardingSuggestedStarterPacksSkeleton
 pub struct GetOnboardingSuggestedStarterPacksSkeletonRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetOnboardingSuggestedStarterPacksSkeletonRequest {
-    const PATH: &'static str =
-        "/xrpc/app.bsky.unspecced.getOnboardingSuggestedStarterPacksSkeleton";
+impl jacquard_common::xrpc::XrpcEndpoint
+for GetOnboardingSuggestedStarterPacksSkeletonRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getOnboardingSuggestedStarterPacksSkeleton";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Request<S: BosStr> = GetOnboardingSuggestedStarterPacksSkeleton<S>;
     type Response = GetOnboardingSuggestedStarterPacksSkeletonResponse;
@@ -75,7 +70,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_onboarding_suggested_starter_packs_skeleton_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -94,31 +89,39 @@ pub mod get_onboarding_suggested_starter_packs_skeleton_state {
 
 /// Builder for constructing an instance of this type.
 pub struct GetOnboardingSuggestedStarterPacksSkeletonBuilder<
-    S: BosStr,
     St: get_onboarding_suggested_starter_packs_skeleton_state::State,
+    S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetOnboardingSuggestedStarterPacksSkeleton<S> {
-    /// Create a new builder for this type.
+impl GetOnboardingSuggestedStarterPacksSkeleton<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
     pub fn new() -> GetOnboardingSuggestedStarterPacksSkeletonBuilder<
-        S,
         get_onboarding_suggested_starter_packs_skeleton_state::Empty,
+        DefaultStr,
     > {
         GetOnboardingSuggestedStarterPacksSkeletonBuilder::new()
     }
 }
 
-impl<S: BosStr>
-    GetOnboardingSuggestedStarterPacksSkeletonBuilder<
-        S,
+impl<S: BosStr> GetOnboardingSuggestedStarterPacksSkeleton<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetOnboardingSuggestedStarterPacksSkeletonBuilder<
         get_onboarding_suggested_starter_packs_skeleton_state::Empty,
-    >
-{
-    /// Create a new builder with all fields unset.
+        S,
+    > {
+        GetOnboardingSuggestedStarterPacksSkeletonBuilder::builder()
+    }
+}
+
+impl GetOnboardingSuggestedStarterPacksSkeletonBuilder<
+    get_onboarding_suggested_starter_packs_skeleton_state::Empty,
+    DefaultStr,
+> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetOnboardingSuggestedStarterPacksSkeletonBuilder {
             _state: PhantomData,
@@ -128,9 +131,26 @@ impl<S: BosStr>
     }
 }
 
-impl<S: BosStr, St: get_onboarding_suggested_starter_packs_skeleton_state::State>
-    GetOnboardingSuggestedStarterPacksSkeletonBuilder<S, St>
-{
+impl<
+    S: BosStr,
+> GetOnboardingSuggestedStarterPacksSkeletonBuilder<
+    get_onboarding_suggested_starter_packs_skeleton_state::Empty,
+    S,
+> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetOnboardingSuggestedStarterPacksSkeletonBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<
+    St: get_onboarding_suggested_starter_packs_skeleton_state::State,
+    S: BosStr,
+> GetOnboardingSuggestedStarterPacksSkeletonBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -143,9 +163,10 @@ impl<S: BosStr, St: get_onboarding_suggested_starter_packs_skeleton_state::State
     }
 }
 
-impl<S: BosStr, St: get_onboarding_suggested_starter_packs_skeleton_state::State>
-    GetOnboardingSuggestedStarterPacksSkeletonBuilder<S, St>
-{
+impl<
+    St: get_onboarding_suggested_starter_packs_skeleton_state::State,
+    S: BosStr,
+> GetOnboardingSuggestedStarterPacksSkeletonBuilder<St, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -158,7 +179,7 @@ impl<S: BosStr, St: get_onboarding_suggested_starter_packs_skeleton_state::State
     }
 }
 
-impl<S: BosStr, St> GetOnboardingSuggestedStarterPacksSkeletonBuilder<S, St>
+impl<St, S: BosStr> GetOnboardingSuggestedStarterPacksSkeletonBuilder<St, S>
 where
     St: get_onboarding_suggested_starter_packs_skeleton_state::State,
 {

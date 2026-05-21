@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Current execution state of rotation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -117,7 +117,7 @@ impl<S: BosStr> LexiconSchema for State<S> {
 
 pub mod state_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -160,21 +160,28 @@ pub mod state_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StateBuilder<S: BosStr, St: state_state::State> {
+pub struct StateBuilder<St: state_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> State<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> StateBuilder<S, state_state::Empty> {
+impl State<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StateBuilder<state_state::Empty, DefaultStr> {
         StateBuilder::new()
     }
 }
 
-impl<S: BosStr> StateBuilder<S, state_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> State<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StateBuilder<state_state::Empty, S> {
+        StateBuilder::builder()
+    }
+}
+
+impl StateBuilder<state_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StateBuilder {
             _state: PhantomData,
@@ -184,13 +191,27 @@ impl<S: BosStr> StateBuilder<S, state_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> StateBuilder<S, St>
+impl<S: BosStr> StateBuilder<state_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StateBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StateBuilder<St, S>
 where
     St: state_state::State,
     St::Cursor: state_state::IsUnset,
 {
     /// Set the `cursor` field (required)
-    pub fn cursor(mut self, value: impl Into<S>) -> StateBuilder<S, state_state::SetCursor<St>> {
+    pub fn cursor(
+        mut self,
+        value: impl Into<S>,
+    ) -> StateBuilder<state_state::SetCursor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
@@ -200,7 +221,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StateBuilder<S, St>
+impl<St, S: BosStr> StateBuilder<St, S>
 where
     St: state_state::State,
     St::LastUpdated: state_state::IsUnset,
@@ -209,7 +230,7 @@ where
     pub fn last_updated(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StateBuilder<S, state_state::SetLastUpdated<St>> {
+    ) -> StateBuilder<state_state::SetLastUpdated<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
@@ -219,7 +240,7 @@ where
     }
 }
 
-impl<S: BosStr, St> StateBuilder<S, St>
+impl<St, S: BosStr> StateBuilder<St, S>
 where
     St: state_state::State,
     St::Cursor: state_state::IsSet,
@@ -244,10 +265,10 @@ where
 }
 
 fn lexicon_doc_app_chavatar_state() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chavatar.state"),

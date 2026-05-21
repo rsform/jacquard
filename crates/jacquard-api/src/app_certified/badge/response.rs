@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_certified::badge::award::Award;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_certified::badge::award::Award;
 /// Recipient response to a badge award.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -201,7 +201,7 @@ impl<S: BosStr> LexiconSchema for Response<S> {
 
 pub mod response_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -209,56 +209,56 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type BadgeAward;
         type Response;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type BadgeAward = Unset;
         type Response = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `badge_award` field to Set
-    pub struct SetBadgeAward<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBadgeAward<St> {}
-    impl<St: State> State for SetBadgeAward<St> {
-        type BadgeAward = Set<members::badge_award>;
-        type Response = St::Response;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `response` field to Set
-    pub struct SetResponse<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetResponse<St> {}
-    impl<St: State> State for SetResponse<St> {
-        type BadgeAward = St::BadgeAward;
-        type Response = Set<members::response>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type BadgeAward = St::BadgeAward;
         type Response = St::Response;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `badge_award` field to Set
+    pub struct SetBadgeAward<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBadgeAward<St> {}
+    impl<St: State> State for SetBadgeAward<St> {
+        type CreatedAt = St::CreatedAt;
+        type BadgeAward = Set<members::badge_award>;
+        type Response = St::Response;
+    }
+    ///State transition - sets the `response` field to Set
+    pub struct SetResponse<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetResponse<St> {}
+    impl<St: State> State for SetResponse<St> {
+        type CreatedAt = St::CreatedAt;
+        type BadgeAward = St::BadgeAward;
+        type Response = Set<members::response>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `badge_award` field
         pub struct badge_award(());
         ///Marker type for the `response` field
         pub struct response(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ResponseBuilder<S: BosStr, St: response_state::State> {
+pub struct ResponseBuilder<St: response_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Award<S>>,
@@ -269,15 +269,22 @@ pub struct ResponseBuilder<S: BosStr, St: response_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Response<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ResponseBuilder<S, response_state::Empty> {
+impl Response<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ResponseBuilder<response_state::Empty, DefaultStr> {
         ResponseBuilder::new()
     }
 }
 
-impl<S: BosStr> ResponseBuilder<S, response_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Response<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ResponseBuilder<response_state::Empty, S> {
+        ResponseBuilder::builder()
+    }
+}
+
+impl ResponseBuilder<response_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ResponseBuilder {
             _state: PhantomData,
@@ -287,7 +294,18 @@ impl<S: BosStr> ResponseBuilder<S, response_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> ResponseBuilder<S, St>
+impl<S: BosStr> ResponseBuilder<response_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ResponseBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ResponseBuilder<St, S>
 where
     St: response_state::State,
     St::BadgeAward: response_state::IsUnset,
@@ -296,7 +314,7 @@ where
     pub fn badge_award(
         mut self,
         value: impl Into<Award<S>>,
-    ) -> ResponseBuilder<S, response_state::SetBadgeAward<St>> {
+    ) -> ResponseBuilder<response_state::SetBadgeAward<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ResponseBuilder {
             _state: PhantomData,
@@ -306,7 +324,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ResponseBuilder<S, St>
+impl<St, S: BosStr> ResponseBuilder<St, S>
 where
     St: response_state::State,
     St::CreatedAt: response_state::IsUnset,
@@ -315,7 +333,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ResponseBuilder<S, response_state::SetCreatedAt<St>> {
+    ) -> ResponseBuilder<response_state::SetCreatedAt<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ResponseBuilder {
             _state: PhantomData,
@@ -325,7 +343,7 @@ where
     }
 }
 
-impl<S: BosStr, St> ResponseBuilder<S, St>
+impl<St, S: BosStr> ResponseBuilder<St, S>
 where
     St: response_state::State,
     St::Response: response_state::IsUnset,
@@ -334,7 +352,7 @@ where
     pub fn response(
         mut self,
         value: impl Into<ResponseResponse<S>>,
-    ) -> ResponseBuilder<S, response_state::SetResponse<St>> {
+    ) -> ResponseBuilder<response_state::SetResponse<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ResponseBuilder {
             _state: PhantomData,
@@ -344,7 +362,7 @@ where
     }
 }
 
-impl<S: BosStr, St: response_state::State> ResponseBuilder<S, St> {
+impl<St: response_state::State, S: BosStr> ResponseBuilder<St, S> {
     /// Set the `weight` field (optional)
     pub fn weight(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -357,12 +375,12 @@ impl<S: BosStr, St: response_state::State> ResponseBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> ResponseBuilder<S, St>
+impl<St, S: BosStr> ResponseBuilder<St, S>
 where
     St: response_state::State,
+    St::CreatedAt: response_state::IsSet,
     St::BadgeAward: response_state::IsSet,
     St::Response: response_state::IsSet,
-    St::CreatedAt: response_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Response<S> {
@@ -387,10 +405,10 @@ where
 }
 
 fn lexicon_doc_app_certified_badge_response() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.certified.badge.response"),

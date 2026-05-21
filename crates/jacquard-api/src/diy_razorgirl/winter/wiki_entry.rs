@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -56,6 +56,7 @@ pub struct WikiEntry<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum WikiEntryStatus<S: BosStr = DefaultStr> {
@@ -262,7 +263,7 @@ impl<S: BosStr> LexiconSchema for WikiEntry<S> {
 
 pub mod wiki_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -270,90 +271,90 @@ pub mod wiki_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Content;
-        type CreatedAt;
-        type LastUpdated;
         type Slug;
+        type CreatedAt;
+        type Title;
+        type LastUpdated;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Content = Unset;
-        type CreatedAt = Unset;
-        type LastUpdated = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type Content = St::Content;
-        type CreatedAt = St::CreatedAt;
-        type LastUpdated = St::LastUpdated;
-        type Slug = St::Slug;
+        type CreatedAt = Unset;
+        type Title = Unset;
+        type LastUpdated = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
-        type Title = St::Title;
         type Content = Set<members::content>;
+        type Slug = St::Slug;
         type CreatedAt = St::CreatedAt;
-        type LastUpdated = St::LastUpdated;
-        type Slug = St::Slug;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
         type Title = St::Title;
-        type Content = St::Content;
-        type CreatedAt = Set<members::created_at>;
         type LastUpdated = St::LastUpdated;
-        type Slug = St::Slug;
-    }
-    ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLastUpdated<St> {}
-    impl<St: State> State for SetLastUpdated<St> {
-        type Title = St::Title;
-        type Content = St::Content;
-        type CreatedAt = St::CreatedAt;
-        type LastUpdated = Set<members::last_updated>;
-        type Slug = St::Slug;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSlug<St> {}
     impl<St: State> State for SetSlug<St> {
-        type Title = St::Title;
         type Content = St::Content;
-        type CreatedAt = St::CreatedAt;
-        type LastUpdated = St::LastUpdated;
         type Slug = Set<members::slug>;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type LastUpdated = St::LastUpdated;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Content = St::Content;
+        type Slug = St::Slug;
+        type CreatedAt = Set<members::created_at>;
+        type Title = St::Title;
+        type LastUpdated = St::LastUpdated;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Content = St::Content;
+        type Slug = St::Slug;
+        type CreatedAt = St::CreatedAt;
+        type Title = Set<members::title>;
+        type LastUpdated = St::LastUpdated;
+    }
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLastUpdated<St> {}
+    impl<St: State> State for SetLastUpdated<St> {
+        type Content = St::Content;
+        type Slug = St::Slug;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type LastUpdated = Set<members::last_updated>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `last_updated` field
-        pub struct last_updated(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `last_updated` field
+        pub struct last_updated(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WikiEntryBuilder<S: BosStr, St: wiki_entry_state::State> {
+pub struct WikiEntryBuilder<St: wiki_entry_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
@@ -370,15 +371,22 @@ pub struct WikiEntryBuilder<S: BosStr, St: wiki_entry_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> WikiEntry<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> WikiEntryBuilder<S, wiki_entry_state::Empty> {
+impl WikiEntry<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> WikiEntryBuilder<wiki_entry_state::Empty, DefaultStr> {
         WikiEntryBuilder::new()
     }
 }
 
-impl<S: BosStr> WikiEntryBuilder<S, wiki_entry_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> WikiEntry<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> WikiEntryBuilder<wiki_entry_state::Empty, S> {
+        WikiEntryBuilder::builder()
+    }
+}
+
+impl WikiEntryBuilder<wiki_entry_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         WikiEntryBuilder {
             _state: PhantomData,
@@ -388,7 +396,18 @@ impl<S: BosStr> WikiEntryBuilder<S, wiki_entry_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: wiki_entry_state::State> WikiEntryBuilder<S, St> {
+impl<S: BosStr> WikiEntryBuilder<wiki_entry_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        WikiEntryBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: wiki_entry_state::State, S: BosStr> WikiEntryBuilder<St, S> {
     /// Set the `aliases` field (optional)
     pub fn aliases(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -401,7 +420,7 @@ impl<S: BosStr, St: wiki_entry_state::State> WikiEntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WikiEntryBuilder<S, St>
+impl<St, S: BosStr> WikiEntryBuilder<St, S>
 where
     St: wiki_entry_state::State,
     St::Content: wiki_entry_state::IsUnset,
@@ -410,7 +429,7 @@ where
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> WikiEntryBuilder<S, wiki_entry_state::SetContent<St>> {
+    ) -> WikiEntryBuilder<wiki_entry_state::SetContent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         WikiEntryBuilder {
             _state: PhantomData,
@@ -420,7 +439,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WikiEntryBuilder<S, St>
+impl<St, S: BosStr> WikiEntryBuilder<St, S>
 where
     St: wiki_entry_state::State,
     St::CreatedAt: wiki_entry_state::IsUnset,
@@ -429,7 +448,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WikiEntryBuilder<S, wiki_entry_state::SetCreatedAt<St>> {
+    ) -> WikiEntryBuilder<wiki_entry_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         WikiEntryBuilder {
             _state: PhantomData,
@@ -439,7 +458,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WikiEntryBuilder<S, St>
+impl<St, S: BosStr> WikiEntryBuilder<St, S>
 where
     St: wiki_entry_state::State,
     St::LastUpdated: wiki_entry_state::IsUnset,
@@ -448,7 +467,7 @@ where
     pub fn last_updated(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WikiEntryBuilder<S, wiki_entry_state::SetLastUpdated<St>> {
+    ) -> WikiEntryBuilder<wiki_entry_state::SetLastUpdated<St>, S> {
         self._fields.3 = Option::Some(value.into());
         WikiEntryBuilder {
             _state: PhantomData,
@@ -458,7 +477,7 @@ where
     }
 }
 
-impl<S: BosStr, St> WikiEntryBuilder<S, St>
+impl<St, S: BosStr> WikiEntryBuilder<St, S>
 where
     St: wiki_entry_state::State,
     St::Slug: wiki_entry_state::IsUnset,
@@ -467,7 +486,7 @@ where
     pub fn slug(
         mut self,
         value: impl Into<S>,
-    ) -> WikiEntryBuilder<S, wiki_entry_state::SetSlug<St>> {
+    ) -> WikiEntryBuilder<wiki_entry_state::SetSlug<St>, S> {
         self._fields.4 = Option::Some(value.into());
         WikiEntryBuilder {
             _state: PhantomData,
@@ -477,7 +496,7 @@ where
     }
 }
 
-impl<S: BosStr, St: wiki_entry_state::State> WikiEntryBuilder<S, St> {
+impl<St: wiki_entry_state::State, S: BosStr> WikiEntryBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<WikiEntryStatus<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -490,7 +509,7 @@ impl<S: BosStr, St: wiki_entry_state::State> WikiEntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: wiki_entry_state::State> WikiEntryBuilder<S, St> {
+impl<St: wiki_entry_state::State, S: BosStr> WikiEntryBuilder<St, S> {
     /// Set the `summary` field (optional)
     pub fn summary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -503,7 +522,7 @@ impl<S: BosStr, St: wiki_entry_state::State> WikiEntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: wiki_entry_state::State> WikiEntryBuilder<S, St> {
+impl<St: wiki_entry_state::State, S: BosStr> WikiEntryBuilder<St, S> {
     /// Set the `supersedes` field (optional)
     pub fn supersedes(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -516,7 +535,7 @@ impl<S: BosStr, St: wiki_entry_state::State> WikiEntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: wiki_entry_state::State> WikiEntryBuilder<S, St> {
+impl<St: wiki_entry_state::State, S: BosStr> WikiEntryBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -529,7 +548,7 @@ impl<S: BosStr, St: wiki_entry_state::State> WikiEntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> WikiEntryBuilder<S, St>
+impl<St, S: BosStr> WikiEntryBuilder<St, S>
 where
     St: wiki_entry_state::State,
     St::Title: wiki_entry_state::IsUnset,
@@ -538,7 +557,7 @@ where
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> WikiEntryBuilder<S, wiki_entry_state::SetTitle<St>> {
+    ) -> WikiEntryBuilder<wiki_entry_state::SetTitle<St>, S> {
         self._fields.9 = Option::Some(value.into());
         WikiEntryBuilder {
             _state: PhantomData,
@@ -548,14 +567,14 @@ where
     }
 }
 
-impl<S: BosStr, St> WikiEntryBuilder<S, St>
+impl<St, S: BosStr> WikiEntryBuilder<St, S>
 where
     St: wiki_entry_state::State,
-    St::Title: wiki_entry_state::IsSet,
     St::Content: wiki_entry_state::IsSet,
-    St::CreatedAt: wiki_entry_state::IsSet,
-    St::LastUpdated: wiki_entry_state::IsSet,
     St::Slug: wiki_entry_state::IsSet,
+    St::CreatedAt: wiki_entry_state::IsSet,
+    St::Title: wiki_entry_state::IsSet,
+    St::LastUpdated: wiki_entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> WikiEntry<S> {
@@ -574,7 +593,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> WikiEntry<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> WikiEntry<S> {
         WikiEntry {
             aliases: self._fields.0,
             content: self._fields.1.unwrap(),
@@ -592,10 +614,10 @@ where
 }
 
 fn lexicon_doc_diy_razorgirl_winter_wikiEntry() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("diy.razorgirl.winter.wikiEntry"),
@@ -606,22 +628,25 @@ fn lexicon_doc_diy_razorgirl_winter_wikiEntry() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("slug"),
-                            SmolStr::new_static("content"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("lastUpdated"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"), SmolStr::new_static("slug"),
+                                SmolStr::new_static("content"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("lastUpdated")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("aliases"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Alternative names for [[alias]] resolution",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Alternative names for [[alias]] resolution",
+                                        ),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         ..Default::default()
                                     }),
@@ -653,9 +678,11 @@ fn lexicon_doc_diy_razorgirl_winter_wikiEntry() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("slug"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "URL-safe identifier for [[slug]] linking",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "URL-safe identifier for [[slug]] linking",
+                                        ),
+                                    ),
                                     max_length: Some(128usize),
                                     ..Default::default()
                                 }),

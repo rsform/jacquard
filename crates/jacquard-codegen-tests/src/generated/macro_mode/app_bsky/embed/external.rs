@@ -281,7 +281,10 @@ pub mod external_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ExternalBuilder<S: jacquard_common::BosStr, St: external_state::State> {
+pub struct ExternalBuilder<
+    St: external_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
+> {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
         core::option::Option<S>,
@@ -292,15 +295,22 @@ pub struct ExternalBuilder<S: jacquard_common::BosStr, St: external_state::State
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> External<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ExternalBuilder<S, external_state::Empty> {
+impl External<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ExternalBuilder<external_state::Empty, jacquard_common::DefaultStr> {
         ExternalBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> ExternalBuilder<S, external_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> External<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ExternalBuilder<external_state::Empty, S> {
+        ExternalBuilder::builder()
+    }
+}
+
+impl ExternalBuilder<external_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ExternalBuilder {
             _state: ::core::marker::PhantomData,
@@ -310,7 +320,18 @@ impl<S: jacquard_common::BosStr> ExternalBuilder<S, external_state::Empty> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ExternalBuilder<S, St>
+impl<S: jacquard_common::BosStr> ExternalBuilder<external_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ExternalBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None, None, None, None),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St, S: jacquard_common::BosStr> ExternalBuilder<St, S>
 where
     St: external_state::State,
     St::Description: external_state::IsUnset,
@@ -319,7 +340,7 @@ where
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> ExternalBuilder<S, external_state::SetDescription<St>> {
+    ) -> ExternalBuilder<external_state::SetDescription<St>, S> {
         self._fields.0 = ::core::option::Option::Some(value.into());
         ExternalBuilder {
             _state: ::core::marker::PhantomData,
@@ -329,7 +350,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St: external_state::State> ExternalBuilder<S, St> {
+impl<St: external_state::State, S: jacquard_common::BosStr> ExternalBuilder<St, S> {
     /// Set the `thumb` field (optional)
     pub fn thumb(
         mut self,
@@ -348,7 +369,7 @@ impl<S: jacquard_common::BosStr, St: external_state::State> ExternalBuilder<S, S
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ExternalBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> ExternalBuilder<St, S>
 where
     St: external_state::State,
     St::Title: external_state::IsUnset,
@@ -357,7 +378,7 @@ where
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ExternalBuilder<S, external_state::SetTitle<St>> {
+    ) -> ExternalBuilder<external_state::SetTitle<St>, S> {
         self._fields.2 = ::core::option::Option::Some(value.into());
         ExternalBuilder {
             _state: ::core::marker::PhantomData,
@@ -367,7 +388,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ExternalBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> ExternalBuilder<St, S>
 where
     St: external_state::State,
     St::Uri: external_state::IsUnset,
@@ -376,7 +397,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<jacquard_common::types::string::UriValue<S>>,
-    ) -> ExternalBuilder<S, external_state::SetUri<St>> {
+    ) -> ExternalBuilder<external_state::SetUri<St>, S> {
         self._fields.3 = ::core::option::Option::Some(value.into());
         ExternalBuilder {
             _state: ::core::marker::PhantomData,
@@ -386,7 +407,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ExternalBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> ExternalBuilder<St, S>
 where
     St: external_state::State,
     St::Uri: external_state::IsSet,
@@ -635,8 +656,8 @@ pub mod external_record_state {
 
 /// Builder for constructing an instance of this type.
 pub struct ExternalRecordBuilder<
-    S: jacquard_common::BosStr,
     St: external_record_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
 > {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
@@ -645,15 +666,25 @@ pub struct ExternalRecordBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> ExternalRecord<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ExternalRecordBuilder<S, external_record_state::Empty> {
+impl ExternalRecord<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ExternalRecordBuilder<
+        external_record_state::Empty,
+        jacquard_common::DefaultStr,
+    > {
         ExternalRecordBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> ExternalRecordBuilder<S, external_record_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> ExternalRecord<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ExternalRecordBuilder<external_record_state::Empty, S> {
+        ExternalRecordBuilder::builder()
+    }
+}
+
+impl ExternalRecordBuilder<external_record_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ExternalRecordBuilder {
             _state: ::core::marker::PhantomData,
@@ -663,7 +694,18 @@ impl<S: jacquard_common::BosStr> ExternalRecordBuilder<S, external_record_state:
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ExternalRecordBuilder<S, St>
+impl<S: jacquard_common::BosStr> ExternalRecordBuilder<external_record_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ExternalRecordBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None,),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St, S: jacquard_common::BosStr> ExternalRecordBuilder<St, S>
 where
     St: external_record_state::State,
     St::External: external_record_state::IsUnset,
@@ -672,7 +714,7 @@ where
     pub fn external(
         mut self,
         value: impl Into<crate::macro_mode::app_bsky::embed::external::External<S>>,
-    ) -> ExternalRecordBuilder<S, external_record_state::SetExternal<St>> {
+    ) -> ExternalRecordBuilder<external_record_state::SetExternal<St>, S> {
         self._fields.0 = ::core::option::Option::Some(value.into());
         ExternalRecordBuilder {
             _state: ::core::marker::PhantomData,
@@ -682,7 +724,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ExternalRecordBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> ExternalRecordBuilder<St, S>
 where
     St: external_record_state::State,
     St::External: external_record_state::IsSet,
@@ -742,7 +784,10 @@ pub mod view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ViewBuilder<S: jacquard_common::BosStr, St: view_state::State> {
+pub struct ViewBuilder<
+    St: view_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
+> {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
         core::option::Option<
@@ -752,15 +797,22 @@ pub struct ViewBuilder<S: jacquard_common::BosStr, St: view_state::State> {
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> View<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ViewBuilder<S, view_state::Empty> {
+impl View<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ViewBuilder<view_state::Empty, jacquard_common::DefaultStr> {
         ViewBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> ViewBuilder<S, view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> View<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ViewBuilder<view_state::Empty, S> {
+        ViewBuilder::builder()
+    }
+}
+
+impl ViewBuilder<view_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ViewBuilder {
             _state: ::core::marker::PhantomData,
@@ -770,7 +822,18 @@ impl<S: jacquard_common::BosStr> ViewBuilder<S, view_state::Empty> {
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ViewBuilder<S, St>
+impl<S: jacquard_common::BosStr> ViewBuilder<view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ViewBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None,),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St, S: jacquard_common::BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
     St::External: view_state::IsUnset,
@@ -779,7 +842,7 @@ where
     pub fn external(
         mut self,
         value: impl Into<crate::macro_mode::app_bsky::embed::external::ViewExternal<S>>,
-    ) -> ViewBuilder<S, view_state::SetExternal<St>> {
+    ) -> ViewBuilder<view_state::SetExternal<St>, S> {
         self._fields.0 = ::core::option::Option::Some(value.into());
         ViewBuilder {
             _state: ::core::marker::PhantomData,
@@ -789,7 +852,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ViewBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> ViewBuilder<St, S>
 where
     St: view_state::State,
     St::External: view_state::IsSet,
@@ -826,58 +889,58 @@ pub mod view_external_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Description;
         type Uri;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Description = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type Description = St::Description;
-        type Uri = St::Uri;
+        type Title = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDescription<St> {}
     impl<St: State> State for SetDescription<St> {
-        type Title = St::Title;
         type Description = Set<members::description>;
         type Uri = St::Uri;
+        type Title = St::Title;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Title = St::Title;
         type Description = St::Description;
         type Uri = Set<members::uri>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Description = St::Description;
+        type Uri = St::Uri;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `description` field
         pub struct description(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type.
 pub struct ViewExternalBuilder<
-    S: jacquard_common::BosStr,
     St: view_external_state::State,
+    S: jacquard_common::BosStr = jacquard_common::DefaultStr,
 > {
     _state: ::core::marker::PhantomData<fn() -> St>,
     _fields: (
@@ -889,15 +952,25 @@ pub struct ViewExternalBuilder<
     _type: ::core::marker::PhantomData<fn() -> S>,
 }
 
-impl<S: jacquard_common::BosStr> ViewExternal<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> ViewExternalBuilder<S, view_external_state::Empty> {
+impl ViewExternal<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ViewExternalBuilder<
+        view_external_state::Empty,
+        jacquard_common::DefaultStr,
+    > {
         ViewExternalBuilder::new()
     }
 }
 
-impl<S: jacquard_common::BosStr> ViewExternalBuilder<S, view_external_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: jacquard_common::BosStr> ViewExternal<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ViewExternalBuilder<view_external_state::Empty, S> {
+        ViewExternalBuilder::builder()
+    }
+}
+
+impl ViewExternalBuilder<view_external_state::Empty, jacquard_common::DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ViewExternalBuilder {
             _state: ::core::marker::PhantomData,
@@ -907,7 +980,18 @@ impl<S: jacquard_common::BosStr> ViewExternalBuilder<S, view_external_state::Emp
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ViewExternalBuilder<S, St>
+impl<S: jacquard_common::BosStr> ViewExternalBuilder<view_external_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ViewExternalBuilder {
+            _state: ::core::marker::PhantomData,
+            _fields: (None, None, None, None),
+            _type: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<St, S: jacquard_common::BosStr> ViewExternalBuilder<St, S>
 where
     St: view_external_state::State,
     St::Description: view_external_state::IsUnset,
@@ -916,7 +1000,7 @@ where
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> ViewExternalBuilder<S, view_external_state::SetDescription<St>> {
+    ) -> ViewExternalBuilder<view_external_state::SetDescription<St>, S> {
         self._fields.0 = ::core::option::Option::Some(value.into());
         ViewExternalBuilder {
             _state: ::core::marker::PhantomData,
@@ -927,9 +1011,9 @@ where
 }
 
 impl<
-    S: jacquard_common::BosStr,
     St: view_external_state::State,
-> ViewExternalBuilder<S, St> {
+    S: jacquard_common::BosStr,
+> ViewExternalBuilder<St, S> {
     /// Set the `thumb` field (optional)
     pub fn thumb(
         mut self,
@@ -948,7 +1032,7 @@ impl<
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ViewExternalBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> ViewExternalBuilder<St, S>
 where
     St: view_external_state::State,
     St::Title: view_external_state::IsUnset,
@@ -957,7 +1041,7 @@ where
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ViewExternalBuilder<S, view_external_state::SetTitle<St>> {
+    ) -> ViewExternalBuilder<view_external_state::SetTitle<St>, S> {
         self._fields.2 = ::core::option::Option::Some(value.into());
         ViewExternalBuilder {
             _state: ::core::marker::PhantomData,
@@ -967,7 +1051,7 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ViewExternalBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> ViewExternalBuilder<St, S>
 where
     St: view_external_state::State,
     St::Uri: view_external_state::IsUnset,
@@ -976,7 +1060,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<jacquard_common::types::string::UriValue<S>>,
-    ) -> ViewExternalBuilder<S, view_external_state::SetUri<St>> {
+    ) -> ViewExternalBuilder<view_external_state::SetUri<St>, S> {
         self._fields.3 = ::core::option::Option::Some(value.into());
         ViewExternalBuilder {
             _state: ::core::marker::PhantomData,
@@ -986,12 +1070,12 @@ where
     }
 }
 
-impl<S: jacquard_common::BosStr, St> ViewExternalBuilder<S, St>
+impl<St, S: jacquard_common::BosStr> ViewExternalBuilder<St, S>
 where
     St: view_external_state::State,
-    St::Title: view_external_state::IsSet,
     St::Description: view_external_state::IsSet,
     St::Uri: view_external_state::IsSet,
+    St::Title: view_external_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ViewExternal<S> {

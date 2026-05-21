@@ -8,12 +8,13 @@
 pub mod allow;
 pub mod push_notify;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +25,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::win_tomo_x::pushat;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::win_tomo_x::pushat;
 pub type DeviceList<S = DefaultStr> = Vec<pushat::DeviceListItem<S>>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeviceListItem<S: BosStr = DefaultStr> {
     /// Defaults to `false`.
     #[serde(default = "_default_device_list_item_current")]
@@ -45,11 +43,9 @@ pub struct DeviceListItem<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotifyBody<S: BosStr = DefaultStr> {
     ///Body text of the notification.
     pub body: S,
@@ -125,7 +121,7 @@ fn _default_device_list_item_current() -> bool {
 
 pub mod device_list_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -134,69 +130,79 @@ pub mod device_list_item_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Id;
-        type Name;
         type Current;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Id = Unset;
-        type Name = Unset;
         type Current = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
+        type Current = St::Current;
         type Name = St::Name;
-        type Current = St::Current;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Id = St::Id;
-        type Name = Set<members::name>;
-        type Current = St::Current;
     }
     ///State transition - sets the `current` field to Set
     pub struct SetCurrent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCurrent<St> {}
     impl<St: State> State for SetCurrent<St> {
         type Id = St::Id;
-        type Name = St::Name;
         type Current = Set<members::current>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Id = St::Id;
+        type Current = St::Current;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `current` field
         pub struct current(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeviceListItemBuilder<S: BosStr, St: device_list_item_state::State> {
+pub struct DeviceListItemBuilder<
+    St: device_list_item_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<Tid>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> DeviceListItem<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> DeviceListItemBuilder<S, device_list_item_state::Empty> {
+impl DeviceListItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DeviceListItemBuilder<device_list_item_state::Empty, DefaultStr> {
         DeviceListItemBuilder::new()
     }
 }
 
-impl<S: BosStr> DeviceListItemBuilder<S, device_list_item_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> DeviceListItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DeviceListItemBuilder<device_list_item_state::Empty, S> {
+        DeviceListItemBuilder::builder()
+    }
+}
+
+impl DeviceListItemBuilder<device_list_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DeviceListItemBuilder {
             _state: PhantomData,
@@ -206,7 +212,18 @@ impl<S: BosStr> DeviceListItemBuilder<S, device_list_item_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> DeviceListItemBuilder<S, St>
+impl<S: BosStr> DeviceListItemBuilder<device_list_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DeviceListItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DeviceListItemBuilder<St, S>
 where
     St: device_list_item_state::State,
     St::Current: device_list_item_state::IsUnset,
@@ -215,7 +232,7 @@ where
     pub fn current(
         mut self,
         value: impl Into<bool>,
-    ) -> DeviceListItemBuilder<S, device_list_item_state::SetCurrent<St>> {
+    ) -> DeviceListItemBuilder<device_list_item_state::SetCurrent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DeviceListItemBuilder {
             _state: PhantomData,
@@ -225,7 +242,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeviceListItemBuilder<S, St>
+impl<St, S: BosStr> DeviceListItemBuilder<St, S>
 where
     St: device_list_item_state::State,
     St::Id: device_list_item_state::IsUnset,
@@ -234,7 +251,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<Tid>,
-    ) -> DeviceListItemBuilder<S, device_list_item_state::SetId<St>> {
+    ) -> DeviceListItemBuilder<device_list_item_state::SetId<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DeviceListItemBuilder {
             _state: PhantomData,
@@ -244,7 +261,7 @@ where
     }
 }
 
-impl<S: BosStr, St> DeviceListItemBuilder<S, St>
+impl<St, S: BosStr> DeviceListItemBuilder<St, S>
 where
     St: device_list_item_state::State,
     St::Name: device_list_item_state::IsUnset,
@@ -253,7 +270,7 @@ where
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> DeviceListItemBuilder<S, device_list_item_state::SetName<St>> {
+    ) -> DeviceListItemBuilder<device_list_item_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         DeviceListItemBuilder {
             _state: PhantomData,
@@ -263,12 +280,12 @@ where
     }
 }
 
-impl<S: BosStr, St> DeviceListItemBuilder<S, St>
+impl<St, S: BosStr> DeviceListItemBuilder<St, S>
 where
     St: device_list_item_state::State,
     St::Id: device_list_item_state::IsSet,
-    St::Name: device_list_item_state::IsSet,
     St::Current: device_list_item_state::IsSet,
+    St::Name: device_list_item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DeviceListItem<S> {
@@ -280,7 +297,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeviceListItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeviceListItem<S> {
         DeviceListItem {
             current: self._fields.0.unwrap(),
             id: self._fields.1.unwrap(),
@@ -291,10 +311,10 @@ where
 }
 
 fn lexicon_doc_win_tomo_x_pushat_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("win.tomo-x.pushat.defs"),
@@ -313,11 +333,12 @@ fn lexicon_doc_win_tomo_x_pushat_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("deviceListItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("current"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("name"), SmolStr::new_static("id"),
+                            SmolStr::new_static("current")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

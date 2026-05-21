@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Merge<S: BosStr = DefaultStr> {
     ///Author email for the merge commit
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,8 +55,9 @@ impl jacquard_common::xrpc::XrpcResp for MergeResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Merge<S> {
     const NSID: &'static str = "sh.tangled.repo.merge";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = MergeResponse;
 }
 
@@ -67,15 +65,16 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Merge<S> {
 pub struct MergeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MergeRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.merge";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Merge<S>;
     type Response = MergeResponse;
 }
 
 pub mod merge_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -83,72 +82,72 @@ pub mod merge_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
+        type Branch;
         type Patch;
         type Did;
-        type Branch;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
+        type Branch = Unset;
         type Patch = Unset;
         type Did = Unset;
-        type Branch = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `patch` field to Set
-    pub struct SetPatch<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPatch<St> {}
-    impl<St: State> State for SetPatch<St> {
-        type Patch = Set<members::patch>;
-        type Did = St::Did;
-        type Branch = St::Branch;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Patch = St::Patch;
-        type Did = Set<members::did>;
-        type Branch = St::Branch;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBranch<St> {}
-    impl<St: State> State for SetBranch<St> {
-        type Patch = St::Patch;
-        type Did = St::Did;
-        type Branch = Set<members::branch>;
-        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
+        type Name = Set<members::name>;
+        type Branch = St::Branch;
         type Patch = St::Patch;
         type Did = St::Did;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBranch<St> {}
+    impl<St: State> State for SetBranch<St> {
+        type Name = St::Name;
+        type Branch = Set<members::branch>;
+        type Patch = St::Patch;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `patch` field to Set
+    pub struct SetPatch<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPatch<St> {}
+    impl<St: State> State for SetPatch<St> {
+        type Name = St::Name;
         type Branch = St::Branch;
-        type Name = Set<members::name>;
+        type Patch = Set<members::patch>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Name = St::Name;
+        type Branch = St::Branch;
+        type Patch = St::Patch;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
         ///Marker type for the `patch` field
         pub struct patch(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `branch` field
-        pub struct branch(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MergeBuilder<S: BosStr, St: merge_state::State> {
+pub struct MergeBuilder<St: merge_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -163,15 +162,22 @@ pub struct MergeBuilder<S: BosStr, St: merge_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Merge<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> MergeBuilder<S, merge_state::Empty> {
+impl Merge<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> MergeBuilder<merge_state::Empty, DefaultStr> {
         MergeBuilder::new()
     }
 }
 
-impl<S: BosStr> MergeBuilder<S, merge_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Merge<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> MergeBuilder<merge_state::Empty, S> {
+        MergeBuilder::builder()
+    }
+}
+
+impl MergeBuilder<merge_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         MergeBuilder {
             _state: PhantomData,
@@ -181,7 +187,18 @@ impl<S: BosStr> MergeBuilder<S, merge_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: merge_state::State> MergeBuilder<S, St> {
+impl<S: BosStr> MergeBuilder<merge_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        MergeBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: merge_state::State, S: BosStr> MergeBuilder<St, S> {
     /// Set the `authorEmail` field (optional)
     pub fn author_email(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -194,7 +211,7 @@ impl<S: BosStr, St: merge_state::State> MergeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: merge_state::State> MergeBuilder<S, St> {
+impl<St: merge_state::State, S: BosStr> MergeBuilder<St, S> {
     /// Set the `authorName` field (optional)
     pub fn author_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -207,13 +224,16 @@ impl<S: BosStr, St: merge_state::State> MergeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MergeBuilder<S, St>
+impl<St, S: BosStr> MergeBuilder<St, S>
 where
     St: merge_state::State,
     St::Branch: merge_state::IsUnset,
 {
     /// Set the `branch` field (required)
-    pub fn branch(mut self, value: impl Into<S>) -> MergeBuilder<S, merge_state::SetBranch<St>> {
+    pub fn branch(
+        mut self,
+        value: impl Into<S>,
+    ) -> MergeBuilder<merge_state::SetBranch<St>, S> {
         self._fields.2 = Option::Some(value.into());
         MergeBuilder {
             _state: PhantomData,
@@ -223,7 +243,7 @@ where
     }
 }
 
-impl<S: BosStr, St: merge_state::State> MergeBuilder<S, St> {
+impl<St: merge_state::State, S: BosStr> MergeBuilder<St, S> {
     /// Set the `commitBody` field (optional)
     pub fn commit_body(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -236,7 +256,7 @@ impl<S: BosStr, St: merge_state::State> MergeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: merge_state::State> MergeBuilder<S, St> {
+impl<St: merge_state::State, S: BosStr> MergeBuilder<St, S> {
     /// Set the `commitMessage` field (optional)
     pub fn commit_message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -249,13 +269,16 @@ impl<S: BosStr, St: merge_state::State> MergeBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> MergeBuilder<S, St>
+impl<St, S: BosStr> MergeBuilder<St, S>
 where
     St: merge_state::State,
     St::Did: merge_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> MergeBuilder<S, merge_state::SetDid<St>> {
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> MergeBuilder<merge_state::SetDid<St>, S> {
         self._fields.5 = Option::Some(value.into());
         MergeBuilder {
             _state: PhantomData,
@@ -265,13 +288,16 @@ where
     }
 }
 
-impl<S: BosStr, St> MergeBuilder<S, St>
+impl<St, S: BosStr> MergeBuilder<St, S>
 where
     St: merge_state::State,
     St::Name: merge_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> MergeBuilder<S, merge_state::SetName<St>> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> MergeBuilder<merge_state::SetName<St>, S> {
         self._fields.6 = Option::Some(value.into());
         MergeBuilder {
             _state: PhantomData,
@@ -281,13 +307,16 @@ where
     }
 }
 
-impl<S: BosStr, St> MergeBuilder<S, St>
+impl<St, S: BosStr> MergeBuilder<St, S>
 where
     St: merge_state::State,
     St::Patch: merge_state::IsUnset,
 {
     /// Set the `patch` field (required)
-    pub fn patch(mut self, value: impl Into<S>) -> MergeBuilder<S, merge_state::SetPatch<St>> {
+    pub fn patch(
+        mut self,
+        value: impl Into<S>,
+    ) -> MergeBuilder<merge_state::SetPatch<St>, S> {
         self._fields.7 = Option::Some(value.into());
         MergeBuilder {
             _state: PhantomData,
@@ -297,13 +326,13 @@ where
     }
 }
 
-impl<S: BosStr, St> MergeBuilder<S, St>
+impl<St, S: BosStr> MergeBuilder<St, S>
 where
     St: merge_state::State,
+    St::Name: merge_state::IsSet,
+    St::Branch: merge_state::IsSet,
     St::Patch: merge_state::IsSet,
     St::Did: merge_state::IsSet,
-    St::Branch: merge_state::IsSet,
-    St::Name: merge_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Merge<S> {

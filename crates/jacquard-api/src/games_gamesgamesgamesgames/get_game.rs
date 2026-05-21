@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::games_gamesgamesgamesgames::GameDetailView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::GameDetailView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetGame<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub apple_app_store_id: Option<S>,
@@ -54,11 +51,9 @@ pub struct GetGame<S: BosStr = DefaultStr> {
     pub xbox_id: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetGameOutput<S: BosStr = DefaultStr> {
     pub game: GameDetailView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -91,7 +86,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetGameRequest {
 
 pub mod get_game_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -109,7 +104,7 @@ pub mod get_game_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetGameBuilder<S: BosStr, St: get_game_state::State> {
+pub struct GetGameBuilder<St: get_game_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -130,27 +125,73 @@ pub struct GetGameBuilder<S: BosStr, St: get_game_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetGame<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetGameBuilder<S, get_game_state::Empty> {
+impl GetGame<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetGameBuilder<get_game_state::Empty, DefaultStr> {
         GetGameBuilder::new()
     }
 }
 
-impl<S: BosStr> GetGameBuilder<S, get_game_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetGame<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetGameBuilder<get_game_state::Empty, S> {
+        GetGameBuilder::builder()
+    }
+}
+
+impl GetGameBuilder<get_game_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetGameBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
+impl<S: BosStr> GetGameBuilder<get_game_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetGameBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_game_state::State, S: BosStr> GetGameBuilder<St, S> {
     /// Set the `appleAppStoreId` field (optional)
     pub fn apple_app_store_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -163,7 +204,7 @@ impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
+impl<St: get_game_state::State, S: BosStr> GetGameBuilder<St, S> {
     /// Set the `epicGamesId` field (optional)
     pub fn epic_games_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -176,7 +217,7 @@ impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
+impl<St: get_game_state::State, S: BosStr> GetGameBuilder<St, S> {
     /// Set the `gogId` field (optional)
     pub fn gog_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -189,7 +230,7 @@ impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
+impl<St: get_game_state::State, S: BosStr> GetGameBuilder<St, S> {
     /// Set the `googlePlayId` field (optional)
     pub fn google_play_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -202,7 +243,7 @@ impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
+impl<St: get_game_state::State, S: BosStr> GetGameBuilder<St, S> {
     /// Set the `humbleBundleId` field (optional)
     pub fn humble_bundle_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -215,7 +256,7 @@ impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
+impl<St: get_game_state::State, S: BosStr> GetGameBuilder<St, S> {
     /// Set the `igdbId` field (optional)
     pub fn igdb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -228,7 +269,7 @@ impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
+impl<St: get_game_state::State, S: BosStr> GetGameBuilder<St, S> {
     /// Set the `includeActorCredits` field (optional)
     pub fn include_actor_credits(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.6 = value.into();
@@ -241,7 +282,7 @@ impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
+impl<St: get_game_state::State, S: BosStr> GetGameBuilder<St, S> {
     /// Set the `includeOrgCredits` field (optional)
     pub fn include_org_credits(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.7 = value.into();
@@ -254,7 +295,7 @@ impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
+impl<St: get_game_state::State, S: BosStr> GetGameBuilder<St, S> {
     /// Set the `nintendoEshopId` field (optional)
     pub fn nintendo_eshop_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -267,7 +308,7 @@ impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
+impl<St: get_game_state::State, S: BosStr> GetGameBuilder<St, S> {
     /// Set the `playStationId` field (optional)
     pub fn play_station_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -280,7 +321,7 @@ impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
+impl<St: get_game_state::State, S: BosStr> GetGameBuilder<St, S> {
     /// Set the `slug` field (optional)
     pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -293,7 +334,7 @@ impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
+impl<St: get_game_state::State, S: BosStr> GetGameBuilder<St, S> {
     /// Set the `steamId` field (optional)
     pub fn steam_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
@@ -306,7 +347,7 @@ impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
+impl<St: get_game_state::State, S: BosStr> GetGameBuilder<St, S> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.12 = value.into();
@@ -319,7 +360,7 @@ impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
+impl<St: get_game_state::State, S: BosStr> GetGameBuilder<St, S> {
     /// Set the `xboxId` field (optional)
     pub fn xbox_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.13 = value.into();
@@ -332,7 +373,7 @@ impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> GetGameBuilder<S, St>
+impl<St, S: BosStr> GetGameBuilder<St, S>
 where
     St: get_game_state::State,
 {

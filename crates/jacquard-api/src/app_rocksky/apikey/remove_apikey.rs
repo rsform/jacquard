@@ -10,26 +10,21 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RemoveApikeyParams<S: BosStr = DefaultStr> {
     pub id: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RemoveApikeyOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -52,8 +47,9 @@ impl jacquard_common::xrpc::XrpcResp for RemoveApikeyResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RemoveApikey {
     const NSID: &'static str = "app.rocksky.apikey.removeApikey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RemoveApikeyResponse;
 }
 
@@ -61,15 +57,16 @@ impl jacquard_common::xrpc::XrpcRequest for RemoveApikey {
 pub struct RemoveApikeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveApikeyRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.apikey.removeApikey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = RemoveApikey;
     type Response = RemoveApikeyResponse;
 }
 
 pub mod remove_apikey_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -100,21 +97,34 @@ pub mod remove_apikey_params_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RemoveApikeyParamsBuilder<S: BosStr, St: remove_apikey_params_state::State> {
+pub struct RemoveApikeyParamsBuilder<
+    St: remove_apikey_params_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> RemoveApikeyParams<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> RemoveApikeyParamsBuilder<S, remove_apikey_params_state::Empty> {
+impl RemoveApikeyParams<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RemoveApikeyParamsBuilder<
+        remove_apikey_params_state::Empty,
+        DefaultStr,
+    > {
         RemoveApikeyParamsBuilder::new()
     }
 }
 
-impl<S: BosStr> RemoveApikeyParamsBuilder<S, remove_apikey_params_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> RemoveApikeyParams<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RemoveApikeyParamsBuilder<remove_apikey_params_state::Empty, S> {
+        RemoveApikeyParamsBuilder::builder()
+    }
+}
+
+impl RemoveApikeyParamsBuilder<remove_apikey_params_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         RemoveApikeyParamsBuilder {
             _state: PhantomData,
@@ -124,7 +134,18 @@ impl<S: BosStr> RemoveApikeyParamsBuilder<S, remove_apikey_params_state::Empty> 
     }
 }
 
-impl<S: BosStr, St> RemoveApikeyParamsBuilder<S, St>
+impl<S: BosStr> RemoveApikeyParamsBuilder<remove_apikey_params_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RemoveApikeyParamsBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RemoveApikeyParamsBuilder<St, S>
 where
     St: remove_apikey_params_state::State,
     St::Id: remove_apikey_params_state::IsUnset,
@@ -133,7 +154,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> RemoveApikeyParamsBuilder<S, remove_apikey_params_state::SetId<St>> {
+    ) -> RemoveApikeyParamsBuilder<remove_apikey_params_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RemoveApikeyParamsBuilder {
             _state: PhantomData,
@@ -143,7 +164,7 @@ where
     }
 }
 
-impl<S: BosStr, St> RemoveApikeyParamsBuilder<S, St>
+impl<St, S: BosStr> RemoveApikeyParamsBuilder<St, S>
 where
     St: remove_apikey_params_state::State,
     St::Id: remove_apikey_params_state::IsSet,

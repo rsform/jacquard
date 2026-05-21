@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Request to subscribe to a notebook. Requires acceptance to be active.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -105,7 +105,7 @@ impl<S: BosStr> LexiconSchema for Subscribe<S> {
 
 pub mod subscribe_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -148,21 +148,28 @@ pub mod subscribe_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SubscribeBuilder<S: BosStr, St: subscribe_state::State> {
+pub struct SubscribeBuilder<St: subscribe_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Subscribe<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SubscribeBuilder<S, subscribe_state::Empty> {
+impl Subscribe<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SubscribeBuilder<subscribe_state::Empty, DefaultStr> {
         SubscribeBuilder::new()
     }
 }
 
-impl<S: BosStr> SubscribeBuilder<S, subscribe_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Subscribe<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SubscribeBuilder<subscribe_state::Empty, S> {
+        SubscribeBuilder::builder()
+    }
+}
+
+impl SubscribeBuilder<subscribe_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SubscribeBuilder {
             _state: PhantomData,
@@ -172,7 +179,18 @@ impl<S: BosStr> SubscribeBuilder<S, subscribe_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SubscribeBuilder<S, St>
+impl<S: BosStr> SubscribeBuilder<subscribe_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SubscribeBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SubscribeBuilder<St, S>
 where
     St: subscribe_state::State,
     St::CreatedAt: subscribe_state::IsUnset,
@@ -181,7 +199,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SubscribeBuilder<S, subscribe_state::SetCreatedAt<St>> {
+    ) -> SubscribeBuilder<subscribe_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SubscribeBuilder {
             _state: PhantomData,
@@ -191,7 +209,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SubscribeBuilder<S, St>
+impl<St, S: BosStr> SubscribeBuilder<St, S>
 where
     St: subscribe_state::State,
     St::Notebook: subscribe_state::IsUnset,
@@ -200,7 +218,7 @@ where
     pub fn notebook(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SubscribeBuilder<S, subscribe_state::SetNotebook<St>> {
+    ) -> SubscribeBuilder<subscribe_state::SetNotebook<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SubscribeBuilder {
             _state: PhantomData,
@@ -210,7 +228,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SubscribeBuilder<S, St>
+impl<St, S: BosStr> SubscribeBuilder<St, S>
 where
     St: subscribe_state::State,
     St::CreatedAt: subscribe_state::IsSet,
@@ -225,7 +243,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Subscribe<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Subscribe<S> {
         Subscribe {
             created_at: self._fields.0.unwrap(),
             notebook: self._fields.1.unwrap(),
@@ -235,10 +256,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_graph_subscribe() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.graph.subscribe"),
@@ -247,15 +268,19 @@ fn lexicon_doc_sh_weaver_graph_subscribe() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Request to subscribe to a notebook. Requires acceptance to be active.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Request to subscribe to a notebook. Requires acceptance to be active.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("notebook"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("notebook"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -269,9 +294,9 @@ fn lexicon_doc_sh_weaver_graph_subscribe() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("notebook"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "URI of the notebook to subscribe to.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("URI of the notebook to subscribe to."),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

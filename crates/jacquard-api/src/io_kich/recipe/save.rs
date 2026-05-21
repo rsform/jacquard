@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -107,7 +107,7 @@ impl<S: BosStr> LexiconSchema for Save<S> {
 
 pub mod save_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -115,56 +115,63 @@ pub mod save_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type CreatedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = St::CreatedAt;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Subject = St::Subject;
         type CreatedAt = Set<members::created_at>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SaveBuilder<S: BosStr, St: save_state::State> {
+pub struct SaveBuilder<St: save_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<StrongRef<S>>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Save<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> SaveBuilder<S, save_state::Empty> {
+impl Save<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SaveBuilder<save_state::Empty, DefaultStr> {
         SaveBuilder::new()
     }
 }
 
-impl<S: BosStr> SaveBuilder<S, save_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Save<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SaveBuilder<save_state::Empty, S> {
+        SaveBuilder::builder()
+    }
+}
+
+impl SaveBuilder<save_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SaveBuilder {
             _state: PhantomData,
@@ -174,7 +181,18 @@ impl<S: BosStr> SaveBuilder<S, save_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> SaveBuilder<S, St>
+impl<S: BosStr> SaveBuilder<save_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SaveBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SaveBuilder<St, S>
 where
     St: save_state::State,
     St::CreatedAt: save_state::IsUnset,
@@ -183,7 +201,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SaveBuilder<S, save_state::SetCreatedAt<St>> {
+    ) -> SaveBuilder<save_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SaveBuilder {
             _state: PhantomData,
@@ -193,7 +211,7 @@ where
     }
 }
 
-impl<S: BosStr, St> SaveBuilder<S, St>
+impl<St, S: BosStr> SaveBuilder<St, S>
 where
     St: save_state::State,
     St::Subject: save_state::IsUnset,
@@ -202,7 +220,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> SaveBuilder<S, save_state::SetSubject<St>> {
+    ) -> SaveBuilder<save_state::SetSubject<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SaveBuilder {
             _state: PhantomData,
@@ -212,7 +230,7 @@ where
     }
 }
 
-impl<S: BosStr, St: save_state::State> SaveBuilder<S, St> {
+impl<St: save_state::State, S: BosStr> SaveBuilder<St, S> {
     /// Set the `via` field (optional)
     pub fn via(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -225,11 +243,11 @@ impl<S: BosStr, St: save_state::State> SaveBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> SaveBuilder<S, St>
+impl<St, S: BosStr> SaveBuilder<St, S>
 where
     St: save_state::State,
-    St::Subject: save_state::IsSet,
     St::CreatedAt: save_state::IsSet,
+    St::Subject: save_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Save<S> {
@@ -252,10 +270,10 @@ where
 }
 
 fn lexicon_doc_io_kich_recipe_save() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.kich.recipe.save"),
@@ -266,10 +284,12 @@ fn lexicon_doc_io_kich_recipe_save() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("subject"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

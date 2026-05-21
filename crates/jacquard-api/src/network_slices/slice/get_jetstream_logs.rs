@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::network_slices::slice::get_job_logs::LogEntry;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::slice::get_job_logs::LogEntry;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetJetstreamLogs<S: BosStr = DefaultStr> {
     ///Defaults to `100`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
@@ -31,11 +28,9 @@ pub struct GetJetstreamLogs<S: BosStr = DefaultStr> {
     pub slice: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetJetstreamLogsOutput<S: BosStr = DefaultStr> {
     pub logs: Vec<LogEntry<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -72,7 +67,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_jetstream_logs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -90,21 +85,34 @@ pub mod get_jetstream_logs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetJetstreamLogsBuilder<S: BosStr, St: get_jetstream_logs_state::State> {
+pub struct GetJetstreamLogsBuilder<
+    St: get_jetstream_logs_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetJetstreamLogs<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetJetstreamLogsBuilder<S, get_jetstream_logs_state::Empty> {
+impl GetJetstreamLogs<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetJetstreamLogsBuilder<
+        get_jetstream_logs_state::Empty,
+        DefaultStr,
+    > {
         GetJetstreamLogsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetJetstreamLogsBuilder<S, get_jetstream_logs_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetJetstreamLogs<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetJetstreamLogsBuilder<get_jetstream_logs_state::Empty, S> {
+        GetJetstreamLogsBuilder::builder()
+    }
+}
+
+impl GetJetstreamLogsBuilder<get_jetstream_logs_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetJetstreamLogsBuilder {
             _state: PhantomData,
@@ -114,7 +122,18 @@ impl<S: BosStr> GetJetstreamLogsBuilder<S, get_jetstream_logs_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: get_jetstream_logs_state::State> GetJetstreamLogsBuilder<S, St> {
+impl<S: BosStr> GetJetstreamLogsBuilder<get_jetstream_logs_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetJetstreamLogsBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: get_jetstream_logs_state::State, S: BosStr> GetJetstreamLogsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -127,7 +146,7 @@ impl<S: BosStr, St: get_jetstream_logs_state::State> GetJetstreamLogsBuilder<S, 
     }
 }
 
-impl<S: BosStr, St: get_jetstream_logs_state::State> GetJetstreamLogsBuilder<S, St> {
+impl<St: get_jetstream_logs_state::State, S: BosStr> GetJetstreamLogsBuilder<St, S> {
     /// Set the `slice` field (optional)
     pub fn slice(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -140,7 +159,7 @@ impl<S: BosStr, St: get_jetstream_logs_state::State> GetJetstreamLogsBuilder<S, 
     }
 }
 
-impl<S: BosStr, St> GetJetstreamLogsBuilder<S, St>
+impl<St, S: BosStr> GetJetstreamLogsBuilder<St, S>
 where
     St: get_jetstream_logs_state::State,
 {

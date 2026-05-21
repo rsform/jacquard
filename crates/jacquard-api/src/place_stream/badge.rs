@@ -7,12 +7,13 @@
 
 pub mod get_valid_badges;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,14 +26,11 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// View of a badge record, with fields resolved for display. If the DID in issuer is not the current streamplace node, the signature field shall be required.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BadgeView<S: BosStr = DefaultStr> {
     pub badge_type: BadgeViewBadgeType<S>,
     ///DID of the badge issuer.
@@ -45,6 +43,7 @@ pub struct BadgeView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BadgeViewBadgeType<S: BosStr = DefaultStr> {
@@ -170,7 +169,7 @@ impl<S: BosStr> LexiconSchema for BadgeView<S> {
 
 pub mod badge_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -178,75 +177,77 @@ pub mod badge_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Recipient;
         type Issuer;
+        type Recipient;
         type BadgeType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Recipient = Unset;
         type Issuer = Unset;
+        type Recipient = Unset;
         type BadgeType = Unset;
-    }
-    ///State transition - sets the `recipient` field to Set
-    pub struct SetRecipient<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecipient<St> {}
-    impl<St: State> State for SetRecipient<St> {
-        type Recipient = Set<members::recipient>;
-        type Issuer = St::Issuer;
-        type BadgeType = St::BadgeType;
     }
     ///State transition - sets the `issuer` field to Set
     pub struct SetIssuer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIssuer<St> {}
     impl<St: State> State for SetIssuer<St> {
-        type Recipient = St::Recipient;
         type Issuer = Set<members::issuer>;
+        type Recipient = St::Recipient;
+        type BadgeType = St::BadgeType;
+    }
+    ///State transition - sets the `recipient` field to Set
+    pub struct SetRecipient<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecipient<St> {}
+    impl<St: State> State for SetRecipient<St> {
+        type Issuer = St::Issuer;
+        type Recipient = Set<members::recipient>;
         type BadgeType = St::BadgeType;
     }
     ///State transition - sets the `badge_type` field to Set
     pub struct SetBadgeType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBadgeType<St> {}
     impl<St: State> State for SetBadgeType<St> {
-        type Recipient = St::Recipient;
         type Issuer = St::Issuer;
+        type Recipient = St::Recipient;
         type BadgeType = Set<members::badge_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `recipient` field
-        pub struct recipient(());
         ///Marker type for the `issuer` field
         pub struct issuer(());
+        ///Marker type for the `recipient` field
+        pub struct recipient(());
         ///Marker type for the `badge_type` field
         pub struct badge_type(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BadgeViewBuilder<S: BosStr, St: badge_view_state::State> {
+pub struct BadgeViewBuilder<St: badge_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<BadgeViewBadgeType<S>>,
-        Option<Did<S>>,
-        Option<Did<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<BadgeViewBadgeType<S>>, Option<Did<S>>, Option<Did<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> BadgeView<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BadgeViewBuilder<S, badge_view_state::Empty> {
+impl BadgeView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BadgeViewBuilder<badge_view_state::Empty, DefaultStr> {
         BadgeViewBuilder::new()
     }
 }
 
-impl<S: BosStr> BadgeViewBuilder<S, badge_view_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> BadgeView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BadgeViewBuilder<badge_view_state::Empty, S> {
+        BadgeViewBuilder::builder()
+    }
+}
+
+impl BadgeViewBuilder<badge_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BadgeViewBuilder {
             _state: PhantomData,
@@ -256,7 +257,18 @@ impl<S: BosStr> BadgeViewBuilder<S, badge_view_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BadgeViewBuilder<S, St>
+impl<S: BosStr> BadgeViewBuilder<badge_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BadgeViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BadgeViewBuilder<St, S>
 where
     St: badge_view_state::State,
     St::BadgeType: badge_view_state::IsUnset,
@@ -265,7 +277,7 @@ where
     pub fn badge_type(
         mut self,
         value: impl Into<BadgeViewBadgeType<S>>,
-    ) -> BadgeViewBuilder<S, badge_view_state::SetBadgeType<St>> {
+    ) -> BadgeViewBuilder<badge_view_state::SetBadgeType<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BadgeViewBuilder {
             _state: PhantomData,
@@ -275,7 +287,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BadgeViewBuilder<S, St>
+impl<St, S: BosStr> BadgeViewBuilder<St, S>
 where
     St: badge_view_state::State,
     St::Issuer: badge_view_state::IsUnset,
@@ -284,7 +296,7 @@ where
     pub fn issuer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> BadgeViewBuilder<S, badge_view_state::SetIssuer<St>> {
+    ) -> BadgeViewBuilder<badge_view_state::SetIssuer<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BadgeViewBuilder {
             _state: PhantomData,
@@ -294,7 +306,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BadgeViewBuilder<S, St>
+impl<St, S: BosStr> BadgeViewBuilder<St, S>
 where
     St: badge_view_state::State,
     St::Recipient: badge_view_state::IsUnset,
@@ -303,7 +315,7 @@ where
     pub fn recipient(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> BadgeViewBuilder<S, badge_view_state::SetRecipient<St>> {
+    ) -> BadgeViewBuilder<badge_view_state::SetRecipient<St>, S> {
         self._fields.2 = Option::Some(value.into());
         BadgeViewBuilder {
             _state: PhantomData,
@@ -313,7 +325,7 @@ where
     }
 }
 
-impl<S: BosStr, St: badge_view_state::State> BadgeViewBuilder<S, St> {
+impl<St: badge_view_state::State, S: BosStr> BadgeViewBuilder<St, S> {
     /// Set the `signature` field (optional)
     pub fn signature(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -326,11 +338,11 @@ impl<S: BosStr, St: badge_view_state::State> BadgeViewBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BadgeViewBuilder<S, St>
+impl<St, S: BosStr> BadgeViewBuilder<St, S>
 where
     St: badge_view_state::State,
-    St::Recipient: badge_view_state::IsSet,
     St::Issuer: badge_view_state::IsSet,
+    St::Recipient: badge_view_state::IsSet,
     St::BadgeType: badge_view_state::IsSet,
 {
     /// Build the final struct.
@@ -344,7 +356,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BadgeView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BadgeView<S> {
         BadgeView {
             badge_type: self._fields.0.unwrap(),
             issuer: self._fields.1.unwrap(),
@@ -356,10 +371,10 @@ where
 }
 
 fn lexicon_doc_place_stream_badge_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.badge.defs"),
@@ -425,21 +440,15 @@ fn lexicon_doc_place_stream_badge_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("mod"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("streamer"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("vip"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map
         },

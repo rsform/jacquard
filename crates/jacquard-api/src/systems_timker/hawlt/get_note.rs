@@ -8,32 +8,27 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::systems_timker::hawlt::note::Note;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Cid, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::systems_timker::hawlt::note::Note;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetNote<S: BosStr = DefaultStr> {
     pub repo: AtIdentifier<S>,
     pub rkey: RecordKey<Rkey<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetNoteOutput<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -68,7 +63,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetNoteRequest {
 
 pub mod get_note_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -76,56 +71,63 @@ pub mod get_note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rkey;
         type Repo;
+        type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rkey = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRkey<St> {}
-    impl<St: State> State for SetRkey<St> {
-        type Rkey = Set<members::rkey>;
-        type Repo = St::Repo;
+        type Rkey = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
-        type Rkey = St::Rkey;
         type Repo = Set<members::repo>;
+        type Rkey = St::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRkey<St> {}
+    impl<St: State> State for SetRkey<St> {
+        type Repo = St::Repo;
+        type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetNoteBuilder<S: BosStr, St: get_note_state::State> {
+pub struct GetNoteBuilder<St: get_note_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<RecordKey<Rkey<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> GetNote<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> GetNoteBuilder<S, get_note_state::Empty> {
+impl GetNote<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> GetNoteBuilder<get_note_state::Empty, DefaultStr> {
         GetNoteBuilder::new()
     }
 }
 
-impl<S: BosStr> GetNoteBuilder<S, get_note_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> GetNote<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> GetNoteBuilder<get_note_state::Empty, S> {
+        GetNoteBuilder::builder()
+    }
+}
+
+impl GetNoteBuilder<get_note_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetNoteBuilder {
             _state: PhantomData,
@@ -135,7 +137,18 @@ impl<S: BosStr> GetNoteBuilder<S, get_note_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> GetNoteBuilder<S, St>
+impl<S: BosStr> GetNoteBuilder<get_note_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        GetNoteBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> GetNoteBuilder<St, S>
 where
     St: get_note_state::State,
     St::Repo: get_note_state::IsUnset,
@@ -144,7 +157,7 @@ where
     pub fn repo(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetNoteBuilder<S, get_note_state::SetRepo<St>> {
+    ) -> GetNoteBuilder<get_note_state::SetRepo<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetNoteBuilder {
             _state: PhantomData,
@@ -154,7 +167,7 @@ where
     }
 }
 
-impl<S: BosStr, St> GetNoteBuilder<S, St>
+impl<St, S: BosStr> GetNoteBuilder<St, S>
 where
     St: get_note_state::State,
     St::Rkey: get_note_state::IsUnset,
@@ -163,7 +176,7 @@ where
     pub fn rkey(
         mut self,
         value: impl Into<RecordKey<Rkey<S>>>,
-    ) -> GetNoteBuilder<S, get_note_state::SetRkey<St>> {
+    ) -> GetNoteBuilder<get_note_state::SetRkey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetNoteBuilder {
             _state: PhantomData,
@@ -173,11 +186,11 @@ where
     }
 }
 
-impl<S: BosStr, St> GetNoteBuilder<S, St>
+impl<St, S: BosStr> GetNoteBuilder<St, S>
 where
     St: get_note_state::State,
-    St::Rkey: get_note_state::IsSet,
     St::Repo: get_note_state::IsSet,
+    St::Rkey: get_note_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GetNote<S> {

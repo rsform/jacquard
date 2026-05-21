@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_greengale::blog::BlobMetadata;
 use crate::app_greengale::blog::Ogp;
 use crate::app_greengale::blog::Theme;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A markdown blog post with extended theme and LaTeX support.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -176,7 +176,7 @@ fn _default_entry_visibility<S: FromStaticStr>() -> ::core::option::Option<S> {
 
 pub mod entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -207,7 +207,7 @@ pub mod entry_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EntryBuilder<S: BosStr, St: entry_state::State> {
+pub struct EntryBuilder<St: entry_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<BlobMetadata<S>>>,
@@ -223,15 +223,22 @@ pub struct EntryBuilder<S: BosStr, St: entry_state::State> {
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Entry<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> EntryBuilder<S, entry_state::Empty> {
+impl Entry<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> EntryBuilder<entry_state::Empty, DefaultStr> {
         EntryBuilder::new()
     }
 }
 
-impl<S: BosStr> EntryBuilder<S, entry_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Entry<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> EntryBuilder<entry_state::Empty, S> {
+        EntryBuilder::builder()
+    }
+}
+
+impl EntryBuilder<entry_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EntryBuilder {
             _state: PhantomData,
@@ -241,7 +248,18 @@ impl<S: BosStr> EntryBuilder<S, entry_state::Empty> {
     }
 }
 
-impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
+impl<S: BosStr> EntryBuilder<entry_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        EntryBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: entry_state::State, S: BosStr> EntryBuilder<St, S> {
     /// Set the `blobs` field (optional)
     pub fn blobs(mut self, value: impl Into<Option<Vec<BlobMetadata<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -254,13 +272,16 @@ impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EntryBuilder<S, St>
+impl<St, S: BosStr> EntryBuilder<St, S>
 where
     St: entry_state::State,
     St::Content: entry_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(mut self, value: impl Into<S>) -> EntryBuilder<S, entry_state::SetContent<St>> {
+    pub fn content(
+        mut self,
+        value: impl Into<S>,
+    ) -> EntryBuilder<entry_state::SetContent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
@@ -270,7 +291,7 @@ where
     }
 }
 
-impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
+impl<St: entry_state::State, S: BosStr> EntryBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -283,7 +304,7 @@ impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
+impl<St: entry_state::State, S: BosStr> EntryBuilder<St, S> {
     /// Set the `latex` field (optional)
     pub fn latex(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -296,7 +317,7 @@ impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
+impl<St: entry_state::State, S: BosStr> EntryBuilder<St, S> {
     /// Set the `ogp` field (optional)
     pub fn ogp(mut self, value: impl Into<Option<Ogp<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -309,7 +330,7 @@ impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
+impl<St: entry_state::State, S: BosStr> EntryBuilder<St, S> {
     /// Set the `subtitle` field (optional)
     pub fn subtitle(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -322,7 +343,7 @@ impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
+impl<St: entry_state::State, S: BosStr> EntryBuilder<St, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<Theme<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -335,7 +356,7 @@ impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
+impl<St: entry_state::State, S: BosStr> EntryBuilder<St, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -348,7 +369,7 @@ impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
+impl<St: entry_state::State, S: BosStr> EntryBuilder<St, S> {
     /// Set the `visibility` field (optional)
     pub fn visibility(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -361,7 +382,7 @@ impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> EntryBuilder<S, St>
+impl<St, S: BosStr> EntryBuilder<St, S>
 where
     St: entry_state::State,
     St::Content: entry_state::IsSet,
@@ -399,10 +420,10 @@ where
 }
 
 fn lexicon_doc_app_greengale_blog_entry() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.greengale.blog.entry"),
@@ -411,9 +432,11 @@ fn lexicon_doc_app_greengale_blog_entry() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A markdown blog post with extended theme and LaTeX support.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A markdown blog post with extended theme and LaTeX support.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("content")]),
@@ -435,9 +458,9 @@ fn lexicon_doc_app_greengale_blog_entry() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("content"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Markdown content of the blog post",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Markdown content of the blog post"),
+                                    ),
                                     max_length: Some(100000usize),
                                     ..Default::default()
                                 }),
@@ -486,9 +509,9 @@ fn lexicon_doc_app_greengale_blog_entry() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("visibility"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Controls who can view this entry",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Controls who can view this entry"),
+                                    ),
                                     max_length: Some(16usize),
                                     ..Default::default()
                                 }),

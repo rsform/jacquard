@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_asadaame5121::at_circle::RingRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_asadaame5121::at_circle::RingRef;
 /// Block/Kick a member from the circle
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -143,7 +143,7 @@ impl<S: BosStr> LexiconSchema for Block<S> {
 
 pub mod block_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -151,75 +151,77 @@ pub mod block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ring;
-        type Subject;
         type CreatedAt;
+        type Subject;
+        type Ring;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ring = Unset;
-        type Subject = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `ring` field to Set
-    pub struct SetRing<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRing<St> {}
-    impl<St: State> State for SetRing<St> {
-        type Ring = Set<members::ring>;
-        type Subject = St::Subject;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Ring = St::Ring;
-        type Subject = Set<members::subject>;
-        type CreatedAt = St::CreatedAt;
+        type Subject = Unset;
+        type Ring = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Ring = St::Ring;
-        type Subject = St::Subject;
         type CreatedAt = Set<members::created_at>;
+        type Subject = St::Subject;
+        type Ring = St::Ring;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subject = Set<members::subject>;
+        type Ring = St::Ring;
+    }
+    ///State transition - sets the `ring` field to Set
+    pub struct SetRing<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRing<St> {}
+    impl<St: State> State for SetRing<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subject = St::Subject;
+        type Ring = Set<members::ring>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ring` field
-        pub struct ring(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `ring` field
+        pub struct ring(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BlockBuilder<S: BosStr, St: block_state::State> {
+pub struct BlockBuilder<St: block_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<S>,
-        Option<RingRef<S>>,
-        Option<Did<S>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<RingRef<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
-impl<S: BosStr> Block<S> {
-    /// Create a new builder for this type.
-    pub fn new() -> BlockBuilder<S, block_state::Empty> {
+impl Block<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BlockBuilder<block_state::Empty, DefaultStr> {
         BlockBuilder::new()
     }
 }
 
-impl<S: BosStr> BlockBuilder<S, block_state::Empty> {
-    /// Create a new builder with all fields unset.
+impl<S: BosStr> Block<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BlockBuilder<block_state::Empty, S> {
+        BlockBuilder::builder()
+    }
+}
+
+impl BlockBuilder<block_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         BlockBuilder {
             _state: PhantomData,
@@ -229,7 +231,18 @@ impl<S: BosStr> BlockBuilder<S, block_state::Empty> {
     }
 }
 
-impl<S: BosStr, St> BlockBuilder<S, St>
+impl<S: BosStr> BlockBuilder<block_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BlockBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BlockBuilder<St, S>
 where
     St: block_state::State,
     St::CreatedAt: block_state::IsUnset,
@@ -238,7 +251,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BlockBuilder<S, block_state::SetCreatedAt<St>> {
+    ) -> BlockBuilder<block_state::SetCreatedAt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BlockBuilder {
             _state: PhantomData,
@@ -248,7 +261,7 @@ where
     }
 }
 
-impl<S: BosStr, St: block_state::State> BlockBuilder<S, St> {
+impl<St: block_state::State, S: BosStr> BlockBuilder<St, S> {
     /// Set the `reason` field (optional)
     pub fn reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -261,7 +274,7 @@ impl<S: BosStr, St: block_state::State> BlockBuilder<S, St> {
     }
 }
 
-impl<S: BosStr, St> BlockBuilder<S, St>
+impl<St, S: BosStr> BlockBuilder<St, S>
 where
     St: block_state::State,
     St::Ring: block_state::IsUnset,
@@ -270,7 +283,7 @@ where
     pub fn ring(
         mut self,
         value: impl Into<RingRef<S>>,
-    ) -> BlockBuilder<S, block_state::SetRing<St>> {
+    ) -> BlockBuilder<block_state::SetRing<St>, S> {
         self._fields.2 = Option::Some(value.into());
         BlockBuilder {
             _state: PhantomData,
@@ -280,7 +293,7 @@ where
     }
 }
 
-impl<S: BosStr, St> BlockBuilder<S, St>
+impl<St, S: BosStr> BlockBuilder<St, S>
 where
     St: block_state::State,
     St::Subject: block_state::IsUnset,
@@ -289,7 +302,7 @@ where
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> BlockBuilder<S, block_state::SetSubject<St>> {
+    ) -> BlockBuilder<block_state::SetSubject<St>, S> {
         self._fields.3 = Option::Some(value.into());
         BlockBuilder {
             _state: PhantomData,
@@ -299,12 +312,12 @@ where
     }
 }
 
-impl<S: BosStr, St> BlockBuilder<S, St>
+impl<St, S: BosStr> BlockBuilder<St, S>
 where
     St: block_state::State,
-    St::Ring: block_state::IsSet,
-    St::Subject: block_state::IsSet,
     St::CreatedAt: block_state::IsSet,
+    St::Subject: block_state::IsSet,
+    St::Ring: block_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Block<S> {
@@ -329,10 +342,10 @@ where
 }
 
 fn lexicon_doc_net_asadaame5121_at_circle_block() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.asadaame5121.at-circle.block"),
@@ -341,14 +354,17 @@ fn lexicon_doc_net_asadaame5121_at_circle_block() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("Block/Kick a member from the circle")),
+                    description: Some(
+                        CowStr::new_static("Block/Kick a member from the circle"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("ring"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("subject"), SmolStr::new_static("ring"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -362,7 +378,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_block() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("reason"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Reason for blocking")),
+                                    description: Some(
+                                        CowStr::new_static("Reason for blocking"),
+                                    ),
                                     max_length: Some(1000usize),
                                     max_graphemes: Some(100usize),
                                     ..Default::default()
@@ -380,9 +398,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_block() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("subject"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "DID of the member to block",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("DID of the member to block"),
+                                    ),
                                     format: Some(LexStringFormat::Did),
                                     max_length: Some(2000usize),
                                     ..Default::default()
