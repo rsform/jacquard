@@ -264,37 +264,37 @@ pub mod did_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Identifier;
         type Owner;
+        type Identifier;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Identifier = Unset;
         type Owner = Unset;
-    }
-    ///State transition - sets the `identifier` field to Set
-    pub struct SetIdentifier<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIdentifier<St> {}
-    impl<St: State> State for SetIdentifier<St> {
-        type Identifier = Set<members::identifier>;
-        type Owner = St::Owner;
+        type Identifier = Unset;
     }
     ///State transition - sets the `owner` field to Set
     pub struct SetOwner<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOwner<St> {}
     impl<St: State> State for SetOwner<St> {
-        type Identifier = St::Identifier;
         type Owner = Set<members::owner>;
+        type Identifier = St::Identifier;
+    }
+    ///State transition - sets the `identifier` field to Set
+    pub struct SetIdentifier<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIdentifier<St> {}
+    impl<St: State> State for SetIdentifier<St> {
+        type Owner = St::Owner;
+        type Identifier = Set<members::identifier>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `identifier` field
-        pub struct identifier(());
         ///Marker type for the `owner` field
         pub struct owner(());
+        ///Marker type for the `identifier` field
+        pub struct identifier(());
     }
 }
 
@@ -405,8 +405,8 @@ where
 impl<St, S: jacquard_common::BosStr> DidRecordBuilder<St, S>
 where
     St: did_record_state::State,
-    St::Identifier: did_record_state::IsSet,
     St::Owner: did_record_state::IsSet,
+    St::Identifier: did_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DidRecord<S> {

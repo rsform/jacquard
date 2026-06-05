@@ -321,37 +321,37 @@ pub mod collection_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Items;
         type Name;
+        type Items;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Items = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `items` field to Set
-    pub struct SetItems<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetItems<St> {}
-    impl<St: State> State for SetItems<St> {
-        type Items = Set<members::items>;
-        type Name = St::Name;
+        type Items = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Items = St::Items;
         type Name = Set<members::name>;
+        type Items = St::Items;
+    }
+    ///State transition - sets the `items` field to Set
+    pub struct SetItems<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItems<St> {}
+    impl<St: State> State for SetItems<St> {
+        type Name = St::Name;
+        type Items = Set<members::items>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `items` field
-        pub struct items(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `items` field
+        pub struct items(());
     }
 }
 
@@ -480,8 +480,8 @@ where
 impl<St, S: jacquard_common::BosStr> CollectionRecordBuilder<St, S>
 where
     St: collection_record_state::State,
-    St::Items: collection_record_state::IsSet,
     St::Name: collection_record_state::IsSet,
+    St::Items: collection_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CollectionRecord<S> {

@@ -16,3 +16,4 @@ crates/jacquard-lexicon/target
 rustdoc-host.nix
 **/**.car
 result
+crates/jacquard-codegen-tests/src/generated/
