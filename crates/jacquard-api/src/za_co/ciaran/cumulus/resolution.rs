@@ -137,51 +137,51 @@ pub mod resolution_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Answer;
         type CreatedAt;
         type Market;
-        type Answer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Answer = Unset;
         type CreatedAt = Unset;
         type Market = Unset;
-        type Answer = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Market = St::Market;
-        type Answer = St::Answer;
-    }
-    ///State transition - sets the `market` field to Set
-    pub struct SetMarket<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMarket<St> {}
-    impl<St: State> State for SetMarket<St> {
-        type CreatedAt = St::CreatedAt;
-        type Market = Set<members::market>;
-        type Answer = St::Answer;
     }
     ///State transition - sets the `answer` field to Set
     pub struct SetAnswer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAnswer<St> {}
     impl<St: State> State for SetAnswer<St> {
+        type Answer = Set<members::answer>;
         type CreatedAt = St::CreatedAt;
         type Market = St::Market;
-        type Answer = Set<members::answer>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Answer = St::Answer;
+        type CreatedAt = Set<members::created_at>;
+        type Market = St::Market;
+    }
+    ///State transition - sets the `market` field to Set
+    pub struct SetMarket<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMarket<St> {}
+    impl<St: State> State for SetMarket<St> {
+        type Answer = St::Answer;
+        type CreatedAt = St::CreatedAt;
+        type Market = Set<members::market>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `answer` field
+        pub struct answer(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `market` field
         pub struct market(());
-        ///Marker type for the `answer` field
-        pub struct answer(());
     }
 }
 
@@ -288,9 +288,9 @@ where
 impl<St, S: BosStr> ResolutionBuilder<St, S>
 where
     St: resolution_state::State,
+    St::Answer: resolution_state::IsSet,
     St::CreatedAt: resolution_state::IsSet,
     St::Market: resolution_state::IsSet,
-    St::Answer: resolution_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Resolution<S> {

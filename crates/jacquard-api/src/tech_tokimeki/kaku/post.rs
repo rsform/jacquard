@@ -205,51 +205,51 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Image;
         type AspectRatio;
         type CreatedAt;
+        type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Image = Unset;
         type AspectRatio = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetImage<St> {}
-    impl<St: State> State for SetImage<St> {
-        type Image = Set<members::image>;
-        type AspectRatio = St::AspectRatio;
-        type CreatedAt = St::CreatedAt;
+        type Image = Unset;
     }
     ///State transition - sets the `aspect_ratio` field to Set
     pub struct SetAspectRatio<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAspectRatio<St> {}
     impl<St: State> State for SetAspectRatio<St> {
-        type Image = St::Image;
         type AspectRatio = Set<members::aspect_ratio>;
         type CreatedAt = St::CreatedAt;
+        type Image = St::Image;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Image = St::Image;
         type AspectRatio = St::AspectRatio;
         type CreatedAt = Set<members::created_at>;
+        type Image = St::Image;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
+        type AspectRatio = St::AspectRatio;
+        type CreatedAt = St::CreatedAt;
+        type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image` field
-        pub struct image(());
         ///Marker type for the `aspect_ratio` field
         pub struct aspect_ratio(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `image` field
+        pub struct image(());
     }
 }
 
@@ -416,9 +416,9 @@ impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
 impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
-    St::Image: post_state::IsSet,
     St::AspectRatio: post_state::IsSet,
     St::CreatedAt: post_state::IsSet,
+    St::Image: post_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Post<S> {

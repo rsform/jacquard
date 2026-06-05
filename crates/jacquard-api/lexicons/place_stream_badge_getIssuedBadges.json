@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.badge.getIssuedBadges",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Returns badges issued to the authenticated user, organized by display slot. Also indicates which badges are currently selected in the user's chat profile.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "streamer": {
+            "type": "string",
+            "description": "DID of the streamer channel to compute the server badge against.",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "streamer",
+            "user"
+          ],
+          "properties": {
+            "server": {
+              "type": "ref",
+              "description": "Computed server badge (streamer, mod, or bot) for the given streamer context. Absent if the user has no server role.",
+              "ref": "place.stream.badge.defs#badgeView"
+            },
+            "streamer": {
+              "type": "ref",
+              "description": "Streamer-issued badges (e.g. VIP) available to the user.",
+              "ref": "place.stream.badge.defs#badgeSlot"
+            },
+            "user": {
+              "type": "ref",
+              "description": "Globally-issued cosmetic badges (e.g. event) available to the user.",
+              "ref": "place.stream.badge.defs#badgeSlot"
+            }
+          }
+        }
+      }
+    }
+  }
+}

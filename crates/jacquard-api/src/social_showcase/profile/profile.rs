@@ -344,67 +344,67 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
-        type Tags;
-        type Handle;
         type CreatedAt;
+        type Did;
+        type Handle;
+        type Tags;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
-        type Tags = Unset;
-        type Handle = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Tags = St::Tags;
-        type Handle = St::Handle;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTags<St> {}
-    impl<St: State> State for SetTags<St> {
-        type Did = St::Did;
-        type Tags = Set<members::tags>;
-        type Handle = St::Handle;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHandle<St> {}
-    impl<St: State> State for SetHandle<St> {
-        type Did = St::Did;
-        type Tags = St::Tags;
-        type Handle = Set<members::handle>;
-        type CreatedAt = St::CreatedAt;
+        type Did = Unset;
+        type Handle = Unset;
+        type Tags = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Did = St::Did;
-        type Tags = St::Tags;
-        type Handle = St::Handle;
         type CreatedAt = Set<members::created_at>;
+        type Did = St::Did;
+        type Handle = St::Handle;
+        type Tags = St::Tags;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type CreatedAt = St::CreatedAt;
+        type Did = Set<members::did>;
+        type Handle = St::Handle;
+        type Tags = St::Tags;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type CreatedAt = St::CreatedAt;
+        type Did = St::Did;
+        type Handle = Set<members::handle>;
+        type Tags = St::Tags;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTags<St> {}
+    impl<St: State> State for SetTags<St> {
+        type CreatedAt = St::CreatedAt;
+        type Did = St::Did;
+        type Handle = St::Handle;
+        type Tags = Set<members::tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
     }
 }
 
@@ -737,10 +737,10 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
-    St::Did: profile_state::IsSet,
-    St::Tags: profile_state::IsSet,
-    St::Handle: profile_state::IsSet,
     St::CreatedAt: profile_state::IsSet,
+    St::Did: profile_state::IsSet,
+    St::Handle: profile_state::IsSet,
+    St::Tags: profile_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Profile<S> {

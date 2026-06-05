@@ -608,37 +608,37 @@ pub mod sync_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SyncedAt;
         type MatchesCount;
+        type SyncedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SyncedAt = Unset;
         type MatchesCount = Unset;
-    }
-    ///State transition - sets the `synced_at` field to Set
-    pub struct SetSyncedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSyncedAt<St> {}
-    impl<St: State> State for SetSyncedAt<St> {
-        type SyncedAt = Set<members::synced_at>;
-        type MatchesCount = St::MatchesCount;
+        type SyncedAt = Unset;
     }
     ///State transition - sets the `matches_count` field to Set
     pub struct SetMatchesCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMatchesCount<St> {}
     impl<St: State> State for SetMatchesCount<St> {
-        type SyncedAt = St::SyncedAt;
         type MatchesCount = Set<members::matches_count>;
+        type SyncedAt = St::SyncedAt;
+    }
+    ///State transition - sets the `synced_at` field to Set
+    pub struct SetSyncedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSyncedAt<St> {}
+    impl<St: State> State for SetSyncedAt<St> {
+        type MatchesCount = St::MatchesCount;
+        type SyncedAt = Set<members::synced_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `synced_at` field
-        pub struct synced_at(());
         ///Marker type for the `matches_count` field
         pub struct matches_count(());
+        ///Marker type for the `synced_at` field
+        pub struct synced_at(());
     }
 }
 
@@ -726,8 +726,8 @@ where
 impl<St, S: BosStr> SyncStatusBuilder<St, S>
 where
     St: sync_status_state::State,
-    St::SyncedAt: sync_status_state::IsSet,
     St::MatchesCount: sync_status_state::IsSet,
+    St::SyncedAt: sync_status_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SyncStatus<S> {

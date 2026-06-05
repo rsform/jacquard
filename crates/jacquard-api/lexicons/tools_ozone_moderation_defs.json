@@ -266,6 +266,22 @@
         }
       }
     },
+    "convoView": {
+      "type": "object",
+      "required": [
+        "did",
+        "convoId"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        }
+      }
+    },
     "identityEvent": {
       "type": "object",
       "description": "Logs identity related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.",
@@ -546,6 +562,10 @@
           "type": "string",
           "description": "Additional comment about added/removed tags."
         },
+        "durationInHours": {
+          "type": "integer",
+          "description": "Indicates how long the tags being added should remain before automatically being removed. Only applies to tags being added."
+        },
         "remove": {
           "type": "array",
           "description": "Tags to be removed to the subject. Ignores a tag If it doesn't exist, won't be duplicated.",
@@ -688,7 +708,8 @@
           "refs": [
             "com.atproto.admin.defs#repoRef",
             "com.atproto.repo.strongRef",
-            "chat.bsky.convo.defs#messageRef"
+            "chat.bsky.convo.defs#messageRef",
+            "chat.bsky.convo.defs#convoRef"
           ]
         },
         "subjectBlobCids": {
@@ -764,7 +785,8 @@
             "#repoView",
             "#repoViewNotFound",
             "#recordView",
-            "#recordViewNotFound"
+            "#recordViewNotFound",
+            "#convoView"
           ]
         },
         "subjectBlobs": {
@@ -1468,7 +1490,8 @@
           "refs": [
             "com.atproto.admin.defs#repoRef",
             "com.atproto.repo.strongRef",
-            "chat.bsky.convo.defs#messageRef"
+            "chat.bsky.convo.defs#messageRef",
+            "chat.bsky.convo.defs#convoRef"
           ]
         },
         "subjectBlobCids": {

@@ -2,6 +2,104 @@
   "lexicon": 1,
   "id": "games.gamesgamesgamesgames.defs",
   "defs": {
+    "activityFeedItem": {
+      "type": "object",
+      "required": [
+        "type",
+        "createdAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "When the activity occurred.",
+          "format": "datetime"
+        },
+        "game": {
+          "type": "ref",
+          "description": "The game associated with this activity.",
+          "ref": "games.gamesgamesgamesgames.defs#gameView"
+        },
+        "list": {
+          "type": "ref",
+          "description": "List data, present when type is 'listCreate' or 'listAddGame'.",
+          "ref": "games.gamesgamesgamesgames.defs#activityListView"
+        },
+        "review": {
+          "type": "ref",
+          "description": "Review data, present when type is 'review'.",
+          "ref": "games.gamesgamesgamesgames.defs#activityReviewView"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of activity.",
+          "knownValues": [
+            "like",
+            "review",
+            "listCreate",
+            "listAddGame"
+          ]
+        }
+      }
+    },
+    "activityListView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "name",
+        "createdAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "name": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "activityReviewView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "rating",
+        "createdAt"
+      ],
+      "properties": {
+        "containsSpoilers": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "rating": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "text": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
     "actorCreditView": {
       "type": "object",
       "required": [
@@ -1167,6 +1265,24 @@
             "offline",
             "release"
           ]
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "description": "An inline attestation signature.",
+      "required": [
+        "key",
+        "signature"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "DID key reference (e.g., did:web:example.com#signing1)."
+        },
+        "signature": {
+          "type": "bytes",
+          "description": "The signature bytes."
         }
       }
     },

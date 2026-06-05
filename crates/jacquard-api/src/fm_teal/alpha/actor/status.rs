@@ -38,11 +38,11 @@ use crate::fm_teal::alpha::feed::PlayView;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Status<S: BosStr = DefaultStr> {
-    ///The unix timestamp of the expiry time of the item. If unavailable, default to 10 minutes past the start time.
+    ///The RFC 3339 formatted time of the expiry time of the item. If unavailable, default to 10 minutes past the start time.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expiry: Option<Datetime>,
     pub item: PlayView<S>,
-    ///The unix timestamp of when the item was recorded
+    ///The RFC 3339 formatted time of when the item was recorded
     pub time: Datetime,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -304,7 +304,7 @@ fn lexicon_doc_fm_teal_alpha_actor_status() -> LexiconDoc<'static> {
                                 LexObjectProperty::String(LexString {
                                     description: Some(
                                         CowStr::new_static(
-                                            "The unix timestamp of the expiry time of the item. If unavailable, default to 10 minutes past the start time.",
+                                            "The RFC 3339 formatted time of the expiry time of the item. If unavailable, default to 10 minutes past the start time.",
                                         ),
                                     ),
                                     format: Some(LexStringFormat::Datetime),
@@ -325,7 +325,7 @@ fn lexicon_doc_fm_teal_alpha_actor_status() -> LexiconDoc<'static> {
                                 LexObjectProperty::String(LexString {
                                     description: Some(
                                         CowStr::new_static(
-                                            "The unix timestamp of when the item was recorded",
+                                            "The RFC 3339 formatted time of when the item was recorded",
                                         ),
                                     ),
                                     format: Some(LexStringFormat::Datetime),

@@ -1,0 +1,116 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.listIssues",
+  "defs": {
+    "issueListItem": {
+      "type": "object",
+      "required": [
+        "uri",
+        "value",
+        "state",
+        "commentCount"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "commentCount": {
+          "type": "integer",
+          "description": "Count of sh.tangled.repo.issue.comment records targeting this issue.",
+          "minimum": 0
+        },
+        "state": {
+          "type": "string",
+          "description": "Latest derived state.",
+          "knownValues": [
+            "open",
+            "closed"
+          ]
+        },
+        "stateUpdatedAt": {
+          "type": "string",
+          "description": "TID-derived timestamp of the latest state record.",
+          "format": "datetime"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "value": {
+          "type": "unknown",
+          "description": "Embedded sh.tangled.repo.issue record"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "subject"
+        ],
+        "properties": {
+          "author": {
+            "type": "string",
+            "description": "Restrict to issues authored by this user DID.",
+            "format": "did"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "order": {
+            "type": "string",
+            "description": "Sort direction by createdAt.",
+            "default": "desc",
+            "knownValues": [
+              "asc",
+              "desc"
+            ]
+          },
+          "state": {
+            "type": "string",
+            "description": "Restrict to issues whose latest derived state matches.",
+            "knownValues": [
+              "open",
+              "closed"
+            ]
+          },
+          "subject": {
+            "type": "string",
+            "description": "Repo DID to list issues for",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#issueListItem"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

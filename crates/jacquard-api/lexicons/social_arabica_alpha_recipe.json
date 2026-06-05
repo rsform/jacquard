@@ -1,0 +1,88 @@
+{
+  "lexicon": 1,
+  "id": "social.arabica.alpha.recipe",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A reusable brewing recipe with parameters for repeatable coffee preparation",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "brewerRef": {
+            "type": "string",
+            "description": "AT-URI reference to a specific brewer record",
+            "format": "at-uri"
+          },
+          "brewerType": {
+            "type": "string",
+            "description": "Fallback brewer type when no specific brewer is referenced (e.g., 'Pour-Over', 'French Press')",
+            "maxLength": 100
+          },
+          "coffeeAmount": {
+            "type": "integer",
+            "description": "Amount of coffee in tenths of grams (e.g., 180 = 18.0g)",
+            "minimum": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the recipe was created",
+            "format": "datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "User-given name for the recipe (e.g., 'James Hoffmann V60')",
+            "maxLength": 200
+          },
+          "notes": {
+            "type": "string",
+            "description": "Free-text instructions, tips, or notes about the recipe",
+            "maxLength": 2000
+          },
+          "pours": {
+            "type": "array",
+            "description": "Array of pour information for multi-pour methods",
+            "items": {
+              "type": "ref",
+              "ref": "#pour"
+            }
+          },
+          "sourceRef": {
+            "type": "string",
+            "description": "AT-URI of the recipe this was forked/copied from",
+            "format": "at-uri"
+          },
+          "waterAmount": {
+            "type": "integer",
+            "description": "Amount of water in tenths of grams (e.g., 3000 = 300.0g)",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "pour": {
+      "type": "object",
+      "description": "Information about a single pour in a multi-pour brewing method",
+      "required": [
+        "waterAmount",
+        "timeSeconds"
+      ],
+      "properties": {
+        "timeSeconds": {
+          "type": "integer",
+          "description": "Time of this pour relative to brew start (seconds)",
+          "minimum": 0
+        },
+        "waterAmount": {
+          "type": "integer",
+          "description": "Amount of water in this pour (grams or ml)",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

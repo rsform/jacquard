@@ -38,7 +38,7 @@ pub struct Card<S: BosStr = DefaultStr> {
     ///Text of the card
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<S>,
-    ///URL of the card
+    ///URL of the link
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -168,7 +168,7 @@ fn lexicon_doc_blue_linkat_board() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("URL of the card")),
+                                description: Some(CowStr::new_static("URL of the link")),
                                 ..Default::default()
                             }),
                         );

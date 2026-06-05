@@ -215,125 +215,125 @@ pub mod datastream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Thing;
         type CreatedAt;
-        type ObservationType;
         type Name;
-        type Sensor;
+        type ObservationType;
         type ObservedProperty;
+        type Sensor;
+        type Thing;
         type UnitOfMeasurement;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Thing = Unset;
         type CreatedAt = Unset;
-        type ObservationType = Unset;
         type Name = Unset;
-        type Sensor = Unset;
+        type ObservationType = Unset;
         type ObservedProperty = Unset;
+        type Sensor = Unset;
+        type Thing = Unset;
         type UnitOfMeasurement = Unset;
-    }
-    ///State transition - sets the `thing` field to Set
-    pub struct SetThing<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetThing<St> {}
-    impl<St: State> State for SetThing<St> {
-        type Thing = Set<members::thing>;
-        type CreatedAt = St::CreatedAt;
-        type ObservationType = St::ObservationType;
-        type Name = St::Name;
-        type Sensor = St::Sensor;
-        type ObservedProperty = St::ObservedProperty;
-        type UnitOfMeasurement = St::UnitOfMeasurement;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Thing = St::Thing;
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
         type ObservationType = St::ObservationType;
-        type Name = St::Name;
-        type Sensor = St::Sensor;
         type ObservedProperty = St::ObservedProperty;
-        type UnitOfMeasurement = St::UnitOfMeasurement;
-    }
-    ///State transition - sets the `observation_type` field to Set
-    pub struct SetObservationType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetObservationType<St> {}
-    impl<St: State> State for SetObservationType<St> {
+        type Sensor = St::Sensor;
         type Thing = St::Thing;
-        type CreatedAt = St::CreatedAt;
-        type ObservationType = Set<members::observation_type>;
-        type Name = St::Name;
-        type Sensor = St::Sensor;
-        type ObservedProperty = St::ObservedProperty;
         type UnitOfMeasurement = St::UnitOfMeasurement;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Thing = St::Thing;
         type CreatedAt = St::CreatedAt;
-        type ObservationType = St::ObservationType;
         type Name = Set<members::name>;
-        type Sensor = St::Sensor;
+        type ObservationType = St::ObservationType;
         type ObservedProperty = St::ObservedProperty;
+        type Sensor = St::Sensor;
+        type Thing = St::Thing;
         type UnitOfMeasurement = St::UnitOfMeasurement;
     }
-    ///State transition - sets the `sensor` field to Set
-    pub struct SetSensor<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSensor<St> {}
-    impl<St: State> State for SetSensor<St> {
-        type Thing = St::Thing;
+    ///State transition - sets the `observation_type` field to Set
+    pub struct SetObservationType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetObservationType<St> {}
+    impl<St: State> State for SetObservationType<St> {
         type CreatedAt = St::CreatedAt;
-        type ObservationType = St::ObservationType;
         type Name = St::Name;
-        type Sensor = Set<members::sensor>;
+        type ObservationType = Set<members::observation_type>;
         type ObservedProperty = St::ObservedProperty;
+        type Sensor = St::Sensor;
+        type Thing = St::Thing;
         type UnitOfMeasurement = St::UnitOfMeasurement;
     }
     ///State transition - sets the `observed_property` field to Set
     pub struct SetObservedProperty<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetObservedProperty<St> {}
     impl<St: State> State for SetObservedProperty<St> {
-        type Thing = St::Thing;
         type CreatedAt = St::CreatedAt;
-        type ObservationType = St::ObservationType;
         type Name = St::Name;
-        type Sensor = St::Sensor;
+        type ObservationType = St::ObservationType;
         type ObservedProperty = Set<members::observed_property>;
+        type Sensor = St::Sensor;
+        type Thing = St::Thing;
+        type UnitOfMeasurement = St::UnitOfMeasurement;
+    }
+    ///State transition - sets the `sensor` field to Set
+    pub struct SetSensor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSensor<St> {}
+    impl<St: State> State for SetSensor<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type ObservationType = St::ObservationType;
+        type ObservedProperty = St::ObservedProperty;
+        type Sensor = Set<members::sensor>;
+        type Thing = St::Thing;
+        type UnitOfMeasurement = St::UnitOfMeasurement;
+    }
+    ///State transition - sets the `thing` field to Set
+    pub struct SetThing<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetThing<St> {}
+    impl<St: State> State for SetThing<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type ObservationType = St::ObservationType;
+        type ObservedProperty = St::ObservedProperty;
+        type Sensor = St::Sensor;
+        type Thing = Set<members::thing>;
         type UnitOfMeasurement = St::UnitOfMeasurement;
     }
     ///State transition - sets the `unit_of_measurement` field to Set
     pub struct SetUnitOfMeasurement<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUnitOfMeasurement<St> {}
     impl<St: State> State for SetUnitOfMeasurement<St> {
-        type Thing = St::Thing;
         type CreatedAt = St::CreatedAt;
-        type ObservationType = St::ObservationType;
         type Name = St::Name;
-        type Sensor = St::Sensor;
+        type ObservationType = St::ObservationType;
         type ObservedProperty = St::ObservedProperty;
+        type Sensor = St::Sensor;
+        type Thing = St::Thing;
         type UnitOfMeasurement = Set<members::unit_of_measurement>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `thing` field
-        pub struct thing(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `observation_type` field
-        pub struct observation_type(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `sensor` field
-        pub struct sensor(());
+        ///Marker type for the `observation_type` field
+        pub struct observation_type(());
         ///Marker type for the `observed_property` field
         pub struct observed_property(());
+        ///Marker type for the `sensor` field
+        pub struct sensor(());
+        ///Marker type for the `thing` field
+        pub struct thing(());
         ///Marker type for the `unit_of_measurement` field
         pub struct unit_of_measurement(());
     }
@@ -582,12 +582,12 @@ impl<St: datastream_state::State, S: BosStr> DatastreamBuilder<St, S> {
 impl<St, S: BosStr> DatastreamBuilder<St, S>
 where
     St: datastream_state::State,
-    St::Thing: datastream_state::IsSet,
     St::CreatedAt: datastream_state::IsSet,
-    St::ObservationType: datastream_state::IsSet,
     St::Name: datastream_state::IsSet,
-    St::Sensor: datastream_state::IsSet,
+    St::ObservationType: datastream_state::IsSet,
     St::ObservedProperty: datastream_state::IsSet,
+    St::Sensor: datastream_state::IsSet,
+    St::Thing: datastream_state::IsSet,
     St::UnitOfMeasurement: datastream_state::IsSet,
 {
     /// Build the final struct.

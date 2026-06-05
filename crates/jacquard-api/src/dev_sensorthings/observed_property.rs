@@ -137,51 +137,51 @@ pub mod observed_property_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Definition;
         type Name;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Definition = Unset;
         type Name = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `definition` field to Set
-    pub struct SetDefinition<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDefinition<St> {}
-    impl<St: State> State for SetDefinition<St> {
-        type Definition = Set<members::definition>;
-        type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Definition = St::Definition;
-        type Name = Set<members::name>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type Definition = St::Definition;
         type Name = St::Name;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `definition` field to Set
+    pub struct SetDefinition<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDefinition<St> {}
+    impl<St: State> State for SetDefinition<St> {
+        type CreatedAt = St::CreatedAt;
+        type Definition = Set<members::definition>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Definition = St::Definition;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `definition` field
         pub struct definition(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -304,9 +304,9 @@ where
 impl<St, S: BosStr> ObservedPropertyBuilder<St, S>
 where
     St: observed_property_state::State,
+    St::CreatedAt: observed_property_state::IsSet,
     St::Definition: observed_property_state::IsSet,
     St::Name: observed_property_state::IsSet,
-    St::CreatedAt: observed_property_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ObservedProperty<S> {

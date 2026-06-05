@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "app.chavatar.authExecuteRotation",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Permission to perform avatar rotation",
+      "detail": "Allows reading avatars and rotation settings, and writing their status.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": [
+            "app.chavatar.avatar",
+            "app.chavatar.settings"
+          ]
+        },
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": [
+            "app.chavatar.state"
+          ],
+          "action": [
+            "create",
+            "update"
+          ]
+        },
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": [
+            "app.chavatar.settings.executor"
+          ],
+          "action": [
+            "create",
+            "update"
+          ]
+        }
+      ]
+    }
+  }
+}

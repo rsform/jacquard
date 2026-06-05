@@ -43,6 +43,9 @@ pub struct Image<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
     pub aspect_ratio: image::AspectRatio<S>,
+    ///Whether the image should extend to the full width of the container, ignoring padding.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub full_bleed: Option<bool>,
     pub image: BlobRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -337,6 +340,12 @@ fn lexicon_doc_pub_leaflet_blocks_image() -> LexiconDoc<'static> {
                             }),
                         );
                         map.insert(
+                            SmolStr::new_static("fullBleed"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
                             SmolStr::new_static("image"),
                             LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
@@ -361,44 +370,49 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Image;
         type AspectRatio;
+        type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Image = Unset;
         type AspectRatio = Unset;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetImage<St> {}
-    impl<St: State> State for SetImage<St> {
-        type Image = Set<members::image>;
-        type AspectRatio = St::AspectRatio;
+        type Image = Unset;
     }
     ///State transition - sets the `aspect_ratio` field to Set
     pub struct SetAspectRatio<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAspectRatio<St> {}
     impl<St: State> State for SetAspectRatio<St> {
-        type Image = St::Image;
         type AspectRatio = Set<members::aspect_ratio>;
+        type Image = St::Image;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
+        type AspectRatio = St::AspectRatio;
+        type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image` field
-        pub struct image(());
         ///Marker type for the `aspect_ratio` field
         pub struct aspect_ratio(());
+        ///Marker type for the `image` field
+        pub struct image(());
     }
 }
 
 /// Builder for constructing an instance of this type.
 pub struct ImageBuilder<St: image_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<image::AspectRatio<S>>, Option<BlobRef<S>>),
+    _fields: (
+        Option<S>,
+        Option<image::AspectRatio<S>>,
+        Option<bool>,
+        Option<BlobRef<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -421,7 +435,7 @@ impl ImageBuilder<image_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ImageBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -432,7 +446,7 @@ impl<S: BosStr> ImageBuilder<image_state::Empty, S> {
     pub fn builder() -> Self {
         ImageBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -470,6 +484,19 @@ where
     }
 }
 
+impl<St: image_state::State, S: BosStr> ImageBuilder<St, S> {
+    /// Set the `fullBleed` field (optional)
+    pub fn full_bleed(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `fullBleed` field to an Option value (optional)
+    pub fn maybe_full_bleed(mut self, value: Option<bool>) -> Self {
+        self._fields.2 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
@@ -480,7 +507,7 @@ where
         mut self,
         value: impl Into<BlobRef<S>>,
     ) -> ImageBuilder<image_state::SetImage<St>, S> {
-        self._fields.2 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -492,15 +519,16 @@ where
 impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
-    St::Image: image_state::IsSet,
     St::AspectRatio: image_state::IsSet,
+    St::Image: image_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Image<S> {
         Image {
             alt: self._fields.0,
             aspect_ratio: self._fields.1.unwrap(),
-            image: self._fields.2.unwrap(),
+            full_bleed: self._fields.2,
+            image: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -509,7 +537,8 @@ where
         Image {
             alt: self._fields.0,
             aspect_ratio: self._fields.1.unwrap(),
-            image: self._fields.2.unwrap(),
+            full_bleed: self._fields.2,
+            image: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.authFullApp",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Full Anisota App Permissions",
+      "detail": "Manage posts, interactions, chronicles, expeditions, spells, harvests, player state, lists, and all other Anisota features.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": [
+            "net.anisota.feed.post",
+            "net.anisota.feed.like",
+            "net.anisota.feed.repost",
+            "net.anisota.feed.list",
+            "net.anisota.feed.listItem",
+            "net.anisota.feed.draft",
+            "net.anisota.chronicle.log",
+            "net.anisota.chronicle.log.daily",
+            "net.anisota.chronicle.log.weekly",
+            "net.anisota.chronicle.log.monthly",
+            "net.anisota.chronicle.log.yearly",
+            "net.anisota.chronicle.level",
+            "net.anisota.chronicle.collection",
+            "net.anisota.chronicle.inventory",
+            "net.anisota.chronicle.achievement",
+            "net.anisota.chronicle.expedition",
+            "net.anisota.chronicle.expedition.camp",
+            "net.anisota.chronicle.progress",
+            "net.anisota.harvest.minigame",
+            "net.anisota.player.state",
+            "net.anisota.spell.custom",
+            "net.anisota.spell.book",
+            "net.anisota.settings",
+            "net.anisota.graph.mute",
+            "net.anisota.graph.listMute",
+            "net.anisota.graph.list",
+            "net.anisota.observatory.element",
+            "net.anisota.observatory.layout"
+          ],
+          "action": [
+            "create",
+            "update",
+            "delete"
+          ]
+        }
+      ]
+    }
+  }
+}

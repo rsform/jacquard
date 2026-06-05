@@ -173,49 +173,49 @@ pub mod agents_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ShortDescription;
         type CreatedAt;
+        type ShortDescription;
         type Sim;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ShortDescription = Unset;
         type CreatedAt = Unset;
+        type ShortDescription = Unset;
         type Sim = Unset;
-    }
-    ///State transition - sets the `short_description` field to Set
-    pub struct SetShortDescription<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetShortDescription<St> {}
-    impl<St: State> State for SetShortDescription<St> {
-        type ShortDescription = Set<members::short_description>;
-        type CreatedAt = St::CreatedAt;
-        type Sim = St::Sim;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type ShortDescription = St::ShortDescription;
         type CreatedAt = Set<members::created_at>;
+        type ShortDescription = St::ShortDescription;
+        type Sim = St::Sim;
+    }
+    ///State transition - sets the `short_description` field to Set
+    pub struct SetShortDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShortDescription<St> {}
+    impl<St: State> State for SetShortDescription<St> {
+        type CreatedAt = St::CreatedAt;
+        type ShortDescription = Set<members::short_description>;
         type Sim = St::Sim;
     }
     ///State transition - sets the `sim` field to Set
     pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSim<St> {}
     impl<St: State> State for SetSim<St> {
-        type ShortDescription = St::ShortDescription;
         type CreatedAt = St::CreatedAt;
+        type ShortDescription = St::ShortDescription;
         type Sim = Set<members::sim>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `short_description` field
-        pub struct short_description(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `short_description` field
+        pub struct short_description(());
         ///Marker type for the `sim` field
         pub struct sim(());
     }
@@ -379,8 +379,8 @@ where
 impl<St, S: BosStr> AgentsBuilder<St, S>
 where
     St: agents_state::State,
-    St::ShortDescription: agents_state::IsSet,
     St::CreatedAt: agents_state::IsSet,
+    St::ShortDescription: agents_state::IsSet,
     St::Sim: agents_state::IsSet,
 {
     /// Build the final struct.

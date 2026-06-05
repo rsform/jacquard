@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "social.oolong.alpha.infuser",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A standalone infuser used inside a vessel to contain loose leaf during brewing (basket, ball, sock, etc.). Tea bags and loose-leaf-in-vessel are not infusers — they are infusion methods on the brew record.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "link": {
+            "type": "string",
+            "description": "Optional product, manual, or information URL for the infuser",
+            "format": "uri",
+            "maxLength": 500
+          },
+          "material": {
+            "type": "string",
+            "description": "Material (e.g., 'stainless steel', 'silicone', 'cotton', 'paper')",
+            "maxLength": 200
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the infuser (e.g., 'stainless basket', 'silicone tea ball', 'cotton sock')",
+            "maxLength": 200
+          },
+          "sourceRef": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "style": {
+            "type": "string",
+            "description": "Infuser form-factor. Known values: basket, ball, sock, other",
+            "maxLength": 50,
+            "knownValues": [
+              "basket",
+              "ball",
+              "sock",
+              "other"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

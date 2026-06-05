@@ -617,66 +617,66 @@ pub mod event_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
+        type CreatorDid;
         type Name;
         type WorldReference;
-        type CreatorDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
+        type CreatorDid = Unset;
         type Name = Unset;
         type WorldReference = Unset;
-        type CreatorDid = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type CreatorDid = St::CreatorDid;
         type Name = St::Name;
         type WorldReference = St::WorldReference;
-        type CreatorDid = St::CreatorDid;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type CreatedAt = St::CreatedAt;
-        type Name = Set<members::name>;
-        type WorldReference = St::WorldReference;
-        type CreatorDid = St::CreatorDid;
-    }
-    ///State transition - sets the `world_reference` field to Set
-    pub struct SetWorldReference<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWorldReference<St> {}
-    impl<St: State> State for SetWorldReference<St> {
-        type CreatedAt = St::CreatedAt;
-        type Name = St::Name;
-        type WorldReference = Set<members::world_reference>;
-        type CreatorDid = St::CreatorDid;
     }
     ///State transition - sets the `creator_did` field to Set
     pub struct SetCreatorDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatorDid<St> {}
     impl<St: State> State for SetCreatorDid<St> {
         type CreatedAt = St::CreatedAt;
+        type CreatorDid = Set<members::creator_did>;
         type Name = St::Name;
         type WorldReference = St::WorldReference;
-        type CreatorDid = Set<members::creator_did>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type CreatorDid = St::CreatorDid;
+        type Name = Set<members::name>;
+        type WorldReference = St::WorldReference;
+    }
+    ///State transition - sets the `world_reference` field to Set
+    pub struct SetWorldReference<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWorldReference<St> {}
+    impl<St: State> State for SetWorldReference<St> {
+        type CreatedAt = St::CreatedAt;
+        type CreatorDid = St::CreatorDid;
+        type Name = St::Name;
+        type WorldReference = Set<members::world_reference>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `creator_did` field
+        pub struct creator_did(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `world_reference` field
         pub struct world_reference(());
-        ///Marker type for the `creator_did` field
-        pub struct creator_did(());
     }
 }
 
@@ -978,9 +978,9 @@ impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
     St::CreatedAt: event_state::IsSet,
+    St::CreatorDid: event_state::IsSet,
     St::Name: event_state::IsSet,
     St::WorldReference: event_state::IsSet,
-    St::CreatorDid: event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Event<S> {

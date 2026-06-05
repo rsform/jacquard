@@ -1,0 +1,20 @@
+{
+  "lexicon": 1,
+  "id": "app.chavatar.authViewAvatar",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Avatar display.",
+      "detail": "Allows the display of avatars stored in the repository.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": [
+            "app.chavatar.avatar"
+          ]
+        }
+      ]
+    }
+  }
+}

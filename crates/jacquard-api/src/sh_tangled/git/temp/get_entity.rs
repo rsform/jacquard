@@ -12,7 +12,7 @@ use alloc::collections::BTreeMap;
 use core::marker::PhantomData;
 use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::AtUri;
+use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
@@ -26,7 +26,7 @@ pub struct GetEntity<S: BosStr = DefaultStr> {
     #[serde(default = "_default_ref")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#ref: Option<S>,
-    pub repo: AtUri<S>,
+    pub repo: Did<S>,
 }
 
 
@@ -177,7 +177,7 @@ pub mod get_entity_state {
 /// Builder for constructing an instance of this type.
 pub struct GetEntityBuilder<St: get_entity_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<AtUri<S>>),
+    _fields: (Option<S>, Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -257,7 +257,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<S>>,
+        value: impl Into<Did<S>>,
     ) -> GetEntityBuilder<get_entity_state::SetRepo<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GetEntityBuilder {

@@ -12,7 +12,7 @@ use alloc::collections::BTreeMap;
 use core::marker::PhantomData;
 use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::AtUri;
+use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
@@ -21,7 +21,7 @@ use crate::sh_tangled::git::temp::Branch;
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetHead<S: BosStr = DefaultStr> {
-    pub repo: AtUri<S>,
+    pub repo: Did<S>,
 }
 
 
@@ -146,7 +146,7 @@ pub mod get_head_state {
 /// Builder for constructing an instance of this type.
 pub struct GetHeadBuilder<St: get_head_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<AtUri<S>>,),
+    _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -194,7 +194,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<S>>,
+        value: impl Into<Did<S>>,
     ) -> GetHeadBuilder<get_head_state::SetRepo<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetHeadBuilder {

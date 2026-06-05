@@ -6,12 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod create_webhook;
+pub mod delete_storage;
 pub mod delete_webhook;
 pub mod get_server_time;
+pub mod get_storage;
 pub mod get_webhook;
 pub mod list_webhooks;
 pub mod settings;
 pub mod update_webhook;
+pub mod upsert_storage;
 
 
 #[allow(unused_imports)]
@@ -42,6 +45,19 @@ pub struct RewriteRule<S: BosStr = DefaultStr> {
     pub from: S,
     ///Text to replace with.
     pub to: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// S3 storage configuration for backups.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct Storage<S: BosStr = DefaultStr> {
+    ///Whether backup storage is currently active.
+    pub is_active: bool,
+    ///S3 storage URL with masked secret key in format: s3+https://ACCESS_KEY:***@endpoint/bucket
+    pub url: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -140,6 +156,21 @@ impl<S: BosStr> LexiconSchema for RewriteRule<S> {
     }
 }
 
+impl<S: BosStr> LexiconSchema for Storage<S> {
+    fn nsid() -> &'static str {
+        "place.stream.server.defs"
+    }
+    fn def_name() -> &'static str {
+        "storage"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_place_stream_server_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
 impl<S: BosStr> LexiconSchema for Webhook<S> {
     fn nsid() -> &'static str {
         "place.stream.server.defs"
@@ -232,6 +263,40 @@ fn lexicon_doc_place_stream_server_defs() -> LexiconDoc<'static> {
                                     CowStr::new_static("Text to replace with."),
                                 ),
                                 max_length: Some(100usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("storage"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static("S3 storage configuration for backups."),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("url"), SmolStr::new_static("isActive")],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("isActive"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "S3 storage URL with masked secret key in format: s3+https://ACCESS_KEY:***@endpoint/bucket",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -418,6 +483,155 @@ fn lexicon_doc_place_stream_server_defs() -> LexiconDoc<'static> {
     }
 }
 
+pub mod storage_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type IsActive;
+        type Url;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type IsActive = Unset;
+        type Url = Unset;
+    }
+    ///State transition - sets the `is_active` field to Set
+    pub struct SetIsActive<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIsActive<St> {}
+    impl<St: State> State for SetIsActive<St> {
+        type IsActive = Set<members::is_active>;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type IsActive = St::IsActive;
+        type Url = Set<members::url>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `is_active` field
+        pub struct is_active(());
+        ///Marker type for the `url` field
+        pub struct url(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct StorageBuilder<St: storage_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<bool>, Option<S>),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl Storage<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StorageBuilder<storage_state::Empty, DefaultStr> {
+        StorageBuilder::new()
+    }
+}
+
+impl<S: BosStr> Storage<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StorageBuilder<storage_state::Empty, S> {
+        StorageBuilder::builder()
+    }
+}
+
+impl StorageBuilder<storage_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        StorageBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> StorageBuilder<storage_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StorageBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StorageBuilder<St, S>
+where
+    St: storage_state::State,
+    St::IsActive: storage_state::IsUnset,
+{
+    /// Set the `isActive` field (required)
+    pub fn is_active(
+        mut self,
+        value: impl Into<bool>,
+    ) -> StorageBuilder<storage_state::SetIsActive<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        StorageBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StorageBuilder<St, S>
+where
+    St: storage_state::State,
+    St::Url: storage_state::IsUnset,
+{
+    /// Set the `url` field (required)
+    pub fn url(
+        mut self,
+        value: impl Into<S>,
+    ) -> StorageBuilder<storage_state::SetUrl<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        StorageBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StorageBuilder<St, S>
+where
+    St: storage_state::State,
+    St::IsActive: storage_state::IsSet,
+    St::Url: storage_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> Storage<S> {
+        Storage {
+            is_active: self._fields.0.unwrap(),
+            url: self._fields.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Storage<S> {
+        Storage {
+            is_active: self._fields.0.unwrap(),
+            url: self._fields.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
 pub mod webhook_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -428,9 +642,9 @@ pub mod webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Events;
         type Active;
         type CreatedAt;
+        type Events;
         type Id;
         type Url;
     }
@@ -438,29 +652,19 @@ pub mod webhook_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Events = Unset;
         type Active = Unset;
         type CreatedAt = Unset;
+        type Events = Unset;
         type Id = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `events` field to Set
-    pub struct SetEvents<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEvents<St> {}
-    impl<St: State> State for SetEvents<St> {
-        type Events = Set<members::events>;
-        type Active = St::Active;
-        type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
-        type Url = St::Url;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetActive<St> {}
     impl<St: State> State for SetActive<St> {
-        type Events = St::Events;
         type Active = Set<members::active>;
         type CreatedAt = St::CreatedAt;
+        type Events = St::Events;
         type Id = St::Id;
         type Url = St::Url;
     }
@@ -468,9 +672,19 @@ pub mod webhook_state {
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Events = St::Events;
         type Active = St::Active;
         type CreatedAt = Set<members::created_at>;
+        type Events = St::Events;
+        type Id = St::Id;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `events` field to Set
+    pub struct SetEvents<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEvents<St> {}
+    impl<St: State> State for SetEvents<St> {
+        type Active = St::Active;
+        type CreatedAt = St::CreatedAt;
+        type Events = Set<members::events>;
         type Id = St::Id;
         type Url = St::Url;
     }
@@ -478,9 +692,9 @@ pub mod webhook_state {
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type Events = St::Events;
         type Active = St::Active;
         type CreatedAt = St::CreatedAt;
+        type Events = St::Events;
         type Id = Set<members::id>;
         type Url = St::Url;
     }
@@ -488,21 +702,21 @@ pub mod webhook_state {
     pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUrl<St> {}
     impl<St: State> State for SetUrl<St> {
-        type Events = St::Events;
         type Active = St::Active;
         type CreatedAt = St::CreatedAt;
+        type Events = St::Events;
         type Id = St::Id;
         type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `events` field
-        pub struct events(());
         ///Marker type for the `active` field
         pub struct active(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `events` field
+        pub struct events(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `url` field
@@ -816,9 +1030,9 @@ where
 impl<St, S: BosStr> WebhookBuilder<St, S>
 where
     St: webhook_state::State,
-    St::Events: webhook_state::IsSet,
     St::Active: webhook_state::IsSet,
     St::CreatedAt: webhook_state::IsSet,
+    St::Events: webhook_state::IsSet,
     St::Id: webhook_state::IsSet,
     St::Url: webhook_state::IsSet,
 {

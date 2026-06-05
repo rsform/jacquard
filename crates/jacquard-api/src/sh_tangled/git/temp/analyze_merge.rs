@@ -15,7 +15,7 @@ use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::AtUri;
+use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -43,7 +43,7 @@ pub struct ConflictInfo<S: BosStr = DefaultStr> {
 pub struct AnalyzeMerge<S: BosStr = DefaultStr> {
     pub branch: S,
     pub patch: S,
-    pub repo: AtUri<S>,
+    pub repo: Did<S>,
 }
 
 
@@ -181,9 +181,9 @@ fn lexicon_doc_sh_tangled_git_temp_analyzeMerge() -> LexiconDoc<'static> {
                                     SmolStr::new_static("repo"),
                                     LexXrpcParametersProperty::String(LexString {
                                         description: Some(
-                                            CowStr::new_static("AT-URI of the repository"),
+                                            CowStr::new_static("DID of the repository"),
                                         ),
-                                        format: Some(LexStringFormat::AtUri),
+                                        format: Some(LexStringFormat::Did),
                                         ..Default::default()
                                     }),
                                 );
@@ -211,49 +211,49 @@ pub mod analyze_merge_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Patch;
         type Branch;
+        type Patch;
         type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Patch = Unset;
         type Branch = Unset;
+        type Patch = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `patch` field to Set
-    pub struct SetPatch<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPatch<St> {}
-    impl<St: State> State for SetPatch<St> {
-        type Patch = Set<members::patch>;
-        type Branch = St::Branch;
-        type Repo = St::Repo;
     }
     ///State transition - sets the `branch` field to Set
     pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBranch<St> {}
     impl<St: State> State for SetBranch<St> {
-        type Patch = St::Patch;
         type Branch = Set<members::branch>;
+        type Patch = St::Patch;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `patch` field to Set
+    pub struct SetPatch<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPatch<St> {}
+    impl<St: State> State for SetPatch<St> {
+        type Branch = St::Branch;
+        type Patch = Set<members::patch>;
         type Repo = St::Repo;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
-        type Patch = St::Patch;
         type Branch = St::Branch;
+        type Patch = St::Patch;
         type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `patch` field
-        pub struct patch(());
         ///Marker type for the `branch` field
         pub struct branch(());
+        ///Marker type for the `patch` field
+        pub struct patch(());
         ///Marker type for the `repo` field
         pub struct repo(());
     }
@@ -262,7 +262,7 @@ pub mod analyze_merge_state {
 /// Builder for constructing an instance of this type.
 pub struct AnalyzeMergeBuilder<St: analyze_merge_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<AtUri<S>>),
+    _fields: (Option<S>, Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -348,7 +348,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<S>>,
+        value: impl Into<Did<S>>,
     ) -> AnalyzeMergeBuilder<analyze_merge_state::SetRepo<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AnalyzeMergeBuilder {
@@ -362,8 +362,8 @@ where
 impl<St, S: BosStr> AnalyzeMergeBuilder<St, S>
 where
     St: analyze_merge_state::State,
-    St::Patch: analyze_merge_state::IsSet,
     St::Branch: analyze_merge_state::IsSet,
+    St::Patch: analyze_merge_state::IsSet,
     St::Repo: analyze_merge_state::IsSet,
 {
     /// Build the final struct.

@@ -70,37 +70,37 @@ pub mod card_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ScryfallUri;
         type OracleUri;
+        type ScryfallUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ScryfallUri = Unset;
         type OracleUri = Unset;
-    }
-    ///State transition - sets the `scryfall_uri` field to Set
-    pub struct SetScryfallUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScryfallUri<St> {}
-    impl<St: State> State for SetScryfallUri<St> {
-        type ScryfallUri = Set<members::scryfall_uri>;
-        type OracleUri = St::OracleUri;
+        type ScryfallUri = Unset;
     }
     ///State transition - sets the `oracle_uri` field to Set
     pub struct SetOracleUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOracleUri<St> {}
     impl<St: State> State for SetOracleUri<St> {
-        type ScryfallUri = St::ScryfallUri;
         type OracleUri = Set<members::oracle_uri>;
+        type ScryfallUri = St::ScryfallUri;
+    }
+    ///State transition - sets the `scryfall_uri` field to Set
+    pub struct SetScryfallUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScryfallUri<St> {}
+    impl<St: State> State for SetScryfallUri<St> {
+        type OracleUri = St::OracleUri;
+        type ScryfallUri = Set<members::scryfall_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scryfall_uri` field
-        pub struct scryfall_uri(());
         ///Marker type for the `oracle_uri` field
         pub struct oracle_uri(());
+        ///Marker type for the `scryfall_uri` field
+        pub struct scryfall_uri(());
     }
 }
 
@@ -188,8 +188,8 @@ where
 impl<St, S: BosStr> CardRefBuilder<St, S>
 where
     St: card_ref_state::State,
-    St::ScryfallUri: card_ref_state::IsSet,
     St::OracleUri: card_ref_state::IsSet,
+    St::ScryfallUri: card_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CardRef<S> {

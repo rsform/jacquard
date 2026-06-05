@@ -129,50 +129,50 @@ pub mod collection_item_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Collection;
-        type Post;
         type CreatedAt;
+        type Post;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Collection = Unset;
-        type Post = Unset;
         type CreatedAt = Unset;
+        type Post = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
         type Collection = Set<members::collection>;
+        type CreatedAt = St::CreatedAt;
         type Post = St::Post;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `post` field to Set
-    pub struct SetPost<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPost<St> {}
-    impl<St: State> State for SetPost<St> {
-        type Collection = St::Collection;
-        type Post = Set<members::post>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type Collection = St::Collection;
-        type Post = St::Post;
         type CreatedAt = Set<members::created_at>;
+        type Post = St::Post;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPost<St> {}
+    impl<St: State> State for SetPost<St> {
+        type Collection = St::Collection;
+        type CreatedAt = St::CreatedAt;
+        type Post = Set<members::post>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `collection` field
         pub struct collection(());
-        ///Marker type for the `post` field
-        pub struct post(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `post` field
+        pub struct post(());
     }
 }
 
@@ -296,8 +296,8 @@ impl<St, S: BosStr> CollectionItemBuilder<St, S>
 where
     St: collection_item_state::State,
     St::Collection: collection_item_state::IsSet,
-    St::Post: collection_item_state::IsSet,
     St::CreatedAt: collection_item_state::IsSet,
+    St::Post: collection_item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CollectionItem<S> {

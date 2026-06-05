@@ -35,17 +35,20 @@
         "properties": {
           "avatars": {
             "type": "array",
+            "description": "List of avatar items to rotate through.",
             "items": {
               "type": "ref",
               "ref": "#avatarItem"
             }
           },
           "enabled": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether avatar rotation feature is enabled."
           },
           "interval": {
             "type": "string",
-            "maxLength": 10,
+            "description": "The interval at which avatar rotation should occur.",
+            "maxLength": 6,
             "knownValues": [
               "1h",
               "3h",
@@ -58,6 +61,7 @@
           },
           "mode": {
             "type": "string",
+            "description": "The rotation mode to use for avatar selection.",
             "maxLength": 20,
             "knownValues": [
               "sequential",

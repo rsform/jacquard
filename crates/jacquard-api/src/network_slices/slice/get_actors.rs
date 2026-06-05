@@ -128,50 +128,50 @@ pub mod actor_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
-        type SliceUri;
         type IndexedAt;
+        type SliceUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
-        type SliceUri = Unset;
         type IndexedAt = Unset;
+        type SliceUri = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
+        type IndexedAt = St::IndexedAt;
         type SliceUri = St::SliceUri;
-        type IndexedAt = St::IndexedAt;
-    }
-    ///State transition - sets the `slice_uri` field to Set
-    pub struct SetSliceUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSliceUri<St> {}
-    impl<St: State> State for SetSliceUri<St> {
-        type Did = St::Did;
-        type SliceUri = Set<members::slice_uri>;
-        type IndexedAt = St::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
     impl<St: State> State for SetIndexedAt<St> {
         type Did = St::Did;
-        type SliceUri = St::SliceUri;
         type IndexedAt = Set<members::indexed_at>;
+        type SliceUri = St::SliceUri;
+    }
+    ///State transition - sets the `slice_uri` field to Set
+    pub struct SetSliceUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSliceUri<St> {}
+    impl<St: State> State for SetSliceUri<St> {
+        type Did = St::Did;
+        type IndexedAt = St::IndexedAt;
+        type SliceUri = Set<members::slice_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `slice_uri` field
-        pub struct slice_uri(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `slice_uri` field
+        pub struct slice_uri(());
     }
 }
 
@@ -292,8 +292,8 @@ impl<St, S: BosStr> ActorBuilder<St, S>
 where
     St: actor_state::State,
     St::Did: actor_state::IsSet,
-    St::SliceUri: actor_state::IsSet,
     St::IndexedAt: actor_state::IsSet,
+    St::SliceUri: actor_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Actor<S> {

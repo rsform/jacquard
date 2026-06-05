@@ -4,3 +4,8 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod follow;
+pub mod list_follows;
+pub mod list_follows_by;
+pub mod list_vouches;
+pub mod list_vouches_by;
+pub mod vouch;

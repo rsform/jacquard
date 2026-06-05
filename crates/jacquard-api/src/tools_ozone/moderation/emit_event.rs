@@ -11,10 +11,18 @@ use alloc::collections::BTreeMap;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Cid};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::admin::RepoRef;
 use crate::com_atproto::repo::strong_ref::StrongRef;
@@ -45,6 +53,7 @@ use crate::tools_ozone::moderation::ModTool;
 use crate::tools_ozone::moderation::RecordEvent;
 use crate::tools_ozone::moderation::RevokeAccountCredentialsEvent;
 use crate::tools_ozone::moderation::ScheduleTakedownEvent;
+use crate::tools_ozone::moderation::emit_event;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -56,6 +65,9 @@ pub struct EmitEvent<S: BosStr = DefaultStr> {
     pub external_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mod_tool: Option<ModTool<S>>,
+    ///Optional report-level targeting. If provided, this event will be linked to specific reports and reporters may be notified.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub report_action: Option<emit_event::ReportAction<S>>,
     pub subject: EmitEventSubject<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject_blob_cids: Option<Vec<Cid<S>>>,
@@ -193,6 +205,27 @@ impl core::fmt::Display for EmitEventError {
     }
 }
 
+/// Target specific reports when emitting a moderation event
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct ReportAction<S: BosStr = DefaultStr> {
+    ///Target ALL reports on the subject
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub all: Option<bool>,
+    ///Target specific report IDs
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ids: Option<Vec<i64>>,
+    ///Note to send to reporter(s) when actioning their report
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub note: Option<S>,
+    ///Target reports matching these report types on the subject (fully qualified NSIDs)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub types: Option<Vec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Response type for tools.ozone.moderation.emitEvent
 pub struct EmitEventResponse;
 impl jacquard_common::xrpc::XrpcResp for EmitEventResponse {
@@ -219,6 +252,21 @@ impl jacquard_common::xrpc::XrpcEndpoint for EmitEventRequest {
     );
     type Request<S: BosStr> = EmitEvent<S>;
     type Response = EmitEventResponse;
+}
+
+impl<S: BosStr> LexiconSchema for ReportAction<S> {
+    fn nsid() -> &'static str {
+        "tools.ozone.moderation.emitEvent"
+    }
+    fn def_name() -> &'static str {
+        "reportAction"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_moderation_emitEvent()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
 }
 
 pub mod emit_event_state {
@@ -287,6 +335,7 @@ pub struct EmitEventBuilder<St: emit_event_state::State, S: BosStr = DefaultStr>
         Option<EmitEventEvent<S>>,
         Option<S>,
         Option<ModTool<S>>,
+        Option<emit_event::ReportAction<S>>,
         Option<EmitEventSubject<S>>,
         Option<Vec<Cid<S>>>,
     ),
@@ -312,7 +361,7 @@ impl EmitEventBuilder<emit_event_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         EmitEventBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -323,7 +372,7 @@ impl<S: BosStr> EmitEventBuilder<emit_event_state::Empty, S> {
     pub fn builder() -> Self {
         EmitEventBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -393,6 +442,25 @@ impl<St: emit_event_state::State, S: BosStr> EmitEventBuilder<St, S> {
     }
 }
 
+impl<St: emit_event_state::State, S: BosStr> EmitEventBuilder<St, S> {
+    /// Set the `reportAction` field (optional)
+    pub fn report_action(
+        mut self,
+        value: impl Into<Option<emit_event::ReportAction<S>>>,
+    ) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `reportAction` field to an Option value (optional)
+    pub fn maybe_report_action(
+        mut self,
+        value: Option<emit_event::ReportAction<S>>,
+    ) -> Self {
+        self._fields.4 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> EmitEventBuilder<St, S>
 where
     St: emit_event_state::State,
@@ -403,7 +471,7 @@ where
         mut self,
         value: impl Into<EmitEventSubject<S>>,
     ) -> EmitEventBuilder<emit_event_state::SetSubject<St>, S> {
-        self._fields.4 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         EmitEventBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -415,12 +483,12 @@ where
 impl<St: emit_event_state::State, S: BosStr> EmitEventBuilder<St, S> {
     /// Set the `subjectBlobCids` field (optional)
     pub fn subject_blob_cids(mut self, value: impl Into<Option<Vec<Cid<S>>>>) -> Self {
-        self._fields.5 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `subjectBlobCids` field to an Option value (optional)
     pub fn maybe_subject_blob_cids(mut self, value: Option<Vec<Cid<S>>>) -> Self {
-        self._fields.5 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -439,8 +507,9 @@ where
             event: self._fields.1.unwrap(),
             external_id: self._fields.2,
             mod_tool: self._fields.3,
-            subject: self._fields.4.unwrap(),
-            subject_blob_cids: self._fields.5,
+            report_action: self._fields.4,
+            subject: self._fields.5.unwrap(),
+            subject_blob_cids: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -454,9 +523,199 @@ where
             event: self._fields.1.unwrap(),
             external_id: self._fields.2,
             mod_tool: self._fields.3,
-            subject: self._fields.4.unwrap(),
-            subject_blob_cids: self._fields.5,
+            report_action: self._fields.4,
+            subject: self._fields.5.unwrap(),
+            subject_blob_cids: self._fields.6,
             extra_data: Some(extra_data),
         }
+    }
+}
+
+fn lexicon_doc_tools_ozone_moderation_emitEvent() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("tools.ozone.moderation.emitEvent"),
+        defs: {
+            let mut map = BTreeMap::new();
+            map.insert(
+                SmolStr::new_static("main"),
+                LexUserType::XrpcProcedure(LexXrpcProcedure {
+                    input: Some(LexXrpcBody {
+                        encoding: CowStr::new_static("application/json"),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(
+                                    vec![
+                                        SmolStr::new_static("event"),
+                                        SmolStr::new_static("subject"),
+                                        SmolStr::new_static("createdBy")
+                                    ],
+                                ),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("createdBy"),
+                                        LexObjectProperty::String(LexString {
+                                            format: Some(LexStringFormat::Did),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("event"),
+                                        LexObjectProperty::Union(LexRefUnion {
+                                            refs: vec![
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventTakedown"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventAcknowledge"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventEscalate"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventComment"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventLabel"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventReport"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventMute"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventUnmute"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventMuteReporter"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventUnmuteReporter"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventReverseTakedown"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventResolveAppeal"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventEmail"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventDivert"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventTag"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#accountEvent"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#identityEvent"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#recordEvent"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#modEventPriorityScore"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#ageAssuranceEvent"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#ageAssuranceOverrideEvent"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#ageAssurancePurgeEvent"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#revokeAccountCredentialsEvent"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#scheduleTakedownEvent"),
+                                                CowStr::new_static("tools.ozone.moderation.defs#cancelScheduledTakedownEvent")
+                                            ],
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("externalId"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static(
+                                                    "An optional external ID for the event, used to deduplicate events from external systems. Fails when an event of same type with the same external ID exists for the same subject.",
+                                                ),
+                                            ),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("modTool"),
+                                        LexObjectProperty::Ref(LexRef {
+                                            r#ref: CowStr::new_static(
+                                                "tools.ozone.moderation.defs#modTool",
+                                            ),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("reportAction"),
+                                        LexObjectProperty::Ref(LexRef {
+                                            r#ref: CowStr::new_static("#reportAction"),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("subject"),
+                                        LexObjectProperty::Union(LexRefUnion {
+                                            refs: vec![
+                                                CowStr::new_static("com.atproto.admin.defs#repoRef"),
+                                                CowStr::new_static("com.atproto.repo.strongRef")
+                                            ],
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("subjectBlobCids"),
+                                        LexObjectProperty::Array(LexArray {
+                                            items: LexArrayItem::String(LexString {
+                                                format: Some(LexStringFormat::Cid),
+                                                ..Default::default()
+                                            }),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
+                        ..Default::default()
+                    }),
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("reportAction"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Target specific reports when emitting a moderation event",
+                        ),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("all"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("ids"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static("Target specific report IDs"),
+                                ),
+                                items: LexArrayItem::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("note"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Note to send to reporter(s) when actioning their report",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("types"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Target reports matching these report types on the subject (fully qualified NSIDs)",
+                                    ),
+                                ),
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
+                                }),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map
+        },
+        ..Default::default()
     }
 }

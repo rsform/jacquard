@@ -35,6 +35,9 @@ use crate::pub_leaflet::blocks::math::Math;
 use crate::pub_leaflet::blocks::ordered_list::OrderedList;
 use crate::pub_leaflet::blocks::page::Page;
 use crate::pub_leaflet::blocks::poll::Poll;
+use crate::pub_leaflet::blocks::posts_list::PostsList;
+use crate::pub_leaflet::blocks::signup::Signup;
+use crate::pub_leaflet::blocks::standard_site_post::StandardSitePost;
 use crate::pub_leaflet::blocks::text::Text;
 use crate::pub_leaflet::blocks::unordered_list::UnorderedList;
 use crate::pub_leaflet::blocks::website::Website;
@@ -165,12 +168,18 @@ pub enum BlockBlock<S: BosStr = DefaultStr> {
     HorizontalRule(Box<HorizontalRule<S>>),
     #[serde(rename = "pub.leaflet.blocks.bskyPost")]
     BskyPost(Box<BskyPost<S>>),
+    #[serde(rename = "pub.leaflet.blocks.standardSitePost")]
+    StandardSitePost(Box<StandardSitePost<S>>),
     #[serde(rename = "pub.leaflet.blocks.page")]
     Page(Box<Page<S>>),
     #[serde(rename = "pub.leaflet.blocks.poll")]
     Poll(Box<Poll<S>>),
     #[serde(rename = "pub.leaflet.blocks.button")]
     Button(Box<Button<S>>),
+    #[serde(rename = "pub.leaflet.blocks.postsList")]
+    PostsList(Box<PostsList<S>>),
+    #[serde(rename = "pub.leaflet.blocks.signup")]
+    Signup(Box<Signup<S>>),
 }
 
 
@@ -467,9 +476,12 @@ fn lexicon_doc_pub_leaflet_pages_linearDocument() -> LexiconDoc<'static> {
                                     CowStr::new_static("pub.leaflet.blocks.code"),
                                     CowStr::new_static("pub.leaflet.blocks.horizontalRule"),
                                     CowStr::new_static("pub.leaflet.blocks.bskyPost"),
+                                    CowStr::new_static("pub.leaflet.blocks.standardSitePost"),
                                     CowStr::new_static("pub.leaflet.blocks.page"),
                                     CowStr::new_static("pub.leaflet.blocks.poll"),
-                                    CowStr::new_static("pub.leaflet.blocks.button")
+                                    CowStr::new_static("pub.leaflet.blocks.button"),
+                                    CowStr::new_static("pub.leaflet.blocks.postsList"),
+                                    CowStr::new_static("pub.leaflet.blocks.signup")
                                 ],
                                 ..Default::default()
                             }),
@@ -730,37 +742,37 @@ pub mod position_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Offset;
         type Block;
+        type Offset;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Offset = Unset;
         type Block = Unset;
-    }
-    ///State transition - sets the `offset` field to Set
-    pub struct SetOffset<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOffset<St> {}
-    impl<St: State> State for SetOffset<St> {
-        type Offset = Set<members::offset>;
-        type Block = St::Block;
+        type Offset = Unset;
     }
     ///State transition - sets the `block` field to Set
     pub struct SetBlock<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlock<St> {}
     impl<St: State> State for SetBlock<St> {
-        type Offset = St::Offset;
         type Block = Set<members::block>;
+        type Offset = St::Offset;
+    }
+    ///State transition - sets the `offset` field to Set
+    pub struct SetOffset<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOffset<St> {}
+    impl<St: State> State for SetOffset<St> {
+        type Block = St::Block;
+        type Offset = Set<members::offset>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `offset` field
-        pub struct offset(());
         ///Marker type for the `block` field
         pub struct block(());
+        ///Marker type for the `offset` field
+        pub struct offset(());
     }
 }
 
@@ -848,8 +860,8 @@ where
 impl<St, S: BosStr> PositionBuilder<St, S>
 where
     St: position_state::State,
-    St::Offset: position_state::IsSet,
     St::Block: position_state::IsSet,
+    St::Offset: position_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Position<S> {
@@ -879,37 +891,37 @@ pub mod quote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Start;
         type End;
+        type Start;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Start = Unset;
         type End = Unset;
-    }
-    ///State transition - sets the `start` field to Set
-    pub struct SetStart<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStart<St> {}
-    impl<St: State> State for SetStart<St> {
-        type Start = Set<members::start>;
-        type End = St::End;
+        type Start = Unset;
     }
     ///State transition - sets the `end` field to Set
     pub struct SetEnd<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEnd<St> {}
     impl<St: State> State for SetEnd<St> {
-        type Start = St::Start;
         type End = Set<members::end>;
+        type Start = St::Start;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStart<St> {}
+    impl<St: State> State for SetStart<St> {
+        type End = St::End;
+        type Start = Set<members::start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start` field
-        pub struct start(());
         ///Marker type for the `end` field
         pub struct end(());
+        ///Marker type for the `start` field
+        pub struct start(());
     }
 }
 
@@ -1000,8 +1012,8 @@ where
 impl<St, S: BosStr> QuoteBuilder<St, S>
 where
     St: quote_state::State,
-    St::Start: quote_state::IsSet,
     St::End: quote_state::IsSet,
+    St::Start: quote_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Quote<S> {

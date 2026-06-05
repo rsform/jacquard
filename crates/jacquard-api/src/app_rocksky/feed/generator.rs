@@ -204,51 +204,51 @@ pub mod generator_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DisplayName;
         type CreatedAt;
         type Did;
+        type DisplayName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DisplayName = Unset;
         type CreatedAt = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
-    impl<St: State> State for SetDisplayName<St> {
-        type DisplayName = Set<members::display_name>;
-        type CreatedAt = St::CreatedAt;
-        type Did = St::Did;
+        type DisplayName = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type DisplayName = St::DisplayName;
         type CreatedAt = Set<members::created_at>;
         type Did = St::Did;
+        type DisplayName = St::DisplayName;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type DisplayName = St::DisplayName;
         type CreatedAt = St::CreatedAt;
         type Did = Set<members::did>;
+        type DisplayName = St::DisplayName;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
+    impl<St: State> State for SetDisplayName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Did = St::Did;
+        type DisplayName = Set<members::display_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
     }
 }
 
@@ -387,9 +387,9 @@ where
 impl<St, S: BosStr> GeneratorBuilder<St, S>
 where
     St: generator_state::State,
-    St::DisplayName: generator_state::IsSet,
     St::CreatedAt: generator_state::IsSet,
     St::Did: generator_state::IsSet,
+    St::DisplayName: generator_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Generator<S> {

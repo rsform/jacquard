@@ -16,7 +16,7 @@ use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,6 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
+use crate::sh_tangled::feed::star;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -37,9 +38,19 @@ use serde::{Serialize, Deserialize};
 )]
 pub struct Star<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
-    pub subject: AtUri<S>,
+    pub subject: StarSubject<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub enum StarSubject<S: BosStr = DefaultStr> {
+    #[serde(rename = "sh.tangled.feed.star#repo")]
+    Repo(Box<star::Repo<S>>),
+    #[serde(rename = "sh.tangled.feed.star#string")]
+    String(Box<star::StarString<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -51,6 +62,24 @@ pub struct StarGetRecordOutput<S: BosStr = DefaultStr> {
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Star<S>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct Repo<S: BosStr = DefaultStr> {
+    pub did: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct StarString<S: BosStr = DefaultStr> {
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 impl<S: BosStr> Star<S> {
@@ -92,6 +121,36 @@ impl<S: BosStr> LexiconSchema for Star<S> {
     }
     fn def_name() -> &'static str {
         "main"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_feed_star()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for Repo<S> {
+    fn nsid() -> &'static str {
+        "sh.tangled.feed.star"
+    }
+    fn def_name() -> &'static str {
+        "repo"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_feed_star()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for StarString<S> {
+    fn nsid() -> &'static str {
+        "sh.tangled.feed.star"
+    }
+    fn def_name() -> &'static str {
+        "string"
     }
     fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_feed_star()
@@ -148,7 +207,7 @@ pub mod star_state {
 /// Builder for constructing an instance of this type.
 pub struct StarBuilder<St: star_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<AtUri<S>>),
+    _fields: (Option<Datetime>, Option<StarSubject<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -215,7 +274,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<AtUri<S>>,
+        value: impl Into<StarSubject<S>>,
     ) -> StarBuilder<star_state::SetSubject<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StarBuilder {
@@ -283,8 +342,11 @@ fn lexicon_doc_sh_tangled_feed_star() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("subject"),
-                                LexObjectProperty::String(LexString {
-                                    format: Some(LexStringFormat::AtUri),
+                                LexObjectProperty::Union(LexRefUnion {
+                                    refs: vec![
+                                        CowStr::new_static("#repo"), CowStr::new_static("#string")
+                                    ],
+                                    closed: Some(true),
                                     ..Default::default()
                                 }),
                             );
@@ -295,8 +357,279 @@ fn lexicon_doc_sh_tangled_feed_star() -> LexiconDoc<'static> {
                     ..Default::default()
                 }),
             );
+            map.insert(
+                SmolStr::new_static("repo"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("did")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("did"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("string"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("uri")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
             map
         },
         ..Default::default()
+    }
+}
+
+pub mod repo_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Did = Set<members::did>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct RepoBuilder<St: repo_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<Did<S>>,),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl Repo<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RepoBuilder<repo_state::Empty, DefaultStr> {
+        RepoBuilder::new()
+    }
+}
+
+impl<S: BosStr> Repo<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RepoBuilder<repo_state::Empty, S> {
+        RepoBuilder::builder()
+    }
+}
+
+impl RepoBuilder<repo_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        RepoBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> RepoBuilder<repo_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RepoBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RepoBuilder<St, S>
+where
+    St: repo_state::State,
+    St::Did: repo_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> RepoBuilder<repo_state::SetDid<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        RepoBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RepoBuilder<St, S>
+where
+    St: repo_state::State,
+    St::Did: repo_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> Repo<S> {
+        Repo {
+            did: self._fields.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Repo<S> {
+        Repo {
+            did: self._fields.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+pub mod star_string_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct StarStringBuilder<St: star_string_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<AtUri<S>>,),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl StarString<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> StarStringBuilder<star_string_state::Empty, DefaultStr> {
+        StarStringBuilder::new()
+    }
+}
+
+impl<S: BosStr> StarString<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> StarStringBuilder<star_string_state::Empty, S> {
+        StarStringBuilder::builder()
+    }
+}
+
+impl StarStringBuilder<star_string_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        StarStringBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> StarStringBuilder<star_string_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        StarStringBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StarStringBuilder<St, S>
+where
+    St: star_string_state::State,
+    St::Uri: star_string_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> StarStringBuilder<star_string_state::SetUri<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        StarStringBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StarStringBuilder<St, S>
+where
+    St: star_string_state::State,
+    St::Uri: star_string_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> StarString<S> {
+        StarString {
+            uri: self._fields.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StarString<S> {
+        StarString {
+            uri: self._fields.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
     }
 }

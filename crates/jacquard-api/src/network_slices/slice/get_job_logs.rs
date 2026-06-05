@@ -124,85 +124,85 @@ pub mod log_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
         type CreatedAt;
-        type LogType;
-        type Level;
         type Id;
+        type Level;
+        type LogType;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
         type CreatedAt = Unset;
-        type LogType = Unset;
-        type Level = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMessage<St> {}
-    impl<St: State> State for SetMessage<St> {
-        type Message = Set<members::message>;
-        type CreatedAt = St::CreatedAt;
-        type LogType = St::LogType;
-        type Level = St::Level;
-        type Id = St::Id;
+        type Level = Unset;
+        type LogType = Unset;
+        type Message = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Message = St::Message;
         type CreatedAt = Set<members::created_at>;
-        type LogType = St::LogType;
+        type Id = St::Id;
         type Level = St::Level;
-        type Id = St::Id;
-    }
-    ///State transition - sets the `log_type` field to Set
-    pub struct SetLogType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLogType<St> {}
-    impl<St: State> State for SetLogType<St> {
-        type Message = St::Message;
-        type CreatedAt = St::CreatedAt;
-        type LogType = Set<members::log_type>;
-        type Level = St::Level;
-        type Id = St::Id;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLevel<St> {}
-    impl<St: State> State for SetLevel<St> {
-        type Message = St::Message;
-        type CreatedAt = St::CreatedAt;
         type LogType = St::LogType;
-        type Level = Set<members::level>;
-        type Id = St::Id;
+        type Message = St::Message;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type Message = St::Message;
         type CreatedAt = St::CreatedAt;
-        type LogType = St::LogType;
-        type Level = St::Level;
         type Id = Set<members::id>;
+        type Level = St::Level;
+        type LogType = St::LogType;
+        type Message = St::Message;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
+        type CreatedAt = St::CreatedAt;
+        type Id = St::Id;
+        type Level = Set<members::level>;
+        type LogType = St::LogType;
+        type Message = St::Message;
+    }
+    ///State transition - sets the `log_type` field to Set
+    pub struct SetLogType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLogType<St> {}
+    impl<St: State> State for SetLogType<St> {
+        type CreatedAt = St::CreatedAt;
+        type Id = St::Id;
+        type Level = St::Level;
+        type LogType = Set<members::log_type>;
+        type Message = St::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
+        type CreatedAt = St::CreatedAt;
+        type Id = St::Id;
+        type Level = St::Level;
+        type LogType = St::LogType;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `log_type` field
-        pub struct log_type(());
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `level` field
+        pub struct level(());
+        ///Marker type for the `log_type` field
+        pub struct log_type(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
@@ -409,11 +409,11 @@ impl<St: log_entry_state::State, S: BosStr> LogEntryBuilder<St, S> {
 impl<St, S: BosStr> LogEntryBuilder<St, S>
 where
     St: log_entry_state::State,
-    St::Message: log_entry_state::IsSet,
     St::CreatedAt: log_entry_state::IsSet,
-    St::LogType: log_entry_state::IsSet,
-    St::Level: log_entry_state::IsSet,
     St::Id: log_entry_state::IsSet,
+    St::Level: log_entry_state::IsSet,
+    St::LogType: log_entry_state::IsSet,
+    St::Message: log_entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LogEntry<S> {

@@ -163,67 +163,67 @@ pub mod enrollment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Service;
-        type SigningKey;
         type Attestation;
         type CreatedAt;
+        type Service;
+        type SigningKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Service = Unset;
-        type SigningKey = Unset;
         type Attestation = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `service` field to Set
-    pub struct SetService<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetService<St> {}
-    impl<St: State> State for SetService<St> {
-        type Service = Set<members::service>;
-        type SigningKey = St::SigningKey;
-        type Attestation = St::Attestation;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `signing_key` field to Set
-    pub struct SetSigningKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSigningKey<St> {}
-    impl<St: State> State for SetSigningKey<St> {
-        type Service = St::Service;
-        type SigningKey = Set<members::signing_key>;
-        type Attestation = St::Attestation;
-        type CreatedAt = St::CreatedAt;
+        type Service = Unset;
+        type SigningKey = Unset;
     }
     ///State transition - sets the `attestation` field to Set
     pub struct SetAttestation<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAttestation<St> {}
     impl<St: State> State for SetAttestation<St> {
-        type Service = St::Service;
-        type SigningKey = St::SigningKey;
         type Attestation = Set<members::attestation>;
         type CreatedAt = St::CreatedAt;
+        type Service = St::Service;
+        type SigningKey = St::SigningKey;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Service = St::Service;
-        type SigningKey = St::SigningKey;
         type Attestation = St::Attestation;
         type CreatedAt = Set<members::created_at>;
+        type Service = St::Service;
+        type SigningKey = St::SigningKey;
+    }
+    ///State transition - sets the `service` field to Set
+    pub struct SetService<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetService<St> {}
+    impl<St: State> State for SetService<St> {
+        type Attestation = St::Attestation;
+        type CreatedAt = St::CreatedAt;
+        type Service = Set<members::service>;
+        type SigningKey = St::SigningKey;
+    }
+    ///State transition - sets the `signing_key` field to Set
+    pub struct SetSigningKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSigningKey<St> {}
+    impl<St: State> State for SetSigningKey<St> {
+        type Attestation = St::Attestation;
+        type CreatedAt = St::CreatedAt;
+        type Service = St::Service;
+        type SigningKey = Set<members::signing_key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `service` field
-        pub struct service(());
-        ///Marker type for the `signing_key` field
-        pub struct signing_key(());
         ///Marker type for the `attestation` field
         pub struct attestation(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `service` field
+        pub struct service(());
+        ///Marker type for the `signing_key` field
+        pub struct signing_key(());
     }
 }
 
@@ -368,10 +368,10 @@ where
 impl<St, S: BosStr> EnrollmentBuilder<St, S>
 where
     St: enrollment_state::State,
-    St::Service: enrollment_state::IsSet,
-    St::SigningKey: enrollment_state::IsSet,
     St::Attestation: enrollment_state::IsSet,
     St::CreatedAt: enrollment_state::IsSet,
+    St::Service: enrollment_state::IsSet,
+    St::SigningKey: enrollment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Enrollment<S> {

@@ -3115,50 +3115,50 @@ pub mod settings_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Version;
         type UpdatedAt;
+        type Version;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Version = Unset;
         type UpdatedAt = Unset;
+        type Version = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type UpdatedAt = St::UpdatedAt;
         type Version = St::Version;
-        type UpdatedAt = St::UpdatedAt;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVersion<St> {}
-    impl<St: State> State for SetVersion<St> {
-        type CreatedAt = St::CreatedAt;
-        type Version = Set<members::version>;
-        type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
     impl<St: State> State for SetUpdatedAt<St> {
         type CreatedAt = St::CreatedAt;
-        type Version = St::Version;
         type UpdatedAt = Set<members::updated_at>;
+        type Version = St::Version;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVersion<St> {}
+    impl<St: State> State for SetVersion<St> {
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type Version = Set<members::version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `version` field
-        pub struct version(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `version` field
+        pub struct version(());
     }
 }
 
@@ -3355,8 +3355,8 @@ impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
     St::CreatedAt: settings_state::IsSet,
-    St::Version: settings_state::IsSet,
     St::UpdatedAt: settings_state::IsSet,
+    St::Version: settings_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Settings<S> {

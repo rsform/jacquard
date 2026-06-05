@@ -10,8 +10,7 @@
         "schema": {
           "type": "object",
           "required": [
-            "uri",
-            "name"
+            "uri"
           ],
           "properties": {
             "ageRatings": {
@@ -107,6 +106,9 @@
             },
             "shouldPublish": {
               "type": "boolean"
+            },
+            "slug": {
+              "type": "string"
             },
             "storyline": {
               "type": "string"

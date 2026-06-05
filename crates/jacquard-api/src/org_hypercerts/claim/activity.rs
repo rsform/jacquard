@@ -928,50 +928,50 @@ pub mod activity_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Title;
         type ShortDescription;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Title = Unset;
         type ShortDescription = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type ShortDescription = St::ShortDescription;
         type Title = St::Title;
-        type ShortDescription = St::ShortDescription;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type CreatedAt = St::CreatedAt;
-        type Title = Set<members::title>;
-        type ShortDescription = St::ShortDescription;
     }
     ///State transition - sets the `short_description` field to Set
     pub struct SetShortDescription<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetShortDescription<St> {}
     impl<St: State> State for SetShortDescription<St> {
         type CreatedAt = St::CreatedAt;
-        type Title = St::Title;
         type ShortDescription = Set<members::short_description>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type ShortDescription = St::ShortDescription;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `short_description` field
         pub struct short_description(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -1247,8 +1247,8 @@ impl<St, S: BosStr> ActivityBuilder<St, S>
 where
     St: activity_state::State,
     St::CreatedAt: activity_state::IsSet,
-    St::Title: activity_state::IsSet,
     St::ShortDescription: activity_state::IsSet,
+    St::Title: activity_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Activity<S> {

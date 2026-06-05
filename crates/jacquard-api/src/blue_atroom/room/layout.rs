@@ -414,50 +414,50 @@ pub mod color_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Blue;
-        type Red;
         type Green;
+        type Red;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Blue = Unset;
-        type Red = Unset;
         type Green = Unset;
+        type Red = Unset;
     }
     ///State transition - sets the `blue` field to Set
     pub struct SetBlue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlue<St> {}
     impl<St: State> State for SetBlue<St> {
         type Blue = Set<members::blue>;
+        type Green = St::Green;
         type Red = St::Red;
-        type Green = St::Green;
-    }
-    ///State transition - sets the `red` field to Set
-    pub struct SetRed<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRed<St> {}
-    impl<St: State> State for SetRed<St> {
-        type Blue = St::Blue;
-        type Red = Set<members::red>;
-        type Green = St::Green;
     }
     ///State transition - sets the `green` field to Set
     pub struct SetGreen<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGreen<St> {}
     impl<St: State> State for SetGreen<St> {
         type Blue = St::Blue;
-        type Red = St::Red;
         type Green = Set<members::green>;
+        type Red = St::Red;
+    }
+    ///State transition - sets the `red` field to Set
+    pub struct SetRed<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRed<St> {}
+    impl<St: State> State for SetRed<St> {
+        type Blue = St::Blue;
+        type Green = St::Green;
+        type Red = Set<members::red>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `blue` field
         pub struct blue(());
-        ///Marker type for the `red` field
-        pub struct red(());
         ///Marker type for the `green` field
         pub struct green(());
+        ///Marker type for the `red` field
+        pub struct red(());
     }
 }
 
@@ -565,8 +565,8 @@ impl<St, S: BosStr> ColorBuilder<St, S>
 where
     St: color_state::State,
     St::Blue: color_state::IsSet,
-    St::Red: color_state::IsSet,
     St::Green: color_state::IsSet,
+    St::Red: color_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Color<S> {
@@ -1182,85 +1182,85 @@ pub mod layout_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Size;
-        type Floor;
-        type Wall;
-        type Furnishings;
         type CreatedAt;
+        type Floor;
+        type Furnishings;
+        type Size;
+        type Wall;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Size = Unset;
-        type Floor = Unset;
-        type Wall = Unset;
-        type Furnishings = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSize<St> {}
-    impl<St: State> State for SetSize<St> {
-        type Size = Set<members::size>;
-        type Floor = St::Floor;
-        type Wall = St::Wall;
-        type Furnishings = St::Furnishings;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `floor` field to Set
-    pub struct SetFloor<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFloor<St> {}
-    impl<St: State> State for SetFloor<St> {
-        type Size = St::Size;
-        type Floor = Set<members::floor>;
-        type Wall = St::Wall;
-        type Furnishings = St::Furnishings;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `wall` field to Set
-    pub struct SetWall<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWall<St> {}
-    impl<St: State> State for SetWall<St> {
-        type Size = St::Size;
-        type Floor = St::Floor;
-        type Wall = Set<members::wall>;
-        type Furnishings = St::Furnishings;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `furnishings` field to Set
-    pub struct SetFurnishings<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFurnishings<St> {}
-    impl<St: State> State for SetFurnishings<St> {
-        type Size = St::Size;
-        type Floor = St::Floor;
-        type Wall = St::Wall;
-        type Furnishings = Set<members::furnishings>;
-        type CreatedAt = St::CreatedAt;
+        type Floor = Unset;
+        type Furnishings = Unset;
+        type Size = Unset;
+        type Wall = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Size = St::Size;
-        type Floor = St::Floor;
-        type Wall = St::Wall;
-        type Furnishings = St::Furnishings;
         type CreatedAt = Set<members::created_at>;
+        type Floor = St::Floor;
+        type Furnishings = St::Furnishings;
+        type Size = St::Size;
+        type Wall = St::Wall;
+    }
+    ///State transition - sets the `floor` field to Set
+    pub struct SetFloor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFloor<St> {}
+    impl<St: State> State for SetFloor<St> {
+        type CreatedAt = St::CreatedAt;
+        type Floor = Set<members::floor>;
+        type Furnishings = St::Furnishings;
+        type Size = St::Size;
+        type Wall = St::Wall;
+    }
+    ///State transition - sets the `furnishings` field to Set
+    pub struct SetFurnishings<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFurnishings<St> {}
+    impl<St: State> State for SetFurnishings<St> {
+        type CreatedAt = St::CreatedAt;
+        type Floor = St::Floor;
+        type Furnishings = Set<members::furnishings>;
+        type Size = St::Size;
+        type Wall = St::Wall;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSize<St> {}
+    impl<St: State> State for SetSize<St> {
+        type CreatedAt = St::CreatedAt;
+        type Floor = St::Floor;
+        type Furnishings = St::Furnishings;
+        type Size = Set<members::size>;
+        type Wall = St::Wall;
+    }
+    ///State transition - sets the `wall` field to Set
+    pub struct SetWall<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWall<St> {}
+    impl<St: State> State for SetWall<St> {
+        type CreatedAt = St::CreatedAt;
+        type Floor = St::Floor;
+        type Furnishings = St::Furnishings;
+        type Size = St::Size;
+        type Wall = Set<members::wall>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `size` field
-        pub struct size(());
-        ///Marker type for the `floor` field
-        pub struct floor(());
-        ///Marker type for the `wall` field
-        pub struct wall(());
-        ///Marker type for the `furnishings` field
-        pub struct furnishings(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `floor` field
+        pub struct floor(());
+        ///Marker type for the `furnishings` field
+        pub struct furnishings(());
+        ///Marker type for the `size` field
+        pub struct size(());
+        ///Marker type for the `wall` field
+        pub struct wall(());
     }
 }
 
@@ -1411,11 +1411,11 @@ where
 impl<St, S: BosStr> LayoutBuilder<St, S>
 where
     St: layout_state::State,
-    St::Size: layout_state::IsSet,
-    St::Floor: layout_state::IsSet,
-    St::Wall: layout_state::IsSet,
-    St::Furnishings: layout_state::IsSet,
     St::CreatedAt: layout_state::IsSet,
+    St::Floor: layout_state::IsSet,
+    St::Furnishings: layout_state::IsSet,
+    St::Size: layout_state::IsSet,
+    St::Wall: layout_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Layout<S> {
@@ -1596,51 +1596,51 @@ pub mod wall_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Thickness;
         type Height;
         type Surface;
+        type Thickness;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Thickness = Unset;
         type Height = Unset;
         type Surface = Unset;
-    }
-    ///State transition - sets the `thickness` field to Set
-    pub struct SetThickness<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetThickness<St> {}
-    impl<St: State> State for SetThickness<St> {
-        type Thickness = Set<members::thickness>;
-        type Height = St::Height;
-        type Surface = St::Surface;
+        type Thickness = Unset;
     }
     ///State transition - sets the `height` field to Set
     pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHeight<St> {}
     impl<St: State> State for SetHeight<St> {
-        type Thickness = St::Thickness;
         type Height = Set<members::height>;
         type Surface = St::Surface;
+        type Thickness = St::Thickness;
     }
     ///State transition - sets the `surface` field to Set
     pub struct SetSurface<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSurface<St> {}
     impl<St: State> State for SetSurface<St> {
-        type Thickness = St::Thickness;
         type Height = St::Height;
         type Surface = Set<members::surface>;
+        type Thickness = St::Thickness;
+    }
+    ///State transition - sets the `thickness` field to Set
+    pub struct SetThickness<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetThickness<St> {}
+    impl<St: State> State for SetThickness<St> {
+        type Height = St::Height;
+        type Surface = St::Surface;
+        type Thickness = Set<members::thickness>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `thickness` field
-        pub struct thickness(());
         ///Marker type for the `height` field
         pub struct height(());
         ///Marker type for the `surface` field
         pub struct surface(());
+        ///Marker type for the `thickness` field
+        pub struct thickness(());
     }
 }
 
@@ -1747,9 +1747,9 @@ where
 impl<St, S: BosStr> WallBuilder<St, S>
 where
     St: wall_state::State,
-    St::Thickness: wall_state::IsSet,
     St::Height: wall_state::IsSet,
     St::Surface: wall_state::IsSet,
+    St::Thickness: wall_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Wall<S> {

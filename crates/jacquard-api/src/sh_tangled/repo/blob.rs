@@ -15,7 +15,7 @@ use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::Datetime;
+use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -51,7 +51,7 @@ pub struct Blob<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub raw: Option<bool>,
     pub r#ref: S,
-    pub repo: S,
+    pub repo: Did<S>,
 }
 
 
@@ -64,6 +64,8 @@ pub struct BlobOutput<S: BosStr = DefaultStr> {
     ///Content encoding
     #[serde(skip_serializing_if = "Option::is_none")]
     pub encoding: Option<S>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub file_too_large: Option<bool>,
     ///Whether the file is binary
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_binary: Option<bool>,
@@ -560,10 +562,9 @@ fn lexicon_doc_sh_tangled_repo_blob() -> LexiconDoc<'static> {
                                     SmolStr::new_static("repo"),
                                     LexXrpcParametersProperty::String(LexString {
                                         description: Some(
-                                            CowStr::new_static(
-                                                "Repository identifier in format 'did:plc:.../repoName'",
-                                            ),
+                                            CowStr::new_static("DID of the repository"),
                                         ),
+                                        format: Some(LexStringFormat::Did),
                                         ..Default::default()
                                     }),
                                 );
@@ -673,58 +674,58 @@ pub mod blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
-        type Ref;
         type Path;
+        type Ref;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
-        type Ref = Unset;
         type Path = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Repo = Set<members::repo>;
-        type Ref = St::Ref;
-        type Path = St::Path;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRef<St> {}
-    impl<St: State> State for SetRef<St> {
-        type Repo = St::Repo;
-        type Ref = Set<members::r#ref>;
-        type Path = St::Path;
+        type Ref = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `path` field to Set
     pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPath<St> {}
     impl<St: State> State for SetPath<St> {
-        type Repo = St::Repo;
-        type Ref = St::Ref;
         type Path = Set<members::path>;
+        type Ref = St::Ref;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRef<St> {}
+    impl<St: State> State for SetRef<St> {
+        type Path = St::Path;
+        type Ref = Set<members::r#ref>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Path = St::Path;
+        type Ref = St::Ref;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `path` field
         pub struct path(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type.
 pub struct BlobBuilder<St: blob_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<bool>, Option<S>, Option<S>),
+    _fields: (Option<S>, Option<bool>, Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -823,7 +824,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<Did<S>>,
     ) -> BlobBuilder<blob_state::SetRepo<St>, S> {
         self._fields.3 = Option::Some(value.into());
         BlobBuilder {
@@ -837,9 +838,9 @@ where
 impl<St, S: BosStr> BlobBuilder<St, S>
 where
     St: blob_state::State,
-    St::Repo: blob_state::IsSet,
-    St::Ref: blob_state::IsSet,
     St::Path: blob_state::IsSet,
+    St::Ref: blob_state::IsSet,
+    St::Repo: blob_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Blob<S> {
@@ -862,49 +863,49 @@ pub mod signature_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Email;
+        type Name;
         type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Email = Unset;
+        type Name = Unset;
         type When = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Email = St::Email;
-        type When = St::When;
     }
     ///State transition - sets the `email` field to Set
     pub struct SetEmail<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEmail<St> {}
     impl<St: State> State for SetEmail<St> {
-        type Name = St::Name;
         type Email = Set<members::email>;
+        type Name = St::Name;
+        type When = St::When;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Email = St::Email;
+        type Name = Set<members::name>;
         type When = St::When;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWhen<St> {}
     impl<St: State> State for SetWhen<St> {
-        type Name = St::Name;
         type Email = St::Email;
+        type Name = St::Name;
         type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `email` field
         pub struct email(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `when` field
         pub struct when(());
     }
@@ -1013,8 +1014,8 @@ where
 impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
-    St::Name: signature_state::IsSet,
     St::Email: signature_state::IsSet,
+    St::Name: signature_state::IsSet,
     St::When: signature_state::IsSet,
 {
     /// Build the final struct.

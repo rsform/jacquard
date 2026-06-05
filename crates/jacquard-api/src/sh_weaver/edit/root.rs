@@ -154,37 +154,37 @@ pub mod root_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Snapshot;
         type Doc;
+        type Snapshot;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Snapshot = Unset;
         type Doc = Unset;
-    }
-    ///State transition - sets the `snapshot` field to Set
-    pub struct SetSnapshot<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSnapshot<St> {}
-    impl<St: State> State for SetSnapshot<St> {
-        type Snapshot = Set<members::snapshot>;
-        type Doc = St::Doc;
+        type Snapshot = Unset;
     }
     ///State transition - sets the `doc` field to Set
     pub struct SetDoc<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDoc<St> {}
     impl<St: State> State for SetDoc<St> {
-        type Snapshot = St::Snapshot;
         type Doc = Set<members::doc>;
+        type Snapshot = St::Snapshot;
+    }
+    ///State transition - sets the `snapshot` field to Set
+    pub struct SetSnapshot<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSnapshot<St> {}
+    impl<St: State> State for SetSnapshot<St> {
+        type Doc = St::Doc;
+        type Snapshot = Set<members::snapshot>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `snapshot` field
-        pub struct snapshot(());
         ///Marker type for the `doc` field
         pub struct doc(());
+        ///Marker type for the `snapshot` field
+        pub struct snapshot(());
     }
 }
 
@@ -272,8 +272,8 @@ where
 impl<St, S: BosStr> RootBuilder<St, S>
 where
     St: root_state::State,
-    St::Snapshot: root_state::IsSet,
     St::Doc: root_state::IsSet,
+    St::Snapshot: root_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Root<S> {

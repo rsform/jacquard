@@ -1,0 +1,83 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.issue.listStates",
+  "defs": {
+    "listItem": {
+      "type": "object",
+      "required": [
+        "uri",
+        "value"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "value": {
+          "type": "unknown",
+          "description": "Embedded sh.tangled.repo.issue.state record"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "subject"
+        ],
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "order": {
+            "type": "string",
+            "description": "Sort direction by createdAt.",
+            "default": "desc",
+            "knownValues": [
+              "asc",
+              "desc"
+            ]
+          },
+          "subject": {
+            "type": "string",
+            "description": "Issue AT-URI whose state records to list.",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#listItem"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

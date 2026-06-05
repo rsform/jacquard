@@ -217,105 +217,105 @@ pub mod hive_book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type CreatedAt;
-        type UpdatedAt;
-        type Thumbnail;
-        type Id;
         type Authors;
+        type CreatedAt;
+        type Id;
+        type Thumbnail;
+        type Title;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type CreatedAt = Unset;
-        type UpdatedAt = Unset;
-        type Thumbnail = Unset;
-        type Id = Unset;
         type Authors = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
-        type Thumbnail = St::Thumbnail;
-        type Id = St::Id;
-        type Authors = St::Authors;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Title = St::Title;
-        type CreatedAt = Set<members::created_at>;
-        type UpdatedAt = St::UpdatedAt;
-        type Thumbnail = St::Thumbnail;
-        type Id = St::Id;
-        type Authors = St::Authors;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
-    impl<St: State> State for SetUpdatedAt<St> {
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = Set<members::updated_at>;
-        type Thumbnail = St::Thumbnail;
-        type Id = St::Id;
-        type Authors = St::Authors;
-    }
-    ///State transition - sets the `thumbnail` field to Set
-    pub struct SetThumbnail<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetThumbnail<St> {}
-    impl<St: State> State for SetThumbnail<St> {
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
-        type Thumbnail = Set<members::thumbnail>;
-        type Id = St::Id;
-        type Authors = St::Authors;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
-        type Thumbnail = St::Thumbnail;
-        type Id = Set<members::id>;
-        type Authors = St::Authors;
+        type CreatedAt = Unset;
+        type Id = Unset;
+        type Thumbnail = Unset;
+        type Title = Unset;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthors<St> {}
     impl<St: State> State for SetAuthors<St> {
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
-        type Thumbnail = St::Thumbnail;
-        type Id = St::Id;
         type Authors = Set<members::authors>;
+        type CreatedAt = St::CreatedAt;
+        type Id = St::Id;
+        type Thumbnail = St::Thumbnail;
+        type Title = St::Title;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Authors = St::Authors;
+        type CreatedAt = Set<members::created_at>;
+        type Id = St::Id;
+        type Thumbnail = St::Thumbnail;
+        type Title = St::Title;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Authors = St::Authors;
+        type CreatedAt = St::CreatedAt;
+        type Id = Set<members::id>;
+        type Thumbnail = St::Thumbnail;
+        type Title = St::Title;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `thumbnail` field to Set
+    pub struct SetThumbnail<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetThumbnail<St> {}
+    impl<St: State> State for SetThumbnail<St> {
+        type Authors = St::Authors;
+        type CreatedAt = St::CreatedAt;
+        type Id = St::Id;
+        type Thumbnail = Set<members::thumbnail>;
+        type Title = St::Title;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Authors = St::Authors;
+        type CreatedAt = St::CreatedAt;
+        type Id = St::Id;
+        type Thumbnail = St::Thumbnail;
+        type Title = Set<members::title>;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type Authors = St::Authors;
+        type CreatedAt = St::CreatedAt;
+        type Id = St::Id;
+        type Thumbnail = St::Thumbnail;
+        type Title = St::Title;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `thumbnail` field
-        pub struct thumbnail(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `authors` field
         pub struct authors(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `thumbnail` field
+        pub struct thumbnail(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
@@ -628,12 +628,12 @@ where
 impl<St, S: BosStr> HiveBookBuilder<St, S>
 where
     St: hive_book_state::State,
-    St::Title: hive_book_state::IsSet,
-    St::CreatedAt: hive_book_state::IsSet,
-    St::UpdatedAt: hive_book_state::IsSet,
-    St::Thumbnail: hive_book_state::IsSet,
-    St::Id: hive_book_state::IsSet,
     St::Authors: hive_book_state::IsSet,
+    St::CreatedAt: hive_book_state::IsSet,
+    St::Id: hive_book_state::IsSet,
+    St::Thumbnail: hive_book_state::IsSet,
+    St::Title: hive_book_state::IsSet,
+    St::UpdatedAt: hive_book_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> HiveBook<S> {

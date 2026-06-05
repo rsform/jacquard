@@ -120,50 +120,50 @@ pub mod example_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Value;
         type Lexicon;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Value = Unset;
         type Lexicon = Unset;
+        type Value = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Lexicon = St::Lexicon;
         type Value = St::Value;
-        type Lexicon = St::Lexicon;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValue<St> {}
-    impl<St: State> State for SetValue<St> {
-        type CreatedAt = St::CreatedAt;
-        type Value = Set<members::value>;
-        type Lexicon = St::Lexicon;
     }
     ///State transition - sets the `lexicon` field to Set
     pub struct SetLexicon<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLexicon<St> {}
     impl<St: State> State for SetLexicon<St> {
         type CreatedAt = St::CreatedAt;
-        type Value = St::Value;
         type Lexicon = Set<members::lexicon>;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type CreatedAt = St::CreatedAt;
+        type Lexicon = St::Lexicon;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `lexicon` field
         pub struct lexicon(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -284,8 +284,8 @@ impl<St, S: BosStr> ExampleBuilder<St, S>
 where
     St: example_state::State,
     St::CreatedAt: example_state::IsSet,
-    St::Value: example_state::IsSet,
     St::Lexicon: example_state::IsSet,
+    St::Value: example_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Example<S> {

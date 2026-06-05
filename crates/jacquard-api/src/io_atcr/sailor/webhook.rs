@@ -142,67 +142,67 @@ pub mod webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type HoldDid;
-        type Triggers;
-        type PrivateCid;
         type CreatedAt;
+        type HoldDid;
+        type PrivateCid;
+        type Triggers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type HoldDid = Unset;
-        type Triggers = Unset;
-        type PrivateCid = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `hold_did` field to Set
-    pub struct SetHoldDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHoldDid<St> {}
-    impl<St: State> State for SetHoldDid<St> {
-        type HoldDid = Set<members::hold_did>;
-        type Triggers = St::Triggers;
-        type PrivateCid = St::PrivateCid;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `triggers` field to Set
-    pub struct SetTriggers<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTriggers<St> {}
-    impl<St: State> State for SetTriggers<St> {
-        type HoldDid = St::HoldDid;
-        type Triggers = Set<members::triggers>;
-        type PrivateCid = St::PrivateCid;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `private_cid` field to Set
-    pub struct SetPrivateCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPrivateCid<St> {}
-    impl<St: State> State for SetPrivateCid<St> {
-        type HoldDid = St::HoldDid;
-        type Triggers = St::Triggers;
-        type PrivateCid = Set<members::private_cid>;
-        type CreatedAt = St::CreatedAt;
+        type HoldDid = Unset;
+        type PrivateCid = Unset;
+        type Triggers = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type HoldDid = St::HoldDid;
-        type Triggers = St::Triggers;
-        type PrivateCid = St::PrivateCid;
         type CreatedAt = Set<members::created_at>;
+        type HoldDid = St::HoldDid;
+        type PrivateCid = St::PrivateCid;
+        type Triggers = St::Triggers;
+    }
+    ///State transition - sets the `hold_did` field to Set
+    pub struct SetHoldDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHoldDid<St> {}
+    impl<St: State> State for SetHoldDid<St> {
+        type CreatedAt = St::CreatedAt;
+        type HoldDid = Set<members::hold_did>;
+        type PrivateCid = St::PrivateCid;
+        type Triggers = St::Triggers;
+    }
+    ///State transition - sets the `private_cid` field to Set
+    pub struct SetPrivateCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPrivateCid<St> {}
+    impl<St: State> State for SetPrivateCid<St> {
+        type CreatedAt = St::CreatedAt;
+        type HoldDid = St::HoldDid;
+        type PrivateCid = Set<members::private_cid>;
+        type Triggers = St::Triggers;
+    }
+    ///State transition - sets the `triggers` field to Set
+    pub struct SetTriggers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTriggers<St> {}
+    impl<St: State> State for SetTriggers<St> {
+        type CreatedAt = St::CreatedAt;
+        type HoldDid = St::HoldDid;
+        type PrivateCid = St::PrivateCid;
+        type Triggers = Set<members::triggers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `hold_did` field
-        pub struct hold_did(());
-        ///Marker type for the `triggers` field
-        pub struct triggers(());
-        ///Marker type for the `private_cid` field
-        pub struct private_cid(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `hold_did` field
+        pub struct hold_did(());
+        ///Marker type for the `private_cid` field
+        pub struct private_cid(());
+        ///Marker type for the `triggers` field
+        pub struct triggers(());
     }
 }
 
@@ -347,10 +347,10 @@ impl<St: webhook_state::State, S: BosStr> WebhookBuilder<St, S> {
 impl<St, S: BosStr> WebhookBuilder<St, S>
 where
     St: webhook_state::State,
-    St::HoldDid: webhook_state::IsSet,
-    St::Triggers: webhook_state::IsSet,
-    St::PrivateCid: webhook_state::IsSet,
     St::CreatedAt: webhook_state::IsSet,
+    St::HoldDid: webhook_state::IsSet,
+    St::PrivateCid: webhook_state::IsSet,
+    St::Triggers: webhook_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Webhook<S> {

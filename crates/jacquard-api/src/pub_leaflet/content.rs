@@ -15,6 +15,7 @@ use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,6 +31,12 @@ use crate::pub_leaflet::pages::linear_document::LinearDocument;
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Content<S: BosStr = DefaultStr> {
+    ///JSON-encoded array of pages. When the inline pages array would be too large to store on the PDS, the pages are uploaded as a blob and referenced here. When set, consumers MUST ignore `pages` and use the decoded blob contents as the page array; the inline `pages` field will be empty or a stub.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub blob_pages: Option<BlobRef<S>>,
+    ///Blobs referenced inside `blobPages`. Load-bearing when `blobPages` is set: the PDS only scans the top level of a record for blob references when deciding what to garbage-collect, so any image/etc. blob now living inside the opaque JSON blob must be mirrored here to remain referenced.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub blobs: Option<Vec<BlobRef<S>>>,
     pub pages: Vec<ContentPagesItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -57,6 +64,44 @@ impl<S: BosStr> LexiconSchema for Content<S> {
         lexicon_doc_pub_leaflet_content()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.blob_pages {
+            {
+                let size = value.blob().size;
+                if size > 5000000usize {
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("blob_pages"),
+                        max: 5000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.blob_pages {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["application/json"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("blob_pages"),
+                        accepted: vec!["application/json".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }
@@ -96,7 +141,11 @@ pub mod content_state {
 /// Builder for constructing an instance of this type.
 pub struct ContentBuilder<St: content_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<ContentPagesItem<S>>>,),
+    _fields: (
+        Option<BlobRef<S>>,
+        Option<Vec<BlobRef<S>>>,
+        Option<Vec<ContentPagesItem<S>>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -119,7 +168,7 @@ impl ContentBuilder<content_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ContentBuilder {
             _state: PhantomData,
-            _fields: (None,),
+            _fields: (None, None, None),
             _type: PhantomData,
         }
     }
@@ -130,9 +179,35 @@ impl<S: BosStr> ContentBuilder<content_state::Empty, S> {
     pub fn builder() -> Self {
         ContentBuilder {
             _state: PhantomData,
-            _fields: (None,),
+            _fields: (None, None, None),
             _type: PhantomData,
         }
+    }
+}
+
+impl<St: content_state::State, S: BosStr> ContentBuilder<St, S> {
+    /// Set the `blobPages` field (optional)
+    pub fn blob_pages(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `blobPages` field to an Option value (optional)
+    pub fn maybe_blob_pages(mut self, value: Option<BlobRef<S>>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St: content_state::State, S: BosStr> ContentBuilder<St, S> {
+    /// Set the `blobs` field (optional)
+    pub fn blobs(mut self, value: impl Into<Option<Vec<BlobRef<S>>>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `blobs` field to an Option value (optional)
+    pub fn maybe_blobs(mut self, value: Option<Vec<BlobRef<S>>>) -> Self {
+        self._fields.1 = value;
+        self
     }
 }
 
@@ -146,7 +221,7 @@ where
         mut self,
         value: impl Into<Vec<ContentPagesItem<S>>>,
     ) -> ContentBuilder<content_state::SetPages<St>, S> {
-        self._fields.0 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ContentBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -163,14 +238,18 @@ where
     /// Build the final struct.
     pub fn build(self) -> Content<S> {
         Content {
-            pages: self._fields.0.unwrap(),
+            blob_pages: self._fields.0,
+            blobs: self._fields.1,
+            pages: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Content<S> {
         Content {
-            pages: self._fields.0.unwrap(),
+            blob_pages: self._fields.0,
+            blobs: self._fields.1,
+            pages: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -196,6 +275,22 @@ fn lexicon_doc_pub_leaflet_content() -> LexiconDoc<'static> {
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("blobPages"),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("blobs"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Blobs referenced inside `blobPages`. Load-bearing when `blobPages` is set: the PDS only scans the top level of a record for blob references when deciding what to garbage-collect, so any image/etc. blob now living inside the opaque JSON blob must be mirrored here to remain referenced.",
+                                    ),
+                                ),
+                                items: LexArrayItem::Blob(LexBlob { ..Default::default() }),
+                                ..Default::default()
+                            }),
+                        );
                         map.insert(
                             SmolStr::new_static("pages"),
                             LexObjectProperty::Array(LexArray {

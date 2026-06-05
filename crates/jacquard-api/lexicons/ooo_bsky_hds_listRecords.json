@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.hds.listRecords",
+  "revision": 1,
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "collection"
+        ],
+        "properties": {
+          "collection": {
+            "type": "string",
+            "format": "nsid"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "repo": {
+            "type": "string",
+            "format": "at-identifier"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "boxes"
+          ],
+          "properties": {
+            "boxes": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "ooo.bsky.hidden.box"
+              }
+            },
+            "cursor": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

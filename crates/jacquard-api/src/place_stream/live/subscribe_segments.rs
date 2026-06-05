@@ -55,6 +55,42 @@ impl<S: BosStr> SubscribeSegmentsMessage<S> {
     }
 }
 
+
+#[derive(
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
+)]
+
+#[serde(tag = "error", content = "message")]
+pub enum SubscribeSegmentsError {
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
+}
+
+impl core::fmt::Display for SubscribeSegmentsError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+        }
+    }
+}
+
 pub type Segment = Bytes;
 ///Stream response type for
 ///place.stream.live.subscribeSegments
@@ -63,7 +99,7 @@ impl jacquard_common::xrpc::SubscriptionResp for SubscribeSegmentsStream {
     const NSID: &'static str = "place.stream.live.subscribeSegments";
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Message<S: BosStr> = SubscribeSegmentsMessage<S>;
-    type Error = jacquard_common::xrpc::GenericError;
+    type Error = SubscribeSegmentsError;
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcSubscription for SubscribeSegments<S> {

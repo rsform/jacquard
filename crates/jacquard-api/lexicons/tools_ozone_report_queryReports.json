@@ -1,0 +1,133 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.report.queryReports",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "View moderation reports. Reports are individual instances of content being reported, as opposed to subject statuses which aggregate reports at the subject level.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "assignedTo": {
+            "type": "string",
+            "description": "Filter by the DID of the moderator permanently assigned to the report.",
+            "format": "did"
+          },
+          "collections": {
+            "type": "array",
+            "description": "If specified, reports where the subject belongs to the given collections will be returned. When subjectType is set to 'account', this will be ignored.",
+            "items": {
+              "type": "string",
+              "format": "nsid"
+            },
+            "maxLength": 20
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "did": {
+            "type": "string",
+            "description": "Filter to reports where the subject is this DID or any record owned by this DID. Unlike `subject` (which scopes to a specific account or record), this returns all reports tied to the DID across both account-level and record-level subjects.",
+            "format": "did"
+          },
+          "isMuted": {
+            "type": "boolean",
+            "description": "Filter by muted status. true returns only muted reports, false returns only unmuted reports. Defaults to false.",
+            "default": false
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "queueId": {
+            "type": "integer",
+            "description": "Filter by queue ID. Use -1 for unassigned reports."
+          },
+          "reportTypes": {
+            "type": "array",
+            "description": "Filter by report types (fully qualified string in the format of com.atproto.moderation.defs#reason<name>).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reportedAfter": {
+            "type": "string",
+            "description": "Retrieve reports created after a given timestamp",
+            "format": "datetime"
+          },
+          "reportedBefore": {
+            "type": "string",
+            "description": "Retrieve reports created before a given timestamp",
+            "format": "datetime"
+          },
+          "sortDirection": {
+            "type": "string",
+            "default": "desc",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          "sortField": {
+            "type": "string",
+            "default": "createdAt",
+            "enum": [
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "Filter by report status.",
+            "knownValues": [
+              "open",
+              "closed",
+              "escalated",
+              "queued",
+              "assigned"
+            ]
+          },
+          "subject": {
+            "type": "string",
+            "description": "Filter by subject DID or AT-URI.",
+            "format": "uri"
+          },
+          "subjectType": {
+            "type": "string",
+            "description": "If specified, reports of the given type (account or record) will be returned.",
+            "knownValues": [
+              "account",
+              "record"
+            ]
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "reports"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "reports": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "tools.ozone.report.defs#reportView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

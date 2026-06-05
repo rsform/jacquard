@@ -158,51 +158,51 @@ pub mod category_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CategoryType;
         type Group;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CategoryType = Unset;
         type Group = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type CategoryType = St::CategoryType;
-        type Group = St::Group;
+        type Name = Unset;
     }
     ///State transition - sets the `category_type` field to Set
     pub struct SetCategoryType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCategoryType<St> {}
     impl<St: State> State for SetCategoryType<St> {
-        type Name = St::Name;
         type CategoryType = Set<members::category_type>;
         type Group = St::Group;
+        type Name = St::Name;
     }
     ///State transition - sets the `group` field to Set
     pub struct SetGroup<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGroup<St> {}
     impl<St: State> State for SetGroup<St> {
-        type Name = St::Name;
         type CategoryType = St::CategoryType;
         type Group = Set<members::group>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CategoryType = St::CategoryType;
+        type Group = St::Group;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `category_type` field
         pub struct category_type(());
         ///Marker type for the `group` field
         pub struct group(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -322,9 +322,9 @@ where
 impl<St, S: BosStr> CategoryBuilder<St, S>
 where
     St: category_state::State,
-    St::Name: category_state::IsSet,
     St::CategoryType: category_state::IsSet,
     St::Group: category_state::IsSet,
+    St::Name: category_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Category<S> {

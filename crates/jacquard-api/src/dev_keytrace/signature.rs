@@ -86,85 +86,85 @@ pub mod signature_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SignedAt;
         type Attestation;
-        type Src;
         type Kid;
+        type SignedAt;
         type SignedFields;
+        type Src;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SignedAt = Unset;
         type Attestation = Unset;
-        type Src = Unset;
         type Kid = Unset;
+        type SignedAt = Unset;
         type SignedFields = Unset;
-    }
-    ///State transition - sets the `signed_at` field to Set
-    pub struct SetSignedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSignedAt<St> {}
-    impl<St: State> State for SetSignedAt<St> {
-        type SignedAt = Set<members::signed_at>;
-        type Attestation = St::Attestation;
-        type Src = St::Src;
-        type Kid = St::Kid;
-        type SignedFields = St::SignedFields;
+        type Src = Unset;
     }
     ///State transition - sets the `attestation` field to Set
     pub struct SetAttestation<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAttestation<St> {}
     impl<St: State> State for SetAttestation<St> {
-        type SignedAt = St::SignedAt;
         type Attestation = Set<members::attestation>;
-        type Src = St::Src;
         type Kid = St::Kid;
-        type SignedFields = St::SignedFields;
-    }
-    ///State transition - sets the `src` field to Set
-    pub struct SetSrc<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSrc<St> {}
-    impl<St: State> State for SetSrc<St> {
         type SignedAt = St::SignedAt;
-        type Attestation = St::Attestation;
-        type Src = Set<members::src>;
-        type Kid = St::Kid;
         type SignedFields = St::SignedFields;
+        type Src = St::Src;
     }
     ///State transition - sets the `kid` field to Set
     pub struct SetKid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetKid<St> {}
     impl<St: State> State for SetKid<St> {
-        type SignedAt = St::SignedAt;
         type Attestation = St::Attestation;
-        type Src = St::Src;
         type Kid = Set<members::kid>;
+        type SignedAt = St::SignedAt;
         type SignedFields = St::SignedFields;
+        type Src = St::Src;
+    }
+    ///State transition - sets the `signed_at` field to Set
+    pub struct SetSignedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSignedAt<St> {}
+    impl<St: State> State for SetSignedAt<St> {
+        type Attestation = St::Attestation;
+        type Kid = St::Kid;
+        type SignedAt = Set<members::signed_at>;
+        type SignedFields = St::SignedFields;
+        type Src = St::Src;
     }
     ///State transition - sets the `signed_fields` field to Set
     pub struct SetSignedFields<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSignedFields<St> {}
     impl<St: State> State for SetSignedFields<St> {
-        type SignedAt = St::SignedAt;
         type Attestation = St::Attestation;
-        type Src = St::Src;
         type Kid = St::Kid;
+        type SignedAt = St::SignedAt;
         type SignedFields = Set<members::signed_fields>;
+        type Src = St::Src;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSrc<St> {}
+    impl<St: State> State for SetSrc<St> {
+        type Attestation = St::Attestation;
+        type Kid = St::Kid;
+        type SignedAt = St::SignedAt;
+        type SignedFields = St::SignedFields;
+        type Src = Set<members::src>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signed_at` field
-        pub struct signed_at(());
         ///Marker type for the `attestation` field
         pub struct attestation(());
-        ///Marker type for the `src` field
-        pub struct src(());
         ///Marker type for the `kid` field
         pub struct kid(());
+        ///Marker type for the `signed_at` field
+        pub struct signed_at(());
         ///Marker type for the `signed_fields` field
         pub struct signed_fields(());
+        ///Marker type for the `src` field
+        pub struct src(());
     }
 }
 
@@ -343,11 +343,11 @@ where
 impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
-    St::SignedAt: signature_state::IsSet,
     St::Attestation: signature_state::IsSet,
-    St::Src: signature_state::IsSet,
     St::Kid: signature_state::IsSet,
+    St::SignedAt: signature_state::IsSet,
     St::SignedFields: signature_state::IsSet,
+    St::Src: signature_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Signature<S> {

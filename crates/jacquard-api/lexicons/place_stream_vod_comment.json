@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.vod.comment",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record containing a comment on a VOD.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "text",
+          "createdAt",
+          "video"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this comment was created.",
+            "format": "datetime"
+          },
+          "facets": {
+            "type": "array",
+            "description": "Annotations of text (mentions, URLs, etc)",
+            "items": {
+              "type": "ref",
+              "ref": "place.stream.richtext.facet"
+            }
+          },
+          "reply": {
+            "type": "ref",
+            "ref": "#replyRef"
+          },
+          "text": {
+            "type": "string",
+            "description": "The comment text content.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "video": {
+            "type": "string",
+            "description": "AT-URI of the place.stream.video record this comment belongs to.",
+            "format": "at-uri"
+          }
+        }
+      }
+    },
+    "replyRef": {
+      "type": "object",
+      "required": [
+        "root",
+        "parent"
+      ],
+      "properties": {
+        "parent": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "root": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    }
+  }
+}

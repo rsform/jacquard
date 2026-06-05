@@ -101,6 +101,26 @@ pub struct DraftEmbedExternal<S: BosStr = DefaultStr> {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct DraftEmbedGallery<S: BosStr = DefaultStr> {
+    pub items: draft::DraftEmbedGalleryItems<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub enum DraftEmbedGalleryItemsItem<S: BosStr = DefaultStr> {
+    #[serde(rename = "app.bsky.draft.defs#draftEmbedImage")]
+    DraftEmbedImage(Box<draft::DraftEmbedImage<S>>),
+}
+
+/// The schema-level maxLength of 20 is a future-proof ceiling. Clients should currently enforce a soft limit of 10 items in authoring UIs.
+pub type DraftEmbedGalleryItems<S = DefaultStr> = Vec<DraftEmbedGalleryItemsItem<S>>;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftEmbedImage<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -148,6 +168,8 @@ pub struct DraftEmbedVideo<S: BosStr = DefaultStr> {
 pub struct DraftPost<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed_externals: Option<Vec<draft::DraftEmbedExternal<S>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub embed_gallery: Option<draft::DraftEmbedGallery<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed_images: Option<Vec<draft::DraftEmbedImage<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -310,6 +332,21 @@ impl<S: BosStr> LexiconSchema for DraftEmbedExternal<S> {
     }
     fn def_name() -> &'static str {
         "draftEmbedExternal"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_app_bsky_draft_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for DraftEmbedGallery<S> {
+    fn nsid() -> &'static str {
+        "app.bsky.draft.defs"
+    }
+    fn def_name() -> &'static str {
+        "draftEmbedGallery"
     }
     fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_draft_defs()
@@ -922,6 +959,36 @@ fn lexicon_doc_app_bsky_draft_defs() -> LexiconDoc<'static> {
                 }),
             );
             map.insert(
+                SmolStr::new_static("draftEmbedGallery"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("items")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("items"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#draftEmbedGalleryItems"),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("draftEmbedGalleryItems"),
+                LexUserType::Array(LexArray {
+                    items: LexArrayItem::Union(LexRefUnion {
+                        refs: vec![CowStr::new_static("#draftEmbedImage")],
+                        ..Default::default()
+                    }),
+                    max_length: Some(20usize),
+                    ..Default::default()
+                }),
+            );
+            map.insert(
                 SmolStr::new_static("draftEmbedImage"),
                 LexUserType::Object(LexObject {
                     required: Some(vec![SmolStr::new_static("localRef")]),
@@ -1046,6 +1113,13 @@ fn lexicon_doc_app_bsky_draft_defs() -> LexiconDoc<'static> {
                                     ..Default::default()
                                 }),
                                 max_length: Some(1usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("embedGallery"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#draftEmbedGallery"),
                                 ..Default::default()
                             }),
                         );
@@ -1500,6 +1574,130 @@ where
     }
 }
 
+pub mod draft_embed_gallery_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Items;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Items = Unset;
+    }
+    ///State transition - sets the `items` field to Set
+    pub struct SetItems<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItems<St> {}
+    impl<St: State> State for SetItems<St> {
+        type Items = Set<members::items>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `items` field
+        pub struct items(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct DraftEmbedGalleryBuilder<
+    St: draft_embed_gallery_state::State,
+    S: BosStr = DefaultStr,
+> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<draft::DraftEmbedGalleryItems<S>>,),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl DraftEmbedGallery<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> DraftEmbedGalleryBuilder<
+        draft_embed_gallery_state::Empty,
+        DefaultStr,
+    > {
+        DraftEmbedGalleryBuilder::new()
+    }
+}
+
+impl<S: BosStr> DraftEmbedGallery<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> DraftEmbedGalleryBuilder<draft_embed_gallery_state::Empty, S> {
+        DraftEmbedGalleryBuilder::builder()
+    }
+}
+
+impl DraftEmbedGalleryBuilder<draft_embed_gallery_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        DraftEmbedGalleryBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> DraftEmbedGalleryBuilder<draft_embed_gallery_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        DraftEmbedGalleryBuilder {
+            _state: PhantomData,
+            _fields: (None,),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DraftEmbedGalleryBuilder<St, S>
+where
+    St: draft_embed_gallery_state::State,
+    St::Items: draft_embed_gallery_state::IsUnset,
+{
+    /// Set the `items` field (required)
+    pub fn items(
+        mut self,
+        value: impl Into<draft::DraftEmbedGalleryItems<S>>,
+    ) -> DraftEmbedGalleryBuilder<draft_embed_gallery_state::SetItems<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        DraftEmbedGalleryBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> DraftEmbedGalleryBuilder<St, S>
+where
+    St: draft_embed_gallery_state::State,
+    St::Items: draft_embed_gallery_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> DraftEmbedGallery<S> {
+        DraftEmbedGallery {
+            items: self._fields.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DraftEmbedGallery<S> {
+        DraftEmbedGallery {
+            items: self._fields.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
 pub mod draft_embed_image_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1931,67 +2129,67 @@ pub mod draft_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
-        type Draft;
         type CreatedAt;
+        type Draft;
         type Id;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
-        type Draft = Unset;
         type CreatedAt = Unset;
+        type Draft = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
-    impl<St: State> State for SetUpdatedAt<St> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Draft = St::Draft;
-        type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
-    }
-    ///State transition - sets the `draft` field to Set
-    pub struct SetDraft<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDraft<St> {}
-    impl<St: State> State for SetDraft<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Draft = Set<members::draft>;
-        type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Draft = St::Draft;
         type CreatedAt = Set<members::created_at>;
+        type Draft = St::Draft;
         type Id = St::Id;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `draft` field to Set
+    pub struct SetDraft<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDraft<St> {}
+    impl<St: State> State for SetDraft<St> {
+        type CreatedAt = St::CreatedAt;
+        type Draft = Set<members::draft>;
+        type Id = St::Id;
+        type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Draft = St::Draft;
         type CreatedAt = St::CreatedAt;
+        type Draft = St::Draft;
         type Id = Set<members::id>;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type CreatedAt = St::CreatedAt;
+        type Draft = St::Draft;
+        type Id = St::Id;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `draft` field
-        pub struct draft(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `draft` field
+        pub struct draft(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
@@ -2117,10 +2315,10 @@ where
 impl<St, S: BosStr> DraftViewBuilder<St, S>
 where
     St: draft_view_state::State,
-    St::UpdatedAt: draft_view_state::IsSet,
-    St::Draft: draft_view_state::IsSet,
     St::CreatedAt: draft_view_state::IsSet,
+    St::Draft: draft_view_state::IsSet,
     St::Id: draft_view_state::IsSet,
+    St::UpdatedAt: draft_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DraftView<S> {
@@ -2157,37 +2355,37 @@ pub mod draft_with_id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Draft;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Draft = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type Draft = St::Draft;
+        type Id = Unset;
     }
     ///State transition - sets the `draft` field to Set
     pub struct SetDraft<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDraft<St> {}
     impl<St: State> State for SetDraft<St> {
-        type Id = St::Id;
         type Draft = Set<members::draft>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Draft = St::Draft;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `draft` field
         pub struct draft(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -2275,8 +2473,8 @@ where
 impl<St, S: BosStr> DraftWithIdBuilder<St, S>
 where
     St: draft_with_id_state::State,
-    St::Id: draft_with_id_state::IsSet,
     St::Draft: draft_with_id_state::IsSet,
+    St::Id: draft_with_id_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DraftWithId<S> {

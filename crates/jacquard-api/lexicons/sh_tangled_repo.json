@@ -4,11 +4,10 @@
   "defs": {
     "main": {
       "type": "record",
-      "key": "tid",
+      "key": "any",
       "record": {
         "type": "object",
         "required": [
-          "name",
           "knot",
           "createdAt"
         ],
@@ -36,7 +35,12 @@
           },
           "name": {
             "type": "string",
-            "description": "name of the repo"
+            "description": "Cosmetic name of the repo."
+          },
+          "repoDid": {
+            "type": "string",
+            "description": "DID of the repo itself, if assigned",
+            "format": "did"
           },
           "source": {
             "type": "string",

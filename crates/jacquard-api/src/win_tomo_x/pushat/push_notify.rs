@@ -125,37 +125,37 @@ pub mod push_notify_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Target;
         type Body;
+        type Target;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Target = Unset;
         type Body = Unset;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTarget<St> {}
-    impl<St: State> State for SetTarget<St> {
-        type Target = Set<members::target>;
-        type Body = St::Body;
+        type Target = Unset;
     }
     ///State transition - sets the `body` field to Set
     pub struct SetBody<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBody<St> {}
     impl<St: State> State for SetBody<St> {
-        type Target = St::Target;
         type Body = Set<members::body>;
+        type Target = St::Target;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTarget<St> {}
+    impl<St: State> State for SetTarget<St> {
+        type Body = St::Body;
+        type Target = Set<members::target>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `target` field
-        pub struct target(());
         ///Marker type for the `body` field
         pub struct body(());
+        ///Marker type for the `target` field
+        pub struct target(());
     }
 }
 
@@ -243,8 +243,8 @@ where
 impl<St, S: BosStr> PushNotifyBuilder<St, S>
 where
     St: push_notify_state::State,
-    St::Target: push_notify_state::IsSet,
     St::Body: push_notify_state::IsSet,
+    St::Target: push_notify_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PushNotify<S> {

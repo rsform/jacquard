@@ -11,7 +11,8 @@
       "properties": {
         "artistMbId": {
           "type": "string",
-          "description": "The Musicbrainz ID of the artist"
+          "description": "The MusicBrainz artist ID URI, formatted as mbid:<uuid>",
+          "format": "uri"
         },
         "artistName": {
           "type": "string",
@@ -60,11 +61,13 @@
         },
         "recordingMbId": {
           "type": "string",
-          "description": "The Musicbrainz recording ID of the track"
+          "description": "The MusicBrainz recording ID URI of the track, formatted as mbid:<uuid>",
+          "format": "uri"
         },
         "releaseMbId": {
           "type": "string",
-          "description": "The Musicbrainz release ID"
+          "description": "The MusicBrainz release ID URI, formatted as mbid:<uuid>",
+          "format": "uri"
         },
         "releaseName": {
           "type": "string",
@@ -80,7 +83,8 @@
         },
         "trackMbId": {
           "type": "string",
-          "description": "The Musicbrainz ID of the track"
+          "description": "The MusicBrainz ID URI of the track, formatted as mbid:<uuid>",
+          "format": "uri"
         },
         "trackName": {
           "type": "string",

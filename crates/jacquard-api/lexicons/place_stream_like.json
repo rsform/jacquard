@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.like",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record indicating a like on some other record (e.g. a video or a comment).",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this like was created.",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "description": "AT-URI of the record being liked (e.g. a place.stream.video or place.stream.vod.comment).",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

@@ -37,8 +37,8 @@ use serde::{Serialize, Deserialize};
 )]
 pub struct Collaborator<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
-    ///repo to add this user to
-    pub repo: AtUri<S>,
+    ///repo DID to add this user to
+    pub repo: Did<S>,
     pub subject: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -114,57 +114,57 @@ pub mod collaborator_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Subject;
         type Repo;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Subject = Unset;
         type Repo = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Repo = St::Repo;
         type Subject = St::Subject;
-        type Repo = St::Repo;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type CreatedAt = St::CreatedAt;
-        type Subject = Set<members::subject>;
-        type Repo = St::Repo;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
         type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
         type Repo = Set<members::repo>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Repo = St::Repo;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type.
 pub struct CollaboratorBuilder<St: collaborator_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<AtUri<S>>, Option<Did<S>>),
+    _fields: (Option<Datetime>, Option<Did<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -231,7 +231,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<S>>,
+        value: impl Into<Did<S>>,
     ) -> CollaboratorBuilder<collaborator_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CollaboratorBuilder {
@@ -265,8 +265,8 @@ impl<St, S: BosStr> CollaboratorBuilder<St, S>
 where
     St: collaborator_state::State,
     St::CreatedAt: collaborator_state::IsSet,
-    St::Subject: collaborator_state::IsSet,
     St::Repo: collaborator_state::IsSet,
+    St::Subject: collaborator_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Collaborator<S> {
@@ -326,9 +326,9 @@ fn lexicon_doc_sh_tangled_repo_collaborator() -> LexiconDoc<'static> {
                                 SmolStr::new_static("repo"),
                                 LexObjectProperty::String(LexString {
                                     description: Some(
-                                        CowStr::new_static("repo to add this user to"),
+                                        CowStr::new_static("repo DID to add this user to"),
                                     ),
-                                    format: Some(LexStringFormat::AtUri),
+                                    format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
                             );

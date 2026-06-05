@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.queue.unassignModerator",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Remove a user's assignment from a queue.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "queueId",
+            "did"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "DID to be unassigned.",
+              "format": "did"
+            },
+            "queueId": {
+              "type": "integer",
+              "description": "The ID of the queue to unassign the user from."
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "No active assignment exists for the given queue and user.",
+          "name": "InvalidAssignment"
+        }
+      ]
+    }
+  }
+}

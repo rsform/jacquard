@@ -1,0 +1,76 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.media.createUpload",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Start a resumable upload of arbitrary media content. Returns a TUS upload URL and a short-lived bearer token used to authenticate subsequent chunk requests (no DPoP required on chunks). The DID of the authenticated user is recorded against the upload; on completion a VOD processing task is enqueued.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "size",
+            "mimeType"
+          ],
+          "properties": {
+            "filename": {
+              "type": "string",
+              "description": "Optional filename hint to attach as upload metadata."
+            },
+            "mimeType": {
+              "type": "string",
+              "description": "MIME type of the content being uploaded (e.g. video/mp4)."
+            },
+            "size": {
+              "type": "integer",
+              "description": "Total size of the upload in bytes."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uploadUrl",
+            "uploadToken",
+            "expiresAt",
+            "uploadId"
+          ],
+          "properties": {
+            "expiresAt": {
+              "type": "string",
+              "description": "When the upload token expires.",
+              "format": "datetime"
+            },
+            "uploadId": {
+              "type": "string",
+              "description": "Server-side identifier for this upload."
+            },
+            "uploadToken": {
+              "type": "string",
+              "description": "Short-lived bearer token bound to this upload. Send as 'Authorization: Bearer <token>' on TUS requests."
+            },
+            "uploadUrl": {
+              "type": "string",
+              "description": "Absolute URL to PATCH/HEAD per the TUS protocol.",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "The requested upload exceeds the server's maximum allowed size.",
+          "name": "UploadTooLarge"
+        },
+        {
+          "description": "The server does not accept this MIME type for upload.",
+          "name": "UnsupportedMimeType"
+        }
+      ]
+    }
+  }
+}

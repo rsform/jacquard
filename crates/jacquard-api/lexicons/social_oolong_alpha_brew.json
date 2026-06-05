@@ -1,0 +1,89 @@
+{
+  "lexicon": 1,
+  "id": "social.oolong.alpha.brew",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A tea brewing session",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "teaRef",
+          "style",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "infuserRef": {
+            "type": "string",
+            "description": "AT-URI to a social.oolong.alpha.infuser record. Only meaningful when infusionMethod=infuser.",
+            "format": "at-uri"
+          },
+          "infusionMethod": {
+            "type": "string",
+            "description": "How the leaf was contained during brewing",
+            "maxLength": 50,
+            "knownValues": [
+              "tea-bag",
+              "loose-leaf",
+              "infuser"
+            ]
+          },
+          "leafGrams": {
+            "type": "integer",
+            "description": "Leaf weight in tenths of a gram (e.g. 50 = 5.0g)",
+            "minimum": 0
+          },
+          "rating": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "style": {
+            "type": "string",
+            "description": "Brewing style. Required. Canonical filterable axis.",
+            "maxLength": 50,
+            "knownValues": [
+              "longSteep",
+              "coldBrew"
+            ]
+          },
+          "tastingNotes": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "teaRef": {
+            "type": "string",
+            "description": "AT-URI to a social.oolong.alpha.tea record",
+            "format": "at-uri"
+          },
+          "temperature": {
+            "type": "integer",
+            "description": "Water temperature in tenths of °C (e.g. 850 = 85.0°C)",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "timeSeconds": {
+            "type": "integer",
+            "description": "Total brew time in seconds",
+            "minimum": 0
+          },
+          "vesselRef": {
+            "type": "string",
+            "description": "AT-URI to a social.oolong.alpha.brewer record",
+            "format": "at-uri"
+          },
+          "waterAmount": {
+            "type": "integer",
+            "description": "Amount of water used in grams or milliliters",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}

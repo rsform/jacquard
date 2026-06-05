@@ -5,9 +5,588 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod assign_moderator;
+pub mod create_activity;
+pub mod get_assignments;
+pub mod get_historical_stats;
+pub mod get_latest_report;
+pub mod get_live_stats;
+pub mod get_report;
+pub mod list_activities;
+pub mod query_reports;
+pub mod reassign_queue;
+pub mod refresh_stats;
+pub mod unassign_moderator;
+
+
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
+use core::marker::PhantomData;
 use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
-use jacquard_derive::IntoStatic;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::ModEventView;
+use crate::tools_ozone::moderation::SubjectStatusView;
+use crate::tools_ozone::moderation::SubjectView;
+use crate::tools_ozone::queue::QueueView;
+use crate::tools_ozone::team::Member;
+use crate::com_atproto::moderation;
+use crate::tools_ozone::report;
+/// Activity recording a moderator being assigned to a report.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct AssignmentActivity<S: BosStr = DefaultStr> {
+    ///The report's status before this activity. Populated automatically from the report row; not required in input.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub previous_status: Option<AssignmentActivityPreviousStatus<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// The report's status before this activity. Populated automatically from the report row; not required in input.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AssignmentActivityPreviousStatus<S: BosStr = DefaultStr> {
+    Open,
+    Closed,
+    Escalated,
+    Queued,
+    Assigned,
+    Other(S),
+}
+
+impl<S: BosStr> AssignmentActivityPreviousStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Open => "open",
+            Self::Closed => "closed",
+            Self::Escalated => "escalated",
+            Self::Queued => "queued",
+            Self::Assigned => "assigned",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "open" => Self::Open,
+            "closed" => Self::Closed,
+            "escalated" => Self::Escalated,
+            "queued" => Self::Queued,
+            "assigned" => Self::Assigned,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for AssignmentActivityPreviousStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for AssignmentActivityPreviousStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for AssignmentActivityPreviousStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for AssignmentActivityPreviousStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for AssignmentActivityPreviousStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for AssignmentActivityPreviousStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = AssignmentActivityPreviousStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AssignmentActivityPreviousStatus::Open => {
+                AssignmentActivityPreviousStatus::Open
+            }
+            AssignmentActivityPreviousStatus::Closed => {
+                AssignmentActivityPreviousStatus::Closed
+            }
+            AssignmentActivityPreviousStatus::Escalated => {
+                AssignmentActivityPreviousStatus::Escalated
+            }
+            AssignmentActivityPreviousStatus::Queued => {
+                AssignmentActivityPreviousStatus::Queued
+            }
+            AssignmentActivityPreviousStatus::Assigned => {
+                AssignmentActivityPreviousStatus::Assigned
+            }
+            AssignmentActivityPreviousStatus::Other(v) => {
+                AssignmentActivityPreviousStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct AssignmentView<S: BosStr = DefaultStr> {
+    pub did: Did<S>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end_at: Option<Datetime>,
+    pub id: i64,
+    ///The moderator assigned to this report
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub moderator: Option<Member<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub queue: Option<QueueView<S>>,
+    pub report_id: i64,
+    pub start_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Activity recording a report being closed.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct CloseActivity<S: BosStr = DefaultStr> {
+    ///The report's status before this activity. Populated automatically from the report row; not required in input.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub previous_status: Option<CloseActivityPreviousStatus<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// The report's status before this activity. Populated automatically from the report row; not required in input.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CloseActivityPreviousStatus<S: BosStr = DefaultStr> {
+    Open,
+    Closed,
+    Escalated,
+    Queued,
+    Assigned,
+    Other(S),
+}
+
+impl<S: BosStr> CloseActivityPreviousStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Open => "open",
+            Self::Closed => "closed",
+            Self::Escalated => "escalated",
+            Self::Queued => "queued",
+            Self::Assigned => "assigned",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "open" => Self::Open,
+            "closed" => Self::Closed,
+            "escalated" => Self::Escalated,
+            "queued" => Self::Queued,
+            "assigned" => Self::Assigned,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for CloseActivityPreviousStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for CloseActivityPreviousStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for CloseActivityPreviousStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for CloseActivityPreviousStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for CloseActivityPreviousStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for CloseActivityPreviousStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CloseActivityPreviousStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CloseActivityPreviousStatus::Open => CloseActivityPreviousStatus::Open,
+            CloseActivityPreviousStatus::Closed => CloseActivityPreviousStatus::Closed,
+            CloseActivityPreviousStatus::Escalated => {
+                CloseActivityPreviousStatus::Escalated
+            }
+            CloseActivityPreviousStatus::Queued => CloseActivityPreviousStatus::Queued,
+            CloseActivityPreviousStatus::Assigned => {
+                CloseActivityPreviousStatus::Assigned
+            }
+            CloseActivityPreviousStatus::Other(v) => {
+                CloseActivityPreviousStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Activity recording a report being escalated.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct EscalationActivity<S: BosStr = DefaultStr> {
+    ///The report's status before this activity. Populated automatically from the report row; not required in input.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub previous_status: Option<EscalationActivityPreviousStatus<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// The report's status before this activity. Populated automatically from the report row; not required in input.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum EscalationActivityPreviousStatus<S: BosStr = DefaultStr> {
+    Open,
+    Closed,
+    Escalated,
+    Queued,
+    Assigned,
+    Other(S),
+}
+
+impl<S: BosStr> EscalationActivityPreviousStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Open => "open",
+            Self::Closed => "closed",
+            Self::Escalated => "escalated",
+            Self::Queued => "queued",
+            Self::Assigned => "assigned",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "open" => Self::Open,
+            "closed" => Self::Closed,
+            "escalated" => Self::Escalated,
+            "queued" => Self::Queued,
+            "assigned" => Self::Assigned,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for EscalationActivityPreviousStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for EscalationActivityPreviousStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for EscalationActivityPreviousStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for EscalationActivityPreviousStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for EscalationActivityPreviousStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for EscalationActivityPreviousStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = EscalationActivityPreviousStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            EscalationActivityPreviousStatus::Open => {
+                EscalationActivityPreviousStatus::Open
+            }
+            EscalationActivityPreviousStatus::Closed => {
+                EscalationActivityPreviousStatus::Closed
+            }
+            EscalationActivityPreviousStatus::Escalated => {
+                EscalationActivityPreviousStatus::Escalated
+            }
+            EscalationActivityPreviousStatus::Queued => {
+                EscalationActivityPreviousStatus::Queued
+            }
+            EscalationActivityPreviousStatus::Assigned => {
+                EscalationActivityPreviousStatus::Assigned
+            }
+            EscalationActivityPreviousStatus::Other(v) => {
+                EscalationActivityPreviousStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// A single daily snapshot of report statistics for a calendar date.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct HistoricalStats<S: BosStr = DefaultStr> {
+    ///Percentage of reports actioned (actionedCount / inboundCount * 100), rounded to nearest integer.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub action_rate: Option<i64>,
+    ///Number of reports closed during this day.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub actioned_count: Option<i64>,
+    ///Average time in seconds from report creation (or moderator assignment) to close.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub avg_handling_time_sec: Option<i64>,
+    ///When this snapshot was last computed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub computed_at: Option<Datetime>,
+    ///The calendar date this snapshot covers (YYYY-MM-DD).
+    pub date: S,
+    ///Number of reports escalated during this day.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub escalated_count: Option<i64>,
+    ///Reports received during this day.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inbound_count: Option<i64>,
+    ///Number of reports not closed at time of computation.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pending_count: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Live statistics for reports for the current calendar day, filterable by queue, moderator, or report type.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct LiveStats<S: BosStr = DefaultStr> {
+    ///Percentage of reports actioned (actionedCount / inboundCount * 100), rounded to nearest integer.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub action_rate: Option<i64>,
+    ///Number of reports closed today.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub actioned_count: Option<i64>,
+    ///Average time in seconds from report creation (or moderator assignment) to close.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub avg_handling_time_sec: Option<i64>,
+    ///Number of reports escalated today.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub escalated_count: Option<i64>,
+    ///Reports received today.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inbound_count: Option<i64>,
+    ///When these statistics were last computed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_updated: Option<Datetime>,
+    ///Number of reports currently not closed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pending_count: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Activity recording a note on a report. Use internalNote for moderator-only notes or publicNote for reporter-visible notes (or both).
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct NoteActivity<S: BosStr = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Activity recording a report being routed to a queue.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct QueueActivity<S: BosStr = DefaultStr> {
+    ///The report's status before this activity. Populated automatically from the report row; not required in input.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub previous_status: Option<QueueActivityPreviousStatus<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// The report's status before this activity. Populated automatically from the report row; not required in input.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum QueueActivityPreviousStatus<S: BosStr = DefaultStr> {
+    Open,
+    Closed,
+    Escalated,
+    Queued,
+    Assigned,
+    Other(S),
+}
+
+impl<S: BosStr> QueueActivityPreviousStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Open => "open",
+            Self::Closed => "closed",
+            Self::Escalated => "escalated",
+            Self::Queued => "queued",
+            Self::Assigned => "assigned",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "open" => Self::Open,
+            "closed" => Self::Closed,
+            "escalated" => Self::Escalated,
+            "queued" => Self::Queued,
+            "assigned" => Self::Assigned,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for QueueActivityPreviousStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for QueueActivityPreviousStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for QueueActivityPreviousStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for QueueActivityPreviousStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for QueueActivityPreviousStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for QueueActivityPreviousStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = QueueActivityPreviousStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            QueueActivityPreviousStatus::Open => QueueActivityPreviousStatus::Open,
+            QueueActivityPreviousStatus::Closed => QueueActivityPreviousStatus::Closed,
+            QueueActivityPreviousStatus::Escalated => {
+                QueueActivityPreviousStatus::Escalated
+            }
+            QueueActivityPreviousStatus::Queued => QueueActivityPreviousStatus::Queued,
+            QueueActivityPreviousStatus::Assigned => {
+                QueueActivityPreviousStatus::Assigned
+            }
+            QueueActivityPreviousStatus::Other(v) => {
+                QueueActivityPreviousStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
 /// Appeal a previously taken moderation action
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
@@ -869,5 +1448,2877 @@ pub struct ReasonViolenceTrafficking;
 impl core::fmt::Display for ReasonViolenceTrafficking {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonViolenceTrafficking")
+    }
+}
+
+/// Activity recording a closed report being reopened. Only valid when the report is in 'closed' status.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct ReopenActivity<S: BosStr = DefaultStr> {
+    ///The report's status before this activity. Populated automatically from the report row; not required in input.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub previous_status: Option<ReopenActivityPreviousStatus<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// The report's status before this activity. Populated automatically from the report row; not required in input.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ReopenActivityPreviousStatus<S: BosStr = DefaultStr> {
+    Open,
+    Closed,
+    Escalated,
+    Queued,
+    Assigned,
+    Other(S),
+}
+
+impl<S: BosStr> ReopenActivityPreviousStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Open => "open",
+            Self::Closed => "closed",
+            Self::Escalated => "escalated",
+            Self::Queued => "queued",
+            Self::Assigned => "assigned",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "open" => Self::Open,
+            "closed" => Self::Closed,
+            "escalated" => Self::Escalated,
+            "queued" => Self::Queued,
+            "assigned" => Self::Assigned,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ReopenActivityPreviousStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ReopenActivityPreviousStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ReopenActivityPreviousStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ReopenActivityPreviousStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ReopenActivityPreviousStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ReopenActivityPreviousStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ReopenActivityPreviousStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ReopenActivityPreviousStatus::Open => ReopenActivityPreviousStatus::Open,
+            ReopenActivityPreviousStatus::Closed => ReopenActivityPreviousStatus::Closed,
+            ReopenActivityPreviousStatus::Escalated => {
+                ReopenActivityPreviousStatus::Escalated
+            }
+            ReopenActivityPreviousStatus::Queued => ReopenActivityPreviousStatus::Queued,
+            ReopenActivityPreviousStatus::Assigned => {
+                ReopenActivityPreviousStatus::Assigned
+            }
+            ReopenActivityPreviousStatus::Other(v) => {
+                ReopenActivityPreviousStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// A single activity entry on a report.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct ReportActivityView<S: BosStr = DefaultStr> {
+    ///The typed activity object describing what occurred.
+    pub activity: ReportActivityViewActivity<S>,
+    ///When this activity was created
+    pub created_at: Datetime,
+    ///DID of the actor who created this activity, or the service DID for automated activities.
+    pub created_by: Did<S>,
+    ///Activity ID
+    pub id: i64,
+    ///Optional moderator-only note. Not visible to reporters.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub internal_note: Option<S>,
+    ///True if this activity was created by an automated process (e.g. queue router) rather than a direct human action.
+    pub is_automated: bool,
+    ///Extensible JSON payload for loose activity-specific metadata (e.g. assignmentId).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub meta: Option<Data<S>>,
+    ///Full member record of the moderator who created this activity
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub moderator: Option<Member<S>>,
+    ///Optional public note, potentially visible to the reporter.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub public_note: Option<S>,
+    ///ID of the report this activity belongs to
+    pub report_id: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub enum ReportActivityViewActivity<S: BosStr = DefaultStr> {
+    #[serde(rename = "tools.ozone.report.defs#queueActivity")]
+    QueueActivity(Box<report::QueueActivity<S>>),
+    #[serde(rename = "tools.ozone.report.defs#assignmentActivity")]
+    AssignmentActivity(Box<report::AssignmentActivity<S>>),
+    #[serde(rename = "tools.ozone.report.defs#escalationActivity")]
+    EscalationActivity(Box<report::EscalationActivity<S>>),
+    #[serde(rename = "tools.ozone.report.defs#closeActivity")]
+    CloseActivity(Box<report::CloseActivity<S>>),
+    #[serde(rename = "tools.ozone.report.defs#reopenActivity")]
+    ReopenActivity(Box<report::ReopenActivity<S>>),
+    #[serde(rename = "tools.ozone.report.defs#noteActivity")]
+    NoteActivity(Box<report::NoteActivity<S>>),
+}
+
+/// Information about the moderator currently assigned to a report.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct ReportAssignment<S: BosStr = DefaultStr> {
+    ///When the report was assigned
+    pub assigned_at: Datetime,
+    ///DID of the assigned moderator
+    pub did: Did<S>,
+    ///Full member record of the assigned moderator
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub moderator: Option<Member<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct ReportView<S: BosStr = DefaultStr> {
+    ///Array of moderation event IDs representing actions taken on this report (sorted DESC, most recent first)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub action_event_ids: Option<Vec<i64>>,
+    ///Note sent to reporter when report was actioned
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub action_note: Option<S>,
+    ///Optional: expanded action events
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub actions: Option<Vec<ModEventView<S>>>,
+    ///Information about moderator currently assigned to this report (if any)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub assignment: Option<report::ReportAssignment<S>>,
+    ///Comment provided by the reporter
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub comment: Option<S>,
+    ///When the report was created
+    pub created_at: Datetime,
+    ///ID of the moderation event that created this report
+    pub event_id: i64,
+    ///Report ID
+    pub id: i64,
+    ///Whether this report is muted. A report is muted if the reporter was muted or the subject was muted at the time the report was created.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_muted: Option<bool>,
+    ///The queue this report is assigned to (if any)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub queue: Option<QueueView<S>>,
+    ///When the report was assigned to its current queue
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub queued_at: Option<Datetime>,
+    ///Number of other pending reports on the same subject
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub related_report_count: Option<i64>,
+    ///Type of report
+    pub report_type: moderation::ReasonType<S>,
+    ///DID of the user who made the report
+    pub reported_by: Did<S>,
+    ///Full subject view of the reporter account
+    pub reporter: SubjectView<S>,
+    ///Current status of the report
+    pub status: ReportViewStatus<S>,
+    ///The subject that was reported with full details
+    pub subject: SubjectView<S>,
+    ///Current status of the reported subject
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub subject_status: Option<SubjectStatusView<S>>,
+    ///When the report was last updated
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Current status of the report
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ReportViewStatus<S: BosStr = DefaultStr> {
+    Open,
+    Closed,
+    Escalated,
+    Queued,
+    Assigned,
+    Other(S),
+}
+
+impl<S: BosStr> ReportViewStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Open => "open",
+            Self::Closed => "closed",
+            Self::Escalated => "escalated",
+            Self::Queued => "queued",
+            Self::Assigned => "assigned",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "open" => Self::Open,
+            "closed" => Self::Closed,
+            "escalated" => Self::Escalated,
+            "queued" => Self::Queued,
+            "assigned" => Self::Assigned,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ReportViewStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ReportViewStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ReportViewStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ReportViewStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ReportViewStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ReportViewStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ReportViewStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ReportViewStatus::Open => ReportViewStatus::Open,
+            ReportViewStatus::Closed => ReportViewStatus::Closed,
+            ReportViewStatus::Escalated => ReportViewStatus::Escalated,
+            ReportViewStatus::Queued => ReportViewStatus::Queued,
+            ReportViewStatus::Assigned => ReportViewStatus::Assigned,
+            ReportViewStatus::Other(v) => ReportViewStatus::Other(v.into_static()),
+        }
+    }
+}
+
+impl<S: BosStr> LexiconSchema for AssignmentActivity<S> {
+    fn nsid() -> &'static str {
+        "tools.ozone.report.defs"
+    }
+    fn def_name() -> &'static str {
+        "assignmentActivity"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_report_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for AssignmentView<S> {
+    fn nsid() -> &'static str {
+        "tools.ozone.report.defs"
+    }
+    fn def_name() -> &'static str {
+        "assignmentView"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_report_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for CloseActivity<S> {
+    fn nsid() -> &'static str {
+        "tools.ozone.report.defs"
+    }
+    fn def_name() -> &'static str {
+        "closeActivity"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_report_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for EscalationActivity<S> {
+    fn nsid() -> &'static str {
+        "tools.ozone.report.defs"
+    }
+    fn def_name() -> &'static str {
+        "escalationActivity"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_report_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for HistoricalStats<S> {
+    fn nsid() -> &'static str {
+        "tools.ozone.report.defs"
+    }
+    fn def_name() -> &'static str {
+        "historicalStats"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_report_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for LiveStats<S> {
+    fn nsid() -> &'static str {
+        "tools.ozone.report.defs"
+    }
+    fn def_name() -> &'static str {
+        "liveStats"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_report_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for NoteActivity<S> {
+    fn nsid() -> &'static str {
+        "tools.ozone.report.defs"
+    }
+    fn def_name() -> &'static str {
+        "noteActivity"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_report_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for QueueActivity<S> {
+    fn nsid() -> &'static str {
+        "tools.ozone.report.defs"
+    }
+    fn def_name() -> &'static str {
+        "queueActivity"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_report_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for ReopenActivity<S> {
+    fn nsid() -> &'static str {
+        "tools.ozone.report.defs"
+    }
+    fn def_name() -> &'static str {
+        "reopenActivity"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_report_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for ReportActivityView<S> {
+    fn nsid() -> &'static str {
+        "tools.ozone.report.defs"
+    }
+    fn def_name() -> &'static str {
+        "reportActivityView"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_report_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for ReportAssignment<S> {
+    fn nsid() -> &'static str {
+        "tools.ozone.report.defs"
+    }
+    fn def_name() -> &'static str {
+        "reportAssignment"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_report_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for ReportView<S> {
+    fn nsid() -> &'static str {
+        "tools.ozone.report.defs"
+    }
+    fn def_name() -> &'static str {
+        "reportView"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_report_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+fn lexicon_doc_tools_ozone_report_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("tools.ozone.report.defs"),
+        defs: {
+            let mut map = BTreeMap::new();
+            map.insert(
+                SmolStr::new_static("assignmentActivity"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Activity recording a moderator being assigned to a report.",
+                        ),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("previousStatus"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The report's status before this activity. Populated automatically from the report row; not required in input.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("assignmentView"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("did"),
+                            SmolStr::new_static("reportId"),
+                            SmolStr::new_static("startAt")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("did"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("endAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("moderator"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("tools.ozone.team.defs#member"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("queue"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
+                                    "tools.ozone.queue.defs#queueView",
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("reportId"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("startAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("closeActivity"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static("Activity recording a report being closed."),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("previousStatus"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The report's status before this activity. Populated automatically from the report row; not required in input.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("escalationActivity"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Activity recording a report being escalated.",
+                        ),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("previousStatus"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The report's status before this activity. Populated automatically from the report row; not required in input.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("historicalStats"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "A single daily snapshot of report statistics for a calendar date.",
+                        ),
+                    ),
+                    required: Some(vec![SmolStr::new_static("date")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("actionRate"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("actionedCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("avgHandlingTimeSec"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("computedAt"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("When this snapshot was last computed."),
+                                ),
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("date"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The calendar date this snapshot covers (YYYY-MM-DD).",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("escalatedCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("inboundCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("pendingCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("liveStats"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Live statistics for reports for the current calendar day, filterable by queue, moderator, or report type.",
+                        ),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("actionRate"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("actionedCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("avgHandlingTimeSec"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("escalatedCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("inboundCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("lastUpdated"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "When these statistics were last computed.",
+                                    ),
+                                ),
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("pendingCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("noteActivity"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Activity recording a note on a report. Use internalNote for moderator-only notes or publicNote for reporter-visible notes (or both).",
+                        ),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("queueActivity"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Activity recording a report being routed to a queue.",
+                        ),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("previousStatus"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The report's status before this activity. Populated automatically from the report row; not required in input.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonAppeal"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonChildSafetyCSAM"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonChildSafetyGroom"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonChildSafetyHarassment"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonChildSafetyOther"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonChildSafetyPrivacy"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonHarassmentDoxxing"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonHarassmentHateSpeech"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonHarassmentOther"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonHarassmentTargeted"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonHarassmentTroll"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonMisleadingBot"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonMisleadingElections"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonMisleadingImpersonation"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonMisleadingOther"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonMisleadingScam"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonMisleadingSpam"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonOther"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonRuleBanEvasion"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonRuleOther"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonRuleProhibitedSales"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonRuleSiteSecurity"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonSelfHarmContent"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonSelfHarmED"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonSelfHarmOther"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonSelfHarmStunts"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonSelfHarmSubstances"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonSexualAbuseContent"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonSexualAnimal"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonSexualDeepfake"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonSexualNCII"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonSexualOther"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonSexualUnlabeled"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonType"),
+                LexUserType::String(LexString { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonViolenceAnimal"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonViolenceExtremistContent"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonViolenceGlorification"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonViolenceGraphicContent"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonViolenceOther"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonViolenceThreats"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reasonViolenceTrafficking"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("reopenActivity"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Activity recording a closed report being reopened. Only valid when the report is in 'closed' status.",
+                        ),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("previousStatus"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The report's status before this activity. Populated automatically from the report row; not required in input.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("reportActivityView"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static("A single activity entry on a report."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("reportId"),
+                            SmolStr::new_static("activity"),
+                            SmolStr::new_static("isAutomated"),
+                            SmolStr::new_static("createdBy"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("activity"),
+                            LexObjectProperty::Union(LexRefUnion {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The typed activity object describing what occurred.",
+                                    ),
+                                ),
+                                refs: vec![
+                                    CowStr::new_static("#queueActivity"),
+                                    CowStr::new_static("#assignmentActivity"),
+                                    CowStr::new_static("#escalationActivity"),
+                                    CowStr::new_static("#closeActivity"),
+                                    CowStr::new_static("#reopenActivity"),
+                                    CowStr::new_static("#noteActivity")
+                                ],
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("When this activity was created"),
+                                ),
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("createdBy"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "DID of the actor who created this activity, or the service DID for automated activities.",
+                                    ),
+                                ),
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("internalNote"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Optional moderator-only note. Not visible to reporters.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("isAutomated"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("meta"),
+                            LexObjectProperty::Unknown(LexUnknown {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("moderator"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("tools.ozone.team.defs#member"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("publicNote"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Optional public note, potentially visible to the reporter.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("reportId"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("reportAssignment"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Information about the moderator currently assigned to a report.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("did"), SmolStr::new_static("assignedAt")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("assignedAt"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("When the report was assigned"),
+                                ),
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("did"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("DID of the assigned moderator"),
+                                ),
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("moderator"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("tools.ozone.team.defs#member"),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("reportView"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("eventId"),
+                            SmolStr::new_static("status"),
+                            SmolStr::new_static("subject"),
+                            SmolStr::new_static("reportType"),
+                            SmolStr::new_static("reportedBy"),
+                            SmolStr::new_static("reporter"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("actionEventIds"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Array of moderation event IDs representing actions taken on this report (sorted DESC, most recent first)",
+                                    ),
+                                ),
+                                items: LexArrayItem::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("actionNote"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Note sent to reporter when report was actioned",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("actions"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static("Optional: expanded action events"),
+                                ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
+                                        "tools.ozone.moderation.defs#modEventView",
+                                    ),
+                                    ..Default::default()
+                                }),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("assignment"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#reportAssignment"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("comment"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Comment provided by the reporter"),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("When the report was created"),
+                                ),
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("eventId"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("isMuted"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("queue"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
+                                    "tools.ozone.queue.defs#queueView",
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("queuedAt"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "When the report was assigned to its current queue",
+                                    ),
+                                ),
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("relatedReportCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("reportType"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
+                                    "com.atproto.moderation.defs#reasonType",
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("reportedBy"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("DID of the user who made the report"),
+                                ),
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("reporter"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
+                                    "tools.ozone.moderation.defs#subjectView",
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("status"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Current status of the report"),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("subject"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
+                                    "tools.ozone.moderation.defs#subjectView",
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("subjectStatus"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
+                                    "tools.ozone.moderation.defs#subjectStatusView",
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("updatedAt"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("When the report was last updated"),
+                                ),
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map
+        },
+        ..Default::default()
+    }
+}
+
+pub mod assignment_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Id;
+        type ReportId;
+        type StartAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Id = Unset;
+        type ReportId = Unset;
+        type StartAt = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Did = Set<members::did>;
+        type Id = St::Id;
+        type ReportId = St::ReportId;
+        type StartAt = St::StartAt;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Did = St::Did;
+        type Id = Set<members::id>;
+        type ReportId = St::ReportId;
+        type StartAt = St::StartAt;
+    }
+    ///State transition - sets the `report_id` field to Set
+    pub struct SetReportId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReportId<St> {}
+    impl<St: State> State for SetReportId<St> {
+        type Did = St::Did;
+        type Id = St::Id;
+        type ReportId = Set<members::report_id>;
+        type StartAt = St::StartAt;
+    }
+    ///State transition - sets the `start_at` field to Set
+    pub struct SetStartAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartAt<St> {}
+    impl<St: State> State for SetStartAt<St> {
+        type Did = St::Did;
+        type Id = St::Id;
+        type ReportId = St::ReportId;
+        type StartAt = Set<members::start_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `report_id` field
+        pub struct report_id(());
+        ///Marker type for the `start_at` field
+        pub struct start_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct AssignmentViewBuilder<
+    St: assignment_view_state::State,
+    S: BosStr = DefaultStr,
+> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (
+        Option<Did<S>>,
+        Option<Datetime>,
+        Option<i64>,
+        Option<Member<S>>,
+        Option<QueueView<S>>,
+        Option<i64>,
+        Option<Datetime>,
+    ),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl AssignmentView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AssignmentViewBuilder<assignment_view_state::Empty, DefaultStr> {
+        AssignmentViewBuilder::new()
+    }
+}
+
+impl<S: BosStr> AssignmentView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AssignmentViewBuilder<assignment_view_state::Empty, S> {
+        AssignmentViewBuilder::builder()
+    }
+}
+
+impl AssignmentViewBuilder<assignment_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        AssignmentViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> AssignmentViewBuilder<assignment_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AssignmentViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AssignmentViewBuilder<St, S>
+where
+    St: assignment_view_state::State,
+    St::Did: assignment_view_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> AssignmentViewBuilder<assignment_view_state::SetDid<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        AssignmentViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: assignment_view_state::State, S: BosStr> AssignmentViewBuilder<St, S> {
+    /// Set the `endAt` field (optional)
+    pub fn end_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `endAt` field to an Option value (optional)
+    pub fn maybe_end_at(mut self, value: Option<Datetime>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> AssignmentViewBuilder<St, S>
+where
+    St: assignment_view_state::State,
+    St::Id: assignment_view_state::IsUnset,
+{
+    /// Set the `id` field (required)
+    pub fn id(
+        mut self,
+        value: impl Into<i64>,
+    ) -> AssignmentViewBuilder<assignment_view_state::SetId<St>, S> {
+        self._fields.2 = Option::Some(value.into());
+        AssignmentViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: assignment_view_state::State, S: BosStr> AssignmentViewBuilder<St, S> {
+    /// Set the `moderator` field (optional)
+    pub fn moderator(mut self, value: impl Into<Option<Member<S>>>) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `moderator` field to an Option value (optional)
+    pub fn maybe_moderator(mut self, value: Option<Member<S>>) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
+impl<St: assignment_view_state::State, S: BosStr> AssignmentViewBuilder<St, S> {
+    /// Set the `queue` field (optional)
+    pub fn queue(mut self, value: impl Into<Option<QueueView<S>>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `queue` field to an Option value (optional)
+    pub fn maybe_queue(mut self, value: Option<QueueView<S>>) -> Self {
+        self._fields.4 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> AssignmentViewBuilder<St, S>
+where
+    St: assignment_view_state::State,
+    St::ReportId: assignment_view_state::IsUnset,
+{
+    /// Set the `reportId` field (required)
+    pub fn report_id(
+        mut self,
+        value: impl Into<i64>,
+    ) -> AssignmentViewBuilder<assignment_view_state::SetReportId<St>, S> {
+        self._fields.5 = Option::Some(value.into());
+        AssignmentViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AssignmentViewBuilder<St, S>
+where
+    St: assignment_view_state::State,
+    St::StartAt: assignment_view_state::IsUnset,
+{
+    /// Set the `startAt` field (required)
+    pub fn start_at(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> AssignmentViewBuilder<assignment_view_state::SetStartAt<St>, S> {
+        self._fields.6 = Option::Some(value.into());
+        AssignmentViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AssignmentViewBuilder<St, S>
+where
+    St: assignment_view_state::State,
+    St::Did: assignment_view_state::IsSet,
+    St::Id: assignment_view_state::IsSet,
+    St::ReportId: assignment_view_state::IsSet,
+    St::StartAt: assignment_view_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> AssignmentView<S> {
+        AssignmentView {
+            did: self._fields.0.unwrap(),
+            end_at: self._fields.1,
+            id: self._fields.2.unwrap(),
+            moderator: self._fields.3,
+            queue: self._fields.4,
+            report_id: self._fields.5.unwrap(),
+            start_at: self._fields.6.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AssignmentView<S> {
+        AssignmentView {
+            did: self._fields.0.unwrap(),
+            end_at: self._fields.1,
+            id: self._fields.2.unwrap(),
+            moderator: self._fields.3,
+            queue: self._fields.4,
+            report_id: self._fields.5.unwrap(),
+            start_at: self._fields.6.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+pub mod report_activity_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Activity;
+        type CreatedAt;
+        type CreatedBy;
+        type Id;
+        type IsAutomated;
+        type ReportId;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Activity = Unset;
+        type CreatedAt = Unset;
+        type CreatedBy = Unset;
+        type Id = Unset;
+        type IsAutomated = Unset;
+        type ReportId = Unset;
+    }
+    ///State transition - sets the `activity` field to Set
+    pub struct SetActivity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActivity<St> {}
+    impl<St: State> State for SetActivity<St> {
+        type Activity = Set<members::activity>;
+        type CreatedAt = St::CreatedAt;
+        type CreatedBy = St::CreatedBy;
+        type Id = St::Id;
+        type IsAutomated = St::IsAutomated;
+        type ReportId = St::ReportId;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Activity = St::Activity;
+        type CreatedAt = Set<members::created_at>;
+        type CreatedBy = St::CreatedBy;
+        type Id = St::Id;
+        type IsAutomated = St::IsAutomated;
+        type ReportId = St::ReportId;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedBy<St> {}
+    impl<St: State> State for SetCreatedBy<St> {
+        type Activity = St::Activity;
+        type CreatedAt = St::CreatedAt;
+        type CreatedBy = Set<members::created_by>;
+        type Id = St::Id;
+        type IsAutomated = St::IsAutomated;
+        type ReportId = St::ReportId;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Activity = St::Activity;
+        type CreatedAt = St::CreatedAt;
+        type CreatedBy = St::CreatedBy;
+        type Id = Set<members::id>;
+        type IsAutomated = St::IsAutomated;
+        type ReportId = St::ReportId;
+    }
+    ///State transition - sets the `is_automated` field to Set
+    pub struct SetIsAutomated<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIsAutomated<St> {}
+    impl<St: State> State for SetIsAutomated<St> {
+        type Activity = St::Activity;
+        type CreatedAt = St::CreatedAt;
+        type CreatedBy = St::CreatedBy;
+        type Id = St::Id;
+        type IsAutomated = Set<members::is_automated>;
+        type ReportId = St::ReportId;
+    }
+    ///State transition - sets the `report_id` field to Set
+    pub struct SetReportId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReportId<St> {}
+    impl<St: State> State for SetReportId<St> {
+        type Activity = St::Activity;
+        type CreatedAt = St::CreatedAt;
+        type CreatedBy = St::CreatedBy;
+        type Id = St::Id;
+        type IsAutomated = St::IsAutomated;
+        type ReportId = Set<members::report_id>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `activity` field
+        pub struct activity(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `is_automated` field
+        pub struct is_automated(());
+        ///Marker type for the `report_id` field
+        pub struct report_id(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct ReportActivityViewBuilder<
+    St: report_activity_view_state::State,
+    S: BosStr = DefaultStr,
+> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (
+        Option<ReportActivityViewActivity<S>>,
+        Option<Datetime>,
+        Option<Did<S>>,
+        Option<i64>,
+        Option<S>,
+        Option<bool>,
+        Option<Data<S>>,
+        Option<Member<S>>,
+        Option<S>,
+        Option<i64>,
+    ),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl ReportActivityView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReportActivityViewBuilder<
+        report_activity_view_state::Empty,
+        DefaultStr,
+    > {
+        ReportActivityViewBuilder::new()
+    }
+}
+
+impl<S: BosStr> ReportActivityView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReportActivityViewBuilder<report_activity_view_state::Empty, S> {
+        ReportActivityViewBuilder::builder()
+    }
+}
+
+impl ReportActivityViewBuilder<report_activity_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        ReportActivityViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> ReportActivityViewBuilder<report_activity_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReportActivityViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReportActivityViewBuilder<St, S>
+where
+    St: report_activity_view_state::State,
+    St::Activity: report_activity_view_state::IsUnset,
+{
+    /// Set the `activity` field (required)
+    pub fn activity(
+        mut self,
+        value: impl Into<ReportActivityViewActivity<S>>,
+    ) -> ReportActivityViewBuilder<report_activity_view_state::SetActivity<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        ReportActivityViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReportActivityViewBuilder<St, S>
+where
+    St: report_activity_view_state::State,
+    St::CreatedAt: report_activity_view_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> ReportActivityViewBuilder<report_activity_view_state::SetCreatedAt<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        ReportActivityViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReportActivityViewBuilder<St, S>
+where
+    St: report_activity_view_state::State,
+    St::CreatedBy: report_activity_view_state::IsUnset,
+{
+    /// Set the `createdBy` field (required)
+    pub fn created_by(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> ReportActivityViewBuilder<report_activity_view_state::SetCreatedBy<St>, S> {
+        self._fields.2 = Option::Some(value.into());
+        ReportActivityViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReportActivityViewBuilder<St, S>
+where
+    St: report_activity_view_state::State,
+    St::Id: report_activity_view_state::IsUnset,
+{
+    /// Set the `id` field (required)
+    pub fn id(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ReportActivityViewBuilder<report_activity_view_state::SetId<St>, S> {
+        self._fields.3 = Option::Some(value.into());
+        ReportActivityViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: report_activity_view_state::State, S: BosStr> ReportActivityViewBuilder<St, S> {
+    /// Set the `internalNote` field (optional)
+    pub fn internal_note(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `internalNote` field to an Option value (optional)
+    pub fn maybe_internal_note(mut self, value: Option<S>) -> Self {
+        self._fields.4 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ReportActivityViewBuilder<St, S>
+where
+    St: report_activity_view_state::State,
+    St::IsAutomated: report_activity_view_state::IsUnset,
+{
+    /// Set the `isAutomated` field (required)
+    pub fn is_automated(
+        mut self,
+        value: impl Into<bool>,
+    ) -> ReportActivityViewBuilder<report_activity_view_state::SetIsAutomated<St>, S> {
+        self._fields.5 = Option::Some(value.into());
+        ReportActivityViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: report_activity_view_state::State, S: BosStr> ReportActivityViewBuilder<St, S> {
+    /// Set the `meta` field (optional)
+    pub fn meta(mut self, value: impl Into<Option<Data<S>>>) -> Self {
+        self._fields.6 = value.into();
+        self
+    }
+    /// Set the `meta` field to an Option value (optional)
+    pub fn maybe_meta(mut self, value: Option<Data<S>>) -> Self {
+        self._fields.6 = value;
+        self
+    }
+}
+
+impl<St: report_activity_view_state::State, S: BosStr> ReportActivityViewBuilder<St, S> {
+    /// Set the `moderator` field (optional)
+    pub fn moderator(mut self, value: impl Into<Option<Member<S>>>) -> Self {
+        self._fields.7 = value.into();
+        self
+    }
+    /// Set the `moderator` field to an Option value (optional)
+    pub fn maybe_moderator(mut self, value: Option<Member<S>>) -> Self {
+        self._fields.7 = value;
+        self
+    }
+}
+
+impl<St: report_activity_view_state::State, S: BosStr> ReportActivityViewBuilder<St, S> {
+    /// Set the `publicNote` field (optional)
+    pub fn public_note(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.8 = value.into();
+        self
+    }
+    /// Set the `publicNote` field to an Option value (optional)
+    pub fn maybe_public_note(mut self, value: Option<S>) -> Self {
+        self._fields.8 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ReportActivityViewBuilder<St, S>
+where
+    St: report_activity_view_state::State,
+    St::ReportId: report_activity_view_state::IsUnset,
+{
+    /// Set the `reportId` field (required)
+    pub fn report_id(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ReportActivityViewBuilder<report_activity_view_state::SetReportId<St>, S> {
+        self._fields.9 = Option::Some(value.into());
+        ReportActivityViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReportActivityViewBuilder<St, S>
+where
+    St: report_activity_view_state::State,
+    St::Activity: report_activity_view_state::IsSet,
+    St::CreatedAt: report_activity_view_state::IsSet,
+    St::CreatedBy: report_activity_view_state::IsSet,
+    St::Id: report_activity_view_state::IsSet,
+    St::IsAutomated: report_activity_view_state::IsSet,
+    St::ReportId: report_activity_view_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> ReportActivityView<S> {
+        ReportActivityView {
+            activity: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            created_by: self._fields.2.unwrap(),
+            id: self._fields.3.unwrap(),
+            internal_note: self._fields.4,
+            is_automated: self._fields.5.unwrap(),
+            meta: self._fields.6,
+            moderator: self._fields.7,
+            public_note: self._fields.8,
+            report_id: self._fields.9.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReportActivityView<S> {
+        ReportActivityView {
+            activity: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            created_by: self._fields.2.unwrap(),
+            id: self._fields.3.unwrap(),
+            internal_note: self._fields.4,
+            is_automated: self._fields.5.unwrap(),
+            meta: self._fields.6,
+            moderator: self._fields.7,
+            public_note: self._fields.8,
+            report_id: self._fields.9.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+pub mod report_assignment_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type AssignedAt;
+        type Did;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type AssignedAt = Unset;
+        type Did = Unset;
+    }
+    ///State transition - sets the `assigned_at` field to Set
+    pub struct SetAssignedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAssignedAt<St> {}
+    impl<St: State> State for SetAssignedAt<St> {
+        type AssignedAt = Set<members::assigned_at>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type AssignedAt = St::AssignedAt;
+        type Did = Set<members::did>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `assigned_at` field
+        pub struct assigned_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct ReportAssignmentBuilder<
+    St: report_assignment_state::State,
+    S: BosStr = DefaultStr,
+> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<Datetime>, Option<Did<S>>, Option<Member<S>>),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl ReportAssignment<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReportAssignmentBuilder<report_assignment_state::Empty, DefaultStr> {
+        ReportAssignmentBuilder::new()
+    }
+}
+
+impl<S: BosStr> ReportAssignment<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReportAssignmentBuilder<report_assignment_state::Empty, S> {
+        ReportAssignmentBuilder::builder()
+    }
+}
+
+impl ReportAssignmentBuilder<report_assignment_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        ReportAssignmentBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> ReportAssignmentBuilder<report_assignment_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReportAssignmentBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReportAssignmentBuilder<St, S>
+where
+    St: report_assignment_state::State,
+    St::AssignedAt: report_assignment_state::IsUnset,
+{
+    /// Set the `assignedAt` field (required)
+    pub fn assigned_at(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> ReportAssignmentBuilder<report_assignment_state::SetAssignedAt<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        ReportAssignmentBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReportAssignmentBuilder<St, S>
+where
+    St: report_assignment_state::State,
+    St::Did: report_assignment_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> ReportAssignmentBuilder<report_assignment_state::SetDid<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        ReportAssignmentBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: report_assignment_state::State, S: BosStr> ReportAssignmentBuilder<St, S> {
+    /// Set the `moderator` field (optional)
+    pub fn moderator(mut self, value: impl Into<Option<Member<S>>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `moderator` field to an Option value (optional)
+    pub fn maybe_moderator(mut self, value: Option<Member<S>>) -> Self {
+        self._fields.2 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ReportAssignmentBuilder<St, S>
+where
+    St: report_assignment_state::State,
+    St::AssignedAt: report_assignment_state::IsSet,
+    St::Did: report_assignment_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> ReportAssignment<S> {
+        ReportAssignment {
+            assigned_at: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            moderator: self._fields.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReportAssignment<S> {
+        ReportAssignment {
+            assigned_at: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            moderator: self._fields.2,
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+pub mod report_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type EventId;
+        type Id;
+        type ReportType;
+        type ReportedBy;
+        type Reporter;
+        type Status;
+        type Subject;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type CreatedAt = Unset;
+        type EventId = Unset;
+        type Id = Unset;
+        type ReportType = Unset;
+        type ReportedBy = Unset;
+        type Reporter = Unset;
+        type Status = Unset;
+        type Subject = Unset;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
+        type EventId = St::EventId;
+        type Id = St::Id;
+        type ReportType = St::ReportType;
+        type ReportedBy = St::ReportedBy;
+        type Reporter = St::Reporter;
+        type Status = St::Status;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `event_id` field to Set
+    pub struct SetEventId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEventId<St> {}
+    impl<St: State> State for SetEventId<St> {
+        type CreatedAt = St::CreatedAt;
+        type EventId = Set<members::event_id>;
+        type Id = St::Id;
+        type ReportType = St::ReportType;
+        type ReportedBy = St::ReportedBy;
+        type Reporter = St::Reporter;
+        type Status = St::Status;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type CreatedAt = St::CreatedAt;
+        type EventId = St::EventId;
+        type Id = Set<members::id>;
+        type ReportType = St::ReportType;
+        type ReportedBy = St::ReportedBy;
+        type Reporter = St::Reporter;
+        type Status = St::Status;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `report_type` field to Set
+    pub struct SetReportType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReportType<St> {}
+    impl<St: State> State for SetReportType<St> {
+        type CreatedAt = St::CreatedAt;
+        type EventId = St::EventId;
+        type Id = St::Id;
+        type ReportType = Set<members::report_type>;
+        type ReportedBy = St::ReportedBy;
+        type Reporter = St::Reporter;
+        type Status = St::Status;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `reported_by` field to Set
+    pub struct SetReportedBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReportedBy<St> {}
+    impl<St: State> State for SetReportedBy<St> {
+        type CreatedAt = St::CreatedAt;
+        type EventId = St::EventId;
+        type Id = St::Id;
+        type ReportType = St::ReportType;
+        type ReportedBy = Set<members::reported_by>;
+        type Reporter = St::Reporter;
+        type Status = St::Status;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `reporter` field to Set
+    pub struct SetReporter<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReporter<St> {}
+    impl<St: State> State for SetReporter<St> {
+        type CreatedAt = St::CreatedAt;
+        type EventId = St::EventId;
+        type Id = St::Id;
+        type ReportType = St::ReportType;
+        type ReportedBy = St::ReportedBy;
+        type Reporter = Set<members::reporter>;
+        type Status = St::Status;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type CreatedAt = St::CreatedAt;
+        type EventId = St::EventId;
+        type Id = St::Id;
+        type ReportType = St::ReportType;
+        type ReportedBy = St::ReportedBy;
+        type Reporter = St::Reporter;
+        type Status = Set<members::status>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type EventId = St::EventId;
+        type Id = St::Id;
+        type ReportType = St::ReportType;
+        type ReportedBy = St::ReportedBy;
+        type Reporter = St::Reporter;
+        type Status = St::Status;
+        type Subject = Set<members::subject>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `event_id` field
+        pub struct event_id(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `report_type` field
+        pub struct report_type(());
+        ///Marker type for the `reported_by` field
+        pub struct reported_by(());
+        ///Marker type for the `reporter` field
+        pub struct reporter(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct ReportViewBuilder<St: report_view_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (
+        Option<Vec<i64>>,
+        Option<S>,
+        Option<Vec<ModEventView<S>>>,
+        Option<report::ReportAssignment<S>>,
+        Option<S>,
+        Option<Datetime>,
+        Option<i64>,
+        Option<i64>,
+        Option<bool>,
+        Option<QueueView<S>>,
+        Option<Datetime>,
+        Option<i64>,
+        Option<moderation::ReasonType<S>>,
+        Option<Did<S>>,
+        Option<SubjectView<S>>,
+        Option<ReportViewStatus<S>>,
+        Option<SubjectView<S>>,
+        Option<SubjectStatusView<S>>,
+        Option<Datetime>,
+    ),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl ReportView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ReportViewBuilder<report_view_state::Empty, DefaultStr> {
+        ReportViewBuilder::new()
+    }
+}
+
+impl<S: BosStr> ReportView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ReportViewBuilder<report_view_state::Empty, S> {
+        ReportViewBuilder::builder()
+    }
+}
+
+impl ReportViewBuilder<report_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        ReportViewBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> ReportViewBuilder<report_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ReportViewBuilder {
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
+    /// Set the `actionEventIds` field (optional)
+    pub fn action_event_ids(mut self, value: impl Into<Option<Vec<i64>>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `actionEventIds` field to an Option value (optional)
+    pub fn maybe_action_event_ids(mut self, value: Option<Vec<i64>>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
+    /// Set the `actionNote` field (optional)
+    pub fn action_note(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `actionNote` field to an Option value (optional)
+    pub fn maybe_action_note(mut self, value: Option<S>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
+    /// Set the `actions` field (optional)
+    pub fn actions(mut self, value: impl Into<Option<Vec<ModEventView<S>>>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `actions` field to an Option value (optional)
+    pub fn maybe_actions(mut self, value: Option<Vec<ModEventView<S>>>) -> Self {
+        self._fields.2 = value;
+        self
+    }
+}
+
+impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
+    /// Set the `assignment` field (optional)
+    pub fn assignment(
+        mut self,
+        value: impl Into<Option<report::ReportAssignment<S>>>,
+    ) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `assignment` field to an Option value (optional)
+    pub fn maybe_assignment(
+        mut self,
+        value: Option<report::ReportAssignment<S>>,
+    ) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
+impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
+    /// Set the `comment` field (optional)
+    pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `comment` field to an Option value (optional)
+    pub fn maybe_comment(mut self, value: Option<S>) -> Self {
+        self._fields.4 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ReportViewBuilder<St, S>
+where
+    St: report_view_state::State,
+    St::CreatedAt: report_view_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> ReportViewBuilder<report_view_state::SetCreatedAt<St>, S> {
+        self._fields.5 = Option::Some(value.into());
+        ReportViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReportViewBuilder<St, S>
+where
+    St: report_view_state::State,
+    St::EventId: report_view_state::IsUnset,
+{
+    /// Set the `eventId` field (required)
+    pub fn event_id(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ReportViewBuilder<report_view_state::SetEventId<St>, S> {
+        self._fields.6 = Option::Some(value.into());
+        ReportViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReportViewBuilder<St, S>
+where
+    St: report_view_state::State,
+    St::Id: report_view_state::IsUnset,
+{
+    /// Set the `id` field (required)
+    pub fn id(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ReportViewBuilder<report_view_state::SetId<St>, S> {
+        self._fields.7 = Option::Some(value.into());
+        ReportViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
+    /// Set the `isMuted` field (optional)
+    pub fn is_muted(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.8 = value.into();
+        self
+    }
+    /// Set the `isMuted` field to an Option value (optional)
+    pub fn maybe_is_muted(mut self, value: Option<bool>) -> Self {
+        self._fields.8 = value;
+        self
+    }
+}
+
+impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
+    /// Set the `queue` field (optional)
+    pub fn queue(mut self, value: impl Into<Option<QueueView<S>>>) -> Self {
+        self._fields.9 = value.into();
+        self
+    }
+    /// Set the `queue` field to an Option value (optional)
+    pub fn maybe_queue(mut self, value: Option<QueueView<S>>) -> Self {
+        self._fields.9 = value;
+        self
+    }
+}
+
+impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
+    /// Set the `queuedAt` field (optional)
+    pub fn queued_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
+        self._fields.10 = value.into();
+        self
+    }
+    /// Set the `queuedAt` field to an Option value (optional)
+    pub fn maybe_queued_at(mut self, value: Option<Datetime>) -> Self {
+        self._fields.10 = value;
+        self
+    }
+}
+
+impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
+    /// Set the `relatedReportCount` field (optional)
+    pub fn related_report_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self._fields.11 = value.into();
+        self
+    }
+    /// Set the `relatedReportCount` field to an Option value (optional)
+    pub fn maybe_related_report_count(mut self, value: Option<i64>) -> Self {
+        self._fields.11 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ReportViewBuilder<St, S>
+where
+    St: report_view_state::State,
+    St::ReportType: report_view_state::IsUnset,
+{
+    /// Set the `reportType` field (required)
+    pub fn report_type(
+        mut self,
+        value: impl Into<moderation::ReasonType<S>>,
+    ) -> ReportViewBuilder<report_view_state::SetReportType<St>, S> {
+        self._fields.12 = Option::Some(value.into());
+        ReportViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReportViewBuilder<St, S>
+where
+    St: report_view_state::State,
+    St::ReportedBy: report_view_state::IsUnset,
+{
+    /// Set the `reportedBy` field (required)
+    pub fn reported_by(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> ReportViewBuilder<report_view_state::SetReportedBy<St>, S> {
+        self._fields.13 = Option::Some(value.into());
+        ReportViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReportViewBuilder<St, S>
+where
+    St: report_view_state::State,
+    St::Reporter: report_view_state::IsUnset,
+{
+    /// Set the `reporter` field (required)
+    pub fn reporter(
+        mut self,
+        value: impl Into<SubjectView<S>>,
+    ) -> ReportViewBuilder<report_view_state::SetReporter<St>, S> {
+        self._fields.14 = Option::Some(value.into());
+        ReportViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReportViewBuilder<St, S>
+where
+    St: report_view_state::State,
+    St::Status: report_view_state::IsUnset,
+{
+    /// Set the `status` field (required)
+    pub fn status(
+        mut self,
+        value: impl Into<ReportViewStatus<S>>,
+    ) -> ReportViewBuilder<report_view_state::SetStatus<St>, S> {
+        self._fields.15 = Option::Some(value.into());
+        ReportViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ReportViewBuilder<St, S>
+where
+    St: report_view_state::State,
+    St::Subject: report_view_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<SubjectView<S>>,
+    ) -> ReportViewBuilder<report_view_state::SetSubject<St>, S> {
+        self._fields.16 = Option::Some(value.into());
+        ReportViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
+    /// Set the `subjectStatus` field (optional)
+    pub fn subject_status(
+        mut self,
+        value: impl Into<Option<SubjectStatusView<S>>>,
+    ) -> Self {
+        self._fields.17 = value.into();
+        self
+    }
+    /// Set the `subjectStatus` field to an Option value (optional)
+    pub fn maybe_subject_status(mut self, value: Option<SubjectStatusView<S>>) -> Self {
+        self._fields.17 = value;
+        self
+    }
+}
+
+impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
+    /// Set the `updatedAt` field (optional)
+    pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
+        self._fields.18 = value.into();
+        self
+    }
+    /// Set the `updatedAt` field to an Option value (optional)
+    pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
+        self._fields.18 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ReportViewBuilder<St, S>
+where
+    St: report_view_state::State,
+    St::CreatedAt: report_view_state::IsSet,
+    St::EventId: report_view_state::IsSet,
+    St::Id: report_view_state::IsSet,
+    St::ReportType: report_view_state::IsSet,
+    St::ReportedBy: report_view_state::IsSet,
+    St::Reporter: report_view_state::IsSet,
+    St::Status: report_view_state::IsSet,
+    St::Subject: report_view_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> ReportView<S> {
+        ReportView {
+            action_event_ids: self._fields.0,
+            action_note: self._fields.1,
+            actions: self._fields.2,
+            assignment: self._fields.3,
+            comment: self._fields.4,
+            created_at: self._fields.5.unwrap(),
+            event_id: self._fields.6.unwrap(),
+            id: self._fields.7.unwrap(),
+            is_muted: self._fields.8,
+            queue: self._fields.9,
+            queued_at: self._fields.10,
+            related_report_count: self._fields.11,
+            report_type: self._fields.12.unwrap(),
+            reported_by: self._fields.13.unwrap(),
+            reporter: self._fields.14.unwrap(),
+            status: self._fields.15.unwrap(),
+            subject: self._fields.16.unwrap(),
+            subject_status: self._fields.17,
+            updated_at: self._fields.18,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReportView<S> {
+        ReportView {
+            action_event_ids: self._fields.0,
+            action_note: self._fields.1,
+            actions: self._fields.2,
+            assignment: self._fields.3,
+            comment: self._fields.4,
+            created_at: self._fields.5.unwrap(),
+            event_id: self._fields.6.unwrap(),
+            id: self._fields.7.unwrap(),
+            is_muted: self._fields.8,
+            queue: self._fields.9,
+            queued_at: self._fields.10,
+            related_report_count: self._fields.11,
+            report_type: self._fields.12.unwrap(),
+            reported_by: self._fields.13.unwrap(),
+            reporter: self._fields.14.unwrap(),
+            status: self._fields.15.unwrap(),
+            subject: self._fields.16.unwrap(),
+            subject_status: self._fields.17,
+            updated_at: self._fields.18,
+            extra_data: Some(extra_data),
+        }
     }
 }

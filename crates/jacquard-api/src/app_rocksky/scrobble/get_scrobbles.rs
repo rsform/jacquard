@@ -23,8 +23,6 @@ use crate::app_rocksky::scrobble::ScrobbleViewBasic;
 pub struct GetScrobbles<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<AtIdentifier<S>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub following: Option<bool>,
     ///(min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -89,7 +87,7 @@ pub mod get_scrobbles_state {
 /// Builder for constructing an instance of this type.
 pub struct GetScrobblesBuilder<St: get_scrobbles_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<AtIdentifier<S>>, Option<bool>, Option<i64>, Option<i64>),
+    _fields: (Option<AtIdentifier<S>>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -112,7 +110,7 @@ impl GetScrobblesBuilder<get_scrobbles_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         GetScrobblesBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None),
             _type: PhantomData,
         }
     }
@@ -123,7 +121,7 @@ impl<S: BosStr> GetScrobblesBuilder<get_scrobbles_state::Empty, S> {
     pub fn builder() -> Self {
         GetScrobblesBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None),
             _type: PhantomData,
         }
     }
@@ -143,27 +141,14 @@ impl<St: get_scrobbles_state::State, S: BosStr> GetScrobblesBuilder<St, S> {
 }
 
 impl<St: get_scrobbles_state::State, S: BosStr> GetScrobblesBuilder<St, S> {
-    /// Set the `following` field (optional)
-    pub fn following(mut self, value: impl Into<Option<bool>>) -> Self {
-        self._fields.1 = value.into();
-        self
-    }
-    /// Set the `following` field to an Option value (optional)
-    pub fn maybe_following(mut self, value: Option<bool>) -> Self {
-        self._fields.1 = value;
-        self
-    }
-}
-
-impl<St: get_scrobbles_state::State, S: BosStr> GetScrobblesBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.2 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self._fields.2 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -171,12 +156,12 @@ impl<St: get_scrobbles_state::State, S: BosStr> GetScrobblesBuilder<St, S> {
 impl<St: get_scrobbles_state::State, S: BosStr> GetScrobblesBuilder<St, S> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.3 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `offset` field to an Option value (optional)
     pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
-        self._fields.3 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -189,9 +174,8 @@ where
     pub fn build(self) -> GetScrobbles<S> {
         GetScrobbles {
             did: self._fields.0,
-            following: self._fields.1,
-            limit: self._fields.2,
-            offset: self._fields.3,
+            limit: self._fields.1,
+            offset: self._fields.2,
         }
     }
 }

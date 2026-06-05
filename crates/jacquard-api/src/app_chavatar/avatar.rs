@@ -38,7 +38,9 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Avatar<S: BosStr = DefaultStr> {
+    ///The image data for the avatar.
     pub avatar: BlobRef<S>,
+    ///The timestamp when the avatar was created.
     pub created_at: Datetime,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -103,10 +105,10 @@ impl<S: BosStr> LexiconSchema for Avatar<S> {
             let value = &self.avatar;
             {
                 let size = value.blob().size;
-                if size > 1000000usize {
+                if size > 2000000usize {
                     return Err(ConstraintError::BlobTooLarge {
                         path: ValidationPath::from_field("avatar"),
-                        max: 1000000usize,
+                        max: 2000000usize,
                         actual: size,
                     });
                 }
@@ -329,6 +331,11 @@ fn lexicon_doc_app_chavatar_avatar() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The timestamp when the avatar was created.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

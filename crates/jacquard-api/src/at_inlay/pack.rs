@@ -155,37 +155,37 @@ pub mod export_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Component;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Component = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Type = Set<members::r#type>;
-        type Component = St::Component;
+        type Type = Unset;
     }
     ///State transition - sets the `component` field to Set
     pub struct SetComponent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetComponent<St> {}
     impl<St: State> State for SetComponent<St> {
-        type Type = St::Type;
         type Component = Set<members::component>;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Component = St::Component;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `component` field
         pub struct component(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -273,8 +273,8 @@ where
 impl<St, S: BosStr> ExportBuilder<St, S>
 where
     St: export_state::State,
-    St::Type: export_state::IsSet,
     St::Component: export_state::IsSet,
+    St::Type: export_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Export<S> {

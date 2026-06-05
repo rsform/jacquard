@@ -8,6 +8,10 @@
         "content"
       ],
       "properties": {
+        "checked": {
+          "type": "boolean",
+          "description": "If present, this item is a checklist item. true = checked, false = unchecked. If absent, this is a normal list item."
+        },
         "children": {
           "type": "array",
           "description": "Nested unordered list items. Mutually exclusive with orderedListChildren; if both are present, children takes precedence.",

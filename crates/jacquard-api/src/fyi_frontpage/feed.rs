@@ -4,5 +4,8 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod comment;
+pub mod describe_feed_generator;
+pub mod generator;
+pub mod get_feed_skeleton;
 pub mod post;
 pub mod vote;

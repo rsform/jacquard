@@ -198,49 +198,49 @@ pub mod item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type VenueName;
         type CreatedAt;
+        type VenueName;
         type VenueUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type VenueName = Unset;
         type CreatedAt = Unset;
+        type VenueName = Unset;
         type VenueUri = Unset;
-    }
-    ///State transition - sets the `venue_name` field to Set
-    pub struct SetVenueName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVenueName<St> {}
-    impl<St: State> State for SetVenueName<St> {
-        type VenueName = Set<members::venue_name>;
-        type CreatedAt = St::CreatedAt;
-        type VenueUri = St::VenueUri;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type VenueName = St::VenueName;
         type CreatedAt = Set<members::created_at>;
+        type VenueName = St::VenueName;
+        type VenueUri = St::VenueUri;
+    }
+    ///State transition - sets the `venue_name` field to Set
+    pub struct SetVenueName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVenueName<St> {}
+    impl<St: State> State for SetVenueName<St> {
+        type CreatedAt = St::CreatedAt;
+        type VenueName = Set<members::venue_name>;
         type VenueUri = St::VenueUri;
     }
     ///State transition - sets the `venue_uri` field to Set
     pub struct SetVenueUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetVenueUri<St> {}
     impl<St: State> State for SetVenueUri<St> {
-        type VenueName = St::VenueName;
         type CreatedAt = St::CreatedAt;
+        type VenueName = St::VenueName;
         type VenueUri = Set<members::venue_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `venue_name` field
-        pub struct venue_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `venue_name` field
+        pub struct venue_name(());
         ///Marker type for the `venue_uri` field
         pub struct venue_uri(());
     }
@@ -437,8 +437,8 @@ where
 impl<St, S: BosStr> ItemBuilder<St, S>
 where
     St: item_state::State,
-    St::VenueName: item_state::IsSet,
     St::CreatedAt: item_state::IsSet,
+    St::VenueName: item_state::IsSet,
     St::VenueUri: item_state::IsSet,
 {
     /// Build the final struct.

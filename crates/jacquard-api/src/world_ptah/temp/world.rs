@@ -606,51 +606,51 @@ pub mod world_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type CreatorDid;
         type CreatedAt;
+        type CreatorDid;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type CreatorDid = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type CreatorDid = St::CreatorDid;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `creator_did` field to Set
-    pub struct SetCreatorDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatorDid<St> {}
-    impl<St: State> State for SetCreatorDid<St> {
-        type Name = St::Name;
-        type CreatorDid = Set<members::creator_did>;
-        type CreatedAt = St::CreatedAt;
+        type CreatorDid = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Name = St::Name;
-        type CreatorDid = St::CreatorDid;
         type CreatedAt = Set<members::created_at>;
+        type CreatorDid = St::CreatorDid;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `creator_did` field to Set
+    pub struct SetCreatorDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatorDid<St> {}
+    impl<St: State> State for SetCreatorDid<St> {
+        type CreatedAt = St::CreatedAt;
+        type CreatorDid = Set<members::creator_did>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type CreatorDid = St::CreatorDid;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `creator_did` field
-        pub struct creator_did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `creator_did` field
+        pub struct creator_did(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -863,9 +863,9 @@ impl<St: world_state::State, S: BosStr> WorldBuilder<St, S> {
 impl<St, S: BosStr> WorldBuilder<St, S>
 where
     St: world_state::State,
-    St::Name: world_state::IsSet,
-    St::CreatorDid: world_state::IsSet,
     St::CreatedAt: world_state::IsSet,
+    St::CreatorDid: world_state::IsSet,
+    St::Name: world_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> World<S> {

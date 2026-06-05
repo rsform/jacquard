@@ -17,7 +17,7 @@ use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, UriValue};
+use jacquard_common::types::string::{Handle, AtUri, Cid, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -51,9 +51,12 @@ pub struct Profile<S: BosStr = DefaultStr> {
     ///Free-form location text.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location: Option<S>,
-    ///Any ATURI, it is up to appviews to validate these fields.
+    ///Pinned repositories. Values are repo DIDs for repos that have them, or AT-URIs for legacy repos.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pinned_repositories: Option<Vec<AtUri<S>>>,
+    pub pinned_repositories: Option<Vec<S>>,
+    ///A handle the user prefers to be displayed as.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub preferred_handle: Option<Handle<S>>,
     ///Preferred gender pronouns.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pronouns: Option<S>,
@@ -242,6 +245,16 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
                 });
             }
         }
+        if let Some(ref value) = self.preferred_handle {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 253usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("preferred_handle"),
+                    max: 253usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         if let Some(ref value) = self.pronouns {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40usize {
@@ -317,7 +330,8 @@ pub struct ProfileBuilder<St: profile_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<Vec<UriValue<S>>>,
         Option<S>,
-        Option<Vec<AtUri<S>>>,
+        Option<Vec<S>>,
+        Option<Handle<S>>,
         Option<S>,
         Option<Vec<S>>,
     ),
@@ -343,7 +357,7 @@ impl ProfileBuilder<profile_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -354,7 +368,7 @@ impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
     pub fn builder() -> Self {
         ProfileBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -433,16 +447,26 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `pinnedRepositories` field (optional)
-    pub fn pinned_repositories(
-        mut self,
-        value: impl Into<Option<Vec<AtUri<S>>>>,
-    ) -> Self {
+    pub fn pinned_repositories(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `pinnedRepositories` field to an Option value (optional)
-    pub fn maybe_pinned_repositories(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
+    pub fn maybe_pinned_repositories(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.5 = value;
+        self
+    }
+}
+
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
+    /// Set the `preferredHandle` field (optional)
+    pub fn preferred_handle(mut self, value: impl Into<Option<Handle<S>>>) -> Self {
+        self._fields.6 = value.into();
+        self
+    }
+    /// Set the `preferredHandle` field to an Option value (optional)
+    pub fn maybe_preferred_handle(mut self, value: Option<Handle<S>>) -> Self {
+        self._fields.6 = value;
         self
     }
 }
@@ -450,12 +474,12 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `pronouns` field (optional)
     pub fn pronouns(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.6 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
     pub fn maybe_pronouns(mut self, value: Option<S>) -> Self {
-        self._fields.6 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -463,12 +487,12 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `stats` field (optional)
     pub fn stats(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
-        self._fields.7 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `stats` field to an Option value (optional)
     pub fn maybe_stats(mut self, value: Option<Vec<S>>) -> Self {
-        self._fields.7 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -487,8 +511,9 @@ where
             links: self._fields.3,
             location: self._fields.4,
             pinned_repositories: self._fields.5,
-            pronouns: self._fields.6,
-            stats: self._fields.7,
+            preferred_handle: self._fields.6,
+            pronouns: self._fields.7,
+            stats: self._fields.8,
             extra_data: Default::default(),
         }
     }
@@ -501,8 +526,9 @@ where
             links: self._fields.3,
             location: self._fields.4,
             pinned_repositories: self._fields.5,
-            pronouns: self._fields.6,
-            stats: self._fields.7,
+            preferred_handle: self._fields.6,
+            pronouns: self._fields.7,
+            stats: self._fields.8,
             extra_data: Some(extra_data),
         }
     }
@@ -584,15 +610,27 @@ fn lexicon_doc_sh_tangled_actor_profile() -> LexiconDoc<'static> {
                                 LexObjectProperty::Array(LexArray {
                                     description: Some(
                                         CowStr::new_static(
-                                            "Any ATURI, it is up to appviews to validate these fields.",
+                                            "Pinned repositories. Values are repo DIDs for repos that have them, or AT-URIs for legacy repos.",
                                         ),
                                     ),
                                     items: LexArrayItem::String(LexString {
-                                        format: Some(LexStringFormat::AtUri),
                                         ..Default::default()
                                     }),
                                     min_length: Some(0usize),
                                     max_length: Some(6usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("preferredHandle"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "A handle the user prefers to be displayed as.",
+                                        ),
+                                    ),
+                                    format: Some(LexStringFormat::Handle),
+                                    max_length: Some(253usize),
                                     ..Default::default()
                                 }),
                             );

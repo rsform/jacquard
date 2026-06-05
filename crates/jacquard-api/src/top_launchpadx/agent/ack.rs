@@ -120,37 +120,37 @@ pub mod ack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WorkType;
         type CreatedAt;
+        type WorkType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WorkType = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `work_type` field to Set
-    pub struct SetWorkType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWorkType<St> {}
-    impl<St: State> State for SetWorkType<St> {
-        type WorkType = Set<members::work_type>;
-        type CreatedAt = St::CreatedAt;
+        type WorkType = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type WorkType = St::WorkType;
         type CreatedAt = Set<members::created_at>;
+        type WorkType = St::WorkType;
+    }
+    ///State transition - sets the `work_type` field to Set
+    pub struct SetWorkType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWorkType<St> {}
+    impl<St: State> State for SetWorkType<St> {
+        type CreatedAt = St::CreatedAt;
+        type WorkType = Set<members::work_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `work_type` field
-        pub struct work_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `work_type` field
+        pub struct work_type(());
     }
 }
 
@@ -264,8 +264,8 @@ where
 impl<St, S: BosStr> AckBuilder<St, S>
 where
     St: ack_state::State,
-    St::WorkType: ack_state::IsSet,
     St::CreatedAt: ack_state::IsSet,
+    St::WorkType: ack_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Ack<S> {

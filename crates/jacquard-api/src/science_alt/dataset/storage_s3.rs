@@ -464,37 +464,37 @@ pub mod shard_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Checksum;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Checksum = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKey<St> {}
-    impl<St: State> State for SetKey<St> {
-        type Key = Set<members::key>;
-        type Checksum = St::Checksum;
+        type Key = Unset;
     }
     ///State transition - sets the `checksum` field to Set
     pub struct SetChecksum<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetChecksum<St> {}
     impl<St: State> State for SetChecksum<St> {
-        type Key = St::Key;
         type Checksum = Set<members::checksum>;
+        type Key = St::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type Checksum = St::Checksum;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `checksum` field
         pub struct checksum(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
@@ -582,8 +582,8 @@ where
 impl<St, S: BosStr> ShardEntryBuilder<St, S>
 where
     St: shard_entry_state::State,
-    St::Key: shard_entry_state::IsSet,
     St::Checksum: shard_entry_state::IsSet,
+    St::Key: shard_entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ShardEntry<S> {

@@ -1,0 +1,17 @@
+{
+  "lexicon": 1,
+  "id": "ing.dasl.pfpRef",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "Reference to a perceptual fingerprint (PFP).",
+      "required": ["__pfp"],
+      "properties": {
+        "__pfp": {
+          "type": "string",
+          "description": "Perceptual fingerprint per DASL spec. Format: p<base32-payload>."
+        }
+      }
+    }
+  }
+}

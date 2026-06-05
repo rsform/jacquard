@@ -118,65 +118,65 @@ pub mod verification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
-        type DisplayName;
         type CreatedAt;
+        type DisplayName;
+        type Handle;
         type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
-        type DisplayName = Unset;
         type CreatedAt = Unset;
+        type DisplayName = Unset;
+        type Handle = Unset;
         type Subject = Unset;
     }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHandle<St> {}
-    impl<St: State> State for SetHandle<St> {
-        type Handle = Set<members::handle>;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type DisplayName = St::DisplayName;
-        type CreatedAt = St::CreatedAt;
+        type Handle = St::Handle;
         type Subject = St::Subject;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDisplayName<St> {}
     impl<St: State> State for SetDisplayName<St> {
-        type Handle = St::Handle;
-        type DisplayName = Set<members::display_name>;
         type CreatedAt = St::CreatedAt;
+        type DisplayName = Set<members::display_name>;
+        type Handle = St::Handle;
         type Subject = St::Subject;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Handle = St::Handle;
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type CreatedAt = St::CreatedAt;
         type DisplayName = St::DisplayName;
-        type CreatedAt = Set<members::created_at>;
+        type Handle = Set<members::handle>;
         type Subject = St::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
-        type Handle = St::Handle;
-        type DisplayName = St::DisplayName;
         type CreatedAt = St::CreatedAt;
+        type DisplayName = St::DisplayName;
+        type Handle = St::Handle;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
         ///Marker type for the `subject` field
         pub struct subject(());
     }
@@ -304,9 +304,9 @@ where
 impl<St, S: BosStr> VerificationBuilder<St, S>
 where
     St: verification_state::State,
-    St::Handle: verification_state::IsSet,
-    St::DisplayName: verification_state::IsSet,
     St::CreatedAt: verification_state::IsSet,
+    St::DisplayName: verification_state::IsSet,
+    St::Handle: verification_state::IsSet,
     St::Subject: verification_state::IsSet,
 {
     /// Build the final struct.

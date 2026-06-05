@@ -68,51 +68,51 @@ pub mod delete_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rkey;
-        type Name;
         type Did;
+        type Name;
+        type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rkey = Unset;
-        type Name = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRkey<St> {}
-    impl<St: State> State for SetRkey<St> {
-        type Rkey = Set<members::rkey>;
-        type Name = St::Name;
-        type Did = St::Did;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Rkey = St::Rkey;
-        type Name = Set<members::name>;
-        type Did = St::Did;
+        type Name = Unset;
+        type Rkey = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Rkey = St::Rkey;
-        type Name = St::Name;
         type Did = Set<members::did>;
+        type Name = St::Name;
+        type Rkey = St::Rkey;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Did = St::Did;
+        type Name = Set<members::name>;
+        type Rkey = St::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRkey<St> {}
+    impl<St: State> State for SetRkey<St> {
+        type Did = St::Did;
+        type Name = St::Name;
+        type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
     }
 }
 
@@ -219,9 +219,9 @@ where
 impl<St, S: BosStr> DeleteBuilder<St, S>
 where
     St: delete_state::State,
-    St::Rkey: delete_state::IsSet,
-    St::Name: delete_state::IsSet,
     St::Did: delete_state::IsSet,
+    St::Name: delete_state::IsSet,
+    St::Rkey: delete_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Delete<S> {

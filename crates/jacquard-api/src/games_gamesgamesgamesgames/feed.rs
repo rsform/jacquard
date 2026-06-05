@@ -5,11 +5,15 @@
 
 pub mod describe_feed_generator;
 pub mod generator;
+pub mod get_activity_feed;
 pub mod get_feed_skeleton;
 pub mod get_game_feed;
 pub mod get_hot_games_feed;
 pub mod get_likes_feed;
+pub mod get_org_developed_feed;
+pub mod get_org_published_feed;
 pub mod get_personalized_feed;
+pub mod get_recently_released_feed;
 pub mod get_recently_updated_feed;
 pub mod get_similar_games_feed;
 pub mod get_upcoming_releases_feed;

@@ -1,0 +1,96 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.getLikes",
+  "defs": {
+    "likeView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "record",
+        "indexedAt"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "record": {
+          "type": "unknown"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Get likes for a subject (video or comment).",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "subject"
+        ],
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "Optional pagination cursor."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of likes to return.",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "subject": {
+            "type": "string",
+            "description": "AT-URI of the subject (video or comment).",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "subject",
+            "count"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "description": "Total number of likes for this subject.",
+              "minimum": 0
+            },
+            "cursor": {
+              "type": "string"
+            },
+            "likes": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#likeView"
+              }
+            },
+            "subject": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

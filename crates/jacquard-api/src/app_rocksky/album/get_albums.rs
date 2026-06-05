@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,10 +18,8 @@ use serde::{Serialize, Deserialize};
 use crate::app_rocksky::album::AlbumViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
-pub struct GetAlbums<S: BosStr = DefaultStr> {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub genre: Option<S>,
+#[serde(rename_all = "camelCase")]
+pub struct GetAlbums {
     ///(min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -49,7 +47,7 @@ impl jacquard_common::xrpc::XrpcResp for GetAlbumsResponse {
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetAlbums<S> {
+impl jacquard_common::xrpc::XrpcRequest for GetAlbums {
     const NSID: &'static str = "app.rocksky.album.getAlbums";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAlbumsResponse;
@@ -60,7 +58,7 @@ pub struct GetAlbumsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAlbumsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.album.getAlbums";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: BosStr> = GetAlbums<S>;
+    type Request<S: BosStr> = GetAlbums;
     type Response = GetAlbumsResponse;
 }
 
@@ -84,97 +82,73 @@ pub mod get_albums_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetAlbumsBuilder<St: get_albums_state::State, S: BosStr = DefaultStr> {
+pub struct GetAlbumsBuilder<St: get_albums_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<i64>),
-    _type: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>),
 }
 
-impl GetAlbums<DefaultStr> {
-    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetAlbumsBuilder<get_albums_state::Empty, DefaultStr> {
+impl GetAlbums {
+    /// Create a new builder for this type.
+    pub fn new() -> GetAlbumsBuilder<get_albums_state::Empty> {
         GetAlbumsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetAlbums<S> {
-    /// Create a new builder for this type
-    pub fn builder() -> GetAlbumsBuilder<get_albums_state::Empty, S> {
-        GetAlbumsBuilder::builder()
-    }
-}
-
-impl GetAlbumsBuilder<get_albums_state::Empty, DefaultStr> {
+impl GetAlbumsBuilder<get_albums_state::Empty> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetAlbumsBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
-            _type: PhantomData,
+            _fields: (None, None),
         }
     }
 }
 
-impl<S: BosStr> GetAlbumsBuilder<get_albums_state::Empty, S> {
+impl GetAlbumsBuilder<get_albums_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         GetAlbumsBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
-            _type: PhantomData,
+            _fields: (None, None),
         }
     }
 }
 
-impl<St: get_albums_state::State, S: BosStr> GetAlbumsBuilder<St, S> {
-    /// Set the `genre` field (optional)
-    pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
+impl<St: get_albums_state::State> GetAlbumsBuilder<St> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
         self
     }
-    /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<S>) -> Self {
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
         self._fields.0 = value;
         self
     }
 }
 
-impl<St: get_albums_state::State, S: BosStr> GetAlbumsBuilder<St, S> {
-    /// Set the `limit` field (optional)
-    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+impl<St: get_albums_state::State> GetAlbumsBuilder<St> {
+    /// Set the `offset` field (optional)
+    pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
         self
     }
-    /// Set the `limit` field to an Option value (optional)
-    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+    /// Set the `offset` field to an Option value (optional)
+    pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<St: get_albums_state::State, S: BosStr> GetAlbumsBuilder<St, S> {
-    /// Set the `offset` field (optional)
-    pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.2 = value.into();
-        self
-    }
-    /// Set the `offset` field to an Option value (optional)
-    pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
-        self._fields.2 = value;
-        self
-    }
-}
-
-impl<St, S: BosStr> GetAlbumsBuilder<St, S>
+impl<St> GetAlbumsBuilder<St>
 where
     St: get_albums_state::State,
 {
     /// Build the final struct.
-    pub fn build(self) -> GetAlbums<S> {
+    pub fn build(self) -> GetAlbums {
         GetAlbums {
-            genre: self._fields.0,
-            limit: self._fields.1,
-            offset: self._fields.2,
+            limit: self._fields.0,
+            offset: self._fields.1,
         }
     }
 }

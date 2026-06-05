@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "social.oolong.alpha.cafe",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A cafe or teahouse where tea is served",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Street address",
+            "maxLength": 500
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "location": {
+            "type": "string",
+            "description": "Human-readable location (e.g., 'Brooklyn, NY', 'Tokyo')",
+            "maxLength": 200
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the cafe or teahouse",
+            "maxLength": 200
+          },
+          "sourceRef": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "vendorRef": {
+            "type": "string",
+            "description": "Optional AT-URI to a vendor record if the cafe is operated by a vendor",
+            "format": "at-uri"
+          },
+          "website": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 500
+          }
+        }
+      }
+    }
+  }
+}

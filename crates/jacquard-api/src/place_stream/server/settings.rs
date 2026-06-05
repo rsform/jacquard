@@ -218,6 +218,7 @@ fn lexicon_doc_place_stream_server_settings() -> LexiconDoc<'static> {
                     ),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
+                        required: Some(vec![]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

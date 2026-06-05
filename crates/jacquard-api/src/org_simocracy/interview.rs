@@ -222,67 +222,67 @@ pub mod interview_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type YesNoAnswers;
+        type CreatedAt;
         type OpenAnswers;
         type Sim;
-        type CreatedAt;
+        type YesNoAnswers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type YesNoAnswers = Unset;
+        type CreatedAt = Unset;
         type OpenAnswers = Unset;
         type Sim = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `yes_no_answers` field to Set
-    pub struct SetYesNoAnswers<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetYesNoAnswers<St> {}
-    impl<St: State> State for SetYesNoAnswers<St> {
-        type YesNoAnswers = Set<members::yes_no_answers>;
-        type OpenAnswers = St::OpenAnswers;
-        type Sim = St::Sim;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `open_answers` field to Set
-    pub struct SetOpenAnswers<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOpenAnswers<St> {}
-    impl<St: State> State for SetOpenAnswers<St> {
-        type YesNoAnswers = St::YesNoAnswers;
-        type OpenAnswers = Set<members::open_answers>;
-        type Sim = St::Sim;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `sim` field to Set
-    pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSim<St> {}
-    impl<St: State> State for SetSim<St> {
-        type YesNoAnswers = St::YesNoAnswers;
-        type OpenAnswers = St::OpenAnswers;
-        type Sim = Set<members::sim>;
-        type CreatedAt = St::CreatedAt;
+        type YesNoAnswers = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type YesNoAnswers = St::YesNoAnswers;
+        type CreatedAt = Set<members::created_at>;
         type OpenAnswers = St::OpenAnswers;
         type Sim = St::Sim;
-        type CreatedAt = Set<members::created_at>;
+        type YesNoAnswers = St::YesNoAnswers;
+    }
+    ///State transition - sets the `open_answers` field to Set
+    pub struct SetOpenAnswers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOpenAnswers<St> {}
+    impl<St: State> State for SetOpenAnswers<St> {
+        type CreatedAt = St::CreatedAt;
+        type OpenAnswers = Set<members::open_answers>;
+        type Sim = St::Sim;
+        type YesNoAnswers = St::YesNoAnswers;
+    }
+    ///State transition - sets the `sim` field to Set
+    pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSim<St> {}
+    impl<St: State> State for SetSim<St> {
+        type CreatedAt = St::CreatedAt;
+        type OpenAnswers = St::OpenAnswers;
+        type Sim = Set<members::sim>;
+        type YesNoAnswers = St::YesNoAnswers;
+    }
+    ///State transition - sets the `yes_no_answers` field to Set
+    pub struct SetYesNoAnswers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetYesNoAnswers<St> {}
+    impl<St: State> State for SetYesNoAnswers<St> {
+        type CreatedAt = St::CreatedAt;
+        type OpenAnswers = St::OpenAnswers;
+        type Sim = St::Sim;
+        type YesNoAnswers = Set<members::yes_no_answers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `yes_no_answers` field
-        pub struct yes_no_answers(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `open_answers` field
         pub struct open_answers(());
         ///Marker type for the `sim` field
         pub struct sim(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `yes_no_answers` field
+        pub struct yes_no_answers(());
     }
 }
 
@@ -413,10 +413,10 @@ where
 impl<St, S: BosStr> InterviewBuilder<St, S>
 where
     St: interview_state::State,
-    St::YesNoAnswers: interview_state::IsSet,
+    St::CreatedAt: interview_state::IsSet,
     St::OpenAnswers: interview_state::IsSet,
     St::Sim: interview_state::IsSet,
-    St::CreatedAt: interview_state::IsSet,
+    St::YesNoAnswers: interview_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Interview<S> {

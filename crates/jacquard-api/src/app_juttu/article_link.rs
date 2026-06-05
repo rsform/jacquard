@@ -131,51 +131,51 @@ pub mod article_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type ArticleId;
         type CommentsThread;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type ArticleId = Unset;
         type CommentsThread = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type ArticleId = St::ArticleId;
-        type CommentsThread = St::CommentsThread;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `article_id` field to Set
     pub struct SetArticleId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetArticleId<St> {}
     impl<St: State> State for SetArticleId<St> {
-        type CreatedAt = St::CreatedAt;
         type ArticleId = Set<members::article_id>;
         type CommentsThread = St::CommentsThread;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `comments_thread` field to Set
     pub struct SetCommentsThread<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCommentsThread<St> {}
     impl<St: State> State for SetCommentsThread<St> {
-        type CreatedAt = St::CreatedAt;
         type ArticleId = St::ArticleId;
         type CommentsThread = Set<members::comments_thread>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type ArticleId = St::ArticleId;
+        type CommentsThread = St::CommentsThread;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `article_id` field
         pub struct article_id(());
         ///Marker type for the `comments_thread` field
         pub struct comments_thread(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -295,9 +295,9 @@ where
 impl<St, S: BosStr> ArticleLinkBuilder<St, S>
 where
     St: article_link_state::State,
-    St::CreatedAt: article_link_state::IsSet,
     St::ArticleId: article_link_state::IsSet,
     St::CommentsThread: article_link_state::IsSet,
+    St::CreatedAt: article_link_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ArticleLink<S> {

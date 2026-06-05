@@ -149,105 +149,105 @@ pub mod lfg_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tags;
-        type StartsAt;
         type Active;
-        type EndsAt;
         type CreatedAt;
+        type EndsAt;
         type Location;
+        type StartsAt;
+        type Tags;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tags = Unset;
-        type StartsAt = Unset;
         type Active = Unset;
-        type EndsAt = Unset;
         type CreatedAt = Unset;
+        type EndsAt = Unset;
         type Location = Unset;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTags<St> {}
-    impl<St: State> State for SetTags<St> {
-        type Tags = Set<members::tags>;
-        type StartsAt = St::StartsAt;
-        type Active = St::Active;
-        type EndsAt = St::EndsAt;
-        type CreatedAt = St::CreatedAt;
-        type Location = St::Location;
-    }
-    ///State transition - sets the `starts_at` field to Set
-    pub struct SetStartsAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStartsAt<St> {}
-    impl<St: State> State for SetStartsAt<St> {
-        type Tags = St::Tags;
-        type StartsAt = Set<members::starts_at>;
-        type Active = St::Active;
-        type EndsAt = St::EndsAt;
-        type CreatedAt = St::CreatedAt;
-        type Location = St::Location;
+        type StartsAt = Unset;
+        type Tags = Unset;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetActive<St> {}
     impl<St: State> State for SetActive<St> {
-        type Tags = St::Tags;
-        type StartsAt = St::StartsAt;
         type Active = Set<members::active>;
+        type CreatedAt = St::CreatedAt;
         type EndsAt = St::EndsAt;
-        type CreatedAt = St::CreatedAt;
         type Location = St::Location;
-    }
-    ///State transition - sets the `ends_at` field to Set
-    pub struct SetEndsAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEndsAt<St> {}
-    impl<St: State> State for SetEndsAt<St> {
-        type Tags = St::Tags;
         type StartsAt = St::StartsAt;
-        type Active = St::Active;
-        type EndsAt = Set<members::ends_at>;
-        type CreatedAt = St::CreatedAt;
-        type Location = St::Location;
+        type Tags = St::Tags;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Tags = St::Tags;
-        type StartsAt = St::StartsAt;
         type Active = St::Active;
-        type EndsAt = St::EndsAt;
         type CreatedAt = Set<members::created_at>;
+        type EndsAt = St::EndsAt;
         type Location = St::Location;
+        type StartsAt = St::StartsAt;
+        type Tags = St::Tags;
+    }
+    ///State transition - sets the `ends_at` field to Set
+    pub struct SetEndsAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEndsAt<St> {}
+    impl<St: State> State for SetEndsAt<St> {
+        type Active = St::Active;
+        type CreatedAt = St::CreatedAt;
+        type EndsAt = Set<members::ends_at>;
+        type Location = St::Location;
+        type StartsAt = St::StartsAt;
+        type Tags = St::Tags;
     }
     ///State transition - sets the `location` field to Set
     pub struct SetLocation<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLocation<St> {}
     impl<St: State> State for SetLocation<St> {
-        type Tags = St::Tags;
-        type StartsAt = St::StartsAt;
         type Active = St::Active;
-        type EndsAt = St::EndsAt;
         type CreatedAt = St::CreatedAt;
+        type EndsAt = St::EndsAt;
         type Location = Set<members::location>;
+        type StartsAt = St::StartsAt;
+        type Tags = St::Tags;
+    }
+    ///State transition - sets the `starts_at` field to Set
+    pub struct SetStartsAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartsAt<St> {}
+    impl<St: State> State for SetStartsAt<St> {
+        type Active = St::Active;
+        type CreatedAt = St::CreatedAt;
+        type EndsAt = St::EndsAt;
+        type Location = St::Location;
+        type StartsAt = Set<members::starts_at>;
+        type Tags = St::Tags;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTags<St> {}
+    impl<St: State> State for SetTags<St> {
+        type Active = St::Active;
+        type CreatedAt = St::CreatedAt;
+        type EndsAt = St::EndsAt;
+        type Location = St::Location;
+        type StartsAt = St::StartsAt;
+        type Tags = Set<members::tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tags` field
-        pub struct tags(());
-        ///Marker type for the `starts_at` field
-        pub struct starts_at(());
         ///Marker type for the `active` field
         pub struct active(());
-        ///Marker type for the `ends_at` field
-        pub struct ends_at(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `ends_at` field
+        pub struct ends_at(());
         ///Marker type for the `location` field
         pub struct location(());
+        ///Marker type for the `starts_at` field
+        pub struct starts_at(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
     }
 }
 
@@ -418,12 +418,12 @@ where
 impl<St, S: BosStr> LfgBuilder<St, S>
 where
     St: lfg_state::State,
-    St::Tags: lfg_state::IsSet,
-    St::StartsAt: lfg_state::IsSet,
     St::Active: lfg_state::IsSet,
-    St::EndsAt: lfg_state::IsSet,
     St::CreatedAt: lfg_state::IsSet,
+    St::EndsAt: lfg_state::IsSet,
     St::Location: lfg_state::IsSet,
+    St::StartsAt: lfg_state::IsSet,
+    St::Tags: lfg_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Lfg<S> {

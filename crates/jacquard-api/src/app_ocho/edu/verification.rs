@@ -116,51 +116,51 @@ pub mod verification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
-        type Domain;
         type CreatedAt;
+        type Domain;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
-        type Domain = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Subject = Set<members::subject>;
-        type Domain = St::Domain;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `domain` field to Set
-    pub struct SetDomain<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDomain<St> {}
-    impl<St: State> State for SetDomain<St> {
-        type Subject = St::Subject;
-        type Domain = Set<members::domain>;
-        type CreatedAt = St::CreatedAt;
+        type Domain = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Subject = St::Subject;
-        type Domain = St::Domain;
         type CreatedAt = Set<members::created_at>;
+        type Domain = St::Domain;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `domain` field to Set
+    pub struct SetDomain<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDomain<St> {}
+    impl<St: State> State for SetDomain<St> {
+        type CreatedAt = St::CreatedAt;
+        type Domain = Set<members::domain>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Domain = St::Domain;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `domain` field
-        pub struct domain(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `domain` field
+        pub struct domain(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -267,9 +267,9 @@ where
 impl<St, S: BosStr> VerificationBuilder<St, S>
 where
     St: verification_state::State,
-    St::Subject: verification_state::IsSet,
-    St::Domain: verification_state::IsSet,
     St::CreatedAt: verification_state::IsSet,
+    St::Domain: verification_state::IsSet,
+    St::Subject: verification_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Verification<S> {

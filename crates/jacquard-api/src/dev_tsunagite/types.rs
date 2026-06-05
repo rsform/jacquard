@@ -117,50 +117,50 @@ pub mod indexable_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Id;
-        type Name;
         type Index;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Id = Unset;
-        type Name = Unset;
         type Index = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
+        type Index = St::Index;
         type Name = St::Name;
-        type Index = St::Index;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Id = St::Id;
-        type Name = Set<members::name>;
-        type Index = St::Index;
     }
     ///State transition - sets the `index` field to Set
     pub struct SetIndex<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndex<St> {}
     impl<St: State> State for SetIndex<St> {
         type Id = St::Id;
-        type Name = St::Name;
         type Index = Set<members::index>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Id = St::Id;
+        type Index = St::Index;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `index` field
         pub struct index(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -268,8 +268,8 @@ impl<St, S: BosStr> IndexableBuilder<St, S>
 where
     St: indexable_state::State,
     St::Id: indexable_state::IsSet,
-    St::Name: indexable_state::IsSet,
     St::Index: indexable_state::IsSet,
+    St::Name: indexable_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Indexable<S> {

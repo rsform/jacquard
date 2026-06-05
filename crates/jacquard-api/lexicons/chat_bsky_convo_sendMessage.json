@@ -4,6 +4,7 @@
   "defs": {
     "main": {
       "type": "procedure",
+      "description": "Sends a message to a conversation.",
       "input": {
         "encoding": "application/json",
         "schema": {
@@ -29,7 +30,15 @@
           "type": "ref",
           "ref": "chat.bsky.convo.defs#messageView"
         }
-      }
+      },
+      "errors": [
+        {
+          "name": "ConvoLocked"
+        },
+        {
+          "name": "InvalidConvo"
+        }
+      ]
     }
   }
 }

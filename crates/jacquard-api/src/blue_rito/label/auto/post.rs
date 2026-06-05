@@ -122,85 +122,85 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Label;
+        type AppliedTo;
         type Condition;
         type CreatedAt;
         type DurationInHours;
-        type AppliedTo;
+        type Label;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Label = Unset;
+        type AppliedTo = Unset;
         type Condition = Unset;
         type CreatedAt = Unset;
         type DurationInHours = Unset;
-        type AppliedTo = Unset;
-    }
-    ///State transition - sets the `label` field to Set
-    pub struct SetLabel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLabel<St> {}
-    impl<St: State> State for SetLabel<St> {
-        type Label = Set<members::label>;
-        type Condition = St::Condition;
-        type CreatedAt = St::CreatedAt;
-        type DurationInHours = St::DurationInHours;
-        type AppliedTo = St::AppliedTo;
-    }
-    ///State transition - sets the `condition` field to Set
-    pub struct SetCondition<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCondition<St> {}
-    impl<St: State> State for SetCondition<St> {
-        type Label = St::Label;
-        type Condition = Set<members::condition>;
-        type CreatedAt = St::CreatedAt;
-        type DurationInHours = St::DurationInHours;
-        type AppliedTo = St::AppliedTo;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Label = St::Label;
-        type Condition = St::Condition;
-        type CreatedAt = Set<members::created_at>;
-        type DurationInHours = St::DurationInHours;
-        type AppliedTo = St::AppliedTo;
-    }
-    ///State transition - sets the `duration_in_hours` field to Set
-    pub struct SetDurationInHours<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDurationInHours<St> {}
-    impl<St: State> State for SetDurationInHours<St> {
-        type Label = St::Label;
-        type Condition = St::Condition;
-        type CreatedAt = St::CreatedAt;
-        type DurationInHours = Set<members::duration_in_hours>;
-        type AppliedTo = St::AppliedTo;
+        type Label = Unset;
     }
     ///State transition - sets the `applied_to` field to Set
     pub struct SetAppliedTo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAppliedTo<St> {}
     impl<St: State> State for SetAppliedTo<St> {
-        type Label = St::Label;
+        type AppliedTo = Set<members::applied_to>;
         type Condition = St::Condition;
         type CreatedAt = St::CreatedAt;
         type DurationInHours = St::DurationInHours;
-        type AppliedTo = Set<members::applied_to>;
+        type Label = St::Label;
+    }
+    ///State transition - sets the `condition` field to Set
+    pub struct SetCondition<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCondition<St> {}
+    impl<St: State> State for SetCondition<St> {
+        type AppliedTo = St::AppliedTo;
+        type Condition = Set<members::condition>;
+        type CreatedAt = St::CreatedAt;
+        type DurationInHours = St::DurationInHours;
+        type Label = St::Label;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type AppliedTo = St::AppliedTo;
+        type Condition = St::Condition;
+        type CreatedAt = Set<members::created_at>;
+        type DurationInHours = St::DurationInHours;
+        type Label = St::Label;
+    }
+    ///State transition - sets the `duration_in_hours` field to Set
+    pub struct SetDurationInHours<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDurationInHours<St> {}
+    impl<St: State> State for SetDurationInHours<St> {
+        type AppliedTo = St::AppliedTo;
+        type Condition = St::Condition;
+        type CreatedAt = St::CreatedAt;
+        type DurationInHours = Set<members::duration_in_hours>;
+        type Label = St::Label;
+    }
+    ///State transition - sets the `label` field to Set
+    pub struct SetLabel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLabel<St> {}
+    impl<St: State> State for SetLabel<St> {
+        type AppliedTo = St::AppliedTo;
+        type Condition = St::Condition;
+        type CreatedAt = St::CreatedAt;
+        type DurationInHours = St::DurationInHours;
+        type Label = Set<members::label>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `label` field
-        pub struct label(());
+        ///Marker type for the `applied_to` field
+        pub struct applied_to(());
         ///Marker type for the `condition` field
         pub struct condition(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `duration_in_hours` field
         pub struct duration_in_hours(());
-        ///Marker type for the `applied_to` field
-        pub struct applied_to(());
+        ///Marker type for the `label` field
+        pub struct label(());
     }
 }
 
@@ -358,11 +358,11 @@ where
 impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
-    St::Label: post_state::IsSet,
+    St::AppliedTo: post_state::IsSet,
     St::Condition: post_state::IsSet,
     St::CreatedAt: post_state::IsSet,
     St::DurationInHours: post_state::IsSet,
-    St::AppliedTo: post_state::IsSet,
+    St::Label: post_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Post<S> {

@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.hidden.box",
+  "revision": 1,
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "gateUri",
+        "uri",
+        "cid",
+        "value"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "gateUri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "value": {
+          "type": "unknown"
+        }
+      }
+    }
+  }
+}

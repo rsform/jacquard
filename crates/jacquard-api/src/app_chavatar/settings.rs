@@ -5,6 +5,9 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod executor;
+
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -49,14 +52,19 @@ pub struct AvatarItem<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Settings<S: BosStr = DefaultStr> {
+    ///List of avatar items to rotate through.
     pub avatars: Vec<settings::AvatarItem<S>>,
+    ///Whether avatar rotation feature is enabled.
     pub enabled: bool,
+    ///The interval at which avatar rotation should occur.
     pub interval: SettingsInterval<S>,
+    ///The rotation mode to use for avatar selection.
     pub mode: SettingsMode<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+/// The interval at which avatar rotation should occur.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SettingsInterval<S: BosStr = DefaultStr> {
@@ -155,6 +163,7 @@ where
     }
 }
 
+/// The rotation mode to use for avatar selection.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SettingsMode<S: BosStr = DefaultStr> {
@@ -317,10 +326,10 @@ impl<S: BosStr> LexiconSchema for Settings<S> {
         {
             let value = &self.interval;
             #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
+            if <str>::len(value.as_ref()) > 6usize {
                 return Err(ConstraintError::MaxLength {
                     path: ValidationPath::from_field("interval"),
-                    max: 10usize,
+                    max: 6usize,
                     actual: <str>::len(value.as_ref()),
                 });
             }
@@ -551,6 +560,11 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("avatars"),
                                 LexObjectProperty::Array(LexArray {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "List of avatar items to rotate through.",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#avatarItem"),
                                         ..Default::default()
@@ -567,13 +581,23 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("interval"),
                                 LexObjectProperty::String(LexString {
-                                    max_length: Some(10usize),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The interval at which avatar rotation should occur.",
+                                        ),
+                                    ),
+                                    max_length: Some(6usize),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("mode"),
                                 LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The rotation mode to use for avatar selection.",
+                                        ),
+                                    ),
                                     max_length: Some(20usize),
                                     ..Default::default()
                                 }),
@@ -601,67 +625,67 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Avatars;
+        type Enabled;
         type Interval;
         type Mode;
-        type Enabled;
-        type Avatars;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Avatars = Unset;
+        type Enabled = Unset;
         type Interval = Unset;
         type Mode = Unset;
-        type Enabled = Unset;
-        type Avatars = Unset;
-    }
-    ///State transition - sets the `interval` field to Set
-    pub struct SetInterval<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetInterval<St> {}
-    impl<St: State> State for SetInterval<St> {
-        type Interval = Set<members::interval>;
-        type Mode = St::Mode;
-        type Enabled = St::Enabled;
-        type Avatars = St::Avatars;
-    }
-    ///State transition - sets the `mode` field to Set
-    pub struct SetMode<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMode<St> {}
-    impl<St: State> State for SetMode<St> {
-        type Interval = St::Interval;
-        type Mode = Set<members::mode>;
-        type Enabled = St::Enabled;
-        type Avatars = St::Avatars;
-    }
-    ///State transition - sets the `enabled` field to Set
-    pub struct SetEnabled<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEnabled<St> {}
-    impl<St: State> State for SetEnabled<St> {
-        type Interval = St::Interval;
-        type Mode = St::Mode;
-        type Enabled = Set<members::enabled>;
-        type Avatars = St::Avatars;
     }
     ///State transition - sets the `avatars` field to Set
     pub struct SetAvatars<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAvatars<St> {}
     impl<St: State> State for SetAvatars<St> {
+        type Avatars = Set<members::avatars>;
+        type Enabled = St::Enabled;
         type Interval = St::Interval;
         type Mode = St::Mode;
+    }
+    ///State transition - sets the `enabled` field to Set
+    pub struct SetEnabled<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEnabled<St> {}
+    impl<St: State> State for SetEnabled<St> {
+        type Avatars = St::Avatars;
+        type Enabled = Set<members::enabled>;
+        type Interval = St::Interval;
+        type Mode = St::Mode;
+    }
+    ///State transition - sets the `interval` field to Set
+    pub struct SetInterval<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetInterval<St> {}
+    impl<St: State> State for SetInterval<St> {
+        type Avatars = St::Avatars;
         type Enabled = St::Enabled;
-        type Avatars = Set<members::avatars>;
+        type Interval = Set<members::interval>;
+        type Mode = St::Mode;
+    }
+    ///State transition - sets the `mode` field to Set
+    pub struct SetMode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMode<St> {}
+    impl<St: State> State for SetMode<St> {
+        type Avatars = St::Avatars;
+        type Enabled = St::Enabled;
+        type Interval = St::Interval;
+        type Mode = Set<members::mode>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `avatars` field
+        pub struct avatars(());
+        ///Marker type for the `enabled` field
+        pub struct enabled(());
         ///Marker type for the `interval` field
         pub struct interval(());
         ///Marker type for the `mode` field
         pub struct mode(());
-        ///Marker type for the `enabled` field
-        pub struct enabled(());
-        ///Marker type for the `avatars` field
-        pub struct avatars(());
     }
 }
 
@@ -792,10 +816,10 @@ where
 impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
+    St::Avatars: settings_state::IsSet,
+    St::Enabled: settings_state::IsSet,
     St::Interval: settings_state::IsSet,
     St::Mode: settings_state::IsSet,
-    St::Enabled: settings_state::IsSet,
-    St::Avatars: settings_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Settings<S> {

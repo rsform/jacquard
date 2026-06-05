@@ -1,0 +1,190 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.getContribution",
+  "defs": {
+    "contributionView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "contributorDid",
+        "contributionType",
+        "changes",
+        "createdAt"
+      ],
+      "properties": {
+        "changes": {
+          "type": "unknown"
+        },
+        "cid": {
+          "type": "string"
+        },
+        "contributionType": {
+          "type": "string",
+          "knownValues": [
+            "correction",
+            "addition",
+            "newGame"
+          ]
+        },
+        "contributorDid": {
+          "type": "string",
+          "format": "did"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "message": {
+          "type": "string"
+        },
+        "patch": {
+          "type": "ref",
+          "ref": "#patchView"
+        },
+        "review": {
+          "type": "ref",
+          "ref": "#reviewView"
+        },
+        "subject": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "subjectName": {
+          "type": "string",
+          "description": "Resolved name of the subject entity for display."
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "verification": {
+          "type": "ref",
+          "ref": "#verificationView"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Get details of a community contribution.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "contribution"
+          ],
+          "properties": {
+            "contribution": {
+              "type": "ref",
+              "ref": "#contributionView"
+            }
+          }
+        }
+      }
+    },
+    "patchView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "subject",
+        "changes",
+        "createdAt"
+      ],
+      "properties": {
+        "changes": {
+          "type": "unknown"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "subject": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "reviewView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "status",
+        "reviewedBy",
+        "createdAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "reviewedBy": {
+          "type": "string",
+          "format": "did"
+        },
+        "status": {
+          "type": "string",
+          "knownValues": [
+            "approved",
+            "denied",
+            "needsRevision"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "verificationView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "contributor",
+        "acceptedBy",
+        "createdAt"
+      ],
+      "properties": {
+        "acceptedBy": {
+          "type": "string",
+          "knownValues": [
+            "mod",
+            "owner",
+            "both"
+          ]
+        },
+        "contributor": {
+          "type": "string",
+          "format": "did"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

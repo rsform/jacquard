@@ -3,4 +3,9 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod get_live_playlist;
+pub mod get_live_segment;
+pub mod get_playback_server;
+pub mod get_video_blob;
+pub mod get_video_playlist;
 pub mod whep;

@@ -28,9 +28,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
-use crate::pub_leaflet::publication::Theme;
+use crate::com_atproto::label::SelfLabels;
 use crate::site_standard::theme::basic::Basic;
 use crate::site_standard::publication;
+/// A publication record representing a blog, website, or content platform. Publications serve as containers for documents and define the overall branding and settings.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -40,17 +41,24 @@ use crate::site_standard::publication;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Publication<S: BosStr = DefaultStr> {
+    ///Simplified publication theme for tools and apps to utilize when displaying content.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub basic_theme: Option<Basic<S>>,
+    ///Brief description of the publication.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
+    ///Square image to identify the publication. Should be at least 256x256.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<BlobRef<S>>,
+    ///Self-label values for this publication. Effectively content warnings.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub labels: Option<SelfLabels<S>>,
+    ///Name of the publication.
     pub name: S,
+    ///Object containing platform specific preferences (with a few shared properties).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub preferences: Option<publication::Preferences<S>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub theme: Option<Theme<S>>,
+    ///Base publication url (ex: https://standard.site). The canonical document URL is formed by combining this value with the document path.
     pub url: UriValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -71,26 +79,10 @@ pub struct PublicationGetRecordOutput<S: BosStr = DefaultStr> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Preferences<S: BosStr = DefaultStr> {
-    /// Defaults to `true`.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default = "_default_preferences_show_comments")]
-    pub show_comments: Option<bool>,
-    /// Defaults to `true`.
+    ///Boolean which decides whether the publication should appear in discovery feeds.  Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_preferences_show_in_discover")]
     pub show_in_discover: Option<bool>,
-    /// Defaults to `true`.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default = "_default_preferences_show_mentions")]
-    pub show_mentions: Option<bool>,
-    /// Defaults to `false`.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default = "_default_preferences_show_prev_next")]
-    pub show_prev_next: Option<bool>,
-    /// Defaults to `true`.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default = "_default_preferences_show_recommends")]
-    pub show_recommends: Option<bool>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -141,10 +133,10 @@ impl<S: BosStr> LexiconSchema for Publication<S> {
     fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3000usize {
+            if <str>::len(value.as_ref()) > 30000usize {
                 return Err(ConstraintError::MaxLength {
                     path: ValidationPath::from_field("description"),
-                    max: 3000usize,
+                    max: 30000usize,
                     actual: <str>::len(value.as_ref()),
                 });
             }
@@ -152,10 +144,10 @@ impl<S: BosStr> LexiconSchema for Publication<S> {
         if let Some(ref value) = self.description {
             {
                 let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
-                if count > 300usize {
+                if count > 3000usize {
                     return Err(ConstraintError::MaxGraphemes {
                         path: ValidationPath::from_field("description"),
-                        max: 300usize,
+                        max: 3000usize,
                         actual: count,
                     });
                 }
@@ -202,10 +194,10 @@ impl<S: BosStr> LexiconSchema for Publication<S> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1280usize {
+            if <str>::len(value.as_ref()) > 5000usize {
                 return Err(ConstraintError::MaxLength {
                     path: ValidationPath::from_field("name"),
-                    max: 1280usize,
+                    max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
             }
@@ -214,10 +206,10 @@ impl<S: BosStr> LexiconSchema for Publication<S> {
             let value = &self.name;
             {
                 let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
-                if count > 128usize {
+                if count > 500usize {
                     return Err(ConstraintError::MaxGraphemes {
                         path: ValidationPath::from_field("name"),
-                        max: 128usize,
+                        max: 500usize,
                         actual: count,
                     });
                 }
@@ -252,37 +244,37 @@ pub mod publication_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Name;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type Url = Set<members::url>;
-        type Name = St::Name;
+        type Url = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Url = St::Url;
         type Name = Set<members::name>;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type Name = St::Name;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -293,9 +285,9 @@ pub struct PublicationBuilder<St: publication_state::State, S: BosStr = DefaultS
         Option<Basic<S>>,
         Option<S>,
         Option<BlobRef<S>>,
+        Option<SelfLabels<S>>,
         Option<S>,
         Option<publication::Preferences<S>>,
-        Option<Theme<S>>,
         Option<UriValue<S>>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -376,6 +368,19 @@ impl<St: publication_state::State, S: BosStr> PublicationBuilder<St, S> {
     }
 }
 
+impl<St: publication_state::State, S: BosStr> PublicationBuilder<St, S> {
+    /// Set the `labels` field (optional)
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `labels` field to an Option value (optional)
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<S>>) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> PublicationBuilder<St, S>
 where
     St: publication_state::State,
@@ -386,7 +391,7 @@ where
         mut self,
         value: impl Into<S>,
     ) -> PublicationBuilder<publication_state::SetName<St>, S> {
-        self._fields.3 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -401,7 +406,7 @@ impl<St: publication_state::State, S: BosStr> PublicationBuilder<St, S> {
         mut self,
         value: impl Into<Option<publication::Preferences<S>>>,
     ) -> Self {
-        self._fields.4 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `preferences` field to an Option value (optional)
@@ -409,19 +414,6 @@ impl<St: publication_state::State, S: BosStr> PublicationBuilder<St, S> {
         mut self,
         value: Option<publication::Preferences<S>>,
     ) -> Self {
-        self._fields.4 = value;
-        self
-    }
-}
-
-impl<St: publication_state::State, S: BosStr> PublicationBuilder<St, S> {
-    /// Set the `theme` field (optional)
-    pub fn theme(mut self, value: impl Into<Option<Theme<S>>>) -> Self {
-        self._fields.5 = value.into();
-        self
-    }
-    /// Set the `theme` field to an Option value (optional)
-    pub fn maybe_theme(mut self, value: Option<Theme<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -449,8 +441,8 @@ where
 impl<St, S: BosStr> PublicationBuilder<St, S>
 where
     St: publication_state::State,
-    St::Url: publication_state::IsSet,
     St::Name: publication_state::IsSet,
+    St::Url: publication_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Publication<S> {
@@ -458,9 +450,9 @@ where
             basic_theme: self._fields.0,
             description: self._fields.1,
             icon: self._fields.2,
-            name: self._fields.3.unwrap(),
-            preferences: self._fields.4,
-            theme: self._fields.5,
+            labels: self._fields.3,
+            name: self._fields.4.unwrap(),
+            preferences: self._fields.5,
             url: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
@@ -474,9 +466,9 @@ where
             basic_theme: self._fields.0,
             description: self._fields.1,
             icon: self._fields.2,
-            name: self._fields.3.unwrap(),
-            preferences: self._fields.4,
-            theme: self._fields.5,
+            labels: self._fields.3,
+            name: self._fields.4.unwrap(),
+            preferences: self._fields.5,
             url: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
@@ -496,6 +488,11 @@ fn lexicon_doc_site_standard_publication() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
+                    description: Some(
+                        CowStr::new_static(
+                            "A publication record representing a blog, website, or content platform. Publications serve as containers for documents and define the overall branding and settings.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(
@@ -514,8 +511,11 @@ fn lexicon_doc_site_standard_publication() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    max_length: Some(3000usize),
-                                    max_graphemes: Some(300usize),
+                                    description: Some(
+                                        CowStr::new_static("Brief description of the publication."),
+                                    ),
+                                    max_length: Some(30000usize),
+                                    max_graphemes: Some(3000usize),
                                     ..Default::default()
                                 }),
                             );
@@ -524,10 +524,27 @@ fn lexicon_doc_site_standard_publication() -> LexiconDoc<'static> {
                                 LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
+                                SmolStr::new_static("labels"),
+                                LexObjectProperty::Union(LexRefUnion {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Self-label values for this publication. Effectively content warnings.",
+                                        ),
+                                    ),
+                                    refs: vec![
+                                        CowStr::new_static("com.atproto.label.defs#selfLabels")
+                                    ],
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    max_length: Some(1280usize),
-                                    max_graphemes: Some(128usize),
+                                    description: Some(
+                                        CowStr::new_static("Name of the publication."),
+                                    ),
+                                    max_length: Some(5000usize),
+                                    max_graphemes: Some(500usize),
                                     ..Default::default()
                                 }),
                             );
@@ -539,17 +556,13 @@ fn lexicon_doc_site_standard_publication() -> LexiconDoc<'static> {
                                 }),
                             );
                             map.insert(
-                                SmolStr::new_static("theme"),
-                                LexObjectProperty::Union(LexRefUnion {
-                                    refs: vec![
-                                        CowStr::new_static("pub.leaflet.publication#theme")
-                                    ],
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
                                 SmolStr::new_static("url"),
                                 LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Base publication url (ex: https://standard.site). The canonical document URL is formed by combining this value with the document path.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -568,31 +581,7 @@ fn lexicon_doc_site_standard_publication() -> LexiconDoc<'static> {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
-                            SmolStr::new_static("showComments"),
-                            LexObjectProperty::Boolean(LexBoolean {
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
                             SmolStr::new_static("showInDiscover"),
-                            LexObjectProperty::Boolean(LexBoolean {
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("showMentions"),
-                            LexObjectProperty::Boolean(LexBoolean {
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("showPrevNext"),
-                            LexObjectProperty::Boolean(LexBoolean {
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("showRecommends"),
                             LexObjectProperty::Boolean(LexBoolean {
                                 ..Default::default()
                             }),
@@ -608,34 +597,14 @@ fn lexicon_doc_site_standard_publication() -> LexiconDoc<'static> {
     }
 }
 
-fn _default_preferences_show_comments() -> Option<bool> {
-    Some(true)
-}
-
 fn _default_preferences_show_in_discover() -> Option<bool> {
-    Some(true)
-}
-
-fn _default_preferences_show_mentions() -> Option<bool> {
-    Some(true)
-}
-
-fn _default_preferences_show_prev_next() -> Option<bool> {
-    Some(false)
-}
-
-fn _default_preferences_show_recommends() -> Option<bool> {
     Some(true)
 }
 
 impl Default for Preferences {
     fn default() -> Self {
         Self {
-            show_comments: Some(true),
             show_in_discover: Some(true),
-            show_mentions: Some(true),
-            show_prev_next: Some(false),
-            show_recommends: Some(true),
             extra_data: Default::default(),
         }
     }

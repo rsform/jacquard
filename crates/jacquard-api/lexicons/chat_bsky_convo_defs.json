@@ -2,6 +2,44 @@
   "lexicon": 1,
   "id": "chat.bsky.convo.defs",
   "defs": {
+    "convoKind": {
+      "type": "string",
+      "knownValues": [
+        "direct",
+        "group"
+      ]
+    },
+    "convoLockStatus": {
+      "type": "string",
+      "knownValues": [
+        "unlocked",
+        "locked",
+        "locked-permanently"
+      ]
+    },
+    "convoRef": {
+      "type": "object",
+      "required": [
+        "did",
+        "convoId"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        }
+      }
+    },
+    "convoStatus": {
+      "type": "string",
+      "knownValues": [
+        "request",
+        "accepted"
+      ]
+    },
     "convoView": {
       "type": "object",
       "required": [
@@ -15,11 +53,20 @@
         "id": {
           "type": "string"
         },
+        "kind": {
+          "type": "union",
+          "description": "Union field that has data specific to different kinds of convos.",
+          "refs": [
+            "#directConvo",
+            "#groupConvo"
+          ]
+        },
         "lastMessage": {
           "type": "union",
           "refs": [
             "#messageView",
-            "#deletedMessageView"
+            "#deletedMessageView",
+            "#systemMessageView"
           ]
         },
         "lastReaction": {
@@ -30,6 +77,7 @@
         },
         "members": {
           "type": "array",
+          "description": "Members of this conversation. For direct convos, it will be an immutable list of the 2 members. For group convos, it will a list of important members (the first few members, the viewer, the member who added the viewer, the member who sent the last message, the member who sent the last reaction), but will not contain the full list of members. Use chat.bsky.convo.getConvoMembers to list all members.",
           "items": {
             "type": "ref",
             "ref": "chat.bsky.actor.defs#profileViewBasic"
@@ -42,11 +90,9 @@
           "type": "string"
         },
         "status": {
-          "type": "string",
-          "knownValues": [
-            "request",
-            "accepted"
-          ]
+          "type": "ref",
+          "description": "Convo status for the viewer member (not the convo itself).",
+          "ref": "#convoStatus"
         },
         "unreadCount": {
           "type": "integer"
@@ -78,8 +124,62 @@
         }
       }
     },
+    "directConvo": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here].",
+      "properties": {}
+    },
+    "groupConvo": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here].",
+      "required": [
+        "createdAt",
+        "lockStatus",
+        "memberCount",
+        "memberLimit",
+        "name"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "joinLink": {
+          "type": "ref",
+          "ref": "chat.bsky.group.defs#joinLinkView"
+        },
+        "joinRequestCount": {
+          "type": "integer",
+          "description": "The total number of pending join requests for the group conversation. Only present for the owner. Capped at 21."
+        },
+        "lockStatus": {
+          "type": "ref",
+          "description": "The lock status of the conversation.",
+          "ref": "#convoLockStatus"
+        },
+        "memberCount": {
+          "type": "integer",
+          "description": "The total number of members in the group conversation."
+        },
+        "memberLimit": {
+          "type": "integer",
+          "description": "The maximum number of members allowed in the group conversation."
+        },
+        "name": {
+          "type": "string",
+          "description": "The display name of the group conversation.",
+          "maxLength": 1280,
+          "maxGraphemes": 128
+        },
+        "unreadJoinRequestCount": {
+          "type": "integer",
+          "description": "The number of unread join requests for the group conversation. Only present for the owner."
+        }
+      }
+    },
     "logAcceptConvo": {
       "type": "object",
+      "description": "Event indicating the viewer accepted a convo, and it can be moved out of the request inbox. Can be direct or group.",
       "required": [
         "rev",
         "convoId"
@@ -93,8 +193,40 @@
         }
       }
     },
+    "logAddMember": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member was added to a group convo. The member who was added gets a logBeginConvo (to create the convo) but also a logAddMember (to show the system message as the first message the user sees).",
+      "required": [
+        "rev",
+        "convoId",
+        "message",
+        "relatedProfiles"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "ref",
+          "description": "A system message with data of type #systemMessageDataAddMember",
+          "ref": "#systemMessageView"
+        },
+        "relatedProfiles": {
+          "type": "array",
+          "description": "Profiles referred in the system message.",
+          "items": {
+            "type": "ref",
+            "ref": "chat.bsky.actor.defs#profileViewBasic"
+          }
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
     "logAddReaction": {
       "type": "object",
+      "description": "Event indicating a reaction was added to a message.",
       "required": [
         "rev",
         "convoId",
@@ -116,6 +248,36 @@
           "type": "ref",
           "ref": "#reactionView"
         },
+        "relatedProfiles": {
+          "type": "array",
+          "description": "Profiles referred in the message and reaction views. This isn't required for compatibility, because it was added later, but should generally be present.",
+          "items": {
+            "type": "ref",
+            "ref": "chat.bsky.actor.defs#profileViewBasic"
+          }
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logApproveJoinRequest": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was approved by the viewer. Only the owner gets this. The approved member gets a logBeginConvo.",
+      "required": [
+        "rev",
+        "convoId",
+        "member"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "member": {
+          "type": "ref",
+          "description": "Prospective member who requested to join.",
+          "ref": "chat.bsky.actor.defs#profileViewBasic"
+        },
         "rev": {
           "type": "string"
         }
@@ -123,6 +285,7 @@
     },
     "logBeginConvo": {
       "type": "object",
+      "description": "Event indicating a convo containing the viewer was started. Can be direct or group. When a member is added to a group convo, they also get this event.",
       "required": [
         "rev",
         "convoId"
@@ -130,6 +293,28 @@
       "properties": {
         "convoId": {
           "type": "string"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logCreateJoinLink": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join link was created for a group convo.",
+      "required": [
+        "rev",
+        "convoId",
+        "message"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "ref",
+          "description": "A system message with data of type #systemMessageDataCreateJoinLink",
+          "ref": "#systemMessageView"
         },
         "rev": {
           "type": "string"
@@ -138,6 +323,7 @@
     },
     "logCreateMessage": {
       "type": "object",
+      "description": "Event indicating a user-originated message was created. Is not emitted for system messages.",
       "required": [
         "rev",
         "convoId",
@@ -153,6 +339,14 @@
             "#messageView",
             "#deletedMessageView"
           ]
+        },
+        "relatedProfiles": {
+          "type": "array",
+          "description": "Profiles referred to in the message view. This isn't required for compatibility, because it was added later, but should generally be present.",
+          "items": {
+            "type": "ref",
+            "ref": "chat.bsky.actor.defs#profileViewBasic"
+          }
         },
         "rev": {
           "type": "string"
@@ -161,6 +355,7 @@
     },
     "logDeleteMessage": {
       "type": "object",
+      "description": "Event indicating a user-originated message was deleted. Is not emitted for system messages.",
       "required": [
         "rev",
         "convoId",
@@ -182,8 +377,119 @@
         }
       }
     },
+    "logDisableJoinLink": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join link was disabled for a group convo.",
+      "required": [
+        "rev",
+        "convoId",
+        "message"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "ref",
+          "description": "A system message with data of type #systemMessageDataDisableJoinLink",
+          "ref": "#systemMessageView"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logEditGroup": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating info about group convo was edited.",
+      "required": [
+        "rev",
+        "convoId",
+        "message"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "ref",
+          "description": "A system message with data of type #systemMessageDataEditGroup",
+          "ref": "#systemMessageView"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logEditJoinLink": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a settings about a join link for a group convo were edited.",
+      "required": [
+        "rev",
+        "convoId",
+        "message"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "ref",
+          "description": "A system message with data of type #systemMessageDataEditJoinLink",
+          "ref": "#systemMessageView"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logEnableJoinLink": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join link was enabled for a group convo.",
+      "required": [
+        "rev",
+        "convoId",
+        "message"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "ref",
+          "description": "A system message with data of type #systemMessageDataEnableJoinLink",
+          "ref": "#systemMessageView"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logIncomingJoinRequest": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was made to a group the viewer owns. Only the owner gets this.",
+      "required": [
+        "rev",
+        "convoId",
+        "member"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "member": {
+          "type": "ref",
+          "description": "Prospective member who requested to join.",
+          "ref": "chat.bsky.actor.defs#profileViewBasic"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
     "logLeaveConvo": {
       "type": "object",
+      "description": "Event indicating the viewer left a convo. Can be direct or group.",
       "required": [
         "rev",
         "convoId"
@@ -197,8 +503,190 @@
         }
       }
     },
+    "logLockConvo": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a group convo was locked.",
+      "required": [
+        "rev",
+        "convoId",
+        "message",
+        "relatedProfiles"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "ref",
+          "description": "A system message with data of type #systemMessageDataLockConvo",
+          "ref": "#systemMessageView"
+        },
+        "relatedProfiles": {
+          "type": "array",
+          "description": "Profiles referred in the system message.",
+          "items": {
+            "type": "ref",
+            "ref": "chat.bsky.actor.defs#profileViewBasic"
+          }
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logLockConvoPermanently": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a group convo was locked permanently.",
+      "required": [
+        "rev",
+        "convoId",
+        "message",
+        "relatedProfiles"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "ref",
+          "description": "A system message with data of type #systemMessageDataLockConvoPermanently",
+          "ref": "#systemMessageView"
+        },
+        "relatedProfiles": {
+          "type": "array",
+          "description": "Profiles referred in the system message.",
+          "items": {
+            "type": "ref",
+            "ref": "chat.bsky.actor.defs#profileViewBasic"
+          }
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logMemberJoin": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member joined a group convo via join link. The member who was added gets a logBeginConvo (to create the convo) but also a logMemberJoin (to show the system message as the first message the user sees).",
+      "required": [
+        "rev",
+        "convoId",
+        "message",
+        "relatedProfiles"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "ref",
+          "description": "A system message with data of type #systemMessageDataMemberJoin",
+          "ref": "#systemMessageView"
+        },
+        "relatedProfiles": {
+          "type": "array",
+          "description": "Profiles referred in the system message.",
+          "items": {
+            "type": "ref",
+            "ref": "chat.bsky.actor.defs#profileViewBasic"
+          }
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logMemberLeave": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member voluntarily left a group convo. The member who was removed gets a logLeaveConvo (to leave the convo) but not a logMemberLeave (because they already left, so can't see the system message).",
+      "required": [
+        "rev",
+        "convoId",
+        "message",
+        "relatedProfiles"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "ref",
+          "description": "A system message with data of type #systemMessageDataMemberLeave",
+          "ref": "#systemMessageView"
+        },
+        "relatedProfiles": {
+          "type": "array",
+          "description": "Profiles referred in the system message.",
+          "items": {
+            "type": "ref",
+            "ref": "chat.bsky.actor.defs#profileViewBasic"
+          }
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
     "logMuteConvo": {
       "type": "object",
+      "description": "Event indicating the viewer muted a convo. Can be direct or group.",
+      "required": [
+        "rev",
+        "convoId"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logOutgoingJoinRequest": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was made by the requester. Only requester actor gets this.",
+      "required": [
+        "rev",
+        "convoId"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logReadConvo": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a convo was read up to a certain message.",
+      "required": [
+        "rev",
+        "convoId",
+        "message"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "union",
+          "refs": [
+            "#messageView",
+            "#deletedMessageView",
+            "#systemMessageView"
+          ]
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logReadJoinRequests": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating the group owner marked join requests as read. Only the owner gets this.",
       "required": [
         "rev",
         "convoId"
@@ -214,6 +702,7 @@
     },
     "logReadMessage": {
       "type": "object",
+      "description": "DEPRECATED: use logReadConvo instead. Event indicating a convo was read up to a certain message.",
       "required": [
         "rev",
         "convoId",
@@ -227,8 +716,62 @@
           "type": "union",
           "refs": [
             "#messageView",
-            "#deletedMessageView"
+            "#deletedMessageView",
+            "#systemMessageView"
           ]
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logRejectJoinRequest": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was rejected by the viewer. Only the owner gets this.",
+      "required": [
+        "rev",
+        "convoId",
+        "member"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "member": {
+          "type": "ref",
+          "description": "Prospective member who requested to join.",
+          "ref": "chat.bsky.actor.defs#profileViewBasic"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logRemoveMember": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member was removed from a group convo. The member who was removed gets a logLeaveConvo (to leave the convo) but not a logRemoveMember (because they already left, so can't see the system message).",
+      "required": [
+        "rev",
+        "convoId",
+        "message",
+        "relatedProfiles"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "ref",
+          "description": "A system message with data of type #systemMessageDataRemoveMember",
+          "ref": "#systemMessageView"
+        },
+        "relatedProfiles": {
+          "type": "array",
+          "description": "Profiles referred in the system message.",
+          "items": {
+            "type": "ref",
+            "ref": "chat.bsky.actor.defs#profileViewBasic"
+          }
         },
         "rev": {
           "type": "string"
@@ -237,6 +780,7 @@
     },
     "logRemoveReaction": {
       "type": "object",
+      "description": "Event indicating a reaction was removed from a message.",
       "required": [
         "rev",
         "convoId",
@@ -258,6 +802,45 @@
           "type": "ref",
           "ref": "#reactionView"
         },
+        "relatedProfiles": {
+          "type": "array",
+          "description": "Profiles referred in the message and reaction views. This isn't required for compatibility, because it was added later, but should generally be present.",
+          "items": {
+            "type": "ref",
+            "ref": "chat.bsky.actor.defs#profileViewBasic"
+          }
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logUnlockConvo": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a group convo was unlocked.",
+      "required": [
+        "rev",
+        "convoId",
+        "message",
+        "relatedProfiles"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "ref",
+          "description": "A system message with data of type #systemMessageDataUnlockConvo",
+          "ref": "#systemMessageView"
+        },
+        "relatedProfiles": {
+          "type": "array",
+          "description": "Profiles referred in the system message.",
+          "items": {
+            "type": "ref",
+            "ref": "chat.bsky.actor.defs#profileViewBasic"
+          }
+        },
         "rev": {
           "type": "string"
         }
@@ -265,6 +848,45 @@
     },
     "logUnmuteConvo": {
       "type": "object",
+      "description": "Event indicating the viewer unmuted a convo. Can be direct or group.",
+      "required": [
+        "rev",
+        "convoId"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logWithdrawIncomingJoinRequest": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a prospective member withdrew their join request. Only the owner gets this.",
+      "required": [
+        "rev",
+        "convoId",
+        "member"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "member": {
+          "type": "ref",
+          "description": "Prospective member who withdrew their join request.",
+          "ref": "chat.bsky.actor.defs#profileViewBasic"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logWithdrawOutgoingJoinRequest": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating the viewer withdrew their own join request. Only requester actor gets this.",
       "required": [
         "rev",
         "convoId"
@@ -304,7 +926,8 @@
         "embed": {
           "type": "union",
           "refs": [
-            "app.bsky.embed.record"
+            "app.bsky.embed.record",
+            "chat.bsky.embed.joinLink"
           ]
         },
         "facets": {
@@ -355,7 +978,8 @@
         "embed": {
           "type": "union",
           "refs": [
-            "app.bsky.embed.record#view"
+            "app.bsky.embed.record#view",
+            "chat.bsky.embed.joinLink#view"
           ]
         },
         "facets": {
@@ -437,6 +1061,216 @@
         "did": {
           "type": "string",
           "format": "did"
+        }
+      }
+    },
+    "systemMessageDataAddMember": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user was added to the group convo.",
+      "required": [
+        "member",
+        "role",
+        "addedBy"
+      ],
+      "properties": {
+        "addedBy": {
+          "type": "ref",
+          "ref": "#systemMessageReferredUser"
+        },
+        "member": {
+          "type": "ref",
+          "description": "Current view of the member who was added.",
+          "ref": "#systemMessageReferredUser"
+        },
+        "role": {
+          "type": "ref",
+          "description": "Role the user was added to the group with. The role from 'member' will reflect the current data, not historical.",
+          "ref": "chat.bsky.actor.defs#memberRole"
+        }
+      }
+    },
+    "systemMessageDataCreateJoinLink": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was created.",
+      "properties": {}
+    },
+    "systemMessageDataDisableJoinLink": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was disabled.",
+      "properties": {}
+    },
+    "systemMessageDataEditGroup": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group info was edited.",
+      "properties": {
+        "newName": {
+          "type": "string",
+          "description": "Group name that replaced the old."
+        },
+        "oldName": {
+          "type": "string",
+          "description": "Group name that was replaced."
+        }
+      }
+    },
+    "systemMessageDataEditJoinLink": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was edited.",
+      "properties": {}
+    },
+    "systemMessageDataEnableJoinLink": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was enabled.",
+      "properties": {}
+    },
+    "systemMessageDataLockConvo": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group convo was locked.",
+      "required": [
+        "lockedBy"
+      ],
+      "properties": {
+        "lockedBy": {
+          "type": "ref",
+          "description": "Current view of the member who locked the group.",
+          "ref": "#systemMessageReferredUser"
+        }
+      }
+    },
+    "systemMessageDataLockConvoPermanently": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group convo was locked permanently.",
+      "required": [
+        "lockedBy"
+      ],
+      "properties": {
+        "lockedBy": {
+          "type": "ref",
+          "description": "Current view of the member who locked the group.",
+          "ref": "#systemMessageReferredUser"
+        }
+      }
+    },
+    "systemMessageDataMemberJoin": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user joined the group convo via join link.",
+      "required": [
+        "member",
+        "role"
+      ],
+      "properties": {
+        "approvedBy": {
+          "type": "ref",
+          "description": "If join link was configured to require approval, this will be set to who approved the request. Undefined if approval was not required.",
+          "ref": "#systemMessageReferredUser"
+        },
+        "member": {
+          "type": "ref",
+          "description": "Current view of the member who joined.",
+          "ref": "#systemMessageReferredUser"
+        },
+        "role": {
+          "type": "ref",
+          "description": "Role the user was added to the group with. The role from 'member' will reflect the current data, not historical.",
+          "ref": "chat.bsky.actor.defs#memberRole"
+        }
+      }
+    },
+    "systemMessageDataMemberLeave": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user voluntarily left the group convo.",
+      "required": [
+        "member"
+      ],
+      "properties": {
+        "member": {
+          "type": "ref",
+          "description": "Current view of the member who left the group.",
+          "ref": "#systemMessageReferredUser"
+        }
+      }
+    },
+    "systemMessageDataRemoveMember": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user was removed from the group convo.",
+      "required": [
+        "member",
+        "removedBy"
+      ],
+      "properties": {
+        "member": {
+          "type": "ref",
+          "description": "Current view of the member who was removed.",
+          "ref": "#systemMessageReferredUser"
+        },
+        "removedBy": {
+          "type": "ref",
+          "ref": "#systemMessageReferredUser"
+        }
+      }
+    },
+    "systemMessageDataUnlockConvo": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group convo was unlocked.",
+      "required": [
+        "unlockedBy"
+      ],
+      "properties": {
+        "unlockedBy": {
+          "type": "ref",
+          "description": "Current view of the member who unlocked the group.",
+          "ref": "#systemMessageReferredUser"
+        }
+      }
+    },
+    "systemMessageReferredUser": {
+      "type": "object",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        }
+      }
+    },
+    "systemMessageView": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here].",
+      "required": [
+        "id",
+        "rev",
+        "sentAt",
+        "data"
+      ],
+      "properties": {
+        "data": {
+          "type": "union",
+          "refs": [
+            "#systemMessageDataAddMember",
+            "#systemMessageDataRemoveMember",
+            "#systemMessageDataMemberJoin",
+            "#systemMessageDataMemberLeave",
+            "#systemMessageDataLockConvo",
+            "#systemMessageDataUnlockConvo",
+            "#systemMessageDataLockConvoPermanently",
+            "#systemMessageDataEditGroup",
+            "#systemMessageDataCreateJoinLink",
+            "#systemMessageDataEditJoinLink",
+            "#systemMessageDataEnableJoinLink",
+            "#systemMessageDataDisableJoinLink"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "rev": {
+          "type": "string"
+        },
+        "sentAt": {
+          "type": "string",
+          "format": "datetime"
         }
       }
     }

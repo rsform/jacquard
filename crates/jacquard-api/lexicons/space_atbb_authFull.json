@@ -1,0 +1,22 @@
+{
+  "lexicon": 1,
+  "id": "space.atbb.authFull",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Full atBB forum access",
+      "detail": "Provides full access to all atbb.space features including joining and posting on forums.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": [
+            "space.atbb.post",
+            "space.atbb.reaction",
+            "space.atbb.membership"
+          ]
+        }
+      ]
+    }
+  }
+}

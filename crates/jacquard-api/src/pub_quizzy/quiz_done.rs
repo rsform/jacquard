@@ -115,37 +115,37 @@ pub mod quiz_done_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Timestamp;
         type QuizBegin;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Timestamp = Unset;
         type QuizBegin = Unset;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
-    impl<St: State> State for SetTimestamp<St> {
-        type Timestamp = Set<members::timestamp>;
-        type QuizBegin = St::QuizBegin;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `quiz_begin` field to Set
     pub struct SetQuizBegin<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetQuizBegin<St> {}
     impl<St: State> State for SetQuizBegin<St> {
-        type Timestamp = St::Timestamp;
         type QuizBegin = Set<members::quiz_begin>;
+        type Timestamp = St::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
+        type QuizBegin = St::QuizBegin;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `quiz_begin` field
         pub struct quiz_begin(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
@@ -233,8 +233,8 @@ where
 impl<St, S: BosStr> QuizDoneBuilder<St, S>
 where
     St: quiz_done_state::State,
-    St::Timestamp: quiz_done_state::IsSet,
     St::QuizBegin: quiz_done_state::IsSet,
+    St::Timestamp: quiz_done_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> QuizDone<S> {

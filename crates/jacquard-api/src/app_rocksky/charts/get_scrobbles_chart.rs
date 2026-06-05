@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::AtUri;
@@ -28,8 +28,6 @@ pub struct GetScrobblesChart<S: BosStr = DefaultStr> {
     pub artisturi: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<AtIdentifier<S>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub genre: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub songuri: Option<AtUri<S>>,
 }
@@ -97,7 +95,6 @@ pub struct GetScrobblesChartBuilder<
         Option<AtUri<S>>,
         Option<AtUri<S>>,
         Option<AtIdentifier<S>>,
-        Option<S>,
         Option<AtUri<S>>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -125,7 +122,7 @@ impl GetScrobblesChartBuilder<get_scrobbles_chart_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         GetScrobblesChartBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -136,7 +133,7 @@ impl<S: BosStr> GetScrobblesChartBuilder<get_scrobbles_chart_state::Empty, S> {
     pub fn builder() -> Self {
         GetScrobblesChartBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -182,27 +179,14 @@ impl<St: get_scrobbles_chart_state::State, S: BosStr> GetScrobblesChartBuilder<S
 }
 
 impl<St: get_scrobbles_chart_state::State, S: BosStr> GetScrobblesChartBuilder<St, S> {
-    /// Set the `genre` field (optional)
-    pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.3 = value.into();
-        self
-    }
-    /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<S>) -> Self {
-        self._fields.3 = value;
-        self
-    }
-}
-
-impl<St: get_scrobbles_chart_state::State, S: BosStr> GetScrobblesChartBuilder<St, S> {
     /// Set the `songuri` field (optional)
     pub fn songuri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
-        self._fields.4 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `songuri` field to an Option value (optional)
     pub fn maybe_songuri(mut self, value: Option<AtUri<S>>) -> Self {
-        self._fields.4 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -217,8 +201,7 @@ where
             albumuri: self._fields.0,
             artisturi: self._fields.1,
             did: self._fields.2,
-            genre: self._fields.3,
-            songuri: self._fields.4,
+            songuri: self._fields.3,
         }
     }
 }

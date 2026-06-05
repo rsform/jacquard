@@ -113,37 +113,37 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Poll;
         type Option;
+        type Poll;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Poll = Unset;
         type Option = Unset;
-    }
-    ///State transition - sets the `poll` field to Set
-    pub struct SetPoll<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPoll<St> {}
-    impl<St: State> State for SetPoll<St> {
-        type Poll = Set<members::poll>;
-        type Option = St::Option;
+        type Poll = Unset;
     }
     ///State transition - sets the `option` field to Set
     pub struct SetOption<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOption<St> {}
     impl<St: State> State for SetOption<St> {
-        type Poll = St::Poll;
         type Option = Set<members::option>;
+        type Poll = St::Poll;
+    }
+    ///State transition - sets the `poll` field to Set
+    pub struct SetPoll<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPoll<St> {}
+    impl<St: State> State for SetPoll<St> {
+        type Option = St::Option;
+        type Poll = Set<members::poll>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `poll` field
-        pub struct poll(());
         ///Marker type for the `option` field
         pub struct option(());
+        ///Marker type for the `poll` field
+        pub struct poll(());
     }
 }
 
@@ -231,8 +231,8 @@ where
 impl<St, S: BosStr> VoteBuilder<St, S>
 where
     St: vote_state::State,
-    St::Poll: vote_state::IsSet,
     St::Option: vote_state::IsSet,
+    St::Poll: vote_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Vote<S> {

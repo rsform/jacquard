@@ -36,13 +36,46 @@ pub struct GetBroadcasterOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
+#[derive(
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
+)]
+
+#[serde(tag = "error", content = "message")]
+pub enum GetBroadcasterError {
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
+}
+
+impl core::fmt::Display for GetBroadcasterError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+        }
+    }
+}
+
 /// Response type for place.stream.broadcast.getBroadcaster
 pub struct GetBroadcasterResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBroadcasterResponse {
     const NSID: &'static str = "place.stream.broadcast.getBroadcaster";
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = GetBroadcasterOutput<S>;
-    type Err = jacquard_common::xrpc::GenericError;
+    type Err = GetBroadcasterError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetBroadcaster {

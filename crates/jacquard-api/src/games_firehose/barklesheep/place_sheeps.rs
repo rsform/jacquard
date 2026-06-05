@@ -108,37 +108,37 @@ pub mod place_sheeps_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Sheeps;
         type GameId;
+        type Sheeps;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Sheeps = Unset;
         type GameId = Unset;
-    }
-    ///State transition - sets the `sheeps` field to Set
-    pub struct SetSheeps<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSheeps<St> {}
-    impl<St: State> State for SetSheeps<St> {
-        type Sheeps = Set<members::sheeps>;
-        type GameId = St::GameId;
+        type Sheeps = Unset;
     }
     ///State transition - sets the `game_id` field to Set
     pub struct SetGameId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGameId<St> {}
     impl<St: State> State for SetGameId<St> {
-        type Sheeps = St::Sheeps;
         type GameId = Set<members::game_id>;
+        type Sheeps = St::Sheeps;
+    }
+    ///State transition - sets the `sheeps` field to Set
+    pub struct SetSheeps<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSheeps<St> {}
+    impl<St: State> State for SetSheeps<St> {
+        type GameId = St::GameId;
+        type Sheeps = Set<members::sheeps>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sheeps` field
-        pub struct sheeps(());
         ///Marker type for the `game_id` field
         pub struct game_id(());
+        ///Marker type for the `sheeps` field
+        pub struct sheeps(());
     }
 }
 
@@ -226,8 +226,8 @@ where
 impl<St, S: BosStr> PlaceSheepsBuilder<St, S>
 where
     St: place_sheeps_state::State,
-    St::Sheeps: place_sheeps_state::IsSet,
     St::GameId: place_sheeps_state::IsSet,
+    St::Sheeps: place_sheeps_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PlaceSheeps<S> {

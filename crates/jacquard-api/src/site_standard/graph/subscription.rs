@@ -16,7 +16,7 @@ use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
-/// Record declaring a subscription to a publication
+/// Record declaring a subscription to a publication.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -37,6 +37,9 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Subscription<S: BosStr = DefaultStr> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<Datetime>,
+    ///AT-URI reference to the publication record being subscribed to (ex: at://did:plc:abc123/site.standard.publication/xyz789).
     pub publication: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -136,7 +139,7 @@ pub mod subscription_state {
 /// Builder for constructing an instance of this type.
 pub struct SubscriptionBuilder<St: subscription_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<AtUri<S>>,),
+    _fields: (Option<Datetime>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -159,7 +162,7 @@ impl SubscriptionBuilder<subscription_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         SubscriptionBuilder {
             _state: PhantomData,
-            _fields: (None,),
+            _fields: (None, None),
             _type: PhantomData,
         }
     }
@@ -170,9 +173,22 @@ impl<S: BosStr> SubscriptionBuilder<subscription_state::Empty, S> {
     pub fn builder() -> Self {
         SubscriptionBuilder {
             _state: PhantomData,
-            _fields: (None,),
+            _fields: (None, None),
             _type: PhantomData,
         }
+    }
+}
+
+impl<St: subscription_state::State, S: BosStr> SubscriptionBuilder<St, S> {
+    /// Set the `createdAt` field (optional)
+    pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `createdAt` field to an Option value (optional)
+    pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
+        self._fields.0 = value;
+        self
     }
 }
 
@@ -186,7 +202,7 @@ where
         mut self,
         value: impl Into<AtUri<S>>,
     ) -> SubscriptionBuilder<subscription_state::SetPublication<St>, S> {
-        self._fields.0 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SubscriptionBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -203,7 +219,8 @@ where
     /// Build the final struct.
     pub fn build(self) -> Subscription<S> {
         Subscription {
-            publication: self._fields.0.unwrap(),
+            created_at: self._fields.0,
+            publication: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -213,7 +230,8 @@ where
         extra_data: BTreeMap<SmolStr, Data<S>>,
     ) -> Subscription<S> {
         Subscription {
-            publication: self._fields.0.unwrap(),
+            created_at: self._fields.0,
+            publication: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -234,7 +252,7 @@ fn lexicon_doc_site_standard_graph_subscription() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     description: Some(
                         CowStr::new_static(
-                            "Record declaring a subscription to a publication",
+                            "Record declaring a subscription to a publication.",
                         ),
                     ),
                     key: Some(CowStr::new_static("tid")),
@@ -244,8 +262,20 @@ fn lexicon_doc_site_standard_graph_subscription() -> LexiconDoc<'static> {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
                                 SmolStr::new_static("publication"),
                                 LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "AT-URI reference to the publication record being subscribed to (ex: at://did:plc:abc123/site.standard.publication/xyz789).",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

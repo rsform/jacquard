@@ -3,5 +3,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod auth_full;
 pub mod place_sheeps;
 pub mod reaction;

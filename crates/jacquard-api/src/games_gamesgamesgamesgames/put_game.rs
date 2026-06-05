@@ -56,7 +56,8 @@ pub struct PutGame<S: BosStr = DefaultStr> {
     pub modes: Option<Vec<Mode<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub multiplayer_modes: Option<Vec<MultiplayerMode<S>>>,
-    pub name: S,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -65,6 +66,8 @@ pub struct PutGame<S: BosStr = DefaultStr> {
     pub releases: Option<Vec<Release<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub should_publish: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub slug: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub storyline: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -131,36 +134,24 @@ pub mod put_game_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Uri;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Uri = Unset;
-        type Name = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Uri = St::Uri;
-        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
@@ -184,6 +175,7 @@ pub struct PutGameBuilder<St: put_game_state::State, S: BosStr = DefaultStr> {
         Option<Vec<PlayerPerspective<S>>>,
         Option<Vec<Release<S>>>,
         Option<bool>,
+        Option<S>,
         Option<S>,
         Option<S>,
         Option<Vec<Theme<S>>>,
@@ -238,6 +230,7 @@ impl PutGameBuilder<put_game_state::Empty, DefaultStr> {
                 None,
                 None,
                 None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -250,6 +243,7 @@ impl<S: BosStr> PutGameBuilder<put_game_state::Empty, S> {
         PutGameBuilder {
             _state: PhantomData,
             _fields: (
+                None,
                 None,
                 None,
                 None,
@@ -443,22 +437,16 @@ impl<St: put_game_state::State, S: BosStr> PutGameBuilder<St, S> {
     }
 }
 
-impl<St, S: BosStr> PutGameBuilder<St, S>
-where
-    St: put_game_state::State,
-    St::Name: put_game_state::IsUnset,
-{
-    /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> PutGameBuilder<put_game_state::SetName<St>, S> {
-        self._fields.11 = Option::Some(value.into());
-        PutGameBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: put_game_state::State, S: BosStr> PutGameBuilder<St, S> {
+    /// Set the `name` field (optional)
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.11 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
+        self._fields.11 = value;
+        self
     }
 }
 
@@ -521,14 +509,27 @@ impl<St: put_game_state::State, S: BosStr> PutGameBuilder<St, S> {
 }
 
 impl<St: put_game_state::State, S: BosStr> PutGameBuilder<St, S> {
+    /// Set the `slug` field (optional)
+    pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.16 = value.into();
+        self
+    }
+    /// Set the `slug` field to an Option value (optional)
+    pub fn maybe_slug(mut self, value: Option<S>) -> Self {
+        self._fields.16 = value;
+        self
+    }
+}
+
+impl<St: put_game_state::State, S: BosStr> PutGameBuilder<St, S> {
     /// Set the `storyline` field (optional)
     pub fn storyline(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.16 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `storyline` field to an Option value (optional)
     pub fn maybe_storyline(mut self, value: Option<S>) -> Self {
-        self._fields.16 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -536,12 +537,12 @@ impl<St: put_game_state::State, S: BosStr> PutGameBuilder<St, S> {
 impl<St: put_game_state::State, S: BosStr> PutGameBuilder<St, S> {
     /// Set the `summary` field (optional)
     pub fn summary(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.17 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `summary` field to an Option value (optional)
     pub fn maybe_summary(mut self, value: Option<S>) -> Self {
-        self._fields.17 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -549,12 +550,12 @@ impl<St: put_game_state::State, S: BosStr> PutGameBuilder<St, S> {
 impl<St: put_game_state::State, S: BosStr> PutGameBuilder<St, S> {
     /// Set the `themes` field (optional)
     pub fn themes(mut self, value: impl Into<Option<Vec<Theme<S>>>>) -> Self {
-        self._fields.18 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `themes` field to an Option value (optional)
     pub fn maybe_themes(mut self, value: Option<Vec<Theme<S>>>) -> Self {
-        self._fields.18 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -562,12 +563,12 @@ impl<St: put_game_state::State, S: BosStr> PutGameBuilder<St, S> {
 impl<St: put_game_state::State, S: BosStr> PutGameBuilder<St, S> {
     /// Set the `timeToBeat` field (optional)
     pub fn time_to_beat(mut self, value: impl Into<Option<TimeToBeat<S>>>) -> Self {
-        self._fields.19 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `timeToBeat` field to an Option value (optional)
     pub fn maybe_time_to_beat(mut self, value: Option<TimeToBeat<S>>) -> Self {
-        self._fields.19 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -582,7 +583,7 @@ where
         mut self,
         value: impl Into<AtUri<S>>,
     ) -> PutGameBuilder<put_game_state::SetUri<St>, S> {
-        self._fields.20 = Option::Some(value.into());
+        self._fields.21 = Option::Some(value.into());
         PutGameBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -594,12 +595,12 @@ where
 impl<St: put_game_state::State, S: BosStr> PutGameBuilder<St, S> {
     /// Set the `videos` field (optional)
     pub fn videos(mut self, value: impl Into<Option<Vec<ExternalVideo<S>>>>) -> Self {
-        self._fields.21 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `videos` field to an Option value (optional)
     pub fn maybe_videos(mut self, value: Option<Vec<ExternalVideo<S>>>) -> Self {
-        self._fields.21 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -607,12 +608,12 @@ impl<St: put_game_state::State, S: BosStr> PutGameBuilder<St, S> {
 impl<St: put_game_state::State, S: BosStr> PutGameBuilder<St, S> {
     /// Set the `websites` field (optional)
     pub fn websites(mut self, value: impl Into<Option<Vec<Website<S>>>>) -> Self {
-        self._fields.22 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `websites` field to an Option value (optional)
     pub fn maybe_websites(mut self, value: Option<Vec<Website<S>>>) -> Self {
-        self._fields.22 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -621,7 +622,6 @@ impl<St, S: BosStr> PutGameBuilder<St, S>
 where
     St: put_game_state::State,
     St::Uri: put_game_state::IsSet,
-    St::Name: put_game_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PutGame<S> {
@@ -637,18 +637,19 @@ where
             media: self._fields.8,
             modes: self._fields.9,
             multiplayer_modes: self._fields.10,
-            name: self._fields.11.unwrap(),
+            name: self._fields.11,
             parent: self._fields.12,
             player_perspectives: self._fields.13,
             releases: self._fields.14,
             should_publish: self._fields.15,
-            storyline: self._fields.16,
-            summary: self._fields.17,
-            themes: self._fields.18,
-            time_to_beat: self._fields.19,
-            uri: self._fields.20.unwrap(),
-            videos: self._fields.21,
-            websites: self._fields.22,
+            slug: self._fields.16,
+            storyline: self._fields.17,
+            summary: self._fields.18,
+            themes: self._fields.19,
+            time_to_beat: self._fields.20,
+            uri: self._fields.21.unwrap(),
+            videos: self._fields.22,
+            websites: self._fields.23,
             extra_data: Default::default(),
         }
     }
@@ -666,18 +667,19 @@ where
             media: self._fields.8,
             modes: self._fields.9,
             multiplayer_modes: self._fields.10,
-            name: self._fields.11.unwrap(),
+            name: self._fields.11,
             parent: self._fields.12,
             player_perspectives: self._fields.13,
             releases: self._fields.14,
             should_publish: self._fields.15,
-            storyline: self._fields.16,
-            summary: self._fields.17,
-            themes: self._fields.18,
-            time_to_beat: self._fields.19,
-            uri: self._fields.20.unwrap(),
-            videos: self._fields.21,
-            websites: self._fields.22,
+            slug: self._fields.16,
+            storyline: self._fields.17,
+            summary: self._fields.18,
+            themes: self._fields.19,
+            time_to_beat: self._fields.20,
+            uri: self._fields.21.unwrap(),
+            videos: self._fields.22,
+            websites: self._fields.23,
             extra_data: Some(extra_data),
         }
     }

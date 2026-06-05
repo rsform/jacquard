@@ -228,67 +228,67 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type BadgeType;
         type CreatedAt;
         type Icon;
         type Title;
-        type BadgeType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type BadgeType = Unset;
         type CreatedAt = Unset;
         type Icon = Unset;
         type Title = Unset;
-        type BadgeType = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Icon = St::Icon;
-        type Title = St::Title;
-        type BadgeType = St::BadgeType;
-    }
-    ///State transition - sets the `icon` field to Set
-    pub struct SetIcon<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIcon<St> {}
-    impl<St: State> State for SetIcon<St> {
-        type CreatedAt = St::CreatedAt;
-        type Icon = Set<members::icon>;
-        type Title = St::Title;
-        type BadgeType = St::BadgeType;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type CreatedAt = St::CreatedAt;
-        type Icon = St::Icon;
-        type Title = Set<members::title>;
-        type BadgeType = St::BadgeType;
     }
     ///State transition - sets the `badge_type` field to Set
     pub struct SetBadgeType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBadgeType<St> {}
     impl<St: State> State for SetBadgeType<St> {
+        type BadgeType = Set<members::badge_type>;
         type CreatedAt = St::CreatedAt;
         type Icon = St::Icon;
         type Title = St::Title;
-        type BadgeType = Set<members::badge_type>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type BadgeType = St::BadgeType;
+        type CreatedAt = Set<members::created_at>;
+        type Icon = St::Icon;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `icon` field to Set
+    pub struct SetIcon<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIcon<St> {}
+    impl<St: State> State for SetIcon<St> {
+        type BadgeType = St::BadgeType;
+        type CreatedAt = St::CreatedAt;
+        type Icon = Set<members::icon>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type BadgeType = St::BadgeType;
+        type CreatedAt = St::CreatedAt;
+        type Icon = St::Icon;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `badge_type` field
+        pub struct badge_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `icon` field
         pub struct icon(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `badge_type` field
-        pub struct badge_type(());
     }
 }
 
@@ -447,10 +447,10 @@ where
 impl<St, S: BosStr> DefinitionBuilder<St, S>
 where
     St: definition_state::State,
+    St::BadgeType: definition_state::IsSet,
     St::CreatedAt: definition_state::IsSet,
     St::Icon: definition_state::IsSet,
     St::Title: definition_state::IsSet,
-    St::BadgeType: definition_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Definition<S> {

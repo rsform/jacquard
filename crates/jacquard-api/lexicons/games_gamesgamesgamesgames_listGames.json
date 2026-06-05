@@ -8,6 +8,38 @@
       "parameters": {
         "type": "params",
         "properties": {
+          "ageRatings": {
+            "type": "array",
+            "description": "Filter by age rating in 'organization:rating' format (e.g. esrb:M, pegi:Eighteen).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "applicationTypes": {
+            "type": "array",
+            "description": "Filter by application type (e.g. game, dlc, bundle).",
+            "items": {
+              "type": "string",
+              "knownValues": [
+                "addon",
+                "bundle",
+                "dlc",
+                "episode",
+                "expandedGame",
+                "expansion",
+                "fork",
+                "game",
+                "mod",
+                "pack",
+                "port",
+                "remake",
+                "remaster",
+                "season",
+                "standaloneExpansion",
+                "update"
+              ]
+            }
+          },
           "cursor": {
             "type": "string"
           },
@@ -15,11 +47,38 @@
             "type": "string",
             "format": "did"
           },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "includeCancelled": {
+            "type": "boolean",
+            "default": false
+          },
+          "includeUnrated": {
+            "type": "boolean",
+            "description": "When age rating filters are active, also include games with no age ratings.",
+            "default": false
+          },
           "limit": {
             "type": "integer",
             "default": 20,
             "minimum": 1,
             "maximum": 100
+          },
+          "modes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "playerPerspectives": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "sort": {
             "type": "string",
@@ -34,6 +93,12 @@
               "asc",
               "desc"
             ]
+          },
+          "themes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },

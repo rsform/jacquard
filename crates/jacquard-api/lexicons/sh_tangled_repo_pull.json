@@ -10,8 +10,8 @@
         "required": [
           "target",
           "title",
-          "patchBlob",
-          "createdAt"
+          "createdAt",
+          "rounds"
         ],
         "properties": {
           "body": {
@@ -21,6 +21,10 @@
             "type": "string",
             "format": "datetime"
           },
+          "dependentOn": {
+            "type": "string",
+            "format": "at-uri"
+          },
           "mentions": {
             "type": "array",
             "items": {
@@ -28,22 +32,18 @@
               "format": "did"
             }
           },
-          "patch": {
-            "type": "string",
-            "description": "(deprecated) use patchBlob instead"
-          },
-          "patchBlob": {
-            "type": "blob",
-            "description": "patch content",
-            "accept": [
-              "text/x-patch"
-            ]
-          },
           "references": {
             "type": "array",
             "items": {
               "type": "string",
               "format": "at-uri"
+            }
+          },
+          "rounds": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#round"
             }
           },
           "source": {
@@ -60,11 +60,30 @@
         }
       }
     },
+    "round": {
+      "type": "object",
+      "description": "revisions of this pull request, newer rounds are appended to this array. appviews may reject records do not treat this field as append-only. the blob format is gzipped text-based git-format-patches.",
+      "required": [
+        "patchBlob",
+        "createdAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "patchBlob": {
+          "type": "blob",
+          "accept": [
+            "application/gzip"
+          ]
+        }
+      }
+    },
     "source": {
       "type": "object",
       "required": [
-        "branch",
-        "sha"
+        "branch"
       ],
       "properties": {
         "branch": {
@@ -72,12 +91,7 @@
         },
         "repo": {
           "type": "string",
-          "format": "at-uri"
-        },
-        "sha": {
-          "type": "string",
-          "minLength": 40,
-          "maxLength": 40
+          "format": "did"
         }
       }
     },
@@ -93,7 +107,7 @@
         },
         "repo": {
           "type": "string",
-          "format": "at-uri"
+          "format": "did"
         }
       }
     }

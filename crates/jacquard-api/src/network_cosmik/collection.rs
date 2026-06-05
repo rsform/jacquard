@@ -228,37 +228,37 @@ pub mod collection_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type AccessType;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type AccessType = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type AccessType = St::AccessType;
+        type Name = Unset;
     }
     ///State transition - sets the `access_type` field to Set
     pub struct SetAccessType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAccessType<St> {}
     impl<St: State> State for SetAccessType<St> {
-        type Name = St::Name;
         type AccessType = Set<members::access_type>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type AccessType = St::AccessType;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `access_type` field
         pub struct access_type(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -405,8 +405,8 @@ impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
 impl<St, S: BosStr> CollectionBuilder<St, S>
 where
     St: collection_state::State,
-    St::Name: collection_state::IsSet,
     St::AccessType: collection_state::IsSet,
+    St::Name: collection_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Collection<S> {

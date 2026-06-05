@@ -238,85 +238,85 @@ pub mod current_plan_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tier;
         type DisplayName;
-        type IsActive;
         type Id;
+        type IsActive;
         type Name;
+        type Tier;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tier = Unset;
         type DisplayName = Unset;
-        type IsActive = Unset;
         type Id = Unset;
+        type IsActive = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `tier` field to Set
-    pub struct SetTier<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTier<St> {}
-    impl<St: State> State for SetTier<St> {
-        type Tier = Set<members::tier>;
-        type DisplayName = St::DisplayName;
-        type IsActive = St::IsActive;
-        type Id = St::Id;
-        type Name = St::Name;
+        type Tier = Unset;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDisplayName<St> {}
     impl<St: State> State for SetDisplayName<St> {
-        type Tier = St::Tier;
         type DisplayName = Set<members::display_name>;
+        type Id = St::Id;
         type IsActive = St::IsActive;
-        type Id = St::Id;
         type Name = St::Name;
-    }
-    ///State transition - sets the `is_active` field to Set
-    pub struct SetIsActive<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIsActive<St> {}
-    impl<St: State> State for SetIsActive<St> {
         type Tier = St::Tier;
-        type DisplayName = St::DisplayName;
-        type IsActive = Set<members::is_active>;
-        type Id = St::Id;
-        type Name = St::Name;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type Tier = St::Tier;
         type DisplayName = St::DisplayName;
-        type IsActive = St::IsActive;
         type Id = Set<members::id>;
+        type IsActive = St::IsActive;
         type Name = St::Name;
+        type Tier = St::Tier;
+    }
+    ///State transition - sets the `is_active` field to Set
+    pub struct SetIsActive<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIsActive<St> {}
+    impl<St: State> State for SetIsActive<St> {
+        type DisplayName = St::DisplayName;
+        type Id = St::Id;
+        type IsActive = Set<members::is_active>;
+        type Name = St::Name;
+        type Tier = St::Tier;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Tier = St::Tier;
         type DisplayName = St::DisplayName;
-        type IsActive = St::IsActive;
         type Id = St::Id;
+        type IsActive = St::IsActive;
         type Name = Set<members::name>;
+        type Tier = St::Tier;
+    }
+    ///State transition - sets the `tier` field to Set
+    pub struct SetTier<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTier<St> {}
+    impl<St: State> State for SetTier<St> {
+        type DisplayName = St::DisplayName;
+        type Id = St::Id;
+        type IsActive = St::IsActive;
+        type Name = St::Name;
+        type Tier = Set<members::tier>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tier` field
-        pub struct tier(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
-        ///Marker type for the `is_active` field
-        pub struct is_active(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `is_active` field
+        pub struct is_active(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `tier` field
+        pub struct tier(());
     }
 }
 
@@ -481,11 +481,11 @@ impl<St: current_plan_state::State, S: BosStr> CurrentPlanBuilder<St, S> {
 impl<St, S: BosStr> CurrentPlanBuilder<St, S>
 where
     St: current_plan_state::State,
-    St::Tier: current_plan_state::IsSet,
     St::DisplayName: current_plan_state::IsSet,
-    St::IsActive: current_plan_state::IsSet,
     St::Id: current_plan_state::IsSet,
+    St::IsActive: current_plan_state::IsSet,
     St::Name: current_plan_state::IsSet,
+    St::Tier: current_plan_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CurrentPlan<S> {
@@ -796,105 +796,105 @@ pub mod plan_limits_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MonthlyPostsLimit;
         type MaxImagesPerPost;
-        type ThreadPostsLimit;
         type MaxScheduleDays;
+        type MonthlyPostsLimit;
         type PendingPostsLimit;
         type ScheduleIntervalMinutes;
+        type ThreadPostsLimit;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MonthlyPostsLimit = Unset;
         type MaxImagesPerPost = Unset;
-        type ThreadPostsLimit = Unset;
         type MaxScheduleDays = Unset;
+        type MonthlyPostsLimit = Unset;
         type PendingPostsLimit = Unset;
         type ScheduleIntervalMinutes = Unset;
-    }
-    ///State transition - sets the `monthly_posts_limit` field to Set
-    pub struct SetMonthlyPostsLimit<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMonthlyPostsLimit<St> {}
-    impl<St: State> State for SetMonthlyPostsLimit<St> {
-        type MonthlyPostsLimit = Set<members::monthly_posts_limit>;
-        type MaxImagesPerPost = St::MaxImagesPerPost;
-        type ThreadPostsLimit = St::ThreadPostsLimit;
-        type MaxScheduleDays = St::MaxScheduleDays;
-        type PendingPostsLimit = St::PendingPostsLimit;
-        type ScheduleIntervalMinutes = St::ScheduleIntervalMinutes;
+        type ThreadPostsLimit = Unset;
     }
     ///State transition - sets the `max_images_per_post` field to Set
     pub struct SetMaxImagesPerPost<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMaxImagesPerPost<St> {}
     impl<St: State> State for SetMaxImagesPerPost<St> {
-        type MonthlyPostsLimit = St::MonthlyPostsLimit;
         type MaxImagesPerPost = Set<members::max_images_per_post>;
-        type ThreadPostsLimit = St::ThreadPostsLimit;
         type MaxScheduleDays = St::MaxScheduleDays;
-        type PendingPostsLimit = St::PendingPostsLimit;
-        type ScheduleIntervalMinutes = St::ScheduleIntervalMinutes;
-    }
-    ///State transition - sets the `thread_posts_limit` field to Set
-    pub struct SetThreadPostsLimit<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetThreadPostsLimit<St> {}
-    impl<St: State> State for SetThreadPostsLimit<St> {
         type MonthlyPostsLimit = St::MonthlyPostsLimit;
-        type MaxImagesPerPost = St::MaxImagesPerPost;
-        type ThreadPostsLimit = Set<members::thread_posts_limit>;
-        type MaxScheduleDays = St::MaxScheduleDays;
         type PendingPostsLimit = St::PendingPostsLimit;
         type ScheduleIntervalMinutes = St::ScheduleIntervalMinutes;
+        type ThreadPostsLimit = St::ThreadPostsLimit;
     }
     ///State transition - sets the `max_schedule_days` field to Set
     pub struct SetMaxScheduleDays<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMaxScheduleDays<St> {}
     impl<St: State> State for SetMaxScheduleDays<St> {
-        type MonthlyPostsLimit = St::MonthlyPostsLimit;
         type MaxImagesPerPost = St::MaxImagesPerPost;
-        type ThreadPostsLimit = St::ThreadPostsLimit;
         type MaxScheduleDays = Set<members::max_schedule_days>;
+        type MonthlyPostsLimit = St::MonthlyPostsLimit;
         type PendingPostsLimit = St::PendingPostsLimit;
         type ScheduleIntervalMinutes = St::ScheduleIntervalMinutes;
+        type ThreadPostsLimit = St::ThreadPostsLimit;
+    }
+    ///State transition - sets the `monthly_posts_limit` field to Set
+    pub struct SetMonthlyPostsLimit<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMonthlyPostsLimit<St> {}
+    impl<St: State> State for SetMonthlyPostsLimit<St> {
+        type MaxImagesPerPost = St::MaxImagesPerPost;
+        type MaxScheduleDays = St::MaxScheduleDays;
+        type MonthlyPostsLimit = Set<members::monthly_posts_limit>;
+        type PendingPostsLimit = St::PendingPostsLimit;
+        type ScheduleIntervalMinutes = St::ScheduleIntervalMinutes;
+        type ThreadPostsLimit = St::ThreadPostsLimit;
     }
     ///State transition - sets the `pending_posts_limit` field to Set
     pub struct SetPendingPostsLimit<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPendingPostsLimit<St> {}
     impl<St: State> State for SetPendingPostsLimit<St> {
-        type MonthlyPostsLimit = St::MonthlyPostsLimit;
         type MaxImagesPerPost = St::MaxImagesPerPost;
-        type ThreadPostsLimit = St::ThreadPostsLimit;
         type MaxScheduleDays = St::MaxScheduleDays;
+        type MonthlyPostsLimit = St::MonthlyPostsLimit;
         type PendingPostsLimit = Set<members::pending_posts_limit>;
         type ScheduleIntervalMinutes = St::ScheduleIntervalMinutes;
+        type ThreadPostsLimit = St::ThreadPostsLimit;
     }
     ///State transition - sets the `schedule_interval_minutes` field to Set
     pub struct SetScheduleIntervalMinutes<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetScheduleIntervalMinutes<St> {}
     impl<St: State> State for SetScheduleIntervalMinutes<St> {
-        type MonthlyPostsLimit = St::MonthlyPostsLimit;
         type MaxImagesPerPost = St::MaxImagesPerPost;
-        type ThreadPostsLimit = St::ThreadPostsLimit;
         type MaxScheduleDays = St::MaxScheduleDays;
+        type MonthlyPostsLimit = St::MonthlyPostsLimit;
         type PendingPostsLimit = St::PendingPostsLimit;
         type ScheduleIntervalMinutes = Set<members::schedule_interval_minutes>;
+        type ThreadPostsLimit = St::ThreadPostsLimit;
+    }
+    ///State transition - sets the `thread_posts_limit` field to Set
+    pub struct SetThreadPostsLimit<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetThreadPostsLimit<St> {}
+    impl<St: State> State for SetThreadPostsLimit<St> {
+        type MaxImagesPerPost = St::MaxImagesPerPost;
+        type MaxScheduleDays = St::MaxScheduleDays;
+        type MonthlyPostsLimit = St::MonthlyPostsLimit;
+        type PendingPostsLimit = St::PendingPostsLimit;
+        type ScheduleIntervalMinutes = St::ScheduleIntervalMinutes;
+        type ThreadPostsLimit = Set<members::thread_posts_limit>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `monthly_posts_limit` field
-        pub struct monthly_posts_limit(());
         ///Marker type for the `max_images_per_post` field
         pub struct max_images_per_post(());
-        ///Marker type for the `thread_posts_limit` field
-        pub struct thread_posts_limit(());
         ///Marker type for the `max_schedule_days` field
         pub struct max_schedule_days(());
+        ///Marker type for the `monthly_posts_limit` field
+        pub struct monthly_posts_limit(());
         ///Marker type for the `pending_posts_limit` field
         pub struct pending_posts_limit(());
         ///Marker type for the `schedule_interval_minutes` field
         pub struct schedule_interval_minutes(());
+        ///Marker type for the `thread_posts_limit` field
+        pub struct thread_posts_limit(());
     }
 }
 
@@ -1178,12 +1178,12 @@ impl<St: plan_limits_state::State, S: BosStr> PlanLimitsBuilder<St, S> {
 impl<St, S: BosStr> PlanLimitsBuilder<St, S>
 where
     St: plan_limits_state::State,
-    St::MonthlyPostsLimit: plan_limits_state::IsSet,
     St::MaxImagesPerPost: plan_limits_state::IsSet,
-    St::ThreadPostsLimit: plan_limits_state::IsSet,
     St::MaxScheduleDays: plan_limits_state::IsSet,
+    St::MonthlyPostsLimit: plan_limits_state::IsSet,
     St::PendingPostsLimit: plan_limits_state::IsSet,
     St::ScheduleIntervalMinutes: plan_limits_state::IsSet,
+    St::ThreadPostsLimit: plan_limits_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PlanLimits<S> {
@@ -1236,85 +1236,85 @@ pub mod usage_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MonthlyPostsCount;
         type LastUpdated;
         type MonthlyPeriodEnd;
-        type PendingPostsCount;
         type MonthlyPeriodStart;
+        type MonthlyPostsCount;
+        type PendingPostsCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MonthlyPostsCount = Unset;
         type LastUpdated = Unset;
         type MonthlyPeriodEnd = Unset;
-        type PendingPostsCount = Unset;
         type MonthlyPeriodStart = Unset;
-    }
-    ///State transition - sets the `monthly_posts_count` field to Set
-    pub struct SetMonthlyPostsCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMonthlyPostsCount<St> {}
-    impl<St: State> State for SetMonthlyPostsCount<St> {
-        type MonthlyPostsCount = Set<members::monthly_posts_count>;
-        type LastUpdated = St::LastUpdated;
-        type MonthlyPeriodEnd = St::MonthlyPeriodEnd;
-        type PendingPostsCount = St::PendingPostsCount;
-        type MonthlyPeriodStart = St::MonthlyPeriodStart;
+        type MonthlyPostsCount = Unset;
+        type PendingPostsCount = Unset;
     }
     ///State transition - sets the `last_updated` field to Set
     pub struct SetLastUpdated<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLastUpdated<St> {}
     impl<St: State> State for SetLastUpdated<St> {
-        type MonthlyPostsCount = St::MonthlyPostsCount;
         type LastUpdated = Set<members::last_updated>;
         type MonthlyPeriodEnd = St::MonthlyPeriodEnd;
-        type PendingPostsCount = St::PendingPostsCount;
         type MonthlyPeriodStart = St::MonthlyPeriodStart;
+        type MonthlyPostsCount = St::MonthlyPostsCount;
+        type PendingPostsCount = St::PendingPostsCount;
     }
     ///State transition - sets the `monthly_period_end` field to Set
     pub struct SetMonthlyPeriodEnd<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMonthlyPeriodEnd<St> {}
     impl<St: State> State for SetMonthlyPeriodEnd<St> {
-        type MonthlyPostsCount = St::MonthlyPostsCount;
         type LastUpdated = St::LastUpdated;
         type MonthlyPeriodEnd = Set<members::monthly_period_end>;
-        type PendingPostsCount = St::PendingPostsCount;
         type MonthlyPeriodStart = St::MonthlyPeriodStart;
-    }
-    ///State transition - sets the `pending_posts_count` field to Set
-    pub struct SetPendingPostsCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPendingPostsCount<St> {}
-    impl<St: State> State for SetPendingPostsCount<St> {
         type MonthlyPostsCount = St::MonthlyPostsCount;
-        type LastUpdated = St::LastUpdated;
-        type MonthlyPeriodEnd = St::MonthlyPeriodEnd;
-        type PendingPostsCount = Set<members::pending_posts_count>;
-        type MonthlyPeriodStart = St::MonthlyPeriodStart;
+        type PendingPostsCount = St::PendingPostsCount;
     }
     ///State transition - sets the `monthly_period_start` field to Set
     pub struct SetMonthlyPeriodStart<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMonthlyPeriodStart<St> {}
     impl<St: State> State for SetMonthlyPeriodStart<St> {
-        type MonthlyPostsCount = St::MonthlyPostsCount;
         type LastUpdated = St::LastUpdated;
         type MonthlyPeriodEnd = St::MonthlyPeriodEnd;
-        type PendingPostsCount = St::PendingPostsCount;
         type MonthlyPeriodStart = Set<members::monthly_period_start>;
+        type MonthlyPostsCount = St::MonthlyPostsCount;
+        type PendingPostsCount = St::PendingPostsCount;
+    }
+    ///State transition - sets the `monthly_posts_count` field to Set
+    pub struct SetMonthlyPostsCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMonthlyPostsCount<St> {}
+    impl<St: State> State for SetMonthlyPostsCount<St> {
+        type LastUpdated = St::LastUpdated;
+        type MonthlyPeriodEnd = St::MonthlyPeriodEnd;
+        type MonthlyPeriodStart = St::MonthlyPeriodStart;
+        type MonthlyPostsCount = Set<members::monthly_posts_count>;
+        type PendingPostsCount = St::PendingPostsCount;
+    }
+    ///State transition - sets the `pending_posts_count` field to Set
+    pub struct SetPendingPostsCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPendingPostsCount<St> {}
+    impl<St: State> State for SetPendingPostsCount<St> {
+        type LastUpdated = St::LastUpdated;
+        type MonthlyPeriodEnd = St::MonthlyPeriodEnd;
+        type MonthlyPeriodStart = St::MonthlyPeriodStart;
+        type MonthlyPostsCount = St::MonthlyPostsCount;
+        type PendingPostsCount = Set<members::pending_posts_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `monthly_posts_count` field
-        pub struct monthly_posts_count(());
         ///Marker type for the `last_updated` field
         pub struct last_updated(());
         ///Marker type for the `monthly_period_end` field
         pub struct monthly_period_end(());
-        ///Marker type for the `pending_posts_count` field
-        pub struct pending_posts_count(());
         ///Marker type for the `monthly_period_start` field
         pub struct monthly_period_start(());
+        ///Marker type for the `monthly_posts_count` field
+        pub struct monthly_posts_count(());
+        ///Marker type for the `pending_posts_count` field
+        pub struct pending_posts_count(());
     }
 }
 
@@ -1493,11 +1493,11 @@ impl<St: usage_stats_state::State, S: BosStr> UsageStatsBuilder<St, S> {
 impl<St, S: BosStr> UsageStatsBuilder<St, S>
 where
     St: usage_stats_state::State,
-    St::MonthlyPostsCount: usage_stats_state::IsSet,
     St::LastUpdated: usage_stats_state::IsSet,
     St::MonthlyPeriodEnd: usage_stats_state::IsSet,
-    St::PendingPostsCount: usage_stats_state::IsSet,
     St::MonthlyPeriodStart: usage_stats_state::IsSet,
+    St::MonthlyPostsCount: usage_stats_state::IsSet,
+    St::PendingPostsCount: usage_stats_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> UsageStats<S> {

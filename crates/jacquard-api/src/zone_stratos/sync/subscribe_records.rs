@@ -605,8 +605,8 @@ pub mod commit_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
-        type Rev;
         type Ops;
+        type Rev;
         type Seq;
         type Time;
     }
@@ -615,8 +615,8 @@ pub mod commit_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
-        type Rev = Unset;
         type Ops = Unset;
+        type Rev = Unset;
         type Seq = Unset;
         type Time = Unset;
     }
@@ -625,18 +625,8 @@ pub mod commit_state {
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
+        type Ops = St::Ops;
         type Rev = St::Rev;
-        type Ops = St::Ops;
-        type Seq = St::Seq;
-        type Time = St::Time;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev<St> {}
-    impl<St: State> State for SetRev<St> {
-        type Did = St::Did;
-        type Rev = Set<members::rev>;
-        type Ops = St::Ops;
         type Seq = St::Seq;
         type Time = St::Time;
     }
@@ -645,8 +635,18 @@ pub mod commit_state {
     impl<St: State> sealed::Sealed for SetOps<St> {}
     impl<St: State> State for SetOps<St> {
         type Did = St::Did;
-        type Rev = St::Rev;
         type Ops = Set<members::ops>;
+        type Rev = St::Rev;
+        type Seq = St::Seq;
+        type Time = St::Time;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev<St> {}
+    impl<St: State> State for SetRev<St> {
+        type Did = St::Did;
+        type Ops = St::Ops;
+        type Rev = Set<members::rev>;
         type Seq = St::Seq;
         type Time = St::Time;
     }
@@ -655,8 +655,8 @@ pub mod commit_state {
     impl<St: State> sealed::Sealed for SetSeq<St> {}
     impl<St: State> State for SetSeq<St> {
         type Did = St::Did;
-        type Rev = St::Rev;
         type Ops = St::Ops;
+        type Rev = St::Rev;
         type Seq = Set<members::seq>;
         type Time = St::Time;
     }
@@ -665,8 +665,8 @@ pub mod commit_state {
     impl<St: State> sealed::Sealed for SetTime<St> {}
     impl<St: State> State for SetTime<St> {
         type Did = St::Did;
-        type Rev = St::Rev;
         type Ops = St::Ops;
+        type Rev = St::Rev;
         type Seq = St::Seq;
         type Time = Set<members::time>;
     }
@@ -675,10 +675,10 @@ pub mod commit_state {
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `ops` field
         pub struct ops(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
         ///Marker type for the `seq` field
         pub struct seq(());
         ///Marker type for the `time` field
@@ -834,8 +834,8 @@ impl<St, S: BosStr> CommitBuilder<St, S>
 where
     St: commit_state::State,
     St::Did: commit_state::IsSet,
-    St::Rev: commit_state::IsSet,
     St::Ops: commit_state::IsSet,
+    St::Rev: commit_state::IsSet,
     St::Seq: commit_state::IsSet,
     St::Time: commit_state::IsSet,
 {
@@ -1182,51 +1182,51 @@ pub mod enrollment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Action;
         type Did;
         type Time;
-        type Action;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Action = Unset;
         type Did = Unset;
         type Time = Unset;
-        type Action = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Time = St::Time;
-        type Action = St::Action;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTime<St> {}
-    impl<St: State> State for SetTime<St> {
-        type Did = St::Did;
-        type Time = Set<members::time>;
-        type Action = St::Action;
     }
     ///State transition - sets the `action` field to Set
     pub struct SetAction<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAction<St> {}
     impl<St: State> State for SetAction<St> {
+        type Action = Set<members::action>;
         type Did = St::Did;
         type Time = St::Time;
-        type Action = Set<members::action>;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Action = St::Action;
+        type Did = Set<members::did>;
+        type Time = St::Time;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTime<St> {}
+    impl<St: State> State for SetTime<St> {
+        type Action = St::Action;
+        type Did = St::Did;
+        type Time = Set<members::time>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `action` field
+        pub struct action(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `time` field
         pub struct time(());
-        ///Marker type for the `action` field
-        pub struct action(());
     }
 }
 
@@ -1365,9 +1365,9 @@ where
 impl<St, S: BosStr> EnrollmentBuilder<St, S>
 where
     St: enrollment_state::State,
+    St::Action: enrollment_state::IsSet,
     St::Did: enrollment_state::IsSet,
     St::Time: enrollment_state::IsSet,
-    St::Action: enrollment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Enrollment<S> {

@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "social.oolong.alpha.like",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A like on an Oolong record (brew, tea, vendor, vessel, or infuser)",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the like was created",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "The AT-URI and CID of the record being liked",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

@@ -16,7 +16,6 @@ use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
-use crate::app_rocksky::feed::FeedView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -34,7 +33,7 @@ pub struct GetFeed<S: BosStr = DefaultStr> {
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFeedOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    pub value: FeedView<S>,
+    pub value: Data<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }

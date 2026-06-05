@@ -11,9 +11,6 @@
           "position"
         ],
         "properties": {
-          "playerId": {
-            "type": "string"
-          },
           "position": {
             "type": "integer",
             "description": "The position in seconds to seek to"

@@ -5,8 +5,13 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod add_member;
 pub mod list_keys;
+pub mod list_knots;
+pub mod list_members;
+pub mod list_members_by;
 pub mod member;
+pub mod remove_member;
 
 
 #[cfg(feature = "streaming")]

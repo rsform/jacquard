@@ -1,0 +1,54 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.badge.def",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Defines a badge's visual appearance and type. Created by the issuer and referenced by issuance records.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "badgeType",
+          "createdAt"
+        ],
+        "properties": {
+          "badgeType": {
+            "type": "string",
+            "description": "The category of this badge, used for scope and display rules.",
+            "knownValues": [
+              "place.stream.badge.defs#vip",
+              "place.stream.badge.defs#event"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description of the badge.",
+            "maxLength": 256
+          },
+          "image": {
+            "type": "blob",
+            "description": "Badge icon image.",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/gif",
+              "image/webp"
+            ],
+            "maxSize": 262144
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for this badge.",
+            "maxLength": 64
+          }
+        }
+      }
+    }
+  }
+}

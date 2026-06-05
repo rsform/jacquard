@@ -150,50 +150,50 @@ pub mod ref_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ObjectId;
-        type Repo;
         type RefName;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ObjectId = Unset;
-        type Repo = Unset;
         type RefName = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `object_id` field to Set
     pub struct SetObjectId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetObjectId<St> {}
     impl<St: State> State for SetObjectId<St> {
         type ObjectId = Set<members::object_id>;
+        type RefName = St::RefName;
         type Repo = St::Repo;
-        type RefName = St::RefName;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type ObjectId = St::ObjectId;
-        type Repo = Set<members::repo>;
-        type RefName = St::RefName;
     }
     ///State transition - sets the `ref_name` field to Set
     pub struct SetRefName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRefName<St> {}
     impl<St: State> State for SetRefName<St> {
         type ObjectId = St::ObjectId;
-        type Repo = St::Repo;
         type RefName = Set<members::ref_name>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type ObjectId = St::ObjectId;
+        type RefName = St::RefName;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `object_id` field
         pub struct object_id(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `ref_name` field
         pub struct ref_name(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -298,8 +298,8 @@ impl<St, S: BosStr> RefBuilder<St, S>
 where
     St: ref_state::State,
     St::ObjectId: ref_state::IsSet,
-    St::Repo: ref_state::IsSet,
     St::RefName: ref_state::IsSet,
+    St::Repo: ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Ref<S> {

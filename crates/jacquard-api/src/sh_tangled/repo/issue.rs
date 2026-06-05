@@ -6,6 +6,8 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod comment;
+pub mod list_states;
+pub mod list_states_by;
 pub mod state;
 
 
@@ -47,7 +49,7 @@ pub struct Issue<S: BosStr = DefaultStr> {
     pub mentions: Option<Vec<Did<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub references: Option<Vec<AtUri<S>>>,
-    pub repo: AtUri<S>,
+    pub repo: Did<S>,
     pub title: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -122,51 +124,51 @@ pub mod issue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Repo;
         type Title;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Repo = Unset;
         type Title = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Repo = Set<members::repo>;
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Repo = St::Repo;
-        type Title = Set<members::title>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type Repo = St::Repo;
         type Title = St::Title;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type CreatedAt = St::CreatedAt;
+        type Repo = Set<members::repo>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type Repo = St::Repo;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -178,7 +180,7 @@ pub struct IssueBuilder<St: issue_state::State, S: BosStr = DefaultStr> {
         Option<Datetime>,
         Option<Vec<Did<S>>>,
         Option<Vec<AtUri<S>>>,
-        Option<AtUri<S>>,
+        Option<Did<S>>,
         Option<S>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -286,7 +288,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<S>>,
+        value: impl Into<Did<S>>,
     ) -> IssueBuilder<issue_state::SetRepo<St>, S> {
         self._fields.4 = Option::Some(value.into());
         IssueBuilder {
@@ -319,9 +321,9 @@ where
 impl<St, S: BosStr> IssueBuilder<St, S>
 where
     St: issue_state::State,
+    St::CreatedAt: issue_state::IsSet,
     St::Repo: issue_state::IsSet,
     St::Title: issue_state::IsSet,
-    St::CreatedAt: issue_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Issue<S> {
@@ -409,7 +411,7 @@ fn lexicon_doc_sh_tangled_repo_issue() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("repo"),
                                 LexObjectProperty::String(LexString {
-                                    format: Some(LexStringFormat::AtUri),
+                                    format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
                             );

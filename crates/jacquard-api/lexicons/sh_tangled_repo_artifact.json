@@ -9,7 +9,6 @@
         "type": "object",
         "required": [
           "name",
-          "repo",
           "tag",
           "createdAt",
           "artifact"
@@ -36,6 +35,10 @@
             "type": "string",
             "description": "repo that this artifact is being uploaded to",
             "format": "at-uri"
+          },
+          "repoDid": {
+            "type": "string",
+            "format": "did"
           },
           "tag": {
             "type": "bytes",

@@ -32,6 +32,9 @@ use crate::pub_leaflet::blocks::unordered_list;
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListItem<S: BosStr = DefaultStr> {
+    ///If present, this item is a checklist item. true = checked, false = unchecked. If absent, this is a normal list item.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub checked: Option<bool>,
     ///Nested unordered list items. Mutually exclusive with orderedListChildren; if both are present, children takes precedence.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub children: Option<Vec<unordered_list::ListItem<S>>>,
@@ -131,6 +134,7 @@ pub mod list_item_state {
 pub struct ListItemBuilder<St: list_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
+        Option<bool>,
         Option<Vec<unordered_list::ListItem<S>>>,
         Option<ListItemContent<S>>,
         Option<OrderedList<S>>,
@@ -157,7 +161,7 @@ impl ListItemBuilder<list_item_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ListItemBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -168,9 +172,22 @@ impl<S: BosStr> ListItemBuilder<list_item_state::Empty, S> {
     pub fn builder() -> Self {
         ListItemBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
+    }
+}
+
+impl<St: list_item_state::State, S: BosStr> ListItemBuilder<St, S> {
+    /// Set the `checked` field (optional)
+    pub fn checked(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `checked` field to an Option value (optional)
+    pub fn maybe_checked(mut self, value: Option<bool>) -> Self {
+        self._fields.0 = value;
+        self
     }
 }
 
@@ -180,7 +197,7 @@ impl<St: list_item_state::State, S: BosStr> ListItemBuilder<St, S> {
         mut self,
         value: impl Into<Option<Vec<unordered_list::ListItem<S>>>>,
     ) -> Self {
-        self._fields.0 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `children` field to an Option value (optional)
@@ -188,7 +205,7 @@ impl<St: list_item_state::State, S: BosStr> ListItemBuilder<St, S> {
         mut self,
         value: Option<Vec<unordered_list::ListItem<S>>>,
     ) -> Self {
-        self._fields.0 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -203,7 +220,7 @@ where
         mut self,
         value: impl Into<ListItemContent<S>>,
     ) -> ListItemBuilder<list_item_state::SetContent<St>, S> {
-        self._fields.1 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ListItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -218,12 +235,12 @@ impl<St: list_item_state::State, S: BosStr> ListItemBuilder<St, S> {
         mut self,
         value: impl Into<Option<OrderedList<S>>>,
     ) -> Self {
-        self._fields.2 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `orderedListChildren` field to an Option value (optional)
     pub fn maybe_ordered_list_children(mut self, value: Option<OrderedList<S>>) -> Self {
-        self._fields.2 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -236,18 +253,20 @@ where
     /// Build the final struct.
     pub fn build(self) -> ListItem<S> {
         ListItem {
-            children: self._fields.0,
-            content: self._fields.1.unwrap(),
-            ordered_list_children: self._fields.2,
+            checked: self._fields.0,
+            children: self._fields.1,
+            content: self._fields.2.unwrap(),
+            ordered_list_children: self._fields.3,
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ListItem<S> {
         ListItem {
-            children: self._fields.0,
-            content: self._fields.1.unwrap(),
-            ordered_list_children: self._fields.2,
+            checked: self._fields.0,
+            children: self._fields.1,
+            content: self._fields.2.unwrap(),
+            ordered_list_children: self._fields.3,
             extra_data: Some(extra_data),
         }
     }
@@ -270,6 +289,12 @@ fn lexicon_doc_pub_leaflet_blocks_unorderedList() -> LexiconDoc<'static> {
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("checked"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
                         map.insert(
                             SmolStr::new_static("children"),
                             LexObjectProperty::Array(LexArray {

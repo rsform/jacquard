@@ -753,8 +753,8 @@ pub mod notify_manifest_state {
     pub trait State: sealed::Sealed {
         type Manifest;
         type ManifestDigest;
-        type UserDid;
         type Repository;
+        type UserDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -762,8 +762,8 @@ pub mod notify_manifest_state {
     impl State for Empty {
         type Manifest = Unset;
         type ManifestDigest = Unset;
-        type UserDid = Unset;
         type Repository = Unset;
+        type UserDid = Unset;
     }
     ///State transition - sets the `manifest` field to Set
     pub struct SetManifest<St: State = Empty>(PhantomData<fn() -> St>);
@@ -771,8 +771,8 @@ pub mod notify_manifest_state {
     impl<St: State> State for SetManifest<St> {
         type Manifest = Set<members::manifest>;
         type ManifestDigest = St::ManifestDigest;
-        type UserDid = St::UserDid;
         type Repository = St::Repository;
+        type UserDid = St::UserDid;
     }
     ///State transition - sets the `manifest_digest` field to Set
     pub struct SetManifestDigest<St: State = Empty>(PhantomData<fn() -> St>);
@@ -780,17 +780,8 @@ pub mod notify_manifest_state {
     impl<St: State> State for SetManifestDigest<St> {
         type Manifest = St::Manifest;
         type ManifestDigest = Set<members::manifest_digest>;
+        type Repository = St::Repository;
         type UserDid = St::UserDid;
-        type Repository = St::Repository;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUserDid<St> {}
-    impl<St: State> State for SetUserDid<St> {
-        type Manifest = St::Manifest;
-        type ManifestDigest = St::ManifestDigest;
-        type UserDid = Set<members::user_did>;
-        type Repository = St::Repository;
     }
     ///State transition - sets the `repository` field to Set
     pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
@@ -798,8 +789,17 @@ pub mod notify_manifest_state {
     impl<St: State> State for SetRepository<St> {
         type Manifest = St::Manifest;
         type ManifestDigest = St::ManifestDigest;
-        type UserDid = St::UserDid;
         type Repository = Set<members::repository>;
+        type UserDid = St::UserDid;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUserDid<St> {}
+    impl<St: State> State for SetUserDid<St> {
+        type Manifest = St::Manifest;
+        type ManifestDigest = St::ManifestDigest;
+        type Repository = St::Repository;
+        type UserDid = Set<members::user_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -808,10 +808,10 @@ pub mod notify_manifest_state {
         pub struct manifest(());
         ///Marker type for the `manifest_digest` field
         pub struct manifest_digest(());
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
         ///Marker type for the `repository` field
         pub struct repository(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
     }
 }
 
@@ -978,8 +978,8 @@ where
     St: notify_manifest_state::State,
     St::Manifest: notify_manifest_state::IsSet,
     St::ManifestDigest: notify_manifest_state::IsSet,
-    St::UserDid: notify_manifest_state::IsSet,
     St::Repository: notify_manifest_state::IsSet,
+    St::UserDid: notify_manifest_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> NotifyManifest<S> {

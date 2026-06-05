@@ -114,37 +114,37 @@ pub mod flora_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GbifTaxonKeys;
         type CreatedAt;
+        type GbifTaxonKeys;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GbifTaxonKeys = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `gbif_taxon_keys` field to Set
-    pub struct SetGbifTaxonKeys<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGbifTaxonKeys<St> {}
-    impl<St: State> State for SetGbifTaxonKeys<St> {
-        type GbifTaxonKeys = Set<members::gbif_taxon_keys>;
-        type CreatedAt = St::CreatedAt;
+        type GbifTaxonKeys = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type GbifTaxonKeys = St::GbifTaxonKeys;
         type CreatedAt = Set<members::created_at>;
+        type GbifTaxonKeys = St::GbifTaxonKeys;
+    }
+    ///State transition - sets the `gbif_taxon_keys` field to Set
+    pub struct SetGbifTaxonKeys<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGbifTaxonKeys<St> {}
+    impl<St: State> State for SetGbifTaxonKeys<St> {
+        type CreatedAt = St::CreatedAt;
+        type GbifTaxonKeys = Set<members::gbif_taxon_keys>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `gbif_taxon_keys` field
-        pub struct gbif_taxon_keys(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `gbif_taxon_keys` field
+        pub struct gbif_taxon_keys(());
     }
 }
 
@@ -232,8 +232,8 @@ where
 impl<St, S: BosStr> FloraBuilder<St, S>
 where
     St: flora_state::State,
-    St::GbifTaxonKeys: flora_state::IsSet,
     St::CreatedAt: flora_state::IsSet,
+    St::GbifTaxonKeys: flora_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Flora<S> {

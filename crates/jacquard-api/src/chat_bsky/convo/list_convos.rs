@@ -22,10 +22,14 @@ use crate::chat_bsky::convo::ConvoView;
 pub struct ListConvos<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub kind: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lock_status: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub read_state: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -93,7 +97,7 @@ pub mod list_convos_state {
 /// Builder for constructing an instance of this type.
 pub struct ListConvosBuilder<St: list_convos_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<S>, Option<S>),
+    _fields: (Option<S>, Option<S>, Option<i64>, Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -116,7 +120,7 @@ impl ListConvosBuilder<list_convos_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ListConvosBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -127,7 +131,7 @@ impl<S: BosStr> ListConvosBuilder<list_convos_state::Empty, S> {
     pub fn builder() -> Self {
         ListConvosBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -147,14 +151,40 @@ impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
 }
 
 impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
+    /// Set the `kind` field (optional)
+    pub fn kind(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `kind` field to an Option value (optional)
+    pub fn maybe_kind(mut self, value: Option<S>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.1 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self._fields.1 = value;
+        self._fields.2 = value;
+        self
+    }
+}
+
+impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
+    /// Set the `lockStatus` field (optional)
+    pub fn lock_status(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `lockStatus` field to an Option value (optional)
+    pub fn maybe_lock_status(mut self, value: Option<S>) -> Self {
+        self._fields.3 = value;
         self
     }
 }
@@ -162,12 +192,12 @@ impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
 impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
     /// Set the `readState` field (optional)
     pub fn read_state(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.2 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `readState` field to an Option value (optional)
     pub fn maybe_read_state(mut self, value: Option<S>) -> Self {
-        self._fields.2 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -175,12 +205,12 @@ impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
 impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.3 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<S>) -> Self {
-        self._fields.3 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -193,9 +223,11 @@ where
     pub fn build(self) -> ListConvos<S> {
         ListConvos {
             cursor: self._fields.0,
-            limit: self._fields.1,
-            read_state: self._fields.2,
-            status: self._fields.3,
+            kind: self._fields.1,
+            limit: self._fields.2,
+            lock_status: self._fields.3,
+            read_state: self._fields.4,
+            status: self._fields.5,
         }
     }
 }

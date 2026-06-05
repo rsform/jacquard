@@ -143,50 +143,50 @@ pub mod server_public_key_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type PublicJwk;
-        type ValidUntil;
         type ValidFrom;
+        type ValidUntil;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type PublicJwk = Unset;
-        type ValidUntil = Unset;
         type ValidFrom = Unset;
+        type ValidUntil = Unset;
     }
     ///State transition - sets the `public_jwk` field to Set
     pub struct SetPublicJwk<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPublicJwk<St> {}
     impl<St: State> State for SetPublicJwk<St> {
         type PublicJwk = Set<members::public_jwk>;
+        type ValidFrom = St::ValidFrom;
         type ValidUntil = St::ValidUntil;
-        type ValidFrom = St::ValidFrom;
-    }
-    ///State transition - sets the `valid_until` field to Set
-    pub struct SetValidUntil<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValidUntil<St> {}
-    impl<St: State> State for SetValidUntil<St> {
-        type PublicJwk = St::PublicJwk;
-        type ValidUntil = Set<members::valid_until>;
-        type ValidFrom = St::ValidFrom;
     }
     ///State transition - sets the `valid_from` field to Set
     pub struct SetValidFrom<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValidFrom<St> {}
     impl<St: State> State for SetValidFrom<St> {
         type PublicJwk = St::PublicJwk;
-        type ValidUntil = St::ValidUntil;
         type ValidFrom = Set<members::valid_from>;
+        type ValidUntil = St::ValidUntil;
+    }
+    ///State transition - sets the `valid_until` field to Set
+    pub struct SetValidUntil<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValidUntil<St> {}
+    impl<St: State> State for SetValidUntil<St> {
+        type PublicJwk = St::PublicJwk;
+        type ValidFrom = St::ValidFrom;
+        type ValidUntil = Set<members::valid_until>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `public_jwk` field
         pub struct public_jwk(());
-        ///Marker type for the `valid_until` field
-        pub struct valid_until(());
         ///Marker type for the `valid_from` field
         pub struct valid_from(());
+        ///Marker type for the `valid_until` field
+        pub struct valid_until(());
     }
 }
 
@@ -310,8 +310,8 @@ impl<St, S: BosStr> ServerPublicKeyBuilder<St, S>
 where
     St: server_public_key_state::State,
     St::PublicJwk: server_public_key_state::IsSet,
-    St::ValidUntil: server_public_key_state::IsSet,
     St::ValidFrom: server_public_key_state::IsSet,
+    St::ValidUntil: server_public_key_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ServerPublicKey<S> {

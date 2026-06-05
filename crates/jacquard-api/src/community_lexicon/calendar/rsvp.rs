@@ -225,37 +225,37 @@ pub mod rsvp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Status;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Subject = Set<members::subject>;
-        type Status = St::Status;
+        type Subject = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStatus<St> {}
     impl<St: State> State for SetStatus<St> {
-        type Subject = St::Subject;
         type Status = Set<members::status>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Status = St::Status;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -343,8 +343,8 @@ where
 impl<St, S: BosStr> RsvpBuilder<St, S>
 where
     St: rsvp_state::State,
-    St::Subject: rsvp_state::IsSet,
     St::Status: rsvp_state::IsSet,
+    St::Subject: rsvp_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Rsvp<S> {

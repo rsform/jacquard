@@ -202,127 +202,127 @@ pub mod info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ShortDescription;
-        type Objectives;
-        type Visibility;
+        type Country;
         type CreatedAt;
         type DisplayName;
-        type Country;
         type LongDescription;
+        type Objectives;
+        type ShortDescription;
+        type Visibility;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ShortDescription = Unset;
-        type Objectives = Unset;
-        type Visibility = Unset;
+        type Country = Unset;
         type CreatedAt = Unset;
         type DisplayName = Unset;
-        type Country = Unset;
         type LongDescription = Unset;
-    }
-    ///State transition - sets the `short_description` field to Set
-    pub struct SetShortDescription<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetShortDescription<St> {}
-    impl<St: State> State for SetShortDescription<St> {
-        type ShortDescription = Set<members::short_description>;
-        type Objectives = St::Objectives;
-        type Visibility = St::Visibility;
-        type CreatedAt = St::CreatedAt;
-        type DisplayName = St::DisplayName;
-        type Country = St::Country;
-        type LongDescription = St::LongDescription;
-    }
-    ///State transition - sets the `objectives` field to Set
-    pub struct SetObjectives<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetObjectives<St> {}
-    impl<St: State> State for SetObjectives<St> {
-        type ShortDescription = St::ShortDescription;
-        type Objectives = Set<members::objectives>;
-        type Visibility = St::Visibility;
-        type CreatedAt = St::CreatedAt;
-        type DisplayName = St::DisplayName;
-        type Country = St::Country;
-        type LongDescription = St::LongDescription;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVisibility<St> {}
-    impl<St: State> State for SetVisibility<St> {
-        type ShortDescription = St::ShortDescription;
-        type Objectives = St::Objectives;
-        type Visibility = Set<members::visibility>;
-        type CreatedAt = St::CreatedAt;
-        type DisplayName = St::DisplayName;
-        type Country = St::Country;
-        type LongDescription = St::LongDescription;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type ShortDescription = St::ShortDescription;
-        type Objectives = St::Objectives;
-        type Visibility = St::Visibility;
-        type CreatedAt = Set<members::created_at>;
-        type DisplayName = St::DisplayName;
-        type Country = St::Country;
-        type LongDescription = St::LongDescription;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
-    impl<St: State> State for SetDisplayName<St> {
-        type ShortDescription = St::ShortDescription;
-        type Objectives = St::Objectives;
-        type Visibility = St::Visibility;
-        type CreatedAt = St::CreatedAt;
-        type DisplayName = Set<members::display_name>;
-        type Country = St::Country;
-        type LongDescription = St::LongDescription;
+        type Objectives = Unset;
+        type ShortDescription = Unset;
+        type Visibility = Unset;
     }
     ///State transition - sets the `country` field to Set
     pub struct SetCountry<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCountry<St> {}
     impl<St: State> State for SetCountry<St> {
-        type ShortDescription = St::ShortDescription;
-        type Objectives = St::Objectives;
-        type Visibility = St::Visibility;
+        type Country = Set<members::country>;
         type CreatedAt = St::CreatedAt;
         type DisplayName = St::DisplayName;
-        type Country = Set<members::country>;
         type LongDescription = St::LongDescription;
+        type Objectives = St::Objectives;
+        type ShortDescription = St::ShortDescription;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Country = St::Country;
+        type CreatedAt = Set<members::created_at>;
+        type DisplayName = St::DisplayName;
+        type LongDescription = St::LongDescription;
+        type Objectives = St::Objectives;
+        type ShortDescription = St::ShortDescription;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
+    impl<St: State> State for SetDisplayName<St> {
+        type Country = St::Country;
+        type CreatedAt = St::CreatedAt;
+        type DisplayName = Set<members::display_name>;
+        type LongDescription = St::LongDescription;
+        type Objectives = St::Objectives;
+        type ShortDescription = St::ShortDescription;
+        type Visibility = St::Visibility;
     }
     ///State transition - sets the `long_description` field to Set
     pub struct SetLongDescription<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLongDescription<St> {}
     impl<St: State> State for SetLongDescription<St> {
-        type ShortDescription = St::ShortDescription;
-        type Objectives = St::Objectives;
-        type Visibility = St::Visibility;
+        type Country = St::Country;
         type CreatedAt = St::CreatedAt;
         type DisplayName = St::DisplayName;
-        type Country = St::Country;
         type LongDescription = Set<members::long_description>;
+        type Objectives = St::Objectives;
+        type ShortDescription = St::ShortDescription;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `objectives` field to Set
+    pub struct SetObjectives<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetObjectives<St> {}
+    impl<St: State> State for SetObjectives<St> {
+        type Country = St::Country;
+        type CreatedAt = St::CreatedAt;
+        type DisplayName = St::DisplayName;
+        type LongDescription = St::LongDescription;
+        type Objectives = Set<members::objectives>;
+        type ShortDescription = St::ShortDescription;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `short_description` field to Set
+    pub struct SetShortDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShortDescription<St> {}
+    impl<St: State> State for SetShortDescription<St> {
+        type Country = St::Country;
+        type CreatedAt = St::CreatedAt;
+        type DisplayName = St::DisplayName;
+        type LongDescription = St::LongDescription;
+        type Objectives = St::Objectives;
+        type ShortDescription = Set<members::short_description>;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVisibility<St> {}
+    impl<St: State> State for SetVisibility<St> {
+        type Country = St::Country;
+        type CreatedAt = St::CreatedAt;
+        type DisplayName = St::DisplayName;
+        type LongDescription = St::LongDescription;
+        type Objectives = St::Objectives;
+        type ShortDescription = St::ShortDescription;
+        type Visibility = Set<members::visibility>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `short_description` field
-        pub struct short_description(());
-        ///Marker type for the `objectives` field
-        pub struct objectives(());
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
+        ///Marker type for the `country` field
+        pub struct country(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
-        ///Marker type for the `country` field
-        pub struct country(());
         ///Marker type for the `long_description` field
         pub struct long_description(());
+        ///Marker type for the `objectives` field
+        pub struct objectives(());
+        ///Marker type for the `short_description` field
+        pub struct short_description(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
     }
 }
 
@@ -569,13 +569,13 @@ impl<St: info_state::State, S: BosStr> InfoBuilder<St, S> {
 impl<St, S: BosStr> InfoBuilder<St, S>
 where
     St: info_state::State,
-    St::ShortDescription: info_state::IsSet,
-    St::Objectives: info_state::IsSet,
-    St::Visibility: info_state::IsSet,
+    St::Country: info_state::IsSet,
     St::CreatedAt: info_state::IsSet,
     St::DisplayName: info_state::IsSet,
-    St::Country: info_state::IsSet,
     St::LongDescription: info_state::IsSet,
+    St::Objectives: info_state::IsSet,
+    St::ShortDescription: info_state::IsSet,
+    St::Visibility: info_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Info<S> {

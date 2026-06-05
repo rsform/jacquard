@@ -94,6 +94,29 @@
         }
       }
     },
+    "draftEmbedGallery": {
+      "type": "object",
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "ref",
+          "ref": "#draftEmbedGalleryItems"
+        }
+      }
+    },
+    "draftEmbedGalleryItems": {
+      "type": "array",
+      "description": "The schema-level maxLength of 20 is a future-proof ceiling. Clients should currently enforce a soft limit of 10 items in authoring UIs.",
+      "items": {
+        "type": "union",
+        "refs": [
+          "#draftEmbedImage"
+        ]
+      },
+      "maxLength": 20
+    },
     "draftEmbedImage": {
       "type": "object",
       "required": [
@@ -174,6 +197,10 @@
             "ref": "#draftEmbedExternal"
           },
           "maxLength": 1
+        },
+        "embedGallery": {
+          "type": "ref",
+          "ref": "#draftEmbedGallery"
         },
         "embedImages": {
           "type": "array",

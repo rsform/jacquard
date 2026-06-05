@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "chat.bsky.moderation.getConvoMembers",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Returns a paginated list of members from a conversation, for moderation purposes. Does not require the requester to be a member of the conversation.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "convoId"
+        ],
+        "properties": {
+          "convoId": {
+            "type": "string"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "members"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "members": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "chat.bsky.actor.defs#profileViewBasic"
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidConvo"
+        }
+      ]
+    }
+  }
+}

@@ -160,85 +160,85 @@ pub mod pin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
-        type Longitude;
         type Description;
-        type PlacedAt;
+        type Did;
         type Latitude;
+        type Longitude;
+        type PlacedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
-        type Longitude = Unset;
         type Description = Unset;
-        type PlacedAt = Unset;
+        type Did = Unset;
         type Latitude = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Longitude = St::Longitude;
-        type Description = St::Description;
-        type PlacedAt = St::PlacedAt;
-        type Latitude = St::Latitude;
-    }
-    ///State transition - sets the `longitude` field to Set
-    pub struct SetLongitude<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLongitude<St> {}
-    impl<St: State> State for SetLongitude<St> {
-        type Did = St::Did;
-        type Longitude = Set<members::longitude>;
-        type Description = St::Description;
-        type PlacedAt = St::PlacedAt;
-        type Latitude = St::Latitude;
+        type Longitude = Unset;
+        type PlacedAt = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDescription<St> {}
     impl<St: State> State for SetDescription<St> {
-        type Did = St::Did;
-        type Longitude = St::Longitude;
         type Description = Set<members::description>;
-        type PlacedAt = St::PlacedAt;
-        type Latitude = St::Latitude;
-    }
-    ///State transition - sets the `placed_at` field to Set
-    pub struct SetPlacedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlacedAt<St> {}
-    impl<St: State> State for SetPlacedAt<St> {
         type Did = St::Did;
-        type Longitude = St::Longitude;
-        type Description = St::Description;
-        type PlacedAt = Set<members::placed_at>;
         type Latitude = St::Latitude;
+        type Longitude = St::Longitude;
+        type PlacedAt = St::PlacedAt;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Description = St::Description;
+        type Did = Set<members::did>;
+        type Latitude = St::Latitude;
+        type Longitude = St::Longitude;
+        type PlacedAt = St::PlacedAt;
     }
     ///State transition - sets the `latitude` field to Set
     pub struct SetLatitude<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLatitude<St> {}
     impl<St: State> State for SetLatitude<St> {
-        type Did = St::Did;
-        type Longitude = St::Longitude;
         type Description = St::Description;
-        type PlacedAt = St::PlacedAt;
+        type Did = St::Did;
         type Latitude = Set<members::latitude>;
+        type Longitude = St::Longitude;
+        type PlacedAt = St::PlacedAt;
+    }
+    ///State transition - sets the `longitude` field to Set
+    pub struct SetLongitude<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLongitude<St> {}
+    impl<St: State> State for SetLongitude<St> {
+        type Description = St::Description;
+        type Did = St::Did;
+        type Latitude = St::Latitude;
+        type Longitude = Set<members::longitude>;
+        type PlacedAt = St::PlacedAt;
+    }
+    ///State transition - sets the `placed_at` field to Set
+    pub struct SetPlacedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlacedAt<St> {}
+    impl<St: State> State for SetPlacedAt<St> {
+        type Description = St::Description;
+        type Did = St::Did;
+        type Latitude = St::Latitude;
+        type Longitude = St::Longitude;
+        type PlacedAt = Set<members::placed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `longitude` field
-        pub struct longitude(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `placed_at` field
-        pub struct placed_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `latitude` field
         pub struct latitude(());
+        ///Marker type for the `longitude` field
+        pub struct longitude(());
+        ///Marker type for the `placed_at` field
+        pub struct placed_at(());
     }
 }
 
@@ -403,11 +403,11 @@ impl<St: pin_state::State, S: BosStr> PinBuilder<St, S> {
 impl<St, S: BosStr> PinBuilder<St, S>
 where
     St: pin_state::State,
-    St::Did: pin_state::IsSet,
-    St::Longitude: pin_state::IsSet,
     St::Description: pin_state::IsSet,
-    St::PlacedAt: pin_state::IsSet,
+    St::Did: pin_state::IsSet,
     St::Latitude: pin_state::IsSet,
+    St::Longitude: pin_state::IsSet,
+    St::PlacedAt: pin_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Pin<S> {

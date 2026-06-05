@@ -154,37 +154,37 @@ pub mod import_contacts_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Token;
         type Contacts;
+        type Token;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Token = Unset;
         type Contacts = Unset;
-    }
-    ///State transition - sets the `token` field to Set
-    pub struct SetToken<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetToken<St> {}
-    impl<St: State> State for SetToken<St> {
-        type Token = Set<members::token>;
-        type Contacts = St::Contacts;
+        type Token = Unset;
     }
     ///State transition - sets the `contacts` field to Set
     pub struct SetContacts<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContacts<St> {}
     impl<St: State> State for SetContacts<St> {
-        type Token = St::Token;
         type Contacts = Set<members::contacts>;
+        type Token = St::Token;
+    }
+    ///State transition - sets the `token` field to Set
+    pub struct SetToken<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetToken<St> {}
+    impl<St: State> State for SetToken<St> {
+        type Contacts = St::Contacts;
+        type Token = Set<members::token>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `token` field
-        pub struct token(());
         ///Marker type for the `contacts` field
         pub struct contacts(());
+        ///Marker type for the `token` field
+        pub struct token(());
     }
 }
 
@@ -275,8 +275,8 @@ where
 impl<St, S: BosStr> ImportContactsBuilder<St, S>
 where
     St: import_contacts_state::State,
-    St::Token: import_contacts_state::IsSet,
     St::Contacts: import_contacts_state::IsSet,
+    St::Token: import_contacts_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ImportContacts<S> {

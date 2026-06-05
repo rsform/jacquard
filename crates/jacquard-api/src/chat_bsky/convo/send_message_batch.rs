@@ -16,7 +16,7 @@ use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::IntoStatic;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -54,6 +54,57 @@ pub struct SendMessageBatchOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
+#[derive(
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
+)]
+
+#[serde(tag = "error", content = "message")]
+pub enum SendMessageBatchError {
+    #[serde(rename = "ConvoLocked")]
+    ConvoLocked(Option<SmolStr>),
+    #[serde(rename = "InvalidConvo")]
+    InvalidConvo(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
+}
+
+impl core::fmt::Display for SendMessageBatchError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::ConvoLocked(msg) => {
+                write!(f, "ConvoLocked")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidConvo(msg) => {
+                write!(f, "InvalidConvo")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+        }
+    }
+}
+
 impl<S: BosStr> LexiconSchema for BatchItem<S> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.sendMessageBatch"
@@ -75,7 +126,7 @@ impl jacquard_common::xrpc::XrpcResp for SendMessageBatchResponse {
     const NSID: &'static str = "chat.bsky.convo.sendMessageBatch";
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = SendMessageBatchOutput<S>;
-    type Err = jacquard_common::xrpc::GenericError;
+    type Err = SendMessageBatchError;
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SendMessageBatch<S> {
@@ -107,37 +158,37 @@ pub mod batch_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
         type ConvoId;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
         type ConvoId = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMessage<St> {}
-    impl<St: State> State for SetMessage<St> {
-        type Message = Set<members::message>;
-        type ConvoId = St::ConvoId;
+        type Message = Unset;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetConvoId<St> {}
     impl<St: State> State for SetConvoId<St> {
-        type Message = St::Message;
         type ConvoId = Set<members::convo_id>;
+        type Message = St::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
+        type ConvoId = St::ConvoId;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
@@ -225,8 +276,8 @@ where
 impl<St, S: BosStr> BatchItemBuilder<St, S>
 where
     St: batch_item_state::State,
-    St::Message: batch_item_state::IsSet,
     St::ConvoId: batch_item_state::IsSet,
+    St::Message: batch_item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> BatchItem<S> {

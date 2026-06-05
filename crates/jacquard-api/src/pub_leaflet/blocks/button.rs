@@ -59,37 +59,37 @@ pub mod button_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Text;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Text = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type Url = Set<members::url>;
-        type Text = St::Text;
+        type Url = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetText<St> {}
     impl<St: State> State for SetText<St> {
-        type Url = St::Url;
         type Text = Set<members::text>;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type Text = St::Text;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -177,8 +177,8 @@ where
 impl<St, S: BosStr> ButtonBuilder<St, S>
 where
     St: button_state::State,
-    St::Url: button_state::IsSet,
     St::Text: button_state::IsSet,
+    St::Url: button_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Button<S> {

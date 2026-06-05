@@ -1,0 +1,28 @@
+{
+  "lexicon": 1,
+  "id": "app.chavatar.authManageAvatar",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Manage avatars",
+      "detail": "Allows uploading, deleting, and rotating avatars.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": [
+            "app.chavatar.avatar",
+            "app.chavatar.settings",
+            "app.chavatar.settings.executor",
+            "app.chavatar.state"
+          ],
+          "action": [
+            "create",
+            "delete",
+            "update"
+          ]
+        }
+      ]
+    }
+  }
+}

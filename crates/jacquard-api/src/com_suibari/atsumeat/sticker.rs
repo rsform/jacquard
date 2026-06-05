@@ -429,10 +429,10 @@ pub mod sticker_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Model;
-        type OriginalOwner;
         type Image;
+        type Model;
         type ObtainedAt;
+        type OriginalOwner;
         type Signature;
         type SignedPayload;
     }
@@ -440,43 +440,32 @@ pub mod sticker_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Model = Unset;
-        type OriginalOwner = Unset;
         type Image = Unset;
+        type Model = Unset;
         type ObtainedAt = Unset;
+        type OriginalOwner = Unset;
         type Signature = Unset;
         type SignedPayload = Unset;
-    }
-    ///State transition - sets the `model` field to Set
-    pub struct SetModel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetModel<St> {}
-    impl<St: State> State for SetModel<St> {
-        type Model = Set<members::model>;
-        type OriginalOwner = St::OriginalOwner;
-        type Image = St::Image;
-        type ObtainedAt = St::ObtainedAt;
-        type Signature = St::Signature;
-        type SignedPayload = St::SignedPayload;
-    }
-    ///State transition - sets the `original_owner` field to Set
-    pub struct SetOriginalOwner<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOriginalOwner<St> {}
-    impl<St: State> State for SetOriginalOwner<St> {
-        type Model = St::Model;
-        type OriginalOwner = Set<members::original_owner>;
-        type Image = St::Image;
-        type ObtainedAt = St::ObtainedAt;
-        type Signature = St::Signature;
-        type SignedPayload = St::SignedPayload;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetImage<St> {}
     impl<St: State> State for SetImage<St> {
-        type Model = St::Model;
-        type OriginalOwner = St::OriginalOwner;
         type Image = Set<members::image>;
+        type Model = St::Model;
         type ObtainedAt = St::ObtainedAt;
+        type OriginalOwner = St::OriginalOwner;
+        type Signature = St::Signature;
+        type SignedPayload = St::SignedPayload;
+    }
+    ///State transition - sets the `model` field to Set
+    pub struct SetModel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetModel<St> {}
+    impl<St: State> State for SetModel<St> {
+        type Image = St::Image;
+        type Model = Set<members::model>;
+        type ObtainedAt = St::ObtainedAt;
+        type OriginalOwner = St::OriginalOwner;
         type Signature = St::Signature;
         type SignedPayload = St::SignedPayload;
     }
@@ -484,10 +473,21 @@ pub mod sticker_state {
     pub struct SetObtainedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetObtainedAt<St> {}
     impl<St: State> State for SetObtainedAt<St> {
-        type Model = St::Model;
-        type OriginalOwner = St::OriginalOwner;
         type Image = St::Image;
+        type Model = St::Model;
         type ObtainedAt = Set<members::obtained_at>;
+        type OriginalOwner = St::OriginalOwner;
+        type Signature = St::Signature;
+        type SignedPayload = St::SignedPayload;
+    }
+    ///State transition - sets the `original_owner` field to Set
+    pub struct SetOriginalOwner<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOriginalOwner<St> {}
+    impl<St: State> State for SetOriginalOwner<St> {
+        type Image = St::Image;
+        type Model = St::Model;
+        type ObtainedAt = St::ObtainedAt;
+        type OriginalOwner = Set<members::original_owner>;
         type Signature = St::Signature;
         type SignedPayload = St::SignedPayload;
     }
@@ -495,10 +495,10 @@ pub mod sticker_state {
     pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSignature<St> {}
     impl<St: State> State for SetSignature<St> {
-        type Model = St::Model;
-        type OriginalOwner = St::OriginalOwner;
         type Image = St::Image;
+        type Model = St::Model;
         type ObtainedAt = St::ObtainedAt;
+        type OriginalOwner = St::OriginalOwner;
         type Signature = Set<members::signature>;
         type SignedPayload = St::SignedPayload;
     }
@@ -506,24 +506,24 @@ pub mod sticker_state {
     pub struct SetSignedPayload<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSignedPayload<St> {}
     impl<St: State> State for SetSignedPayload<St> {
-        type Model = St::Model;
-        type OriginalOwner = St::OriginalOwner;
         type Image = St::Image;
+        type Model = St::Model;
         type ObtainedAt = St::ObtainedAt;
+        type OriginalOwner = St::OriginalOwner;
         type Signature = St::Signature;
         type SignedPayload = Set<members::signed_payload>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `model` field
-        pub struct model(());
-        ///Marker type for the `original_owner` field
-        pub struct original_owner(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `model` field
+        pub struct model(());
         ///Marker type for the `obtained_at` field
         pub struct obtained_at(());
+        ///Marker type for the `original_owner` field
+        pub struct original_owner(());
         ///Marker type for the `signature` field
         pub struct signature(());
         ///Marker type for the `signed_payload` field
@@ -824,10 +824,10 @@ impl<St: sticker_state::State, S: BosStr> StickerBuilder<St, S> {
 impl<St, S: BosStr> StickerBuilder<St, S>
 where
     St: sticker_state::State,
-    St::Model: sticker_state::IsSet,
-    St::OriginalOwner: sticker_state::IsSet,
     St::Image: sticker_state::IsSet,
+    St::Model: sticker_state::IsSet,
     St::ObtainedAt: sticker_state::IsSet,
+    St::OriginalOwner: sticker_state::IsSet,
     St::Signature: sticker_state::IsSet,
     St::SignedPayload: sticker_state::IsSet,
 {

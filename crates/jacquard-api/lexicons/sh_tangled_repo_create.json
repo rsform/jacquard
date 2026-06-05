@@ -10,12 +10,22 @@
         "schema": {
           "type": "object",
           "required": [
-            "rkey"
+            "rkey",
+            "name"
           ],
           "properties": {
             "defaultBranch": {
               "type": "string",
               "description": "Default branch to push to"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the repository"
+            },
+            "repoDid": {
+              "type": "string",
+              "description": "Optional user-provided did:web to use as the repo identity instead of minting a did:plc.",
+              "format": "did"
             },
             "rkey": {
               "type": "string",
@@ -24,6 +34,18 @@
             "source": {
               "type": "string",
               "description": "A source URL to clone from, populate this when forking or importing a repository."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "repoDid": {
+              "type": "string",
+              "format": "did"
             }
           }
         }

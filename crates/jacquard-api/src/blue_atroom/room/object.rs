@@ -341,8 +341,8 @@ pub mod object_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Model;
         type CreatedAt;
+        type Model;
         type Name;
         type Scale;
     }
@@ -350,26 +350,26 @@ pub mod object_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Model = Unset;
         type CreatedAt = Unset;
+        type Model = Unset;
         type Name = Unset;
         type Scale = Unset;
-    }
-    ///State transition - sets the `model` field to Set
-    pub struct SetModel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetModel<St> {}
-    impl<St: State> State for SetModel<St> {
-        type Model = Set<members::model>;
-        type CreatedAt = St::CreatedAt;
-        type Name = St::Name;
-        type Scale = St::Scale;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Model = St::Model;
         type CreatedAt = Set<members::created_at>;
+        type Model = St::Model;
+        type Name = St::Name;
+        type Scale = St::Scale;
+    }
+    ///State transition - sets the `model` field to Set
+    pub struct SetModel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetModel<St> {}
+    impl<St: State> State for SetModel<St> {
+        type CreatedAt = St::CreatedAt;
+        type Model = Set<members::model>;
         type Name = St::Name;
         type Scale = St::Scale;
     }
@@ -377,8 +377,8 @@ pub mod object_state {
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Model = St::Model;
         type CreatedAt = St::CreatedAt;
+        type Model = St::Model;
         type Name = Set<members::name>;
         type Scale = St::Scale;
     }
@@ -386,18 +386,18 @@ pub mod object_state {
     pub struct SetScale<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetScale<St> {}
     impl<St: State> State for SetScale<St> {
-        type Model = St::Model;
         type CreatedAt = St::CreatedAt;
+        type Model = St::Model;
         type Name = St::Name;
         type Scale = Set<members::scale>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `model` field
-        pub struct model(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `model` field
+        pub struct model(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `scale` field
@@ -552,8 +552,8 @@ where
 impl<St, S: BosStr> ObjectBuilder<St, S>
 where
     St: object_state::State,
-    St::Model: object_state::IsSet,
     St::CreatedAt: object_state::IsSet,
+    St::Model: object_state::IsSet,
     St::Name: object_state::IsSet,
     St::Scale: object_state::IsSet,
 {

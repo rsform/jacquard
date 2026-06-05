@@ -132,50 +132,50 @@ pub mod credit_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Game;
-        type Roles;
         type Org;
+        type Roles;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Game = Unset;
-        type Roles = Unset;
         type Org = Unset;
+        type Roles = Unset;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGame<St> {}
     impl<St: State> State for SetGame<St> {
         type Game = Set<members::game>;
+        type Org = St::Org;
         type Roles = St::Roles;
-        type Org = St::Org;
-    }
-    ///State transition - sets the `roles` field to Set
-    pub struct SetRoles<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRoles<St> {}
-    impl<St: State> State for SetRoles<St> {
-        type Game = St::Game;
-        type Roles = Set<members::roles>;
-        type Org = St::Org;
     }
     ///State transition - sets the `org` field to Set
     pub struct SetOrg<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOrg<St> {}
     impl<St: State> State for SetOrg<St> {
         type Game = St::Game;
-        type Roles = St::Roles;
         type Org = Set<members::org>;
+        type Roles = St::Roles;
+    }
+    ///State transition - sets the `roles` field to Set
+    pub struct SetRoles<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoles<St> {}
+    impl<St: State> State for SetRoles<St> {
+        type Game = St::Game;
+        type Org = St::Org;
+        type Roles = Set<members::roles>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `game` field
         pub struct game(());
-        ///Marker type for the `roles` field
-        pub struct roles(());
         ///Marker type for the `org` field
         pub struct org(());
+        ///Marker type for the `roles` field
+        pub struct roles(());
     }
 }
 
@@ -315,8 +315,8 @@ impl<St, S: BosStr> CreditBuilder<St, S>
 where
     St: credit_state::State,
     St::Game: credit_state::IsSet,
-    St::Roles: credit_state::IsSet,
     St::Org: credit_state::IsSet,
+    St::Roles: credit_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Credit<S> {

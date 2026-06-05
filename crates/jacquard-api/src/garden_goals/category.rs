@@ -139,50 +139,50 @@ pub mod category_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CategoryId;
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CategoryId = Unset;
-        type Name = Unset;
         type CreatedAt = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `category_id` field to Set
     pub struct SetCategoryId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCategoryId<St> {}
     impl<St: State> State for SetCategoryId<St> {
         type CategoryId = Set<members::category_id>;
+        type CreatedAt = St::CreatedAt;
         type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type CategoryId = St::CategoryId;
-        type Name = Set<members::name>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CategoryId = St::CategoryId;
-        type Name = St::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CategoryId = St::CategoryId;
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `category_id` field
         pub struct category_id(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -290,8 +290,8 @@ impl<St, S: BosStr> CategoryBuilder<St, S>
 where
     St: category_state::State,
     St::CategoryId: category_state::IsSet,
-    St::Name: category_state::IsSet,
     St::CreatedAt: category_state::IsSet,
+    St::Name: category_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Category<S> {

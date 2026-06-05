@@ -3,5 +3,12 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod comment;
+pub mod list_comments;
+pub mod list_comments_by;
+pub mod list_reactions;
+pub mod list_reactions_by;
+pub mod list_stars;
+pub mod list_stars_by;
 pub mod reaction;
 pub mod star;

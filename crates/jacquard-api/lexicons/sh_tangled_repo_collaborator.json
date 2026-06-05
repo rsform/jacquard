@@ -19,8 +19,8 @@
           },
           "repo": {
             "type": "string",
-            "description": "repo to add this user to",
-            "format": "at-uri"
+            "description": "repo DID to add this user to",
+            "format": "did"
           },
           "subject": {
             "type": "string",

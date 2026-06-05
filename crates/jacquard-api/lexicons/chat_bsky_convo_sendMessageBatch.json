@@ -20,6 +20,7 @@
     },
     "main": {
       "type": "procedure",
+      "description": "Sends a batch of messages to a conversation.",
       "input": {
         "encoding": "application/json",
         "schema": {
@@ -56,7 +57,15 @@
             }
           }
         }
-      }
+      },
+      "errors": [
+        {
+          "name": "ConvoLocked"
+        },
+        {
+          "name": "InvalidConvo"
+        }
+      ]
     }
   }
 }

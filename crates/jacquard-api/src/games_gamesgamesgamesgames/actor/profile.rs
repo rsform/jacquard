@@ -200,37 +200,37 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DisplayName;
         type CreatedAt;
+        type DisplayName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DisplayName = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
-    impl<St: State> State for SetDisplayName<St> {
-        type DisplayName = Set<members::display_name>;
-        type CreatedAt = St::CreatedAt;
+        type DisplayName = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type DisplayName = St::DisplayName;
         type CreatedAt = Set<members::created_at>;
+        type DisplayName = St::DisplayName;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
+    impl<St: State> State for SetDisplayName<St> {
+        type CreatedAt = St::CreatedAt;
+        type DisplayName = Set<members::display_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
     }
 }
 
@@ -394,8 +394,8 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
-    St::DisplayName: profile_state::IsSet,
     St::CreatedAt: profile_state::IsSet,
+    St::DisplayName: profile_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Profile<S> {

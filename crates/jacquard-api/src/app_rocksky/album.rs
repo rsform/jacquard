@@ -46,9 +46,6 @@ pub struct Album<S: BosStr = DefaultStr> {
     ///The album art of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub album_art: Option<BlobRef<S>>,
-    ///The URL of the album art of the album.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub album_art_url: Option<UriValue<S>>,
     ///The Apple Music link of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub apple_music_link: Option<UriValue<S>>,
@@ -163,8 +160,6 @@ pub struct AlbumViewDetailed<S: BosStr = DefaultStr> {
     ///The SHA256 hash of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sha256: Option<S>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub tags: Option<Vec<S>>,
     ///The title of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
@@ -401,51 +396,51 @@ pub mod album_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Artist;
         type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Artist = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type Artist = St::Artist;
-        type CreatedAt = St::CreatedAt;
+        type Title = Unset;
     }
     ///State transition - sets the `artist` field to Set
     pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetArtist<St> {}
     impl<St: State> State for SetArtist<St> {
-        type Title = St::Title;
         type Artist = Set<members::artist>;
         type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Title = St::Title;
         type Artist = St::Artist;
         type CreatedAt = Set<members::created_at>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Artist = St::Artist;
+        type CreatedAt = St::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `artist` field
         pub struct artist(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -454,7 +449,6 @@ pub struct AlbumBuilder<St: album_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
-        Option<UriValue<S>>,
         Option<UriValue<S>>,
         Option<S>,
         Option<Datetime>,
@@ -504,7 +498,6 @@ impl AlbumBuilder<album_state::Empty, DefaultStr> {
                 None,
                 None,
                 None,
-                None,
             ),
             _type: PhantomData,
         }
@@ -517,7 +510,6 @@ impl<S: BosStr> AlbumBuilder<album_state::Empty, S> {
         AlbumBuilder {
             _state: PhantomData,
             _fields: (
-                None,
                 None,
                 None,
                 None,
@@ -551,27 +543,14 @@ impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
 }
 
 impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
-    /// Set the `albumArtUrl` field (optional)
-    pub fn album_art_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
-        self._fields.1 = value.into();
-        self
-    }
-    /// Set the `albumArtUrl` field to an Option value (optional)
-    pub fn maybe_album_art_url(mut self, value: Option<UriValue<S>>) -> Self {
-        self._fields.1 = value;
-        self
-    }
-}
-
-impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
     /// Set the `appleMusicLink` field (optional)
     pub fn apple_music_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
-        self._fields.2 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `appleMusicLink` field to an Option value (optional)
     pub fn maybe_apple_music_link(mut self, value: Option<UriValue<S>>) -> Self {
-        self._fields.2 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -586,7 +565,7 @@ where
         mut self,
         value: impl Into<S>,
     ) -> AlbumBuilder<album_state::SetArtist<St>, S> {
-        self._fields.3 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         AlbumBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -605,7 +584,7 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AlbumBuilder<album_state::SetCreatedAt<St>, S> {
-        self._fields.4 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         AlbumBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -617,12 +596,12 @@ where
 impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.5 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
     pub fn maybe_duration(mut self, value: Option<i64>) -> Self {
-        self._fields.5 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -630,12 +609,12 @@ impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
 impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.6 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<S>) -> Self {
-        self._fields.6 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -643,12 +622,12 @@ impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
 impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
     /// Set the `releaseDate` field (optional)
     pub fn release_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.7 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `releaseDate` field to an Option value (optional)
     pub fn maybe_release_date(mut self, value: Option<Datetime>) -> Self {
-        self._fields.7 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -656,12 +635,12 @@ impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
 impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
     /// Set the `spotifyLink` field (optional)
     pub fn spotify_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
-        self._fields.8 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `spotifyLink` field to an Option value (optional)
     pub fn maybe_spotify_link(mut self, value: Option<UriValue<S>>) -> Self {
-        self._fields.8 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -669,12 +648,12 @@ impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
 impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
-        self._fields.9 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
-        self._fields.9 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -682,12 +661,12 @@ impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
 impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
     /// Set the `tidalLink` field (optional)
     pub fn tidal_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
-        self._fields.10 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `tidalLink` field to an Option value (optional)
     pub fn maybe_tidal_link(mut self, value: Option<UriValue<S>>) -> Self {
-        self._fields.10 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -702,7 +681,7 @@ where
         mut self,
         value: impl Into<S>,
     ) -> AlbumBuilder<album_state::SetTitle<St>, S> {
-        self._fields.11 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         AlbumBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -714,12 +693,12 @@ where
 impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
     /// Set the `year` field (optional)
     pub fn year(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.12 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `year` field to an Option value (optional)
     pub fn maybe_year(mut self, value: Option<i64>) -> Self {
-        self._fields.12 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -727,12 +706,12 @@ impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
 impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
     /// Set the `youtubeLink` field (optional)
     pub fn youtube_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
-        self._fields.13 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `youtubeLink` field to an Option value (optional)
     pub fn maybe_youtube_link(mut self, value: Option<UriValue<S>>) -> Self {
-        self._fields.13 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -740,27 +719,26 @@ impl<St: album_state::State, S: BosStr> AlbumBuilder<St, S> {
 impl<St, S: BosStr> AlbumBuilder<St, S>
 where
     St: album_state::State,
-    St::Title: album_state::IsSet,
     St::Artist: album_state::IsSet,
     St::CreatedAt: album_state::IsSet,
+    St::Title: album_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Album<S> {
         Album {
             album_art: self._fields.0,
-            album_art_url: self._fields.1,
-            apple_music_link: self._fields.2,
-            artist: self._fields.3.unwrap(),
-            created_at: self._fields.4.unwrap(),
-            duration: self._fields.5,
-            genre: self._fields.6,
-            release_date: self._fields.7,
-            spotify_link: self._fields.8,
-            tags: self._fields.9,
-            tidal_link: self._fields.10,
-            title: self._fields.11.unwrap(),
-            year: self._fields.12,
-            youtube_link: self._fields.13,
+            apple_music_link: self._fields.1,
+            artist: self._fields.2.unwrap(),
+            created_at: self._fields.3.unwrap(),
+            duration: self._fields.4,
+            genre: self._fields.5,
+            release_date: self._fields.6,
+            spotify_link: self._fields.7,
+            tags: self._fields.8,
+            tidal_link: self._fields.9,
+            title: self._fields.10.unwrap(),
+            year: self._fields.11,
+            youtube_link: self._fields.12,
             extra_data: Default::default(),
         }
     }
@@ -768,19 +746,18 @@ where
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Album<S> {
         Album {
             album_art: self._fields.0,
-            album_art_url: self._fields.1,
-            apple_music_link: self._fields.2,
-            artist: self._fields.3.unwrap(),
-            created_at: self._fields.4.unwrap(),
-            duration: self._fields.5,
-            genre: self._fields.6,
-            release_date: self._fields.7,
-            spotify_link: self._fields.8,
-            tags: self._fields.9,
-            tidal_link: self._fields.10,
-            title: self._fields.11.unwrap(),
-            year: self._fields.12,
-            youtube_link: self._fields.13,
+            apple_music_link: self._fields.1,
+            artist: self._fields.2.unwrap(),
+            created_at: self._fields.3.unwrap(),
+            duration: self._fields.4,
+            genre: self._fields.5,
+            release_date: self._fields.6,
+            spotify_link: self._fields.7,
+            tags: self._fields.8,
+            tidal_link: self._fields.9,
+            title: self._fields.10.unwrap(),
+            year: self._fields.11,
+            youtube_link: self._fields.12,
             extra_data: Some(extra_data),
         }
     }
@@ -814,16 +791,6 @@ fn lexicon_doc_app_rocksky_album() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("albumArt"),
                                 LexObjectProperty::Blob(LexBlob { ..Default::default() }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("albumArtUrl"),
-                                LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The URL of the album art of the album."),
-                                    ),
-                                    format: Some(LexStringFormat::Uri),
-                                    ..Default::default()
-                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("appleMusicLink"),
@@ -1140,15 +1107,6 @@ fn lexicon_doc_app_rocksky_album_defs() -> LexiconDoc<'static> {
                                 description: Some(
                                     CowStr::new_static("The SHA256 hash of the album."),
                                 ),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("tags"),
-                            LexObjectProperty::Array(LexArray {
-                                items: LexArrayItem::String(LexString {
-                                    ..Default::default()
-                                }),
                                 ..Default::default()
                             }),
                         );

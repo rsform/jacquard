@@ -222,50 +222,50 @@ pub mod create_record_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Collection;
-        type Repo;
         type Record;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Collection = Unset;
-        type Repo = Unset;
         type Record = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
         type Collection = Set<members::collection>;
+        type Record = St::Record;
         type Repo = St::Repo;
-        type Record = St::Record;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Collection = St::Collection;
-        type Repo = Set<members::repo>;
-        type Record = St::Record;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecord<St> {}
     impl<St: State> State for SetRecord<St> {
         type Collection = St::Collection;
-        type Repo = St::Repo;
         type Record = Set<members::record>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Collection = St::Collection;
+        type Record = St::Record;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `collection` field
         pub struct collection(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -419,8 +419,8 @@ impl<St, S: BosStr> CreateRecordBuilder<St, S>
 where
     St: create_record_state::State,
     St::Collection: create_record_state::IsSet,
-    St::Repo: create_record_state::IsSet,
     St::Record: create_record_state::IsSet,
+    St::Repo: create_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CreateRecord<S> {

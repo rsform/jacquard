@@ -195,37 +195,37 @@ pub mod migrate_claim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ClaimReview;
         type Claim;
+        type ClaimReview;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ClaimReview = Unset;
         type Claim = Unset;
-    }
-    ///State transition - sets the `claim_review` field to Set
-    pub struct SetClaimReview<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetClaimReview<St> {}
-    impl<St: State> State for SetClaimReview<St> {
-        type ClaimReview = Set<members::claim_review>;
-        type Claim = St::Claim;
+        type ClaimReview = Unset;
     }
     ///State transition - sets the `claim` field to Set
     pub struct SetClaim<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetClaim<St> {}
     impl<St: State> State for SetClaim<St> {
-        type ClaimReview = St::ClaimReview;
         type Claim = Set<members::claim>;
+        type ClaimReview = St::ClaimReview;
+    }
+    ///State transition - sets the `claim_review` field to Set
+    pub struct SetClaimReview<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetClaimReview<St> {}
+    impl<St: State> State for SetClaimReview<St> {
+        type Claim = St::Claim;
+        type ClaimReview = Set<members::claim_review>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `claim_review` field
-        pub struct claim_review(());
         ///Marker type for the `claim` field
         pub struct claim(());
+        ///Marker type for the `claim_review` field
+        pub struct claim_review(());
     }
 }
 
@@ -313,8 +313,8 @@ where
 impl<St, S: BosStr> MigrateClaimBuilder<St, S>
 where
     St: migrate_claim_state::State,
-    St::ClaimReview: migrate_claim_state::IsSet,
     St::Claim: migrate_claim_state::IsSet,
+    St::ClaimReview: migrate_claim_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MigrateClaim<S> {

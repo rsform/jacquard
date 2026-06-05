@@ -16,7 +16,7 @@ use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -37,10 +37,10 @@ use crate::fm_teal::alpha::feed::Artist;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Play<S: BosStr = DefaultStr> {
-    ///Array of Musicbrainz artist IDs. Prefer using 'artists'.
+    ///DEPRECATED: USE 'artists' INSTEAD. Array of Musicbrainz artist IDs.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artist_mb_ids: Option<Vec<S>>,
-    ///Array of artist names in order of original appearance. Prefer using 'artists'.
+    ///DEPRECATED: USE 'artists' INSTEAD. Array of artist names in order of original appearance.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artist_names: Option<Vec<S>>,
     ///Array of artists in order of original appearance.
@@ -61,15 +61,15 @@ pub struct Play<S: BosStr = DefaultStr> {
     ///The unix timestamp of when the track was played
     #[serde(skip_serializing_if = "Option::is_none")]
     pub played_time: Option<Datetime>,
-    ///The Musicbrainz recording ID of the track
+    ///The MusicBrainz recording ID URI of the track, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub recording_mb_id: Option<S>,
+    pub recording_mb_id: Option<UriValue<S>>,
     ///Distinguishing information for release variants (e.g. 'Deluxe Edition', 'Remastered', '2023 Remaster', 'Special Edition'). Used to differentiate between different versions of the same base release while maintaining grouping capabilities.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub release_discriminant: Option<S>,
-    ///The Musicbrainz release ID
+    ///The MusicBrainz release ID URI, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub release_mb_id: Option<S>,
+    pub release_mb_id: Option<UriValue<S>>,
     ///The name of the release/album
     #[serde(skip_serializing_if = "Option::is_none")]
     pub release_name: Option<S>,
@@ -79,9 +79,9 @@ pub struct Play<S: BosStr = DefaultStr> {
     ///Distinguishing information for track variants (e.g. 'Acoustic Version', 'Live at Wembley', 'Radio Edit', 'Demo'). Used to differentiate between different versions of the same base track while maintaining grouping capabilities.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub track_discriminant: Option<S>,
-    ///The Musicbrainz ID of the track
+    ///The MusicBrainz ID URI of the track, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub track_mb_id: Option<S>,
+    pub track_mb_id: Option<UriValue<S>>,
     ///The name of the track
     pub track_name: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -314,13 +314,13 @@ pub struct PlayBuilder<St: play_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<S>,
         Option<Datetime>,
+        Option<UriValue<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
         Option<S>,
         Option<S>,
         Option<S>,
-        Option<S>,
-        Option<S>,
-        Option<S>,
-        Option<S>,
+        Option<UriValue<S>>,
         Option<S>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -502,12 +502,12 @@ impl<St: play_state::State, S: BosStr> PlayBuilder<St, S> {
 
 impl<St: play_state::State, S: BosStr> PlayBuilder<St, S> {
     /// Set the `recordingMbId` field (optional)
-    pub fn recording_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn recording_mb_id(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `recordingMbId` field to an Option value (optional)
-    pub fn maybe_recording_mb_id(mut self, value: Option<S>) -> Self {
+    pub fn maybe_recording_mb_id(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -528,12 +528,12 @@ impl<St: play_state::State, S: BosStr> PlayBuilder<St, S> {
 
 impl<St: play_state::State, S: BosStr> PlayBuilder<St, S> {
     /// Set the `releaseMbId` field (optional)
-    pub fn release_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn release_mb_id(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `releaseMbId` field to an Option value (optional)
-    pub fn maybe_release_mb_id(mut self, value: Option<S>) -> Self {
+    pub fn maybe_release_mb_id(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -580,12 +580,12 @@ impl<St: play_state::State, S: BosStr> PlayBuilder<St, S> {
 
 impl<St: play_state::State, S: BosStr> PlayBuilder<St, S> {
     /// Set the `trackMbId` field (optional)
-    pub fn track_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn track_mb_id(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.14 = value.into();
         self
     }
     /// Set the `trackMbId` field to an Option value (optional)
-    pub fn maybe_track_mb_id(mut self, value: Option<S>) -> Self {
+    pub fn maybe_track_mb_id(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.14 = value;
         self
     }
@@ -685,7 +685,7 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> LexiconDoc<'static> {
                                 LexObjectProperty::Array(LexArray {
                                     description: Some(
                                         CowStr::new_static(
-                                            "Array of Musicbrainz artist IDs. Prefer using 'artists'.",
+                                            "DEPRECATED: USE 'artists' INSTEAD. Array of Musicbrainz artist IDs.",
                                         ),
                                     ),
                                     items: LexArrayItem::String(LexString {
@@ -699,7 +699,7 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> LexiconDoc<'static> {
                                 LexObjectProperty::Array(LexArray {
                                     description: Some(
                                         CowStr::new_static(
-                                            "Array of artist names in order of original appearance. Prefer using 'artists'.",
+                                            "DEPRECATED: USE 'artists' INSTEAD. Array of artist names in order of original appearance.",
                                         ),
                                     ),
                                     items: LexArrayItem::String(LexString {
@@ -780,9 +780,10 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> LexiconDoc<'static> {
                                 LexObjectProperty::String(LexString {
                                     description: Some(
                                         CowStr::new_static(
-                                            "The Musicbrainz recording ID of the track",
+                                            "The MusicBrainz recording ID URI of the track, formatted as mbid:<uuid>",
                                         ),
                                     ),
+                                    format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
                             );
@@ -803,8 +804,11 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> LexiconDoc<'static> {
                                 SmolStr::new_static("releaseMbId"),
                                 LexObjectProperty::String(LexString {
                                     description: Some(
-                                        CowStr::new_static("The Musicbrainz release ID"),
+                                        CowStr::new_static(
+                                            "The MusicBrainz release ID URI, formatted as mbid:<uuid>",
+                                        ),
                                     ),
+                                    format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
                             );
@@ -849,8 +853,11 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> LexiconDoc<'static> {
                                 SmolStr::new_static("trackMbId"),
                                 LexObjectProperty::String(LexString {
                                     description: Some(
-                                        CowStr::new_static("The Musicbrainz ID of the track"),
+                                        CowStr::new_static(
+                                            "The MusicBrainz ID URI of the track, formatted as mbid:<uuid>",
+                                        ),
                                     ),
+                                    format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
                             );

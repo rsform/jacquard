@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,10 +18,8 @@ use serde::{Serialize, Deserialize};
 use crate::app_rocksky::song::SongViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
-pub struct GetSongs<S: BosStr = DefaultStr> {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub genre: Option<S>,
+#[serde(rename_all = "camelCase")]
+pub struct GetSongs {
     ///(min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -49,7 +47,7 @@ impl jacquard_common::xrpc::XrpcResp for GetSongsResponse {
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetSongs<S> {
+impl jacquard_common::xrpc::XrpcRequest for GetSongs {
     const NSID: &'static str = "app.rocksky.song.getSongs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSongsResponse;
@@ -60,7 +58,7 @@ pub struct GetSongsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSongsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.song.getSongs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: BosStr> = GetSongs<S>;
+    type Request<S: BosStr> = GetSongs;
     type Response = GetSongsResponse;
 }
 
@@ -84,97 +82,73 @@ pub mod get_songs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetSongsBuilder<St: get_songs_state::State, S: BosStr = DefaultStr> {
+pub struct GetSongsBuilder<St: get_songs_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<i64>),
-    _type: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>),
 }
 
-impl GetSongs<DefaultStr> {
-    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetSongsBuilder<get_songs_state::Empty, DefaultStr> {
+impl GetSongs {
+    /// Create a new builder for this type.
+    pub fn new() -> GetSongsBuilder<get_songs_state::Empty> {
         GetSongsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetSongs<S> {
-    /// Create a new builder for this type
-    pub fn builder() -> GetSongsBuilder<get_songs_state::Empty, S> {
-        GetSongsBuilder::builder()
-    }
-}
-
-impl GetSongsBuilder<get_songs_state::Empty, DefaultStr> {
+impl GetSongsBuilder<get_songs_state::Empty> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetSongsBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
-            _type: PhantomData,
+            _fields: (None, None),
         }
     }
 }
 
-impl<S: BosStr> GetSongsBuilder<get_songs_state::Empty, S> {
+impl GetSongsBuilder<get_songs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         GetSongsBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
-            _type: PhantomData,
+            _fields: (None, None),
         }
     }
 }
 
-impl<St: get_songs_state::State, S: BosStr> GetSongsBuilder<St, S> {
-    /// Set the `genre` field (optional)
-    pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
+impl<St: get_songs_state::State> GetSongsBuilder<St> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
         self
     }
-    /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<S>) -> Self {
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
         self._fields.0 = value;
         self
     }
 }
 
-impl<St: get_songs_state::State, S: BosStr> GetSongsBuilder<St, S> {
-    /// Set the `limit` field (optional)
-    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+impl<St: get_songs_state::State> GetSongsBuilder<St> {
+    /// Set the `offset` field (optional)
+    pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
         self
     }
-    /// Set the `limit` field to an Option value (optional)
-    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+    /// Set the `offset` field to an Option value (optional)
+    pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<St: get_songs_state::State, S: BosStr> GetSongsBuilder<St, S> {
-    /// Set the `offset` field (optional)
-    pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.2 = value.into();
-        self
-    }
-    /// Set the `offset` field to an Option value (optional)
-    pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
-        self._fields.2 = value;
-        self
-    }
-}
-
-impl<St, S: BosStr> GetSongsBuilder<St, S>
+impl<St> GetSongsBuilder<St>
 where
     St: get_songs_state::State,
 {
     /// Build the final struct.
-    pub fn build(self) -> GetSongs<S> {
+    pub fn build(self) -> GetSongs {
         GetSongs {
-            genre: self._fields.0,
-            limit: self._fields.1,
-            offset: self._fields.2,
+            limit: self._fields.0,
+            offset: self._fields.1,
         }
     }
 }

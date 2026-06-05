@@ -1,0 +1,13 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.hds.exportAccount",
+  "revision": 1,
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "output": {
+        "encoding": "application/vnd.ipld.car"
+      }
+    }
+  }
+}

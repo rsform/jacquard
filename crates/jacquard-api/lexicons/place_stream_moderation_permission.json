@@ -37,7 +37,9 @@
               "enum": [
                 "ban",
                 "hide",
-                "livestream.manage"
+                "livestream.manage",
+                "message.pin",
+                "vod.comment.hide"
               ]
             }
           }

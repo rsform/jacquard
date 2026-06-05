@@ -12,6 +12,7 @@ use alloc::collections::BTreeMap;
 use core::marker::PhantomData;
 use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
@@ -22,6 +23,11 @@ pub struct Create<S: BosStr = DefaultStr> {
     ///Default branch to push to
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default_branch: Option<S>,
+    ///Name of the repository
+    pub name: S,
+    ///Optional user-provided did:web to use as the repo identity instead of minting a did:plc.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub repo_did: Option<Did<S>>,
     ///Rkey of the repository record
     pub rkey: S,
     ///A source URL to clone from, populate this when forking or importing a repository.
@@ -31,12 +37,22 @@ pub struct Create<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct CreateOutput<S: BosStr = DefaultStr> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub repo_did: Option<Did<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Response type for sh.tangled.repo.create
 pub struct CreateResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateResponse {
     const NSID: &'static str = "sh.tangled.repo.create";
     const ENCODING: &'static str = "application/json";
-    type Output<S: BosStr> = ();
+    type Output<S: BosStr> = CreateOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 

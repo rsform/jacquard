@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "record",
-      "description": "Record declaring a subscription to a publication",
+      "description": "Record declaring a subscription to a publication.",
       "key": "tid",
       "record": {
         "type": "object",
@@ -12,8 +12,13 @@
           "publication"
         ],
         "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
           "publication": {
             "type": "string",
+            "description": "AT-URI reference to the publication record being subscribed to (ex: at://did:plc:abc123/site.standard.publication/xyz789).",
             "format": "at-uri"
           }
         }

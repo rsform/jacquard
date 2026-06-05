@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "app.chavatar.settings.executor",
+  "description": "Designated Cron executor for avatar rotation.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "The provider authorized to execute avatar rotation on behalf of the user.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "execClientId"
+        ],
+        "properties": {
+          "execClientId": {
+            "type": "string",
+            "description": "OAuth client_id of the provider authorized to execute rotation.",
+            "format": "uri",
+            "maxLength": 2048
+          }
+        }
+      }
+    }
+  }
+}

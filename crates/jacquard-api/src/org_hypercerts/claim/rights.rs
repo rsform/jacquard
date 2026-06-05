@@ -180,67 +180,67 @@ pub mod rights_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type RightsDescription;
         type RightsName;
         type RightsType;
-        type RightsDescription;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
+        type RightsDescription = Unset;
         type RightsName = Unset;
         type RightsType = Unset;
-        type RightsDescription = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `rights_name` field to Set
-    pub struct SetRightsName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRightsName<St> {}
-    impl<St: State> State for SetRightsName<St> {
-        type RightsName = Set<members::rights_name>;
-        type RightsType = St::RightsType;
-        type RightsDescription = St::RightsDescription;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `rights_type` field to Set
-    pub struct SetRightsType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRightsType<St> {}
-    impl<St: State> State for SetRightsType<St> {
-        type RightsName = St::RightsName;
-        type RightsType = Set<members::rights_type>;
-        type RightsDescription = St::RightsDescription;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `rights_description` field to Set
-    pub struct SetRightsDescription<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRightsDescription<St> {}
-    impl<St: State> State for SetRightsDescription<St> {
-        type RightsName = St::RightsName;
-        type RightsType = St::RightsType;
-        type RightsDescription = Set<members::rights_description>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
+        type RightsDescription = St::RightsDescription;
         type RightsName = St::RightsName;
         type RightsType = St::RightsType;
+    }
+    ///State transition - sets the `rights_description` field to Set
+    pub struct SetRightsDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRightsDescription<St> {}
+    impl<St: State> State for SetRightsDescription<St> {
+        type CreatedAt = St::CreatedAt;
+        type RightsDescription = Set<members::rights_description>;
+        type RightsName = St::RightsName;
+        type RightsType = St::RightsType;
+    }
+    ///State transition - sets the `rights_name` field to Set
+    pub struct SetRightsName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRightsName<St> {}
+    impl<St: State> State for SetRightsName<St> {
+        type CreatedAt = St::CreatedAt;
         type RightsDescription = St::RightsDescription;
-        type CreatedAt = Set<members::created_at>;
+        type RightsName = Set<members::rights_name>;
+        type RightsType = St::RightsType;
+    }
+    ///State transition - sets the `rights_type` field to Set
+    pub struct SetRightsType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRightsType<St> {}
+    impl<St: State> State for SetRightsType<St> {
+        type CreatedAt = St::CreatedAt;
+        type RightsDescription = St::RightsDescription;
+        type RightsName = St::RightsName;
+        type RightsType = Set<members::rights_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `rights_description` field
+        pub struct rights_description(());
         ///Marker type for the `rights_name` field
         pub struct rights_name(());
         ///Marker type for the `rights_type` field
         pub struct rights_type(());
-        ///Marker type for the `rights_description` field
-        pub struct rights_description(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -385,10 +385,10 @@ where
 impl<St, S: BosStr> RightsBuilder<St, S>
 where
     St: rights_state::State,
+    St::CreatedAt: rights_state::IsSet,
+    St::RightsDescription: rights_state::IsSet,
     St::RightsName: rights_state::IsSet,
     St::RightsType: rights_state::IsSet,
-    St::RightsDescription: rights_state::IsSet,
-    St::CreatedAt: rights_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Rights<S> {

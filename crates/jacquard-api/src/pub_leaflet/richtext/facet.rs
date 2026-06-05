@@ -24,6 +24,8 @@ use jacquard_lexicon::schema::LexiconSchema;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
+use crate::pub_leaflet::theme::color::Rgb;
+use crate::pub_leaflet::theme::color::Rgba;
 use crate::pub_leaflet::richtext::facet;
 /// Facet feature for mentioning an AT URI.
 
@@ -31,6 +33,8 @@ use crate::pub_leaflet::richtext::facet;
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AtMention<S: BosStr = DefaultStr> {
     pub at_uri: UriValue<S>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub href: Option<UriValue<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -92,8 +96,21 @@ pub struct Footnote<S: BosStr = DefaultStr> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Highlight<S: BosStr = DefaultStr> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub color: Option<HighlightColor<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub enum HighlightColor<S: BosStr = DefaultStr> {
+    #[serde(rename = "pub.leaflet.theme.color#rgba")]
+    ColorRgba(Box<Rgba<S>>),
+    #[serde(rename = "pub.leaflet.theme.color#rgb")]
+    ColorRgb(Box<Rgb<S>>),
 }
 
 /// Facet feature for an identifier. Used for linking to a segment
@@ -434,7 +451,7 @@ pub mod at_mention_state {
 /// Builder for constructing an instance of this type.
 pub struct AtMentionBuilder<St: at_mention_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<UriValue<S>>,),
+    _fields: (Option<UriValue<S>>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -457,7 +474,7 @@ impl AtMentionBuilder<at_mention_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         AtMentionBuilder {
             _state: PhantomData,
-            _fields: (None,),
+            _fields: (None, None),
             _type: PhantomData,
         }
     }
@@ -468,7 +485,7 @@ impl<S: BosStr> AtMentionBuilder<at_mention_state::Empty, S> {
     pub fn builder() -> Self {
         AtMentionBuilder {
             _state: PhantomData,
-            _fields: (None,),
+            _fields: (None, None),
             _type: PhantomData,
         }
     }
@@ -493,6 +510,19 @@ where
     }
 }
 
+impl<St: at_mention_state::State, S: BosStr> AtMentionBuilder<St, S> {
+    /// Set the `href` field (optional)
+    pub fn href(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `href` field to an Option value (optional)
+    pub fn maybe_href(mut self, value: Option<UriValue<S>>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> AtMentionBuilder<St, S>
 where
     St: at_mention_state::State,
@@ -502,6 +532,7 @@ where
     pub fn build(self) -> AtMention<S> {
         AtMention {
             at_uri: self._fields.0.unwrap(),
+            href: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -512,6 +543,7 @@ where
     ) -> AtMention<S> {
         AtMention {
             at_uri: self._fields.0.unwrap(),
+            href: self._fields.1,
             extra_data: Some(extra_data),
         }
     }
@@ -539,6 +571,13 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("atURI"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("href"),
                             LexObjectProperty::String(LexString {
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
@@ -683,6 +722,16 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> LexiconDoc<'static> {
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("color"),
+                            LexObjectProperty::Union(LexRefUnion {
+                                refs: vec![
+                                    CowStr::new_static("pub.leaflet.theme.color#rgba"),
+                                    CowStr::new_static("pub.leaflet.theme.color#rgb")
+                                ],
+                                ..Default::default()
+                            }),
+                        );
                         map
                     },
                     ..Default::default()

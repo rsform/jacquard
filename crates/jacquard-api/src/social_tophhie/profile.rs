@@ -438,51 +438,51 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PdsPreferences;
         type CommunicationPreferences;
         type CreatedAt;
+        type PdsPreferences;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PdsPreferences = Unset;
         type CommunicationPreferences = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `pds_preferences` field to Set
-    pub struct SetPdsPreferences<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPdsPreferences<St> {}
-    impl<St: State> State for SetPdsPreferences<St> {
-        type PdsPreferences = Set<members::pds_preferences>;
-        type CommunicationPreferences = St::CommunicationPreferences;
-        type CreatedAt = St::CreatedAt;
+        type PdsPreferences = Unset;
     }
     ///State transition - sets the `communication_preferences` field to Set
     pub struct SetCommunicationPreferences<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCommunicationPreferences<St> {}
     impl<St: State> State for SetCommunicationPreferences<St> {
-        type PdsPreferences = St::PdsPreferences;
         type CommunicationPreferences = Set<members::communication_preferences>;
         type CreatedAt = St::CreatedAt;
+        type PdsPreferences = St::PdsPreferences;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type PdsPreferences = St::PdsPreferences;
         type CommunicationPreferences = St::CommunicationPreferences;
         type CreatedAt = Set<members::created_at>;
+        type PdsPreferences = St::PdsPreferences;
+    }
+    ///State transition - sets the `pds_preferences` field to Set
+    pub struct SetPdsPreferences<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPdsPreferences<St> {}
+    impl<St: State> State for SetPdsPreferences<St> {
+        type CommunicationPreferences = St::CommunicationPreferences;
+        type CreatedAt = St::CreatedAt;
+        type PdsPreferences = Set<members::pds_preferences>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `pds_preferences` field
-        pub struct pds_preferences(());
         ///Marker type for the `communication_preferences` field
         pub struct communication_preferences(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `pds_preferences` field
+        pub struct pds_preferences(());
     }
 }
 
@@ -607,9 +607,9 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
-    St::PdsPreferences: profile_state::IsSet,
     St::CommunicationPreferences: profile_state::IsSet,
     St::CreatedAt: profile_state::IsSet,
+    St::PdsPreferences: profile_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Profile<S> {

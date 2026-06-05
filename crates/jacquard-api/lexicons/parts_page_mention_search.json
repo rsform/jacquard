@@ -1,0 +1,178 @@
+{
+  "lexicon": 1,
+  "id": "parts.page.mention.search",
+  "defs": {
+    "aspectRatio": {
+      "type": "object",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer"
+        },
+        "width": {
+          "type": "integer"
+        }
+      }
+    },
+    "embedInfo": {
+      "type": "object",
+      "required": [
+        "src"
+      ],
+      "properties": {
+        "aspectRatio": {
+          "type": "ref",
+          "description": "Aspect ratio of the embed. If provided, takes precedence over width/height for sizing.",
+          "ref": "#aspectRatio"
+        },
+        "height": {
+          "type": "integer",
+          "description": "Default height of the embed in pixels",
+          "minimum": 16,
+          "maximum": 3200
+        },
+        "src": {
+          "type": "string",
+          "description": "Source URL for the iframe embed",
+          "format": "uri"
+        },
+        "width": {
+          "type": "integer",
+          "description": "Default width of the embed in pixels",
+          "minimum": 16,
+          "maximum": 3200
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Search a mention service for matching results. A single XRPC host can serve multiple mention services, distinguished by the service AT URI.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "service",
+          "search"
+        ],
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of results to return",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 50
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope identifier to narrow results within a service, as returned by a previous result's subscope.scope field"
+          },
+          "search": {
+            "type": "string",
+            "description": "Search query string"
+          },
+          "service": {
+            "type": "string",
+            "description": "AT URI of the parts.page.mention.service record identifying which service to query",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "results"
+          ],
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#result"
+              },
+              "maxLength": 50
+            }
+          }
+        }
+      }
+    },
+    "mentionLabel": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "uri",
+        "name"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "A description for the mentioned entity"
+        },
+        "embed": {
+          "type": "ref",
+          "description": "Optional embed info for creating an embed block instead of an inline mention",
+          "ref": "#embedInfo"
+        },
+        "href": {
+          "type": "string",
+          "description": "Optional web URL for the mentioned entity",
+          "format": "uri"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Optional icon URL for the mentioned entity, displayed next to the mention",
+          "format": "uri"
+        },
+        "labels": {
+          "type": "array",
+          "description": "A set of labels to be rendered with the mentionedEntity",
+          "items": {
+            "type": "ref",
+            "ref": "#mentionLabel"
+          }
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name for the mentioned entity"
+        },
+        "subscope": {
+          "type": "ref",
+          "description": "Optional subscope info indicating this result can be scoped into for further searching",
+          "ref": "#subscopeInfo"
+        },
+        "uri": {
+          "type": "string",
+          "description": "Identifier for the mentioned entity"
+        }
+      }
+    },
+    "subscopeInfo": {
+      "type": "object",
+      "required": [
+        "scope",
+        "label"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Display label for the scope-down button (e.g. 'Posts', 'Tracks')",
+          "maxLength": 100
+        },
+        "scope": {
+          "type": "string",
+          "description": "Scope identifier passed back to the service in subsequent search queries"
+        }
+      }
+    }
+  }
+}

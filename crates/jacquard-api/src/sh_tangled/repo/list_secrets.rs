@@ -233,8 +233,8 @@ pub mod secret_state {
     pub trait State: sealed::Sealed {
         type CreatedAt;
         type CreatedBy;
-        type Repo;
         type Key;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -242,8 +242,8 @@ pub mod secret_state {
     impl State for Empty {
         type CreatedAt = Unset;
         type CreatedBy = Unset;
-        type Repo = Unset;
         type Key = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
@@ -251,8 +251,8 @@ pub mod secret_state {
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
         type CreatedBy = St::CreatedBy;
-        type Repo = St::Repo;
         type Key = St::Key;
+        type Repo = St::Repo;
     }
     ///State transition - sets the `created_by` field to Set
     pub struct SetCreatedBy<St: State = Empty>(PhantomData<fn() -> St>);
@@ -260,17 +260,8 @@ pub mod secret_state {
     impl<St: State> State for SetCreatedBy<St> {
         type CreatedAt = St::CreatedAt;
         type CreatedBy = Set<members::created_by>;
+        type Key = St::Key;
         type Repo = St::Repo;
-        type Key = St::Key;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type CreatedAt = St::CreatedAt;
-        type CreatedBy = St::CreatedBy;
-        type Repo = Set<members::repo>;
-        type Key = St::Key;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
@@ -278,8 +269,17 @@ pub mod secret_state {
     impl<St: State> State for SetKey<St> {
         type CreatedAt = St::CreatedAt;
         type CreatedBy = St::CreatedBy;
-        type Repo = St::Repo;
         type Key = Set<members::key>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type CreatedAt = St::CreatedAt;
+        type CreatedBy = St::CreatedBy;
+        type Key = St::Key;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -288,10 +288,10 @@ pub mod secret_state {
         pub struct created_at(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -419,8 +419,8 @@ where
     St: secret_state::State,
     St::CreatedAt: secret_state::IsSet,
     St::CreatedBy: secret_state::IsSet,
-    St::Repo: secret_state::IsSet,
     St::Key: secret_state::IsSet,
+    St::Repo: secret_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Secret<S> {

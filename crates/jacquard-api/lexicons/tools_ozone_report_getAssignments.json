@@ -1,0 +1,67 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.report.getAssignments",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get assignments for reports.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "dids": {
+            "type": "array",
+            "description": "If specified, returns assignments for these moderators only.",
+            "items": {
+              "type": "string",
+              "format": "did"
+            },
+            "maxLength": 50
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "onlyActive": {
+            "type": "boolean",
+            "description": "When true, only returns active assignments.",
+            "default": true
+          },
+          "reportIds": {
+            "type": "array",
+            "description": "If specified, returns assignments for these reports only.",
+            "items": {
+              "type": "integer"
+            },
+            "maxLength": 50
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "assignments"
+          ],
+          "properties": {
+            "assignments": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "tools.ozone.report.defs#assignmentView"
+              }
+            },
+            "cursor": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

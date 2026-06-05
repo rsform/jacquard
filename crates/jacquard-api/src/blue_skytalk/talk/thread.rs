@@ -179,51 +179,51 @@ pub mod thread_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type ChannelId;
         type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type ChannelId = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type ChannelId = St::ChannelId;
-        type CreatedAt = St::CreatedAt;
+        type Title = Unset;
     }
     ///State transition - sets the `channel_id` field to Set
     pub struct SetChannelId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetChannelId<St> {}
     impl<St: State> State for SetChannelId<St> {
-        type Title = St::Title;
         type ChannelId = Set<members::channel_id>;
         type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Title = St::Title;
         type ChannelId = St::ChannelId;
         type CreatedAt = Set<members::created_at>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type ChannelId = St::ChannelId;
+        type CreatedAt = St::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `channel_id` field
         pub struct channel_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -362,9 +362,9 @@ where
 impl<St, S: BosStr> ThreadBuilder<St, S>
 where
     St: thread_state::State,
-    St::Title: thread_state::IsSet,
     St::ChannelId: thread_state::IsSet,
     St::CreatedAt: thread_state::IsSet,
+    St::Title: thread_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Thread<S> {

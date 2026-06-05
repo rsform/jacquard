@@ -10,13 +10,17 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
-use jacquard_derive::IntoStatic;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,16 +28,70 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::site_standard::theme::color::Rgb;
+/// A simplified theme definition for publications, providing basic color customization for content display across different platforms and applications.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    rename = "site.standard.theme.basic",
+    tag = "$type",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Basic<S: BosStr = DefaultStr> {
+    ///Color used for links and button backgrounds.
     pub accent: Rgb<S>,
+    ///Color used for button text.
     pub accent_foreground: Rgb<S>,
+    ///Color used for content background.
     pub background: Rgb<S>,
+    ///Color used for content text.
     pub foreground: Rgb<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase")]
+pub struct BasicGetRecordOutput<S: BosStr = DefaultStr> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Basic<S>,
+}
+
+impl<S: BosStr> Basic<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, BasicRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct BasicRecord;
+impl XrpcResp for BasicRecord {
+    const NSID: &'static str = "site.standard.theme.basic";
+    const ENCODING: &'static str = "application/json";
+    type Output<S: BosStr> = BasicGetRecordOutput<S>;
+    type Err = RecordError;
+}
+
+impl<S: BosStr> From<BasicGetRecordOutput<S>> for Basic<S> {
+    fn from(output: BasicGetRecordOutput<S>) -> Self {
+        output.value
+    }
+}
+
+impl<S: BosStr> Collection for Basic<S> {
+    const NSID: &'static str = "site.standard.theme.basic";
+    type Record = BasicRecord;
+}
+
+impl Collection for BasicRecord {
+    const NSID: &'static str = "site.standard.theme.basic";
+    type Record = BasicRecord;
 }
 
 impl<S: BosStr> LexiconSchema for Basic<S> {
@@ -61,67 +119,67 @@ pub mod basic_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Foreground;
         type Accent;
         type AccentForeground;
         type Background;
+        type Foreground;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Foreground = Unset;
         type Accent = Unset;
         type AccentForeground = Unset;
         type Background = Unset;
-    }
-    ///State transition - sets the `foreground` field to Set
-    pub struct SetForeground<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetForeground<St> {}
-    impl<St: State> State for SetForeground<St> {
-        type Foreground = Set<members::foreground>;
-        type Accent = St::Accent;
-        type AccentForeground = St::AccentForeground;
-        type Background = St::Background;
+        type Foreground = Unset;
     }
     ///State transition - sets the `accent` field to Set
     pub struct SetAccent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAccent<St> {}
     impl<St: State> State for SetAccent<St> {
-        type Foreground = St::Foreground;
         type Accent = Set<members::accent>;
         type AccentForeground = St::AccentForeground;
         type Background = St::Background;
+        type Foreground = St::Foreground;
     }
     ///State transition - sets the `accent_foreground` field to Set
     pub struct SetAccentForeground<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAccentForeground<St> {}
     impl<St: State> State for SetAccentForeground<St> {
-        type Foreground = St::Foreground;
         type Accent = St::Accent;
         type AccentForeground = Set<members::accent_foreground>;
         type Background = St::Background;
+        type Foreground = St::Foreground;
     }
     ///State transition - sets the `background` field to Set
     pub struct SetBackground<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBackground<St> {}
     impl<St: State> State for SetBackground<St> {
-        type Foreground = St::Foreground;
         type Accent = St::Accent;
         type AccentForeground = St::AccentForeground;
         type Background = Set<members::background>;
+        type Foreground = St::Foreground;
+    }
+    ///State transition - sets the `foreground` field to Set
+    pub struct SetForeground<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetForeground<St> {}
+    impl<St: State> State for SetForeground<St> {
+        type Accent = St::Accent;
+        type AccentForeground = St::AccentForeground;
+        type Background = St::Background;
+        type Foreground = Set<members::foreground>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `foreground` field
-        pub struct foreground(());
         ///Marker type for the `accent` field
         pub struct accent(());
         ///Marker type for the `accent_foreground` field
         pub struct accent_foreground(());
         ///Marker type for the `background` field
         pub struct background(());
+        ///Marker type for the `foreground` field
+        pub struct foreground(());
     }
 }
 
@@ -247,10 +305,10 @@ where
 impl<St, S: BosStr> BasicBuilder<St, S>
 where
     St: basic_state::State,
-    St::Foreground: basic_state::IsSet,
     St::Accent: basic_state::IsSet,
     St::AccentForeground: basic_state::IsSet,
     St::Background: basic_state::IsSet,
+    St::Foreground: basic_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Basic<S> {
@@ -286,56 +344,79 @@ fn lexicon_doc_site_standard_theme_basic() -> LexiconDoc<'static> {
             let mut map = BTreeMap::new();
             map.insert(
                 SmolStr::new_static("main"),
-                LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("background"),
-                            SmolStr::new_static("foreground"),
-                            SmolStr::new_static("accent"),
-                            SmolStr::new_static("accentForeground")
-                        ],
+                LexUserType::Record(LexRecord {
+                    description: Some(
+                        CowStr::new_static(
+                            "A simplified theme definition for publications, providing basic color customization for content display across different platforms and applications.",
+                        ),
                     ),
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("accent"),
-                            LexObjectProperty::Union(LexRefUnion {
-                                refs: vec![
-                                    CowStr::new_static("site.standard.theme.color#rgb")
-                                ],
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("accentForeground"),
-                            LexObjectProperty::Union(LexRefUnion {
-                                refs: vec![
-                                    CowStr::new_static("site.standard.theme.color#rgb")
-                                ],
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("background"),
-                            LexObjectProperty::Union(LexRefUnion {
-                                refs: vec![
-                                    CowStr::new_static("site.standard.theme.color#rgb")
-                                ],
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("foreground"),
-                            LexObjectProperty::Union(LexRefUnion {
-                                refs: vec![
-                                    CowStr::new_static("site.standard.theme.color#rgb")
-                                ],
-                                ..Default::default()
-                            }),
-                        );
-                        map
-                    },
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("background"),
+                                SmolStr::new_static("foreground"),
+                                SmolStr::new_static("accent"),
+                                SmolStr::new_static("accentForeground")
+                            ],
+                        ),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("accent"),
+                                LexObjectProperty::Union(LexRefUnion {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Color used for links and button backgrounds.",
+                                        ),
+                                    ),
+                                    refs: vec![
+                                        CowStr::new_static("site.standard.theme.color#rgb")
+                                    ],
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("accentForeground"),
+                                LexObjectProperty::Union(LexRefUnion {
+                                    description: Some(
+                                        CowStr::new_static("Color used for button text."),
+                                    ),
+                                    refs: vec![
+                                        CowStr::new_static("site.standard.theme.color#rgb")
+                                    ],
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("background"),
+                                LexObjectProperty::Union(LexRefUnion {
+                                    description: Some(
+                                        CowStr::new_static("Color used for content background."),
+                                    ),
+                                    refs: vec![
+                                        CowStr::new_static("site.standard.theme.color#rgb")
+                                    ],
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("foreground"),
+                                LexObjectProperty::Union(LexRefUnion {
+                                    description: Some(
+                                        CowStr::new_static("Color used for content text."),
+                                    ),
+                                    refs: vec![
+                                        CowStr::new_static("site.standard.theme.color#rgb")
+                                    ],
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    }),
                     ..Default::default()
                 }),
             );

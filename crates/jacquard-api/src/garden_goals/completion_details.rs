@@ -252,85 +252,85 @@ pub mod completion_details_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
-        type Month;
-        type Year;
-        type GoalId;
         type Day;
+        type GoalId;
+        type Month;
+        type UpdatedAt;
+        type Year;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
-        type Month = Unset;
-        type Year = Unset;
-        type GoalId = Unset;
         type Day = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
-    impl<St: State> State for SetUpdatedAt<St> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Month = St::Month;
-        type Year = St::Year;
-        type GoalId = St::GoalId;
-        type Day = St::Day;
-    }
-    ///State transition - sets the `month` field to Set
-    pub struct SetMonth<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMonth<St> {}
-    impl<St: State> State for SetMonth<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Month = Set<members::month>;
-        type Year = St::Year;
-        type GoalId = St::GoalId;
-        type Day = St::Day;
-    }
-    ///State transition - sets the `year` field to Set
-    pub struct SetYear<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetYear<St> {}
-    impl<St: State> State for SetYear<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Month = St::Month;
-        type Year = Set<members::year>;
-        type GoalId = St::GoalId;
-        type Day = St::Day;
-    }
-    ///State transition - sets the `goal_id` field to Set
-    pub struct SetGoalId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGoalId<St> {}
-    impl<St: State> State for SetGoalId<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Month = St::Month;
-        type Year = St::Year;
-        type GoalId = Set<members::goal_id>;
-        type Day = St::Day;
+        type GoalId = Unset;
+        type Month = Unset;
+        type UpdatedAt = Unset;
+        type Year = Unset;
     }
     ///State transition - sets the `day` field to Set
     pub struct SetDay<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDay<St> {}
     impl<St: State> State for SetDay<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Month = St::Month;
-        type Year = St::Year;
-        type GoalId = St::GoalId;
         type Day = Set<members::day>;
+        type GoalId = St::GoalId;
+        type Month = St::Month;
+        type UpdatedAt = St::UpdatedAt;
+        type Year = St::Year;
+    }
+    ///State transition - sets the `goal_id` field to Set
+    pub struct SetGoalId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGoalId<St> {}
+    impl<St: State> State for SetGoalId<St> {
+        type Day = St::Day;
+        type GoalId = Set<members::goal_id>;
+        type Month = St::Month;
+        type UpdatedAt = St::UpdatedAt;
+        type Year = St::Year;
+    }
+    ///State transition - sets the `month` field to Set
+    pub struct SetMonth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMonth<St> {}
+    impl<St: State> State for SetMonth<St> {
+        type Day = St::Day;
+        type GoalId = St::GoalId;
+        type Month = Set<members::month>;
+        type UpdatedAt = St::UpdatedAt;
+        type Year = St::Year;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type Day = St::Day;
+        type GoalId = St::GoalId;
+        type Month = St::Month;
+        type UpdatedAt = Set<members::updated_at>;
+        type Year = St::Year;
+    }
+    ///State transition - sets the `year` field to Set
+    pub struct SetYear<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetYear<St> {}
+    impl<St: State> State for SetYear<St> {
+        type Day = St::Day;
+        type GoalId = St::GoalId;
+        type Month = St::Month;
+        type UpdatedAt = St::UpdatedAt;
+        type Year = Set<members::year>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `month` field
-        pub struct month(());
-        ///Marker type for the `year` field
-        pub struct year(());
-        ///Marker type for the `goal_id` field
-        pub struct goal_id(());
         ///Marker type for the `day` field
         pub struct day(());
+        ///Marker type for the `goal_id` field
+        pub struct goal_id(());
+        ///Marker type for the `month` field
+        pub struct month(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+        ///Marker type for the `year` field
+        pub struct year(());
     }
 }
 
@@ -543,11 +543,11 @@ where
 impl<St, S: BosStr> CompletionDetailsBuilder<St, S>
 where
     St: completion_details_state::State,
-    St::UpdatedAt: completion_details_state::IsSet,
-    St::Month: completion_details_state::IsSet,
-    St::Year: completion_details_state::IsSet,
-    St::GoalId: completion_details_state::IsSet,
     St::Day: completion_details_state::IsSet,
+    St::GoalId: completion_details_state::IsSet,
+    St::Month: completion_details_state::IsSet,
+    St::UpdatedAt: completion_details_state::IsSet,
+    St::Year: completion_details_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CompletionDetails<S> {

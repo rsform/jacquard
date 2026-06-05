@@ -3,6 +3,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod auth_execute_rotation;
+pub mod auth_manage_avatar;
+pub mod auth_view_avatar;
 pub mod avatar;
+pub mod schedules;
 pub mod settings;
 pub mod state;

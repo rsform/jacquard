@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.contributionReview",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A review of a community contribution by a moderator.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "contribution",
+          "status",
+          "reviewedBy",
+          "createdAt"
+        ],
+        "properties": {
+          "contribution": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "reason": {
+            "type": "string",
+            "maxGraphemes": 3000
+          },
+          "reviewedBy": {
+            "type": "string",
+            "format": "did"
+          },
+          "status": {
+            "type": "string",
+            "knownValues": [
+              "approved",
+              "denied",
+              "needsRevision"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -167,49 +167,49 @@ pub mod question_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Content;
+        type CreatedAt;
         type Summary;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Content = Unset;
+        type CreatedAt = Unset;
         type Summary = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = St::Content;
-        type Summary = St::Summary;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
-        type CreatedAt = St::CreatedAt;
         type Content = Set<members::content>;
+        type CreatedAt = St::CreatedAt;
+        type Summary = St::Summary;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Content = St::Content;
+        type CreatedAt = Set<members::created_at>;
         type Summary = St::Summary;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSummary<St> {}
     impl<St: State> State for SetSummary<St> {
-        type CreatedAt = St::CreatedAt;
         type Content = St::Content;
+        type CreatedAt = St::CreatedAt;
         type Summary = Set<members::summary>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `summary` field
         pub struct summary(());
     }
@@ -350,8 +350,8 @@ where
 impl<St, S: BosStr> QuestionBuilder<St, S>
 where
     St: question_state::State,
-    St::CreatedAt: question_state::IsSet,
     St::Content: question_state::IsSet,
+    St::CreatedAt: question_state::IsSet,
     St::Summary: question_state::IsSet,
 {
     /// Build the final struct.

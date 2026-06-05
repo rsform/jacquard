@@ -114,51 +114,51 @@ pub mod issue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Issue;
         type Bug;
         type CreatedAt;
+        type Issue;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Issue = Unset;
         type Bug = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `issue` field to Set
-    pub struct SetIssue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIssue<St> {}
-    impl<St: State> State for SetIssue<St> {
-        type Issue = Set<members::issue>;
-        type Bug = St::Bug;
-        type CreatedAt = St::CreatedAt;
+        type Issue = Unset;
     }
     ///State transition - sets the `bug` field to Set
     pub struct SetBug<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBug<St> {}
     impl<St: State> State for SetBug<St> {
-        type Issue = St::Issue;
         type Bug = Set<members::bug>;
         type CreatedAt = St::CreatedAt;
+        type Issue = St::Issue;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Issue = St::Issue;
         type Bug = St::Bug;
         type CreatedAt = Set<members::created_at>;
+        type Issue = St::Issue;
+    }
+    ///State transition - sets the `issue` field to Set
+    pub struct SetIssue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIssue<St> {}
+    impl<St: State> State for SetIssue<St> {
+        type Bug = St::Bug;
+        type CreatedAt = St::CreatedAt;
+        type Issue = Set<members::issue>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `issue` field
-        pub struct issue(());
         ///Marker type for the `bug` field
         pub struct bug(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `issue` field
+        pub struct issue(());
     }
 }
 
@@ -265,9 +265,9 @@ where
 impl<St, S: BosStr> IssueBuilder<St, S>
 where
     St: issue_state::State,
-    St::Issue: issue_state::IsSet,
     St::Bug: issue_state::IsSet,
     St::CreatedAt: issue_state::IsSet,
+    St::Issue: issue_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Issue<S> {

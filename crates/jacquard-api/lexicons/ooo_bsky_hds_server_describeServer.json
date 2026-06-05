@@ -1,0 +1,61 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.hds.server.describeServer",
+  "revision": 1,
+  "defs": {
+    "contact": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "privacyPolicy": {
+          "type": "string",
+          "format": "uri"
+        },
+        "termsOfService": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "did"
+          ],
+          "properties": {
+            "contact": {
+              "type": "ref",
+              "ref": "#contact"
+            },
+            "description": {
+              "type": "string"
+            },
+            "did": {
+              "type": "string",
+              "format": "did"
+            },
+            "links": {
+              "type": "ref",
+              "ref": "#links"
+            }
+          }
+        }
+      }
+    }
+  }
+}

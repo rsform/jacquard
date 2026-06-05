@@ -228,67 +228,67 @@ pub mod blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Mode;
-        type Size;
         type LastCommit;
+        type Mode;
         type Name;
+        type Size;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Mode = Unset;
-        type Size = Unset;
         type LastCommit = Unset;
+        type Mode = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `mode` field to Set
-    pub struct SetMode<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMode<St> {}
-    impl<St: State> State for SetMode<St> {
-        type Mode = Set<members::mode>;
-        type Size = St::Size;
-        type LastCommit = St::LastCommit;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSize<St> {}
-    impl<St: State> State for SetSize<St> {
-        type Mode = St::Mode;
-        type Size = Set<members::size>;
-        type LastCommit = St::LastCommit;
-        type Name = St::Name;
+        type Size = Unset;
     }
     ///State transition - sets the `last_commit` field to Set
     pub struct SetLastCommit<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLastCommit<St> {}
     impl<St: State> State for SetLastCommit<St> {
-        type Mode = St::Mode;
-        type Size = St::Size;
         type LastCommit = Set<members::last_commit>;
+        type Mode = St::Mode;
         type Name = St::Name;
+        type Size = St::Size;
+    }
+    ///State transition - sets the `mode` field to Set
+    pub struct SetMode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMode<St> {}
+    impl<St: State> State for SetMode<St> {
+        type LastCommit = St::LastCommit;
+        type Mode = Set<members::mode>;
+        type Name = St::Name;
+        type Size = St::Size;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Mode = St::Mode;
-        type Size = St::Size;
         type LastCommit = St::LastCommit;
+        type Mode = St::Mode;
         type Name = Set<members::name>;
+        type Size = St::Size;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSize<St> {}
+    impl<St: State> State for SetSize<St> {
+        type LastCommit = St::LastCommit;
+        type Mode = St::Mode;
+        type Name = St::Name;
+        type Size = Set<members::size>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mode` field
-        pub struct mode(());
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `last_commit` field
         pub struct last_commit(());
+        ///Marker type for the `mode` field
+        pub struct mode(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `size` field
+        pub struct size(());
     }
 }
 
@@ -433,10 +433,10 @@ impl<St: blob_state::State, S: BosStr> BlobBuilder<St, S> {
 impl<St, S: BosStr> BlobBuilder<St, S>
 where
     St: blob_state::State,
-    St::Mode: blob_state::IsSet,
-    St::Size: blob_state::IsSet,
     St::LastCommit: blob_state::IsSet,
+    St::Mode: blob_state::IsSet,
     St::Name: blob_state::IsSet,
+    St::Size: blob_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Blob<S> {
@@ -894,9 +894,9 @@ pub mod commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Hash;
         type Author;
         type Committer;
+        type Hash;
         type Message;
         type Tree;
     }
@@ -904,29 +904,19 @@ pub mod commit_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Hash = Unset;
         type Author = Unset;
         type Committer = Unset;
+        type Hash = Unset;
         type Message = Unset;
         type Tree = Unset;
-    }
-    ///State transition - sets the `hash` field to Set
-    pub struct SetHash<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHash<St> {}
-    impl<St: State> State for SetHash<St> {
-        type Hash = Set<members::hash>;
-        type Author = St::Author;
-        type Committer = St::Committer;
-        type Message = St::Message;
-        type Tree = St::Tree;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthor<St> {}
     impl<St: State> State for SetAuthor<St> {
-        type Hash = St::Hash;
         type Author = Set<members::author>;
         type Committer = St::Committer;
+        type Hash = St::Hash;
         type Message = St::Message;
         type Tree = St::Tree;
     }
@@ -934,9 +924,19 @@ pub mod commit_state {
     pub struct SetCommitter<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCommitter<St> {}
     impl<St: State> State for SetCommitter<St> {
-        type Hash = St::Hash;
         type Author = St::Author;
         type Committer = Set<members::committer>;
+        type Hash = St::Hash;
+        type Message = St::Message;
+        type Tree = St::Tree;
+    }
+    ///State transition - sets the `hash` field to Set
+    pub struct SetHash<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHash<St> {}
+    impl<St: State> State for SetHash<St> {
+        type Author = St::Author;
+        type Committer = St::Committer;
+        type Hash = Set<members::hash>;
         type Message = St::Message;
         type Tree = St::Tree;
     }
@@ -944,9 +944,9 @@ pub mod commit_state {
     pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessage<St> {}
     impl<St: State> State for SetMessage<St> {
-        type Hash = St::Hash;
         type Author = St::Author;
         type Committer = St::Committer;
+        type Hash = St::Hash;
         type Message = Set<members::message>;
         type Tree = St::Tree;
     }
@@ -954,21 +954,21 @@ pub mod commit_state {
     pub struct SetTree<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTree<St> {}
     impl<St: State> State for SetTree<St> {
-        type Hash = St::Hash;
         type Author = St::Author;
         type Committer = St::Committer;
+        type Hash = St::Hash;
         type Message = St::Message;
         type Tree = Set<members::tree>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `hash` field
-        pub struct hash(());
         ///Marker type for the `author` field
         pub struct author(());
         ///Marker type for the `committer` field
         pub struct committer(());
+        ///Marker type for the `hash` field
+        pub struct hash(());
         ///Marker type for the `message` field
         pub struct message(());
         ///Marker type for the `tree` field
@@ -1123,9 +1123,9 @@ where
 impl<St, S: BosStr> CommitBuilder<St, S>
 where
     St: commit_state::State,
-    St::Hash: commit_state::IsSet,
     St::Author: commit_state::IsSet,
     St::Committer: commit_state::IsSet,
+    St::Hash: commit_state::IsSet,
     St::Message: commit_state::IsSet,
     St::Tree: commit_state::IsSet,
 {
@@ -1164,50 +1164,50 @@ pub mod signature_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Email;
-        type When;
         type Name;
+        type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Email = Unset;
-        type When = Unset;
         type Name = Unset;
+        type When = Unset;
     }
     ///State transition - sets the `email` field to Set
     pub struct SetEmail<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEmail<St> {}
     impl<St: State> State for SetEmail<St> {
         type Email = Set<members::email>;
+        type Name = St::Name;
         type When = St::When;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWhen<St> {}
-    impl<St: State> State for SetWhen<St> {
-        type Email = St::Email;
-        type When = Set<members::when>;
-        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
         type Email = St::Email;
-        type When = St::When;
         type Name = Set<members::name>;
+        type When = St::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWhen<St> {}
+    impl<St: State> State for SetWhen<St> {
+        type Email = St::Email;
+        type Name = St::Name;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `email` field
         pub struct email(());
-        ///Marker type for the `when` field
-        pub struct when(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `when` field
+        pub struct when(());
     }
 }
 
@@ -1315,8 +1315,8 @@ impl<St, S: BosStr> SignatureBuilder<St, S>
 where
     St: signature_state::State,
     St::Email: signature_state::IsSet,
-    St::When: signature_state::IsSet,
     St::Name: signature_state::IsSet,
+    St::When: signature_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Signature<S> {

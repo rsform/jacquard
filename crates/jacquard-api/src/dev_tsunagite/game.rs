@@ -402,51 +402,51 @@ pub mod enum_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Values;
-        type Name;
         type Id;
+        type Name;
+        type Values;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Values = Unset;
-        type Name = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `values` field to Set
-    pub struct SetValues<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValues<St> {}
-    impl<St: State> State for SetValues<St> {
-        type Values = Set<members::values>;
-        type Name = St::Name;
-        type Id = St::Id;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Values = St::Values;
-        type Name = Set<members::name>;
-        type Id = St::Id;
+        type Name = Unset;
+        type Values = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type Values = St::Values;
-        type Name = St::Name;
         type Id = Set<members::id>;
+        type Name = St::Name;
+        type Values = St::Values;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Id = St::Id;
+        type Name = Set<members::name>;
+        type Values = St::Values;
+    }
+    ///State transition - sets the `values` field to Set
+    pub struct SetValues<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValues<St> {}
+    impl<St: State> State for SetValues<St> {
+        type Id = St::Id;
+        type Name = St::Name;
+        type Values = Set<members::values>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `values` field
-        pub struct values(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `values` field
+        pub struct values(());
     }
 }
 
@@ -553,9 +553,9 @@ where
 impl<St, S: BosStr> EnumBuilder<St, S>
 where
     St: enum_state::State,
-    St::Values: enum_state::IsSet,
-    St::Name: enum_state::IsSet,
     St::Id: enum_state::IsSet,
+    St::Name: enum_state::IsSet,
+    St::Values: enum_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Enum<S> {
@@ -920,67 +920,67 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type ScoreComponents;
         type DefaultComponent;
         type Judgments;
+        type Name;
+        type ScoreComponents;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type ScoreComponents = Unset;
         type DefaultComponent = Unset;
         type Judgments = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type ScoreComponents = St::ScoreComponents;
-        type DefaultComponent = St::DefaultComponent;
-        type Judgments = St::Judgments;
-    }
-    ///State transition - sets the `score_components` field to Set
-    pub struct SetScoreComponents<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScoreComponents<St> {}
-    impl<St: State> State for SetScoreComponents<St> {
-        type Name = St::Name;
-        type ScoreComponents = Set<members::score_components>;
-        type DefaultComponent = St::DefaultComponent;
-        type Judgments = St::Judgments;
+        type Name = Unset;
+        type ScoreComponents = Unset;
     }
     ///State transition - sets the `default_component` field to Set
     pub struct SetDefaultComponent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDefaultComponent<St> {}
     impl<St: State> State for SetDefaultComponent<St> {
-        type Name = St::Name;
-        type ScoreComponents = St::ScoreComponents;
         type DefaultComponent = Set<members::default_component>;
         type Judgments = St::Judgments;
+        type Name = St::Name;
+        type ScoreComponents = St::ScoreComponents;
     }
     ///State transition - sets the `judgments` field to Set
     pub struct SetJudgments<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetJudgments<St> {}
     impl<St: State> State for SetJudgments<St> {
-        type Name = St::Name;
-        type ScoreComponents = St::ScoreComponents;
         type DefaultComponent = St::DefaultComponent;
         type Judgments = Set<members::judgments>;
+        type Name = St::Name;
+        type ScoreComponents = St::ScoreComponents;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type DefaultComponent = St::DefaultComponent;
+        type Judgments = St::Judgments;
+        type Name = Set<members::name>;
+        type ScoreComponents = St::ScoreComponents;
+    }
+    ///State transition - sets the `score_components` field to Set
+    pub struct SetScoreComponents<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScoreComponents<St> {}
+    impl<St: State> State for SetScoreComponents<St> {
+        type DefaultComponent = St::DefaultComponent;
+        type Judgments = St::Judgments;
+        type Name = St::Name;
+        type ScoreComponents = Set<members::score_components>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `score_components` field
-        pub struct score_components(());
         ///Marker type for the `default_component` field
         pub struct default_component(());
         ///Marker type for the `judgments` field
         pub struct judgments(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `score_components` field
+        pub struct score_components(());
     }
 }
 
@@ -1153,10 +1153,10 @@ where
 impl<St, S: BosStr> GameBuilder<St, S>
 where
     St: game_state::State,
-    St::Name: game_state::IsSet,
-    St::ScoreComponents: game_state::IsSet,
     St::DefaultComponent: game_state::IsSet,
     St::Judgments: game_state::IsSet,
+    St::Name: game_state::IsSet,
+    St::ScoreComponents: game_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Game<S> {
@@ -1204,65 +1204,65 @@ pub mod percentage_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Id;
         type Maximum;
         type Name;
-        type Id;
         type Precision;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Id = Unset;
         type Maximum = Unset;
         type Name = Unset;
-        type Id = Unset;
         type Precision = Unset;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Id = Set<members::id>;
+        type Maximum = St::Maximum;
+        type Name = St::Name;
+        type Precision = St::Precision;
     }
     ///State transition - sets the `maximum` field to Set
     pub struct SetMaximum<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMaximum<St> {}
     impl<St: State> State for SetMaximum<St> {
+        type Id = St::Id;
         type Maximum = Set<members::maximum>;
         type Name = St::Name;
-        type Id = St::Id;
         type Precision = St::Precision;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
+        type Id = St::Id;
         type Maximum = St::Maximum;
         type Name = Set<members::name>;
-        type Id = St::Id;
-        type Precision = St::Precision;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Maximum = St::Maximum;
-        type Name = St::Name;
-        type Id = Set<members::id>;
         type Precision = St::Precision;
     }
     ///State transition - sets the `precision` field to Set
     pub struct SetPrecision<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPrecision<St> {}
     impl<St: State> State for SetPrecision<St> {
+        type Id = St::Id;
         type Maximum = St::Maximum;
         type Name = St::Name;
-        type Id = St::Id;
         type Precision = Set<members::precision>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `maximum` field
         pub struct maximum(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `precision` field
         pub struct precision(());
     }
@@ -1390,9 +1390,9 @@ where
 impl<St, S: BosStr> PercentageBuilder<St, S>
 where
     St: percentage_state::State,
+    St::Id: percentage_state::IsSet,
     St::Maximum: percentage_state::IsSet,
     St::Name: percentage_state::IsSet,
-    St::Id: percentage_state::IsSet,
     St::Precision: percentage_state::IsSet,
 {
     /// Build the final struct.
@@ -1594,37 +1594,37 @@ pub mod text_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Id;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Id = St::Id;
+        type Name = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type Name = St::Name;
         type Id = Set<members::id>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Id = St::Id;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -1712,8 +1712,8 @@ where
 impl<St, S: BosStr> TextBuilder<St, S>
 where
     St: text_state::State,
-    St::Name: text_state::IsSet,
     St::Id: text_state::IsSet,
+    St::Name: text_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Text<S> {

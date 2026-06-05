@@ -100,51 +100,51 @@ pub mod create_o_auth_client_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SliceUri;
         type ClientName;
         type RedirectUris;
+        type SliceUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SliceUri = Unset;
         type ClientName = Unset;
         type RedirectUris = Unset;
-    }
-    ///State transition - sets the `slice_uri` field to Set
-    pub struct SetSliceUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSliceUri<St> {}
-    impl<St: State> State for SetSliceUri<St> {
-        type SliceUri = Set<members::slice_uri>;
-        type ClientName = St::ClientName;
-        type RedirectUris = St::RedirectUris;
+        type SliceUri = Unset;
     }
     ///State transition - sets the `client_name` field to Set
     pub struct SetClientName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetClientName<St> {}
     impl<St: State> State for SetClientName<St> {
-        type SliceUri = St::SliceUri;
         type ClientName = Set<members::client_name>;
         type RedirectUris = St::RedirectUris;
+        type SliceUri = St::SliceUri;
     }
     ///State transition - sets the `redirect_uris` field to Set
     pub struct SetRedirectUris<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRedirectUris<St> {}
     impl<St: State> State for SetRedirectUris<St> {
-        type SliceUri = St::SliceUri;
         type ClientName = St::ClientName;
         type RedirectUris = Set<members::redirect_uris>;
+        type SliceUri = St::SliceUri;
+    }
+    ///State transition - sets the `slice_uri` field to Set
+    pub struct SetSliceUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSliceUri<St> {}
+    impl<St: State> State for SetSliceUri<St> {
+        type ClientName = St::ClientName;
+        type RedirectUris = St::RedirectUris;
+        type SliceUri = Set<members::slice_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slice_uri` field
-        pub struct slice_uri(());
         ///Marker type for the `client_name` field
         pub struct client_name(());
         ///Marker type for the `redirect_uris` field
         pub struct redirect_uris(());
+        ///Marker type for the `slice_uri` field
+        pub struct slice_uri(());
     }
 }
 
@@ -359,9 +359,9 @@ impl<St: create_o_auth_client_state::State, S: BosStr> CreateOAuthClientBuilder<
 impl<St, S: BosStr> CreateOAuthClientBuilder<St, S>
 where
     St: create_o_auth_client_state::State,
-    St::SliceUri: create_o_auth_client_state::IsSet,
     St::ClientName: create_o_auth_client_state::IsSet,
     St::RedirectUris: create_o_auth_client_state::IsSet,
+    St::SliceUri: create_o_auth_client_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CreateOAuthClient<S> {

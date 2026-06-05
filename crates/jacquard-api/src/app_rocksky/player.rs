@@ -39,37 +39,12 @@ pub struct CurrentlyPlayingViewDetailed<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
-pub struct PlaybackQueueViewDetailed<S: BosStr = DefaultStr> {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub tracks: Option<Vec<Data<S>>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
-    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
-}
-
 impl<S: BosStr> LexiconSchema for CurrentlyPlayingViewDetailed<S> {
     fn nsid() -> &'static str {
         "app.rocksky.player.defs"
     }
     fn def_name() -> &'static str {
         "currentlyPlayingViewDetailed"
-    }
-    fn lexicon_doc() -> LexiconDoc<'static> {
-        lexicon_doc_app_rocksky_player_defs()
-    }
-    fn validate(&self) -> Result<(), ConstraintError> {
-        Ok(())
-    }
-}
-
-impl<S: BosStr> LexiconSchema for PlaybackQueueViewDetailed<S> {
-    fn nsid() -> &'static str {
-        "app.rocksky.player.defs"
-    }
-    fn def_name() -> &'static str {
-        "playbackQueueViewDetailed"
     }
     fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_rocksky_player_defs()
@@ -103,29 +78,6 @@ fn lexicon_doc_app_rocksky_player_defs() -> LexiconDoc<'static> {
                                         "The title of the currently playing track",
                                     ),
                                 ),
-                                ..Default::default()
-                            }),
-                        );
-                        map
-                    },
-                    ..Default::default()
-                }),
-            );
-            map.insert(
-                SmolStr::new_static("playbackQueueViewDetailed"),
-                LexUserType::Object(LexObject {
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("tracks"),
-                            LexObjectProperty::Array(LexArray {
-                                items: LexArrayItem::Ref(LexRef {
-                                    r#ref: CowStr::new_static(
-                                        "app.rocksky.song.defs.songViewBasic",
-                                    ),
-                                    ..Default::default()
-                                }),
                                 ..Default::default()
                             }),
                         );

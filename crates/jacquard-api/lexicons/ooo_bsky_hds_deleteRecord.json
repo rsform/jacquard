@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.hds.deleteRecord",
+  "revision": 1,
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repo",
+            "collection",
+            "rkey"
+          ],
+          "properties": {
+            "collection": {
+              "type": "string",
+              "format": "nsid"
+            },
+            "repo": {
+              "type": "string",
+              "format": "at-identifier"
+            },
+            "rkey": {
+              "type": "string",
+              "format": "record-key"
+            },
+            "swapRecord": {
+              "type": "string",
+              "format": "cid"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidSwap"
+        }
+      ]
+    }
+  }
+}

@@ -4,6 +4,7 @@
   "defs": {
     "main": {
       "type": "query",
+      "description": "Returns a page of messages from a conversation.",
       "parameters": {
         "type": "params",
         "required": [
@@ -41,13 +42,27 @@
                 "type": "union",
                 "refs": [
                   "chat.bsky.convo.defs#messageView",
-                  "chat.bsky.convo.defs#deletedMessageView"
+                  "chat.bsky.convo.defs#deletedMessageView",
+                  "chat.bsky.convo.defs#systemMessageView"
                 ]
+              }
+            },
+            "relatedProfiles": {
+              "type": "array",
+              "description": "Set of all members who authored or reacted to the returned messages. Members referred to by system messages are also included.",
+              "items": {
+                "type": "ref",
+                "ref": "chat.bsky.actor.defs#profileViewBasic"
               }
             }
           }
         }
-      }
+      },
+      "errors": [
+        {
+          "name": "InvalidConvo"
+        }
+      ]
     }
   }
 }

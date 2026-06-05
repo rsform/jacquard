@@ -2,12 +2,31 @@
   "lexicon": 1,
   "id": "pub.leaflet.blocks.iframe",
   "defs": {
+    "aspectRatio": {
+      "type": "object",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer"
+        },
+        "width": {
+          "type": "integer"
+        }
+      }
+    },
     "main": {
       "type": "object",
       "required": [
         "url"
       ],
       "properties": {
+        "aspectRatio": {
+          "type": "ref",
+          "ref": "#aspectRatio"
+        },
         "height": {
           "type": "integer",
           "minimum": 16,

@@ -239,66 +239,66 @@ pub mod wiki_link_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Target;
         type LinkType;
         type Source;
+        type Target;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Target = Unset;
         type LinkType = Unset;
         type Source = Unset;
+        type Target = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type LinkType = St::LinkType;
+        type Source = St::Source;
         type Target = St::Target;
-        type LinkType = St::LinkType;
-        type Source = St::Source;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTarget<St> {}
-    impl<St: State> State for SetTarget<St> {
-        type CreatedAt = St::CreatedAt;
-        type Target = Set<members::target>;
-        type LinkType = St::LinkType;
-        type Source = St::Source;
     }
     ///State transition - sets the `link_type` field to Set
     pub struct SetLinkType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLinkType<St> {}
     impl<St: State> State for SetLinkType<St> {
         type CreatedAt = St::CreatedAt;
-        type Target = St::Target;
         type LinkType = Set<members::link_type>;
         type Source = St::Source;
+        type Target = St::Target;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSource<St> {}
     impl<St: State> State for SetSource<St> {
         type CreatedAt = St::CreatedAt;
-        type Target = St::Target;
         type LinkType = St::LinkType;
         type Source = Set<members::source>;
+        type Target = St::Target;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTarget<St> {}
+    impl<St: State> State for SetTarget<St> {
+        type CreatedAt = St::CreatedAt;
+        type LinkType = St::LinkType;
+        type Source = St::Source;
+        type Target = Set<members::target>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `target` field
-        pub struct target(());
         ///Marker type for the `link_type` field
         pub struct link_type(());
         ///Marker type for the `source` field
         pub struct source(());
+        ///Marker type for the `target` field
+        pub struct target(());
     }
 }
 
@@ -472,9 +472,9 @@ impl<St, S: BosStr> WikiLinkBuilder<St, S>
 where
     St: wiki_link_state::State,
     St::CreatedAt: wiki_link_state::IsSet,
-    St::Target: wiki_link_state::IsSet,
     St::LinkType: wiki_link_state::IsSet,
     St::Source: wiki_link_state::IsSet,
+    St::Target: wiki_link_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> WikiLink<S> {

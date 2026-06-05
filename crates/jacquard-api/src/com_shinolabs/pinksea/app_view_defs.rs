@@ -140,37 +140,37 @@ pub mod author_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHandle<St> {}
-    impl<St: State> State for SetHandle<St> {
-        type Handle = Set<members::handle>;
-        type Did = St::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Handle = St::Handle;
         type Did = Set<members::did>;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Did = St::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -258,8 +258,8 @@ where
 impl<St, S: BosStr> AuthorBuilder<St, S>
 where
     St: author_state::State,
-    St::Handle: author_state::IsSet,
     St::Did: author_state::IsSet,
+    St::Handle: author_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Author<S> {
@@ -464,104 +464,104 @@ pub mod hydrated_oekaki_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type At;
+        type Author;
+        type Cid;
+        type CreationTime;
         type Image;
         type Nsfw;
-        type Cid;
-        type Author;
-        type CreationTime;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type At = Unset;
+        type Author = Unset;
+        type Cid = Unset;
+        type CreationTime = Unset;
         type Image = Unset;
         type Nsfw = Unset;
-        type Cid = Unset;
-        type Author = Unset;
-        type CreationTime = Unset;
     }
     ///State transition - sets the `at` field to Set
     pub struct SetAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAt<St> {}
     impl<St: State> State for SetAt<St> {
         type At = Set<members::at>;
+        type Author = St::Author;
+        type Cid = St::Cid;
+        type CreationTime = St::CreationTime;
         type Image = St::Image;
         type Nsfw = St::Nsfw;
-        type Cid = St::Cid;
-        type Author = St::Author;
-        type CreationTime = St::CreationTime;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetImage<St> {}
-    impl<St: State> State for SetImage<St> {
-        type At = St::At;
-        type Image = Set<members::image>;
-        type Nsfw = St::Nsfw;
-        type Cid = St::Cid;
-        type Author = St::Author;
-        type CreationTime = St::CreationTime;
-    }
-    ///State transition - sets the `nsfw` field to Set
-    pub struct SetNsfw<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNsfw<St> {}
-    impl<St: State> State for SetNsfw<St> {
-        type At = St::At;
-        type Image = St::Image;
-        type Nsfw = Set<members::nsfw>;
-        type Cid = St::Cid;
-        type Author = St::Author;
-        type CreationTime = St::CreationTime;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type At = St::At;
-        type Image = St::Image;
-        type Nsfw = St::Nsfw;
-        type Cid = Set<members::cid>;
-        type Author = St::Author;
-        type CreationTime = St::CreationTime;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthor<St> {}
     impl<St: State> State for SetAuthor<St> {
         type At = St::At;
+        type Author = Set<members::author>;
+        type Cid = St::Cid;
+        type CreationTime = St::CreationTime;
         type Image = St::Image;
         type Nsfw = St::Nsfw;
-        type Cid = St::Cid;
-        type Author = Set<members::author>;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type At = St::At;
+        type Author = St::Author;
+        type Cid = Set<members::cid>;
         type CreationTime = St::CreationTime;
+        type Image = St::Image;
+        type Nsfw = St::Nsfw;
     }
     ///State transition - sets the `creation_time` field to Set
     pub struct SetCreationTime<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreationTime<St> {}
     impl<St: State> State for SetCreationTime<St> {
         type At = St::At;
+        type Author = St::Author;
+        type Cid = St::Cid;
+        type CreationTime = Set<members::creation_time>;
         type Image = St::Image;
         type Nsfw = St::Nsfw;
-        type Cid = St::Cid;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
+        type At = St::At;
         type Author = St::Author;
-        type CreationTime = Set<members::creation_time>;
+        type Cid = St::Cid;
+        type CreationTime = St::CreationTime;
+        type Image = Set<members::image>;
+        type Nsfw = St::Nsfw;
+    }
+    ///State transition - sets the `nsfw` field to Set
+    pub struct SetNsfw<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNsfw<St> {}
+    impl<St: State> State for SetNsfw<St> {
+        type At = St::At;
+        type Author = St::Author;
+        type Cid = St::Cid;
+        type CreationTime = St::CreationTime;
+        type Image = St::Image;
+        type Nsfw = Set<members::nsfw>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `at` field
         pub struct at(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `creation_time` field
+        pub struct creation_time(());
         ///Marker type for the `image` field
         pub struct image(());
         ///Marker type for the `nsfw` field
         pub struct nsfw(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `creation_time` field
-        pub struct creation_time(());
     }
 }
 
@@ -764,11 +764,11 @@ impl<St, S: BosStr> HydratedOekakiBuilder<St, S>
 where
     St: hydrated_oekaki_state::State,
     St::At: hydrated_oekaki_state::IsSet,
+    St::Author: hydrated_oekaki_state::IsSet,
+    St::Cid: hydrated_oekaki_state::IsSet,
+    St::CreationTime: hydrated_oekaki_state::IsSet,
     St::Image: hydrated_oekaki_state::IsSet,
     St::Nsfw: hydrated_oekaki_state::IsSet,
-    St::Cid: hydrated_oekaki_state::IsSet,
-    St::Author: hydrated_oekaki_state::IsSet,
-    St::CreationTime: hydrated_oekaki_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> HydratedOekaki<S> {

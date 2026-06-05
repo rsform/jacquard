@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.pipeline.listPipelinesBy",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "subject"
+        ],
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "order": {
+            "type": "string",
+            "description": "Sort direction by createdAt.",
+            "default": "desc",
+            "knownValues": [
+              "asc",
+              "desc"
+            ]
+          },
+          "subject": {
+            "type": "string",
+            "description": "Actor DID whose pipeline authorings to list.",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.tangled.pipeline.listPipelines#listItem"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

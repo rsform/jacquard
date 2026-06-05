@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "download.darkworld.content.markdown",
+  "defs": {
+    "imageRef": {
+      "type": "object",
+      "description": "blob keyed by ref in the body",
+      "required": [
+        "imageRef",
+        "blob"
+      ],
+      "properties": {
+        "blob": {
+          "type": "blob",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 5000000
+        },
+        "imageRef": {
+          "type": "string",
+          "description": "key used to reference the blob",
+          "maxLength": 512,
+          "maxGraphemes": 128
+        }
+      }
+    },
+    "markdown": {
+      "type": "object",
+      "description": "markdown for rendering in darkworld.download/blog",
+      "required": [
+        "body"
+      ],
+      "properties": {
+        "body": {
+          "type": "string",
+          "description": "markdown source ![alt](imageRef) to embed images",
+          "maxLength": 1000000
+        },
+        "images": {
+          "type": "array",
+          "description": "Images referenced in the body with ![alt](imageRef)",
+          "items": {
+            "type": "ref",
+            "ref": "#imageRef"
+          },
+          "maxLength": 128
+        }
+      }
+    }
+  }
+}

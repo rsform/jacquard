@@ -8,10 +8,6 @@
       "parameters": {
         "type": "params",
         "properties": {
-          "genre": {
-            "type": "string",
-            "description": "The genre to filter artists by"
-          },
           "limit": {
             "type": "integer",
             "description": "The maximum number of songs to return",

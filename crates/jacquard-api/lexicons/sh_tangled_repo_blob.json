@@ -54,7 +54,8 @@
           },
           "repo": {
             "type": "string",
-            "description": "Repository identifier in format 'did:plc:.../repoName'"
+            "description": "DID of the repository",
+            "format": "did"
           }
         }
       },
@@ -78,6 +79,9 @@
                 "utf-8",
                 "base64"
               ]
+            },
+            "fileTooLarge": {
+              "type": "boolean"
             },
             "isBinary": {
               "type": "boolean",

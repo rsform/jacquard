@@ -116,51 +116,51 @@ pub mod syndication_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
-        type CreatedAt;
         type Broadcaster;
+        type CreatedAt;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
-        type CreatedAt = Unset;
         type Broadcaster = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStreamer<St> {}
-    impl<St: State> State for SetStreamer<St> {
-        type Streamer = Set<members::streamer>;
-        type CreatedAt = St::CreatedAt;
-        type Broadcaster = St::Broadcaster;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Streamer = St::Streamer;
-        type CreatedAt = Set<members::created_at>;
-        type Broadcaster = St::Broadcaster;
+        type CreatedAt = Unset;
+        type Streamer = Unset;
     }
     ///State transition - sets the `broadcaster` field to Set
     pub struct SetBroadcaster<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBroadcaster<St> {}
     impl<St: State> State for SetBroadcaster<St> {
-        type Streamer = St::Streamer;
-        type CreatedAt = St::CreatedAt;
         type Broadcaster = Set<members::broadcaster>;
+        type CreatedAt = St::CreatedAt;
+        type Streamer = St::Streamer;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Broadcaster = St::Broadcaster;
+        type CreatedAt = Set<members::created_at>;
+        type Streamer = St::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStreamer<St> {}
+    impl<St: State> State for SetStreamer<St> {
+        type Broadcaster = St::Broadcaster;
+        type CreatedAt = St::CreatedAt;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `broadcaster` field
         pub struct broadcaster(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
@@ -267,9 +267,9 @@ where
 impl<St, S: BosStr> SyndicationBuilder<St, S>
 where
     St: syndication_state::State,
-    St::Streamer: syndication_state::IsSet,
-    St::CreatedAt: syndication_state::IsSet,
     St::Broadcaster: syndication_state::IsSet,
+    St::CreatedAt: syndication_state::IsSet,
+    St::Streamer: syndication_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Syndication<S> {

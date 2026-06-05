@@ -6,6 +6,8 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod comment;
+pub mod list_statuses;
+pub mod list_statuses_by;
 pub mod status;
 
 
@@ -46,14 +48,12 @@ pub struct Pull<S: BosStr = DefaultStr> {
     pub body: Option<S>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub mentions: Option<Vec<Did<S>>>,
-    ///(deprecated) use patchBlob instead
+    pub dependent_on: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub patch: Option<S>,
-    ///patch content
-    pub patch_blob: BlobRef<S>,
+    pub mentions: Option<Vec<Did<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub references: Option<Vec<AtUri<S>>>,
+    pub rounds: Vec<pull::Round<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<pull::Source<S>>,
     pub target: pull::Target<S>,
@@ -73,14 +73,24 @@ pub struct PullGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Pull<S>,
 }
 
+/// revisions of this pull request, newer rounds are appended to this array. appviews may reject records do not treat this field as append-only. the blob format is gzipped text-based git-format-patches.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct Round<S: BosStr = DefaultStr> {
+    pub created_at: Datetime,
+    pub patch_blob: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Source<S: BosStr = DefaultStr> {
     pub branch: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub repo: Option<AtUri<S>>,
-    pub sha: S,
+    pub repo: Option<Did<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -90,7 +100,7 @@ pub struct Source<S: BosStr = DefaultStr> {
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Target<S: BosStr = DefaultStr> {
     pub branch: S,
-    pub repo: AtUri<S>,
+    pub repo: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -139,11 +149,26 @@ impl<S: BosStr> LexiconSchema for Pull<S> {
         lexicon_doc_sh_tangled_repo_pull()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for Round<S> {
+    fn nsid() -> &'static str {
+        "sh.tangled.repo.pull"
+    }
+    fn def_name() -> &'static str {
+        "round"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_repo_pull()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.patch_blob;
             {
                 let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["text/x-patch"];
+                let accepted: &[&str] = &["application/gzip"];
                 let matched = accepted
                     .iter()
                     .any(|pattern| {
@@ -160,7 +185,7 @@ impl<S: BosStr> LexiconSchema for Pull<S> {
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("patch_blob"),
-                        accepted: vec!["text/x-patch".to_string()],
+                        accepted: vec!["application/gzip".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -181,28 +206,6 @@ impl<S: BosStr> LexiconSchema for Source<S> {
         lexicon_doc_sh_tangled_repo_pull()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
-        {
-            let value = &self.sha;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 40usize {
-                return Err(ConstraintError::MaxLength {
-                    path: ValidationPath::from_field("sha"),
-                    max: 40usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.sha;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 40usize {
-                return Err(ConstraintError::MinLength {
-                    path: ValidationPath::from_field("sha"),
-                    min: 40usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -233,66 +236,66 @@ pub mod pull_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Title;
-        type PatchBlob;
+        type Rounds;
         type Target;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Title = Unset;
-        type PatchBlob = Unset;
+        type Rounds = Unset;
         type Target = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Rounds = St::Rounds;
+        type Target = St::Target;
         type Title = St::Title;
-        type PatchBlob = St::PatchBlob;
-        type Target = St::Target;
     }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
+    ///State transition - sets the `rounds` field to Set
+    pub struct SetRounds<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRounds<St> {}
+    impl<St: State> State for SetRounds<St> {
         type CreatedAt = St::CreatedAt;
-        type Title = Set<members::title>;
-        type PatchBlob = St::PatchBlob;
+        type Rounds = Set<members::rounds>;
         type Target = St::Target;
-    }
-    ///State transition - sets the `patch_blob` field to Set
-    pub struct SetPatchBlob<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPatchBlob<St> {}
-    impl<St: State> State for SetPatchBlob<St> {
-        type CreatedAt = St::CreatedAt;
         type Title = St::Title;
-        type PatchBlob = Set<members::patch_blob>;
-        type Target = St::Target;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTarget<St> {}
     impl<St: State> State for SetTarget<St> {
         type CreatedAt = St::CreatedAt;
-        type Title = St::Title;
-        type PatchBlob = St::PatchBlob;
+        type Rounds = St::Rounds;
         type Target = Set<members::target>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type Rounds = St::Rounds;
+        type Target = St::Target;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `patch_blob` field
-        pub struct patch_blob(());
+        ///Marker type for the `rounds` field
+        pub struct rounds(());
         ///Marker type for the `target` field
         pub struct target(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -302,10 +305,10 @@ pub struct PullBuilder<St: pull_state::State, S: BosStr = DefaultStr> {
     _fields: (
         Option<S>,
         Option<Datetime>,
+        Option<AtUri<S>>,
         Option<Vec<Did<S>>>,
-        Option<S>,
-        Option<BlobRef<S>>,
         Option<Vec<AtUri<S>>>,
+        Option<Vec<pull::Round<S>>>,
         Option<pull::Source<S>>,
         Option<pull::Target<S>>,
         Option<S>,
@@ -382,27 +385,40 @@ where
 }
 
 impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
-    /// Set the `mentions` field (optional)
-    pub fn mentions(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
+    /// Set the `dependentOn` field (optional)
+    pub fn dependent_on(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
-    /// Set the `mentions` field to an Option value (optional)
-    pub fn maybe_mentions(mut self, value: Option<Vec<Did<S>>>) -> Self {
+    /// Set the `dependentOn` field to an Option value (optional)
+    pub fn maybe_dependent_on(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.2 = value;
         self
     }
 }
 
 impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
-    /// Set the `patch` field (optional)
-    pub fn patch(mut self, value: impl Into<Option<S>>) -> Self {
+    /// Set the `mentions` field (optional)
+    pub fn mentions(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
-    /// Set the `patch` field to an Option value (optional)
-    pub fn maybe_patch(mut self, value: Option<S>) -> Self {
+    /// Set the `mentions` field to an Option value (optional)
+    pub fn maybe_mentions(mut self, value: Option<Vec<Did<S>>>) -> Self {
         self._fields.3 = value;
+        self
+    }
+}
+
+impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
+    /// Set the `references` field (optional)
+    pub fn references(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `references` field to an Option value (optional)
+    pub fn maybe_references(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
+        self._fields.4 = value;
         self
     }
 }
@@ -410,32 +426,19 @@ impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
 impl<St, S: BosStr> PullBuilder<St, S>
 where
     St: pull_state::State,
-    St::PatchBlob: pull_state::IsUnset,
+    St::Rounds: pull_state::IsUnset,
 {
-    /// Set the `patchBlob` field (required)
-    pub fn patch_blob(
+    /// Set the `rounds` field (required)
+    pub fn rounds(
         mut self,
-        value: impl Into<BlobRef<S>>,
-    ) -> PullBuilder<pull_state::SetPatchBlob<St>, S> {
-        self._fields.4 = Option::Some(value.into());
+        value: impl Into<Vec<pull::Round<S>>>,
+    ) -> PullBuilder<pull_state::SetRounds<St>, S> {
+        self._fields.5 = Option::Some(value.into());
         PullBuilder {
             _state: PhantomData,
             _fields: self._fields,
             _type: PhantomData,
         }
-    }
-}
-
-impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
-    /// Set the `references` field (optional)
-    pub fn references(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
-        self._fields.5 = value.into();
-        self
-    }
-    /// Set the `references` field to an Option value (optional)
-    pub fn maybe_references(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
-        self._fields.5 = value;
-        self
     }
 }
 
@@ -494,19 +497,19 @@ impl<St, S: BosStr> PullBuilder<St, S>
 where
     St: pull_state::State,
     St::CreatedAt: pull_state::IsSet,
-    St::Title: pull_state::IsSet,
-    St::PatchBlob: pull_state::IsSet,
+    St::Rounds: pull_state::IsSet,
     St::Target: pull_state::IsSet,
+    St::Title: pull_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Pull<S> {
         Pull {
             body: self._fields.0,
             created_at: self._fields.1.unwrap(),
-            mentions: self._fields.2,
-            patch: self._fields.3,
-            patch_blob: self._fields.4.unwrap(),
-            references: self._fields.5,
+            dependent_on: self._fields.2,
+            mentions: self._fields.3,
+            references: self._fields.4,
+            rounds: self._fields.5.unwrap(),
             source: self._fields.6,
             target: self._fields.7.unwrap(),
             title: self._fields.8.unwrap(),
@@ -518,10 +521,10 @@ where
         Pull {
             body: self._fields.0,
             created_at: self._fields.1.unwrap(),
-            mentions: self._fields.2,
-            patch: self._fields.3,
-            patch_blob: self._fields.4.unwrap(),
-            references: self._fields.5,
+            dependent_on: self._fields.2,
+            mentions: self._fields.3,
+            references: self._fields.4,
+            rounds: self._fields.5.unwrap(),
             source: self._fields.6,
             target: self._fields.7.unwrap(),
             title: self._fields.8.unwrap(),
@@ -548,8 +551,8 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
                         required: Some(
                             vec![
                                 SmolStr::new_static("target"), SmolStr::new_static("title"),
-                                SmolStr::new_static("patchBlob"),
-                                SmolStr::new_static("createdAt")
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("rounds")
                             ],
                         ),
                         properties: {
@@ -569,6 +572,13 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
                                 }),
                             );
                             map.insert(
+                                SmolStr::new_static("dependentOn"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
                                 SmolStr::new_static("mentions"),
                                 LexObjectProperty::Array(LexArray {
                                     items: LexArrayItem::String(LexString {
@@ -579,23 +589,20 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
                                 }),
                             );
                             map.insert(
-                                SmolStr::new_static("patch"),
-                                LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("(deprecated) use patchBlob instead"),
-                                    ),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("patchBlob"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
-                            );
-                            map.insert(
                                 SmolStr::new_static("references"),
                                 LexObjectProperty::Array(LexArray {
                                     items: LexArrayItem::String(LexString {
                                         format: Some(LexStringFormat::AtUri),
+                                        ..Default::default()
+                                    }),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("rounds"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#round"),
                                         ..Default::default()
                                     }),
                                     ..Default::default()
@@ -629,11 +636,42 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
                 }),
             );
             map.insert(
+                SmolStr::new_static("round"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "revisions of this pull request, newer rounds are appended to this array. appviews may reject records do not treat this field as append-only. the blob format is gzipped text-based git-format-patches.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("patchBlob"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("patchBlob"),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
                 SmolStr::new_static("source"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("branch"), SmolStr::new_static("sha")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("branch")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -644,15 +682,7 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("repo"),
                             LexObjectProperty::String(LexString {
-                                format: Some(LexStringFormat::AtUri),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("sha"),
-                            LexObjectProperty::String(LexString {
-                                min_length: Some(40usize),
-                                max_length: Some(40usize),
+                                format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
                         );
@@ -677,7 +707,7 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("repo"),
                             LexObjectProperty::String(LexString {
-                                format: Some(LexStringFormat::AtUri),
+                                format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
                         );
@@ -689,6 +719,155 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
             map
         },
         ..Default::default()
+    }
+}
+
+pub mod round_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type PatchBlob;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type CreatedAt = Unset;
+        type PatchBlob = Unset;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
+        type PatchBlob = St::PatchBlob;
+    }
+    ///State transition - sets the `patch_blob` field to Set
+    pub struct SetPatchBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPatchBlob<St> {}
+    impl<St: State> State for SetPatchBlob<St> {
+        type CreatedAt = St::CreatedAt;
+        type PatchBlob = Set<members::patch_blob>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `patch_blob` field
+        pub struct patch_blob(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct RoundBuilder<St: round_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<Datetime>, Option<BlobRef<S>>),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl Round<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RoundBuilder<round_state::Empty, DefaultStr> {
+        RoundBuilder::new()
+    }
+}
+
+impl<S: BosStr> Round<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RoundBuilder<round_state::Empty, S> {
+        RoundBuilder::builder()
+    }
+}
+
+impl RoundBuilder<round_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        RoundBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> RoundBuilder<round_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RoundBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RoundBuilder<St, S>
+where
+    St: round_state::State,
+    St::CreatedAt: round_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> RoundBuilder<round_state::SetCreatedAt<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        RoundBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RoundBuilder<St, S>
+where
+    St: round_state::State,
+    St::PatchBlob: round_state::IsUnset,
+{
+    /// Set the `patchBlob` field (required)
+    pub fn patch_blob(
+        mut self,
+        value: impl Into<BlobRef<S>>,
+    ) -> RoundBuilder<round_state::SetPatchBlob<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        RoundBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RoundBuilder<St, S>
+where
+    St: round_state::State,
+    St::CreatedAt: round_state::IsSet,
+    St::PatchBlob: round_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> Round<S> {
+        Round {
+            created_at: self._fields.0.unwrap(),
+            patch_blob: self._fields.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Round<S> {
+        Round {
+            created_at: self._fields.0.unwrap(),
+            patch_blob: self._fields.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
     }
 }
 
@@ -739,7 +918,7 @@ pub mod target_state {
 /// Builder for constructing an instance of this type.
 pub struct TargetBuilder<St: target_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<AtUri<S>>),
+    _fields: (Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -806,7 +985,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<S>>,
+        value: impl Into<Did<S>>,
     ) -> TargetBuilder<target_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TargetBuilder {

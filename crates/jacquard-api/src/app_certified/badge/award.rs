@@ -156,51 +156,51 @@ pub mod award_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Badge;
         type CreatedAt;
         type Subject;
-        type Badge;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Badge = Unset;
         type CreatedAt = Unset;
         type Subject = Unset;
-        type Badge = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = St::Subject;
-        type Badge = St::Badge;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type CreatedAt = St::CreatedAt;
-        type Subject = Set<members::subject>;
-        type Badge = St::Badge;
     }
     ///State transition - sets the `badge` field to Set
     pub struct SetBadge<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBadge<St> {}
     impl<St: State> State for SetBadge<St> {
+        type Badge = Set<members::badge>;
         type CreatedAt = St::CreatedAt;
         type Subject = St::Subject;
-        type Badge = Set<members::badge>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Badge = St::Badge;
+        type CreatedAt = Set<members::created_at>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Badge = St::Badge;
+        type CreatedAt = St::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `badge` field
+        pub struct badge(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `badge` field
-        pub struct badge(());
     }
 }
 
@@ -339,9 +339,9 @@ impl<St: award_state::State, S: BosStr> AwardBuilder<St, S> {
 impl<St, S: BosStr> AwardBuilder<St, S>
 where
     St: award_state::State,
+    St::Badge: award_state::IsSet,
     St::CreatedAt: award_state::IsSet,
     St::Subject: award_state::IsSet,
-    St::Badge: award_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Award<S> {

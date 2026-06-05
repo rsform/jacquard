@@ -1,0 +1,25 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.hds.deleteAccount",
+  "revision": 1,
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repo"
+          ],
+          "properties": {
+            "repo": {
+              "type": "string",
+              "format": "at-identifier"
+            }
+          }
+        }
+      }
+    }
+  }
+}

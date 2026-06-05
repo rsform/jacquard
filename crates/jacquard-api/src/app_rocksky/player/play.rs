@@ -10,19 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
-pub struct PlayParams<S: BosStr = DefaultStr> {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub player_id: Option<S>,
-}
-
 /// XRPC request marker type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
@@ -53,91 +45,4 @@ impl jacquard_common::xrpc::XrpcEndpoint for PlayRequest {
     );
     type Request<S: BosStr> = Play;
     type Response = PlayResponse;
-}
-
-pub mod play_params_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {}
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {}
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {}
-}
-
-/// Builder for constructing an instance of this type.
-pub struct PlayParamsBuilder<St: play_params_state::State, S: BosStr = DefaultStr> {
-    _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>,),
-    _type: PhantomData<fn() -> S>,
-}
-
-impl PlayParams<DefaultStr> {
-    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> PlayParamsBuilder<play_params_state::Empty, DefaultStr> {
-        PlayParamsBuilder::new()
-    }
-}
-
-impl<S: BosStr> PlayParams<S> {
-    /// Create a new builder for this type
-    pub fn builder() -> PlayParamsBuilder<play_params_state::Empty, S> {
-        PlayParamsBuilder::builder()
-    }
-}
-
-impl PlayParamsBuilder<play_params_state::Empty, DefaultStr> {
-    /// Create a new builder with all fields unset, using the default string type, if needed
-    pub fn new() -> Self {
-        PlayParamsBuilder {
-            _state: PhantomData,
-            _fields: (None,),
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<S: BosStr> PlayParamsBuilder<play_params_state::Empty, S> {
-    /// Create a new builder with all fields unset
-    pub fn builder() -> Self {
-        PlayParamsBuilder {
-            _state: PhantomData,
-            _fields: (None,),
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St: play_params_state::State, S: BosStr> PlayParamsBuilder<St, S> {
-    /// Set the `playerId` field (optional)
-    pub fn player_id(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.0 = value.into();
-        self
-    }
-    /// Set the `playerId` field to an Option value (optional)
-    pub fn maybe_player_id(mut self, value: Option<S>) -> Self {
-        self._fields.0 = value;
-        self
-    }
-}
-
-impl<St, S: BosStr> PlayParamsBuilder<St, S>
-where
-    St: play_params_state::State,
-{
-    /// Build the final struct.
-    pub fn build(self) -> PlayParams<S> {
-        PlayParams {
-            player_id: self._fields.0,
-        }
-    }
 }

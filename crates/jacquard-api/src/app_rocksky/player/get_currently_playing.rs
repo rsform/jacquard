@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -23,8 +23,6 @@ use crate::app_rocksky::player::CurrentlyPlayingViewDetailed;
 pub struct GetCurrentlyPlaying<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor: Option<AtIdentifier<S>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub player_id: Option<S>,
 }
 
 
@@ -86,7 +84,7 @@ pub struct GetCurrentlyPlayingBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<AtIdentifier<S>>, Option<S>),
+    _fields: (Option<AtIdentifier<S>>,),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -115,7 +113,7 @@ impl GetCurrentlyPlayingBuilder<get_currently_playing_state::Empty, DefaultStr> 
     pub fn new() -> Self {
         GetCurrentlyPlayingBuilder {
             _state: PhantomData,
-            _fields: (None, None),
+            _fields: (None,),
             _type: PhantomData,
         }
     }
@@ -126,7 +124,7 @@ impl<S: BosStr> GetCurrentlyPlayingBuilder<get_currently_playing_state::Empty, S
     pub fn builder() -> Self {
         GetCurrentlyPlayingBuilder {
             _state: PhantomData,
-            _fields: (None, None),
+            _fields: (None,),
             _type: PhantomData,
         }
     }
@@ -148,22 +146,6 @@ impl<
     }
 }
 
-impl<
-    St: get_currently_playing_state::State,
-    S: BosStr,
-> GetCurrentlyPlayingBuilder<St, S> {
-    /// Set the `playerId` field (optional)
-    pub fn player_id(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.1 = value.into();
-        self
-    }
-    /// Set the `playerId` field to an Option value (optional)
-    pub fn maybe_player_id(mut self, value: Option<S>) -> Self {
-        self._fields.1 = value;
-        self
-    }
-}
-
 impl<St, S: BosStr> GetCurrentlyPlayingBuilder<St, S>
 where
     St: get_currently_playing_state::State,
@@ -172,7 +154,6 @@ where
     pub fn build(self) -> GetCurrentlyPlaying<S> {
         GetCurrentlyPlaying {
             actor: self._fields.0,
-            player_id: self._fields.1,
         }
     }
 }

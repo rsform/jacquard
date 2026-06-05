@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "chat.bsky.group.createJoinLink",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. Creates a join link for the group convo.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "convoId",
+            "joinRule"
+          ],
+          "properties": {
+            "convoId": {
+              "type": "string"
+            },
+            "joinRule": {
+              "type": "ref",
+              "ref": "chat.bsky.group.defs#joinRule"
+            },
+            "requireApproval": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "joinLink"
+          ],
+          "properties": {
+            "joinLink": {
+              "type": "ref",
+              "ref": "chat.bsky.group.defs#joinLinkView"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "EnabledJoinLinkAlreadyExists"
+        },
+        {
+          "name": "InvalidConvo"
+        },
+        {
+          "name": "InsufficientRole"
+        }
+      ]
+    }
+  }
+}

@@ -117,51 +117,51 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Votes;
-        type Sim;
         type CreatedAt;
+        type Sim;
+        type Votes;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Votes = Unset;
-        type Sim = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `votes` field to Set
-    pub struct SetVotes<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVotes<St> {}
-    impl<St: State> State for SetVotes<St> {
-        type Votes = Set<members::votes>;
-        type Sim = St::Sim;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `sim` field to Set
-    pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSim<St> {}
-    impl<St: State> State for SetSim<St> {
-        type Votes = St::Votes;
-        type Sim = Set<members::sim>;
-        type CreatedAt = St::CreatedAt;
+        type Sim = Unset;
+        type Votes = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Votes = St::Votes;
-        type Sim = St::Sim;
         type CreatedAt = Set<members::created_at>;
+        type Sim = St::Sim;
+        type Votes = St::Votes;
+    }
+    ///State transition - sets the `sim` field to Set
+    pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSim<St> {}
+    impl<St: State> State for SetSim<St> {
+        type CreatedAt = St::CreatedAt;
+        type Sim = Set<members::sim>;
+        type Votes = St::Votes;
+    }
+    ///State transition - sets the `votes` field to Set
+    pub struct SetVotes<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVotes<St> {}
+    impl<St: State> State for SetVotes<St> {
+        type CreatedAt = St::CreatedAt;
+        type Sim = St::Sim;
+        type Votes = Set<members::votes>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `votes` field
-        pub struct votes(());
-        ///Marker type for the `sim` field
-        pub struct sim(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `sim` field
+        pub struct sim(());
+        ///Marker type for the `votes` field
+        pub struct votes(());
     }
 }
 
@@ -268,9 +268,9 @@ where
 impl<St, S: BosStr> VoteBuilder<St, S>
 where
     St: vote_state::State,
-    St::Votes: vote_state::IsSet,
-    St::Sim: vote_state::IsSet,
     St::CreatedAt: vote_state::IsSet,
+    St::Sim: vote_state::IsSet,
+    St::Votes: vote_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Vote<S> {

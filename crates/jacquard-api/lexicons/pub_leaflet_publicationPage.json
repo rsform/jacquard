@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "pub.leaflet.publicationPage",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A static page belonging to a publication (e.g. about / contact). The rkey is derived from the page path slug.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "publication",
+          "path",
+          "content"
+        ],
+        "properties": {
+          "content": {
+            "type": "ref",
+            "ref": "pub.leaflet.content"
+          },
+          "path": {
+            "type": "string"
+          },
+          "publication": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        }
+      }
+    }
+  }
+}

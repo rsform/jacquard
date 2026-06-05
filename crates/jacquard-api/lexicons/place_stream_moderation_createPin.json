@@ -1,0 +1,73 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.moderation.createPin",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Pin a chat message on behalf of a streamer. Requires 'message.pin' permission. Creates a place.stream.chat.pinnedRecord in the streamer's repo, replacing any existing pin.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "streamer",
+            "messageUri"
+          ],
+          "properties": {
+            "expiresAt": {
+              "type": "string",
+              "description": "Optional expiration time for this pin.",
+              "format": "datetime"
+            },
+            "messageUri": {
+              "type": "string",
+              "description": "The AT-URI of the chat message to pin.",
+              "format": "at-uri"
+            },
+            "streamer": {
+              "type": "string",
+              "description": "The DID of the streamer.",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "The CID of the created pinned record.",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "description": "The AT-URI of the created pinned record.",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "The request lacks valid authentication credentials.",
+          "name": "Unauthorized"
+        },
+        {
+          "description": "The caller does not have permission to pin messages for this streamer.",
+          "name": "Forbidden"
+        },
+        {
+          "description": "The streamer's OAuth session could not be found or is invalid.",
+          "name": "SessionNotFound"
+        }
+      ]
+    }
+  }
+}

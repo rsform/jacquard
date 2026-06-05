@@ -563,105 +563,105 @@ pub mod lens_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PutterCode;
-        type Name;
-        type TargetSchema;
         type CreatedAt;
-        type SourceSchema;
         type GetterCode;
+        type Name;
+        type PutterCode;
+        type SourceSchema;
+        type TargetSchema;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PutterCode = Unset;
-        type Name = Unset;
-        type TargetSchema = Unset;
         type CreatedAt = Unset;
-        type SourceSchema = Unset;
         type GetterCode = Unset;
-    }
-    ///State transition - sets the `putter_code` field to Set
-    pub struct SetPutterCode<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPutterCode<St> {}
-    impl<St: State> State for SetPutterCode<St> {
-        type PutterCode = Set<members::putter_code>;
-        type Name = St::Name;
-        type TargetSchema = St::TargetSchema;
-        type CreatedAt = St::CreatedAt;
-        type SourceSchema = St::SourceSchema;
-        type GetterCode = St::GetterCode;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type PutterCode = St::PutterCode;
-        type Name = Set<members::name>;
-        type TargetSchema = St::TargetSchema;
-        type CreatedAt = St::CreatedAt;
-        type SourceSchema = St::SourceSchema;
-        type GetterCode = St::GetterCode;
-    }
-    ///State transition - sets the `target_schema` field to Set
-    pub struct SetTargetSchema<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTargetSchema<St> {}
-    impl<St: State> State for SetTargetSchema<St> {
-        type PutterCode = St::PutterCode;
-        type Name = St::Name;
-        type TargetSchema = Set<members::target_schema>;
-        type CreatedAt = St::CreatedAt;
-        type SourceSchema = St::SourceSchema;
-        type GetterCode = St::GetterCode;
+        type Name = Unset;
+        type PutterCode = Unset;
+        type SourceSchema = Unset;
+        type TargetSchema = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type PutterCode = St::PutterCode;
-        type Name = St::Name;
-        type TargetSchema = St::TargetSchema;
         type CreatedAt = Set<members::created_at>;
-        type SourceSchema = St::SourceSchema;
         type GetterCode = St::GetterCode;
-    }
-    ///State transition - sets the `source_schema` field to Set
-    pub struct SetSourceSchema<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSourceSchema<St> {}
-    impl<St: State> State for SetSourceSchema<St> {
-        type PutterCode = St::PutterCode;
         type Name = St::Name;
+        type PutterCode = St::PutterCode;
+        type SourceSchema = St::SourceSchema;
         type TargetSchema = St::TargetSchema;
-        type CreatedAt = St::CreatedAt;
-        type SourceSchema = Set<members::source_schema>;
-        type GetterCode = St::GetterCode;
     }
     ///State transition - sets the `getter_code` field to Set
     pub struct SetGetterCode<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGetterCode<St> {}
     impl<St: State> State for SetGetterCode<St> {
-        type PutterCode = St::PutterCode;
-        type Name = St::Name;
-        type TargetSchema = St::TargetSchema;
         type CreatedAt = St::CreatedAt;
-        type SourceSchema = St::SourceSchema;
         type GetterCode = Set<members::getter_code>;
+        type Name = St::Name;
+        type PutterCode = St::PutterCode;
+        type SourceSchema = St::SourceSchema;
+        type TargetSchema = St::TargetSchema;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type GetterCode = St::GetterCode;
+        type Name = Set<members::name>;
+        type PutterCode = St::PutterCode;
+        type SourceSchema = St::SourceSchema;
+        type TargetSchema = St::TargetSchema;
+    }
+    ///State transition - sets the `putter_code` field to Set
+    pub struct SetPutterCode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPutterCode<St> {}
+    impl<St: State> State for SetPutterCode<St> {
+        type CreatedAt = St::CreatedAt;
+        type GetterCode = St::GetterCode;
+        type Name = St::Name;
+        type PutterCode = Set<members::putter_code>;
+        type SourceSchema = St::SourceSchema;
+        type TargetSchema = St::TargetSchema;
+    }
+    ///State transition - sets the `source_schema` field to Set
+    pub struct SetSourceSchema<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSourceSchema<St> {}
+    impl<St: State> State for SetSourceSchema<St> {
+        type CreatedAt = St::CreatedAt;
+        type GetterCode = St::GetterCode;
+        type Name = St::Name;
+        type PutterCode = St::PutterCode;
+        type SourceSchema = Set<members::source_schema>;
+        type TargetSchema = St::TargetSchema;
+    }
+    ///State transition - sets the `target_schema` field to Set
+    pub struct SetTargetSchema<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTargetSchema<St> {}
+    impl<St: State> State for SetTargetSchema<St> {
+        type CreatedAt = St::CreatedAt;
+        type GetterCode = St::GetterCode;
+        type Name = St::Name;
+        type PutterCode = St::PutterCode;
+        type SourceSchema = St::SourceSchema;
+        type TargetSchema = Set<members::target_schema>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `putter_code` field
-        pub struct putter_code(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `target_schema` field
-        pub struct target_schema(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `source_schema` field
-        pub struct source_schema(());
         ///Marker type for the `getter_code` field
         pub struct getter_code(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `putter_code` field
+        pub struct putter_code(());
+        ///Marker type for the `source_schema` field
+        pub struct source_schema(());
+        ///Marker type for the `target_schema` field
+        pub struct target_schema(());
     }
 }
 
@@ -902,12 +902,12 @@ impl<St: lens_state::State, S: BosStr> LensBuilder<St, S> {
 impl<St, S: BosStr> LensBuilder<St, S>
 where
     St: lens_state::State,
-    St::PutterCode: lens_state::IsSet,
-    St::Name: lens_state::IsSet,
-    St::TargetSchema: lens_state::IsSet,
     St::CreatedAt: lens_state::IsSet,
-    St::SourceSchema: lens_state::IsSet,
     St::GetterCode: lens_state::IsSet,
+    St::Name: lens_state::IsSet,
+    St::PutterCode: lens_state::IsSet,
+    St::SourceSchema: lens_state::IsSet,
+    St::TargetSchema: lens_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Lens<S> {

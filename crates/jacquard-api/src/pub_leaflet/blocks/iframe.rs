@@ -24,15 +24,43 @@ use jacquard_lexicon::schema::LexiconSchema;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
+use crate::pub_leaflet::blocks::iframe;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct AspectRatio<S: BosStr = DefaultStr> {
+    pub height: i64,
+    pub width: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Iframe<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub aspect_ratio: Option<iframe::AspectRatio<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
     pub url: UriValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+impl<S: BosStr> LexiconSchema for AspectRatio<S> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.blocks.iframe"
+    }
+    fn def_name() -> &'static str {
+        "aspectRatio"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_blocks_iframe()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
 }
 
 impl<S: BosStr> LexiconSchema for Iframe<S> {
@@ -65,6 +93,234 @@ impl<S: BosStr> LexiconSchema for Iframe<S> {
             }
         }
         Ok(())
+    }
+}
+
+pub mod aspect_ratio_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Height;
+        type Width;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Height = Unset;
+        type Width = Unset;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeight<St> {}
+    impl<St: State> State for SetHeight<St> {
+        type Height = Set<members::height>;
+        type Width = St::Width;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWidth<St> {}
+    impl<St: State> State for SetWidth<St> {
+        type Height = St::Height;
+        type Width = Set<members::width>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `height` field
+        pub struct height(());
+        ///Marker type for the `width` field
+        pub struct width(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct AspectRatioBuilder<St: aspect_ratio_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<i64>, Option<i64>),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl AspectRatio<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AspectRatioBuilder<aspect_ratio_state::Empty, DefaultStr> {
+        AspectRatioBuilder::new()
+    }
+}
+
+impl<S: BosStr> AspectRatio<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AspectRatioBuilder<aspect_ratio_state::Empty, S> {
+        AspectRatioBuilder::builder()
+    }
+}
+
+impl AspectRatioBuilder<aspect_ratio_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        AspectRatioBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> AspectRatioBuilder<aspect_ratio_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AspectRatioBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
+where
+    St: aspect_ratio_state::State,
+    St::Height: aspect_ratio_state::IsUnset,
+{
+    /// Set the `height` field (required)
+    pub fn height(
+        mut self,
+        value: impl Into<i64>,
+    ) -> AspectRatioBuilder<aspect_ratio_state::SetHeight<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        AspectRatioBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
+where
+    St: aspect_ratio_state::State,
+    St::Width: aspect_ratio_state::IsUnset,
+{
+    /// Set the `width` field (required)
+    pub fn width(
+        mut self,
+        value: impl Into<i64>,
+    ) -> AspectRatioBuilder<aspect_ratio_state::SetWidth<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        AspectRatioBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
+where
+    St: aspect_ratio_state::State,
+    St::Height: aspect_ratio_state::IsSet,
+    St::Width: aspect_ratio_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> AspectRatio<S> {
+        AspectRatio {
+            height: self._fields.0.unwrap(),
+            width: self._fields.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AspectRatio<S> {
+        AspectRatio {
+            height: self._fields.0.unwrap(),
+            width: self._fields.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+fn lexicon_doc_pub_leaflet_blocks_iframe() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("pub.leaflet.blocks.iframe"),
+        defs: {
+            let mut map = BTreeMap::new();
+            map.insert(
+                SmolStr::new_static("aspectRatio"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("height"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("width"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("main"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("url")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("aspectRatio"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#aspectRatio"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("height"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(16i64),
+                                maximum: Some(1600i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map
+        },
+        ..Default::default()
     }
 }
 
@@ -103,7 +359,7 @@ pub mod iframe_state {
 /// Builder for constructing an instance of this type.
 pub struct IframeBuilder<St: iframe_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<i64>, Option<UriValue<S>>),
+    _fields: (Option<iframe::AspectRatio<S>>, Option<i64>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -126,7 +382,7 @@ impl IframeBuilder<iframe_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         IframeBuilder {
             _state: PhantomData,
-            _fields: (None, None),
+            _fields: (None, None, None),
             _type: PhantomData,
         }
     }
@@ -137,21 +393,37 @@ impl<S: BosStr> IframeBuilder<iframe_state::Empty, S> {
     pub fn builder() -> Self {
         IframeBuilder {
             _state: PhantomData,
-            _fields: (None, None),
+            _fields: (None, None, None),
             _type: PhantomData,
         }
     }
 }
 
 impl<St: iframe_state::State, S: BosStr> IframeBuilder<St, S> {
+    /// Set the `aspectRatio` field (optional)
+    pub fn aspect_ratio(
+        mut self,
+        value: impl Into<Option<iframe::AspectRatio<S>>>,
+    ) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `aspectRatio` field to an Option value (optional)
+    pub fn maybe_aspect_ratio(mut self, value: Option<iframe::AspectRatio<S>>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St: iframe_state::State, S: BosStr> IframeBuilder<St, S> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.0 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `height` field to an Option value (optional)
     pub fn maybe_height(mut self, value: Option<i64>) -> Self {
-        self._fields.0 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -166,7 +438,7 @@ where
         mut self,
         value: impl Into<UriValue<S>>,
     ) -> IframeBuilder<iframe_state::SetUrl<St>, S> {
-        self._fields.1 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         IframeBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -183,60 +455,19 @@ where
     /// Build the final struct.
     pub fn build(self) -> Iframe<S> {
         Iframe {
-            height: self._fields.0,
-            url: self._fields.1.unwrap(),
+            aspect_ratio: self._fields.0,
+            height: self._fields.1,
+            url: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Iframe<S> {
         Iframe {
-            height: self._fields.0,
-            url: self._fields.1.unwrap(),
+            aspect_ratio: self._fields.0,
+            height: self._fields.1,
+            url: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-fn lexicon_doc_pub_leaflet_blocks_iframe() -> LexiconDoc<'static> {
-    #[allow(unused_imports)]
-    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
-    use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
-    LexiconDoc {
-        lexicon: Lexicon::Lexicon1,
-        id: CowStr::new_static("pub.leaflet.blocks.iframe"),
-        defs: {
-            let mut map = BTreeMap::new();
-            map.insert(
-                SmolStr::new_static("main"),
-                LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("url")]),
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("height"),
-                            LexObjectProperty::Integer(LexInteger {
-                                minimum: Some(16i64),
-                                maximum: Some(1600i64),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("url"),
-                            LexObjectProperty::String(LexString {
-                                format: Some(LexStringFormat::Uri),
-                                ..Default::default()
-                            }),
-                        );
-                        map
-                    },
-                    ..Default::default()
-                }),
-            );
-            map
-        },
-        ..Default::default()
     }
 }

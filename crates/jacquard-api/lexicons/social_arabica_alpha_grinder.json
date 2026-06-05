@@ -1,0 +1,67 @@
+{
+  "lexicon": 1,
+  "id": "social.arabica.alpha.grinder",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A coffee grinder used for grinding beans",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "burrType": {
+            "type": "string",
+            "description": "Type of burr (empty string for unknown)",
+            "maxLength": 20,
+            "enum": [
+              "conical",
+              "flat",
+              "blade",
+              ""
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the grinder record was created",
+            "format": "datetime"
+          },
+          "grinderType": {
+            "type": "string",
+            "description": "Type of grinder mechanism",
+            "maxLength": 20,
+            "enum": [
+              "hand",
+              "electric",
+              "portable_electric"
+            ]
+          },
+          "link": {
+            "type": "string",
+            "description": "Optional product, manual, or information URL for the grinder",
+            "format": "uri",
+            "maxLength": 500
+          },
+          "name": {
+            "type": "string",
+            "description": "Name or model of the grinder (e.g., 'Baratza Encore', '1Zpresso JX')",
+            "maxLength": 200
+          },
+          "notes": {
+            "type": "string",
+            "description": "Additional notes about the grinder",
+            "maxLength": 1000
+          },
+          "sourceRef": {
+            "type": "string",
+            "description": "AT-URI of the record this entity was sourced from",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

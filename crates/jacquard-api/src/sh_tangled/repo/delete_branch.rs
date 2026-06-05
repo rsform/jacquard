@@ -64,37 +64,37 @@ pub mod delete_branch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Branch;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Branch = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Repo = Set<members::repo>;
-        type Branch = St::Branch;
+        type Repo = Unset;
     }
     ///State transition - sets the `branch` field to Set
     pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBranch<St> {}
     impl<St: State> State for SetBranch<St> {
-        type Repo = St::Repo;
         type Branch = Set<members::branch>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Branch = St::Branch;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `branch` field
         pub struct branch(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -182,8 +182,8 @@ where
 impl<St, S: BosStr> DeleteBranchBuilder<St, S>
 where
     St: delete_branch_state::State,
-    St::Repo: delete_branch_state::IsSet,
     St::Branch: delete_branch_state::IsSet,
+    St::Repo: delete_branch_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DeleteBranch<S> {

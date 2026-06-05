@@ -74,50 +74,50 @@ pub mod identity_info_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
-        type Handle;
         type DidDoc;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
-        type Handle = Unset;
         type DidDoc = Unset;
+        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
+        type DidDoc = St::DidDoc;
         type Handle = St::Handle;
-        type DidDoc = St::DidDoc;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHandle<St> {}
-    impl<St: State> State for SetHandle<St> {
-        type Did = St::Did;
-        type Handle = Set<members::handle>;
-        type DidDoc = St::DidDoc;
     }
     ///State transition - sets the `did_doc` field to Set
     pub struct SetDidDoc<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDidDoc<St> {}
     impl<St: State> State for SetDidDoc<St> {
         type Did = St::Did;
-        type Handle = St::Handle;
         type DidDoc = Set<members::did_doc>;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Did = St::Did;
+        type DidDoc = St::DidDoc;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did_doc` field
         pub struct did_doc(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -225,8 +225,8 @@ impl<St, S: BosStr> IdentityInfoBuilder<St, S>
 where
     St: identity_info_state::State,
     St::Did: identity_info_state::IsSet,
-    St::Handle: identity_info_state::IsSet,
     St::DidDoc: identity_info_state::IsSet,
+    St::Handle: identity_info_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> IdentityInfo<S> {

@@ -4,3 +4,5 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod authfetch;
+pub mod hds;
+pub mod hidden;

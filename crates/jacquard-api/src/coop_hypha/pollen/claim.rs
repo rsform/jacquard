@@ -30,6 +30,7 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::coop_hypha::pollen::embed::text::Text;
+use crate::ing_dasl::pfp_ref::PfpRef;
 /// A provenance claim linking a perceptual fingerprint (PFP) to a blob.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -46,7 +47,7 @@ pub struct Claim<S: BosStr = DefaultStr> {
     pub content: Text<S>,
     ///Timestamp when this claim was created.
     pub created_at: Datetime,
-    pub pfp: Data<S>,
+    pub pfp: PfpRef<S>,
     ///Ref to the source record containing the blob.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<StrongRef<S>>,
@@ -125,8 +126,8 @@ pub mod claim_state {
     pub trait State: sealed::Sealed {
         type Cid;
         type Content;
-        type Pfp;
         type CreatedAt;
+        type Pfp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -134,8 +135,8 @@ pub mod claim_state {
     impl State for Empty {
         type Cid = Unset;
         type Content = Unset;
-        type Pfp = Unset;
         type CreatedAt = Unset;
+        type Pfp = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
@@ -143,8 +144,8 @@ pub mod claim_state {
     impl<St: State> State for SetCid<St> {
         type Cid = Set<members::cid>;
         type Content = St::Content;
-        type Pfp = St::Pfp;
         type CreatedAt = St::CreatedAt;
+        type Pfp = St::Pfp;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
@@ -152,17 +153,8 @@ pub mod claim_state {
     impl<St: State> State for SetContent<St> {
         type Cid = St::Cid;
         type Content = Set<members::content>;
+        type CreatedAt = St::CreatedAt;
         type Pfp = St::Pfp;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `pfp` field to Set
-    pub struct SetPfp<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPfp<St> {}
-    impl<St: State> State for SetPfp<St> {
-        type Cid = St::Cid;
-        type Content = St::Content;
-        type Pfp = Set<members::pfp>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
@@ -170,8 +162,17 @@ pub mod claim_state {
     impl<St: State> State for SetCreatedAt<St> {
         type Cid = St::Cid;
         type Content = St::Content;
-        type Pfp = St::Pfp;
         type CreatedAt = Set<members::created_at>;
+        type Pfp = St::Pfp;
+    }
+    ///State transition - sets the `pfp` field to Set
+    pub struct SetPfp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPfp<St> {}
+    impl<St: State> State for SetPfp<St> {
+        type Cid = St::Cid;
+        type Content = St::Content;
+        type CreatedAt = St::CreatedAt;
+        type Pfp = Set<members::pfp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -180,10 +181,10 @@ pub mod claim_state {
         pub struct cid(());
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `pfp` field
-        pub struct pfp(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `pfp` field
+        pub struct pfp(());
     }
 }
 
@@ -194,7 +195,7 @@ pub struct ClaimBuilder<St: claim_state::State, S: BosStr = DefaultStr> {
         Option<CidLink<S>>,
         Option<Text<S>>,
         Option<Datetime>,
-        Option<Data<S>>,
+        Option<PfpRef<S>>,
         Option<StrongRef<S>>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -301,7 +302,7 @@ where
     /// Set the `pfp` field (required)
     pub fn pfp(
         mut self,
-        value: impl Into<Data<S>>,
+        value: impl Into<PfpRef<S>>,
     ) -> ClaimBuilder<claim_state::SetPfp<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ClaimBuilder {
@@ -330,8 +331,8 @@ where
     St: claim_state::State,
     St::Cid: claim_state::IsSet,
     St::Content: claim_state::IsSet,
-    St::Pfp: claim_state::IsSet,
     St::CreatedAt: claim_state::IsSet,
+    St::Pfp: claim_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Claim<S> {

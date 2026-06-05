@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.removeCollaborator",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Remove a collaborator from a repository on this knot",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repo",
+            "subject"
+          ],
+          "properties": {
+            "repo": {
+              "type": "string",
+              "description": "DID of the repository to remove the collaborator from",
+              "format": "did"
+            },
+            "subject": {
+              "type": "string",
+              "description": "DID of the collaborator to remove",
+              "format": "did"
+            }
+          }
+        }
+      }
+    }
+  }
+}

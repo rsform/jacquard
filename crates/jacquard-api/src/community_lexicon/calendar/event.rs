@@ -88,6 +88,9 @@ pub struct Event<S: BosStr = DefaultStr> {
     pub mode: Option<event::Mode<S>>,
     ///The name of the event.
     pub name: S,
+    ///Whether a response is requested from attendees.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rsvp_expected: Option<bool>,
     ///Client-declared timestamp when the event starts.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub starts_at: Option<Datetime>,
@@ -475,37 +478,37 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type CreatedAt = St::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Name = St::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -519,6 +522,7 @@ pub struct EventBuilder<St: event_state::State, S: BosStr = DefaultStr> {
         Option<Vec<EventLocationsItem<S>>>,
         Option<event::Mode<S>>,
         Option<S>,
+        Option<bool>,
         Option<Datetime>,
         Option<event::Status<S>>,
         Option<Vec<event::Uri<S>>>,
@@ -545,7 +549,7 @@ impl EventBuilder<event_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         EventBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -556,7 +560,7 @@ impl<S: BosStr> EventBuilder<event_state::Empty, S> {
     pub fn builder() -> Self {
         EventBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -656,14 +660,27 @@ where
 }
 
 impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
+    /// Set the `rsvpExpected` field (optional)
+    pub fn rsvp_expected(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.6 = value.into();
+        self
+    }
+    /// Set the `rsvpExpected` field to an Option value (optional)
+    pub fn maybe_rsvp_expected(mut self, value: Option<bool>) -> Self {
+        self._fields.6 = value;
+        self
+    }
+}
+
+impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `startsAt` field (optional)
     pub fn starts_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.6 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `startsAt` field to an Option value (optional)
     pub fn maybe_starts_at(mut self, value: Option<Datetime>) -> Self {
-        self._fields.6 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -671,12 +688,12 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
 impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<event::Status<S>>>) -> Self {
-        self._fields.7 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<event::Status<S>>) -> Self {
-        self._fields.7 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -684,12 +701,12 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
 impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `uris` field (optional)
     pub fn uris(mut self, value: impl Into<Option<Vec<event::Uri<S>>>>) -> Self {
-        self._fields.8 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `uris` field to an Option value (optional)
     pub fn maybe_uris(mut self, value: Option<Vec<event::Uri<S>>>) -> Self {
-        self._fields.8 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -697,8 +714,8 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
 impl<St, S: BosStr> EventBuilder<St, S>
 where
     St: event_state::State,
-    St::Name: event_state::IsSet,
     St::CreatedAt: event_state::IsSet,
+    St::Name: event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Event<S> {
@@ -709,9 +726,10 @@ where
             locations: self._fields.3,
             mode: self._fields.4,
             name: self._fields.5.unwrap(),
-            starts_at: self._fields.6,
-            status: self._fields.7,
-            uris: self._fields.8,
+            rsvp_expected: self._fields.6,
+            starts_at: self._fields.7,
+            status: self._fields.8,
+            uris: self._fields.9,
             extra_data: Default::default(),
         }
     }
@@ -724,9 +742,10 @@ where
             locations: self._fields.3,
             mode: self._fields.4,
             name: self._fields.5.unwrap(),
-            starts_at: self._fields.6,
-            status: self._fields.7,
-            uris: self._fields.8,
+            rsvp_expected: self._fields.6,
+            starts_at: self._fields.7,
+            status: self._fields.8,
+            uris: self._fields.9,
             extra_data: Some(extra_data),
         }
     }
@@ -838,6 +857,12 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
                                     description: Some(
                                         CowStr::new_static("The name of the event."),
                                     ),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("rsvpExpected"),
+                                LexObjectProperty::Boolean(LexBoolean {
                                     ..Default::default()
                                 }),
                             );

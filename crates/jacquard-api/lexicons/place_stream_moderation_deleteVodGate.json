@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.moderation.deleteVodGate",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Delete a gate (unhide VOD comment) on behalf of a streamer. Requires 'vod.comment.hide' permission. Deletes a place.stream.vod.gate record from the streamer's repository.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "streamer",
+            "gateUri"
+          ],
+          "properties": {
+            "gateUri": {
+              "type": "string",
+              "description": "The AT-URI of the gate record to delete.",
+              "format": "at-uri"
+            },
+            "streamer": {
+              "type": "string",
+              "description": "The DID of the streamer.",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      "errors": [
+        {
+          "description": "The request lacks valid authentication credentials.",
+          "name": "Unauthorized"
+        },
+        {
+          "description": "The caller does not have permission to unhide VOD comments for this streamer.",
+          "name": "Forbidden"
+        },
+        {
+          "description": "The streamer's OAuth session could not be found or is invalid.",
+          "name": "SessionNotFound"
+        }
+      ]
+    }
+  }
+}

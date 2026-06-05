@@ -1,0 +1,81 @@
+{
+  "lexicon": 1,
+  "id": "social.arabica.alpha.bean",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A coffee bean variety tracked by the user",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "closed": {
+            "type": "boolean",
+            "description": "Whether the bag is closed/finished (default: false)"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the bean record was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Additional notes about the beans",
+            "maxLength": 1000
+          },
+          "link": {
+            "type": "string",
+            "description": "Optional product, vendor, or information URL for the beans",
+            "format": "uri",
+            "maxLength": 500
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the coffee bean (e.g., 'Ethiopian Yirgacheffe', 'Morning Blend')",
+            "maxLength": 200
+          },
+          "origin": {
+            "type": "string",
+            "description": "Geographic origin of the beans (e.g., 'Ethiopia', 'Colombia')",
+            "maxLength": 200
+          },
+          "process": {
+            "type": "string",
+            "description": "Processing method (e.g., 'Washed', 'Natural', 'Honey')",
+            "maxLength": 100
+          },
+          "rating": {
+            "type": "integer",
+            "description": "User rating of the bean (1-10 scale, optional)",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "roastLevel": {
+            "type": "string",
+            "description": "Roast level (e.g., 'Light', 'Medium', 'Dark')",
+            "maxLength": 100
+          },
+          "roasterRef": {
+            "type": "string",
+            "description": "AT-URI reference to the roaster record (e.g., at://did:plc:abc/social.arabica.alpha.roaster/3jxy...)",
+            "format": "at-uri"
+          },
+          "sourceRef": {
+            "type": "string",
+            "description": "AT-URI of the record this entity was sourced from",
+            "format": "at-uri"
+          },
+          "variety": {
+            "type": "string",
+            "description": "Coffee variety (e.g., 'SL28', 'Typica', 'Gesha', 'Caturra')",
+            "maxLength": 200
+          }
+        }
+      }
+    }
+  }
+}

@@ -4,15 +4,7 @@
   "defs": {
     "main": {
       "type": "procedure",
-      "description": "Resume playback of the currently paused track",
-      "parameters": {
-        "type": "params",
-        "properties": {
-          "playerId": {
-            "type": "string"
-          }
-        }
-      }
+      "description": "Resume playback of the currently paused track"
     }
   }
 }

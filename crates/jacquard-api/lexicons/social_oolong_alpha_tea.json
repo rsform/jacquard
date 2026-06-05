@@ -1,0 +1,86 @@
+{
+  "lexicon": 1,
+  "id": "social.oolong.alpha.tea",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A tea variety tracked by the user",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Broad tea category. Known values: green, yellow, white, oolong, red, black, dark, herbal, rooibos, flavored, blend, other",
+            "maxLength": 50,
+            "knownValues": [
+              "green",
+              "yellow",
+              "white",
+              "oolong",
+              "red",
+              "black",
+              "dark",
+              "herbal",
+              "rooibos",
+              "flavored",
+              "blend",
+              "other"
+            ]
+          },
+          "closed": {
+            "type": "boolean",
+            "description": "Whether the bag/pouch is finished"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "harvestYear": {
+            "type": "integer",
+            "minimum": 1900,
+            "maximum": 2100
+          },
+          "link": {
+            "type": "string",
+            "description": "Optional product, vendor, or information URL for the tea",
+            "format": "uri",
+            "maxLength": 500
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the tea (e.g., 'Long Jing 2024 Spring', 'Da Hong Pao')",
+            "maxLength": 200
+          },
+          "origin": {
+            "type": "string",
+            "description": "Region or country of origin",
+            "maxLength": 200
+          },
+          "rating": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "sourceRef": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "vendorRef": {
+            "type": "string",
+            "description": "AT-URI to a social.oolong.alpha.vendor record",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

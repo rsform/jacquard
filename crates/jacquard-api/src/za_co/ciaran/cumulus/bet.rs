@@ -137,51 +137,51 @@ pub mod bet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Position;
         type CreatedAt;
         type Market;
+        type Position;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Position = Unset;
         type CreatedAt = Unset;
         type Market = Unset;
-    }
-    ///State transition - sets the `position` field to Set
-    pub struct SetPosition<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPosition<St> {}
-    impl<St: State> State for SetPosition<St> {
-        type Position = Set<members::position>;
-        type CreatedAt = St::CreatedAt;
-        type Market = St::Market;
+        type Position = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Position = St::Position;
         type CreatedAt = Set<members::created_at>;
         type Market = St::Market;
+        type Position = St::Position;
     }
     ///State transition - sets the `market` field to Set
     pub struct SetMarket<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMarket<St> {}
     impl<St: State> State for SetMarket<St> {
-        type Position = St::Position;
         type CreatedAt = St::CreatedAt;
         type Market = Set<members::market>;
+        type Position = St::Position;
+    }
+    ///State transition - sets the `position` field to Set
+    pub struct SetPosition<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPosition<St> {}
+    impl<St: State> State for SetPosition<St> {
+        type CreatedAt = St::CreatedAt;
+        type Market = St::Market;
+        type Position = Set<members::position>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `position` field
-        pub struct position(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `market` field
         pub struct market(());
+        ///Marker type for the `position` field
+        pub struct position(());
     }
 }
 
@@ -288,9 +288,9 @@ where
 impl<St, S: BosStr> BetBuilder<St, S>
 where
     St: bet_state::State,
-    St::Position: bet_state::IsSet,
     St::CreatedAt: bet_state::IsSet,
     St::Market: bet_state::IsSet,
+    St::Position: bet_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Bet<S> {

@@ -16,7 +16,8 @@
         "codec": {
           "type": "string",
           "enum": [
-            "opus"
+            "opus",
+            "aac"
           ]
         },
         "rate": {

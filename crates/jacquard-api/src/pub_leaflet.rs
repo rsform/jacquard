@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod auth_full_permissions;
 pub mod blocks;
 pub mod comment;
 pub mod content;
@@ -12,5 +13,6 @@ pub mod interactions;
 pub mod pages;
 pub mod poll;
 pub mod publication;
+pub mod publication_page;
 pub mod richtext;
 pub mod theme;

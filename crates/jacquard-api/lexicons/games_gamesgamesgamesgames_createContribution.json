@@ -1,0 +1,58 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.createContribution",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Submit a new community contribution proposing changes to an entity or a new game.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "contributionType",
+            "changes"
+          ],
+          "properties": {
+            "changes": {
+              "type": "unknown",
+              "description": "A partial object with only changed fields."
+            },
+            "contributionType": {
+              "type": "string",
+              "knownValues": [
+                "correction",
+                "addition",
+                "newGame"
+              ]
+            },
+            "message": {
+              "type": "string",
+              "maxGraphemes": 3000
+            },
+            "subject": {
+              "type": "string",
+              "description": "The entity being modified. Required for corrections and additions.",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri"
+          ],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

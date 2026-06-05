@@ -228,37 +228,37 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ImageLink;
         type Blob;
+        type ImageLink;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ImageLink = Unset;
         type Blob = Unset;
-    }
-    ///State transition - sets the `image_link` field to Set
-    pub struct SetImageLink<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetImageLink<St> {}
-    impl<St: State> State for SetImageLink<St> {
-        type ImageLink = Set<members::image_link>;
-        type Blob = St::Blob;
+        type ImageLink = Unset;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlob<St> {}
     impl<St: State> State for SetBlob<St> {
-        type ImageLink = St::ImageLink;
         type Blob = Set<members::blob>;
+        type ImageLink = St::ImageLink;
+    }
+    ///State transition - sets the `image_link` field to Set
+    pub struct SetImageLink<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImageLink<St> {}
+    impl<St: State> State for SetImageLink<St> {
+        type Blob = St::Blob;
+        type ImageLink = Set<members::image_link>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image_link` field
-        pub struct image_link(());
         ///Marker type for the `blob` field
         pub struct blob(());
+        ///Marker type for the `image_link` field
+        pub struct image_link(());
     }
 }
 
@@ -346,8 +346,8 @@ where
 impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
-    St::ImageLink: image_state::IsSet,
     St::Blob: image_state::IsSet,
+    St::ImageLink: image_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Image<S> {
@@ -513,37 +513,37 @@ pub mod oekaki_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Image;
         type CreatedAt;
+        type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Image = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetImage<St> {}
-    impl<St: State> State for SetImage<St> {
-        type Image = Set<members::image>;
-        type CreatedAt = St::CreatedAt;
+        type Image = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Image = St::Image;
         type CreatedAt = Set<members::created_at>;
+        type Image = St::Image;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
+        type CreatedAt = St::CreatedAt;
+        type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image` field
-        pub struct image(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `image` field
+        pub struct image(());
     }
 }
 
@@ -676,8 +676,8 @@ impl<St: oekaki_state::State, S: BosStr> OekakiBuilder<St, S> {
 impl<St, S: BosStr> OekakiBuilder<St, S>
 where
     St: oekaki_state::State,
-    St::Image: oekaki_state::IsSet,
     St::CreatedAt: oekaki_state::IsSet,
+    St::Image: oekaki_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Oekaki<S> {

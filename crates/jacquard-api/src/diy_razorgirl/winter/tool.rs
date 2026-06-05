@@ -165,84 +165,84 @@ pub mod tool_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Code;
-        type Name;
         type CreatedAt;
         type Description;
         type InputSchema;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Code = Unset;
-        type Name = Unset;
         type CreatedAt = Unset;
         type Description = Unset;
         type InputSchema = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCode<St> {}
     impl<St: State> State for SetCode<St> {
         type Code = Set<members::code>;
+        type CreatedAt = St::CreatedAt;
+        type Description = St::Description;
+        type InputSchema = St::InputSchema;
         type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
-        type Description = St::Description;
-        type InputSchema = St::InputSchema;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Code = St::Code;
-        type Name = Set<members::name>;
-        type CreatedAt = St::CreatedAt;
-        type Description = St::Description;
-        type InputSchema = St::InputSchema;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type Code = St::Code;
-        type Name = St::Name;
         type CreatedAt = Set<members::created_at>;
         type Description = St::Description;
         type InputSchema = St::InputSchema;
+        type Name = St::Name;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDescription<St> {}
     impl<St: State> State for SetDescription<St> {
         type Code = St::Code;
-        type Name = St::Name;
         type CreatedAt = St::CreatedAt;
         type Description = Set<members::description>;
         type InputSchema = St::InputSchema;
+        type Name = St::Name;
     }
     ///State transition - sets the `input_schema` field to Set
     pub struct SetInputSchema<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetInputSchema<St> {}
     impl<St: State> State for SetInputSchema<St> {
         type Code = St::Code;
-        type Name = St::Name;
         type CreatedAt = St::CreatedAt;
         type Description = St::Description;
         type InputSchema = Set<members::input_schema>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Code = St::Code;
+        type CreatedAt = St::CreatedAt;
+        type Description = St::Description;
+        type InputSchema = St::InputSchema;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `code` field
         pub struct code(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `description` field
         pub struct description(());
         ///Marker type for the `input_schema` field
         pub struct input_schema(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -518,10 +518,10 @@ impl<St, S: BosStr> ToolBuilder<St, S>
 where
     St: tool_state::State,
     St::Code: tool_state::IsSet,
-    St::Name: tool_state::IsSet,
     St::CreatedAt: tool_state::IsSet,
     St::Description: tool_state::IsSet,
     St::InputSchema: tool_state::IsSet,
+    St::Name: tool_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Tool<S> {

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod def;
+pub mod get_issued_badges;
 pub mod get_valid_badges;
+pub mod issuance;
 
 
 #[allow(unused_imports)]
@@ -18,7 +21,7 @@ use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::Did;
+use jacquard_common::types::string::{Did, AtUri, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,14 +30,148 @@ use jacquard_lexicon::schema::LexiconSchema;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
+use crate::place_stream::badge;
+/// A resolved view of a badge issuance, including def fields for display.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct BadgeIssuanceView<S: BosStr = DefaultStr> {
+    pub badge_type: BadgeIssuanceViewBadgeType<S>,
+    ///Description from the badge definition.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<S>,
+    ///Resolved image URL for the badge icon.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub image_url: Option<UriValue<S>>,
+    ///CID of the place.stream.badge.issuance record.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub issuance_cid: Option<S>,
+    ///AT URI of the place.stream.badge.issuance record.
+    pub issuance_uri: AtUri<S>,
+    ///DID of the badge issuer.
+    pub issuer: Did<S>,
+    ///Display name from the badge definition.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<S>,
+    ///Whether this badge is currently in the user's chat profile selection.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub selected: Option<bool>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum BadgeIssuanceViewBadgeType<S: BosStr = DefaultStr> {
+    Vip,
+    Event,
+    Other(S),
+}
+
+impl<S: BosStr> BadgeIssuanceViewBadgeType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Vip => "place.stream.badge.defs#vip",
+            Self::Event => "place.stream.badge.defs#event",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "place.stream.badge.defs#vip" => Self::Vip,
+            "place.stream.badge.defs#event" => Self::Event,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for BadgeIssuanceViewBadgeType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for BadgeIssuanceViewBadgeType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for BadgeIssuanceViewBadgeType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for BadgeIssuanceViewBadgeType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for BadgeIssuanceViewBadgeType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for BadgeIssuanceViewBadgeType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = BadgeIssuanceViewBadgeType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            BadgeIssuanceViewBadgeType::Vip => BadgeIssuanceViewBadgeType::Vip,
+            BadgeIssuanceViewBadgeType::Event => BadgeIssuanceViewBadgeType::Event,
+            BadgeIssuanceViewBadgeType::Other(v) => {
+                BadgeIssuanceViewBadgeType::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// A display slot containing available issuance-based badges and which one (if any) is currently selected.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct BadgeSlot<S: BosStr = DefaultStr> {
+    ///All badges available for this slot.
+    pub available: Vec<badge::BadgeIssuanceView<S>>,
+    ///The currently selected badge in this slot, if any.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub selected: Option<badge::BadgeIssuanceView<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// View of a badge record, with fields resolved for display. If the DID in issuer is not the current streamplace node, the signature field shall be required.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BadgeView<S: BosStr = DefaultStr> {
     pub badge_type: BadgeViewBadgeType<S>,
+    ///Description from the badge definition.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<S>,
+    ///Resolved image URL for the badge icon.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub image_url: Option<UriValue<S>>,
     ///DID of the badge issuer.
     pub issuer: Did<S>,
+    ///Display name from the badge definition.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<S>,
     ///DID of the badge recipient.
     pub recipient: Did<S>,
     ///TODO: Cryptographic signature of the badge (of a place.stream.key).
@@ -49,6 +186,9 @@ pub struct BadgeView<S: BosStr = DefaultStr> {
 pub enum BadgeViewBadgeType<S: BosStr = DefaultStr> {
     Mod,
     Streamer,
+    Vip,
+    Event,
+    Bot,
     Other(S),
 }
 
@@ -57,6 +197,9 @@ impl<S: BosStr> BadgeViewBadgeType<S> {
         match self {
             Self::Mod => "place.stream.badge.defs#mod",
             Self::Streamer => "place.stream.badge.defs#streamer",
+            Self::Vip => "place.stream.badge.defs#vip",
+            Self::Event => "place.stream.badge.defs#event",
+            Self::Bot => "place.stream.badge.defs#bot",
             Self::Other(s) => s.as_ref(),
         }
     }
@@ -65,6 +208,9 @@ impl<S: BosStr> BadgeViewBadgeType<S> {
         match s.as_ref() {
             "place.stream.badge.defs#mod" => Self::Mod,
             "place.stream.badge.defs#streamer" => Self::Streamer,
+            "place.stream.badge.defs#vip" => Self::Vip,
+            "place.stream.badge.defs#event" => Self::Event,
+            "place.stream.badge.defs#bot" => Self::Bot,
             _ => Self::Other(s),
         }
     }
@@ -117,8 +263,31 @@ where
         match self {
             BadgeViewBadgeType::Mod => BadgeViewBadgeType::Mod,
             BadgeViewBadgeType::Streamer => BadgeViewBadgeType::Streamer,
+            BadgeViewBadgeType::Vip => BadgeViewBadgeType::Vip,
+            BadgeViewBadgeType::Event => BadgeViewBadgeType::Event,
+            BadgeViewBadgeType::Bot => BadgeViewBadgeType::Bot,
             BadgeViewBadgeType::Other(v) => BadgeViewBadgeType::Other(v.into_static()),
         }
+    }
+}
+
+/// This user is a bot. Self-applied via place.stream.chat.profile selfLabels.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
+pub struct Bot;
+impl core::fmt::Display for Bot {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "bot")
+    }
+}
+
+/// This user has won or earned a special event or contest badge.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
+pub struct Event;
+impl core::fmt::Display for Event {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "event")
     }
 }
 
@@ -152,6 +321,36 @@ impl core::fmt::Display for Vip {
     }
 }
 
+impl<S: BosStr> LexiconSchema for BadgeIssuanceView<S> {
+    fn nsid() -> &'static str {
+        "place.stream.badge.defs"
+    }
+    fn def_name() -> &'static str {
+        "badgeIssuanceView"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_place_stream_badge_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for BadgeSlot<S> {
+    fn nsid() -> &'static str {
+        "place.stream.badge.defs"
+    }
+    fn def_name() -> &'static str {
+        "badgeSlot"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_place_stream_badge_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
 impl<S: BosStr> LexiconSchema for BadgeView<S> {
     fn nsid() -> &'static str {
         "place.stream.badge.defs"
@@ -167,7 +366,7 @@ impl<S: BosStr> LexiconSchema for BadgeView<S> {
     }
 }
 
-pub mod badge_view_state {
+pub mod badge_issuance_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
@@ -177,109 +376,124 @@ pub mod badge_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Issuer;
-        type Recipient;
         type BadgeType;
+        type IssuanceUri;
+        type Issuer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Issuer = Unset;
-        type Recipient = Unset;
         type BadgeType = Unset;
-    }
-    ///State transition - sets the `issuer` field to Set
-    pub struct SetIssuer<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIssuer<St> {}
-    impl<St: State> State for SetIssuer<St> {
-        type Issuer = Set<members::issuer>;
-        type Recipient = St::Recipient;
-        type BadgeType = St::BadgeType;
-    }
-    ///State transition - sets the `recipient` field to Set
-    pub struct SetRecipient<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecipient<St> {}
-    impl<St: State> State for SetRecipient<St> {
-        type Issuer = St::Issuer;
-        type Recipient = Set<members::recipient>;
-        type BadgeType = St::BadgeType;
+        type IssuanceUri = Unset;
+        type Issuer = Unset;
     }
     ///State transition - sets the `badge_type` field to Set
     pub struct SetBadgeType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBadgeType<St> {}
     impl<St: State> State for SetBadgeType<St> {
-        type Issuer = St::Issuer;
-        type Recipient = St::Recipient;
         type BadgeType = Set<members::badge_type>;
+        type IssuanceUri = St::IssuanceUri;
+        type Issuer = St::Issuer;
+    }
+    ///State transition - sets the `issuance_uri` field to Set
+    pub struct SetIssuanceUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIssuanceUri<St> {}
+    impl<St: State> State for SetIssuanceUri<St> {
+        type BadgeType = St::BadgeType;
+        type IssuanceUri = Set<members::issuance_uri>;
+        type Issuer = St::Issuer;
+    }
+    ///State transition - sets the `issuer` field to Set
+    pub struct SetIssuer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIssuer<St> {}
+    impl<St: State> State for SetIssuer<St> {
+        type BadgeType = St::BadgeType;
+        type IssuanceUri = St::IssuanceUri;
+        type Issuer = Set<members::issuer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `issuer` field
-        pub struct issuer(());
-        ///Marker type for the `recipient` field
-        pub struct recipient(());
         ///Marker type for the `badge_type` field
         pub struct badge_type(());
+        ///Marker type for the `issuance_uri` field
+        pub struct issuance_uri(());
+        ///Marker type for the `issuer` field
+        pub struct issuer(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BadgeViewBuilder<St: badge_view_state::State, S: BosStr = DefaultStr> {
+pub struct BadgeIssuanceViewBuilder<
+    St: badge_issuance_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<BadgeViewBadgeType<S>>, Option<Did<S>>, Option<Did<S>>, Option<S>),
+    _fields: (
+        Option<BadgeIssuanceViewBadgeType<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<bool>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
-impl BadgeView<DefaultStr> {
+impl BadgeIssuanceView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> BadgeViewBuilder<badge_view_state::Empty, DefaultStr> {
-        BadgeViewBuilder::new()
+    pub fn new() -> BadgeIssuanceViewBuilder<
+        badge_issuance_view_state::Empty,
+        DefaultStr,
+    > {
+        BadgeIssuanceViewBuilder::new()
     }
 }
 
-impl<S: BosStr> BadgeView<S> {
+impl<S: BosStr> BadgeIssuanceView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> BadgeViewBuilder<badge_view_state::Empty, S> {
-        BadgeViewBuilder::builder()
+    pub fn builder() -> BadgeIssuanceViewBuilder<badge_issuance_view_state::Empty, S> {
+        BadgeIssuanceViewBuilder::builder()
     }
 }
 
-impl BadgeViewBuilder<badge_view_state::Empty, DefaultStr> {
+impl BadgeIssuanceViewBuilder<badge_issuance_view_state::Empty, DefaultStr> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
-        BadgeViewBuilder {
+        BadgeIssuanceViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr> BadgeViewBuilder<badge_view_state::Empty, S> {
+impl<S: BosStr> BadgeIssuanceViewBuilder<badge_issuance_view_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
-        BadgeViewBuilder {
+        BadgeIssuanceViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<St, S: BosStr> BadgeViewBuilder<St, S>
+impl<St, S: BosStr> BadgeIssuanceViewBuilder<St, S>
 where
-    St: badge_view_state::State,
-    St::BadgeType: badge_view_state::IsUnset,
+    St: badge_issuance_view_state::State,
+    St::BadgeType: badge_issuance_view_state::IsUnset,
 {
     /// Set the `badgeType` field (required)
     pub fn badge_type(
         mut self,
-        value: impl Into<BadgeViewBadgeType<S>>,
-    ) -> BadgeViewBuilder<badge_view_state::SetBadgeType<St>, S> {
+        value: impl Into<BadgeIssuanceViewBadgeType<S>>,
+    ) -> BadgeIssuanceViewBuilder<badge_issuance_view_state::SetBadgeType<St>, S> {
         self._fields.0 = Option::Some(value.into());
-        BadgeViewBuilder {
+        BadgeIssuanceViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
             _type: PhantomData,
@@ -287,71 +501,127 @@ where
     }
 }
 
-impl<St, S: BosStr> BadgeViewBuilder<St, S>
-where
-    St: badge_view_state::State,
-    St::Issuer: badge_view_state::IsUnset,
-{
-    /// Set the `issuer` field (required)
-    pub fn issuer(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> BadgeViewBuilder<badge_view_state::SetIssuer<St>, S> {
-        self._fields.1 = Option::Some(value.into());
-        BadgeViewBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: badge_issuance_view_state::State, S: BosStr> BadgeIssuanceViewBuilder<St, S> {
+    /// Set the `description` field (optional)
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
+        self._fields.1 = value;
+        self
     }
 }
 
-impl<St, S: BosStr> BadgeViewBuilder<St, S>
-where
-    St: badge_view_state::State,
-    St::Recipient: badge_view_state::IsUnset,
-{
-    /// Set the `recipient` field (required)
-    pub fn recipient(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> BadgeViewBuilder<badge_view_state::SetRecipient<St>, S> {
-        self._fields.2 = Option::Some(value.into());
-        BadgeViewBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: badge_issuance_view_state::State, S: BosStr> BadgeIssuanceViewBuilder<St, S> {
+    /// Set the `imageUrl` field (optional)
+    pub fn image_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `imageUrl` field to an Option value (optional)
+    pub fn maybe_image_url(mut self, value: Option<UriValue<S>>) -> Self {
+        self._fields.2 = value;
+        self
     }
 }
 
-impl<St: badge_view_state::State, S: BosStr> BadgeViewBuilder<St, S> {
-    /// Set the `signature` field (optional)
-    pub fn signature(mut self, value: impl Into<Option<S>>) -> Self {
+impl<St: badge_issuance_view_state::State, S: BosStr> BadgeIssuanceViewBuilder<St, S> {
+    /// Set the `issuanceCid` field (optional)
+    pub fn issuance_cid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
-    /// Set the `signature` field to an Option value (optional)
-    pub fn maybe_signature(mut self, value: Option<S>) -> Self {
+    /// Set the `issuanceCid` field to an Option value (optional)
+    pub fn maybe_issuance_cid(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
 }
 
-impl<St, S: BosStr> BadgeViewBuilder<St, S>
+impl<St, S: BosStr> BadgeIssuanceViewBuilder<St, S>
 where
-    St: badge_view_state::State,
-    St::Issuer: badge_view_state::IsSet,
-    St::Recipient: badge_view_state::IsSet,
-    St::BadgeType: badge_view_state::IsSet,
+    St: badge_issuance_view_state::State,
+    St::IssuanceUri: badge_issuance_view_state::IsUnset,
+{
+    /// Set the `issuanceUri` field (required)
+    pub fn issuance_uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> BadgeIssuanceViewBuilder<badge_issuance_view_state::SetIssuanceUri<St>, S> {
+        self._fields.4 = Option::Some(value.into());
+        BadgeIssuanceViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BadgeIssuanceViewBuilder<St, S>
+where
+    St: badge_issuance_view_state::State,
+    St::Issuer: badge_issuance_view_state::IsUnset,
+{
+    /// Set the `issuer` field (required)
+    pub fn issuer(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> BadgeIssuanceViewBuilder<badge_issuance_view_state::SetIssuer<St>, S> {
+        self._fields.5 = Option::Some(value.into());
+        BadgeIssuanceViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: badge_issuance_view_state::State, S: BosStr> BadgeIssuanceViewBuilder<St, S> {
+    /// Set the `name` field (optional)
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.6 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
+        self._fields.6 = value;
+        self
+    }
+}
+
+impl<St: badge_issuance_view_state::State, S: BosStr> BadgeIssuanceViewBuilder<St, S> {
+    /// Set the `selected` field (optional)
+    pub fn selected(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.7 = value.into();
+        self
+    }
+    /// Set the `selected` field to an Option value (optional)
+    pub fn maybe_selected(mut self, value: Option<bool>) -> Self {
+        self._fields.7 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> BadgeIssuanceViewBuilder<St, S>
+where
+    St: badge_issuance_view_state::State,
+    St::BadgeType: badge_issuance_view_state::IsSet,
+    St::IssuanceUri: badge_issuance_view_state::IsSet,
+    St::Issuer: badge_issuance_view_state::IsSet,
 {
     /// Build the final struct.
-    pub fn build(self) -> BadgeView<S> {
-        BadgeView {
+    pub fn build(self) -> BadgeIssuanceView<S> {
+        BadgeIssuanceView {
             badge_type: self._fields.0.unwrap(),
-            issuer: self._fields.1.unwrap(),
-            recipient: self._fields.2.unwrap(),
-            signature: self._fields.3,
+            description: self._fields.1,
+            image_url: self._fields.2,
+            issuance_cid: self._fields.3,
+            issuance_uri: self._fields.4.unwrap(),
+            issuer: self._fields.5.unwrap(),
+            name: self._fields.6,
+            selected: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -359,12 +629,16 @@ where
     pub fn build_with_data(
         self,
         extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BadgeView<S> {
-        BadgeView {
+    ) -> BadgeIssuanceView<S> {
+        BadgeIssuanceView {
             badge_type: self._fields.0.unwrap(),
-            issuer: self._fields.1.unwrap(),
-            recipient: self._fields.2.unwrap(),
-            signature: self._fields.3,
+            description: self._fields.1,
+            image_url: self._fields.2,
+            issuance_cid: self._fields.3,
+            issuance_uri: self._fields.4.unwrap(),
+            issuer: self._fields.5.unwrap(),
+            name: self._fields.6,
+            selected: self._fields.7,
             extra_data: Some(extra_data),
         }
     }
@@ -380,6 +654,139 @@ fn lexicon_doc_place_stream_badge_defs() -> LexiconDoc<'static> {
         id: CowStr::new_static("place.stream.badge.defs"),
         defs: {
             let mut map = BTreeMap::new();
+            map.insert(
+                SmolStr::new_static("badgeIssuanceView"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "A resolved view of a badge issuance, including def fields for display.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("issuanceUri"),
+                            SmolStr::new_static("badgeType"),
+                            SmolStr::new_static("issuer")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("badgeType"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("description"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Description from the badge definition."),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("imageUrl"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Resolved image URL for the badge icon."),
+                                ),
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("issuanceCid"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "CID of the place.stream.badge.issuance record.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("issuanceUri"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "AT URI of the place.stream.badge.issuance record.",
+                                    ),
+                                ),
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("issuer"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("DID of the badge issuer."),
+                                ),
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Display name from the badge definition.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("selected"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("badgeSlot"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "A display slot containing available issuance-based badges and which one (if any) is currently selected.",
+                        ),
+                    ),
+                    required: Some(vec![SmolStr::new_static("available")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("available"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static("All badges available for this slot."),
+                                ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#badgeIssuanceView"),
+                                    ..Default::default()
+                                }),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("selected"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#badgeIssuanceView"),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
             map.insert(
                 SmolStr::new_static("badgeView"),
                 LexUserType::Object(LexObject {
@@ -403,12 +810,42 @@ fn lexicon_doc_place_stream_badge_defs() -> LexiconDoc<'static> {
                             LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
+                            SmolStr::new_static("description"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Description from the badge definition."),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("imageUrl"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Resolved image URL for the badge icon."),
+                                ),
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
                             SmolStr::new_static("issuer"),
                             LexObjectProperty::String(LexString {
                                 description: Some(
                                     CowStr::new_static("DID of the badge issuer."),
                                 ),
                                 format: Some(LexStringFormat::Did),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Display name from the badge definition.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -439,6 +876,14 @@ fn lexicon_doc_place_stream_badge_defs() -> LexiconDoc<'static> {
                 }),
             );
             map.insert(
+                SmolStr::new_static("bot"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("event"),
+                LexUserType::Token(LexToken { ..Default::default() }),
+            );
+            map.insert(
                 SmolStr::new_static("mod"),
                 LexUserType::Token(LexToken { ..Default::default() }),
             );
@@ -453,5 +898,400 @@ fn lexicon_doc_place_stream_badge_defs() -> LexiconDoc<'static> {
             map
         },
         ..Default::default()
+    }
+}
+
+pub mod badge_slot_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Available;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Available = Unset;
+    }
+    ///State transition - sets the `available` field to Set
+    pub struct SetAvailable<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAvailable<St> {}
+    impl<St: State> State for SetAvailable<St> {
+        type Available = Set<members::available>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `available` field
+        pub struct available(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct BadgeSlotBuilder<St: badge_slot_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (
+        Option<Vec<badge::BadgeIssuanceView<S>>>,
+        Option<badge::BadgeIssuanceView<S>>,
+    ),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl BadgeSlot<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BadgeSlotBuilder<badge_slot_state::Empty, DefaultStr> {
+        BadgeSlotBuilder::new()
+    }
+}
+
+impl<S: BosStr> BadgeSlot<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BadgeSlotBuilder<badge_slot_state::Empty, S> {
+        BadgeSlotBuilder::builder()
+    }
+}
+
+impl BadgeSlotBuilder<badge_slot_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        BadgeSlotBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> BadgeSlotBuilder<badge_slot_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BadgeSlotBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BadgeSlotBuilder<St, S>
+where
+    St: badge_slot_state::State,
+    St::Available: badge_slot_state::IsUnset,
+{
+    /// Set the `available` field (required)
+    pub fn available(
+        mut self,
+        value: impl Into<Vec<badge::BadgeIssuanceView<S>>>,
+    ) -> BadgeSlotBuilder<badge_slot_state::SetAvailable<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        BadgeSlotBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: badge_slot_state::State, S: BosStr> BadgeSlotBuilder<St, S> {
+    /// Set the `selected` field (optional)
+    pub fn selected(
+        mut self,
+        value: impl Into<Option<badge::BadgeIssuanceView<S>>>,
+    ) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `selected` field to an Option value (optional)
+    pub fn maybe_selected(mut self, value: Option<badge::BadgeIssuanceView<S>>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> BadgeSlotBuilder<St, S>
+where
+    St: badge_slot_state::State,
+    St::Available: badge_slot_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> BadgeSlot<S> {
+        BadgeSlot {
+            available: self._fields.0.unwrap(),
+            selected: self._fields.1,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BadgeSlot<S> {
+        BadgeSlot {
+            available: self._fields.0.unwrap(),
+            selected: self._fields.1,
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+pub mod badge_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type BadgeType;
+        type Issuer;
+        type Recipient;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type BadgeType = Unset;
+        type Issuer = Unset;
+        type Recipient = Unset;
+    }
+    ///State transition - sets the `badge_type` field to Set
+    pub struct SetBadgeType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBadgeType<St> {}
+    impl<St: State> State for SetBadgeType<St> {
+        type BadgeType = Set<members::badge_type>;
+        type Issuer = St::Issuer;
+        type Recipient = St::Recipient;
+    }
+    ///State transition - sets the `issuer` field to Set
+    pub struct SetIssuer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIssuer<St> {}
+    impl<St: State> State for SetIssuer<St> {
+        type BadgeType = St::BadgeType;
+        type Issuer = Set<members::issuer>;
+        type Recipient = St::Recipient;
+    }
+    ///State transition - sets the `recipient` field to Set
+    pub struct SetRecipient<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecipient<St> {}
+    impl<St: State> State for SetRecipient<St> {
+        type BadgeType = St::BadgeType;
+        type Issuer = St::Issuer;
+        type Recipient = Set<members::recipient>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `badge_type` field
+        pub struct badge_type(());
+        ///Marker type for the `issuer` field
+        pub struct issuer(());
+        ///Marker type for the `recipient` field
+        pub struct recipient(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct BadgeViewBuilder<St: badge_view_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (
+        Option<BadgeViewBadgeType<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<Did<S>>,
+        Option<S>,
+    ),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl BadgeView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> BadgeViewBuilder<badge_view_state::Empty, DefaultStr> {
+        BadgeViewBuilder::new()
+    }
+}
+
+impl<S: BosStr> BadgeView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> BadgeViewBuilder<badge_view_state::Empty, S> {
+        BadgeViewBuilder::builder()
+    }
+}
+
+impl BadgeViewBuilder<badge_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        BadgeViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> BadgeViewBuilder<badge_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        BadgeViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> BadgeViewBuilder<St, S>
+where
+    St: badge_view_state::State,
+    St::BadgeType: badge_view_state::IsUnset,
+{
+    /// Set the `badgeType` field (required)
+    pub fn badge_type(
+        mut self,
+        value: impl Into<BadgeViewBadgeType<S>>,
+    ) -> BadgeViewBuilder<badge_view_state::SetBadgeType<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        BadgeViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: badge_view_state::State, S: BosStr> BadgeViewBuilder<St, S> {
+    /// Set the `description` field (optional)
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: badge_view_state::State, S: BosStr> BadgeViewBuilder<St, S> {
+    /// Set the `imageUrl` field (optional)
+    pub fn image_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `imageUrl` field to an Option value (optional)
+    pub fn maybe_image_url(mut self, value: Option<UriValue<S>>) -> Self {
+        self._fields.2 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> BadgeViewBuilder<St, S>
+where
+    St: badge_view_state::State,
+    St::Issuer: badge_view_state::IsUnset,
+{
+    /// Set the `issuer` field (required)
+    pub fn issuer(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> BadgeViewBuilder<badge_view_state::SetIssuer<St>, S> {
+        self._fields.3 = Option::Some(value.into());
+        BadgeViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: badge_view_state::State, S: BosStr> BadgeViewBuilder<St, S> {
+    /// Set the `name` field (optional)
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
+        self._fields.4 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> BadgeViewBuilder<St, S>
+where
+    St: badge_view_state::State,
+    St::Recipient: badge_view_state::IsUnset,
+{
+    /// Set the `recipient` field (required)
+    pub fn recipient(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> BadgeViewBuilder<badge_view_state::SetRecipient<St>, S> {
+        self._fields.5 = Option::Some(value.into());
+        BadgeViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: badge_view_state::State, S: BosStr> BadgeViewBuilder<St, S> {
+    /// Set the `signature` field (optional)
+    pub fn signature(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.6 = value.into();
+        self
+    }
+    /// Set the `signature` field to an Option value (optional)
+    pub fn maybe_signature(mut self, value: Option<S>) -> Self {
+        self._fields.6 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> BadgeViewBuilder<St, S>
+where
+    St: badge_view_state::State,
+    St::BadgeType: badge_view_state::IsSet,
+    St::Issuer: badge_view_state::IsSet,
+    St::Recipient: badge_view_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> BadgeView<S> {
+        BadgeView {
+            badge_type: self._fields.0.unwrap(),
+            description: self._fields.1,
+            image_url: self._fields.2,
+            issuer: self._fields.3.unwrap(),
+            name: self._fields.4,
+            recipient: self._fields.5.unwrap(),
+            signature: self._fields.6,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BadgeView<S> {
+        BadgeView {
+            badge_type: self._fields.0.unwrap(),
+            description: self._fields.1,
+            image_url: self._fields.2,
+            issuer: self._fields.3.unwrap(),
+            name: self._fields.4,
+            recipient: self._fields.5.unwrap(),
+            signature: self._fields.6,
+            extra_data: Some(extra_data),
+        }
     }
 }

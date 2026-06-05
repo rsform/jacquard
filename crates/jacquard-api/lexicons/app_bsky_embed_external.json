@@ -2,6 +2,32 @@
   "lexicon": 1,
   "id": "app.bsky.embed.external",
   "defs": {
+    "colorRGB": {
+      "type": "object",
+      "description": "RGB color definition, inspired by site.standard.theme.color#rgb",
+      "required": [
+        "r",
+        "g",
+        "b"
+      ],
+      "properties": {
+        "b": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "g": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "r": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        }
+      }
+    },
     "external": {
       "type": "object",
       "required": [
@@ -10,6 +36,14 @@
         "description"
       ],
       "properties": {
+        "associatedRefs": {
+          "type": "array",
+          "description": "StrongRefs (uri+cid) of the Atmosphere records that backed this view.",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        },
         "description": {
           "type": "string"
         },
@@ -62,8 +96,44 @@
         "description"
       ],
       "properties": {
+        "associatedProfiles": {
+          "type": "array",
+          "description": "Profiles of the owners of the Atmosphere records that backed this view.",
+          "items": {
+            "type": "ref",
+            "ref": "app.bsky.actor.defs#profileViewBasic"
+          }
+        },
+        "associatedRefs": {
+          "type": "array",
+          "description": "StrongRefs (uri+cid) of the Atmosphere records that backed this view.",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "When the external content was created, if available. Example: a publication date, for an article.",
+          "format": "datetime"
+        },
         "description": {
           "type": "string"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#label"
+          }
+        },
+        "readingTime": {
+          "type": "integer",
+          "description": "Estimated reading time in minutes, if applicable and available."
+        },
+        "source": {
+          "type": "ref",
+          "ref": "#viewExternalSource"
         },
         "thumb": {
           "type": "string",
@@ -72,9 +142,66 @@
         "title": {
           "type": "string"
         },
+        "updatedAt": {
+          "type": "string",
+          "description": "When the external content was updated, if available.",
+          "format": "datetime"
+        },
         "uri": {
           "type": "string",
           "format": "uri"
+        }
+      }
+    },
+    "viewExternalSource": {
+      "type": "object",
+      "description": "The source of an external embed, such as a standard.site publication.",
+      "required": [
+        "uri",
+        "title"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Fully-qualified URL where an icon representing the source can be fetched. For example, CDN location provided by the App View.",
+          "format": "uri"
+        },
+        "theme": {
+          "type": "ref",
+          "ref": "#viewExternalSourceTheme"
+        },
+        "title": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "description": "URI of the source, if available. Example: the https:// URL of a site.standard.publication record.",
+          "format": "uri"
+        }
+      }
+    },
+    "viewExternalSourceTheme": {
+      "type": "object",
+      "description": "The theme colors of an external source, such as a site.standard.publication. These colors may be used when rendering an embed from that source.",
+      "properties": {
+        "accentForegroundRGB": {
+          "type": "ref",
+          "ref": "#colorRGB"
+        },
+        "accentRGB": {
+          "type": "ref",
+          "ref": "#colorRGB"
+        },
+        "backgroundRGB": {
+          "type": "ref",
+          "ref": "#colorRGB"
+        },
+        "foregroundRGB": {
+          "type": "ref",
+          "ref": "#colorRGB"
         }
       }
     }

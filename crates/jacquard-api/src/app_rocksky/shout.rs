@@ -229,51 +229,51 @@ pub mod shout_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
-        type Message;
         type CreatedAt;
+        type Message;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
-        type Message = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Subject = Set<members::subject>;
-        type Message = St::Message;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMessage<St> {}
-    impl<St: State> State for SetMessage<St> {
-        type Subject = St::Subject;
-        type Message = Set<members::message>;
-        type CreatedAt = St::CreatedAt;
+        type Message = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Subject = St::Subject;
-        type Message = St::Message;
         type CreatedAt = Set<members::created_at>;
+        type Message = St::Message;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
+        type CreatedAt = St::CreatedAt;
+        type Message = Set<members::message>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Message = St::Message;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `message` field
+        pub struct message(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -393,9 +393,9 @@ where
 impl<St, S: BosStr> ShoutBuilder<St, S>
 where
     St: shout_state::State,
-    St::Subject: shout_state::IsSet,
-    St::Message: shout_state::IsSet,
     St::CreatedAt: shout_state::IsSet,
+    St::Message: shout_state::IsSet,
+    St::Subject: shout_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Shout<S> {

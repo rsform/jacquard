@@ -27,7 +27,7 @@
         "repo"
       ],
       "properties": {
-        "did": {
+        "repo": {
           "type": "string",
           "description": "Repository AT-URI identifier",
           "format": "at-uri"
@@ -78,7 +78,7 @@
           "type": "union",
           "refs": [
             "#identity",
-            "gitRefUpdate"
+            "sh.tangled.git.refUpdate"
           ]
         }
       },

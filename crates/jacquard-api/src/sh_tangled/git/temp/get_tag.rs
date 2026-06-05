@@ -13,7 +13,7 @@ use core::marker::PhantomData;
 use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::AtUri;
+use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
@@ -21,7 +21,7 @@ use serde::{Serialize, Deserialize};
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTag<S: BosStr = DefaultStr> {
-    pub repo: AtUri<S>,
+    pub repo: Did<S>,
     pub tag: S,
 }
 
@@ -185,7 +185,7 @@ pub mod get_tag_state {
 /// Builder for constructing an instance of this type.
 pub struct GetTagBuilder<St: get_tag_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<AtUri<S>>, Option<S>),
+    _fields: (Option<Did<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -233,7 +233,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<S>>,
+        value: impl Into<Did<S>>,
     ) -> GetTagBuilder<get_tag_state::SetRepo<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetTagBuilder {

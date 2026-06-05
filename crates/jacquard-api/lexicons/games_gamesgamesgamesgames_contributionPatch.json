@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.contributionPatch",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A mod-approved patch representing changes to apply to an entity. Created on mod approval, deleted when the entity owner accepts and merges.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "contribution",
+          "contributionReview",
+          "subject",
+          "changes",
+          "createdAt"
+        ],
+        "properties": {
+          "changes": {
+            "type": "unknown",
+            "description": "The approved changes to overlay on the entity."
+          },
+          "contribution": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "contributionReview": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "description": "The entity these changes apply to.",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

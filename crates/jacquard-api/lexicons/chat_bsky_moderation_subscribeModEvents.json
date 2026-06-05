@@ -1,0 +1,673 @@
+{
+  "lexicon": 1,
+  "id": "chat.bsky.moderation.subscribeModEvents",
+  "defs": {
+    "eventChatAccepted": {
+      "type": "object",
+      "description": "Fired when a user accepts a chat convo, either explicitly or by sending a message.",
+      "required": [
+        "actorDid",
+        "convoCreatedAt",
+        "convoId",
+        "createdAt",
+        "method",
+        "rev"
+      ],
+      "properties": {
+        "actorDid": {
+          "type": "string",
+          "description": "The DID of the person accepting the convo.",
+          "format": "did"
+        },
+        "convoCreatedAt": {
+          "type": "string",
+          "description": "When the convo was originally created.",
+          "format": "datetime"
+        },
+        "convoId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "groupMemberCount": {
+          "type": "integer",
+          "description": "Current member count at the time of the event. Only present for group convos."
+        },
+        "groupName": {
+          "type": "string",
+          "description": "The name of the group chat. Only present for group convos."
+        },
+        "method": {
+          "type": "string",
+          "description": "How the convo was accepted.",
+          "knownValues": [
+            "explicit",
+            "message"
+          ]
+        },
+        "ownerDid": {
+          "type": "string",
+          "description": "The DID of the group chat owner. Only present for group convos.",
+          "format": "did"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "eventConvoFirstMessage": {
+      "type": "object",
+      "description": "Fired when the first message was sent on a convo.",
+      "required": [
+        "createdAt",
+        "rev",
+        "convoId",
+        "user",
+        "recipients"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "messageId": {
+          "type": "string"
+        },
+        "recipients": {
+          "type": "array",
+          "description": "The list of DIDs message recipients. Does not include the sender, which is in the `user` field",
+          "items": {
+            "type": "string",
+            "format": "did"
+          }
+        },
+        "rev": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string",
+          "description": "The DID of the message author.",
+          "format": "did"
+        }
+      }
+    },
+    "eventGroupChatCreated": {
+      "type": "object",
+      "description": "Fire when a group chat is created.",
+      "required": [
+        "actorDid",
+        "convoCreatedAt",
+        "convoId",
+        "createdAt",
+        "groupMemberCount",
+        "groupName",
+        "initialMemberDids",
+        "ownerDid",
+        "rev"
+      ],
+      "properties": {
+        "actorDid": {
+          "type": "string",
+          "description": "The DID of the actor performing the action. For this event, same as ownerDid.",
+          "format": "did"
+        },
+        "convoCreatedAt": {
+          "type": "string",
+          "description": "When the group was originally created.",
+          "format": "datetime"
+        },
+        "convoId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "groupMemberCount": {
+          "type": "integer",
+          "description": "Current member count at the time of the event."
+        },
+        "groupName": {
+          "type": "string",
+          "description": "The name set at creation time."
+        },
+        "initialMemberDids": {
+          "type": "array",
+          "description": "DIDs of everyone added at creation time.",
+          "items": {
+            "type": "string",
+            "format": "did"
+          }
+        },
+        "ownerDid": {
+          "type": "string",
+          "description": "The DID of the group chat owner.",
+          "format": "did"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "eventGroupChatJoinRequest": {
+      "type": "object",
+      "description": "Fired when a user requests to join a group chat via an join link that requires approval.",
+      "required": [
+        "actorDid",
+        "convoCreatedAt",
+        "convoId",
+        "createdAt",
+        "groupMemberCount",
+        "groupName",
+        "joinLinkCode",
+        "ownerDid",
+        "rev",
+        "subjectFollowsOwner"
+      ],
+      "properties": {
+        "actorDid": {
+          "type": "string",
+          "description": "The DID of the person requesting to join.",
+          "format": "did"
+        },
+        "convoCreatedAt": {
+          "type": "string",
+          "description": "When the group was originally created.",
+          "format": "datetime"
+        },
+        "convoId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "groupMemberCount": {
+          "type": "integer",
+          "description": "Current member count at the time of the event."
+        },
+        "groupName": {
+          "type": "string"
+        },
+        "joinLinkCode": {
+          "type": "string",
+          "description": "The code of the join link used to request joining."
+        },
+        "ownerDid": {
+          "type": "string",
+          "description": "The DID of the group chat owner.",
+          "format": "did"
+        },
+        "rev": {
+          "type": "string"
+        },
+        "subjectFollowsOwner": {
+          "type": "boolean",
+          "description": "Whether the requesting member follows the group owner."
+        }
+      }
+    },
+    "eventGroupChatJoinRequestApproved": {
+      "type": "object",
+      "description": "Fired when a join request is approved by the group owner.",
+      "required": [
+        "actorDid",
+        "convoCreatedAt",
+        "convoId",
+        "createdAt",
+        "groupMemberCount",
+        "groupName",
+        "ownerDid",
+        "rev",
+        "subjectDid"
+      ],
+      "properties": {
+        "actorDid": {
+          "type": "string",
+          "description": "The DID of the owner approving the request.",
+          "format": "did"
+        },
+        "convoCreatedAt": {
+          "type": "string",
+          "description": "When the group was originally created.",
+          "format": "datetime"
+        },
+        "convoId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "groupMemberCount": {
+          "type": "integer",
+          "description": "Current member count at the time of the event."
+        },
+        "groupName": {
+          "type": "string"
+        },
+        "ownerDid": {
+          "type": "string",
+          "description": "The DID of the group chat owner.",
+          "format": "did"
+        },
+        "rev": {
+          "type": "string"
+        },
+        "subjectDid": {
+          "type": "string",
+          "description": "The DID of the member whose request was approved.",
+          "format": "did"
+        }
+      }
+    },
+    "eventGroupChatJoinRequestRejected": {
+      "type": "object",
+      "description": "Fired when a join request is rejected by the group owner.",
+      "required": [
+        "actorDid",
+        "convoCreatedAt",
+        "convoId",
+        "createdAt",
+        "groupMemberCount",
+        "groupName",
+        "ownerDid",
+        "rev",
+        "subjectDid"
+      ],
+      "properties": {
+        "actorDid": {
+          "type": "string",
+          "description": "The DID of the owner rejecting the request.",
+          "format": "did"
+        },
+        "convoCreatedAt": {
+          "type": "string",
+          "description": "When the group was originally created.",
+          "format": "datetime"
+        },
+        "convoId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "groupMemberCount": {
+          "type": "integer",
+          "description": "Current member count at the time of the event."
+        },
+        "groupName": {
+          "type": "string"
+        },
+        "ownerDid": {
+          "type": "string",
+          "description": "The DID of the group chat owner.",
+          "format": "did"
+        },
+        "rev": {
+          "type": "string"
+        },
+        "subjectDid": {
+          "type": "string",
+          "description": "The DID of the member whose request was rejected.",
+          "format": "did"
+        }
+      }
+    },
+    "eventGroupChatMemberAdded": {
+      "type": "object",
+      "description": "Fired when a member is added to a group chat. Note that members are added in the 'request' state.",
+      "required": [
+        "actorDid",
+        "convoCreatedAt",
+        "convoId",
+        "createdAt",
+        "groupMemberCount",
+        "groupName",
+        "ownerDid",
+        "requestMembersCount",
+        "rev",
+        "subjectDid",
+        "subjectFollowsOwner"
+      ],
+      "properties": {
+        "actorDid": {
+          "type": "string",
+          "description": "The DID of the actor performing the action. For this event, same as ownerDid.",
+          "format": "did"
+        },
+        "convoCreatedAt": {
+          "type": "string",
+          "description": "When the group was originally created.",
+          "format": "datetime"
+        },
+        "convoId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "groupMemberCount": {
+          "type": "integer",
+          "description": "Current member count at the time of the event."
+        },
+        "groupName": {
+          "type": "string"
+        },
+        "ownerDid": {
+          "type": "string",
+          "description": "The DID of the group chat owner.",
+          "format": "did"
+        },
+        "requestMembersCount": {
+          "type": "integer",
+          "description": "The number of members who have not yet accepted the convo."
+        },
+        "rev": {
+          "type": "string"
+        },
+        "subjectDid": {
+          "type": "string",
+          "description": "The DID of the member who was added.",
+          "format": "did"
+        },
+        "subjectFollowsOwner": {
+          "type": "boolean",
+          "description": "Whether the added member follows the group owner."
+        }
+      }
+    },
+    "eventGroupChatMemberJoined": {
+      "type": "object",
+      "description": "Fired when a member joins a group chat via an join link that does not require approval.",
+      "required": [
+        "actorDid",
+        "convoCreatedAt",
+        "convoId",
+        "createdAt",
+        "groupMemberCount",
+        "groupName",
+        "joinLinkCode",
+        "ownerDid",
+        "rev",
+        "subjectFollowsOwner"
+      ],
+      "properties": {
+        "actorDid": {
+          "type": "string",
+          "description": "The DID of the person joining.",
+          "format": "did"
+        },
+        "convoCreatedAt": {
+          "type": "string",
+          "description": "When the group was originally created.",
+          "format": "datetime"
+        },
+        "convoId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "groupMemberCount": {
+          "type": "integer",
+          "description": "Current member count at the time of the event."
+        },
+        "groupName": {
+          "type": "string"
+        },
+        "joinLinkCode": {
+          "type": "string",
+          "description": "The code of the join link used to join."
+        },
+        "ownerDid": {
+          "type": "string",
+          "description": "The DID of the group chat owner.",
+          "format": "did"
+        },
+        "rev": {
+          "type": "string"
+        },
+        "subjectFollowsOwner": {
+          "type": "boolean",
+          "description": "Whether the joining member follows the group owner."
+        }
+      }
+    },
+    "eventGroupChatMemberLeft": {
+      "type": "object",
+      "description": "Fired when a member leaves or is removed from a group chat.",
+      "required": [
+        "actorDid",
+        "convoCreatedAt",
+        "convoId",
+        "createdAt",
+        "groupMemberCount",
+        "groupName",
+        "leaveMethod",
+        "ownerDid",
+        "rev",
+        "subjectDid"
+      ],
+      "properties": {
+        "actorDid": {
+          "type": "string",
+          "description": "The DID of the actor. For voluntary: the person leaving. For kicked: the owner.",
+          "format": "did"
+        },
+        "convoCreatedAt": {
+          "type": "string",
+          "description": "When the group was originally created.",
+          "format": "datetime"
+        },
+        "convoId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "groupMemberCount": {
+          "type": "integer",
+          "description": "Current member count at the time of the event."
+        },
+        "groupName": {
+          "type": "string"
+        },
+        "leaveMethod": {
+          "type": "string",
+          "description": "How the member left.",
+          "knownValues": [
+            "voluntary",
+            "kicked"
+          ]
+        },
+        "ownerDid": {
+          "type": "string",
+          "description": "The DID of the group chat owner.",
+          "format": "did"
+        },
+        "rev": {
+          "type": "string"
+        },
+        "subjectDid": {
+          "type": "string",
+          "description": "The DID of the member who left or was removed.",
+          "format": "did"
+        }
+      }
+    },
+    "eventGroupChatUpdated": {
+      "type": "object",
+      "description": "Fired when a group chat's metadata or status changes.",
+      "required": [
+        "actorDid",
+        "convoCreatedAt",
+        "convoId",
+        "createdAt",
+        "groupMemberCount",
+        "groupName",
+        "ownerDid",
+        "rev",
+        "updateType"
+      ],
+      "properties": {
+        "actorDid": {
+          "type": "string",
+          "description": "The DID of the actor performing the action (the owner).",
+          "format": "did"
+        },
+        "convoCreatedAt": {
+          "type": "string",
+          "description": "When the group was originally created.",
+          "format": "datetime"
+        },
+        "convoId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "groupMemberCount": {
+          "type": "integer",
+          "description": "Current member count at the time of the event."
+        },
+        "groupName": {
+          "type": "string",
+          "description": "Current group name."
+        },
+        "joinLinkCode": {
+          "type": "string",
+          "description": "The code of the join link. Only present when updateType is join-link-related."
+        },
+        "joinLinkFollowersOnly": {
+          "type": "boolean",
+          "description": "Whether the join link is restricted to followers of the owner. Only present when updateType is join-link-related."
+        },
+        "joinLinkRequiresApproval": {
+          "type": "boolean",
+          "description": "Whether the join link requires owner approval to join. Only present when updateType is join-link-related."
+        },
+        "lockReason": {
+          "type": "string",
+          "description": "Why the group was locked. Only present when updateType is 'locked'.",
+          "knownValues": [
+            "owner_action",
+            "owner_left",
+            "owner_deactivated",
+            "owner_deleted",
+            "owner_suspended",
+            "owner_taken_down",
+            "label_applied"
+          ]
+        },
+        "newName": {
+          "type": "string",
+          "description": "The new group name. Only present when updateType is 'name_changed'."
+        },
+        "oldName": {
+          "type": "string",
+          "description": "The previous group name. Only present when updateType is 'name_changed'."
+        },
+        "ownerDid": {
+          "type": "string",
+          "description": "The DID of the group chat owner.",
+          "format": "did"
+        },
+        "rev": {
+          "type": "string"
+        },
+        "updateType": {
+          "type": "string",
+          "description": "What changed.",
+          "knownValues": [
+            "name_changed",
+            "locked",
+            "locked_permanently",
+            "unlocked",
+            "join_link_created",
+            "join_link_disabled",
+            "join_link_settings_changed"
+          ]
+        }
+      }
+    },
+    "eventRateLimitExceeded": {
+      "type": "object",
+      "description": "Fired when a user exceeds a rate limit.",
+      "required": [
+        "actorDid",
+        "createdAt",
+        "endpoint",
+        "rev"
+      ],
+      "properties": {
+        "actorDid": {
+          "type": "string",
+          "description": "The DID of the user who hit the rate limit.",
+          "format": "did"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "endpoint": {
+          "type": "string",
+          "description": "The NSID of the endpoint that was rate limited."
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "main": {
+      "type": "subscription",
+      "description": "Subscribe to stream of chat events targeted to moderation. Private endpoint.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "The last known event seq number to backfill from. Use '2222222222222' to backfill from the beginning. Don't specify a cursor to listen only for new events."
+          }
+        }
+      },
+      "message": {
+        "schema": {
+          "type": "union",
+          "refs": [
+            "#eventConvoFirstMessage",
+            "#eventGroupChatCreated",
+            "#eventGroupChatMemberAdded",
+            "#eventGroupChatMemberJoined",
+            "#eventGroupChatJoinRequest",
+            "#eventGroupChatJoinRequestApproved",
+            "#eventGroupChatJoinRequestRejected",
+            "#eventChatAccepted",
+            "#eventGroupChatMemberLeft",
+            "#eventGroupChatUpdated",
+            "#eventRateLimitExceeded"
+          ]
+        }
+      },
+      "errors": [
+        {
+          "name": "FutureCursor"
+        },
+        {
+          "description": "If the consumer of the stream can not keep up with events, and a backlog gets too large, the server will drop the connection.",
+          "name": "ConsumerTooSlow"
+        }
+      ]
+    }
+  }
+}

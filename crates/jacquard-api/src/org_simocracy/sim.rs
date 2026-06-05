@@ -161,51 +161,51 @@ pub mod sim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Settings;
         type CreatedAt;
         type Name;
+        type Settings;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Settings = Unset;
         type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `settings` field to Set
-    pub struct SetSettings<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSettings<St> {}
-    impl<St: State> State for SetSettings<St> {
-        type Settings = Set<members::settings>;
-        type CreatedAt = St::CreatedAt;
-        type Name = St::Name;
+        type Settings = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Settings = St::Settings;
         type CreatedAt = Set<members::created_at>;
         type Name = St::Name;
+        type Settings = St::Settings;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Settings = St::Settings;
         type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
+        type Settings = St::Settings;
+    }
+    ///State transition - sets the `settings` field to Set
+    pub struct SetSettings<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSettings<St> {}
+    impl<St: State> State for SetSettings<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Settings = Set<members::settings>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `settings` field
-        pub struct settings(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `settings` field
+        pub struct settings(());
     }
 }
 
@@ -327,9 +327,9 @@ where
 impl<St, S: BosStr> SimBuilder<St, S>
 where
     St: sim_state::State,
-    St::Settings: sim_state::IsSet,
     St::CreatedAt: sim_state::IsSet,
     St::Name: sim_state::IsSet,
+    St::Settings: sim_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Sim<S> {

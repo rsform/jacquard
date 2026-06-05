@@ -379,85 +379,85 @@ pub mod listing_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Category;
+        type CreatedAt;
         type Location;
         type Price;
-        type CreatedAt;
         type Title;
-        type Category;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Category = Unset;
+        type CreatedAt = Unset;
         type Location = Unset;
         type Price = Unset;
-        type CreatedAt = Unset;
         type Title = Unset;
-        type Category = Unset;
-    }
-    ///State transition - sets the `location` field to Set
-    pub struct SetLocation<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLocation<St> {}
-    impl<St: State> State for SetLocation<St> {
-        type Location = Set<members::location>;
-        type Price = St::Price;
-        type CreatedAt = St::CreatedAt;
-        type Title = St::Title;
-        type Category = St::Category;
-    }
-    ///State transition - sets the `price` field to Set
-    pub struct SetPrice<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPrice<St> {}
-    impl<St: State> State for SetPrice<St> {
-        type Location = St::Location;
-        type Price = Set<members::price>;
-        type CreatedAt = St::CreatedAt;
-        type Title = St::Title;
-        type Category = St::Category;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Location = St::Location;
-        type Price = St::Price;
-        type CreatedAt = Set<members::created_at>;
-        type Title = St::Title;
-        type Category = St::Category;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Location = St::Location;
-        type Price = St::Price;
-        type CreatedAt = St::CreatedAt;
-        type Title = Set<members::title>;
-        type Category = St::Category;
     }
     ///State transition - sets the `category` field to Set
     pub struct SetCategory<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCategory<St> {}
     impl<St: State> State for SetCategory<St> {
+        type Category = Set<members::category>;
+        type CreatedAt = St::CreatedAt;
         type Location = St::Location;
         type Price = St::Price;
-        type CreatedAt = St::CreatedAt;
         type Title = St::Title;
-        type Category = Set<members::category>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Category = St::Category;
+        type CreatedAt = Set<members::created_at>;
+        type Location = St::Location;
+        type Price = St::Price;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `location` field to Set
+    pub struct SetLocation<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLocation<St> {}
+    impl<St: State> State for SetLocation<St> {
+        type Category = St::Category;
+        type CreatedAt = St::CreatedAt;
+        type Location = Set<members::location>;
+        type Price = St::Price;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `price` field to Set
+    pub struct SetPrice<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPrice<St> {}
+    impl<St: State> State for SetPrice<St> {
+        type Category = St::Category;
+        type CreatedAt = St::CreatedAt;
+        type Location = St::Location;
+        type Price = Set<members::price>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Category = St::Category;
+        type CreatedAt = St::CreatedAt;
+        type Location = St::Location;
+        type Price = St::Price;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `category` field
+        pub struct category(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `location` field
         pub struct location(());
         ///Marker type for the `price` field
         pub struct price(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `category` field
-        pub struct category(());
     }
 }
 
@@ -695,11 +695,11 @@ where
 impl<St, S: BosStr> ListingBuilder<St, S>
 where
     St: listing_state::State,
+    St::Category: listing_state::IsSet,
+    St::CreatedAt: listing_state::IsSet,
     St::Location: listing_state::IsSet,
     St::Price: listing_state::IsSet,
-    St::CreatedAt: listing_state::IsSet,
     St::Title: listing_state::IsSet,
-    St::Category: listing_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Listing<S> {

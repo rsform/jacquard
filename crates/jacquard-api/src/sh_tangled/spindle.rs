@@ -5,6 +5,9 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod list_members;
+pub mod list_members_by;
+pub mod list_spindles;
 pub mod member;
 
 

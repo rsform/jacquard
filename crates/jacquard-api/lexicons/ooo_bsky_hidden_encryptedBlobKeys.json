@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.hidden.encryptedBlobKeys",
+  "revision": 1,
+  "defs": {
+    "key": {
+      "type": "object",
+      "required": [
+        "ref",
+        "ageIdentity"
+      ],
+      "properties": {
+        "ageIdentity": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "cid-link"
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "required": [
+        "blobKeys"
+      ],
+      "properties": {
+        "blobKeys": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#key"
+          }
+        }
+      }
+    }
+  }
+}

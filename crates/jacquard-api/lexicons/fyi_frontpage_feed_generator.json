@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "fyi.frontpage.feed.generator",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring a feed generator. The did field points to the service that runs the feed algorithm.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "did",
+          "displayName",
+          "createdAt"
+        ],
+        "properties": {
+          "acceptsInteractions": {
+            "type": "boolean",
+            "description": "Whether the feed generator accepts interaction feedback."
+          },
+          "avatar": {
+            "type": "blob",
+            "description": "Avatar image for the feed.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this generator was created.",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the feed.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "did": {
+            "type": "string",
+            "description": "DID of the feed generator service.",
+            "format": "did"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name for the feed.",
+            "maxLength": 320,
+            "maxGraphemes": 32
+          }
+        }
+      }
+    }
+  }
+}

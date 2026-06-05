@@ -966,51 +966,51 @@ pub mod candidate_taxon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ScientificName;
         type Confidence;
         type Rank;
+        type ScientificName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ScientificName = Unset;
         type Confidence = Unset;
         type Rank = Unset;
-    }
-    ///State transition - sets the `scientific_name` field to Set
-    pub struct SetScientificName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScientificName<St> {}
-    impl<St: State> State for SetScientificName<St> {
-        type ScientificName = Set<members::scientific_name>;
-        type Confidence = St::Confidence;
-        type Rank = St::Rank;
+        type ScientificName = Unset;
     }
     ///State transition - sets the `confidence` field to Set
     pub struct SetConfidence<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetConfidence<St> {}
     impl<St: State> State for SetConfidence<St> {
-        type ScientificName = St::ScientificName;
         type Confidence = Set<members::confidence>;
         type Rank = St::Rank;
+        type ScientificName = St::ScientificName;
     }
     ///State transition - sets the `rank` field to Set
     pub struct SetRank<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRank<St> {}
     impl<St: State> State for SetRank<St> {
-        type ScientificName = St::ScientificName;
         type Confidence = St::Confidence;
         type Rank = Set<members::rank>;
+        type ScientificName = St::ScientificName;
+    }
+    ///State transition - sets the `scientific_name` field to Set
+    pub struct SetScientificName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScientificName<St> {}
+    impl<St: State> State for SetScientificName<St> {
+        type Confidence = St::Confidence;
+        type Rank = St::Rank;
+        type ScientificName = Set<members::scientific_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scientific_name` field
-        pub struct scientific_name(());
         ///Marker type for the `confidence` field
         pub struct confidence(());
         ///Marker type for the `rank` field
         pub struct rank(());
+        ///Marker type for the `scientific_name` field
+        pub struct scientific_name(());
     }
 }
 
@@ -1180,9 +1180,9 @@ where
 impl<St, S: BosStr> CandidateTaxonBuilder<St, S>
 where
     St: candidate_taxon_state::State,
-    St::ScientificName: candidate_taxon_state::IsSet,
     St::Confidence: candidate_taxon_state::IsSet,
     St::Rank: candidate_taxon_state::IsSet,
+    St::ScientificName: candidate_taxon_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CandidateTaxon<S> {

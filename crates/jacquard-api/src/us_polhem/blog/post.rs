@@ -174,8 +174,8 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Content;
+        type CreatedAt;
         type Slug;
         type Title;
     }
@@ -183,26 +183,26 @@ pub mod post_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Content = Unset;
+        type CreatedAt = Unset;
         type Slug = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = St::Content;
-        type Slug = St::Slug;
-        type Title = St::Title;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
-        type CreatedAt = St::CreatedAt;
         type Content = Set<members::content>;
+        type CreatedAt = St::CreatedAt;
+        type Slug = St::Slug;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Content = St::Content;
+        type CreatedAt = Set<members::created_at>;
         type Slug = St::Slug;
         type Title = St::Title;
     }
@@ -210,8 +210,8 @@ pub mod post_state {
     pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSlug<St> {}
     impl<St: State> State for SetSlug<St> {
-        type CreatedAt = St::CreatedAt;
         type Content = St::Content;
+        type CreatedAt = St::CreatedAt;
         type Slug = Set<members::slug>;
         type Title = St::Title;
     }
@@ -219,18 +219,18 @@ pub mod post_state {
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type CreatedAt = St::CreatedAt;
         type Content = St::Content;
+        type CreatedAt = St::CreatedAt;
         type Slug = St::Slug;
         type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `slug` field
         pub struct slug(());
         ///Marker type for the `title` field
@@ -435,8 +435,8 @@ impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
 impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
-    St::CreatedAt: post_state::IsSet,
     St::Content: post_state::IsSet,
+    St::CreatedAt: post_state::IsSet,
     St::Slug: post_state::IsSet,
     St::Title: post_state::IsSet,
 {

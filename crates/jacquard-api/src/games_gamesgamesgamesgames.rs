@@ -5,21 +5,45 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod accept_contribution;
 pub mod actor;
+pub mod auth_admin;
+pub mod auth_basic;
+pub mod auth_contributions;
+pub mod auth_custom_feeds;
+pub mod auth_game_browsing;
+pub mod auth_game_interactions;
+pub mod auth_profiles;
+pub mod auth_studio;
 pub mod claim;
 pub mod claim_review;
 pub mod collection;
+pub mod contribution;
+pub mod contribution_patch;
+pub mod contribution_review;
+pub mod contribution_verification;
 pub mod create_claim;
+pub mod create_contribution;
 pub mod create_game;
+pub mod create_list;
 pub mod engine;
 pub mod feed;
 pub mod game;
 pub mod get_claim;
+pub mod get_contribution;
+pub mod get_contribution_stats;
 pub mod get_game;
+pub mod get_game_count;
+pub mod get_list_count;
+pub mod get_popular_games;
 pub mod get_profile;
+pub mod get_review_count;
 pub mod get_reviews;
+pub mod get_stats;
+pub mod get_user_lists;
 pub mod graph;
 pub mod list_claims;
+pub mod list_contributions;
 pub mod list_games;
 pub mod list_org_games;
 pub mod migrate_claim;
@@ -27,13 +51,17 @@ pub mod org;
 pub mod platform;
 pub mod platform_family;
 pub mod put_game;
+pub mod put_popularity;
 pub mod redirect;
+pub mod refresh_caches;
 pub mod review_claim;
+pub mod review_contribution;
 pub mod richtext;
 pub mod search;
 pub mod search_profiles_typeahead;
 pub mod search_slugs;
 pub mod slug;
+pub mod toggle_list_item;
 
 
 #[allow(unused_imports)]
@@ -42,6 +70,7 @@ use alloc::collections::BTreeMap;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -58,6 +87,146 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::games_gamesgamesgamesgames;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct ActivityFeedItem<S: BosStr = DefaultStr> {
+    ///When the activity occurred.
+    pub created_at: Datetime,
+    ///The game associated with this activity.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub game: Option<games_gamesgamesgamesgames::GameView<S>>,
+    ///List data, present when type is 'listCreate' or 'listAddGame'.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub list: Option<games_gamesgamesgamesgames::ActivityListView<S>>,
+    ///Review data, present when type is 'review'.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub review: Option<games_gamesgamesgamesgames::ActivityReviewView<S>>,
+    ///The type of activity.
+    pub r#type: ActivityFeedItemType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// The type of activity.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ActivityFeedItemType<S: BosStr = DefaultStr> {
+    Like,
+    Review,
+    ListCreate,
+    ListAddGame,
+    Other(S),
+}
+
+impl<S: BosStr> ActivityFeedItemType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Like => "like",
+            Self::Review => "review",
+            Self::ListCreate => "listCreate",
+            Self::ListAddGame => "listAddGame",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "like" => Self::Like,
+            "review" => Self::Review,
+            "listCreate" => Self::ListCreate,
+            "listAddGame" => Self::ListAddGame,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ActivityFeedItemType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ActivityFeedItemType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ActivityFeedItemType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ActivityFeedItemType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ActivityFeedItemType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ActivityFeedItemType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ActivityFeedItemType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ActivityFeedItemType::Like => ActivityFeedItemType::Like,
+            ActivityFeedItemType::Review => ActivityFeedItemType::Review,
+            ActivityFeedItemType::ListCreate => ActivityFeedItemType::ListCreate,
+            ActivityFeedItemType::ListAddGame => ActivityFeedItemType::ListAddGame,
+            ActivityFeedItemType::Other(v) => {
+                ActivityFeedItemType::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct ActivityListView<S: BosStr = DefaultStr> {
+    pub created_at: Datetime,
+    pub name: S,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct ActivityReviewView<S: BosStr = DefaultStr> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contains_spoilers: Option<bool>,
+    pub created_at: Datetime,
+    pub rating: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tags: Option<Vec<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub text: Option<S>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1913,6 +2082,20 @@ where
     }
 }
 
+/// An inline attestation signature.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct Signature<S: BosStr = DefaultStr> {
+    ///DID key reference (e.g., did:web:example.com#signing1).
+    pub key: S,
+    ///The signature bytes.
+    #[serde(with = "jacquard_common::serde_bytes_helper")]
+    pub signature: Bytes,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2382,6 +2565,71 @@ where
             WebsiteType::Other => WebsiteType::Other,
             WebsiteType::UnknownValue(v) => WebsiteType::UnknownValue(v.into_static()),
         }
+    }
+}
+
+impl<S: BosStr> LexiconSchema for ActivityFeedItem<S> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "activityFeedItem"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for ActivityListView<S> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "activityListView"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for ActivityReviewView<S> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "activityReviewView"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        {
+            let value = &self.rating;
+            if *value > 10i64 {
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("rating"),
+                    max: 10i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.rating;
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("rating"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
     }
 }
 
@@ -3157,6 +3405,21 @@ impl<S: BosStr> LexiconSchema for ReleaseDate<S> {
     }
 }
 
+impl<S: BosStr> LexiconSchema for Signature<S> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "signature"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
 impl<S: BosStr> LexiconSchema for SkeletonGameFeedItem<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
@@ -3257,7 +3520,7 @@ impl<S: BosStr> LexiconSchema for Website<S> {
     }
 }
 
-pub mod actor_credit_view_state {
+pub mod activity_feed_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
@@ -3267,116 +3530,107 @@ pub mod actor_credit_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Credits;
+        type CreatedAt;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Credits = Unset;
+        type CreatedAt = Unset;
+        type Type = Unset;
     }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Credits = St::Credits;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
+        type Type = St::Type;
     }
-    ///State transition - sets the `credits` field to Set
-    pub struct SetCredits<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCredits<St> {}
-    impl<St: State> State for SetCredits<St> {
-        type Uri = St::Uri;
-        type Credits = Set<members::credits>;
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type CreatedAt = St::CreatedAt;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `credits` field
-        pub struct credits(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ActorCreditViewBuilder<
-    St: actor_credit_view_state::State,
+pub struct ActivityFeedItemBuilder<
+    St: activity_feed_item_state::State,
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
     _fields: (
-        Option<AtUri<S>>,
-        Option<Vec<games_gamesgamesgamesgames::CreditEntry<S>>>,
-        Option<S>,
-        Option<AtUri<S>>,
+        Option<Datetime>,
+        Option<games_gamesgamesgamesgames::GameView<S>>,
+        Option<games_gamesgamesgamesgames::ActivityListView<S>>,
+        Option<games_gamesgamesgamesgames::ActivityReviewView<S>>,
+        Option<ActivityFeedItemType<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
 
-impl ActorCreditView<DefaultStr> {
+impl ActivityFeedItem<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ActorCreditViewBuilder<actor_credit_view_state::Empty, DefaultStr> {
-        ActorCreditViewBuilder::new()
+    pub fn new() -> ActivityFeedItemBuilder<
+        activity_feed_item_state::Empty,
+        DefaultStr,
+    > {
+        ActivityFeedItemBuilder::new()
     }
 }
 
-impl<S: BosStr> ActorCreditView<S> {
+impl<S: BosStr> ActivityFeedItem<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ActorCreditViewBuilder<actor_credit_view_state::Empty, S> {
-        ActorCreditViewBuilder::builder()
+    pub fn builder() -> ActivityFeedItemBuilder<activity_feed_item_state::Empty, S> {
+        ActivityFeedItemBuilder::builder()
     }
 }
 
-impl ActorCreditViewBuilder<actor_credit_view_state::Empty, DefaultStr> {
+impl ActivityFeedItemBuilder<activity_feed_item_state::Empty, DefaultStr> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
-        ActorCreditViewBuilder {
+        ActivityFeedItemBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr> ActorCreditViewBuilder<actor_credit_view_state::Empty, S> {
+impl<S: BosStr> ActivityFeedItemBuilder<activity_feed_item_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
-        ActorCreditViewBuilder {
+        ActivityFeedItemBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<St: actor_credit_view_state::State, S: BosStr> ActorCreditViewBuilder<St, S> {
-    /// Set the `actorUri` field (optional)
-    pub fn actor_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
-        self._fields.0 = value.into();
-        self
-    }
-    /// Set the `actorUri` field to an Option value (optional)
-    pub fn maybe_actor_uri(mut self, value: Option<AtUri<S>>) -> Self {
-        self._fields.0 = value;
-        self
-    }
-}
-
-impl<St, S: BosStr> ActorCreditViewBuilder<St, S>
+impl<St, S: BosStr> ActivityFeedItemBuilder<St, S>
 where
-    St: actor_credit_view_state::State,
-    St::Credits: actor_credit_view_state::IsUnset,
+    St: activity_feed_item_state::State,
+    St::CreatedAt: activity_feed_item_state::IsUnset,
 {
-    /// Set the `credits` field (required)
-    pub fn credits(
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
         mut self,
-        value: impl Into<Vec<games_gamesgamesgamesgames::CreditEntry<S>>>,
-    ) -> ActorCreditViewBuilder<actor_credit_view_state::SetCredits<St>, S> {
-        self._fields.1 = Option::Some(value.into());
-        ActorCreditViewBuilder {
+        value: impl Into<Datetime>,
+    ) -> ActivityFeedItemBuilder<activity_feed_item_state::SetCreatedAt<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        ActivityFeedItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
             _type: PhantomData,
@@ -3384,31 +3638,75 @@ where
     }
 }
 
-impl<St: actor_credit_view_state::State, S: BosStr> ActorCreditViewBuilder<St, S> {
-    /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
+impl<St: activity_feed_item_state::State, S: BosStr> ActivityFeedItemBuilder<St, S> {
+    /// Set the `game` field (optional)
+    pub fn game(
+        mut self,
+        value: impl Into<Option<games_gamesgamesgamesgames::GameView<S>>>,
+    ) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `game` field to an Option value (optional)
+    pub fn maybe_game(
+        mut self,
+        value: Option<games_gamesgamesgamesgames::GameView<S>>,
+    ) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: activity_feed_item_state::State, S: BosStr> ActivityFeedItemBuilder<St, S> {
+    /// Set the `list` field (optional)
+    pub fn list(
+        mut self,
+        value: impl Into<Option<games_gamesgamesgamesgames::ActivityListView<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
-    /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
+    /// Set the `list` field to an Option value (optional)
+    pub fn maybe_list(
+        mut self,
+        value: Option<games_gamesgamesgamesgames::ActivityListView<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
 }
 
-impl<St, S: BosStr> ActorCreditViewBuilder<St, S>
-where
-    St: actor_credit_view_state::State,
-    St::Uri: actor_credit_view_state::IsUnset,
-{
-    /// Set the `uri` field (required)
-    pub fn uri(
+impl<St: activity_feed_item_state::State, S: BosStr> ActivityFeedItemBuilder<St, S> {
+    /// Set the `review` field (optional)
+    pub fn review(
         mut self,
-        value: impl Into<AtUri<S>>,
-    ) -> ActorCreditViewBuilder<actor_credit_view_state::SetUri<St>, S> {
-        self._fields.3 = Option::Some(value.into());
-        ActorCreditViewBuilder {
+        value: impl Into<Option<games_gamesgamesgamesgames::ActivityReviewView<S>>>,
+    ) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `review` field to an Option value (optional)
+    pub fn maybe_review(
+        mut self,
+        value: Option<games_gamesgamesgamesgames::ActivityReviewView<S>>,
+    ) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ActivityFeedItemBuilder<St, S>
+where
+    St: activity_feed_item_state::State,
+    St::Type: activity_feed_item_state::IsUnset,
+{
+    /// Set the `type` field (required)
+    pub fn r#type(
+        mut self,
+        value: impl Into<ActivityFeedItemType<S>>,
+    ) -> ActivityFeedItemBuilder<activity_feed_item_state::SetType<St>, S> {
+        self._fields.4 = Option::Some(value.into());
+        ActivityFeedItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
             _type: PhantomData,
@@ -3416,19 +3714,20 @@ where
     }
 }
 
-impl<St, S: BosStr> ActorCreditViewBuilder<St, S>
+impl<St, S: BosStr> ActivityFeedItemBuilder<St, S>
 where
-    St: actor_credit_view_state::State,
-    St::Uri: actor_credit_view_state::IsSet,
-    St::Credits: actor_credit_view_state::IsSet,
+    St: activity_feed_item_state::State,
+    St::CreatedAt: activity_feed_item_state::IsSet,
+    St::Type: activity_feed_item_state::IsSet,
 {
     /// Build the final struct.
-    pub fn build(self) -> ActorCreditView<S> {
-        ActorCreditView {
-            actor_uri: self._fields.0,
-            credits: self._fields.1.unwrap(),
-            display_name: self._fields.2,
-            uri: self._fields.3.unwrap(),
+    pub fn build(self) -> ActivityFeedItem<S> {
+        ActivityFeedItem {
+            created_at: self._fields.0.unwrap(),
+            game: self._fields.1,
+            list: self._fields.2,
+            review: self._fields.3,
+            r#type: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3436,12 +3735,13 @@ where
     pub fn build_with_data(
         self,
         extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ActorCreditView<S> {
-        ActorCreditView {
-            actor_uri: self._fields.0,
-            credits: self._fields.1.unwrap(),
-            display_name: self._fields.2,
-            uri: self._fields.3.unwrap(),
+    ) -> ActivityFeedItem<S> {
+        ActivityFeedItem {
+            created_at: self._fields.0.unwrap(),
+            game: self._fields.1,
+            list: self._fields.2,
+            review: self._fields.3,
+            r#type: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -3457,6 +3757,165 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
         id: CowStr::new_static("games.gamesgamesgamesgames.defs"),
         defs: {
             let mut map = BTreeMap::new();
+            map.insert(
+                SmolStr::new_static("activityFeedItem"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("type"), SmolStr::new_static("createdAt")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("When the activity occurred."),
+                                ),
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("game"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
+                                    "games.gamesgamesgamesgames.defs#gameView",
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("list"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
+                                    "games.gamesgamesgamesgames.defs#activityListView",
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("review"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
+                                    "games.gamesgamesgamesgames.defs#activityReviewView",
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("The type of activity."),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("activityListView"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("name"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("activityReviewView"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("rating"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("containsSpoilers"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("rating"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                maximum: Some(10i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("tags"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
+                                }),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("text"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("title"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
             map.insert(
                 SmolStr::new_static("actorCreditView"),
                 LexUserType::Object(LexObject {
@@ -5000,6 +5459,40 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                 }),
             );
             map.insert(
+                SmolStr::new_static("signature"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static("An inline attestation signature."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("key"), SmolStr::new_static("signature")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("key"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "DID key reference (e.g., did:web:example.com#signing1).",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("signature"),
+                            LexObjectProperty::Bytes(LexBytes { ..Default::default() }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
                 SmolStr::new_static("skeletonGameFeedItem"),
                 LexUserType::Object(LexObject {
                     required: Some(vec![SmolStr::new_static("game")]),
@@ -5188,6 +5681,652 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
     }
 }
 
+pub mod activity_list_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type Name;
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type CreatedAt = Unset;
+        type Name = Unset;
+        type Uri = Unset;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct ActivityListViewBuilder<
+    St: activity_list_view_state::State,
+    S: BosStr = DefaultStr,
+> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<Datetime>, Option<S>, Option<AtUri<S>>),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl ActivityListView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ActivityListViewBuilder<
+        activity_list_view_state::Empty,
+        DefaultStr,
+    > {
+        ActivityListViewBuilder::new()
+    }
+}
+
+impl<S: BosStr> ActivityListView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ActivityListViewBuilder<activity_list_view_state::Empty, S> {
+        ActivityListViewBuilder::builder()
+    }
+}
+
+impl ActivityListViewBuilder<activity_list_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        ActivityListViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> ActivityListViewBuilder<activity_list_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ActivityListViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ActivityListViewBuilder<St, S>
+where
+    St: activity_list_view_state::State,
+    St::CreatedAt: activity_list_view_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> ActivityListViewBuilder<activity_list_view_state::SetCreatedAt<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        ActivityListViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ActivityListViewBuilder<St, S>
+where
+    St: activity_list_view_state::State,
+    St::Name: activity_list_view_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> ActivityListViewBuilder<activity_list_view_state::SetName<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        ActivityListViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ActivityListViewBuilder<St, S>
+where
+    St: activity_list_view_state::State,
+    St::Uri: activity_list_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> ActivityListViewBuilder<activity_list_view_state::SetUri<St>, S> {
+        self._fields.2 = Option::Some(value.into());
+        ActivityListViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ActivityListViewBuilder<St, S>
+where
+    St: activity_list_view_state::State,
+    St::CreatedAt: activity_list_view_state::IsSet,
+    St::Name: activity_list_view_state::IsSet,
+    St::Uri: activity_list_view_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> ActivityListView<S> {
+        ActivityListView {
+            created_at: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            uri: self._fields.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ActivityListView<S> {
+        ActivityListView {
+            created_at: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            uri: self._fields.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+pub mod activity_review_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type Rating;
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type CreatedAt = Unset;
+        type Rating = Unset;
+        type Uri = Unset;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
+        type Rating = St::Rating;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `rating` field to Set
+    pub struct SetRating<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRating<St> {}
+    impl<St: State> State for SetRating<St> {
+        type CreatedAt = St::CreatedAt;
+        type Rating = Set<members::rating>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type CreatedAt = St::CreatedAt;
+        type Rating = St::Rating;
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `rating` field
+        pub struct rating(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct ActivityReviewViewBuilder<
+    St: activity_review_view_state::State,
+    S: BosStr = DefaultStr,
+> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (
+        Option<bool>,
+        Option<Datetime>,
+        Option<i64>,
+        Option<Vec<S>>,
+        Option<S>,
+        Option<S>,
+        Option<AtUri<S>>,
+    ),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl ActivityReviewView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ActivityReviewViewBuilder<
+        activity_review_view_state::Empty,
+        DefaultStr,
+    > {
+        ActivityReviewViewBuilder::new()
+    }
+}
+
+impl<S: BosStr> ActivityReviewView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ActivityReviewViewBuilder<activity_review_view_state::Empty, S> {
+        ActivityReviewViewBuilder::builder()
+    }
+}
+
+impl ActivityReviewViewBuilder<activity_review_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        ActivityReviewViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> ActivityReviewViewBuilder<activity_review_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ActivityReviewViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: activity_review_view_state::State, S: BosStr> ActivityReviewViewBuilder<St, S> {
+    /// Set the `containsSpoilers` field (optional)
+    pub fn contains_spoilers(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `containsSpoilers` field to an Option value (optional)
+    pub fn maybe_contains_spoilers(mut self, value: Option<bool>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ActivityReviewViewBuilder<St, S>
+where
+    St: activity_review_view_state::State,
+    St::CreatedAt: activity_review_view_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> ActivityReviewViewBuilder<activity_review_view_state::SetCreatedAt<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        ActivityReviewViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ActivityReviewViewBuilder<St, S>
+where
+    St: activity_review_view_state::State,
+    St::Rating: activity_review_view_state::IsUnset,
+{
+    /// Set the `rating` field (required)
+    pub fn rating(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ActivityReviewViewBuilder<activity_review_view_state::SetRating<St>, S> {
+        self._fields.2 = Option::Some(value.into());
+        ActivityReviewViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: activity_review_view_state::State, S: BosStr> ActivityReviewViewBuilder<St, S> {
+    /// Set the `tags` field (optional)
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `tags` field to an Option value (optional)
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
+impl<St: activity_review_view_state::State, S: BosStr> ActivityReviewViewBuilder<St, S> {
+    /// Set the `text` field (optional)
+    pub fn text(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `text` field to an Option value (optional)
+    pub fn maybe_text(mut self, value: Option<S>) -> Self {
+        self._fields.4 = value;
+        self
+    }
+}
+
+impl<St: activity_review_view_state::State, S: BosStr> ActivityReviewViewBuilder<St, S> {
+    /// Set the `title` field (optional)
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.5 = value.into();
+        self
+    }
+    /// Set the `title` field to an Option value (optional)
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
+        self._fields.5 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ActivityReviewViewBuilder<St, S>
+where
+    St: activity_review_view_state::State,
+    St::Uri: activity_review_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> ActivityReviewViewBuilder<activity_review_view_state::SetUri<St>, S> {
+        self._fields.6 = Option::Some(value.into());
+        ActivityReviewViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ActivityReviewViewBuilder<St, S>
+where
+    St: activity_review_view_state::State,
+    St::CreatedAt: activity_review_view_state::IsSet,
+    St::Rating: activity_review_view_state::IsSet,
+    St::Uri: activity_review_view_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> ActivityReviewView<S> {
+        ActivityReviewView {
+            contains_spoilers: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            rating: self._fields.2.unwrap(),
+            tags: self._fields.3,
+            text: self._fields.4,
+            title: self._fields.5,
+            uri: self._fields.6.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ActivityReviewView<S> {
+        ActivityReviewView {
+            contains_spoilers: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            rating: self._fields.2.unwrap(),
+            tags: self._fields.3,
+            text: self._fields.4,
+            title: self._fields.5,
+            uri: self._fields.6.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+pub mod actor_credit_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Credits;
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Credits = Unset;
+        type Uri = Unset;
+    }
+    ///State transition - sets the `credits` field to Set
+    pub struct SetCredits<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCredits<St> {}
+    impl<St: State> State for SetCredits<St> {
+        type Credits = Set<members::credits>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Credits = St::Credits;
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `credits` field
+        pub struct credits(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct ActorCreditViewBuilder<
+    St: actor_credit_view_state::State,
+    S: BosStr = DefaultStr,
+> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (
+        Option<AtUri<S>>,
+        Option<Vec<games_gamesgamesgamesgames::CreditEntry<S>>>,
+        Option<S>,
+        Option<AtUri<S>>,
+    ),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl ActorCreditView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ActorCreditViewBuilder<actor_credit_view_state::Empty, DefaultStr> {
+        ActorCreditViewBuilder::new()
+    }
+}
+
+impl<S: BosStr> ActorCreditView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ActorCreditViewBuilder<actor_credit_view_state::Empty, S> {
+        ActorCreditViewBuilder::builder()
+    }
+}
+
+impl ActorCreditViewBuilder<actor_credit_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        ActorCreditViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> ActorCreditViewBuilder<actor_credit_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ActorCreditViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: actor_credit_view_state::State, S: BosStr> ActorCreditViewBuilder<St, S> {
+    /// Set the `actorUri` field (optional)
+    pub fn actor_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `actorUri` field to an Option value (optional)
+    pub fn maybe_actor_uri(mut self, value: Option<AtUri<S>>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ActorCreditViewBuilder<St, S>
+where
+    St: actor_credit_view_state::State,
+    St::Credits: actor_credit_view_state::IsUnset,
+{
+    /// Set the `credits` field (required)
+    pub fn credits(
+        mut self,
+        value: impl Into<Vec<games_gamesgamesgamesgames::CreditEntry<S>>>,
+    ) -> ActorCreditViewBuilder<actor_credit_view_state::SetCredits<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        ActorCreditViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: actor_credit_view_state::State, S: BosStr> ActorCreditViewBuilder<St, S> {
+    /// Set the `displayName` field (optional)
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `displayName` field to an Option value (optional)
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
+        self._fields.2 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ActorCreditViewBuilder<St, S>
+where
+    St: actor_credit_view_state::State,
+    St::Uri: actor_credit_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> ActorCreditViewBuilder<actor_credit_view_state::SetUri<St>, S> {
+        self._fields.3 = Option::Some(value.into());
+        ActorCreditViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ActorCreditViewBuilder<St, S>
+where
+    St: actor_credit_view_state::State,
+    St::Credits: actor_credit_view_state::IsSet,
+    St::Uri: actor_credit_view_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> ActorCreditView<S> {
+        ActorCreditView {
+            actor_uri: self._fields.0,
+            credits: self._fields.1.unwrap(),
+            display_name: self._fields.2,
+            uri: self._fields.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ActorCreditView<S> {
+        ActorCreditView {
+            actor_uri: self._fields.0,
+            credits: self._fields.1.unwrap(),
+            display_name: self._fields.2,
+            uri: self._fields.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
 pub mod actor_profile_detail_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -5198,37 +6337,37 @@ pub mod actor_profile_detail_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Did;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Did = St::Did;
+        type Uri = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Uri = St::Uri;
         type Did = Set<members::did>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Did = St::Did;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -5458,8 +6597,8 @@ impl<
 impl<St, S: BosStr> ActorProfileDetailViewBuilder<St, S>
 where
     St: actor_profile_detail_view_state::State,
-    St::Uri: actor_profile_detail_view_state::IsSet,
     St::Did: actor_profile_detail_view_state::IsSet,
+    St::Uri: actor_profile_detail_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ActorProfileDetailView<S> {
@@ -5506,37 +6645,37 @@ pub mod actor_profile_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Did;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Did = St::Did;
+        type Uri = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Uri = St::Uri;
         type Did = Set<members::did>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Did = St::Did;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -5676,8 +6815,8 @@ where
 impl<St, S: BosStr> ActorProfileSummaryViewBuilder<St, S>
 where
     St: actor_profile_summary_view_state::State,
-    St::Uri: actor_profile_summary_view_state::IsSet,
     St::Did: actor_profile_summary_view_state::IsSet,
+    St::Uri: actor_profile_summary_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ActorProfileSummaryView<S> {
@@ -6052,37 +7191,37 @@ pub mod engine_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Name;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Name = St::Name;
+        type Uri = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Uri = St::Uri;
         type Name = Set<members::name>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Name = St::Name;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -6189,8 +7328,8 @@ where
 impl<St, S: BosStr> EngineSummaryViewBuilder<St, S>
 where
     St: engine_summary_view_state::State,
-    St::Uri: engine_summary_view_state::IsSet,
     St::Name: engine_summary_view_state::IsSet,
+    St::Uri: engine_summary_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> EngineSummaryView<S> {
@@ -6226,50 +7365,50 @@ pub mod game_detail_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Uri;
         type Name;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Uri = Unset;
         type Name = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
         type Uri = St::Uri;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type CreatedAt = St::CreatedAt;
-        type Uri = Set<members::uri>;
-        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
         type CreatedAt = St::CreatedAt;
-        type Uri = St::Uri;
         type Name = Set<members::name>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -6894,8 +8033,8 @@ impl<St, S: BosStr> GameDetailViewBuilder<St, S>
 where
     St: game_detail_view_state::State,
     St::CreatedAt: game_detail_view_state::IsSet,
-    St::Uri: game_detail_view_state::IsSet,
     St::Name: game_detail_view_state::IsSet,
+    St::Uri: game_detail_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GameDetailView<S> {
@@ -7716,37 +8855,37 @@ pub mod org_credit_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Roles;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Roles = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Roles = St::Roles;
+        type Uri = Unset;
     }
     ///State transition - sets the `roles` field to Set
     pub struct SetRoles<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRoles<St> {}
     impl<St: State> State for SetRoles<St> {
-        type Uri = St::Uri;
         type Roles = Set<members::roles>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Roles = St::Roles;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `roles` field
         pub struct roles(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -7868,8 +9007,8 @@ where
 impl<St, S: BosStr> OrgCreditViewBuilder<St, S>
 where
     St: org_credit_view_state::State,
-    St::Uri: org_credit_view_state::IsSet,
     St::Roles: org_credit_view_state::IsSet,
+    St::Uri: org_credit_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> OrgCreditView<S> {
@@ -8325,37 +9464,37 @@ pub mod org_profile_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Did;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Did = St::Did;
+        type Uri = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Uri = St::Uri;
         type Did = Set<members::did>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Did = St::Did;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -8484,8 +9623,8 @@ where
 impl<St, S: BosStr> OrgProfileSummaryViewBuilder<St, S>
 where
     St: org_profile_summary_view_state::State,
-    St::Uri: org_profile_summary_view_state::IsSet,
     St::Did: org_profile_summary_view_state::IsSet,
+    St::Uri: org_profile_summary_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> OrgProfileSummaryView<S> {
@@ -8522,37 +9661,37 @@ pub mod platform_features_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Platform;
         type Features;
+        type Platform;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Platform = Unset;
         type Features = Unset;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlatform<St> {}
-    impl<St: State> State for SetPlatform<St> {
-        type Platform = Set<members::platform>;
-        type Features = St::Features;
+        type Platform = Unset;
     }
     ///State transition - sets the `features` field to Set
     pub struct SetFeatures<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetFeatures<St> {}
     impl<St: State> State for SetFeatures<St> {
-        type Platform = St::Platform;
         type Features = Set<members::features>;
+        type Platform = St::Platform;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlatform<St> {}
+    impl<St: State> State for SetPlatform<St> {
+        type Features = St::Features;
+        type Platform = Set<members::platform>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `platform` field
-        pub struct platform(());
         ///Marker type for the `features` field
         pub struct features(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
     }
 }
 
@@ -8643,8 +9782,8 @@ where
 impl<St, S: BosStr> PlatformFeaturesBuilder<St, S>
 where
     St: platform_features_state::State,
-    St::Platform: platform_features_state::IsSet,
     St::Features: platform_features_state::IsSet,
+    St::Platform: platform_features_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PlatformFeatures<S> {
@@ -8677,37 +9816,37 @@ pub mod platform_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Name;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Name = St::Name;
+        type Uri = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Uri = St::Uri;
         type Name = Set<members::name>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Name = St::Name;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -8864,8 +10003,8 @@ where
 impl<St, S: BosStr> PlatformSummaryViewBuilder<St, S>
 where
     St: platform_summary_view_state::State,
-    St::Uri: platform_summary_view_state::IsSet,
     St::Name: platform_summary_view_state::IsSet,
+    St::Uri: platform_summary_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PlatformSummaryView<S> {
@@ -9119,6 +10258,158 @@ where
             display_name: self._fields.2,
             profile_type: self._fields.3.unwrap(),
             uri: self._fields.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+pub mod signature_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Key;
+        type Signature;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Key = Unset;
+        type Signature = Unset;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type Key = Set<members::key>;
+        type Signature = St::Signature;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSignature<St> {}
+    impl<St: State> State for SetSignature<St> {
+        type Key = St::Key;
+        type Signature = Set<members::signature>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `key` field
+        pub struct key(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct SignatureBuilder<St: signature_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<S>, Option<Bytes>),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl Signature<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> SignatureBuilder<signature_state::Empty, DefaultStr> {
+        SignatureBuilder::new()
+    }
+}
+
+impl<S: BosStr> Signature<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> SignatureBuilder<signature_state::Empty, S> {
+        SignatureBuilder::builder()
+    }
+}
+
+impl SignatureBuilder<signature_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        SignatureBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> SignatureBuilder<signature_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        SignatureBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SignatureBuilder<St, S>
+where
+    St: signature_state::State,
+    St::Key: signature_state::IsUnset,
+{
+    /// Set the `key` field (required)
+    pub fn key(
+        mut self,
+        value: impl Into<S>,
+    ) -> SignatureBuilder<signature_state::SetKey<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        SignatureBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SignatureBuilder<St, S>
+where
+    St: signature_state::State,
+    St::Signature: signature_state::IsUnset,
+{
+    /// Set the `signature` field (required)
+    pub fn signature(
+        mut self,
+        value: impl Into<Bytes>,
+    ) -> SignatureBuilder<signature_state::SetSignature<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        SignatureBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> SignatureBuilder<St, S>
+where
+    St: signature_state::State,
+    St::Key: signature_state::IsSet,
+    St::Signature: signature_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> Signature<S> {
+        Signature {
+            key: self._fields.0.unwrap(),
+            signature: self._fields.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Signature<S> {
+        Signature {
+            key: self._fields.0.unwrap(),
+            signature: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -6,14 +6,20 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod badge;
+pub mod beta;
 pub mod branding;
 pub mod broadcast;
 pub mod chat;
+pub mod config;
+pub mod game;
+pub mod get_likes;
 pub mod graph;
 pub mod ingest;
 pub mod key;
+pub mod like;
 pub mod live;
 pub mod livestream;
+pub mod media;
 pub mod metadata;
 pub mod moderation;
 pub mod multistream;
@@ -21,6 +27,8 @@ pub mod playback;
 pub mod richtext;
 pub mod segment;
 pub mod server;
+pub mod video;
+pub mod vod;
 
 
 #[allow(unused_imports)]
@@ -45,6 +53,139 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewBasic;
 use crate::app_bsky::graph::block::Block;
 use crate::place_stream;
+/// A game from the gamesgamesgamesgames catalog, identified by its AT URI.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct ActivityGame<S: BosStr = DefaultStr> {
+    ///Cached display name of the game.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// A non-game activity with a well-known label.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct ActivityLabel<S: BosStr = DefaultStr> {
+    pub label: ActivityLabelLabel<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ActivityLabelLabel<S: BosStr = DefaultStr> {
+    Events,
+    JustChatting,
+    Music,
+    Art,
+    SoftwareDev,
+    Cooking,
+    Miniatures,
+    MakersCrafting,
+    Fitness,
+    Sports,
+    Other(S),
+}
+
+impl<S: BosStr> ActivityLabelLabel<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Events => "events",
+            Self::JustChatting => "just_chatting",
+            Self::Music => "music",
+            Self::Art => "art",
+            Self::SoftwareDev => "software_dev",
+            Self::Cooking => "cooking",
+            Self::Miniatures => "miniatures",
+            Self::MakersCrafting => "makers_crafting",
+            Self::Fitness => "fitness",
+            Self::Sports => "sports",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "events" => Self::Events,
+            "just_chatting" => Self::JustChatting,
+            "music" => Self::Music,
+            "art" => Self::Art,
+            "software_dev" => Self::SoftwareDev,
+            "cooking" => Self::Cooking,
+            "miniatures" => Self::Miniatures,
+            "makers_crafting" => Self::MakersCrafting,
+            "fitness" => Self::Fitness,
+            "sports" => Self::Sports,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ActivityLabelLabel<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ActivityLabelLabel<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ActivityLabelLabel<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ActivityLabelLabel<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ActivityLabelLabel<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ActivityLabelLabel<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ActivityLabelLabel<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ActivityLabelLabel::Events => ActivityLabelLabel::Events,
+            ActivityLabelLabel::JustChatting => ActivityLabelLabel::JustChatting,
+            ActivityLabelLabel::Music => ActivityLabelLabel::Music,
+            ActivityLabelLabel::Art => ActivityLabelLabel::Art,
+            ActivityLabelLabel::SoftwareDev => ActivityLabelLabel::SoftwareDev,
+            ActivityLabelLabel::Cooking => ActivityLabelLabel::Cooking,
+            ActivityLabelLabel::Miniatures => ActivityLabelLabel::Miniatures,
+            ActivityLabelLabel::MakersCrafting => ActivityLabelLabel::MakersCrafting,
+            ActivityLabelLabel::Fitness => ActivityLabelLabel::Fitness,
+            ActivityLabelLabel::Sports => ActivityLabelLabel::Sports,
+            ActivityLabelLabel::Other(v) => ActivityLabelLabel::Other(v.into_static()),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -74,6 +215,36 @@ pub struct Renditions<S: BosStr = DefaultStr> {
     pub renditions: Vec<place_stream::Rendition<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+impl<S: BosStr> LexiconSchema for ActivityGame<S> {
+    fn nsid() -> &'static str {
+        "place.stream.defs"
+    }
+    fn def_name() -> &'static str {
+        "activityGame"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_place_stream_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for ActivityLabel<S> {
+    fn nsid() -> &'static str {
+        "place.stream.defs"
+    }
+    fn def_name() -> &'static str {
+        "activityLabel"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_place_stream_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
 }
 
 impl<S: BosStr> LexiconSchema for BlockView<S> {
@@ -121,6 +292,303 @@ impl<S: BosStr> LexiconSchema for Renditions<S> {
     }
 }
 
+pub mod activity_game_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct ActivityGameBuilder<St: activity_game_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<S>, Option<AtUri<S>>),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl ActivityGame<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ActivityGameBuilder<activity_game_state::Empty, DefaultStr> {
+        ActivityGameBuilder::new()
+    }
+}
+
+impl<S: BosStr> ActivityGame<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ActivityGameBuilder<activity_game_state::Empty, S> {
+        ActivityGameBuilder::builder()
+    }
+}
+
+impl ActivityGameBuilder<activity_game_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        ActivityGameBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> ActivityGameBuilder<activity_game_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ActivityGameBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: activity_game_state::State, S: BosStr> ActivityGameBuilder<St, S> {
+    /// Set the `name` field (optional)
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ActivityGameBuilder<St, S>
+where
+    St: activity_game_state::State,
+    St::Uri: activity_game_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> ActivityGameBuilder<activity_game_state::SetUri<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        ActivityGameBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ActivityGameBuilder<St, S>
+where
+    St: activity_game_state::State,
+    St::Uri: activity_game_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> ActivityGame<S> {
+        ActivityGame {
+            name: self._fields.0,
+            uri: self._fields.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ActivityGame<S> {
+        ActivityGame {
+            name: self._fields.0,
+            uri: self._fields.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+fn lexicon_doc_place_stream_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("place.stream.defs"),
+        defs: {
+            let mut map = BTreeMap::new();
+            map.insert(
+                SmolStr::new_static("activityGame"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "A game from the gamesgamesgamesgames catalog, identified by its AT URI.",
+                        ),
+                    ),
+                    required: Some(vec![SmolStr::new_static("uri")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Cached display name of the game."),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("activityLabel"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "A non-game activity with a well-known label.",
+                        ),
+                    ),
+                    required: Some(vec![SmolStr::new_static("label")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("label"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("blockView"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("blocker"),
+                            SmolStr::new_static("record"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("blocker"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("cid"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Cid),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("indexedAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("record"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("app.bsky.graph.block"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("rendition"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("name")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("renditions"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("renditions")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("renditions"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#rendition"),
+                                    ..Default::default()
+                                }),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map
+        },
+        ..Default::default()
+    }
+}
+
 pub mod block_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -133,8 +601,8 @@ pub mod block_view_state {
     pub trait State: sealed::Sealed {
         type Blocker;
         type Cid;
-        type Record;
         type IndexedAt;
+        type Record;
         type Uri;
     }
     /// Empty state - all required fields are unset
@@ -143,8 +611,8 @@ pub mod block_view_state {
     impl State for Empty {
         type Blocker = Unset;
         type Cid = Unset;
-        type Record = Unset;
         type IndexedAt = Unset;
+        type Record = Unset;
         type Uri = Unset;
     }
     ///State transition - sets the `blocker` field to Set
@@ -153,8 +621,8 @@ pub mod block_view_state {
     impl<St: State> State for SetBlocker<St> {
         type Blocker = Set<members::blocker>;
         type Cid = St::Cid;
-        type Record = St::Record;
         type IndexedAt = St::IndexedAt;
+        type Record = St::Record;
         type Uri = St::Uri;
     }
     ///State transition - sets the `cid` field to Set
@@ -163,18 +631,8 @@ pub mod block_view_state {
     impl<St: State> State for SetCid<St> {
         type Blocker = St::Blocker;
         type Cid = Set<members::cid>;
+        type IndexedAt = St::IndexedAt;
         type Record = St::Record;
-        type IndexedAt = St::IndexedAt;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
-        type Blocker = St::Blocker;
-        type Cid = St::Cid;
-        type Record = Set<members::record>;
-        type IndexedAt = St::IndexedAt;
         type Uri = St::Uri;
     }
     ///State transition - sets the `indexed_at` field to Set
@@ -183,8 +641,18 @@ pub mod block_view_state {
     impl<St: State> State for SetIndexedAt<St> {
         type Blocker = St::Blocker;
         type Cid = St::Cid;
-        type Record = St::Record;
         type IndexedAt = Set<members::indexed_at>;
+        type Record = St::Record;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Blocker = St::Blocker;
+        type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
+        type Record = Set<members::record>;
         type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
@@ -193,8 +661,8 @@ pub mod block_view_state {
     impl<St: State> State for SetUri<St> {
         type Blocker = St::Blocker;
         type Cid = St::Cid;
-        type Record = St::Record;
         type IndexedAt = St::IndexedAt;
+        type Record = St::Record;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -204,10 +672,10 @@ pub mod block_view_state {
         pub struct blocker(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `uri` field
         pub struct uri(());
     }
@@ -362,8 +830,8 @@ where
     St: block_view_state::State,
     St::Blocker: block_view_state::IsSet,
     St::Cid: block_view_state::IsSet,
-    St::Record: block_view_state::IsSet,
     St::IndexedAt: block_view_state::IsSet,
+    St::Record: block_view_state::IsSet,
     St::Uri: block_view_state::IsSet,
 {
     /// Build the final struct.
@@ -390,116 +858,6 @@ where
             uri: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-fn lexicon_doc_place_stream_defs() -> LexiconDoc<'static> {
-    #[allow(unused_imports)]
-    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
-    use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
-    LexiconDoc {
-        lexicon: Lexicon::Lexicon1,
-        id: CowStr::new_static("place.stream.defs"),
-        defs: {
-            let mut map = BTreeMap::new();
-            map.insert(
-                SmolStr::new_static("blockView"),
-                LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("blocker"),
-                            SmolStr::new_static("record"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("blocker"),
-                            LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileViewBasic",
-                                ),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("cid"),
-                            LexObjectProperty::String(LexString {
-                                format: Some(LexStringFormat::Cid),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("indexedAt"),
-                            LexObjectProperty::String(LexString {
-                                format: Some(LexStringFormat::Datetime),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("record"),
-                            LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.graph.block"),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("uri"),
-                            LexObjectProperty::String(LexString {
-                                format: Some(LexStringFormat::AtUri),
-                                ..Default::default()
-                            }),
-                        );
-                        map
-                    },
-                    ..Default::default()
-                }),
-            );
-            map.insert(
-                SmolStr::new_static("rendition"),
-                LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("name")]),
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
-                        );
-                        map
-                    },
-                    ..Default::default()
-                }),
-            );
-            map.insert(
-                SmolStr::new_static("renditions"),
-                LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("renditions")]),
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("renditions"),
-                            LexObjectProperty::Array(LexArray {
-                                items: LexArrayItem::Ref(LexRef {
-                                    r#ref: CowStr::new_static("#rendition"),
-                                    ..Default::default()
-                                }),
-                                ..Default::default()
-                            }),
-                        );
-                        map
-                    },
-                    ..Default::default()
-                }),
-            );
-            map
-        },
-        ..Default::default()
     }
 }
 

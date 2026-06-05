@@ -15,7 +15,7 @@ use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::AtUri;
+use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,19 +29,8 @@ use crate::sh_tangled::git::temp::list_languages;
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Language<S: BosStr = DefaultStr> {
-    ///Hex color code for this language
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<S>,
-    ///File extensions associated with this language
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub extensions: Option<Vec<S>>,
-    ///Number of files in this language
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub file_count: Option<i64>,
     ///Programming language name
     pub name: S,
-    ///Percentage of total codebase (0-100)
-    pub percentage: i64,
     ///Total size of files in this language (bytes)
     pub size: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -56,7 +45,7 @@ pub struct ListLanguages<S: BosStr = DefaultStr> {
     #[serde(default = "_default_ref")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#ref: Option<S>,
-    pub repo: AtUri<S>,
+    pub repo: Did<S>,
 }
 
 
@@ -66,12 +55,8 @@ pub struct ListLanguagesOutput<S: BosStr = DefaultStr> {
     pub languages: Vec<list_languages::Language<S>>,
     ///The git reference used
     pub r#ref: S,
-    ///Total number of files analyzed
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_files: Option<i64>,
     ///Total size of all analyzed files in bytes
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_size: Option<i64>,
+    pub total: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -190,7 +175,6 @@ pub mod language_state {
     pub trait State: sealed::Sealed {
         type Name;
         type Size;
-        type Percentage;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -198,7 +182,6 @@ pub mod language_state {
     impl State for Empty {
         type Name = Unset;
         type Size = Unset;
-        type Percentage = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
@@ -206,7 +189,6 @@ pub mod language_state {
     impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
         type Size = St::Size;
-        type Percentage = St::Percentage;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
@@ -214,15 +196,6 @@ pub mod language_state {
     impl<St: State> State for SetSize<St> {
         type Name = St::Name;
         type Size = Set<members::size>;
-        type Percentage = St::Percentage;
-    }
-    ///State transition - sets the `percentage` field to Set
-    pub struct SetPercentage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPercentage<St> {}
-    impl<St: State> State for SetPercentage<St> {
-        type Name = St::Name;
-        type Size = St::Size;
-        type Percentage = Set<members::percentage>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -231,22 +204,13 @@ pub mod language_state {
         pub struct name(());
         ///Marker type for the `size` field
         pub struct size(());
-        ///Marker type for the `percentage` field
-        pub struct percentage(());
     }
 }
 
 /// Builder for constructing an instance of this type.
 pub struct LanguageBuilder<St: language_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<Vec<S>>,
-        Option<i64>,
-        Option<S>,
-        Option<i64>,
-        Option<i64>,
-    ),
+    _fields: (Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -269,7 +233,7 @@ impl LanguageBuilder<language_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         LanguageBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None),
+            _fields: (None, None),
             _type: PhantomData,
         }
     }
@@ -280,48 +244,9 @@ impl<S: BosStr> LanguageBuilder<language_state::Empty, S> {
     pub fn builder() -> Self {
         LanguageBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None),
+            _fields: (None, None),
             _type: PhantomData,
         }
-    }
-}
-
-impl<St: language_state::State, S: BosStr> LanguageBuilder<St, S> {
-    /// Set the `color` field (optional)
-    pub fn color(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.0 = value.into();
-        self
-    }
-    /// Set the `color` field to an Option value (optional)
-    pub fn maybe_color(mut self, value: Option<S>) -> Self {
-        self._fields.0 = value;
-        self
-    }
-}
-
-impl<St: language_state::State, S: BosStr> LanguageBuilder<St, S> {
-    /// Set the `extensions` field (optional)
-    pub fn extensions(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
-        self._fields.1 = value.into();
-        self
-    }
-    /// Set the `extensions` field to an Option value (optional)
-    pub fn maybe_extensions(mut self, value: Option<Vec<S>>) -> Self {
-        self._fields.1 = value;
-        self
-    }
-}
-
-impl<St: language_state::State, S: BosStr> LanguageBuilder<St, S> {
-    /// Set the `fileCount` field (optional)
-    pub fn file_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.2 = value.into();
-        self
-    }
-    /// Set the `fileCount` field to an Option value (optional)
-    pub fn maybe_file_count(mut self, value: Option<i64>) -> Self {
-        self._fields.2 = value;
-        self
     }
 }
 
@@ -335,26 +260,7 @@ where
         mut self,
         value: impl Into<S>,
     ) -> LanguageBuilder<language_state::SetName<St>, S> {
-        self._fields.3 = Option::Some(value.into());
-        LanguageBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St, S: BosStr> LanguageBuilder<St, S>
-where
-    St: language_state::State,
-    St::Percentage: language_state::IsUnset,
-{
-    /// Set the `percentage` field (required)
-    pub fn percentage(
-        mut self,
-        value: impl Into<i64>,
-    ) -> LanguageBuilder<language_state::SetPercentage<St>, S> {
-        self._fields.4 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LanguageBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -373,7 +279,7 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> LanguageBuilder<language_state::SetSize<St>, S> {
-        self._fields.5 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LanguageBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -387,29 +293,20 @@ where
     St: language_state::State,
     St::Name: language_state::IsSet,
     St::Size: language_state::IsSet,
-    St::Percentage: language_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Language<S> {
         Language {
-            color: self._fields.0,
-            extensions: self._fields.1,
-            file_count: self._fields.2,
-            name: self._fields.3.unwrap(),
-            percentage: self._fields.4.unwrap(),
-            size: self._fields.5.unwrap(),
+            name: self._fields.0.unwrap(),
+            size: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Language<S> {
         Language {
-            color: self._fields.0,
-            extensions: self._fields.1,
-            file_count: self._fields.2,
-            name: self._fields.3.unwrap(),
-            percentage: self._fields.4.unwrap(),
-            size: self._fields.5.unwrap(),
+            name: self._fields.0.unwrap(),
+            size: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -429,55 +326,17 @@ fn lexicon_doc_sh_tangled_git_temp_listLanguages() -> LexiconDoc<'static> {
                 SmolStr::new_static("language"),
                 LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            SmolStr::new_static("name"), SmolStr::new_static("size"),
-                            SmolStr::new_static("percentage")
-                        ],
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("size")],
                     ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("color"),
-                            LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Hex color code for this language"),
-                                ),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("extensions"),
-                            LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "File extensions associated with this language",
-                                    ),
-                                ),
-                                items: LexArrayItem::String(LexString {
-                                    ..Default::default()
-                                }),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("fileCount"),
-                            LexObjectProperty::Integer(LexInteger {
-                                ..Default::default()
-                            }),
-                        );
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
                                 description: Some(
                                     CowStr::new_static("Programming language name"),
                                 ),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("percentage"),
-                            LexObjectProperty::Integer(LexInteger {
                                 ..Default::default()
                             }),
                         );
@@ -516,9 +375,9 @@ fn lexicon_doc_sh_tangled_git_temp_listLanguages() -> LexiconDoc<'static> {
                                     SmolStr::new_static("repo"),
                                     LexXrpcParametersProperty::String(LexString {
                                         description: Some(
-                                            CowStr::new_static("AT-URI of the repository"),
+                                            CowStr::new_static("DID of the repository"),
                                         ),
-                                        format: Some(LexStringFormat::AtUri),
+                                        format: Some(LexStringFormat::Did),
                                         ..Default::default()
                                     }),
                                 );
@@ -578,7 +437,7 @@ pub struct ListLanguagesBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<AtUri<S>>),
+    _fields: (Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -639,7 +498,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<S>>,
+        value: impl Into<Did<S>>,
     ) -> ListLanguagesBuilder<list_languages_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ListLanguagesBuilder {

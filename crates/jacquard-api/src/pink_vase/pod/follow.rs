@@ -114,37 +114,37 @@ pub mod follow_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Show;
         type CreatedAt;
+        type Show;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Show = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `show` field to Set
-    pub struct SetShow<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetShow<St> {}
-    impl<St: State> State for SetShow<St> {
-        type Show = Set<members::show>;
-        type CreatedAt = St::CreatedAt;
+        type Show = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Show = St::Show;
         type CreatedAt = Set<members::created_at>;
+        type Show = St::Show;
+    }
+    ///State transition - sets the `show` field to Set
+    pub struct SetShow<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShow<St> {}
+    impl<St: State> State for SetShow<St> {
+        type CreatedAt = St::CreatedAt;
+        type Show = Set<members::show>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `show` field
-        pub struct show(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `show` field
+        pub struct show(());
     }
 }
 
@@ -232,8 +232,8 @@ where
 impl<St, S: BosStr> FollowBuilder<St, S>
 where
     St: follow_state::State,
-    St::Show: follow_state::IsSet,
     St::CreatedAt: follow_state::IsSet,
+    St::Show: follow_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Follow<S> {

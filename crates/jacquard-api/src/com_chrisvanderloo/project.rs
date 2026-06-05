@@ -171,8 +171,8 @@ pub mod project_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Description;
-        type Repo;
         type Language;
+        type Repo;
         type Title;
     }
     /// Empty state - all required fields are unset
@@ -180,8 +180,8 @@ pub mod project_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Description = Unset;
-        type Repo = Unset;
         type Language = Unset;
+        type Repo = Unset;
         type Title = Unset;
     }
     ///State transition - sets the `description` field to Set
@@ -189,17 +189,8 @@ pub mod project_state {
     impl<St: State> sealed::Sealed for SetDescription<St> {}
     impl<St: State> State for SetDescription<St> {
         type Description = Set<members::description>;
+        type Language = St::Language;
         type Repo = St::Repo;
-        type Language = St::Language;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Description = St::Description;
-        type Repo = Set<members::repo>;
-        type Language = St::Language;
         type Title = St::Title;
     }
     ///State transition - sets the `language` field to Set
@@ -207,8 +198,17 @@ pub mod project_state {
     impl<St: State> sealed::Sealed for SetLanguage<St> {}
     impl<St: State> State for SetLanguage<St> {
         type Description = St::Description;
-        type Repo = St::Repo;
         type Language = Set<members::language>;
+        type Repo = St::Repo;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Description = St::Description;
+        type Language = St::Language;
+        type Repo = Set<members::repo>;
         type Title = St::Title;
     }
     ///State transition - sets the `title` field to Set
@@ -216,8 +216,8 @@ pub mod project_state {
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
         type Description = St::Description;
-        type Repo = St::Repo;
         type Language = St::Language;
+        type Repo = St::Repo;
         type Title = Set<members::title>;
     }
     /// Marker types for field names
@@ -225,10 +225,10 @@ pub mod project_state {
     pub mod members {
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `language` field
         pub struct language(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
         ///Marker type for the `title` field
         pub struct title(());
     }
@@ -370,8 +370,8 @@ impl<St, S: BosStr> ProjectBuilder<St, S>
 where
     St: project_state::State,
     St::Description: project_state::IsSet,
-    St::Repo: project_state::IsSet,
     St::Language: project_state::IsSet,
+    St::Repo: project_state::IsSet,
     St::Title: project_state::IsSet,
 {
     /// Build the final struct.

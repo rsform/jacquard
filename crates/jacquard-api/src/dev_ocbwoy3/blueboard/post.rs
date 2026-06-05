@@ -169,50 +169,50 @@ pub mod post_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Text;
         type Parent;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Text = Unset;
         type Parent = Unset;
+        type Text = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Parent = St::Parent;
         type Text = St::Text;
-        type Parent = St::Parent;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetText<St> {}
-    impl<St: State> State for SetText<St> {
-        type CreatedAt = St::CreatedAt;
-        type Text = Set<members::text>;
-        type Parent = St::Parent;
     }
     ///State transition - sets the `parent` field to Set
     pub struct SetParent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetParent<St> {}
     impl<St: State> State for SetParent<St> {
         type CreatedAt = St::CreatedAt;
-        type Text = St::Text;
         type Parent = Set<members::parent>;
+        type Text = St::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type CreatedAt = St::CreatedAt;
+        type Parent = St::Parent;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `parent` field
         pub struct parent(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
@@ -333,8 +333,8 @@ impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
     St::CreatedAt: post_state::IsSet,
-    St::Text: post_state::IsSet,
     St::Parent: post_state::IsSet,
+    St::Text: post_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Post<S> {

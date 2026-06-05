@@ -49,6 +49,14 @@
           "createdAt"
         ],
         "properties": {
+          "activity": {
+            "type": "union",
+            "description": "The game or activity being streamed.",
+            "refs": [
+              "place.stream.defs#activityGame",
+              "place.stream.defs#activityLabel"
+            ]
+          },
           "agent": {
             "type": "string",
             "description": "The source of the livestream, if available, in a User Agent format: `<product> / <product-version> <comment>` e.g. Streamplace/0.7.5 iOS"
@@ -85,6 +93,16 @@
             "type": "ref",
             "description": "The post that announced this livestream.",
             "ref": "com.atproto.repo.strongRef"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Freeform tags for this stream. Each tag must be alphanumeric (a-z, A-Z, 0-9) plus colon. Tags with colons indicate a specific tag group (e.g. 'lang:en' indicates the stream's primary language).",
+            "items": {
+              "type": "string",
+              "maxLength": 640,
+              "maxGraphemes": 64
+            },
+            "maxLength": 10
           },
           "thumb": {
             "type": "blob",
@@ -133,7 +151,8 @@
             "place.stream.defs#blockView",
             "place.stream.defs#renditions",
             "place.stream.defs#rendition",
-            "place.stream.chat.defs#messageView"
+            "place.stream.chat.defs#messageView",
+            "place.stream.chat.defs#pinnedRecordView"
           ]
         }
       }

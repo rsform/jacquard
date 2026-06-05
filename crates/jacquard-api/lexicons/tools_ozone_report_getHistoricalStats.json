@@ -1,0 +1,73 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.report.getHistoricalStats",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get historical daily report statistics. Returns a paginated list of daily stat snapshots, newest first. Filter by queue, moderator, or report type.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor."
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Latest date to include (inclusive).",
+            "format": "datetime"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of entries to return.",
+            "default": 30,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "moderatorDid": {
+            "type": "string",
+            "description": "Filter stats by moderator DID.",
+            "format": "did"
+          },
+          "queueId": {
+            "type": "integer",
+            "description": "Filter stats by queue. Use -1 for unqueued reports."
+          },
+          "reportTypes": {
+            "type": "array",
+            "description": "Filter stats by report types.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Earliest date to include (inclusive).",
+            "format": "datetime"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "stats"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "stats": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "tools.ozone.report.defs#historicalStats"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

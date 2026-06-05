@@ -1,0 +1,42 @@
+{
+  "lexicon": 1,
+  "id": "social.oolong.alpha.comment",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A comment on an Oolong record (brew, tea, vendor, vessel, infuser, or another comment)",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the comment was created",
+            "format": "datetime"
+          },
+          "parent": {
+            "type": "ref",
+            "description": "Optional parent comment reference for replies",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "The AT-URI and CID of the record being commented on",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "text": {
+            "type": "string",
+            "description": "The comment text content",
+            "maxLength": 1000,
+            "maxGraphemes": 300
+          }
+        }
+      }
+    }
+  }
+}

@@ -22,13 +22,31 @@ use crate::games_gamesgamesgamesgames::GameSummaryView;
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListGames<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub age_ratings: Option<Vec<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub application_types: Option<Vec<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub genres: Option<Vec<S>>,
+    /// Defaults to `false`.
+    #[serde(default = "_default_include_cancelled")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_cancelled: Option<bool>,
+    /// Defaults to `false`.
+    #[serde(default = "_default_include_unrated")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_unrated: Option<bool>,
     ///Defaults to `20`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub modes: Option<Vec<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub player_perspectives: Option<Vec<S>>,
     ///Defaults to `"indexed_at"`.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -37,6 +55,8 @@ pub struct ListGames<S: BosStr = DefaultStr> {
     #[serde(default = "_default_sort_direction")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort_direction: Option<S>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub themes: Option<Vec<S>>,
 }
 
 
@@ -74,6 +94,14 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListGamesRequest {
     type Response = ListGamesResponse;
 }
 
+fn _default_include_cancelled() -> Option<bool> {
+    Some(false)
+}
+
+fn _default_include_unrated() -> Option<bool> {
+    Some(false)
+}
+
 fn _default_limit() -> Option<i64> {
     Some(20i64)
 }
@@ -108,7 +136,21 @@ pub mod list_games_state {
 /// Builder for constructing an instance of this type.
 pub struct ListGamesBuilder<St: list_games_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<Did<S>>, Option<i64>, Option<S>, Option<S>),
+    _fields: (
+        Option<Vec<S>>,
+        Option<Vec<S>>,
+        Option<S>,
+        Option<Did<S>>,
+        Option<Vec<S>>,
+        Option<bool>,
+        Option<bool>,
+        Option<i64>,
+        Option<Vec<S>>,
+        Option<Vec<S>>,
+        Option<S>,
+        Option<S>,
+        Option<Vec<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -131,7 +173,21 @@ impl ListGamesBuilder<list_games_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ListGamesBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _type: PhantomData,
         }
     }
@@ -142,21 +198,61 @@ impl<S: BosStr> ListGamesBuilder<list_games_state::Empty, S> {
     pub fn builder() -> Self {
         ListGamesBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _type: PhantomData,
         }
     }
 }
 
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
+    /// Set the `ageRatings` field (optional)
+    pub fn age_ratings(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `ageRatings` field to an Option value (optional)
+    pub fn maybe_age_ratings(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
+    /// Set the `applicationTypes` field (optional)
+    pub fn application_types(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `applicationTypes` field to an Option value (optional)
+    pub fn maybe_application_types(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.0 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
-        self._fields.0 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -164,12 +260,51 @@ impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
-        self._fields.1 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
     pub fn maybe_did(mut self, value: Option<Did<S>>) -> Self {
-        self._fields.1 = value;
+        self._fields.3 = value;
+        self
+    }
+}
+
+impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
+    /// Set the `genres` field (optional)
+    pub fn genres(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `genres` field to an Option value (optional)
+    pub fn maybe_genres(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.4 = value;
+        self
+    }
+}
+
+impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
+    /// Set the `includeCancelled` field (optional)
+    pub fn include_cancelled(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.5 = value.into();
+        self
+    }
+    /// Set the `includeCancelled` field to an Option value (optional)
+    pub fn maybe_include_cancelled(mut self, value: Option<bool>) -> Self {
+        self._fields.5 = value;
+        self
+    }
+}
+
+impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
+    /// Set the `includeUnrated` field (optional)
+    pub fn include_unrated(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.6 = value.into();
+        self
+    }
+    /// Set the `includeUnrated` field to an Option value (optional)
+    pub fn maybe_include_unrated(mut self, value: Option<bool>) -> Self {
+        self._fields.6 = value;
         self
     }
 }
@@ -177,12 +312,38 @@ impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.2 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self._fields.2 = value;
+        self._fields.7 = value;
+        self
+    }
+}
+
+impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
+    /// Set the `modes` field (optional)
+    pub fn modes(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.8 = value.into();
+        self
+    }
+    /// Set the `modes` field to an Option value (optional)
+    pub fn maybe_modes(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.8 = value;
+        self
+    }
+}
+
+impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
+    /// Set the `playerPerspectives` field (optional)
+    pub fn player_perspectives(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.9 = value.into();
+        self
+    }
+    /// Set the `playerPerspectives` field to an Option value (optional)
+    pub fn maybe_player_perspectives(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.9 = value;
         self
     }
 }
@@ -190,12 +351,12 @@ impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `sort` field (optional)
     pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.3 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
     pub fn maybe_sort(mut self, value: Option<S>) -> Self {
-        self._fields.3 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -203,12 +364,25 @@ impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `sortDirection` field (optional)
     pub fn sort_direction(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.4 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
     pub fn maybe_sort_direction(mut self, value: Option<S>) -> Self {
-        self._fields.4 = value;
+        self._fields.11 = value;
+        self
+    }
+}
+
+impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
+    /// Set the `themes` field (optional)
+    pub fn themes(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.12 = value.into();
+        self
+    }
+    /// Set the `themes` field to an Option value (optional)
+    pub fn maybe_themes(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.12 = value;
         self
     }
 }
@@ -220,11 +394,19 @@ where
     /// Build the final struct.
     pub fn build(self) -> ListGames<S> {
         ListGames {
-            cursor: self._fields.0,
-            did: self._fields.1,
-            limit: self._fields.2,
-            sort: self._fields.3,
-            sort_direction: self._fields.4,
+            age_ratings: self._fields.0,
+            application_types: self._fields.1,
+            cursor: self._fields.2,
+            did: self._fields.3,
+            genres: self._fields.4,
+            include_cancelled: self._fields.5,
+            include_unrated: self._fields.6,
+            limit: self._fields.7,
+            modes: self._fields.8,
+            player_perspectives: self._fields.9,
+            sort: self._fields.10,
+            sort_direction: self._fields.11,
+            themes: self._fields.12,
         }
     }
 }

@@ -143,37 +143,37 @@ pub mod repost_mutes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subjects;
         type CreatedAt;
+        type Subjects;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subjects = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subjects` field to Set
-    pub struct SetSubjects<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubjects<St> {}
-    impl<St: State> State for SetSubjects<St> {
-        type Subjects = Set<members::subjects>;
-        type CreatedAt = St::CreatedAt;
+        type Subjects = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Subjects = St::Subjects;
         type CreatedAt = Set<members::created_at>;
+        type Subjects = St::Subjects;
+    }
+    ///State transition - sets the `subjects` field to Set
+    pub struct SetSubjects<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubjects<St> {}
+    impl<St: State> State for SetSubjects<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subjects = Set<members::subjects>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subjects` field
-        pub struct subjects(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subjects` field
+        pub struct subjects(());
     }
 }
 
@@ -261,8 +261,8 @@ where
 impl<St, S: BosStr> RepostMutesBuilder<St, S>
 where
     St: repost_mutes_state::State,
-    St::Subjects: repost_mutes_state::IsSet,
     St::CreatedAt: repost_mutes_state::IsSet,
+    St::Subjects: repost_mutes_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RepostMutes<S> {
@@ -409,37 +409,37 @@ pub mod subject_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type CreatedAt;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type CreatedAt = St::CreatedAt;
+        type Did = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Did = St::Did;
         type CreatedAt = Set<members::created_at>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type CreatedAt = St::CreatedAt;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -527,8 +527,8 @@ where
 impl<St, S: BosStr> SubjectBuilder<St, S>
 where
     St: subject_state::State,
-    St::Did: subject_state::IsSet,
     St::CreatedAt: subject_state::IsSet,
+    St::Did: subject_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Subject<S> {

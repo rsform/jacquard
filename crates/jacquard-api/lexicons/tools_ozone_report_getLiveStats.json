@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.report.getLiveStats",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get live report statistics from the past 24 hours. Filter by queue, moderator, or report type. Omit all parameters for aggregate stats.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "moderatorDid": {
+            "type": "string",
+            "description": "Filter stats by moderator DID.",
+            "format": "did"
+          },
+          "queueId": {
+            "type": "integer",
+            "description": "Filter stats by queue. Use -1 for unqueued reports."
+          },
+          "reportTypes": {
+            "type": "array",
+            "description": "Filter stats by report types.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "stats"
+          ],
+          "properties": {
+            "stats": {
+              "type": "ref",
+              "description": "Statistics for the requested filter.",
+              "ref": "tools.ozone.report.defs#liveStats"
+            }
+          }
+        }
+      }
+    }
+  }
+}

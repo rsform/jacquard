@@ -137,37 +137,37 @@ pub mod delete_block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type BlockUri;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type BlockUri = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStreamer<St> {}
-    impl<St: State> State for SetStreamer<St> {
-        type Streamer = Set<members::streamer>;
-        type BlockUri = St::BlockUri;
+        type Streamer = Unset;
     }
     ///State transition - sets the `block_uri` field to Set
     pub struct SetBlockUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlockUri<St> {}
     impl<St: State> State for SetBlockUri<St> {
-        type Streamer = St::Streamer;
         type BlockUri = Set<members::block_uri>;
+        type Streamer = St::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStreamer<St> {}
+    impl<St: State> State for SetStreamer<St> {
+        type BlockUri = St::BlockUri;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `block_uri` field
         pub struct block_uri(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
@@ -255,8 +255,8 @@ where
 impl<St, S: BosStr> DeleteBlockBuilder<St, S>
 where
     St: delete_block_state::State,
-    St::Streamer: delete_block_state::IsSet,
     St::BlockUri: delete_block_state::IsSet,
+    St::Streamer: delete_block_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DeleteBlock<S> {

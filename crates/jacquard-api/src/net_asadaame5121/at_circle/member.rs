@@ -192,8 +192,8 @@ pub mod member_state {
     pub trait State: sealed::Sealed {
         type CreatedAt;
         type Ring;
-        type Url;
         type Title;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -201,8 +201,8 @@ pub mod member_state {
     impl State for Empty {
         type CreatedAt = Unset;
         type Ring = Unset;
-        type Url = Unset;
         type Title = Unset;
+        type Url = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
@@ -210,8 +210,8 @@ pub mod member_state {
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
         type Ring = St::Ring;
-        type Url = St::Url;
         type Title = St::Title;
+        type Url = St::Url;
     }
     ///State transition - sets the `ring` field to Set
     pub struct SetRing<St: State = Empty>(PhantomData<fn() -> St>);
@@ -219,17 +219,8 @@ pub mod member_state {
     impl<St: State> State for SetRing<St> {
         type CreatedAt = St::CreatedAt;
         type Ring = Set<members::ring>;
+        type Title = St::Title;
         type Url = St::Url;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type CreatedAt = St::CreatedAt;
-        type Ring = St::Ring;
-        type Url = Set<members::url>;
-        type Title = St::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
@@ -237,8 +228,17 @@ pub mod member_state {
     impl<St: State> State for SetTitle<St> {
         type CreatedAt = St::CreatedAt;
         type Ring = St::Ring;
-        type Url = St::Url;
         type Title = Set<members::title>;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type CreatedAt = St::CreatedAt;
+        type Ring = St::Ring;
+        type Title = St::Title;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -247,10 +247,10 @@ pub mod member_state {
         pub struct created_at(());
         ///Marker type for the `ring` field
         pub struct ring(());
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -411,8 +411,8 @@ where
     St: member_state::State,
     St::CreatedAt: member_state::IsSet,
     St::Ring: member_state::IsSet,
-    St::Url: member_state::IsSet,
     St::Title: member_state::IsSet,
+    St::Url: member_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Member<S> {

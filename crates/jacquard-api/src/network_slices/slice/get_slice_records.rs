@@ -133,105 +133,105 @@ pub mod indexed_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type IndexedAt;
-        type Value;
-        type Did;
-        type Collection;
         type Cid;
+        type Collection;
+        type Did;
+        type IndexedAt;
+        type Uri;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type IndexedAt = Unset;
-        type Value = Unset;
-        type Did = Unset;
-        type Collection = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type IndexedAt = St::IndexedAt;
-        type Value = St::Value;
-        type Did = St::Did;
-        type Collection = St::Collection;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
-        type Uri = St::Uri;
-        type IndexedAt = Set<members::indexed_at>;
-        type Value = St::Value;
-        type Did = St::Did;
-        type Collection = St::Collection;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValue<St> {}
-    impl<St: State> State for SetValue<St> {
-        type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
-        type Value = Set<members::value>;
-        type Did = St::Did;
-        type Collection = St::Collection;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
-        type Value = St::Value;
-        type Did = Set<members::did>;
-        type Collection = St::Collection;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCollection<St> {}
-    impl<St: State> State for SetCollection<St> {
-        type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
-        type Value = St::Value;
-        type Did = St::Did;
-        type Collection = Set<members::collection>;
-        type Cid = St::Cid;
+        type Collection = Unset;
+        type Did = Unset;
+        type IndexedAt = Unset;
+        type Uri = Unset;
+        type Value = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
-        type Value = St::Value;
-        type Did = St::Did;
-        type Collection = St::Collection;
         type Cid = Set<members::cid>;
+        type Collection = St::Collection;
+        type Did = St::Did;
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCollection<St> {}
+    impl<St: State> State for SetCollection<St> {
+        type Cid = St::Cid;
+        type Collection = Set<members::collection>;
+        type Did = St::Did;
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Cid = St::Cid;
+        type Collection = St::Collection;
+        type Did = Set<members::did>;
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Cid = St::Cid;
+        type Collection = St::Collection;
+        type Did = St::Did;
+        type IndexedAt = Set<members::indexed_at>;
+        type Uri = St::Uri;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type Collection = St::Collection;
+        type Did = St::Did;
+        type IndexedAt = St::IndexedAt;
+        type Uri = Set<members::uri>;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type Cid = St::Cid;
+        type Collection = St::Collection;
+        type Did = St::Did;
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `value` field
-        pub struct value(());
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -405,12 +405,12 @@ where
 impl<St, S: BosStr> IndexedRecordBuilder<St, S>
 where
     St: indexed_record_state::State,
-    St::Uri: indexed_record_state::IsSet,
-    St::IndexedAt: indexed_record_state::IsSet,
-    St::Value: indexed_record_state::IsSet,
-    St::Did: indexed_record_state::IsSet,
-    St::Collection: indexed_record_state::IsSet,
     St::Cid: indexed_record_state::IsSet,
+    St::Collection: indexed_record_state::IsSet,
+    St::Did: indexed_record_state::IsSet,
+    St::IndexedAt: indexed_record_state::IsSet,
+    St::Uri: indexed_record_state::IsSet,
+    St::Value: indexed_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> IndexedRecord<S> {

@@ -4,4 +4,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod definition;
+pub mod list_definitions;
+pub mod list_ops;
+pub mod list_ops_by;
 pub mod op;

@@ -365,50 +365,50 @@ pub mod action_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ActorDid;
-        type WorldReference;
         type CreatedAt;
+        type WorldReference;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ActorDid = Unset;
-        type WorldReference = Unset;
         type CreatedAt = Unset;
+        type WorldReference = Unset;
     }
     ///State transition - sets the `actor_did` field to Set
     pub struct SetActorDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetActorDid<St> {}
     impl<St: State> State for SetActorDid<St> {
         type ActorDid = Set<members::actor_did>;
+        type CreatedAt = St::CreatedAt;
         type WorldReference = St::WorldReference;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `world_reference` field to Set
-    pub struct SetWorldReference<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWorldReference<St> {}
-    impl<St: State> State for SetWorldReference<St> {
-        type ActorDid = St::ActorDid;
-        type WorldReference = Set<members::world_reference>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type ActorDid = St::ActorDid;
-        type WorldReference = St::WorldReference;
         type CreatedAt = Set<members::created_at>;
+        type WorldReference = St::WorldReference;
+    }
+    ///State transition - sets the `world_reference` field to Set
+    pub struct SetWorldReference<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWorldReference<St> {}
+    impl<St: State> State for SetWorldReference<St> {
+        type ActorDid = St::ActorDid;
+        type CreatedAt = St::CreatedAt;
+        type WorldReference = Set<members::world_reference>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `actor_did` field
         pub struct actor_did(());
-        ///Marker type for the `world_reference` field
-        pub struct world_reference(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `world_reference` field
+        pub struct world_reference(());
     }
 }
 
@@ -618,8 +618,8 @@ impl<St, S: BosStr> ActionBuilder<St, S>
 where
     St: action_state::State,
     St::ActorDid: action_state::IsSet,
-    St::WorldReference: action_state::IsSet,
     St::CreatedAt: action_state::IsSet,
+    St::WorldReference: action_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Action<S> {

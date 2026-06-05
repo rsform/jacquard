@@ -17,9 +17,37 @@
             "format": "datetime"
           },
           "subject": {
-            "type": "string",
-            "format": "at-uri"
+            "type": "union",
+            "refs": [
+              "#repo",
+              "#string"
+            ],
+            "closed": true
           }
+        }
+      }
+    },
+    "repo": {
+      "type": "object",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        }
+      }
+    },
+    "string": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
         }
       }
     }

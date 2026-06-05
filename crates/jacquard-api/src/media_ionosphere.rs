@@ -922,37 +922,37 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Role;
         type Entity;
+        type Role;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Role = Unset;
         type Entity = Unset;
-    }
-    ///State transition - sets the `role` field to Set
-    pub struct SetRole<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRole<St> {}
-    impl<St: State> State for SetRole<St> {
-        type Role = Set<members::role>;
-        type Entity = St::Entity;
+        type Role = Unset;
     }
     ///State transition - sets the `entity` field to Set
     pub struct SetEntity<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEntity<St> {}
     impl<St: State> State for SetEntity<St> {
-        type Role = St::Role;
         type Entity = Set<members::entity>;
+        type Role = St::Role;
+    }
+    ///State transition - sets the `role` field to Set
+    pub struct SetRole<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRole<St> {}
+    impl<St: State> State for SetRole<St> {
+        type Entity = St::Entity;
+        type Role = Set<members::role>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `role` field
-        pub struct role(());
         ///Marker type for the `entity` field
         pub struct entity(());
+        ///Marker type for the `role` field
+        pub struct role(());
     }
 }
 
@@ -1040,8 +1040,8 @@ where
 impl<St, S: BosStr> CreditBuilder<St, S>
 where
     St: credit_state::State,
-    St::Role: credit_state::IsSet,
     St::Entity: credit_state::IsSet,
+    St::Role: credit_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Credit<S> {
@@ -1376,37 +1376,37 @@ pub mod track_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Artists;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Artists = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type Artists = St::Artists;
+        type Title = Unset;
     }
     ///State transition - sets the `artists` field to Set
     pub struct SetArtists<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetArtists<St> {}
     impl<St: State> State for SetArtists<St> {
-        type Title = St::Title;
         type Artists = Set<members::artists>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Artists = St::Artists;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `artists` field
         pub struct artists(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -1507,8 +1507,8 @@ where
 impl<St, S: BosStr> TrackBuilder<St, S>
 where
     St: track_state::State,
-    St::Title: track_state::IsSet,
     St::Artists: track_state::IsSet,
+    St::Title: track_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Track<S> {

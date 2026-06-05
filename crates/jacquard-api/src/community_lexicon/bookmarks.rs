@@ -3,5 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod auth_manage_bookmarks;
+pub mod auth_view_bookmarks;
 pub mod bookmark;
 pub mod get_actor_bookmarks;

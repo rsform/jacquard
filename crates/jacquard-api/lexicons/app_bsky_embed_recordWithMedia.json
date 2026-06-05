@@ -15,6 +15,7 @@
           "refs": [
             "app.bsky.embed.images",
             "app.bsky.embed.video",
+            "app.bsky.embed.gallery",
             "app.bsky.embed.external"
           ]
         },
@@ -36,6 +37,7 @@
           "refs": [
             "app.bsky.embed.images#view",
             "app.bsky.embed.video#view",
+            "app.bsky.embed.gallery#view",
             "app.bsky.embed.external#view"
           ]
         },

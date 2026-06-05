@@ -1,0 +1,97 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.listCollaborators",
+  "defs": {
+    "listItem": {
+      "type": "object",
+      "required": [
+        "subject",
+        "addedBy",
+        "createdAt"
+      ],
+      "properties": {
+        "addedBy": {
+          "type": "string",
+          "description": "DID that added this collaborator",
+          "format": "did"
+        },
+        "cid": {
+          "type": "string",
+          "description": "Optional record CID for record-backed indexers",
+          "format": "cid"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "When the collaborator was added",
+          "format": "datetime"
+        },
+        "subject": {
+          "type": "string",
+          "description": "DID of the collaborator",
+          "format": "did"
+        },
+        "uri": {
+          "type": "string",
+          "description": "Optional record AT-URI for record-backed indexers",
+          "format": "at-uri"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "subject"
+        ],
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "order": {
+            "type": "string",
+            "description": "Sort direction by createdAt.",
+            "default": "desc",
+            "knownValues": [
+              "asc",
+              "desc"
+            ]
+          },
+          "subject": {
+            "type": "string",
+            "description": "Repo DID whose collaborator records to list.",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#listItem"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

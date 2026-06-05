@@ -16,6 +16,15 @@
           "type": "ref",
           "ref": "app.bsky.actor.defs#profileViewBasic"
         },
+        "badges": {
+          "type": "array",
+          "description": "Up to 3 badge tokens to display with the message. First badge is server-controlled, remaining badges are user-settable. Tokens are looked up in badges.json for display info.",
+          "items": {
+            "type": "ref",
+            "ref": "place.stream.badge.defs#badgeView"
+          },
+          "maxLength": 3
+        },
         "chatProfile": {
           "type": "ref",
           "ref": "place.stream.chat.profile"
@@ -40,6 +49,42 @@
           "refs": [
             "#messageView"
           ]
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "pinnedRecordView": {
+      "type": "object",
+      "description": "View of a pinned chat record with hydrated message data.",
+      "required": [
+        "uri",
+        "cid",
+        "record",
+        "indexedAt"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "message": {
+          "type": "ref",
+          "ref": "#messageView"
+        },
+        "pinnedBy": {
+          "type": "ref",
+          "ref": "place.stream.chat.profile"
+        },
+        "record": {
+          "type": "ref",
+          "ref": "place.stream.chat.pinnedRecord"
         },
         "uri": {
           "type": "string",

@@ -14,14 +14,14 @@
         "properties": {
           "artistMbIds": {
             "type": "array",
-            "description": "Array of Musicbrainz artist IDs. Prefer using 'artists'.",
+            "description": "DEPRECATED: USE 'artists' INSTEAD. Array of Musicbrainz artist IDs.",
             "items": {
               "type": "string"
             }
           },
           "artistNames": {
             "type": "array",
-            "description": "Array of artist names in order of original appearance. Prefer using 'artists'.",
+            "description": "DEPRECATED: USE 'artists' INSTEAD. Array of artist names in order of original appearance.",
             "items": {
               "type": "string",
               "minLength": 1,
@@ -60,7 +60,8 @@
           },
           "recordingMbId": {
             "type": "string",
-            "description": "The Musicbrainz recording ID of the track"
+            "description": "The MusicBrainz recording ID URI of the track, formatted as mbid:<uuid>",
+            "format": "uri"
           },
           "releaseDiscriminant": {
             "type": "string",
@@ -70,7 +71,8 @@
           },
           "releaseMbId": {
             "type": "string",
-            "description": "The Musicbrainz release ID"
+            "description": "The MusicBrainz release ID URI, formatted as mbid:<uuid>",
+            "format": "uri"
           },
           "releaseName": {
             "type": "string",
@@ -92,7 +94,8 @@
           },
           "trackMbId": {
             "type": "string",
-            "description": "The Musicbrainz ID of the track"
+            "description": "The MusicBrainz ID URI of the track, formatted as mbid:<uuid>",
+            "format": "uri"
           },
           "trackName": {
             "type": "string",

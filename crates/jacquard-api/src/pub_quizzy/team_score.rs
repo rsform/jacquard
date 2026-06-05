@@ -521,37 +521,37 @@ pub mod scored_answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Scores;
         type Answer;
+        type Scores;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Scores = Unset;
         type Answer = Unset;
-    }
-    ///State transition - sets the `scores` field to Set
-    pub struct SetScores<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScores<St> {}
-    impl<St: State> State for SetScores<St> {
-        type Scores = Set<members::scores>;
-        type Answer = St::Answer;
+        type Scores = Unset;
     }
     ///State transition - sets the `answer` field to Set
     pub struct SetAnswer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAnswer<St> {}
     impl<St: State> State for SetAnswer<St> {
-        type Scores = St::Scores;
         type Answer = Set<members::answer>;
+        type Scores = St::Scores;
+    }
+    ///State transition - sets the `scores` field to Set
+    pub struct SetScores<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScores<St> {}
+    impl<St: State> State for SetScores<St> {
+        type Answer = St::Answer;
+        type Scores = Set<members::scores>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scores` field
-        pub struct scores(());
         ///Marker type for the `answer` field
         pub struct answer(());
+        ///Marker type for the `scores` field
+        pub struct scores(());
     }
 }
 
@@ -652,8 +652,8 @@ where
 impl<St, S: BosStr> ScoredAnswerBuilder<St, S>
 where
     St: scored_answer_state::State,
-    St::Scores: scored_answer_state::IsSet,
     St::Answer: scored_answer_state::IsSet,
+    St::Scores: scored_answer_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ScoredAnswer<S> {

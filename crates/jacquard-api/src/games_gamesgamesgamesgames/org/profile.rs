@@ -29,6 +29,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
+use crate::games_gamesgamesgamesgames::ExternalIds;
 use crate::games_gamesgamesgamesgames::MediaItem;
 use crate::games_gamesgamesgamesgames::Website;
 /// A declaration of a Pentaract org profile.
@@ -54,6 +55,8 @@ pub struct Profile<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description_facets: Option<Vec<Facet<S>>>,
     pub display_name: S,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub external_ids: Option<ExternalIds<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub founded_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -288,37 +291,37 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DisplayName;
         type CreatedAt;
+        type DisplayName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DisplayName = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
-    impl<St: State> State for SetDisplayName<St> {
-        type DisplayName = Set<members::display_name>;
-        type CreatedAt = St::CreatedAt;
+        type DisplayName = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type DisplayName = St::DisplayName;
         type CreatedAt = Set<members::created_at>;
+        type DisplayName = St::DisplayName;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
+    impl<St: State> State for SetDisplayName<St> {
+        type CreatedAt = St::CreatedAt;
+        type DisplayName = Set<members::display_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
     }
 }
 
@@ -332,6 +335,7 @@ pub struct ProfileBuilder<St: profile_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<Vec<Facet<S>>>,
         Option<S>,
+        Option<ExternalIds<S>>,
         Option<Datetime>,
         Option<Vec<MediaItem<S>>>,
         Option<AtUri<S>>,
@@ -360,7 +364,20 @@ impl ProfileBuilder<profile_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _type: PhantomData,
         }
     }
@@ -371,7 +388,20 @@ impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
     pub fn builder() -> Self {
         ProfileBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _type: PhantomData,
         }
     }
@@ -471,14 +501,27 @@ where
 }
 
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
+    /// Set the `externalIds` field (optional)
+    pub fn external_ids(mut self, value: impl Into<Option<ExternalIds<S>>>) -> Self {
+        self._fields.6 = value.into();
+        self
+    }
+    /// Set the `externalIds` field to an Option value (optional)
+    pub fn maybe_external_ids(mut self, value: Option<ExternalIds<S>>) -> Self {
+        self._fields.6 = value;
+        self
+    }
+}
+
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `foundedAt` field (optional)
     pub fn founded_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.6 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `foundedAt` field to an Option value (optional)
     pub fn maybe_founded_at(mut self, value: Option<Datetime>) -> Self {
-        self._fields.6 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -486,12 +529,12 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `media` field (optional)
     pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<S>>>>) -> Self {
-        self._fields.7 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `media` field to an Option value (optional)
     pub fn maybe_media(mut self, value: Option<Vec<MediaItem<S>>>) -> Self {
-        self._fields.7 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -499,12 +542,12 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
-        self._fields.8 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
     pub fn maybe_parent(mut self, value: Option<AtUri<S>>) -> Self {
-        self._fields.8 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -512,12 +555,12 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<ProfileStatus<S>>>) -> Self {
-        self._fields.9 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<ProfileStatus<S>>) -> Self {
-        self._fields.9 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -525,12 +568,12 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `websites` field (optional)
     pub fn websites(mut self, value: impl Into<Option<Vec<Website<S>>>>) -> Self {
-        self._fields.10 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `websites` field to an Option value (optional)
     pub fn maybe_websites(mut self, value: Option<Vec<Website<S>>>) -> Self {
-        self._fields.10 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -538,8 +581,8 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 impl<St, S: BosStr> ProfileBuilder<St, S>
 where
     St: profile_state::State,
-    St::DisplayName: profile_state::IsSet,
     St::CreatedAt: profile_state::IsSet,
+    St::DisplayName: profile_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Profile<S> {
@@ -550,11 +593,12 @@ where
             description: self._fields.3,
             description_facets: self._fields.4,
             display_name: self._fields.5.unwrap(),
-            founded_at: self._fields.6,
-            media: self._fields.7,
-            parent: self._fields.8,
-            status: self._fields.9,
-            websites: self._fields.10,
+            external_ids: self._fields.6,
+            founded_at: self._fields.7,
+            media: self._fields.8,
+            parent: self._fields.9,
+            status: self._fields.10,
+            websites: self._fields.11,
             extra_data: Default::default(),
         }
     }
@@ -567,11 +611,12 @@ where
             description: self._fields.3,
             description_facets: self._fields.4,
             display_name: self._fields.5.unwrap(),
-            founded_at: self._fields.6,
-            media: self._fields.7,
-            parent: self._fields.8,
-            status: self._fields.9,
-            websites: self._fields.10,
+            external_ids: self._fields.6,
+            founded_at: self._fields.7,
+            media: self._fields.8,
+            parent: self._fields.9,
+            status: self._fields.10,
+            websites: self._fields.11,
             extra_data: Some(extra_data),
         }
     }
@@ -593,7 +638,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_org_profile() -> LexiconDoc<'static> {
                     description: Some(
                         CowStr::new_static("A declaration of a Pentaract org profile."),
                     ),
-                    key: Some(CowStr::new_static("literal:self")),
+                    key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
@@ -650,6 +695,15 @@ fn lexicon_doc_games_gamesgamesgamesgames_org_profile() -> LexiconDoc<'static> {
                                 SmolStr::new_static("displayName"),
                                 LexObjectProperty::String(LexString {
                                     max_length: Some(640usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("externalIds"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
+                                        "games.gamesgamesgamesgames.defs#externalIds",
+                                    ),
                                     ..Default::default()
                                 }),
                             );

@@ -2,6 +2,77 @@
   "lexicon": 1,
   "id": "place.stream.badge.defs",
   "defs": {
+    "badgeIssuanceView": {
+      "type": "object",
+      "description": "A resolved view of a badge issuance, including def fields for display.",
+      "required": [
+        "issuanceUri",
+        "badgeType",
+        "issuer"
+      ],
+      "properties": {
+        "badgeType": {
+          "type": "string",
+          "knownValues": [
+            "place.stream.badge.defs#vip",
+            "place.stream.badge.defs#event"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Description from the badge definition."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Resolved image URL for the badge icon.",
+          "format": "uri"
+        },
+        "issuanceCid": {
+          "type": "string",
+          "description": "CID of the place.stream.badge.issuance record."
+        },
+        "issuanceUri": {
+          "type": "string",
+          "description": "AT URI of the place.stream.badge.issuance record.",
+          "format": "at-uri"
+        },
+        "issuer": {
+          "type": "string",
+          "description": "DID of the badge issuer.",
+          "format": "did"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name from the badge definition."
+        },
+        "selected": {
+          "type": "boolean",
+          "description": "Whether this badge is currently in the user's chat profile selection."
+        }
+      }
+    },
+    "badgeSlot": {
+      "type": "object",
+      "description": "A display slot containing available issuance-based badges and which one (if any) is currently selected.",
+      "required": [
+        "available"
+      ],
+      "properties": {
+        "available": {
+          "type": "array",
+          "description": "All badges available for this slot.",
+          "items": {
+            "type": "ref",
+            "ref": "#badgeIssuanceView"
+          }
+        },
+        "selected": {
+          "type": "ref",
+          "description": "The currently selected badge in this slot, if any.",
+          "ref": "#badgeIssuanceView"
+        }
+      }
+    },
     "badgeView": {
       "type": "object",
       "description": "View of a badge record, with fields resolved for display. If the DID in issuer is not the current streamplace node, the signature field shall be required.",
@@ -15,13 +86,29 @@
           "type": "string",
           "knownValues": [
             "place.stream.badge.defs#mod",
-            "place.stream.badge.defs#streamer"
+            "place.stream.badge.defs#streamer",
+            "place.stream.badge.defs#vip",
+            "place.stream.badge.defs#event",
+            "place.stream.badge.defs#bot"
           ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Description from the badge definition."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Resolved image URL for the badge icon.",
+          "format": "uri"
         },
         "issuer": {
           "type": "string",
           "description": "DID of the badge issuer.",
           "format": "did"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name from the badge definition."
         },
         "recipient": {
           "type": "string",
@@ -33,6 +120,14 @@
           "description": "TODO: Cryptographic signature of the badge (of a place.stream.key)."
         }
       }
+    },
+    "bot": {
+      "type": "token",
+      "description": "This user is a bot. Self-applied via place.stream.chat.profile selfLabels."
+    },
+    "event": {
+      "type": "token",
+      "description": "This user has won or earned a special event or contest badge."
     },
     "mod": {
       "type": "token",

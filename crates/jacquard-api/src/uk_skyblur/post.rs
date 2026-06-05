@@ -201,67 +201,67 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Visibility;
+        type CreatedAt;
         type Text;
         type Uri;
-        type CreatedAt;
+        type Visibility;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Visibility = Unset;
+        type CreatedAt = Unset;
         type Text = Unset;
         type Uri = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVisibility<St> {}
-    impl<St: State> State for SetVisibility<St> {
-        type Visibility = Set<members::visibility>;
-        type Text = St::Text;
-        type Uri = St::Uri;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetText<St> {}
-    impl<St: State> State for SetText<St> {
-        type Visibility = St::Visibility;
-        type Text = Set<members::text>;
-        type Uri = St::Uri;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Visibility = St::Visibility;
-        type Text = St::Text;
-        type Uri = Set<members::uri>;
-        type CreatedAt = St::CreatedAt;
+        type Visibility = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Visibility = St::Visibility;
+        type CreatedAt = Set<members::created_at>;
         type Text = St::Text;
         type Uri = St::Uri;
-        type CreatedAt = Set<members::created_at>;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type CreatedAt = St::CreatedAt;
+        type Text = Set<members::text>;
+        type Uri = St::Uri;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type CreatedAt = St::CreatedAt;
+        type Text = St::Text;
+        type Uri = Set<members::uri>;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVisibility<St> {}
+    impl<St: State> State for SetVisibility<St> {
+        type CreatedAt = St::CreatedAt;
+        type Text = St::Text;
+        type Uri = St::Uri;
+        type Visibility = Set<members::visibility>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `text` field
         pub struct text(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
     }
 }
 
@@ -420,10 +420,10 @@ where
 impl<St, S: BosStr> PostBuilder<St, S>
 where
     St: post_state::State,
-    St::Visibility: post_state::IsSet,
+    St::CreatedAt: post_state::IsSet,
     St::Text: post_state::IsSet,
     St::Uri: post_state::IsSet,
-    St::CreatedAt: post_state::IsSet,
+    St::Visibility: post_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Post<S> {

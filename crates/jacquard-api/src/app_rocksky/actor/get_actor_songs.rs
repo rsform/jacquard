@@ -13,7 +13,6 @@ use core::marker::PhantomData;
 use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
@@ -23,16 +22,12 @@ use crate::app_rocksky::song::SongViewBasic;
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorSongs<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub end_date: Option<Datetime>,
     ///(min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     ///(min: 0)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<i64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub start_date: Option<Datetime>,
 }
 
 
@@ -107,13 +102,7 @@ pub struct GetActorSongsBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<AtIdentifier<S>>,
-        Option<Datetime>,
-        Option<i64>,
-        Option<i64>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<AtIdentifier<S>>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -136,7 +125,7 @@ impl GetActorSongsBuilder<get_actor_songs_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         GetActorSongsBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None),
             _type: PhantomData,
         }
     }
@@ -147,7 +136,7 @@ impl<S: BosStr> GetActorSongsBuilder<get_actor_songs_state::Empty, S> {
     pub fn builder() -> Self {
         GetActorSongsBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None),
             _type: PhantomData,
         }
     }
@@ -173,27 +162,14 @@ where
 }
 
 impl<St: get_actor_songs_state::State, S: BosStr> GetActorSongsBuilder<St, S> {
-    /// Set the `endDate` field (optional)
-    pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.1 = value.into();
-        self
-    }
-    /// Set the `endDate` field to an Option value (optional)
-    pub fn maybe_end_date(mut self, value: Option<Datetime>) -> Self {
-        self._fields.1 = value;
-        self
-    }
-}
-
-impl<St: get_actor_songs_state::State, S: BosStr> GetActorSongsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.2 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self._fields.2 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -201,25 +177,12 @@ impl<St: get_actor_songs_state::State, S: BosStr> GetActorSongsBuilder<St, S> {
 impl<St: get_actor_songs_state::State, S: BosStr> GetActorSongsBuilder<St, S> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.3 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `offset` field to an Option value (optional)
     pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
-        self._fields.3 = value;
-        self
-    }
-}
-
-impl<St: get_actor_songs_state::State, S: BosStr> GetActorSongsBuilder<St, S> {
-    /// Set the `startDate` field (optional)
-    pub fn start_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.4 = value.into();
-        self
-    }
-    /// Set the `startDate` field to an Option value (optional)
-    pub fn maybe_start_date(mut self, value: Option<Datetime>) -> Self {
-        self._fields.4 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -233,10 +196,8 @@ where
     pub fn build(self) -> GetActorSongs<S> {
         GetActorSongs {
             did: self._fields.0.unwrap(),
-            end_date: self._fields.1,
-            limit: self._fields.2,
-            offset: self._fields.3,
-            start_date: self._fields.4,
+            limit: self._fields.1,
+            offset: self._fields.2,
         }
     }
 }

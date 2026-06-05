@@ -114,67 +114,67 @@ pub mod redirect_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TargetUri;
-        type SourceUri;
-        type CreatedAt;
         type Collection;
+        type CreatedAt;
+        type SourceUri;
+        type TargetUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TargetUri = Unset;
-        type SourceUri = Unset;
-        type CreatedAt = Unset;
         type Collection = Unset;
-    }
-    ///State transition - sets the `target_uri` field to Set
-    pub struct SetTargetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTargetUri<St> {}
-    impl<St: State> State for SetTargetUri<St> {
-        type TargetUri = Set<members::target_uri>;
-        type SourceUri = St::SourceUri;
-        type CreatedAt = St::CreatedAt;
-        type Collection = St::Collection;
-    }
-    ///State transition - sets the `source_uri` field to Set
-    pub struct SetSourceUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSourceUri<St> {}
-    impl<St: State> State for SetSourceUri<St> {
-        type TargetUri = St::TargetUri;
-        type SourceUri = Set<members::source_uri>;
-        type CreatedAt = St::CreatedAt;
-        type Collection = St::Collection;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type TargetUri = St::TargetUri;
-        type SourceUri = St::SourceUri;
-        type CreatedAt = Set<members::created_at>;
-        type Collection = St::Collection;
+        type CreatedAt = Unset;
+        type SourceUri = Unset;
+        type TargetUri = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
-        type TargetUri = St::TargetUri;
-        type SourceUri = St::SourceUri;
-        type CreatedAt = St::CreatedAt;
         type Collection = Set<members::collection>;
+        type CreatedAt = St::CreatedAt;
+        type SourceUri = St::SourceUri;
+        type TargetUri = St::TargetUri;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Collection = St::Collection;
+        type CreatedAt = Set<members::created_at>;
+        type SourceUri = St::SourceUri;
+        type TargetUri = St::TargetUri;
+    }
+    ///State transition - sets the `source_uri` field to Set
+    pub struct SetSourceUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSourceUri<St> {}
+    impl<St: State> State for SetSourceUri<St> {
+        type Collection = St::Collection;
+        type CreatedAt = St::CreatedAt;
+        type SourceUri = Set<members::source_uri>;
+        type TargetUri = St::TargetUri;
+    }
+    ///State transition - sets the `target_uri` field to Set
+    pub struct SetTargetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTargetUri<St> {}
+    impl<St: State> State for SetTargetUri<St> {
+        type Collection = St::Collection;
+        type CreatedAt = St::CreatedAt;
+        type SourceUri = St::SourceUri;
+        type TargetUri = Set<members::target_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `target_uri` field
-        pub struct target_uri(());
-        ///Marker type for the `source_uri` field
-        pub struct source_uri(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `source_uri` field
+        pub struct source_uri(());
+        ///Marker type for the `target_uri` field
+        pub struct target_uri(());
     }
 }
 
@@ -300,10 +300,10 @@ where
 impl<St, S: BosStr> RedirectBuilder<St, S>
 where
     St: redirect_state::State,
-    St::TargetUri: redirect_state::IsSet,
-    St::SourceUri: redirect_state::IsSet,
-    St::CreatedAt: redirect_state::IsSet,
     St::Collection: redirect_state::IsSet,
+    St::CreatedAt: redirect_state::IsSet,
+    St::SourceUri: redirect_state::IsSet,
+    St::TargetUri: redirect_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Redirect<S> {

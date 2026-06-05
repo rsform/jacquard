@@ -389,49 +389,49 @@ pub mod bookmark_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Comments;
+        type CreatedAt;
         type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Comments = Unset;
+        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Comments = St::Comments;
-        type Subject = St::Subject;
     }
     ///State transition - sets the `comments` field to Set
     pub struct SetComments<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetComments<St> {}
     impl<St: State> State for SetComments<St> {
-        type CreatedAt = St::CreatedAt;
         type Comments = Set<members::comments>;
+        type CreatedAt = St::CreatedAt;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Comments = St::Comments;
+        type CreatedAt = Set<members::created_at>;
         type Subject = St::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
-        type CreatedAt = St::CreatedAt;
         type Comments = St::Comments;
+        type CreatedAt = St::CreatedAt;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `comments` field
         pub struct comments(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
     }
@@ -600,8 +600,8 @@ impl<St: bookmark_state::State, S: BosStr> BookmarkBuilder<St, S> {
 impl<St, S: BosStr> BookmarkBuilder<St, S>
 where
     St: bookmark_state::State,
-    St::CreatedAt: bookmark_state::IsSet,
     St::Comments: bookmark_state::IsSet,
+    St::CreatedAt: bookmark_state::IsSet,
     St::Subject: bookmark_state::IsSet,
 {
     /// Build the final struct.

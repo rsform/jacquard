@@ -17,7 +17,7 @@ use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -31,11 +31,11 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::fm_teal::alpha::actor::profile;
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FeaturedItem<S: BosStr = DefaultStr> {
-    ///The Musicbrainz ID of the item
-    pub mbid: S,
+    ///The MusicBrainz ID URI of the item, formatted as mbid:<uuid>
+    pub mbid: UriValue<S>,
     ///The type of the item. Must be a valid Musicbrainz type, e.g. album, track, recording, etc.
     pub r#type: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -273,6 +273,158 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
     }
 }
 
+pub mod featured_item_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Mbid;
+        type Type;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Mbid = Unset;
+        type Type = Unset;
+    }
+    ///State transition - sets the `mbid` field to Set
+    pub struct SetMbid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMbid<St> {}
+    impl<St: State> State for SetMbid<St> {
+        type Mbid = Set<members::mbid>;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Mbid = St::Mbid;
+        type Type = Set<members::r#type>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `mbid` field
+        pub struct mbid(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct FeaturedItemBuilder<St: featured_item_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<UriValue<S>>, Option<S>),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl FeaturedItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> FeaturedItemBuilder<featured_item_state::Empty, DefaultStr> {
+        FeaturedItemBuilder::new()
+    }
+}
+
+impl<S: BosStr> FeaturedItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> FeaturedItemBuilder<featured_item_state::Empty, S> {
+        FeaturedItemBuilder::builder()
+    }
+}
+
+impl FeaturedItemBuilder<featured_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        FeaturedItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> FeaturedItemBuilder<featured_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        FeaturedItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FeaturedItemBuilder<St, S>
+where
+    St: featured_item_state::State,
+    St::Mbid: featured_item_state::IsUnset,
+{
+    /// Set the `mbid` field (required)
+    pub fn mbid(
+        mut self,
+        value: impl Into<UriValue<S>>,
+    ) -> FeaturedItemBuilder<featured_item_state::SetMbid<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        FeaturedItemBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FeaturedItemBuilder<St, S>
+where
+    St: featured_item_state::State,
+    St::Type: featured_item_state::IsUnset,
+{
+    /// Set the `type` field (required)
+    pub fn r#type(
+        mut self,
+        value: impl Into<S>,
+    ) -> FeaturedItemBuilder<featured_item_state::SetType<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        FeaturedItemBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> FeaturedItemBuilder<St, S>
+where
+    St: featured_item_state::State,
+    St::Mbid: featured_item_state::IsSet,
+    St::Type: featured_item_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> FeaturedItem<S> {
+        FeaturedItem {
+            mbid: self._fields.0.unwrap(),
+            r#type: self._fields.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FeaturedItem<S> {
+        FeaturedItem {
+            mbid: self._fields.0.unwrap(),
+            r#type: self._fields.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
 fn lexicon_doc_fm_teal_alpha_actor_profile() -> LexiconDoc<'static> {
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
@@ -296,8 +448,11 @@ fn lexicon_doc_fm_teal_alpha_actor_profile() -> LexiconDoc<'static> {
                             SmolStr::new_static("mbid"),
                             LexObjectProperty::String(LexString {
                                 description: Some(
-                                    CowStr::new_static("The Musicbrainz ID of the item"),
+                                    CowStr::new_static(
+                                        "The MusicBrainz ID URI of the item, formatted as mbid:<uuid>",
+                                    ),
                                 ),
+                                format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
                         );

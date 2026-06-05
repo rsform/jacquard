@@ -13,7 +13,7 @@ use core::marker::PhantomData;
 use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::AtUri;
+use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
@@ -27,7 +27,7 @@ pub struct ListBranches<S: BosStr = DefaultStr> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    pub repo: AtUri<S>,
+    pub repo: Did<S>,
 }
 
 
@@ -172,7 +172,7 @@ pub mod list_branches_state {
 /// Builder for constructing an instance of this type.
 pub struct ListBranchesBuilder<St: list_branches_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
+    _fields: (Option<S>, Option<i64>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -246,7 +246,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<S>>,
+        value: impl Into<Did<S>>,
     ) -> ListBranchesBuilder<list_branches_state::SetRepo<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ListBranchesBuilder {

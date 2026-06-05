@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod add_collaborator;
 pub mod add_secret;
 pub mod archive;
 pub mod artifact;
@@ -16,6 +17,7 @@ pub mod compare;
 pub mod create;
 pub mod delete;
 pub mod delete_branch;
+pub mod describe_repo;
 pub mod diff;
 pub mod fork_status;
 pub mod fork_sync;
@@ -23,11 +25,21 @@ pub mod get_default_branch;
 pub mod hidden_ref;
 pub mod issue;
 pub mod languages;
+pub mod list_artifacts;
+pub mod list_artifacts_by;
+pub mod list_collaborators;
+pub mod list_collaborators_by;
+pub mod list_issues;
+pub mod list_issues_by;
+pub mod list_pulls;
+pub mod list_pulls_by;
+pub mod list_repos;
 pub mod list_secrets;
 pub mod log;
 pub mod merge;
 pub mod merge_check;
 pub mod pull;
+pub mod remove_collaborator;
 pub mod remove_secret;
 pub mod set_default_branch;
 pub mod tag;
@@ -46,7 +58,7 @@ use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -74,8 +86,12 @@ pub struct Repo<S: BosStr = DefaultStr> {
     ///List of labels that this repo subscribes to
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<Vec<AtUri<S>>>,
-    ///name of the repo
-    pub name: S,
+    ///Cosmetic name of the repo.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<S>,
+    ///DID of the repo itself, if assigned
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub repo_did: Option<Did<S>>,
     ///source of the repo
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<UriValue<S>>,
@@ -196,7 +212,6 @@ pub mod repo_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Name;
         type Knot;
     }
     /// Empty state - all required fields are unset
@@ -204,7 +219,6 @@ pub mod repo_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Name = Unset;
         type Knot = Unset;
     }
     ///State transition - sets the `created_at` field to Set
@@ -212,15 +226,6 @@ pub mod repo_state {
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Name = St::Name;
-        type Knot = St::Knot;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type CreatedAt = St::CreatedAt;
-        type Name = Set<members::name>;
         type Knot = St::Knot;
     }
     ///State transition - sets the `knot` field to Set
@@ -228,7 +233,6 @@ pub mod repo_state {
     impl<St: State> sealed::Sealed for SetKnot<St> {}
     impl<St: State> State for SetKnot<St> {
         type CreatedAt = St::CreatedAt;
-        type Name = St::Name;
         type Knot = Set<members::knot>;
     }
     /// Marker types for field names
@@ -236,8 +240,6 @@ pub mod repo_state {
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `knot` field
         pub struct knot(());
     }
@@ -252,6 +254,7 @@ pub struct RepoBuilder<St: repo_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<Vec<AtUri<S>>>,
         Option<S>,
+        Option<Did<S>>,
         Option<UriValue<S>>,
         Option<S>,
         Option<Vec<S>>,
@@ -279,7 +282,7 @@ impl RepoBuilder<repo_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         RepoBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -290,7 +293,7 @@ impl<S: BosStr> RepoBuilder<repo_state::Empty, S> {
     pub fn builder() -> Self {
         RepoBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -360,34 +363,41 @@ impl<St: repo_state::State, S: BosStr> RepoBuilder<St, S> {
     }
 }
 
-impl<St, S: BosStr> RepoBuilder<St, S>
-where
-    St: repo_state::State,
-    St::Name: repo_state::IsUnset,
-{
-    /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> RepoBuilder<repo_state::SetName<St>, S> {
-        self._fields.4 = Option::Some(value.into());
-        RepoBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: repo_state::State, S: BosStr> RepoBuilder<St, S> {
+    /// Set the `name` field (optional)
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
+        self._fields.4 = value;
+        self
+    }
+}
+
+impl<St: repo_state::State, S: BosStr> RepoBuilder<St, S> {
+    /// Set the `repoDid` field (optional)
+    pub fn repo_did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
+        self._fields.5 = value.into();
+        self
+    }
+    /// Set the `repoDid` field to an Option value (optional)
+    pub fn maybe_repo_did(mut self, value: Option<Did<S>>) -> Self {
+        self._fields.5 = value;
+        self
     }
 }
 
 impl<St: repo_state::State, S: BosStr> RepoBuilder<St, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
-        self._fields.5 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
     pub fn maybe_source(mut self, value: Option<UriValue<S>>) -> Self {
-        self._fields.5 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -395,12 +405,12 @@ impl<St: repo_state::State, S: BosStr> RepoBuilder<St, S> {
 impl<St: repo_state::State, S: BosStr> RepoBuilder<St, S> {
     /// Set the `spindle` field (optional)
     pub fn spindle(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.6 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `spindle` field to an Option value (optional)
     pub fn maybe_spindle(mut self, value: Option<S>) -> Self {
-        self._fields.6 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -408,12 +418,12 @@ impl<St: repo_state::State, S: BosStr> RepoBuilder<St, S> {
 impl<St: repo_state::State, S: BosStr> RepoBuilder<St, S> {
     /// Set the `topics` field (optional)
     pub fn topics(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
-        self._fields.7 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `topics` field to an Option value (optional)
     pub fn maybe_topics(mut self, value: Option<Vec<S>>) -> Self {
-        self._fields.7 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -421,12 +431,12 @@ impl<St: repo_state::State, S: BosStr> RepoBuilder<St, S> {
 impl<St: repo_state::State, S: BosStr> RepoBuilder<St, S> {
     /// Set the `website` field (optional)
     pub fn website(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
-        self._fields.8 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `website` field to an Option value (optional)
     pub fn maybe_website(mut self, value: Option<UriValue<S>>) -> Self {
-        self._fields.8 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -435,7 +445,6 @@ impl<St, S: BosStr> RepoBuilder<St, S>
 where
     St: repo_state::State,
     St::CreatedAt: repo_state::IsSet,
-    St::Name: repo_state::IsSet,
     St::Knot: repo_state::IsSet,
 {
     /// Build the final struct.
@@ -445,11 +454,12 @@ where
             description: self._fields.1,
             knot: self._fields.2.unwrap(),
             labels: self._fields.3,
-            name: self._fields.4.unwrap(),
-            source: self._fields.5,
-            spindle: self._fields.6,
-            topics: self._fields.7,
-            website: self._fields.8,
+            name: self._fields.4,
+            repo_did: self._fields.5,
+            source: self._fields.6,
+            spindle: self._fields.7,
+            topics: self._fields.8,
+            website: self._fields.9,
             extra_data: Default::default(),
         }
     }
@@ -460,11 +470,12 @@ where
             description: self._fields.1,
             knot: self._fields.2.unwrap(),
             labels: self._fields.3,
-            name: self._fields.4.unwrap(),
-            source: self._fields.5,
-            spindle: self._fields.6,
-            topics: self._fields.7,
-            website: self._fields.8,
+            name: self._fields.4,
+            repo_did: self._fields.5,
+            source: self._fields.6,
+            spindle: self._fields.7,
+            topics: self._fields.8,
+            website: self._fields.9,
             extra_data: Some(extra_data),
         }
     }
@@ -483,11 +494,11 @@ fn lexicon_doc_sh_tangled_repo() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    key: Some(CowStr::new_static("tid")),
+                    key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                SmolStr::new_static("name"), SmolStr::new_static("knot"),
+                                SmolStr::new_static("knot"),
                                 SmolStr::new_static("createdAt")
                             ],
                         ),
@@ -536,7 +547,19 @@ fn lexicon_doc_sh_tangled_repo() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("name of the repo")),
+                                    description: Some(
+                                        CowStr::new_static("Cosmetic name of the repo."),
+                                    ),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("repoDid"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static("DID of the repo itself, if assigned"),
+                                    ),
+                                    format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
                             );

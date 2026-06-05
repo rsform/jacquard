@@ -120,51 +120,51 @@ pub mod item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Item;
         type CreatedAt;
         type Gallery;
+        type Item;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Item = Unset;
         type CreatedAt = Unset;
         type Gallery = Unset;
-    }
-    ///State transition - sets the `item` field to Set
-    pub struct SetItem<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetItem<St> {}
-    impl<St: State> State for SetItem<St> {
-        type Item = Set<members::item>;
-        type CreatedAt = St::CreatedAt;
-        type Gallery = St::Gallery;
+        type Item = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Item = St::Item;
         type CreatedAt = Set<members::created_at>;
         type Gallery = St::Gallery;
+        type Item = St::Item;
     }
     ///State transition - sets the `gallery` field to Set
     pub struct SetGallery<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGallery<St> {}
     impl<St: State> State for SetGallery<St> {
-        type Item = St::Item;
         type CreatedAt = St::CreatedAt;
         type Gallery = Set<members::gallery>;
+        type Item = St::Item;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItem<St> {}
+    impl<St: State> State for SetItem<St> {
+        type CreatedAt = St::CreatedAt;
+        type Gallery = St::Gallery;
+        type Item = Set<members::item>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `item` field
-        pub struct item(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `gallery` field
         pub struct gallery(());
+        ///Marker type for the `item` field
+        pub struct item(());
     }
 }
 
@@ -284,9 +284,9 @@ impl<St: item_state::State, S: BosStr> ItemBuilder<St, S> {
 impl<St, S: BosStr> ItemBuilder<St, S>
 where
     St: item_state::State,
-    St::Item: item_state::IsSet,
     St::CreatedAt: item_state::IsSet,
     St::Gallery: item_state::IsSet,
+    St::Item: item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Item<S> {

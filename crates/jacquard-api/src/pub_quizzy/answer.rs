@@ -230,67 +230,67 @@ pub mod answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
         type Certainty;
-        type Timestamp;
         type Question;
+        type Text;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
         type Certainty = Unset;
-        type Timestamp = Unset;
         type Question = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetText<St> {}
-    impl<St: State> State for SetText<St> {
-        type Text = Set<members::text>;
-        type Certainty = St::Certainty;
-        type Timestamp = St::Timestamp;
-        type Question = St::Question;
+        type Text = Unset;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `certainty` field to Set
     pub struct SetCertainty<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCertainty<St> {}
     impl<St: State> State for SetCertainty<St> {
-        type Text = St::Text;
         type Certainty = Set<members::certainty>;
-        type Timestamp = St::Timestamp;
         type Question = St::Question;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
-    impl<St: State> State for SetTimestamp<St> {
         type Text = St::Text;
-        type Certainty = St::Certainty;
-        type Timestamp = Set<members::timestamp>;
-        type Question = St::Question;
+        type Timestamp = St::Timestamp;
     }
     ///State transition - sets the `question` field to Set
     pub struct SetQuestion<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetQuestion<St> {}
     impl<St: State> State for SetQuestion<St> {
-        type Text = St::Text;
         type Certainty = St::Certainty;
-        type Timestamp = St::Timestamp;
         type Question = Set<members::question>;
+        type Text = St::Text;
+        type Timestamp = St::Timestamp;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Certainty = St::Certainty;
+        type Question = St::Question;
+        type Text = Set<members::text>;
+        type Timestamp = St::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
+        type Certainty = St::Certainty;
+        type Question = St::Question;
+        type Text = St::Text;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `certainty` field
         pub struct certainty(());
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `question` field
         pub struct question(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
@@ -421,10 +421,10 @@ where
 impl<St, S: BosStr> AnswerBuilder<St, S>
 where
     St: answer_state::State,
-    St::Text: answer_state::IsSet,
     St::Certainty: answer_state::IsSet,
-    St::Timestamp: answer_state::IsSet,
     St::Question: answer_state::IsSet,
+    St::Text: answer_state::IsSet,
+    St::Timestamp: answer_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Answer<S> {

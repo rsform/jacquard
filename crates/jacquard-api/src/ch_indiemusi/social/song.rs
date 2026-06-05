@@ -159,37 +159,37 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type JoinersNeeded;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type JoinersNeeded = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type JoinersNeeded = St::JoinersNeeded;
+        type Name = Unset;
     }
     ///State transition - sets the `joiners_needed` field to Set
     pub struct SetJoinersNeeded<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetJoinersNeeded<St> {}
     impl<St: State> State for SetJoinersNeeded<St> {
-        type Name = St::Name;
         type JoinersNeeded = Set<members::joiners_needed>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type JoinersNeeded = St::JoinersNeeded;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `joiners_needed` field
         pub struct joiners_needed(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -277,8 +277,8 @@ where
 impl<St, S: BosStr> SongBuilder<St, S>
 where
     St: song_state::State,
-    St::Name: song_state::IsSet,
     St::JoinersNeeded: song_state::IsSet,
+    St::Name: song_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Song<S> {

@@ -65,37 +65,37 @@ pub mod update_account_email_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Email;
         type Account;
+        type Email;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Email = Unset;
         type Account = Unset;
-    }
-    ///State transition - sets the `email` field to Set
-    pub struct SetEmail<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEmail<St> {}
-    impl<St: State> State for SetEmail<St> {
-        type Email = Set<members::email>;
-        type Account = St::Account;
+        type Email = Unset;
     }
     ///State transition - sets the `account` field to Set
     pub struct SetAccount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAccount<St> {}
     impl<St: State> State for SetAccount<St> {
-        type Email = St::Email;
         type Account = Set<members::account>;
+        type Email = St::Email;
+    }
+    ///State transition - sets the `email` field to Set
+    pub struct SetEmail<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEmail<St> {}
+    impl<St: State> State for SetEmail<St> {
+        type Account = St::Account;
+        type Email = Set<members::email>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `email` field
-        pub struct email(());
         ///Marker type for the `account` field
         pub struct account(());
+        ///Marker type for the `email` field
+        pub struct email(());
     }
 }
 
@@ -189,8 +189,8 @@ where
 impl<St, S: BosStr> UpdateAccountEmailBuilder<St, S>
 where
     St: update_account_email_state::State,
-    St::Email: update_account_email_state::IsSet,
     St::Account: update_account_email_state::IsSet,
+    St::Email: update_account_email_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> UpdateAccountEmail<S> {

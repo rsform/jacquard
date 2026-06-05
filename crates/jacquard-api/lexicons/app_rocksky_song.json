@@ -32,11 +32,6 @@
             ],
             "maxSize": 2000000
           },
-          "albumArtUrl": {
-            "type": "string",
-            "description": "The URL of the album art of the song.",
-            "format": "uri"
-          },
           "albumArtist": {
             "type": "string",
             "description": "The album artist of the song.",
@@ -53,14 +48,6 @@
             "description": "The artist of the song.",
             "minLength": 1,
             "maxLength": 256
-          },
-          "artists": {
-            "type": "array",
-            "description": "The artists of the song with MusicBrainz IDs.",
-            "items": {
-              "type": "ref",
-              "ref": "app.rocksky.artist.defs#artistMbid"
-            }
           },
           "composer": {
             "type": "string",

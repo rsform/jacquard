@@ -4,6 +4,7 @@
   "defs": {
     "main": {
       "type": "record",
+      "description": "A publication record representing a blog, website, or content platform. Publications serve as containers for documents and define the overall branding and settings.",
       "key": "tid",
       "record": {
         "type": "object",
@@ -14,37 +15,44 @@
         "properties": {
           "basicTheme": {
             "type": "ref",
+            "description": "Simplified publication theme for tools and apps to utilize when displaying content.",
             "ref": "site.standard.theme.basic"
           },
           "description": {
             "type": "string",
-            "maxLength": 3000,
-            "maxGraphemes": 300
+            "description": "Brief description of the publication.",
+            "maxLength": 30000,
+            "maxGraphemes": 3000
           },
           "icon": {
             "type": "blob",
+            "description": "Square image to identify the publication. Should be at least 256x256.",
             "accept": [
               "image/*"
             ],
             "maxSize": 1000000
           },
+          "labels": {
+            "type": "union",
+            "description": "Self-label values for this publication. Effectively content warnings.",
+            "refs": [
+              "com.atproto.label.defs#selfLabels"
+            ]
+          },
           "name": {
             "type": "string",
-            "maxLength": 1280,
-            "maxGraphemes": 128
+            "description": "Name of the publication.",
+            "maxLength": 5000,
+            "maxGraphemes": 500
           },
           "preferences": {
             "type": "ref",
+            "description": "Object containing platform specific preferences (with a few shared properties).",
             "ref": "#preferences"
-          },
-          "theme": {
-            "type": "union",
-            "refs": [
-              "pub.leaflet.publication#theme"
-            ]
           },
           "url": {
             "type": "string",
+            "description": "Base publication url (ex: https://standard.site). The canonical document URL is formed by combining this value with the document path.",
             "format": "uri"
           }
         }
@@ -53,24 +61,9 @@
     "preferences": {
       "type": "object",
       "properties": {
-        "showComments": {
-          "type": "boolean",
-          "default": true
-        },
         "showInDiscover": {
           "type": "boolean",
-          "default": true
-        },
-        "showMentions": {
-          "type": "boolean",
-          "default": true
-        },
-        "showPrevNext": {
-          "type": "boolean",
-          "default": false
-        },
-        "showRecommends": {
-          "type": "boolean",
+          "description": "Boolean which decides whether the publication should appear in discovery feeds.",
           "default": true
         }
       }

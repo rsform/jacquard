@@ -17,7 +17,7 @@ use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -28,10 +28,23 @@ use jacquard_lexicon::schema::LexiconSchema;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
+use crate::com_atproto::label::SelfLabels;
 use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::pub_leaflet::content::Content;
-use crate::pub_leaflet::publication::Preferences;
-use crate::pub_leaflet::publication::Theme;
+use crate::site_standard::document;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct Contributor<S: BosStr = DefaultStr> {
+    pub did: Did<S>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub display_name: Option<S>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub role: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// A document record representing a published article, blog post, or other content. Documents can belong to a publication or exist independently.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -41,30 +54,42 @@ use crate::pub_leaflet::publication::Theme;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Document<S: BosStr = DefaultStr> {
+    ///Strong reference to a Bluesky post. Useful to keep track of comments off-platform.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bsky_post_ref: Option<StrongRef<S>>,
+    ///Open union used to define the record's content. Each entry must specify a $type and may be extended with other lexicons to support additional content formats.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub content: Option<Content<S>>,
+    pub content: Option<Data<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contributors: Option<Vec<document::Contributor<S>>>,
+    ///Image to used for thumbnail or cover image. Less than 1MB is size.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_image: Option<BlobRef<S>>,
+    ///A brief description or excerpt from the document.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///combine with the publication url or the document site to construct a full url to the document
+    ///Self-label values for this post. Effectively content warnings.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub labels: Option<SelfLabels<S>>,
+    ///Array of values describing relationships between this document and external resources
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub links: Option<Data<S>>,
+    ///Combine with site or publication url to construct a canonical URL to the document. Prepend with a leading slash.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub path: Option<S>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub preferences: Option<Preferences<S>>,
+    ///Timestamp of the documents publish time.
     pub published_at: Datetime,
-    ///URI to the site or publication this document belongs to. Supports both AT-URIs (at://did/collection/rkey) for publication references and HTTPS URLs (https://example.com) for standalone documents or external sites.
+    ///Points to a publication record (at://) or a publication url (https://) for loose documents. Avoid trailing slashes.
     pub site: UriValue<S>,
+    ///Array of strings used to tag or categorize the document. Avoid prepending tags with hashtags.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
+    ///Plaintext representation of the documents contents. Should not contain markdown or other formatting.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text_content: Option<S>,
-    ///Theme for standalone documents. For documents in publications, theme is inherited from the publication.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub theme: Option<Theme<S>>,
+    ///Title of the document.
     pub title: S,
+    ///Timestamp of the documents last edit.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -85,6 +110,65 @@ pub struct DocumentGetRecordOutput<S: BosStr = DefaultStr> {
 impl<S: BosStr> Document<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DocumentRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
+    }
+}
+
+impl<S: BosStr> LexiconSchema for Contributor<S> {
+    fn nsid() -> &'static str {
+        "site.standard.document"
+    }
+    fn def_name() -> &'static str {
+        "contributor"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_site_standard_document()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.display_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("display_name"),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            {
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
+                if count > 100usize {
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("display_name"),
+                        max: 100usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.role {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("role"),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.role {
+            {
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
+                if count > 100usize {
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("role"),
+                        max: 100usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
     }
 }
 
@@ -214,6 +298,387 @@ impl<S: BosStr> LexiconSchema for Document<S> {
     }
 }
 
+pub mod contributor_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Did = Set<members::did>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct ContributorBuilder<St: contributor_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<Did<S>>, Option<S>, Option<S>),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl Contributor<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ContributorBuilder<contributor_state::Empty, DefaultStr> {
+        ContributorBuilder::new()
+    }
+}
+
+impl<S: BosStr> Contributor<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ContributorBuilder<contributor_state::Empty, S> {
+        ContributorBuilder::builder()
+    }
+}
+
+impl ContributorBuilder<contributor_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        ContributorBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> ContributorBuilder<contributor_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ContributorBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ContributorBuilder<St, S>
+where
+    St: contributor_state::State,
+    St::Did: contributor_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> ContributorBuilder<contributor_state::SetDid<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        ContributorBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: contributor_state::State, S: BosStr> ContributorBuilder<St, S> {
+    /// Set the `displayName` field (optional)
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `displayName` field to an Option value (optional)
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: contributor_state::State, S: BosStr> ContributorBuilder<St, S> {
+    /// Set the `role` field (optional)
+    pub fn role(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `role` field to an Option value (optional)
+    pub fn maybe_role(mut self, value: Option<S>) -> Self {
+        self._fields.2 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ContributorBuilder<St, S>
+where
+    St: contributor_state::State,
+    St::Did: contributor_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> Contributor<S> {
+        Contributor {
+            did: self._fields.0.unwrap(),
+            display_name: self._fields.1,
+            role: self._fields.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Contributor<S> {
+        Contributor {
+            did: self._fields.0.unwrap(),
+            display_name: self._fields.1,
+            role: self._fields.2,
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+fn lexicon_doc_site_standard_document() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("site.standard.document"),
+        defs: {
+            let mut map = BTreeMap::new();
+            map.insert(
+                SmolStr::new_static("contributor"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("did")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("did"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("displayName"),
+                            LexObjectProperty::String(LexString {
+                                max_length: Some(1000usize),
+                                max_graphemes: Some(100usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("role"),
+                            LexObjectProperty::String(LexString {
+                                max_length: Some(1000usize),
+                                max_graphemes: Some(100usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    description: Some(
+                        CowStr::new_static(
+                            "A document record representing a published article, blog post, or other content. Documents can belong to a publication or exist independently.",
+                        ),
+                    ),
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("site"), SmolStr::new_static("title"),
+                                SmolStr::new_static("publishedAt")
+                            ],
+                        ),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("bskyPostRef"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("content"),
+                                LexObjectProperty::Union(LexRefUnion {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Open union used to define the record's content. Each entry must specify a $type and may be extended with other lexicons to support additional content formats.",
+                                        ),
+                                    ),
+                                    refs: vec![],
+                                    closed: Some(false),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("contributors"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#contributor"),
+                                        ..Default::default()
+                                    }),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("coverImage"),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("description"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "A brief description or excerpt from the document.",
+                                        ),
+                                    ),
+                                    max_length: Some(30000usize),
+                                    max_graphemes: Some(3000usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("labels"),
+                                LexObjectProperty::Union(LexRefUnion {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Self-label values for this post. Effectively content warnings.",
+                                        ),
+                                    ),
+                                    refs: vec![
+                                        CowStr::new_static("com.atproto.label.defs#selfLabels")
+                                    ],
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("links"),
+                                LexObjectProperty::Union(LexRefUnion {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Array of values describing relationships between this document and external resources",
+                                        ),
+                                    ),
+                                    refs: vec![],
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("path"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Combine with site or publication url to construct a canonical URL to the document. Prepend with a leading slash.",
+                                        ),
+                                    ),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("publishedAt"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp of the documents publish time.",
+                                        ),
+                                    ),
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("site"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Points to a publication record (at://) or a publication url (https://) for loose documents. Avoid trailing slashes.",
+                                        ),
+                                    ),
+                                    format: Some(LexStringFormat::Uri),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("tags"),
+                                LexObjectProperty::Array(LexArray {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Array of strings used to tag or categorize the document. Avoid prepending tags with hashtags.",
+                                        ),
+                                    ),
+                                    items: LexArrayItem::String(LexString {
+                                        max_length: Some(1280usize),
+                                        max_graphemes: Some(128usize),
+                                        ..Default::default()
+                                    }),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("textContent"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Plaintext representation of the documents contents. Should not contain markdown or other formatting.",
+                                        ),
+                                    ),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("title"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static("Title of the document."),
+                                    ),
+                                    max_length: Some(5000usize),
+                                    max_graphemes: Some(500usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("updatedAt"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static("Timestamp of the documents last edit."),
+                                    ),
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    }),
+                    ..Default::default()
+                }),
+            );
+            map
+        },
+        ..Default::default()
+    }
+}
+
 pub mod document_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -224,49 +689,49 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Site;
         type PublishedAt;
+        type Site;
         type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Site = Unset;
         type PublishedAt = Unset;
+        type Site = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `site` field to Set
-    pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSite<St> {}
-    impl<St: State> State for SetSite<St> {
-        type Site = Set<members::site>;
-        type PublishedAt = St::PublishedAt;
-        type Title = St::Title;
     }
     ///State transition - sets the `published_at` field to Set
     pub struct SetPublishedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPublishedAt<St> {}
     impl<St: State> State for SetPublishedAt<St> {
-        type Site = St::Site;
         type PublishedAt = Set<members::published_at>;
+        type Site = St::Site;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `site` field to Set
+    pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSite<St> {}
+    impl<St: State> State for SetSite<St> {
+        type PublishedAt = St::PublishedAt;
+        type Site = Set<members::site>;
         type Title = St::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Site = St::Site;
         type PublishedAt = St::PublishedAt;
+        type Site = St::Site;
         type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `site` field
-        pub struct site(());
         ///Marker type for the `published_at` field
         pub struct published_at(());
+        ///Marker type for the `site` field
+        pub struct site(());
         ///Marker type for the `title` field
         pub struct title(());
     }
@@ -277,16 +742,17 @@ pub struct DocumentBuilder<St: document_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<StrongRef<S>>,
-        Option<Content<S>>,
+        Option<Data<S>>,
+        Option<Vec<document::Contributor<S>>>,
         Option<BlobRef<S>>,
         Option<S>,
+        Option<SelfLabels<S>>,
+        Option<Data<S>>,
         Option<S>,
-        Option<Preferences<S>>,
         Option<Datetime>,
         Option<UriValue<S>>,
         Option<Vec<S>>,
         Option<S>,
-        Option<Theme<S>>,
         Option<S>,
         Option<Datetime>,
     ),
@@ -326,6 +792,7 @@ impl DocumentBuilder<document_state::Empty, DefaultStr> {
                 None,
                 None,
                 None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -338,6 +805,7 @@ impl<S: BosStr> DocumentBuilder<document_state::Empty, S> {
         DocumentBuilder {
             _state: PhantomData,
             _fields: (
+                None,
                 None,
                 None,
                 None,
@@ -372,13 +840,32 @@ impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
 
 impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
     /// Set the `content` field (optional)
-    pub fn content(mut self, value: impl Into<Option<Content<S>>>) -> Self {
+    pub fn content(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
-    pub fn maybe_content(mut self, value: Option<Content<S>>) -> Self {
+    pub fn maybe_content(mut self, value: Option<Data<S>>) -> Self {
         self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
+    /// Set the `contributors` field (optional)
+    pub fn contributors(
+        mut self,
+        value: impl Into<Option<Vec<document::Contributor<S>>>>,
+    ) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `contributors` field to an Option value (optional)
+    pub fn maybe_contributors(
+        mut self,
+        value: Option<Vec<document::Contributor<S>>>,
+    ) -> Self {
+        self._fields.2 = value;
         self
     }
 }
@@ -386,12 +873,12 @@ impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
 impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
     /// Set the `coverImage` field (optional)
     pub fn cover_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
-        self._fields.2 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `coverImage` field to an Option value (optional)
     pub fn maybe_cover_image(mut self, value: Option<BlobRef<S>>) -> Self {
-        self._fields.2 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -399,12 +886,38 @@ impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
 impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.3 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<S>) -> Self {
-        self._fields.3 = value;
+        self._fields.4 = value;
+        self
+    }
+}
+
+impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
+    /// Set the `labels` field (optional)
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
+        self._fields.5 = value.into();
+        self
+    }
+    /// Set the `labels` field to an Option value (optional)
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<S>>) -> Self {
+        self._fields.5 = value;
+        self
+    }
+}
+
+impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
+    /// Set the `links` field (optional)
+    pub fn links(mut self, value: impl Into<Option<Data<S>>>) -> Self {
+        self._fields.6 = value.into();
+        self
+    }
+    /// Set the `links` field to an Option value (optional)
+    pub fn maybe_links(mut self, value: Option<Data<S>>) -> Self {
+        self._fields.6 = value;
         self
     }
 }
@@ -412,25 +925,12 @@ impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
 impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
     /// Set the `path` field (optional)
     pub fn path(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.4 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `path` field to an Option value (optional)
     pub fn maybe_path(mut self, value: Option<S>) -> Self {
-        self._fields.4 = value;
-        self
-    }
-}
-
-impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
-    /// Set the `preferences` field (optional)
-    pub fn preferences(mut self, value: impl Into<Option<Preferences<S>>>) -> Self {
-        self._fields.5 = value.into();
-        self
-    }
-    /// Set the `preferences` field to an Option value (optional)
-    pub fn maybe_preferences(mut self, value: Option<Preferences<S>>) -> Self {
-        self._fields.5 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -445,7 +945,7 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> DocumentBuilder<document_state::SetPublishedAt<St>, S> {
-        self._fields.6 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -464,7 +964,7 @@ where
         mut self,
         value: impl Into<UriValue<S>>,
     ) -> DocumentBuilder<document_state::SetSite<St>, S> {
-        self._fields.7 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -476,12 +976,12 @@ where
 impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
-        self._fields.8 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
-        self._fields.8 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -489,25 +989,12 @@ impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
 impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
     /// Set the `textContent` field (optional)
     pub fn text_content(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.9 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `textContent` field to an Option value (optional)
     pub fn maybe_text_content(mut self, value: Option<S>) -> Self {
-        self._fields.9 = value;
-        self
-    }
-}
-
-impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
-    /// Set the `theme` field (optional)
-    pub fn theme(mut self, value: impl Into<Option<Theme<S>>>) -> Self {
-        self._fields.10 = value.into();
-        self
-    }
-    /// Set the `theme` field to an Option value (optional)
-    pub fn maybe_theme(mut self, value: Option<Theme<S>>) -> Self {
-        self._fields.10 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -522,7 +1009,7 @@ where
         mut self,
         value: impl Into<S>,
     ) -> DocumentBuilder<document_state::SetTitle<St>, S> {
-        self._fields.11 = Option::Some(value.into());
+        self._fields.12 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -534,12 +1021,12 @@ where
 impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.12 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self._fields.12 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -547,8 +1034,8 @@ impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
 impl<St, S: BosStr> DocumentBuilder<St, S>
 where
     St: document_state::State,
-    St::Site: document_state::IsSet,
     St::PublishedAt: document_state::IsSet,
+    St::Site: document_state::IsSet,
     St::Title: document_state::IsSet,
 {
     /// Build the final struct.
@@ -556,17 +1043,18 @@ where
         Document {
             bsky_post_ref: self._fields.0,
             content: self._fields.1,
-            cover_image: self._fields.2,
-            description: self._fields.3,
-            path: self._fields.4,
-            preferences: self._fields.5,
-            published_at: self._fields.6.unwrap(),
-            site: self._fields.7.unwrap(),
-            tags: self._fields.8,
-            text_content: self._fields.9,
-            theme: self._fields.10,
-            title: self._fields.11.unwrap(),
-            updated_at: self._fields.12,
+            contributors: self._fields.2,
+            cover_image: self._fields.3,
+            description: self._fields.4,
+            labels: self._fields.5,
+            links: self._fields.6,
+            path: self._fields.7,
+            published_at: self._fields.8.unwrap(),
+            site: self._fields.9.unwrap(),
+            tags: self._fields.10,
+            text_content: self._fields.11,
+            title: self._fields.12.unwrap(),
+            updated_at: self._fields.13,
             extra_data: Default::default(),
         }
     }
@@ -575,161 +1063,19 @@ where
         Document {
             bsky_post_ref: self._fields.0,
             content: self._fields.1,
-            cover_image: self._fields.2,
-            description: self._fields.3,
-            path: self._fields.4,
-            preferences: self._fields.5,
-            published_at: self._fields.6.unwrap(),
-            site: self._fields.7.unwrap(),
-            tags: self._fields.8,
-            text_content: self._fields.9,
-            theme: self._fields.10,
-            title: self._fields.11.unwrap(),
-            updated_at: self._fields.12,
+            contributors: self._fields.2,
+            cover_image: self._fields.3,
+            description: self._fields.4,
+            labels: self._fields.5,
+            links: self._fields.6,
+            path: self._fields.7,
+            published_at: self._fields.8.unwrap(),
+            site: self._fields.9.unwrap(),
+            tags: self._fields.10,
+            text_content: self._fields.11,
+            title: self._fields.12.unwrap(),
+            updated_at: self._fields.13,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-fn lexicon_doc_site_standard_document() -> LexiconDoc<'static> {
-    #[allow(unused_imports)]
-    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
-    use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
-    LexiconDoc {
-        lexicon: Lexicon::Lexicon1,
-        id: CowStr::new_static("site.standard.document"),
-        defs: {
-            let mut map = BTreeMap::new();
-            map.insert(
-                SmolStr::new_static("main"),
-                LexUserType::Record(LexRecord {
-                    key: Some(CowStr::new_static("tid")),
-                    record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("site"), SmolStr::new_static("title"),
-                                SmolStr::new_static("publishedAt")
-                            ],
-                        ),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("bskyPostRef"),
-                                LexObjectProperty::Ref(LexRef {
-                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("content"),
-                                LexObjectProperty::Union(LexRefUnion {
-                                    refs: vec![CowStr::new_static("pub.leaflet.content")],
-                                    closed: Some(false),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("coverImage"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("description"),
-                                LexObjectProperty::String(LexString {
-                                    max_length: Some(30000usize),
-                                    max_graphemes: Some(3000usize),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("path"),
-                                LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "combine with the publication url or the document site to construct a full url to the document",
-                                        ),
-                                    ),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("preferences"),
-                                LexObjectProperty::Union(LexRefUnion {
-                                    refs: vec![
-                                        CowStr::new_static("pub.leaflet.publication#preferences")
-                                    ],
-                                    closed: Some(false),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("publishedAt"),
-                                LexObjectProperty::String(LexString {
-                                    format: Some(LexStringFormat::Datetime),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("site"),
-                                LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "URI to the site or publication this document belongs to. Supports both AT-URIs (at://did/collection/rkey) for publication references and HTTPS URLs (https://example.com) for standalone documents or external sites.",
-                                        ),
-                                    ),
-                                    format: Some(LexStringFormat::Uri),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("tags"),
-                                LexObjectProperty::Array(LexArray {
-                                    items: LexArrayItem::String(LexString {
-                                        max_length: Some(100usize),
-                                        max_graphemes: Some(50usize),
-                                        ..Default::default()
-                                    }),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("textContent"),
-                                LexObjectProperty::String(LexString {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("theme"),
-                                LexObjectProperty::Ref(LexRef {
-                                    r#ref: CowStr::new_static("pub.leaflet.publication#theme"),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("title"),
-                                LexObjectProperty::String(LexString {
-                                    max_length: Some(5000usize),
-                                    max_graphemes: Some(500usize),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("updatedAt"),
-                                LexObjectProperty::String(LexString {
-                                    format: Some(LexStringFormat::Datetime),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    }),
-                    ..Default::default()
-                }),
-            );
-            map
-        },
-        ..Default::default()
     }
 }

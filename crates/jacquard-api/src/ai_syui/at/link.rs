@@ -354,37 +354,37 @@ pub mod link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Links;
         type CreatedAt;
+        type Links;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Links = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `links` field to Set
-    pub struct SetLinks<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLinks<St> {}
-    impl<St: State> State for SetLinks<St> {
-        type Links = Set<members::links>;
-        type CreatedAt = St::CreatedAt;
+        type Links = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Links = St::Links;
         type CreatedAt = Set<members::created_at>;
+        type Links = St::Links;
+    }
+    ///State transition - sets the `links` field to Set
+    pub struct SetLinks<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLinks<St> {}
+    impl<St: State> State for SetLinks<St> {
+        type CreatedAt = St::CreatedAt;
+        type Links = Set<members::links>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `links` field
-        pub struct links(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `links` field
+        pub struct links(());
     }
 }
 
@@ -485,8 +485,8 @@ impl<St: link_state::State, S: BosStr> LinkBuilder<St, S> {
 impl<St, S: BosStr> LinkBuilder<St, S>
 where
     St: link_state::State,
-    St::Links: link_state::IsSet,
     St::CreatedAt: link_state::IsSet,
+    St::Links: link_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Link<S> {

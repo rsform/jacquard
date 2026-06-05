@@ -22,6 +22,24 @@
         }
       }
     },
+    "storage": {
+      "type": "object",
+      "description": "S3 storage configuration for backups.",
+      "required": [
+        "url",
+        "isActive"
+      ],
+      "properties": {
+        "isActive": {
+          "type": "boolean",
+          "description": "Whether backup storage is currently active."
+        },
+        "url": {
+          "type": "string",
+          "description": "S3 storage URL with masked secret key in format: s3+https://ACCESS_KEY:***@endpoint/bucket"
+        }
+      }
+    },
     "webhook": {
       "type": "object",
       "description": "A webhook configuration for receiving Streamplace events.",

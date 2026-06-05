@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.createList",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create a new list for the authenticated user.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "description": {
+              "type": "string",
+              "description": "Optional description of the list.",
+              "maxLength": 500
+            },
+            "name": {
+              "type": "string",
+              "description": "The name of the list.",
+              "maxLength": 100
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string"
+            },
+            "uri": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

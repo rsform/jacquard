@@ -188,65 +188,65 @@ pub mod chart_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rating;
-        type Game;
         type Difficulty;
+        type Game;
+        type Rating;
         type Song;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rating = Unset;
-        type Game = Unset;
         type Difficulty = Unset;
+        type Game = Unset;
+        type Rating = Unset;
         type Song = Unset;
     }
-    ///State transition - sets the `rating` field to Set
-    pub struct SetRating<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRating<St> {}
-    impl<St: State> State for SetRating<St> {
-        type Rating = Set<members::rating>;
+    ///State transition - sets the `difficulty` field to Set
+    pub struct SetDifficulty<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDifficulty<St> {}
+    impl<St: State> State for SetDifficulty<St> {
+        type Difficulty = Set<members::difficulty>;
         type Game = St::Game;
-        type Difficulty = St::Difficulty;
+        type Rating = St::Rating;
         type Song = St::Song;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGame<St> {}
     impl<St: State> State for SetGame<St> {
-        type Rating = St::Rating;
-        type Game = Set<members::game>;
         type Difficulty = St::Difficulty;
+        type Game = Set<members::game>;
+        type Rating = St::Rating;
         type Song = St::Song;
     }
-    ///State transition - sets the `difficulty` field to Set
-    pub struct SetDifficulty<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDifficulty<St> {}
-    impl<St: State> State for SetDifficulty<St> {
-        type Rating = St::Rating;
+    ///State transition - sets the `rating` field to Set
+    pub struct SetRating<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRating<St> {}
+    impl<St: State> State for SetRating<St> {
+        type Difficulty = St::Difficulty;
         type Game = St::Game;
-        type Difficulty = Set<members::difficulty>;
+        type Rating = Set<members::rating>;
         type Song = St::Song;
     }
     ///State transition - sets the `song` field to Set
     pub struct SetSong<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSong<St> {}
     impl<St: State> State for SetSong<St> {
-        type Rating = St::Rating;
-        type Game = St::Game;
         type Difficulty = St::Difficulty;
+        type Game = St::Game;
+        type Rating = St::Rating;
         type Song = Set<members::song>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rating` field
-        pub struct rating(());
-        ///Marker type for the `game` field
-        pub struct game(());
         ///Marker type for the `difficulty` field
         pub struct difficulty(());
+        ///Marker type for the `game` field
+        pub struct game(());
+        ///Marker type for the `rating` field
+        pub struct rating(());
         ///Marker type for the `song` field
         pub struct song(());
     }
@@ -421,9 +421,9 @@ where
 impl<St, S: BosStr> ChartBuilder<St, S>
 where
     St: chart_state::State,
-    St::Rating: chart_state::IsSet,
-    St::Game: chart_state::IsSet,
     St::Difficulty: chart_state::IsSet,
+    St::Game: chart_state::IsSet,
+    St::Rating: chart_state::IsSet,
     St::Song: chart_state::IsSet,
 {
     /// Build the final struct.

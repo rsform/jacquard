@@ -119,65 +119,65 @@ pub mod quiz_begin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Quiz;
         type EndsAt;
         type League;
+        type Quiz;
         type StartedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Quiz = Unset;
         type EndsAt = Unset;
         type League = Unset;
+        type Quiz = Unset;
         type StartedAt = Unset;
-    }
-    ///State transition - sets the `quiz` field to Set
-    pub struct SetQuiz<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetQuiz<St> {}
-    impl<St: State> State for SetQuiz<St> {
-        type Quiz = Set<members::quiz>;
-        type EndsAt = St::EndsAt;
-        type League = St::League;
-        type StartedAt = St::StartedAt;
     }
     ///State transition - sets the `ends_at` field to Set
     pub struct SetEndsAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEndsAt<St> {}
     impl<St: State> State for SetEndsAt<St> {
-        type Quiz = St::Quiz;
         type EndsAt = Set<members::ends_at>;
         type League = St::League;
+        type Quiz = St::Quiz;
         type StartedAt = St::StartedAt;
     }
     ///State transition - sets the `league` field to Set
     pub struct SetLeague<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLeague<St> {}
     impl<St: State> State for SetLeague<St> {
-        type Quiz = St::Quiz;
         type EndsAt = St::EndsAt;
         type League = Set<members::league>;
+        type Quiz = St::Quiz;
+        type StartedAt = St::StartedAt;
+    }
+    ///State transition - sets the `quiz` field to Set
+    pub struct SetQuiz<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuiz<St> {}
+    impl<St: State> State for SetQuiz<St> {
+        type EndsAt = St::EndsAt;
+        type League = St::League;
+        type Quiz = Set<members::quiz>;
         type StartedAt = St::StartedAt;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStartedAt<St> {}
     impl<St: State> State for SetStartedAt<St> {
-        type Quiz = St::Quiz;
         type EndsAt = St::EndsAt;
         type League = St::League;
+        type Quiz = St::Quiz;
         type StartedAt = Set<members::started_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quiz` field
-        pub struct quiz(());
         ///Marker type for the `ends_at` field
         pub struct ends_at(());
         ///Marker type for the `league` field
         pub struct league(());
+        ///Marker type for the `quiz` field
+        pub struct quiz(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
     }
@@ -310,9 +310,9 @@ where
 impl<St, S: BosStr> QuizBeginBuilder<St, S>
 where
     St: quiz_begin_state::State,
-    St::Quiz: quiz_begin_state::IsSet,
     St::EndsAt: quiz_begin_state::IsSet,
     St::League: quiz_begin_state::IsSet,
+    St::Quiz: quiz_begin_state::IsSet,
     St::StartedAt: quiz_begin_state::IsSet,
 {
     /// Build the final struct.

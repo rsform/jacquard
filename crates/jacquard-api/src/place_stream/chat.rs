@@ -7,6 +7,7 @@
 
 pub mod gate;
 pub mod message;
+pub mod pinned_record;
 pub mod profile;
 
 
@@ -30,6 +31,8 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewBasic;
+use crate::place_stream::badge::BadgeView;
+use crate::place_stream::chat::pinned_record::PinnedRecord;
 use crate::place_stream::chat::profile::Profile;
 use crate::place_stream::chat;
 
@@ -37,6 +40,9 @@ use crate::place_stream::chat;
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageView<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
+    ///Up to 3 badge tokens to display with the message. First badge is server-controlled, remaining badges are user-settable. Tokens are looked up in badges.json for display info.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub badges: Option<Vec<BadgeView<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub chat_profile: Option<Profile<S>>,
     pub cid: Cid<S>,
@@ -61,12 +67,54 @@ pub enum MessageViewReplyTo<S: BosStr = DefaultStr> {
     MessageView(Box<chat::MessageView<S>>),
 }
 
+/// View of a pinned chat record with hydrated message data.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct PinnedRecordView<S: BosStr = DefaultStr> {
+    pub cid: Cid<S>,
+    pub indexed_at: Datetime,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<chat::MessageView<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pinned_by: Option<Profile<S>>,
+    pub record: PinnedRecord<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 impl<S: BosStr> LexiconSchema for MessageView<S> {
     fn nsid() -> &'static str {
         "place.stream.chat.defs"
     }
     fn def_name() -> &'static str {
         "messageView"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_place_stream_chat_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.badges {
+            #[allow(unused_comparisons)]
+            if value.len() > 3usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("badges"),
+                    max: 3usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for PinnedRecordView<S> {
+    fn nsid() -> &'static str {
+        "place.stream.chat.defs"
+    }
+    fn def_name() -> &'static str {
+        "pinnedRecordView"
     }
     fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_place_stream_chat_defs()
@@ -86,83 +134,83 @@ pub mod message_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Author;
-        type IndexedAt;
         type Cid;
+        type IndexedAt;
+        type Record;
         type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Author = Unset;
-        type IndexedAt = Unset;
         type Cid = Unset;
+        type IndexedAt = Unset;
+        type Record = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
-        type Record = Set<members::record>;
-        type Author = St::Author;
-        type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
-        type Uri = St::Uri;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthor<St> {}
     impl<St: State> State for SetAuthor<St> {
-        type Record = St::Record;
         type Author = Set<members::author>;
+        type Cid = St::Cid;
         type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
         type Record = St::Record;
-        type Author = St::Author;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = St::Cid;
         type Uri = St::Uri;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Record = St::Record;
         type Author = St::Author;
-        type IndexedAt = St::IndexedAt;
         type Cid = Set<members::cid>;
+        type IndexedAt = St::IndexedAt;
+        type Record = St::Record;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Author = St::Author;
+        type Cid = St::Cid;
+        type IndexedAt = Set<members::indexed_at>;
+        type Record = St::Record;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Author = St::Author;
+        type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
+        type Record = Set<members::record>;
         type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Record = St::Record;
         type Author = St::Author;
-        type IndexedAt = St::IndexedAt;
         type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
+        type Record = St::Record;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `author` field
         pub struct author(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `uri` field
         pub struct uri(());
     }
@@ -173,6 +221,7 @@ pub struct MessageViewBuilder<St: message_view_state::State, S: BosStr = Default
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileViewBasic<S>>,
+        Option<Vec<BadgeView<S>>>,
         Option<Profile<S>>,
         Option<Cid<S>>,
         Option<bool>,
@@ -203,7 +252,7 @@ impl MessageViewBuilder<message_view_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         MessageViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -214,7 +263,7 @@ impl<S: BosStr> MessageViewBuilder<message_view_state::Empty, S> {
     pub fn builder() -> Self {
         MessageViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -240,14 +289,27 @@ where
 }
 
 impl<St: message_view_state::State, S: BosStr> MessageViewBuilder<St, S> {
+    /// Set the `badges` field (optional)
+    pub fn badges(mut self, value: impl Into<Option<Vec<BadgeView<S>>>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `badges` field to an Option value (optional)
+    pub fn maybe_badges(mut self, value: Option<Vec<BadgeView<S>>>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: message_view_state::State, S: BosStr> MessageViewBuilder<St, S> {
     /// Set the `chatProfile` field (optional)
     pub fn chat_profile(mut self, value: impl Into<Option<Profile<S>>>) -> Self {
-        self._fields.1 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `chatProfile` field to an Option value (optional)
     pub fn maybe_chat_profile(mut self, value: Option<Profile<S>>) -> Self {
-        self._fields.1 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -262,7 +324,7 @@ where
         mut self,
         value: impl Into<Cid<S>>,
     ) -> MessageViewBuilder<message_view_state::SetCid<St>, S> {
-        self._fields.2 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -274,12 +336,12 @@ where
 impl<St: message_view_state::State, S: BosStr> MessageViewBuilder<St, S> {
     /// Set the `deleted` field (optional)
     pub fn deleted(mut self, value: impl Into<Option<bool>>) -> Self {
-        self._fields.3 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `deleted` field to an Option value (optional)
     pub fn maybe_deleted(mut self, value: Option<bool>) -> Self {
-        self._fields.3 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -294,7 +356,7 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> MessageViewBuilder<message_view_state::SetIndexedAt<St>, S> {
-        self._fields.4 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -313,7 +375,7 @@ where
         mut self,
         value: impl Into<Data<S>>,
     ) -> MessageViewBuilder<message_view_state::SetRecord<St>, S> {
-        self._fields.5 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -325,12 +387,12 @@ where
 impl<St: message_view_state::State, S: BosStr> MessageViewBuilder<St, S> {
     /// Set the `replyTo` field (optional)
     pub fn reply_to(mut self, value: impl Into<Option<MessageViewReplyTo<S>>>) -> Self {
-        self._fields.6 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `replyTo` field to an Option value (optional)
     pub fn maybe_reply_to(mut self, value: Option<MessageViewReplyTo<S>>) -> Self {
-        self._fields.6 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -345,7 +407,7 @@ where
         mut self,
         value: impl Into<AtUri<S>>,
     ) -> MessageViewBuilder<message_view_state::SetUri<St>, S> {
-        self._fields.7 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -357,23 +419,24 @@ where
 impl<St, S: BosStr> MessageViewBuilder<St, S>
 where
     St: message_view_state::State,
-    St::Record: message_view_state::IsSet,
     St::Author: message_view_state::IsSet,
-    St::IndexedAt: message_view_state::IsSet,
     St::Cid: message_view_state::IsSet,
+    St::IndexedAt: message_view_state::IsSet,
+    St::Record: message_view_state::IsSet,
     St::Uri: message_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MessageView<S> {
         MessageView {
             author: self._fields.0.unwrap(),
-            chat_profile: self._fields.1,
-            cid: self._fields.2.unwrap(),
-            deleted: self._fields.3,
-            indexed_at: self._fields.4.unwrap(),
-            record: self._fields.5.unwrap(),
-            reply_to: self._fields.6,
-            uri: self._fields.7.unwrap(),
+            badges: self._fields.1,
+            chat_profile: self._fields.2,
+            cid: self._fields.3.unwrap(),
+            deleted: self._fields.4,
+            indexed_at: self._fields.5.unwrap(),
+            record: self._fields.6.unwrap(),
+            reply_to: self._fields.7,
+            uri: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -384,13 +447,14 @@ where
     ) -> MessageView<S> {
         MessageView {
             author: self._fields.0.unwrap(),
-            chat_profile: self._fields.1,
-            cid: self._fields.2.unwrap(),
-            deleted: self._fields.3,
-            indexed_at: self._fields.4.unwrap(),
-            record: self._fields.5.unwrap(),
-            reply_to: self._fields.6,
-            uri: self._fields.7.unwrap(),
+            badges: self._fields.1,
+            chat_profile: self._fields.2,
+            cid: self._fields.3.unwrap(),
+            deleted: self._fields.4,
+            indexed_at: self._fields.5.unwrap(),
+            record: self._fields.6.unwrap(),
+            reply_to: self._fields.7,
+            uri: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -425,6 +489,24 @@ fn lexicon_doc_place_stream_chat_defs() -> LexiconDoc<'static> {
                                 r#ref: CowStr::new_static(
                                     "app.bsky.actor.defs#profileViewBasic",
                                 ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("badges"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Up to 3 badge tokens to display with the message. First badge is server-controlled, remaining badges are user-settable. Tokens are looked up in badges.json for display info.",
+                                    ),
+                                ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
+                                        "place.stream.badge.defs#badgeView",
+                                    ),
+                                    ..Default::default()
+                                }),
+                                max_length: Some(3usize),
                                 ..Default::default()
                             }),
                         );
@@ -480,8 +562,342 @@ fn lexicon_doc_place_stream_chat_defs() -> LexiconDoc<'static> {
                     ..Default::default()
                 }),
             );
+            map.insert(
+                SmolStr::new_static("pinnedRecordView"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "View of a pinned chat record with hydrated message data.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("record"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("cid"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Cid),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("indexedAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("message"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#messageView"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("pinnedBy"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("place.stream.chat.profile"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("record"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("place.stream.chat.pinnedRecord"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
             map
         },
         ..Default::default()
+    }
+}
+
+pub mod pinned_record_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Cid;
+        type IndexedAt;
+        type Record;
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Cid = Unset;
+        type IndexedAt = Unset;
+        type Record = Unset;
+        type Uri = Unset;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Cid = Set<members::cid>;
+        type IndexedAt = St::IndexedAt;
+        type Record = St::Record;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Cid = St::Cid;
+        type IndexedAt = Set<members::indexed_at>;
+        type Record = St::Record;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
+        type Record = Set<members::record>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
+        type Record = St::Record;
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct PinnedRecordViewBuilder<
+    St: pinned_record_view_state::State,
+    S: BosStr = DefaultStr,
+> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (
+        Option<Cid<S>>,
+        Option<Datetime>,
+        Option<chat::MessageView<S>>,
+        Option<Profile<S>>,
+        Option<PinnedRecord<S>>,
+        Option<AtUri<S>>,
+    ),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl PinnedRecordView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> PinnedRecordViewBuilder<
+        pinned_record_view_state::Empty,
+        DefaultStr,
+    > {
+        PinnedRecordViewBuilder::new()
+    }
+}
+
+impl<S: BosStr> PinnedRecordView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> PinnedRecordViewBuilder<pinned_record_view_state::Empty, S> {
+        PinnedRecordViewBuilder::builder()
+    }
+}
+
+impl PinnedRecordViewBuilder<pinned_record_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        PinnedRecordViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> PinnedRecordViewBuilder<pinned_record_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        PinnedRecordViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PinnedRecordViewBuilder<St, S>
+where
+    St: pinned_record_view_state::State,
+    St::Cid: pinned_record_view_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<Cid<S>>,
+    ) -> PinnedRecordViewBuilder<pinned_record_view_state::SetCid<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        PinnedRecordViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PinnedRecordViewBuilder<St, S>
+where
+    St: pinned_record_view_state::State,
+    St::IndexedAt: pinned_record_view_state::IsUnset,
+{
+    /// Set the `indexedAt` field (required)
+    pub fn indexed_at(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> PinnedRecordViewBuilder<pinned_record_view_state::SetIndexedAt<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        PinnedRecordViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: pinned_record_view_state::State, S: BosStr> PinnedRecordViewBuilder<St, S> {
+    /// Set the `message` field (optional)
+    pub fn message(mut self, value: impl Into<Option<chat::MessageView<S>>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `message` field to an Option value (optional)
+    pub fn maybe_message(mut self, value: Option<chat::MessageView<S>>) -> Self {
+        self._fields.2 = value;
+        self
+    }
+}
+
+impl<St: pinned_record_view_state::State, S: BosStr> PinnedRecordViewBuilder<St, S> {
+    /// Set the `pinnedBy` field (optional)
+    pub fn pinned_by(mut self, value: impl Into<Option<Profile<S>>>) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `pinnedBy` field to an Option value (optional)
+    pub fn maybe_pinned_by(mut self, value: Option<Profile<S>>) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> PinnedRecordViewBuilder<St, S>
+where
+    St: pinned_record_view_state::State,
+    St::Record: pinned_record_view_state::IsUnset,
+{
+    /// Set the `record` field (required)
+    pub fn record(
+        mut self,
+        value: impl Into<PinnedRecord<S>>,
+    ) -> PinnedRecordViewBuilder<pinned_record_view_state::SetRecord<St>, S> {
+        self._fields.4 = Option::Some(value.into());
+        PinnedRecordViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PinnedRecordViewBuilder<St, S>
+where
+    St: pinned_record_view_state::State,
+    St::Uri: pinned_record_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> PinnedRecordViewBuilder<pinned_record_view_state::SetUri<St>, S> {
+        self._fields.5 = Option::Some(value.into());
+        PinnedRecordViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> PinnedRecordViewBuilder<St, S>
+where
+    St: pinned_record_view_state::State,
+    St::Cid: pinned_record_view_state::IsSet,
+    St::IndexedAt: pinned_record_view_state::IsSet,
+    St::Record: pinned_record_view_state::IsSet,
+    St::Uri: pinned_record_view_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> PinnedRecordView<S> {
+        PinnedRecordView {
+            cid: self._fields.0.unwrap(),
+            indexed_at: self._fields.1.unwrap(),
+            message: self._fields.2,
+            pinned_by: self._fields.3,
+            record: self._fields.4.unwrap(),
+            uri: self._fields.5.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PinnedRecordView<S> {
+        PinnedRecordView {
+            cid: self._fields.0.unwrap(),
+            indexed_at: self._fields.1.unwrap(),
+            message: self._fields.2,
+            pinned_by: self._fields.3,
+            record: self._fields.4.unwrap(),
+            uri: self._fields.5.unwrap(),
+            extra_data: Some(extra_data),
+        }
     }
 }

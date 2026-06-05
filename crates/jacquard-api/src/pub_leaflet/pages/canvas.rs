@@ -35,6 +35,9 @@ use crate::pub_leaflet::blocks::math::Math;
 use crate::pub_leaflet::blocks::ordered_list::OrderedList;
 use crate::pub_leaflet::blocks::page::Page;
 use crate::pub_leaflet::blocks::poll::Poll;
+use crate::pub_leaflet::blocks::posts_list::PostsList;
+use crate::pub_leaflet::blocks::signup::Signup;
+use crate::pub_leaflet::blocks::standard_site_post::StandardSitePost;
 use crate::pub_leaflet::blocks::text::Text;
 use crate::pub_leaflet::blocks::unordered_list::UnorderedList;
 use crate::pub_leaflet::blocks::website::Website;
@@ -85,12 +88,18 @@ pub enum BlockBlock<S: BosStr = DefaultStr> {
     HorizontalRule(Box<HorizontalRule<S>>),
     #[serde(rename = "pub.leaflet.blocks.bskyPost")]
     BskyPost(Box<BskyPost<S>>),
+    #[serde(rename = "pub.leaflet.blocks.standardSitePost")]
+    StandardSitePost(Box<StandardSitePost<S>>),
     #[serde(rename = "pub.leaflet.blocks.page")]
     Page(Box<Page<S>>),
     #[serde(rename = "pub.leaflet.blocks.poll")]
     Poll(Box<Poll<S>>),
     #[serde(rename = "pub.leaflet.blocks.button")]
     Button(Box<Button<S>>),
+    #[serde(rename = "pub.leaflet.blocks.postsList")]
+    PostsList(Box<PostsList<S>>),
+    #[serde(rename = "pub.leaflet.blocks.signup")]
+    Signup(Box<Signup<S>>),
 }
 
 
@@ -221,67 +230,67 @@ pub mod block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Y;
         type Block;
-        type X;
         type Width;
+        type X;
+        type Y;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Y = Unset;
         type Block = Unset;
-        type X = Unset;
         type Width = Unset;
-    }
-    ///State transition - sets the `y` field to Set
-    pub struct SetY<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetY<St> {}
-    impl<St: State> State for SetY<St> {
-        type Y = Set<members::y>;
-        type Block = St::Block;
-        type X = St::X;
-        type Width = St::Width;
+        type X = Unset;
+        type Y = Unset;
     }
     ///State transition - sets the `block` field to Set
     pub struct SetBlock<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlock<St> {}
     impl<St: State> State for SetBlock<St> {
-        type Y = St::Y;
         type Block = Set<members::block>;
+        type Width = St::Width;
         type X = St::X;
-        type Width = St::Width;
-    }
-    ///State transition - sets the `x` field to Set
-    pub struct SetX<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetX<St> {}
-    impl<St: State> State for SetX<St> {
         type Y = St::Y;
-        type Block = St::Block;
-        type X = Set<members::x>;
-        type Width = St::Width;
     }
     ///State transition - sets the `width` field to Set
     pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWidth<St> {}
     impl<St: State> State for SetWidth<St> {
-        type Y = St::Y;
         type Block = St::Block;
-        type X = St::X;
         type Width = Set<members::width>;
+        type X = St::X;
+        type Y = St::Y;
+    }
+    ///State transition - sets the `x` field to Set
+    pub struct SetX<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetX<St> {}
+    impl<St: State> State for SetX<St> {
+        type Block = St::Block;
+        type Width = St::Width;
+        type X = Set<members::x>;
+        type Y = St::Y;
+    }
+    ///State transition - sets the `y` field to Set
+    pub struct SetY<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetY<St> {}
+    impl<St: State> State for SetY<St> {
+        type Block = St::Block;
+        type Width = St::Width;
+        type X = St::X;
+        type Y = Set<members::y>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `y` field
-        pub struct y(());
         ///Marker type for the `block` field
         pub struct block(());
-        ///Marker type for the `x` field
-        pub struct x(());
         ///Marker type for the `width` field
         pub struct width(());
+        ///Marker type for the `x` field
+        pub struct x(());
+        ///Marker type for the `y` field
+        pub struct y(());
     }
 }
 
@@ -434,10 +443,10 @@ where
 impl<St, S: BosStr> BlockBuilder<St, S>
 where
     St: block_state::State,
-    St::Y: block_state::IsSet,
     St::Block: block_state::IsSet,
-    St::X: block_state::IsSet,
     St::Width: block_state::IsSet,
+    St::X: block_state::IsSet,
+    St::Y: block_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Block<S> {
@@ -503,9 +512,12 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> LexiconDoc<'static> {
                                     CowStr::new_static("pub.leaflet.blocks.code"),
                                     CowStr::new_static("pub.leaflet.blocks.horizontalRule"),
                                     CowStr::new_static("pub.leaflet.blocks.bskyPost"),
+                                    CowStr::new_static("pub.leaflet.blocks.standardSitePost"),
                                     CowStr::new_static("pub.leaflet.blocks.page"),
                                     CowStr::new_static("pub.leaflet.blocks.poll"),
-                                    CowStr::new_static("pub.leaflet.blocks.button")
+                                    CowStr::new_static("pub.leaflet.blocks.button"),
+                                    CowStr::new_static("pub.leaflet.blocks.postsList"),
+                                    CowStr::new_static("pub.leaflet.blocks.signup")
                                 ],
                                 ..Default::default()
                             }),

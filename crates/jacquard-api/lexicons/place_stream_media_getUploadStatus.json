@@ -1,0 +1,87 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.media.getUploadStatus",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the processing status of a previously created upload. Only accessible by the DID that created the upload.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uploadId"
+        ],
+        "properties": {
+          "uploadId": {
+            "type": "string",
+            "description": "The upload ID returned by place.stream.media.createUpload."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "status"
+          ],
+          "properties": {
+            "durationMs": {
+              "type": "integer",
+              "description": "Duration of the processed video in milliseconds. Present when status is 'done'."
+            },
+            "error": {
+              "type": "string",
+              "description": "Error message. Present when status is 'error'."
+            },
+            "progress": {
+              "type": "integer",
+              "description": "Processing progress percentage (0-100). Only meaningful when status is 'processing'.",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "status": {
+              "type": "string",
+              "description": "Current processing status of the upload.",
+              "knownValues": [
+                "pending",
+                "processing",
+                "done",
+                "error"
+              ]
+            },
+            "tracks": {
+              "type": "array",
+              "description": "Published track records. Present when status is 'done'.",
+              "items": {
+                "type": "ref",
+                "ref": "#trackRef"
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "No upload exists with the given ID for the authenticated user.",
+          "name": "NotFound"
+        }
+      ]
+    },
+    "trackRef": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

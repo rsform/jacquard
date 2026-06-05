@@ -2,6 +2,43 @@
   "lexicon": 1,
   "id": "chat.bsky.actor.defs",
   "defs": {
+    "directConvoMember": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here].",
+      "properties": {}
+    },
+    "groupConvoMember": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. A current group convo member.",
+      "required": [
+        "role"
+      ],
+      "properties": {
+        "addedBy": {
+          "type": "ref",
+          "description": "Who added this member. Only present if the member was added (instead of joining via link).",
+          "ref": "#profileViewBasic"
+        },
+        "role": {
+          "type": "ref",
+          "description": "The member's role within this conversation. Only present in group conversation member lists.",
+          "ref": "#memberRole"
+        }
+      }
+    },
+    "memberRole": {
+      "type": "string",
+      "knownValues": [
+        "owner",
+        "standard"
+      ]
+    },
+    "pastGroupConvoMember": {
+      "type": "object",
+      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. A past group convo member.",
+      "required": [],
+      "properties": {}
+    },
     "profileViewBasic": {
       "type": "object",
       "required": [
@@ -21,6 +58,10 @@
           "type": "boolean",
           "description": "Set to true when the actor cannot actively participate in conversations"
         },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
         "did": {
           "type": "string",
           "format": "did"
@@ -33,6 +74,15 @@
         "handle": {
           "type": "string",
           "format": "handle"
+        },
+        "kind": {
+          "type": "union",
+          "description": "Union field that has data specific to different kinds of convos.",
+          "refs": [
+            "#directConvoMember",
+            "#groupConvoMember",
+            "#pastGroupConvoMember"
+          ]
         },
         "labels": {
           "type": "array",

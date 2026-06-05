@@ -454,51 +454,51 @@ pub mod contribution_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ContributorDid;
         type CreatedAt;
         type WorldReference;
-        type ContributorDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ContributorDid = Unset;
         type CreatedAt = Unset;
         type WorldReference = Unset;
-        type ContributorDid = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type WorldReference = St::WorldReference;
-        type ContributorDid = St::ContributorDid;
-    }
-    ///State transition - sets the `world_reference` field to Set
-    pub struct SetWorldReference<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWorldReference<St> {}
-    impl<St: State> State for SetWorldReference<St> {
-        type CreatedAt = St::CreatedAt;
-        type WorldReference = Set<members::world_reference>;
-        type ContributorDid = St::ContributorDid;
     }
     ///State transition - sets the `contributor_did` field to Set
     pub struct SetContributorDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContributorDid<St> {}
     impl<St: State> State for SetContributorDid<St> {
+        type ContributorDid = Set<members::contributor_did>;
         type CreatedAt = St::CreatedAt;
         type WorldReference = St::WorldReference;
-        type ContributorDid = Set<members::contributor_did>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type ContributorDid = St::ContributorDid;
+        type CreatedAt = Set<members::created_at>;
+        type WorldReference = St::WorldReference;
+    }
+    ///State transition - sets the `world_reference` field to Set
+    pub struct SetWorldReference<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWorldReference<St> {}
+    impl<St: State> State for SetWorldReference<St> {
+        type ContributorDid = St::ContributorDid;
+        type CreatedAt = St::CreatedAt;
+        type WorldReference = Set<members::world_reference>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `contributor_did` field
+        pub struct contributor_did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `world_reference` field
         pub struct world_reference(());
-        ///Marker type for the `contributor_did` field
-        pub struct contributor_did(());
     }
 }
 
@@ -711,9 +711,9 @@ where
 impl<St, S: BosStr> ContributionBuilder<St, S>
 where
     St: contribution_state::State,
+    St::ContributorDid: contribution_state::IsSet,
     St::CreatedAt: contribution_state::IsSet,
     St::WorldReference: contribution_state::IsSet,
-    St::ContributorDid: contribution_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Contribution<S> {

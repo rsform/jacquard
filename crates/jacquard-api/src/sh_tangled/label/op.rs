@@ -142,67 +142,67 @@ pub mod op_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Delete;
         type Add;
-        type Subject;
+        type Delete;
         type PerformedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Delete = Unset;
         type Add = Unset;
-        type Subject = Unset;
+        type Delete = Unset;
         type PerformedAt = Unset;
-    }
-    ///State transition - sets the `delete` field to Set
-    pub struct SetDelete<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDelete<St> {}
-    impl<St: State> State for SetDelete<St> {
-        type Delete = Set<members::delete>;
-        type Add = St::Add;
-        type Subject = St::Subject;
-        type PerformedAt = St::PerformedAt;
+        type Subject = Unset;
     }
     ///State transition - sets the `add` field to Set
     pub struct SetAdd<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAdd<St> {}
     impl<St: State> State for SetAdd<St> {
-        type Delete = St::Delete;
         type Add = Set<members::add>;
-        type Subject = St::Subject;
-        type PerformedAt = St::PerformedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
         type Delete = St::Delete;
-        type Add = St::Add;
-        type Subject = Set<members::subject>;
         type PerformedAt = St::PerformedAt;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `delete` field to Set
+    pub struct SetDelete<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDelete<St> {}
+    impl<St: State> State for SetDelete<St> {
+        type Add = St::Add;
+        type Delete = Set<members::delete>;
+        type PerformedAt = St::PerformedAt;
+        type Subject = St::Subject;
     }
     ///State transition - sets the `performed_at` field to Set
     pub struct SetPerformedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPerformedAt<St> {}
     impl<St: State> State for SetPerformedAt<St> {
-        type Delete = St::Delete;
         type Add = St::Add;
-        type Subject = St::Subject;
+        type Delete = St::Delete;
         type PerformedAt = Set<members::performed_at>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Add = St::Add;
+        type Delete = St::Delete;
+        type PerformedAt = St::PerformedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `delete` field
-        pub struct delete(());
         ///Marker type for the `add` field
         pub struct add(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
+        ///Marker type for the `delete` field
+        pub struct delete(());
         ///Marker type for the `performed_at` field
         pub struct performed_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -333,10 +333,10 @@ where
 impl<St, S: BosStr> OpBuilder<St, S>
 where
     St: op_state::State,
-    St::Delete: op_state::IsSet,
     St::Add: op_state::IsSet,
-    St::Subject: op_state::IsSet,
+    St::Delete: op_state::IsSet,
     St::PerformedAt: op_state::IsSet,
+    St::Subject: op_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Op<S> {
@@ -482,37 +482,37 @@ pub mod operand_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Key;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValue<St> {}
-    impl<St: State> State for SetValue<St> {
-        type Value = Set<members::value>;
-        type Key = St::Key;
+        type Value = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetKey<St> {}
     impl<St: State> State for SetKey<St> {
-        type Value = St::Value;
         type Key = Set<members::key>;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type Key = St::Key;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -600,8 +600,8 @@ where
 impl<St, S: BosStr> OperandBuilder<St, S>
 where
     St: operand_state::State,
-    St::Value: operand_state::IsSet,
     St::Key: operand_state::IsSet,
+    St::Value: operand_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Operand<S> {

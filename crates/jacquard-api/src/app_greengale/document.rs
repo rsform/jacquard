@@ -560,84 +560,84 @@ pub mod document_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Content;
-        type Url;
-        type PublishedAt;
         type Path;
+        type PublishedAt;
         type Title;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Content = Unset;
-        type Url = Unset;
-        type PublishedAt = Unset;
         type Path = Unset;
+        type PublishedAt = Unset;
         type Title = Unset;
+        type Url = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
-        type Url = St::Url;
+        type Path = St::Path;
         type PublishedAt = St::PublishedAt;
-        type Path = St::Path;
         type Title = St::Title;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type Content = St::Content;
-        type Url = Set<members::url>;
-        type PublishedAt = St::PublishedAt;
-        type Path = St::Path;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `published_at` field to Set
-    pub struct SetPublishedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPublishedAt<St> {}
-    impl<St: State> State for SetPublishedAt<St> {
-        type Content = St::Content;
         type Url = St::Url;
-        type PublishedAt = Set<members::published_at>;
-        type Path = St::Path;
-        type Title = St::Title;
     }
     ///State transition - sets the `path` field to Set
     pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPath<St> {}
     impl<St: State> State for SetPath<St> {
         type Content = St::Content;
-        type Url = St::Url;
-        type PublishedAt = St::PublishedAt;
         type Path = Set<members::path>;
+        type PublishedAt = St::PublishedAt;
         type Title = St::Title;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `published_at` field to Set
+    pub struct SetPublishedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPublishedAt<St> {}
+    impl<St: State> State for SetPublishedAt<St> {
+        type Content = St::Content;
+        type Path = St::Path;
+        type PublishedAt = Set<members::published_at>;
+        type Title = St::Title;
+        type Url = St::Url;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
         type Content = St::Content;
-        type Url = St::Url;
-        type PublishedAt = St::PublishedAt;
         type Path = St::Path;
+        type PublishedAt = St::PublishedAt;
         type Title = Set<members::title>;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type Content = St::Content;
+        type Path = St::Path;
+        type PublishedAt = St::PublishedAt;
+        type Title = St::Title;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `url` field
-        pub struct url(());
-        ///Marker type for the `published_at` field
-        pub struct published_at(());
         ///Marker type for the `path` field
         pub struct path(());
+        ///Marker type for the `published_at` field
+        pub struct published_at(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -913,10 +913,10 @@ impl<St, S: BosStr> DocumentBuilder<St, S>
 where
     St: document_state::State,
     St::Content: document_state::IsSet,
-    St::Url: document_state::IsSet,
-    St::PublishedAt: document_state::IsSet,
     St::Path: document_state::IsSet,
+    St::PublishedAt: document_state::IsSet,
     St::Title: document_state::IsSet,
+    St::Url: document_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Document<S> {

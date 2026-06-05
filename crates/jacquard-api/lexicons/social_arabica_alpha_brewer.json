@@ -1,0 +1,60 @@
+{
+  "lexicon": 1,
+  "id": "social.arabica.alpha.brewer",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A coffee brewing device or method",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "brewerType": {
+            "type": "string",
+            "description": "Category of brewer. Known values: pourover, espresso, immersion, mokapot, coldbrew, cupping, other",
+            "maxLength": 100,
+            "knownValues": [
+              "pourover",
+              "espresso",
+              "immersion",
+              "mokapot",
+              "coldbrew",
+              "cupping",
+              "other"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the brewer record was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description or notes about the brewer",
+            "maxLength": 1000
+          },
+          "link": {
+            "type": "string",
+            "description": "Optional product, manual, or information URL for the brewer",
+            "format": "uri",
+            "maxLength": 500
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the brewer (e.g., 'V60', 'Aeropress', 'Chemex')",
+            "maxLength": 200
+          },
+          "sourceRef": {
+            "type": "string",
+            "description": "AT-URI of the record this entity was sourced from",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

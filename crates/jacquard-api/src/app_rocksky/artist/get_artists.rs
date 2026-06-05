@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,15 +18,11 @@ use serde::{Serialize, Deserialize};
 use crate::app_rocksky::artist::ArtistViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
-pub struct GetArtists<S: BosStr = DefaultStr> {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub genre: Option<S>,
+#[serde(rename_all = "camelCase")]
+pub struct GetArtists {
     ///(min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub names: Option<S>,
     ///(min: 0)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<i64>,
@@ -51,7 +47,7 @@ impl jacquard_common::xrpc::XrpcResp for GetArtistsResponse {
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetArtists<S> {
+impl jacquard_common::xrpc::XrpcRequest for GetArtists {
     const NSID: &'static str = "app.rocksky.artist.getArtists";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetArtistsResponse;
@@ -62,7 +58,7 @@ pub struct GetArtistsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetArtistsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.artist.getArtists";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: BosStr> = GetArtists<S>;
+    type Request<S: BosStr> = GetArtists;
     type Response = GetArtistsResponse;
 }
 
@@ -86,111 +82,73 @@ pub mod get_artists_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetArtistsBuilder<St: get_artists_state::State, S: BosStr = DefaultStr> {
+pub struct GetArtistsBuilder<St: get_artists_state::State> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<S>, Option<i64>),
-    _type: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>),
 }
 
-impl GetArtists<DefaultStr> {
-    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetArtistsBuilder<get_artists_state::Empty, DefaultStr> {
+impl GetArtists {
+    /// Create a new builder for this type.
+    pub fn new() -> GetArtistsBuilder<get_artists_state::Empty> {
         GetArtistsBuilder::new()
     }
 }
 
-impl<S: BosStr> GetArtists<S> {
-    /// Create a new builder for this type
-    pub fn builder() -> GetArtistsBuilder<get_artists_state::Empty, S> {
-        GetArtistsBuilder::builder()
-    }
-}
-
-impl GetArtistsBuilder<get_artists_state::Empty, DefaultStr> {
+impl GetArtistsBuilder<get_artists_state::Empty> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetArtistsBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
-            _type: PhantomData,
+            _fields: (None, None),
         }
     }
 }
 
-impl<S: BosStr> GetArtistsBuilder<get_artists_state::Empty, S> {
+impl GetArtistsBuilder<get_artists_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         GetArtistsBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
-            _type: PhantomData,
+            _fields: (None, None),
         }
     }
 }
 
-impl<St: get_artists_state::State, S: BosStr> GetArtistsBuilder<St, S> {
-    /// Set the `genre` field (optional)
-    pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
+impl<St: get_artists_state::State> GetArtistsBuilder<St> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
         self
     }
-    /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<S>) -> Self {
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
         self._fields.0 = value;
         self
     }
 }
 
-impl<St: get_artists_state::State, S: BosStr> GetArtistsBuilder<St, S> {
-    /// Set the `limit` field (optional)
-    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+impl<St: get_artists_state::State> GetArtistsBuilder<St> {
+    /// Set the `offset` field (optional)
+    pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
         self
     }
-    /// Set the `limit` field to an Option value (optional)
-    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+    /// Set the `offset` field to an Option value (optional)
+    pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<St: get_artists_state::State, S: BosStr> GetArtistsBuilder<St, S> {
-    /// Set the `names` field (optional)
-    pub fn names(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.2 = value.into();
-        self
-    }
-    /// Set the `names` field to an Option value (optional)
-    pub fn maybe_names(mut self, value: Option<S>) -> Self {
-        self._fields.2 = value;
-        self
-    }
-}
-
-impl<St: get_artists_state::State, S: BosStr> GetArtistsBuilder<St, S> {
-    /// Set the `offset` field (optional)
-    pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.3 = value.into();
-        self
-    }
-    /// Set the `offset` field to an Option value (optional)
-    pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
-        self._fields.3 = value;
-        self
-    }
-}
-
-impl<St, S: BosStr> GetArtistsBuilder<St, S>
+impl<St> GetArtistsBuilder<St>
 where
     St: get_artists_state::State,
 {
     /// Build the final struct.
-    pub fn build(self) -> GetArtists<S> {
+    pub fn build(self) -> GetArtists {
         GetArtists {
-            genre: self._fields.0,
-            limit: self._fields.1,
-            names: self._fields.2,
-            offset: self._fields.3,
+            limit: self._fields.0,
+            offset: self._fields.1,
         }
     }
 }

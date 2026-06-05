@@ -16,15 +16,17 @@
         "properties": {
           "avatar": {
             "type": "blob",
+            "description": "The image data for the avatar.",
             "accept": [
               "image/png",
               "image/jpeg",
               "image/webp"
             ],
-            "maxSize": 1000000
+            "maxSize": 2000000
           },
           "createdAt": {
             "type": "string",
+            "description": "The timestamp when the avatar was created.",
             "format": "datetime"
           }
         }

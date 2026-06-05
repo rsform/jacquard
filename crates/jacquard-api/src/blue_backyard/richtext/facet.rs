@@ -558,37 +558,37 @@ pub mod byte_slice_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ByteStart;
         type ByteEnd;
+        type ByteStart;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ByteStart = Unset;
         type ByteEnd = Unset;
-    }
-    ///State transition - sets the `byte_start` field to Set
-    pub struct SetByteStart<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetByteStart<St> {}
-    impl<St: State> State for SetByteStart<St> {
-        type ByteStart = Set<members::byte_start>;
-        type ByteEnd = St::ByteEnd;
+        type ByteStart = Unset;
     }
     ///State transition - sets the `byte_end` field to Set
     pub struct SetByteEnd<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetByteEnd<St> {}
     impl<St: State> State for SetByteEnd<St> {
-        type ByteStart = St::ByteStart;
         type ByteEnd = Set<members::byte_end>;
+        type ByteStart = St::ByteStart;
+    }
+    ///State transition - sets the `byte_start` field to Set
+    pub struct SetByteStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetByteStart<St> {}
+    impl<St: State> State for SetByteStart<St> {
+        type ByteEnd = St::ByteEnd;
+        type ByteStart = Set<members::byte_start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `byte_start` field
-        pub struct byte_start(());
         ///Marker type for the `byte_end` field
         pub struct byte_end(());
+        ///Marker type for the `byte_start` field
+        pub struct byte_start(());
     }
 }
 
@@ -676,8 +676,8 @@ where
 impl<St, S: BosStr> ByteSliceBuilder<St, S>
 where
     St: byte_slice_state::State,
-    St::ByteStart: byte_slice_state::IsSet,
     St::ByteEnd: byte_slice_state::IsSet,
+    St::ByteStart: byte_slice_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ByteSlice<S> {
@@ -825,37 +825,37 @@ pub mod facet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Index;
         type Features;
+        type Index;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Index = Unset;
         type Features = Unset;
-    }
-    ///State transition - sets the `index` field to Set
-    pub struct SetIndex<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndex<St> {}
-    impl<St: State> State for SetIndex<St> {
-        type Index = Set<members::index>;
-        type Features = St::Features;
+        type Index = Unset;
     }
     ///State transition - sets the `features` field to Set
     pub struct SetFeatures<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetFeatures<St> {}
     impl<St: State> State for SetFeatures<St> {
-        type Index = St::Index;
         type Features = Set<members::features>;
+        type Index = St::Index;
+    }
+    ///State transition - sets the `index` field to Set
+    pub struct SetIndex<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndex<St> {}
+    impl<St: State> State for SetIndex<St> {
+        type Features = St::Features;
+        type Index = Set<members::index>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `index` field
-        pub struct index(());
         ///Marker type for the `features` field
         pub struct features(());
+        ///Marker type for the `index` field
+        pub struct index(());
     }
 }
 
@@ -943,8 +943,8 @@ where
 impl<St, S: BosStr> FacetBuilder<St, S>
 where
     St: facet_state::State,
-    St::Index: facet_state::IsSet,
     St::Features: facet_state::IsSet,
+    St::Index: facet_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Facet<S> {

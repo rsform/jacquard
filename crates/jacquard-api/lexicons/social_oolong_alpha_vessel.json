@@ -1,0 +1,65 @@
+{
+  "lexicon": 1,
+  "id": "social.oolong.alpha.vessel",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A tea brewing vessel — holds water during brewing",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "capacityMl": {
+            "type": "integer",
+            "description": "Vessel capacity in millilitres",
+            "minimum": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "link": {
+            "type": "string",
+            "description": "Optional product, manual, or information URL for the vessel",
+            "format": "uri",
+            "maxLength": 500
+          },
+          "material": {
+            "type": "string",
+            "description": "Material (e.g., 'porcelain', 'yixing clay', 'glass', 'cast iron')",
+            "maxLength": 200
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the vessel (e.g., '500ml glass teapot', 'Tokoname kyusu')",
+            "maxLength": 200
+          },
+          "sourceRef": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "style": {
+            "type": "string",
+            "description": "Vessel form-factor. Known values: teapot, mug, jar, matcha-bowl, other",
+            "maxLength": 50,
+            "knownValues": [
+              "teapot",
+              "mug",
+              "jar",
+              "matcha-bowl",
+              "other"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

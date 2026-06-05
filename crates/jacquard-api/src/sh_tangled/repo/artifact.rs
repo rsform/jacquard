@@ -18,7 +18,7 @@ use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -45,7 +45,10 @@ pub struct Artifact<S: BosStr = DefaultStr> {
     ///name of the artifact
     pub name: S,
     ///repo that this artifact is being uploaded to
-    pub repo: AtUri<S>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub repo: Option<AtUri<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub repo_did: Option<Did<S>>,
     ///hash of the tag object that this artifact is attached to (only annotated tags are supported)
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub tag: Bytes,
@@ -162,85 +165,67 @@ pub mod artifact_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type Repo;
-        type Tag;
         type Artifact;
         type CreatedAt;
+        type Name;
+        type Tag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type Repo = Unset;
-        type Tag = Unset;
         type Artifact = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Repo = St::Repo;
-        type Tag = St::Tag;
-        type Artifact = St::Artifact;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Name = St::Name;
-        type Repo = Set<members::repo>;
-        type Tag = St::Tag;
-        type Artifact = St::Artifact;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTag<St> {}
-    impl<St: State> State for SetTag<St> {
-        type Name = St::Name;
-        type Repo = St::Repo;
-        type Tag = Set<members::tag>;
-        type Artifact = St::Artifact;
-        type CreatedAt = St::CreatedAt;
+        type Name = Unset;
+        type Tag = Unset;
     }
     ///State transition - sets the `artifact` field to Set
     pub struct SetArtifact<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetArtifact<St> {}
     impl<St: State> State for SetArtifact<St> {
-        type Name = St::Name;
-        type Repo = St::Repo;
-        type Tag = St::Tag;
         type Artifact = Set<members::artifact>;
         type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Tag = St::Tag;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Name = St::Name;
-        type Repo = St::Repo;
-        type Tag = St::Tag;
         type Artifact = St::Artifact;
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+        type Tag = St::Tag;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Artifact = St::Artifact;
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
+        type Tag = St::Tag;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTag<St> {}
+    impl<St: State> State for SetTag<St> {
+        type Artifact = St::Artifact;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Tag = Set<members::tag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
-        ///Marker type for the `tag` field
-        pub struct tag(());
         ///Marker type for the `artifact` field
         pub struct artifact(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
     }
 }
 
@@ -252,6 +237,7 @@ pub struct ArtifactBuilder<St: artifact_state::State, S: BosStr = DefaultStr> {
         Option<Datetime>,
         Option<S>,
         Option<AtUri<S>>,
+        Option<Did<S>>,
         Option<Bytes>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -276,7 +262,7 @@ impl ArtifactBuilder<artifact_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ArtifactBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -287,7 +273,7 @@ impl<S: BosStr> ArtifactBuilder<artifact_state::Empty, S> {
     pub fn builder() -> Self {
         ArtifactBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -350,22 +336,29 @@ where
     }
 }
 
-impl<St, S: BosStr> ArtifactBuilder<St, S>
-where
-    St: artifact_state::State,
-    St::Repo: artifact_state::IsUnset,
-{
-    /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<AtUri<S>>,
-    ) -> ArtifactBuilder<artifact_state::SetRepo<St>, S> {
-        self._fields.3 = Option::Some(value.into());
-        ArtifactBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: artifact_state::State, S: BosStr> ArtifactBuilder<St, S> {
+    /// Set the `repo` field (optional)
+    pub fn repo(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `repo` field to an Option value (optional)
+    pub fn maybe_repo(mut self, value: Option<AtUri<S>>) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
+impl<St: artifact_state::State, S: BosStr> ArtifactBuilder<St, S> {
+    /// Set the `repoDid` field (optional)
+    pub fn repo_did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `repoDid` field to an Option value (optional)
+    pub fn maybe_repo_did(mut self, value: Option<Did<S>>) -> Self {
+        self._fields.4 = value;
+        self
     }
 }
 
@@ -379,7 +372,7 @@ where
         mut self,
         value: impl Into<Bytes>,
     ) -> ArtifactBuilder<artifact_state::SetTag<St>, S> {
-        self._fields.4 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ArtifactBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -391,11 +384,10 @@ where
 impl<St, S: BosStr> ArtifactBuilder<St, S>
 where
     St: artifact_state::State,
-    St::Name: artifact_state::IsSet,
-    St::Repo: artifact_state::IsSet,
-    St::Tag: artifact_state::IsSet,
     St::Artifact: artifact_state::IsSet,
     St::CreatedAt: artifact_state::IsSet,
+    St::Name: artifact_state::IsSet,
+    St::Tag: artifact_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Artifact<S> {
@@ -403,8 +395,9 @@ where
             artifact: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
             name: self._fields.2.unwrap(),
-            repo: self._fields.3.unwrap(),
-            tag: self._fields.4.unwrap(),
+            repo: self._fields.3,
+            repo_did: self._fields.4,
+            tag: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -414,8 +407,9 @@ where
             artifact: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
             name: self._fields.2.unwrap(),
-            repo: self._fields.3.unwrap(),
-            tag: self._fields.4.unwrap(),
+            repo: self._fields.3,
+            repo_did: self._fields.4,
+            tag: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -438,8 +432,7 @@ fn lexicon_doc_sh_tangled_repo_artifact() -> LexiconDoc<'static> {
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                SmolStr::new_static("name"), SmolStr::new_static("repo"),
-                                SmolStr::new_static("tag"),
+                                SmolStr::new_static("name"), SmolStr::new_static("tag"),
                                 SmolStr::new_static("createdAt"),
                                 SmolStr::new_static("artifact")
                             ],
@@ -479,6 +472,13 @@ fn lexicon_doc_sh_tangled_repo_artifact() -> LexiconDoc<'static> {
                                         ),
                                     ),
                                     format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("repoDid"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
                             );

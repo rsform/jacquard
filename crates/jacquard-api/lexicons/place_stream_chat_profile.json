@@ -2,6 +2,26 @@
   "lexicon": 1,
   "id": "place.stream.chat.profile",
   "defs": {
+    "badgeSelections": {
+      "type": "object",
+      "description": "Selected badges for display in chat, organized by slot.",
+      "properties": {
+        "global": {
+          "type": "ref",
+          "description": "Selected globally-issued badge (e.g. event badge).",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "streamer": {
+          "type": "array",
+          "description": "Selected streamer-issued badges, one per streamer channel.",
+          "items": {
+            "type": "ref",
+            "ref": "#streamerBadgeSelection"
+          },
+          "maxLength": 20
+        }
+      }
+    },
     "color": {
       "type": "object",
       "description": "Customizations for the color of a user's name in chat",
@@ -34,11 +54,53 @@
       "key": "literal:self",
       "record": {
         "type": "object",
+        "required": [],
         "properties": {
+          "badges": {
+            "type": "ref",
+            "description": "Badge selections for display in chat.",
+            "ref": "#badgeSelections"
+          },
           "color": {
             "type": "ref",
             "ref": "#color"
+          },
+          "selfLabels": {
+            "type": "array",
+            "description": "Self-applied labels for this profile, e.g. 'bot'.",
+            "items": {
+              "type": "ref",
+              "ref": "#selfLabel"
+            },
+            "maxLength": 10
           }
+        }
+      }
+    },
+    "selfLabel": {
+      "type": "string",
+      "description": "Label that a user can apply to their own profile.",
+      "knownValues": [
+        "bot"
+      ]
+    },
+    "streamerBadgeSelection": {
+      "type": "object",
+      "description": "A selected badge for a specific streamer's channel.",
+      "required": [
+        "streamer",
+        "badge"
+      ],
+      "properties": {
+        "badge": {
+          "type": "ref",
+          "description": "Strong reference to the selected place.stream.badge.issuance record.",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "streamer": {
+          "type": "string",
+          "description": "DID of the streamer whose channel this selection applies to.",
+          "format": "did"
         }
       }
     }

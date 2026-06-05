@@ -12,7 +12,7 @@ use alloc::collections::BTreeMap;
 use core::marker::PhantomData;
 use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Datetime};
+use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
@@ -22,7 +22,7 @@ use crate::sh_tangled::git::temp::Signature;
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBranch<S: BosStr = DefaultStr> {
     pub name: S,
-    pub repo: AtUri<S>,
+    pub repo: Did<S>,
 }
 
 
@@ -178,7 +178,7 @@ pub mod get_branch_state {
 /// Builder for constructing an instance of this type.
 pub struct GetBranchBuilder<St: get_branch_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<AtUri<S>>),
+    _fields: (Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -245,7 +245,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<S>>,
+        value: impl Into<Did<S>>,
     ) -> GetBranchBuilder<get_branch_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetBranchBuilder {

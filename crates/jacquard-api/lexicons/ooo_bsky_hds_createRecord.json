@@ -1,0 +1,79 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.hds.createRecord",
+  "revision": 1,
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repo",
+            "collection",
+            "gateUri",
+            "record"
+          ],
+          "properties": {
+            "collection": {
+              "type": "string",
+              "format": "nsid"
+            },
+            "gateUri": {
+              "type": "string",
+              "format": "uri"
+            },
+            "record": {
+              "type": "unknown"
+            },
+            "repo": {
+              "type": "string",
+              "format": "at-identifier"
+            },
+            "rkey": {
+              "type": "string",
+              "format": "record-key"
+            },
+            "validate": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid",
+            "validationStatus"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "format": "uri"
+            },
+            "validationStatus": {
+              "type": "string",
+              "enum": [
+                "valid",
+                "unknown"
+              ]
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "AlreadyExists"
+        }
+      ]
+    }
+  }
+}

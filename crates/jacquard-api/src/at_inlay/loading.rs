@@ -75,37 +75,37 @@ pub mod loading_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Fallback;
         type Children;
+        type Fallback;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Fallback = Unset;
         type Children = Unset;
-    }
-    ///State transition - sets the `fallback` field to Set
-    pub struct SetFallback<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFallback<St> {}
-    impl<St: State> State for SetFallback<St> {
-        type Fallback = Set<members::fallback>;
-        type Children = St::Children;
+        type Fallback = Unset;
     }
     ///State transition - sets the `children` field to Set
     pub struct SetChildren<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetChildren<St> {}
     impl<St: State> State for SetChildren<St> {
-        type Fallback = St::Fallback;
         type Children = Set<members::children>;
+        type Fallback = St::Fallback;
+    }
+    ///State transition - sets the `fallback` field to Set
+    pub struct SetFallback<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFallback<St> {}
+    impl<St: State> State for SetFallback<St> {
+        type Children = St::Children;
+        type Fallback = Set<members::fallback>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `fallback` field
-        pub struct fallback(());
         ///Marker type for the `children` field
         pub struct children(());
+        ///Marker type for the `fallback` field
+        pub struct fallback(());
     }
 }
 
@@ -193,8 +193,8 @@ where
 impl<St, S: BosStr> LoadingBuilder<St, S>
 where
     St: loading_state::State,
-    St::Fallback: loading_state::IsSet,
     St::Children: loading_state::IsSet,
+    St::Fallback: loading_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Loading<S> {

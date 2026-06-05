@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "social.oolong.alpha.vendor",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A tea vendor — seller, blender, or importer of tea",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the vendor record was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description or notes about the vendor",
+            "maxLength": 1000
+          },
+          "location": {
+            "type": "string",
+            "description": "Location of the vendor (e.g., 'Chicago, IL', 'Tokyo, Japan')",
+            "maxLength": 200
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the vendor (e.g., 'Spirit Tea', 'Tezumi', 'Yunnan Sourcing')",
+            "maxLength": 200
+          },
+          "sourceRef": {
+            "type": "string",
+            "description": "AT-URI of the record this entity was sourced from",
+            "format": "at-uri"
+          },
+          "website": {
+            "type": "string",
+            "description": "Vendor's website URL",
+            "format": "uri",
+            "maxLength": 500
+          }
+        }
+      }
+    }
+  }
+}
