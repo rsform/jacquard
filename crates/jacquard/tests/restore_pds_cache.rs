@@ -91,32 +91,18 @@ async fn restore_uses_cached_pds_when_present() {
         refresh_jwt: "ref".into(),
         did: Did::new_static("did:plc:alice").unwrap(),
         handle: Handle::new_static("alice.bsky.social").unwrap(),
+        pds: Some(
+            Uri::parse("https://pds-cached")
+                .expect("valid uri")
+                .to_owned(),
+        ),
     };
-    let key = SessionKey(session.did.clone(), "session".into());
+    let key = SessionKey::new(session.did.clone(), "session");
     jacquard_common::session::SessionStore::set(store.as_ref(), key.clone(), session)
         .await
         .unwrap();
     // Verify it is persisted
     assert!(SessionStore::get(store.as_ref(), &key).await.is_some());
-    // Persist PDS endpoint cache to avoid DID resolution on restore
-    store
-        .set_atp_pds(
-            &key,
-            &Uri::parse("https://pds-cached")
-                .expect("valid uri")
-                .to_owned(),
-        )
-        .unwrap();
-    assert_eq!(
-        store
-            .get_atp_pds(&key)
-            .ok()
-            .flatten()
-            .expect("pds cached")
-            .as_str(),
-        "https://pds-cached"
-    );
-
     let session = CredentialSession::new(store.clone(), resolver.clone());
     // Restore should pick cached PDS and NOT call resolve_did_doc
     session

@@ -60,6 +60,11 @@ pub enum OAuthError {
     #[diagnostic(code(jacquard_oauth::form))]
     Form(#[from] serde_html_form::ser::Error),
 
+    /// Invalid OAuth helper input.
+    #[error("invalid OAuth request: {0}")]
+    #[diagnostic(code(jacquard_oauth::invalid_request))]
+    InvalidRequest(String),
+
     /// An error validating an authorization callback.
     #[error(transparent)]
     #[diagnostic(code(jacquard_oauth::callback))]

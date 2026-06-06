@@ -46,7 +46,7 @@
 #![cfg(feature = "loopback")]
 use crate::{
     atproto::AtprotoClientMetadata,
-    authstore::ClientAuthStore,
+    authstore::{ClientAuthStore, OAuthSessionMatch},
     client::OAuthClient,
     dpop::DpopExt,
     error::{CallbackError, OAuthError},
@@ -55,10 +55,22 @@ use crate::{
 };
 use jacquard_common::IntoStatic;
 use jacquard_common::deps::fluent_uri::Uri;
+use jacquard_common::session::{SessionHint, SessionSelector, SessionStoreError};
+use jacquard_common::types::{did::Did, string::Handle};
 use rouille::Server;
 use smol_str::{SmolStr, ToSmolStr};
 use std::net::SocketAddr;
 use tokio::sync::mpsc;
+
+fn oauth_hint_from_input(input: &str) -> SessionHint<SmolStr> {
+    if let Ok(did) = Did::new(input) {
+        SessionHint::Did(did.convert())
+    } else if let Ok(handle) = Handle::new(input) {
+        SessionHint::Handle(handle.convert())
+    } else {
+        SessionHint::Identifier(SmolStr::from(input))
+    }
+}
 
 /// Port selection strategy for the loopback OAuth callback server.
 #[derive(Clone, Debug)]
@@ -315,6 +327,26 @@ where
         }
         .into_static()
     }
+
+    /// Resume a stored session for the input identity, or drive the full OAuth flow using a local loopback server.
+    pub async fn resume_or_login_with_local_server(
+        &self,
+        input: impl AsRef<str>,
+        opts: AuthorizeOptions<SmolStr>,
+        cfg: LoopbackConfig,
+    ) -> crate::error::Result<super::client::OAuthSession<T, S>>
+    where
+        S: SessionSelector<OAuthSessionMatch, Error = SessionStoreError>,
+    {
+        let input_ref = input.as_ref();
+        let hint = oauth_hint_from_input(input_ref);
+        if let Some(matched) = self.registry.store.select_session(&hint).await? {
+            return self
+                .restore(&matched.key.did, matched.key.session_id.as_str())
+                .await;
+        }
+        self.login_with_local_server(input_ref, opts, cfg).await
+    }
 }
 
 #[cfg(feature = "scope-check")]
@@ -382,6 +414,26 @@ where
         }
 
         handle_localhost_callback(handle, &flow_client, &cfg).await
+    }
+
+    /// Resume a stored session for the input identity, or drive the full OAuth flow using a local loopback server.
+    pub async fn resume_or_login_with_local_server(
+        &self,
+        input: impl AsRef<str>,
+        opts: AuthorizeOptions<SmolStr>,
+        cfg: LoopbackConfig,
+    ) -> crate::error::Result<super::client::OAuthSession<T, S>>
+    where
+        S: SessionSelector<OAuthSessionMatch, Error = SessionStoreError>,
+    {
+        let input_ref = input.as_ref();
+        let hint = oauth_hint_from_input(input_ref);
+        if let Some(matched) = self.registry.store.select_session(&hint).await? {
+            return self
+                .restore(&matched.key.did, matched.key.session_id.as_str())
+                .await;
+        }
+        self.login_with_local_server(input_ref, opts, cfg).await
     }
 
     /// Builds a [`crate::session::ClientData`] for use with the local loopback server method of OAuth.

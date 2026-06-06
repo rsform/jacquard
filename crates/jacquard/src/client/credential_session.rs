@@ -9,29 +9,207 @@ use jacquard_common::{
     deps::fluent_uri::Uri,
     error::{AuthError, ClientError, XrpcResult},
     http_client::HttpClient,
-    session::SessionStore,
+    session::{MemorySessionStore, SessionHint, SessionSelector, SessionStore},
     types::{did::Did, string::Handle},
     xrpc::{CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest, XrpcResp, XrpcResponse},
 };
 #[cfg(feature = "streaming")]
 use serde::Serialize;
-use smol_str::SmolStr;
+use smol_str::{SmolStr, ToSmolStr};
 use tokio::sync::RwLock;
 
 use crate::client::AtpSession;
-use jacquard_identity::resolver::{
-    DidDocResponse, IdentityError, IdentityResolver, ResolverOptions,
-};
-use std::any::Any;
-
 #[cfg(feature = "websocket")]
 use jacquard_common::websocket::{WebSocketClient, WebSocketConnection};
 #[cfg(feature = "websocket")]
 use jacquard_common::xrpc::XrpcSubscription;
+use jacquard_identity::resolver::{
+    DidDocResponse, IdentityError, IdentityResolver, ResolverOptions,
+};
 
-/// Storage key for app‑password sessions: `(account DID, session id)`.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SessionKey(pub Did, pub SmolStr);
+pub use jacquard_common::session::SessionKey;
+
+/// App-password session lookup result.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CredentialSessionMatch {
+    /// Matched session key.
+    pub key: SessionKey,
+    /// Stored app-password session for the matched key.
+    pub session: AtpSession,
+}
+
+/// Result of trying to resume an app-password session.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CredentialResumeResult {
+    /// A stored session was found and activated.
+    Resumed(AtpSession),
+    /// No stored session matched; login credentials are required.
+    LoginRequired(CredentialLoginChallenge),
+}
+
+/// Login identity details derived from a failed resume hint.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CredentialLoginChallenge {
+    /// Login identifier known from the hint, if any.
+    pub identifier: Option<SmolStr>,
+    /// Session id known from the hint, if any.
+    pub session_id: Option<SmolStr>,
+}
+
+/// Options for hint/challenge-based app-password login helpers.
+#[derive(Debug, Clone)]
+pub struct CredentialLoginOptions<'a> {
+    /// App-password or account password.
+    pub password: CowStr<'a>,
+    /// Login identifier override, required when the challenge has no identifier.
+    pub identifier: Option<CowStr<'a>>,
+    /// Whether taken-down accounts are allowed.
+    pub allow_takendown: Option<bool>,
+    /// Optional auth factor token.
+    pub auth_factor_token: Option<CowStr<'a>>,
+    /// Explicit PDS/entryway endpoint to use for login.
+    pub pds: Option<Uri<String>>,
+}
+
+/// Resolver-backed app-password session selector.
+///
+/// This adapter returns richer credential-session match data while keeping selection pluggable:
+/// database-backed stores can provide their own [`SessionSelector`] implementation with more
+/// efficient indexed lookup.
+pub struct CredentialSessionSelector<'a, S, R> {
+    store: &'a S,
+    resolver: &'a R,
+}
+
+impl<'a, S, R> CredentialSessionSelector<'a, S, R> {
+    /// Create a selector over an app-password session store and identity resolver.
+    pub fn new(store: &'a S, resolver: &'a R) -> Self {
+        Self { store, resolver }
+    }
+}
+
+impl<S, R> SessionSelector<CredentialSessionMatch> for CredentialSessionSelector<'_, S, R>
+where
+    S: SessionStore<SessionKey, AtpSession>
+        + SessionSelector<CredentialSessionMatch, Error = ClientError>
+        + Sync,
+    R: IdentityResolver + Sync,
+{
+    type Error = ClientError;
+
+    async fn select_session(
+        &self,
+        hint: &SessionHint,
+    ) -> Result<Option<CredentialSessionMatch>, Self::Error> {
+        if let Some(matched) = self.store.select_session(hint).await? {
+            return Ok(Some(matched));
+        }
+
+        let SessionHint::Handle(handle) = hint else {
+            return Ok(None);
+        };
+
+        let did = self.resolver.resolve_handle(handle).await?;
+        self.store.select_session(&SessionHint::Did(did)).await
+    }
+}
+
+/// Resolve a session hint against an app-password [`SessionStore`].
+///
+/// This is a convenience wrapper around [`CredentialSessionSelector`].
+pub async fn resolve_credential_session_hint<S, R>(
+    store: &S,
+    resolver: &R,
+    hint: &SessionHint,
+) -> Result<Option<CredentialSessionMatch>, ClientError>
+where
+    S: SessionStore<SessionKey, AtpSession>
+        + SessionSelector<CredentialSessionMatch, Error = ClientError>
+        + Sync,
+    R: IdentityResolver + Sync,
+{
+    CredentialSessionSelector::new(store, resolver)
+        .select_session(hint)
+        .await
+}
+
+async fn match_credential_session_key<S>(
+    store: &S,
+    key: SessionKey,
+) -> Result<Option<CredentialSessionMatch>, ClientError>
+where
+    S: SessionStore<SessionKey, AtpSession>,
+{
+    Ok(store
+        .get(&key)
+        .await
+        .map(|session| CredentialSessionMatch { key, session }))
+}
+
+impl SessionSelector<CredentialSessionMatch> for MemorySessionStore<SessionKey, AtpSession> {
+    type Error = ClientError;
+
+    async fn select_session(
+        &self,
+        hint: &SessionHint,
+    ) -> Result<Option<CredentialSessionMatch>, Self::Error> {
+        match hint {
+            SessionHint::Any => {
+                let Some(key) = self.list_keys().await?.into_iter().next() else {
+                    return Ok(None);
+                };
+                match_credential_session_key(self, key).await
+            }
+            SessionHint::Did(did) => {
+                for key in self.list_keys().await? {
+                    if key.did.as_str() == did.as_ref() {
+                        if let Some(matched) = match_credential_session_key(self, key).await? {
+                            return Ok(Some(matched));
+                        }
+                    }
+                }
+                Ok(None)
+            }
+            SessionHint::Handle(handle) => {
+                for key in self.list_keys().await? {
+                    if let Some(session) = self.get(&key).await {
+                        if session.handle.as_str() == handle.as_ref() {
+                            return Ok(Some(CredentialSessionMatch { key, session }));
+                        }
+                    }
+                }
+                Ok(None)
+            }
+            SessionHint::Key(key) => match_credential_session_key(self, key.clone()).await,
+            SessionHint::Identifier(_) => Ok(None),
+        }
+    }
+}
+
+fn credential_challenge_from_hint(hint: &SessionHint) -> CredentialLoginChallenge {
+    match hint {
+        SessionHint::Any => CredentialLoginChallenge {
+            identifier: None,
+            session_id: None,
+        },
+        SessionHint::Did(did) => CredentialLoginChallenge {
+            identifier: Some(did.as_str().to_smolstr()),
+            session_id: None,
+        },
+        SessionHint::Handle(handle) => CredentialLoginChallenge {
+            identifier: Some(handle.as_str().to_smolstr()),
+            session_id: None,
+        },
+        SessionHint::Key(key) => CredentialLoginChallenge {
+            identifier: Some(key.did.as_str().to_smolstr()),
+            session_id: Some(key.session_id.clone()),
+        },
+        SessionHint::Identifier(identifier) => CredentialLoginChallenge {
+            identifier: Some(identifier.clone()),
+            session_id: None,
+        },
+    }
+}
 
 /// Stateful client for app‑password based sessions.
 ///
@@ -160,7 +338,9 @@ where
         let session = self.store.get(&key).await;
         let endpoint = self.endpoint().await;
         let mut opts = self.options.read().await.clone();
-        opts.auth = session.map(|s| AuthorizationToken::Bearer(s.refresh_jwt));
+        opts.auth = session
+            .as_ref()
+            .map(|s| AuthorizationToken::Bearer(s.refresh_jwt.clone()));
         let response = self
             .client
             .xrpc(endpoint.borrow())
@@ -173,7 +353,8 @@ where
                 .with_url("com.atproto.server.refreshSession")
         })?;
 
-        let new_session: AtpSession = refresh.into();
+        let mut new_session = session.unwrap_or_else(|| AtpSession::from(refresh.clone()));
+        new_session.merge_refresh(refresh);
         let token = AuthorizationToken::Bearer(new_session.access_jwt.clone());
         self.store.set(key, new_session).await.map_err(|e| {
             ClientError::from(e).with_context("failed to persist refreshed session to store")
@@ -201,10 +382,7 @@ where
         allow_takendown: Option<bool>,
         auth_factor_token: Option<CowStr<'_>>,
         pds: Option<Uri<String>>,
-    ) -> std::result::Result<AtpSession, ClientError>
-    where
-        S: Any + 'static,
-    {
+    ) -> std::result::Result<AtpSession, ClientError> {
         #[cfg(feature = "tracing")]
         let _span =
             tracing::info_span!("credential_session_login", identifier = %identifier).entered();
@@ -284,26 +462,124 @@ where
                 .with_help("check identifier and password are correct")
                 .with_url("com.atproto.server.createSession")
         })?;
-        let session = AtpSession::from(out);
+        let mut session = AtpSession::from(out);
+        if session.pds.is_none() {
+            session.pds = Some(jacquard_common::xrpc::normalize_base_uri(pds.clone()));
+        }
 
         let sid = session_id.unwrap_or_else(|| CowStr::new_static("session"));
-        let key = SessionKey(session.did.clone().convert::<SmolStr>(), SmolStr::from(sid));
+        let key = SessionKey::new(session.did.clone().convert::<SmolStr>(), SmolStr::from(sid));
         self.store
             .set(key.clone(), session.clone())
             .await
             .map_err(|e| ClientError::from(e).with_context("failed to persist session to store"))?;
-        // If using FileAuthStore, persist PDS for faster resume
-        if let Some(file_store) =
-            (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
-        {
-            let _ = file_store.set_atp_pds(&key, &pds);
-        }
         // Activate
         *self.key.write().await = Some(key);
-        let pds_uri = jacquard_common::xrpc::normalize_base_uri(pds);
+        let pds_uri = jacquard_common::xrpc::normalize_base_uri(session.pds.clone().unwrap_or(pds));
         *self.endpoint.write().await = Some(pds_uri);
 
         Ok(session)
+    }
+
+    async fn activate_session(
+        &self,
+        key: SessionKey,
+        mut session: AtpSession,
+    ) -> std::result::Result<AtpSession, ClientError> {
+        let pds = if let Some(pds) = session.pds.clone() {
+            pds
+        } else {
+            let resp = self.client.resolve_did_doc(&session.did).await?;
+            let pds = resp
+                .into_owned()?
+                .pds_endpoint()
+                .map(|u| u.to_owned())
+                .ok_or_else(|| {
+                    ClientError::invalid_request("missing PDS endpoint")
+                        .with_help("DID document must include a PDS service endpoint")
+                })?;
+            session.pds = Some(jacquard_common::xrpc::normalize_base_uri(pds));
+            self.store
+                .set(key.clone(), session.clone())
+                .await
+                .map_err(|e| {
+                    ClientError::from(e).with_context("failed to persist session PDS to store")
+                })?;
+            session.pds.clone().expect("pds just set")
+        };
+
+        *self.key.write().await = Some(key);
+        *self.endpoint.write().await = Some(jacquard_common::xrpc::normalize_base_uri(pds));
+        Ok(session)
+    }
+
+    /// Try to resume a stored app-password session for the given hint.
+    pub async fn resume(&self, hint: &SessionHint) -> Result<CredentialResumeResult, ClientError>
+    where
+        S: SessionSelector<CredentialSessionMatch, Error = ClientError>,
+    {
+        match self.store.select_session(hint).await? {
+            Some(matched) => {
+                let session = self.activate_session(matched.key, matched.session).await?;
+                Ok(CredentialResumeResult::Resumed(session))
+            }
+            None => Ok(CredentialResumeResult::LoginRequired(
+                credential_challenge_from_hint(hint),
+            )),
+        }
+    }
+
+    /// Login using identity details from a resume challenge.
+    pub async fn login_from_challenge(
+        &self,
+        challenge: CredentialLoginChallenge,
+        options: CredentialLoginOptions<'_>,
+    ) -> Result<AtpSession, ClientError> {
+        let identifier = challenge
+            .identifier
+            .map(CowStr::from)
+            .or(options.identifier)
+            .ok_or_else(|| {
+                ClientError::invalid_request("missing login identifier").with_help(
+                    "provide CredentialLoginOptions::identifier for an Any resume challenge",
+                )
+            })?;
+        self.login(
+            identifier,
+            options.password,
+            challenge.session_id.map(CowStr::from),
+            options.allow_takendown,
+            options.auth_factor_token,
+            options.pds,
+        )
+        .await
+    }
+
+    /// Login using identity details derived from a session hint.
+    pub async fn login_with_hint(
+        &self,
+        hint: &SessionHint,
+        options: CredentialLoginOptions<'_>,
+    ) -> Result<AtpSession, ClientError> {
+        self.login_from_challenge(credential_challenge_from_hint(hint), options)
+            .await
+    }
+
+    /// Resume a stored session if available, otherwise login using the provided options.
+    pub async fn resume_or_login(
+        &self,
+        hint: &SessionHint,
+        options: CredentialLoginOptions<'_>,
+    ) -> Result<AtpSession, ClientError>
+    where
+        S: SessionSelector<CredentialSessionMatch, Error = ClientError>,
+    {
+        match self.resume(hint).await? {
+            CredentialResumeResult::Resumed(session) => Ok(session),
+            CredentialResumeResult::LoginRequired(challenge) => {
+                self.login_from_challenge(challenge, options).await
+            }
+        }
     }
 
     /// Restore a previously persisted app-password session and set base endpoint.
@@ -311,58 +587,17 @@ where
         &self,
         did: Did,
         session_id: CowStr<'_>,
-    ) -> std::result::Result<(), ClientError>
-    where
-        S: Any + 'static,
-    {
+    ) -> std::result::Result<(), ClientError> {
         #[cfg(feature = "tracing")]
         let _span =
             tracing::info_span!("credential_session_restore", did = %did, session_id = %session_id)
                 .entered();
 
-        let key = SessionKey(did.clone(), SmolStr::from(session_id.clone()));
+        let key = SessionKey::new(did, SmolStr::from(session_id));
         let Some(sess) = self.store.get(&key).await else {
             return Err(ClientError::auth(AuthError::NotAuthenticated));
         };
-        // Try to read cached PDS; otherwise resolve via DID
-        let pds = if let Some(file_store) =
-            (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
-        {
-            file_store.get_atp_pds(&key).ok().flatten().or_else(|| None)
-        } else {
-            None
-        }
-        .unwrap_or({
-            let resp = self.client.resolve_did_doc(&did).await?;
-            resp.into_owned()?
-                .pds_endpoint()
-                .map(|u| u.to_owned())
-                .ok_or_else(|| {
-                    ClientError::invalid_request("missing PDS endpoint")
-                        .with_help("DID document must include a PDS service endpoint")
-                })?
-        });
-
-        // Activate
-        *self.key.write().await = Some(key.clone());
-        let pds_uri = jacquard_common::xrpc::normalize_base_uri(pds);
-        *self.endpoint.write().await = Some(pds_uri.clone());
-        // ensure store has the session (no-op if it existed)
-        self.store
-            .set(
-                SessionKey(
-                    sess.did.clone().convert::<SmolStr>(),
-                    SmolStr::from(session_id),
-                ),
-                sess,
-            )
-            .await?;
-        if let Some(file_store) =
-            (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
-        {
-            let _ = file_store.set_atp_pds(&key, &pds_uri);
-        }
-        Ok(())
+        self.activate_session(key, sess).await.map(|_| ())
     }
 
     /// Switch to a different stored session (and refresh endpoint/PDS).
@@ -370,41 +605,12 @@ where
         &self,
         did: Did,
         session_id: CowStr<'_>,
-    ) -> std::result::Result<(), ClientError>
-    where
-        S: Any + 'static,
-    {
-        let key = SessionKey(did.clone(), SmolStr::from(session_id));
-        if self.store.get(&key).await.is_none() {
+    ) -> std::result::Result<(), ClientError> {
+        let key = SessionKey::new(did, SmolStr::from(session_id));
+        let Some(sess) = self.store.get(&key).await else {
             return Err(ClientError::auth(AuthError::NotAuthenticated));
-        }
-        // Endpoint from store if cached, else resolve
-        let pds = if let Some(file_store) =
-            (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
-        {
-            file_store.get_atp_pds(&key).ok().flatten().or_else(|| None)
-        } else {
-            None
-        }
-        .unwrap_or({
-            let resp = self.client.resolve_did_doc(&did).await?;
-            resp.into_owned()?
-                .pds_endpoint()
-                .map(|u| u.to_owned())
-                .ok_or_else(|| {
-                    ClientError::invalid_request("missing PDS endpoint")
-                        .with_help("DID document must include a PDS service endpoint")
-                })?
-        });
-        *self.key.write().await = Some(key.clone());
-        let pds_uri = jacquard_common::xrpc::normalize_base_uri(pds);
-        *self.endpoint.write().await = Some(pds_uri.clone());
-        if let Some(file_store) =
-            (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
-        {
-            let _ = file_store.set_atp_pds(&key, &pds_uri);
-        }
-        Ok(())
+        };
+        self.activate_session(key, sess).await.map(|_| ())
     }
 
     /// Clear and delete the current session from the store.

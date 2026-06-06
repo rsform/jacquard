@@ -15,7 +15,7 @@ use jacquard_axum::service_auth::{
 };
 use jacquard_common::{
     bos::BosStr,
-    deps::smol_str::SmolStr,
+    deps::smol_str::{SmolStr, format_smolstr},
     service_auth::JwtHeader,
     types::{
         did::Did,
@@ -114,7 +114,7 @@ fn create_test_did_doc(did: &str, public_key: &k256::ecdsa::VerifyingKey) -> Did
         id: Did::new_owned(did).unwrap(),
         also_known_as: None,
         verification_method: Some(vec![VerificationMethod {
-            id: SmolStr::from(format!("{}#atproto", did)),
+            id: format_smolstr!("{}#atproto", did),
             r#type: SmolStr::new_static("Multikey"),
             controller: Some(SmolStr::from(did)),
             public_key_multibase: Some(SmolStr::from(multibase_key)),

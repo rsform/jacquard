@@ -8,7 +8,7 @@ use crate::{
 use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::{BosStr, IntoStatic};
 use serde::{Deserialize, Serialize};
-use smol_str::SmolStr;
+use smol_str::{SmolStr, ToSmolStr};
 use thiserror::Error;
 
 /// Errors that can occur when building AT Protocol OAuth client metadata.
@@ -248,7 +248,7 @@ where
         }
         let redir_str = redirect_uris.as_ref().map(|uris| {
             uris.iter()
-                .map(|u| SmolStr::from(u.as_str().trim_end_matches("/")))
+                .map(|u| u.as_str().trim_end_matches("/").to_smolstr())
                 .collect()
         });
         let query = serde_html_form::to_string(Parameters {

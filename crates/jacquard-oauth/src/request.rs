@@ -577,7 +577,7 @@ pub async fn par<
         .await?;
 
         let scopes = if let Some(scope) = &metadata.client_metadata.scope {
-            Scopes::new(SmolStr::from(scope.as_ref())).expect("Failed to parse scopes")
+            Scopes::new(scope.as_ref().to_smolstr()).expect("Failed to parse scopes")
         } else {
             Scopes::empty()
         };
@@ -655,7 +655,7 @@ where
     session_data.update_with_tokens(&TokenSet {
         iss,
         sub: session_data.token_set.sub.clone(),
-        aud: SmolStr::from(aud.as_str()),
+        aud: aud.as_str().to_smolstr(),
         scope: response.scope,
         access_token: response.access_token,
         refresh_token: response.refresh_token,
@@ -719,7 +719,7 @@ where
     Ok(TokenSet {
         iss,
         sub,
-        aud: SmolStr::from(aud.as_str()),
+        aud: aud.as_str().to_smolstr(),
         scope: token_response.scope,
         access_token: token_response.access_token,
         refresh_token: token_response.refresh_token,

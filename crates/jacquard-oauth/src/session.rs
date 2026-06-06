@@ -24,7 +24,7 @@ use jacquard_common::{
 };
 use jose_jwk::Key;
 use serde::{Deserialize, Serialize};
-use smol_str::{SmolStr, format_smolstr};
+use smol_str::{SmolStr, ToSmolStr, format_smolstr};
 use tokio::sync::Mutex;
 
 /// Provides DPoP key material and per-server nonces to the DPoP proof-building machinery.
@@ -139,7 +139,7 @@ impl<S: BosStr + Ord + AsRef<str>> ClientSessionData<S> {
     {
         if let Some(scope_str) = token_set.scope.as_ref() {
             // Parse scopes from the returned scope string, converting to the appropriate backing type
-            let scopes_smol = Scopes::new(SmolStr::from(scope_str.as_ref()))
+            let scopes_smol = Scopes::new(scope_str.as_ref().to_smolstr())
                 .expect("server returned invalid scopes in token refresh");
             self.scopes = scopes_smol.convert();
         }

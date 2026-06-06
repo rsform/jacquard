@@ -21,7 +21,7 @@ use jacquard_oauth::scopes::{
 use jacquard_oauth::session::SessionRegistry;
 use jacquard_oauth::session::{ClientData, ClientSessionData, DpopClientData};
 use jacquard_oauth::types::{OAuthAuthorizationServerMetadata, OAuthTokenType, TokenSet};
-use smol_str::SmolStr;
+use smol_str::{SmolStr, format_smolstr};
 use std::collections::BTreeSet;
 use tokio::sync::Mutex;
 
@@ -97,10 +97,10 @@ impl OAuthResolver for MockClient {
     ) -> Result<OAuthAuthorizationServerMetadata, jacquard_oauth::resolver::ResolverError> {
         let mut md = OAuthAuthorizationServerMetadata::default();
         md.issuer = SmolStr::from(issuer);
-        md.token_endpoint = SmolStr::from(format!("{}/token", issuer));
-        md.authorization_endpoint = SmolStr::from(format!("{}/authorize", issuer));
+        md.token_endpoint = format_smolstr!("{}/token", issuer);
+        md.authorization_endpoint = format_smolstr!("{}/authorize", issuer);
         md.require_pushed_authorization_requests = Some(true);
-        md.pushed_authorization_request_endpoint = Some(SmolStr::from(format!("{}/par", issuer)));
+        md.pushed_authorization_request_endpoint = Some(format_smolstr!("{}/par", issuer));
         md.token_endpoint_auth_methods_supported = Some(vec![SmolStr::from("none")]);
         md.dpop_signing_alg_values_supported = Some(vec![SmolStr::from("ES256")]);
         Ok(md)

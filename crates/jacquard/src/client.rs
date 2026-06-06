@@ -54,6 +54,8 @@ pub use jacquard_common::session::{MemorySessionStore, SessionStore, SessionStor
 use jacquard_common::types::blob::{Blob, MimeType};
 use jacquard_common::types::collection::Collection;
 #[cfg(feature = "api")]
+use jacquard_common::types::did_doc::DidDocument;
+#[cfg(feature = "api")]
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::recordkey::{RecordKey, Rkey};
 use jacquard_common::types::string::AtUri;
@@ -479,7 +481,7 @@ impl Default for MemoryCredentialSession {
 /// App password session information from `com.atproto.server.createSession`
 ///
 /// Contains the access and refresh tokens along with user identity information.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct AtpSession {
     /// Access token (JWT) used for authenticated requests
     pub access_jwt: SmolStr,
@@ -489,6 +491,28 @@ pub struct AtpSession {
     pub did: Did,
     /// User's handle (e.g., "alice.bsky.social")
     pub handle: Handle,
+    /// Account PDS endpoint, when known.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pds: Option<Uri<String>>,
+}
+
+impl AtpSession {
+    /// Return the known account PDS endpoint, if present.
+    pub fn pds_endpoint(&self) -> Option<&Uri<String>> {
+        self.pds.as_ref()
+    }
+
+    /// Merge a refresh response into this session, preserving the existing PDS unless
+    /// the refresh response contains a parseable DID document PDS endpoint.
+    #[cfg(feature = "api")]
+    pub fn merge_refresh(&mut self, output: RefreshSessionOutput) {
+        let pds = pds_from_data(output.did_doc.as_ref()).or_else(|| self.pds.clone());
+        self.access_jwt = output.access_jwt;
+        self.refresh_jwt = output.refresh_jwt;
+        self.did = output.did;
+        self.handle = output.handle;
+        self.pds = pds;
+    }
 }
 
 impl IntoStatic for AtpSession {
@@ -500,13 +524,23 @@ impl IntoStatic for AtpSession {
 }
 
 #[cfg(feature = "api")]
+pub(crate) fn pds_from_data<S: BosStr>(
+    data: Option<&jacquard_common::types::value::Data<S>>,
+) -> Option<Uri<String>> {
+    let doc: DidDocument = serde::Deserialize::deserialize(data?).ok()?;
+    doc.pds_endpoint().map(|uri| uri.to_owned())
+}
+
+#[cfg(feature = "api")]
 impl From<CreateSessionOutput> for AtpSession {
     fn from(output: CreateSessionOutput) -> Self {
+        let pds = pds_from_data(output.did_doc.as_ref());
         Self {
             access_jwt: output.access_jwt,
             refresh_jwt: output.refresh_jwt,
             did: output.did,
             handle: output.handle,
+            pds,
         }
     }
 }
@@ -514,11 +548,13 @@ impl From<CreateSessionOutput> for AtpSession {
 #[cfg(feature = "api")]
 impl From<RefreshSessionOutput> for AtpSession {
     fn from(output: RefreshSessionOutput) -> Self {
+        let pds = pds_from_data(output.did_doc.as_ref());
         Self {
             access_jwt: output.access_jwt,
             refresh_jwt: output.refresh_jwt,
             did: output.did,
             handle: output.handle,
+            pds,
         }
     }
 }
@@ -1239,7 +1275,7 @@ where
             CredentialSession::<S, T, W>::session_info(self)
                 .await
                 // Convert the SmolStr session id to CowStr<'static>.
-                .map(|key| (key.0, Some(key.1)))
+                .map(|key| (key.did, Some(key.session_id)))
         }
     }
     fn endpoint(&self) -> impl Future<Output = Uri<String>> {

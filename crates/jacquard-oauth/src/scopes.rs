@@ -3035,7 +3035,7 @@ mod tests {
     fn test_scopes_buffer_size_limit() {
         // Test buffer exceeding u16 limit is rejected.
         let too_long = "a".repeat(u16::MAX as usize + 1);
-        let smol = SmolStr::from(too_long.as_str());
+        let smol = too_long.as_str().to_smolstr();
         let result = Scopes::new(smol);
         assert!(result.is_err());
     }

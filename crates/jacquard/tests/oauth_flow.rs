@@ -7,13 +7,14 @@ use jacquard::BosStr;
 use jacquard::client::Agent;
 use jacquard::xrpc::XrpcClient;
 use jacquard_common::http_client::HttpClient;
+use jacquard_common::session::SessionHint;
 use jacquard_oauth::atproto::AtprotoClientMetadata;
 use jacquard_oauth::authstore::ClientAuthStore;
 use jacquard_oauth::client::OAuthClient;
 use jacquard_oauth::resolver::OAuthResolver;
 use jacquard_oauth::scopes::Scopes;
 use jacquard_oauth::session::ClientData;
-use smol_str::SmolStr;
+use smol_str::{SmolStr, format_smolstr};
 
 #[derive(Clone, Default)]
 struct MockClient {
@@ -120,10 +121,10 @@ impl OAuthResolver for MockClient {
     > {
         let mut md = jacquard_oauth::types::OAuthAuthorizationServerMetadata::default();
         md.issuer = SmolStr::from(issuer);
-        md.authorization_endpoint = SmolStr::from(format!("{}/authorize", issuer));
-        md.token_endpoint = SmolStr::from(format!("{}/token", issuer));
+        md.authorization_endpoint = format_smolstr!("{}/authorize", issuer);
+        md.token_endpoint = format_smolstr!("{}/token", issuer);
         md.require_pushed_authorization_requests = Some(true);
-        md.pushed_authorization_request_endpoint = Some(SmolStr::from(format!("{}/par", issuer)));
+        md.pushed_authorization_request_endpoint = Some(format_smolstr!("{}/par", issuer));
         md.token_endpoint_auth_methods_supported = Some(vec![SmolStr::from("none")]);
         md.dpop_signing_alg_values_supported = Some(vec![SmolStr::from("ES256")]);
         Ok(md)
@@ -314,4 +315,41 @@ async fn oauth_end_to_end_mock_flow() {
     assert_eq!(resp.status(), StatusCode::OK);
 
     let _ = std::fs::remove_file(&path);
+}
+
+#[tokio::test]
+async fn oauth_resume_or_start_auth_rejects_any_without_identity() {
+    let client = MockClient::default();
+    let store = jacquard::client::FileAuthStore::new({
+        let mut path = std::env::temp_dir();
+        path.push(format!(
+            "jacquard-oauth-any-reject-{}.json",
+            std::process::id()
+        ));
+        std::fs::write(&path, "{}").unwrap();
+        path
+    });
+    let oauth = OAuthClient::new_from_resolver(
+        store,
+        client,
+        ClientData {
+            keyset: None,
+            config: AtprotoClientMetadata::new_localhost(
+                None,
+                Some(Scopes::new(SmolStr::new_static("atproto rpc:*")).unwrap()),
+            ),
+        },
+    );
+
+    let err = match oauth
+        .resume_or_start_auth(
+            &SessionHint::Any,
+            jacquard_oauth::types::AuthorizeOptions::<SmolStr>::default(),
+        )
+        .await
+    {
+        Ok(_) => panic!("Any cannot start auth without identity"),
+        Err(err) => err,
+    };
+    assert!(err.to_string().contains("cannot start OAuth authorization"));
 }

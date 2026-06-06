@@ -151,7 +151,7 @@ impl ClientAuthStore for BrowserAuthStore {
 #[cfg(target_arch = "wasm32")]
 impl SessionStore<SessionKey, AtpSession> for BrowserAuthStore {
     fn get(&self, key: &SessionKey) -> impl Future<Output = Option<AtpSession>> + Send {
-        let key = Self::session_key(&key.0, &key.1);
+        let key = Self::session_key(&key.did, key.session_id.as_str());
         async move {
             match LocalStorage::get::<serde_json::Value>(&key) {
                 Ok(value) => {
@@ -170,7 +170,7 @@ impl SessionStore<SessionKey, AtpSession> for BrowserAuthStore {
         session: AtpSession,
     ) -> impl Future<Output = Result<(), SessionStoreError>> + Send {
         async move {
-            let key = Self::session_key(&key.0, &key.1);
+            let key = Self::session_key(&key.did, key.session_id.as_str());
 
             let value = serde_json::to_value(&session)
                 .map_err(|e| SessionStoreError::Other(format!("Serialize error: {}", e).into()))?;
@@ -184,7 +184,7 @@ impl SessionStore<SessionKey, AtpSession> for BrowserAuthStore {
     }
 
     fn del(&self, key: &SessionKey) -> impl Future<Output = Result<(), SessionStoreError>> + Send {
-        let key = Self::session_key(&key.0, &key.1);
+        let key = Self::session_key(&key.did, key.session_id.as_str());
         async move {
             LocalStorage::delete(&key);
             Ok(())
@@ -196,7 +196,7 @@ impl SessionStore<SessionKey, AtpSession> for BrowserAuthStore {
 #[cfg(target_arch = "wasm32")]
 impl SessionStore<SessionKey, SessionKey> for BrowserAuthStore {
     fn get(&self, key: &SessionKey) -> impl Future<Output = Option<SessionKey>> + Send {
-        let key = Self::session_key(&key.0, &key.1);
+        let key = Self::session_key(&key.did, key.session_id.as_str());
         async move {
             match LocalStorage::get::<serde_json::Value>(&key) {
                 Ok(value) => {
@@ -215,7 +215,7 @@ impl SessionStore<SessionKey, SessionKey> for BrowserAuthStore {
         session: SessionKey,
     ) -> impl Future<Output = Result<(), SessionStoreError>> + Send {
         async move {
-            let key = Self::session_key(&key.0, &key.1);
+            let key = Self::session_key(&key.did, key.session_id.as_str());
 
             let value = serde_json::to_value(&session)
                 .map_err(|e| SessionStoreError::Other(format!("Serialize error: {}", e).into()))?;
@@ -229,7 +229,7 @@ impl SessionStore<SessionKey, SessionKey> for BrowserAuthStore {
     }
 
     fn del(&self, key: &SessionKey) -> impl Future<Output = Result<(), SessionStoreError>> + Send {
-        let key = Self::session_key(&key.0, &key.1);
+        let key = Self::session_key(&key.did, key.session_id.as_str());
         async move {
             LocalStorage::delete(&key);
             Ok(())

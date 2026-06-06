@@ -97,8 +97,9 @@ async fn agent_delegates_to_session_and_refreshes() {
         refresh_jwt: "ref1".into(),
         did: Did::new_static("did:plc:alice").unwrap(),
         handle: Handle::new_static("alice.bsky.social").unwrap(),
+        pds: None,
     };
-    let key = SessionKey(atp.did.clone(), "session".into());
+    let key = SessionKey::new(atp.did.clone(), "session");
     jacquard_common::session::SessionStore::set(store.as_ref(), key.clone(), atp)
         .await
         .unwrap();

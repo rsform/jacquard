@@ -1,8 +1,8 @@
 use crate::{
     atproto::atproto_client_metadata,
-    authstore::ClientAuthStore,
+    authstore::{ClientAuthStore, OAuthSessionMatch},
     dpop::DpopExt,
-    error::{CallbackError, Result},
+    error::{CallbackError, OAuthError, Result},
     request::{OAuthMetadata, exchange_code, par},
     resolver::OAuthResolver,
     scopes::Scopes,
@@ -25,6 +25,7 @@ use jacquard_common::{
     deps::fluent_uri::Uri,
     error::{AuthError, ClientError, XrpcResult},
     http_client::HttpClient,
+    session::{SessionHint, SessionSelector, SessionStoreError},
     types::{did::Did, string::Handle},
     xrpc::{
         CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest, XrpcResp, XrpcResponse,
@@ -49,6 +50,18 @@ use jose_jwk::JwkSet;
 use smol_str::{SmolStr, ToSmolStr};
 use std::{str::FromStr, sync::Arc};
 use tokio::sync::RwLock;
+
+/// Result of resuming an OAuth session or starting a new authorization flow.
+pub enum OAuthResumeOrLogin<T, S>
+where
+    T: OAuthResolver,
+    S: ClientAuthStore,
+{
+    /// A stored session was found and restored/refreshed.
+    Resumed(OAuthSession<T, S>),
+    /// No stored session matched; redirect the user to this login URL.
+    LoginUrl(String),
+}
 
 /// The top-level OAuth client responsible for driving the authorization flow.
 pub struct OAuthClient<T, S>
@@ -331,7 +344,7 @@ where
         {
             Ok(token_set) => {
                 let scopes = if let Some(scope) = &token_set.scope {
-                    Scopes::new(SmolStr::from(scope.as_str()))
+                    Scopes::new(scope.as_str().to_smolstr())
                         .expect("Failed to parse scopes from token response")
                 } else {
                     Scopes::empty()
@@ -380,6 +393,55 @@ where
             .await
     }
 
+    /// Resume a stored session for `input`, or begin OAuth authorization and return a login URL.
+    pub async fn resume_or_start_auth_for<Str: BosStr>(
+        &self,
+        input: impl AsRef<str>,
+        options: AuthorizeOptions<Str>,
+    ) -> Result<OAuthResumeOrLogin<T, S>>
+    where
+        S: SessionSelector<OAuthSessionMatch, Error = SessionStoreError>,
+        Str: FromStr + Ord + Clone + core::fmt::Debug,
+        <Str as FromStr>::Err: core::fmt::Debug,
+    {
+        let input = input.as_ref();
+        let hint = oauth_hint_from_input(input);
+        match self.registry.store.select_session(&hint).await? {
+            Some(matched) => Ok(OAuthResumeOrLogin::Resumed(
+                self.restore(&matched.key.did, matched.key.session_id.as_str())
+                    .await?,
+            )),
+            None => Ok(OAuthResumeOrLogin::LoginUrl(
+                self.start_auth(input, options).await?,
+            )),
+        }
+    }
+
+    /// Resume a stored session for `hint`, or begin OAuth authorization from the hint identity.
+    pub async fn resume_or_start_auth<Str: BosStr>(
+        &self,
+        hint: &SessionHint,
+        options: AuthorizeOptions<Str>,
+    ) -> Result<OAuthResumeOrLogin<T, S>>
+    where
+        S: SessionSelector<OAuthSessionMatch, Error = SessionStoreError>,
+        Str: FromStr + Ord + Clone + core::fmt::Debug,
+        <Str as FromStr>::Err: core::fmt::Debug,
+    {
+        match self.registry.store.select_session(hint).await? {
+            Some(matched) => Ok(OAuthResumeOrLogin::Resumed(
+                self.restore(&matched.key.did, matched.key.session_id.as_str())
+                    .await?,
+            )),
+            None => {
+                let input = oauth_start_auth_input_from_hint(hint)?;
+                Ok(OAuthResumeOrLogin::LoginUrl(
+                    self.start_auth(input, options).await?,
+                ))
+            }
+        }
+    }
+
     /// Revoke a session by deleting it from the backing store.
     ///
     /// Note: this removes the session from local storage but does **not** call the authorization
@@ -391,6 +453,28 @@ where
         session_id: &str,
     ) -> Result<()> {
         Ok(self.registry.del(did, session_id).await?)
+    }
+}
+
+fn oauth_hint_from_input(input: &str) -> SessionHint<SmolStr> {
+    if let Ok(did) = Did::new(input) {
+        SessionHint::Did(did.convert())
+    } else if let Ok(handle) = Handle::new(input) {
+        SessionHint::Handle(handle.convert())
+    } else {
+        SessionHint::Identifier(SmolStr::from(input))
+    }
+}
+
+fn oauth_start_auth_input_from_hint(hint: &SessionHint) -> Result<SmolStr> {
+    match hint {
+        SessionHint::Did(did) => Ok(did.as_ref().to_smolstr()),
+        SessionHint::Handle(handle) => Ok(handle.as_ref().to_smolstr()),
+        SessionHint::Key(key) => Ok(key.did.as_str().to_smolstr()),
+        SessionHint::Identifier(identifier) => Ok(identifier.clone()),
+        SessionHint::Any => Err(OAuthError::InvalidRequest(
+            "cannot start OAuth authorization from SessionHint::Any without an identity".into(),
+        )),
     }
 }
 
